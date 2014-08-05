@@ -1,0 +1,245 @@
+/*
+
+PICCANTE
+The hottest HDR imaging library!
+http://vcg.isti.cnr.it/piccante
+
+Copyright (C) 2014
+Visual Computing Laboratory - ISTI CNR
+http://vcg.isti.cnr.it
+First author: Francesco Banterle
+
+PICCANTE is free software; you can redistribute it and/or modify
+under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation; either version 3.0 of
+the License, or (at your option) any later version.
+
+PICCANTE is distributed in the hope that it will be useful, but
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License
+( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+
+*/
+
+#ifndef PIC_FILTERING_FILTER_TRANSFORM_2D_HPP
+#define PIC_FILTERING_FILTER_TRANSFORM_2D_HPP
+
+#include "util/matrix_3_x_3.hpp"
+
+#include "filtering/filter.hpp"
+#include "image_samplers/image_sampler_bilinear.hpp"
+
+namespace pic {
+
+class FilterWarp2D: public Filter
+{
+protected:
+    ImageSamplerBilinear    isb;
+    Matrix3x3               h, h_inv;
+
+    int                     bmin[2], bmax[2];
+
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    {
+        int channels = src[0]->channels;
+
+        float pos[2], mid[2], pos_out[2];
+
+        if(bCentroid) {
+            mid[0] = src[0]->widthf  * 0.5f;
+            mid[1] = src[0]->heightf * 0.5f;
+        } else {
+            mid[0] = 0.0f;
+            mid[1] = 0.0f;
+        }
+
+        for(int j = box->y0; j < box->y1; j++) {
+            pos[1] = float(j + bmin[1]) - mid[1];
+
+            for(int i = box->x0; i < box->x1; i++) {
+                float *tmp_dst = (*dst)(i, j);
+
+                pos[0] = float(i + bmin[0] ) - mid[0];
+
+                h_inv.Projection(pos, pos_out);
+
+                pos_out[0] += mid[0];
+                pos_out[1] += mid[1];
+
+                if(pos_out[0] >= 0.0f && pos_out[0] <= src[0]->width1f &&
+                   pos_out[1] >= 0.0f && pos_out[1] <= src[0]->height1f) {
+                    isb.SampleImageUC(src[0], pos_out[0], pos_out[1], tmp_dst);
+                } else {
+                    for(int k=0; k<channels; k++) {
+                        tmp_dst[k] = 0.0f;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @brief ComputingBoundingBox calculates the bounding box of imgOut.
+     * @param width
+     * @param height
+     * @param bmin
+     * @param bmax
+     */
+    void ComputingBoundingBox(float width, float height, int *bmin, int *bmax) {
+        float bbox[4][2];
+        float bbox_out[4][2];
+
+        bbox[0][0] = 0.0f;
+        bbox[0][1] = 0.0f;
+
+        bbox[1][0] = 0.0f;
+        bbox[1][1] = height;
+
+        bbox[2][0] = width;
+        bbox[2][1] = 0.0f;
+
+        bbox[3][0] = width;
+        bbox[3][1] = height;
+
+        float mid[2];
+
+        if(bCentroid) {
+            mid[0] = width  * 0.5f;
+            mid[1] = height * 0.5f;
+        } else {
+            mid[0] = 0.0f;
+            mid[1] = 0.0f;
+        }
+
+        //Computing the bounding box
+        bmin[0] = 1 << 30;
+        bmin[1] = bmin[0];
+
+        bmax[0] = - (1 << 30);
+        bmax[1] = bmax[0];
+
+        for(int i=0;i<4;i++) {
+
+            bbox[i][0] -= mid[0];
+            bbox[i][1] -= mid[1];
+
+            h.Projection(&bbox[i][0], &bbox_out[i][0]);
+
+            bbox_out[i][0] += mid[0];
+            bbox_out[i][1] += mid[1];
+
+            int x = int(bbox_out[i][0]);
+            int y = int(bbox_out[i][1]);
+
+            //min point
+            if(x < bmin[0]) {
+                bmin[0] = x;
+            }
+
+            if(y < bmin[1]) {
+                bmin[1] = y;
+            }
+
+            //max point
+            if(x > bmax[0]) {
+                bmax[0] = x;
+            }
+
+            if(y > bmax[1]) {
+                bmax[1] = y;
+            }                     
+        }
+    }
+
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+    {
+        if(imgOut != NULL) {
+            return imgOut;
+        }
+
+        if(!bSameSize) {
+            ComputingBoundingBox(imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax);
+            imgOut = new ImageRAW(1, bmax[0] - bmin[0], bmax[1] - bmin[1], imgIn[0]->channels);
+        } else {
+            bmin[0] = 0;
+            bmin[1] = 0;
+
+            bmax[0] = imgIn[0]->width;
+            bmax[1] = imgIn[0]->height;
+
+            imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, imgIn[0]->channels);
+        }
+
+        return imgOut;
+    }    
+
+    bool bSameSize, bCentroid;
+
+public:
+    //Basic constructors
+    FilterWarp2D()
+    {
+        this->bCentroid = false;
+        this->bSameSize = false;
+
+        h.Identity();
+        h_inv.Identity();
+    }
+
+    //Basic constructors
+    FilterWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
+    {
+        Update(h, bSameSize, bCentroid);
+    }
+
+    void Update(Matrix3x3 h, bool bSameSize, bool bCentroid = false)
+    {
+        this->bSameSize = bSameSize;
+        this->bCentroid = bCentroid;
+
+        this->h = h;
+        h.Inverse(&h_inv);
+    }
+
+    /**Output size*/
+    void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        if(!bSameSize) {
+            ComputingBoundingBox(imgIn->widthf, imgIn->heightf, bmin, bmax);
+
+            width  = bmax[0] - bmin[0];
+            height = bmax[1] - bmin[1];
+        } else {
+            width  = imgIn->width;
+            height = imgIn->height;
+        }
+\
+        frames   = imgIn->frames;
+        channels = imgIn->channels;
+    }
+
+    static ImageRAW *Execute(ImageRAW *img, ImageRAW *imgOut, Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
+    {
+        FilterWarp2D flt(h, bSameSize, bCentroid);
+        imgOut = flt.ProcessP(Single(img), imgOut);
+        return imgOut;
+    }
+};
+
+} // end namespace pic
+
+#endif /* PIC_FILTERING_FILTER_LUMINANCE_HPP */
+

@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>filesaveas.ico</file>
+        <file>fileopen.ico</file>
+        <file>exit.ico</file>
+        <file>zoom_out.ico</file>
+        <file>zoom_original.ico</file>
+        <file>zoom_in.ico</file>
+        <file>zoom_fit_best.ico</file>
+    </qresource>
+</RCC>

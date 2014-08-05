@@ -1,0 +1,98 @@
+/*
+
+PICCANTE
+The hottest HDR imaging library!
+http://vcg.isti.cnr.it/piccante
+
+Copyright (C) 2014
+Visual Computing Laboratory - ISTI CNR
+http://vcg.isti.cnr.it
+First author: Francesco Banterle
+
+PICCANTE is free software; you can redistribute it and/or modify
+under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation; either version 3.0 of
+the License, or (at your option) any later version.
+
+PICCANTE is distributed in the hope that it will be useful, but
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License
+( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+
+*/
+
+#ifndef PIC_COLORS_COLOR_CONV_XYZ_TO_CIELAB_HPP
+#define PIC_COLORS_COLOR_CONV_XYZ_TO_CIELAB_HPP
+
+#include "colors/color_conv.hpp"
+
+namespace pic {
+
+const float C_SIX_OVER_TWENTY_NINE          = 0.20689655172413793103448275862069f;
+const float C_SIX_OVER_TWENTY_NINE_CUBIC    = 0.00885645167903563081717167575546f;
+// (29/6)^2 / 3
+const float C_CIELAB_C1                     = 7.787037037037037037037037037037f;
+// (6/29)^2 * 3
+const float C_CIELAB_C1_INV                 = 0.12841854934601664684898929845422f;
+const float C_FOUR_OVER_TWENTY_NINE         = 0.13793103448275862068965517241379f;
+
+class ColorConvXYZtoCIELAB: public ColorConv
+{
+protected:
+
+    float		white_point[3];
+
+public:
+
+    ColorConvXYZtoCIELAB()
+    {
+        white_point[0] = 1.0f;
+        white_point[1] = 1.0f;
+        white_point[2] = 1.0f;
+    }
+
+    ///from XYZ to CIE LAB
+    void direct(float *colIn, float *colOut)
+    {
+        float fY_Yn = f(colIn[1] / white_point[1]);
+
+        colOut[0] = 116.0f * fY_Yn - 16.0f;
+        colOut[1] = 500.0f * (f(colIn[0] / white_point[0]) - fY_Yn);
+        colOut[2] = 200.0f * (fY_Yn - f(colIn[2] / white_point[2]));
+    }
+
+    ///from CIE LAB to XYZ
+    void inverse(float *colIn, float *colOut)
+    {
+        float tmp = (colIn[0] + 16.0f) / 116.0f;
+
+        colOut[1] = white_point[1] * f_inv(tmp);
+        colOut[0] = white_point[0] * f_inv(tmp + colIn[1]/500.0f);
+        colOut[2] = white_point[2] * f_inv(tmp - colIn[2]/200.0f);
+    }
+
+    static float f(float t)
+    {
+        if(t > C_SIX_OVER_TWENTY_NINE_CUBIC) {
+            return powf(t, 1.0f / 3.0f);
+        } else {
+            return C_CIELAB_C1 * t +
+                   C_FOUR_OVER_TWENTY_NINE;
+        }
+    }
+
+    static float f_inv(float t)
+    {
+        if(t > C_SIX_OVER_TWENTY_NINE ){
+            return powf(t, 3.0f);
+        } else {
+            return (t - C_FOUR_OVER_TWENTY_NINE) * C_CIELAB_C1_INV;
+        }
+    }
+};
+
+} // end namespace pic
+
+#endif /* PIC_COLORS_COLOR_SPACE_CIELAB_HPP */
+

@@ -1,0 +1,247 @@
+/*
+
+PICCANTE
+The hottest HDR imaging library!
+http://vcg.isti.cnr.it/piccante
+
+Copyright (C) 2014
+Visual Computing Laboratory - ISTI CNR
+http://vcg.isti.cnr.it
+First author: Francesco Banterle
+
+PICCANTE is free software; you can redistribute it and/or modify
+under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation; either version 3.0 of
+the License, or (at your option) any later version.
+
+PICCANTE is distributed in the hope that it will be useful, but
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License
+( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+
+*/
+
+#ifndef PIC_GL_FILTERING_FILTER_BILATERAL_2DF_HPP
+#define PIC_GL_FILTERING_FILTER_BILATERAL_2DF_HPP
+
+#include "gl/filtering/filter.hpp"
+
+namespace pic {
+
+class FilterGLBilateral2DF: public FilterGL
+{
+protected:
+    float sigma_s, sigma_r;
+
+    void InitShaders();
+    void FragmentShader();
+
+public:
+    //Basic constructors
+    FilterGLBilateral2DF();
+    //Init constructors
+    FilterGLBilateral2DF(float sigma_s, float sigma_r);
+
+    void Update(float sigma_s, float sigma_r);
+
+    //Processing
+    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+
+    /***/
+    static ImageRAWGL *Execute(std::string nameIn,
+                               std::string nameOut,
+                               float sigma_s, float sigma_r)
+    {
+        //Load the image
+        ImageRAWGL imgIn(nameIn);
+        imgIn.generateTextureGL(false);
+
+        //Filtering
+        FilterGLBilateral2DF filter(sigma_s, sigma_r);
+
+        long t0 = timeGetTime();
+        ImageRAWGL *imgRet = filter.Process(SingleGL(&imgIn), NULL);
+        long t1 = timeGetTime();
+        printf("Full Bilateral Filter time: %ld\n", t1 - t0);
+
+        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 4, IMG_CPU);
+        imgOut->readFromFBO(filter.getFbo());
+
+        //Write image out
+        imgOut->Write(nameOut);
+        return imgRet;
+    }
+};
+
+//Basic constructor
+FilterGLBilateral2DF::FilterGLBilateral2DF(): FilterGL()
+{
+}
+
+//Constructor
+FilterGLBilateral2DF::FilterGLBilateral2DF(float sigma_s,
+        float sigma_r): FilterGL()
+{
+    //protected values are assigned/computed
+    this->sigma_s = sigma_s;
+    this->sigma_r = sigma_r;
+
+    FragmentShader();
+    InitShaders();
+}
+
+void FilterGLBilateral2DF::FragmentShader()
+{
+    fragment_source = GLW_STRINGFY
+                      (
+                          uniform sampler2D u_tex;
+                          uniform float     sigmas2;
+                          uniform float     sigmar2;
+                          uniform int       TOKEN_BANANA;
+                          out     vec4      f_color;
+
+    void main(void) {
+        vec3  color = vec3(0.0, 0.0, 0.0);
+        ivec2 coordsFrag = ivec2(gl_FragCoord.xy);
+        vec3 tmpCol;
+
+        vec3 colRef = texelFetch(u_tex, coordsFrag, 0).xyz;
+
+        float weight = 0.0;
+
+        for(int i = -TOKEN_BANANA; i < TOKEN_BANANA; i++) {
+            for(int j = -TOKEN_BANANA; j < TOKEN_BANANA; j++) {
+                //Coordinates
+                ivec2 coords = ivec2(i, j);
+                //Texture fetch
+                tmpCol = texelFetch(u_tex, coordsFrag.xy + coords.xy, 0).xyz;
+                vec3 tmpCol2 = tmpCol - colRef;
+                float dstR = dot(tmpCol2.xyz, tmpCol2.xyz);
+                float tmp = exp(-dstR / sigmar2 - float(coords.x * coords.x + coords.y *
+                                                        coords.y) / sigmas2);
+                color.xyz += tmpCol * tmp;
+                weight += tmp;
+            }
+        }
+
+        color = weight > 0.0 ? color / weight : colRef;
+        f_color = vec4(color.xyz, 1.0);
+    }
+                      );
+}
+
+//Generating shaders
+void FilterGLBilateral2DF::InitShaders()
+{
+    std::string prefix;
+    prefix += glw::version("330");
+//	prefix += glw::ext_require("GL_EXT_gpu_shader4");
+    filteringProgram.setup(prefix, vertex_source, fragment_source);
+
+#ifdef PIC_DEBUG
+    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+#endif
+
+    glw::bind_program(filteringProgram);
+    filteringProgram.attribute_source("a_position", 0);
+    filteringProgram.fragment_target("f_color",    0);
+    glw::bind_program(0);
+    Update(-1.0f, -1.0f);
+}
+
+void FilterGLBilateral2DF::Update(float sigma_s, float sigma_r)
+{
+
+    if(sigma_s > 0.0f) {
+        this->sigma_s = sigma_s;
+    }
+
+    if(sigma_r > 0.0f) {
+        this->sigma_r = sigma_r;
+    }
+
+    float sigmas2 = 2.0 * this->sigma_s * this->sigma_s;
+    float sigmar2 = 2.0 * this->sigma_r * this->sigma_r;
+
+    //Precomputation of the Gaussian Kernel
+    int kernelSize = PrecomputedGaussian::KernelSize(this->sigma_s);
+
+    //Poisson samples
+
+#ifdef PIC_DEBUG
+    printf("Window: %d\n", kernelSize);
+#endif
+
+    glw::bind_program(filteringProgram);
+    filteringProgram.relink();
+    filteringProgram.uniform("u_tex",           0);
+    filteringProgram.uniform("sigmas2",         sigmas2);
+    filteringProgram.uniform("sigmar2",         sigmar2);
+    filteringProgram.uniform("TOKEN_BANANA",    kernelSize>>1);
+    glw::bind_program(0);
+}
+
+//Processing
+ImageRAWGL *FilterGLBilateral2DF::Process(ImageRAWGLVec imgIn,
+        ImageRAWGL *imgOut)
+{
+    if(imgIn[0] == NULL) {
+        return imgOut;
+    }
+
+    int w = imgIn[0]->width;
+    int h = imgIn[0]->height;
+
+    if(imgOut == NULL) {
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+    }
+
+    if(fbo == NULL) {
+        fbo = new Fbo();
+    }
+
+    fbo->create(w, h, 1, false, imgOut->getTexture());
+
+    ImageRAWGL *edge, *base;
+
+    if(imgIn.size() == 2) {
+        //Joint/Cross Bilateral Filtering
+        base = imgIn[0];
+        edge = imgIn[1];
+    } else {
+        base = imgIn[0];
+        edge = imgIn[0];
+    }
+
+    //Rendering
+    fbo->bind();
+    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+
+    //Shaders
+    glw::bind_program(filteringProgram);
+
+    //Textures
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, base->getTexture());
+
+    //Rendering aligned quad
+    quad->Render();
+
+    //Fbo
+    fbo->unbind();
+
+    //Shaders
+    glw::bind_program(0);
+
+    //Textures
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return imgOut;
+}
+
+} // end namespace pic
+
+#endif /* PIC_GL_FILTERING_FILTER_BILATERAL_2DF_HPP */
+
