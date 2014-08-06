@@ -51,7 +51,7 @@ namespace pic {
  * @param points1 is an array of points computed from image 2.
  * @return It returns the homography matrix H.
  */
-Eigen::Matrix3d EstimateHomography(std::vector< Vec<2, float> > points0, std::vector< Vec<2, float> > points1)
+Eigen::Matrix3d EstimateHomography(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1)
 {
     Eigen::Matrix3d  H;
 
@@ -61,7 +61,7 @@ Eigen::Matrix3d EstimateHomography(std::vector< Vec<2, float> > points0, std::ve
     }
 
     //shifting and scaling points for numerical stability
-    std::vector< Vec<2, float> > tmp_points0, tmp_points1;
+    std::vector< Eigen::Vector2f > tmp_points0, tmp_points1;
     tmp_points0.assign(points0.begin(), points0.end());
     tmp_points1.assign(points1.begin(), points1.end());
 
@@ -131,7 +131,7 @@ Eigen::Matrix3d EstimateHomography(std::vector< Vec<2, float> > points0, std::ve
  * @param maxIterations
  * @return
  */
-Eigen::Matrix3d EstimateHomographyRansac(std::vector< Vec<2, float> > points0, std::vector< Vec<2, float> > points1,
+Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1,
                                          std::vector< unsigned int > &inliers, unsigned int maxIterations = 100, double threshold = 4.0)
 {
     if(points0.size() < 5) {
@@ -139,8 +139,8 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Vec<2, float> > points0, s
     }
 
     Eigen::Matrix3d H;
-    std::vector< Vec<2, float> > sub_points0;
-    std::vector< Vec<2, float> > sub_points1;
+    std::vector< Eigen::Vector2f > sub_points0;
+    std::vector< Eigen::Vector2f > sub_points1;
 
     int nSubSet = 4;
     sub_points0.reserve(nSubSet);
@@ -171,12 +171,8 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Vec<2, float> > points0, s
         std::vector< unsigned int > tmp_inliers;
 
         for(unsigned int j = 0; j < n; j++) {
-
-            Eigen::Vector3d pp;
-            pp[0] = tmpH(0, 0) * points0[j][0] + tmpH(0, 1) * points0[j][1] + tmpH(0, 2);
-            pp[1] = tmpH(1, 0) * points0[j][0] + tmpH(1, 1) * points0[j][1] + tmpH(1, 2);
-            pp[2] = tmpH(2, 0) * points0[j][0] + tmpH(2, 1) * points0[j][1] + tmpH(2, 2);
-
+            Eigen::Vector3d point_hom = Eigen::Vector3d(points0[j][0], points0[j][1], 1.0);
+            Eigen::Vector3d pp = tmpH * point_hom;
             pp /= pp[2];
 
             double dx = points1[j][0] - pp[0];
@@ -223,7 +219,7 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Vec<2, float> > points0, s
  * @param points1 is an array of points computed from image 2.
  * @return It returns the fundamental matrix, F_{1,2}.
  */
-Eigen::Matrix3d EstimateFundamental(std::vector< Vec<2, float> > &points0, std::vector< Vec<2, float> > &points1)
+Eigen::Matrix3d EstimateFundamental(std::vector< Eigen::Vector2f > &points0, std::vector< Eigen::Vector2f > &points1)
 {
     Eigen::Matrix3d F;
 
@@ -233,7 +229,7 @@ Eigen::Matrix3d EstimateFundamental(std::vector< Vec<2, float> > &points0, std::
     }
 
     //shifting and scaling points for numerical stability
-    std::vector< Vec<2, float> > tmp_points0, tmp_points1;
+    std::vector< Eigen::Vector2f > tmp_points0, tmp_points1;
     tmp_points0.assign(points0.begin(), points0.end());
     tmp_points1.assign(points1.begin(), points1.end());
 
@@ -303,7 +299,7 @@ Eigen::Matrix3d EstimateFundamental(std::vector< Vec<2, float> > &points0, std::
  * @param maxIterations
  * @return
  */
-Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Vec<2, float> > points0, std::vector< Vec<2, float> > points1,
+Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1,
                                           std::vector< unsigned int > &inliers, unsigned int maxIterations = 100, double threshold = 0.01)
 {
     if(points0.size() < 9) {
@@ -311,8 +307,8 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Vec<2, float> > points0, 
     }
 
     Eigen::Matrix3d F;
-    std::vector< Vec<2, float> > sub_points0;
-    std::vector< Vec<2, float> > sub_points1;
+    std::vector< Eigen::Vector2f > sub_points0;
+    std::vector< Eigen::Vector2f > sub_points1;
 
     int nSubSet = 8;
     sub_points0.reserve(nSubSet);
@@ -403,7 +399,7 @@ Eigen::Matrix3d noramalizeFundamentalMatrix(Eigen::Matrix3d F)
 
     Eigen::Matrix3d F_new = Uf * DiagonalMatrix(Df) * Eigen::Transpose< Eigen::Matrix3d >(Vf);
 
-    float norm = MAX(Df[0], Df[1]);
+    double norm = MAX(Df[0], Df[1]);
     return F_new / norm;
 }
 
@@ -461,21 +457,13 @@ void filterInliers(std::vector< T > &vec, std::vector< unsigned int > &inliers, 
 {
     vecOut.clear();
 
-    for(unsigned int i = 0; i < inliers.size(); i++) {
-        vecOut.push_back(vec[inliers[i]]);
+    if(!inliers.empty()) {
+        for(unsigned int i = 0; i < inliers.size(); i++) {
+            vecOut.push_back(vec[inliers[i]]);
+        }
+    } else {
+        vecOut.assign(vec.begin(), vec.end());
     }
-}
-
-/**
- * @brief RotationMatrixRefinement
- * @param R
- * @return
- */
-Eigen::Matrix3d RotationMatrixRefinement(Eigen::Matrix3d &R)
-{
-    Eigen::Quaternion<double> reg(R);
-
-    return reg.toRotationMatrix();
 }
 
 /**
@@ -842,7 +830,7 @@ Eigen::Vector3d triangulationHartleySturm(Eigen::Vector3d point_0, Eigen::Vector
  * @return
  */
 bool decomposeEssentialMatrixWithConfiguration(Eigen::Matrix3d &E, Eigen::Matrix3d &K0, Eigen::Matrix3d &K1,
-                                               std::vector< Vec<2, float> > &points0, std::vector< Vec<2, float> > &points1,
+                                               std::vector< Eigen::Vector2f > &points0, std::vector< Eigen::Vector2f > &points1,
                                                Eigen::Matrix3d &R, Eigen::Vector3d &t)
 {
     if(points0.size() != points1.size()) {

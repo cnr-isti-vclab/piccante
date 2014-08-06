@@ -210,6 +210,18 @@ Eigen::Vector3d rigidTransform(Eigen::Vector3d &point, Eigen::Matrix3d &R, Eigen
 }
 
 /**
+ * @brief RotationMatrixRefinement
+ * @param R
+ * @return
+ */
+Eigen::Matrix3d RotationMatrixRefinement(Eigen::Matrix3d &R)
+{
+    Eigen::Quaternion<double> reg(R);
+
+    return reg.toRotationMatrix();
+}
+
+/**
  * @brief MatrixConvert converts a matrix from a Eigen::Matrix3f representation
  * into a Matrix3x3 representation.
  * @param mat is an Eigen 3x3 matrix.
@@ -263,7 +275,28 @@ Matrix3x3 MatrixConvert(Eigen::Matrix3d &mat)
  * @param mat
  * @return
  */
-float *getLinearArrayFromMatrix(Eigen::MatrixXd mat)
+float *getLinearArrayFromMatrix(Eigen::Matrix3d &mat)
+{
+    int n = mat.cols() * mat.rows();
+
+    float *ret = new float[n];
+    int c = 0;
+    for(int i = 0; i < mat.rows(); i++) {
+        for(int j = 0; j < mat.cols(); j++) {
+            ret[c] = mat(i, j);
+            c++;
+        }
+    }
+
+    return ret;
+}
+
+/**
+ * @brief getLinearArray
+ * @param mat
+ * @return
+ */
+float *getLinearArrayFromMatrix(Eigen::Matrix3f &mat)
 {
     int n = mat.cols() * mat.rows();
 
@@ -286,7 +319,28 @@ float *getLinearArrayFromMatrix(Eigen::MatrixXd mat)
  * @param cols
  * @return
  */
-Eigen::MatrixXd getMatrixFromLinearArray(float *array, int rows, int cols)
+Eigen::MatrixXf getMatrixfFromLinearArray(float *array, int rows, int cols)
+{
+    Eigen::MatrixXf ret = Eigen::MatrixXf(rows, cols);
+
+    int c = 0;
+    for(int i = 0; i < rows; i++) {
+        for(int j = 0; j < cols; j++) {
+            ret(i, j) = array[c];
+            c++;
+        }
+    }
+    return ret;
+}
+
+/**
+ * @brief getMatrixFromLinearArray
+ * @param array
+ * @param rows
+ * @param cols
+ * @return
+ */
+Eigen::MatrixXd getMatrixdFromLinearArray(float *array, int rows, int cols)
 {
     Eigen::MatrixXd ret = Eigen::MatrixXd(rows, cols);
 

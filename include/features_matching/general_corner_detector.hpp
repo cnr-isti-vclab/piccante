@@ -113,7 +113,7 @@ public:
      * @param points
      * @return It returns the scaling factor and the original center.
      */
-    static Eigen::Vector3f NormalizePoints(std::vector< Vec<2, float> > &points)
+    static Eigen::Vector3f NormalizePoints(std::vector< Eigen::Vector2f > &points)
     {
         Eigen::Vector3f ret;
 
