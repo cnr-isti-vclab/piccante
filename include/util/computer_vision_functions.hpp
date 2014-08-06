@@ -743,7 +743,7 @@ Eigen::Vector3d triangulationLonguetHiggins(Eigen::Vector3d &point_0, Eigen::Vec
  * @param t
  * @return
  */
-Eigen::Vector3d triangulationHartleySturm(Eigen::Vector3d point_0, Eigen::Vector3d point_1,
+Eigen::Vector4d triangulationHartleySturm(Eigen::Vector3d point_0, Eigen::Vector3d point_1,
                                           Eigen::MatrixXd M0, Eigen::MatrixXd M1, int maxIter = 100)
 {
 
@@ -808,13 +808,7 @@ Eigen::Vector3d triangulationHartleySturm(Eigen::Vector3d point_0, Eigen::Vector
         printf("triangulationHartleySturm's Iterations: %d\n",j);
     #endif
 
-    Eigen::Vector3d ret;
-
-    ret[0] = x[0];
-    ret[1] = x[1];
-    ret[2] = x[2];
-
-    return ret;
+    return x;
 }
 
 
@@ -866,10 +860,11 @@ bool decomposeEssentialMatrixWithConfiguration(Eigen::Matrix3d &E, Eigen::Matrix
             Eigen::Vector3d point_0 = Eigen::Vector3d(points0[i][0], points0[i][1], 1.0);
             Eigen::Vector3d point_1 = Eigen::Vector3d(points1[i][0], points1[i][1], 1.0);
 
-            Eigen::Vector3d p_3d_0 = triangulationHartleySturm(point_0, point_1, M0, M1);
-            Eigen::Vector3d p_3d_1 = rigidTransform(p_3d_0, tmp_R, tmp_T);
+            Eigen::Vector4d p0 = triangulationHartleySturm(point_0, point_1, M0, M1);
+            Eigen::Vector3d p0_euc = Eigen::Vector3d(p0[0], p0[1], p0[2]);
+            Eigen::Vector3d p1 = rigidTransform(p0_euc, tmp_R, tmp_T);
 
-            if((p_3d_0[2] >= 0.0) && (p_3d_1[2] >= 0.0)) {
+            if((p0[2] >= 0.0) && (p1[2] >= 0.0)) {
                 tmp_counter++;
             }
 
