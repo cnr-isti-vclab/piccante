@@ -37,7 +37,7 @@ namespace pic {
 
 #ifndef PIC_DISABLE_EIGEN
 
-class NelderMeadOptFundamental: public NelderMeadOptBase<double>
+class NelderMeadOptFundamental: public NelderMeadOptBase<float>
 {
 public:
     std::vector< Eigen::Vector2f > m0, m1;

@@ -101,7 +101,7 @@ Eigen::Matrix3d EstimateHomography(std::vector< Eigen::Vector2f > points0, std::
     }
 
     //Solving the linear system
-    Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeFullV);
     Eigen::MatrixXd V = svd.matrixV();
 
     n = V.cols() - 1;
@@ -256,8 +256,7 @@ Eigen::Matrix3d EstimateFundamental(std::vector< Eigen::Vector2f > &points0, std
     }
 
     //Solving the linear system
-    Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
-    Eigen::MatrixXd U = svd.matrixU();
+    Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeFullV);
     Eigen::MatrixXd V = svd.matrixV();
 
     int n = V.cols() - 1;
@@ -473,7 +472,7 @@ void filterInliers(std::vector< T > &vec, std::vector< unsigned int > &inliers, 
  */
 Eigen::Vector3d ComputeEpipole(Eigen::Matrix3d &F)
 {
-    Eigen::JacobiSVD< Eigen::MatrixXd > svdF(F, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::JacobiSVD< Eigen::MatrixXd > svdF(F, Eigen::ComputeFullV);
     Eigen::Matrix3d V = svdF.matrixV();
 
     Eigen::Vector3d e;
@@ -777,7 +776,7 @@ Eigen::Vector4d triangulationHartleySturm(Eigen::Vector3d point_0, Eigen::Vector
             A(3, i) = A3[i];
         }
 
-        Eigen::JacobiSVD< Eigen::MatrixXd > svdA(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+        Eigen::JacobiSVD< Eigen::MatrixXd > svdA(A, Eigen::ComputeFullV);
         Eigen::MatrixXd V = svdA.matrixV();
         int n = V.cols() - 1;
 
