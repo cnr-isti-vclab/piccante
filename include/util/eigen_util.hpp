@@ -31,6 +31,11 @@ See the GNU Lesser General Public License
 #ifndef PIC_EIGEN_UTIL
 #define PIC_EIGEN_UTIL
 
+namespace Eigen {
+    typedef Matrix<float,  3, 4> Matrix34f;
+    typedef Matrix<double, 3, 4> Matrix34d;
+}
+
 namespace pic {
 
 #ifndef PIC_DISABLE_EIGEN
@@ -53,56 +58,62 @@ Eigen::Matrix3d DiagonalMatrix(Eigen::Vector3d D)
 }
 
 /**
- * @brief RemoveLastColumn
+ * @brief getSquareMatrix
  * @param mat
  * @return
  */
-Eigen::MatrixXd RemoveLastColumn(Eigen::MatrixXd &mat)
+Eigen::Matrix3d getSquareMatrix(Eigen::Matrix34d &mat)
 {
-    Eigen::MatrixXd ret = Eigen::MatrixXd(mat.rows(), mat.cols() - 1);
+    Eigen::Matrix3d ret;
+    ret(0, 0) = mat(0, 0);
+    ret(0, 1) = mat(0, 1);
+    ret(0, 2) = mat(0, 2);
 
-    for(int i = 0; i < mat.rows(); i++) {
-        for(int j = 0; j < (mat.cols() - 1); j++) {
-            ret(i, j) = mat(i, j);
-        }
-    }
+    ret(1, 0) = mat(1, 0);
+    ret(1, 1) = mat(1, 1);
+    ret(1, 2) = mat(1, 2);
+
+    ret(2, 0) = mat(2, 0);
+    ret(2, 1) = mat(2, 1);
+    ret(2, 2) = mat(2, 2);
+
     return ret;
 }
 
 /**
- * @brief getColumn
+ * @brief getLastColumn
  * @param mat
- * @param col
  * @return
  */
-Eigen::VectorXd getColumn(Eigen::MatrixXd &mat, unsigned int col)
+Eigen::Vector3d getLastColumn(Eigen::Matrix34d &mat)
 {
-    Eigen::VectorXd ret = Eigen::VectorXd(mat.rows());
+    Eigen::Vector3d ret;
 
-    for(int i = 0; i < mat.rows(); i++) {
-        ret[i] = mat(i, col);
-    }
+    ret[0] = mat(0, 3);
+    ret[1] = mat(1, 3);
+    ret[2] = mat(2, 3);
+
     return ret;
 }
 
 /**
  * @brief addOne
- * @param mat
- * @param col
+ * @param x
  * @return
  */
-Eigen::VectorXd addOne(Eigen::VectorXd x)
+inline Eigen::Vector3d addOne(Eigen::Vector2d &x)
 {
-    unsigned int n = MAX(x.rows(), x.cols());
-    Eigen::VectorXd ret = Eigen::VectorXd(n + 1);
+    return Eigen::Vector3d(x[0], x[1], 1.0);
+}
 
-    for(unsigned int i = 0; i < n; i++) {
-        ret[i] = x[i];
-    }
-
-    ret[n] = 1.0f;
-
-    return ret;
+/**
+ * @brief addOne
+ * @param x
+ * @return
+ */
+inline Eigen::Vector4d addOne(Eigen::Vector3d &x)
+{
+    return Eigen::Vector4d(x[0], x[1], x[2], 1.0);
 }
 
 /**
@@ -123,7 +134,7 @@ void printfMat(Eigen::MatrixXd mat)
  * @brief printf
  * @param mat
  */
-void printfMat(Eigen::Matrix3f mat)
+void printfMat(Eigen::Matrix3f &mat)
 {
     for(int i = 0; i < 3; i++){
         for(int j = 0; j < 3; j++){
@@ -137,7 +148,7 @@ void printfMat(Eigen::Matrix3f mat)
  * @brief fprintf
  * @param mat
  */
-void fprintfMat(Eigen::MatrixXd mat, std::string name)
+void fprintfMat(Eigen::MatrixXd &mat, std::string name)
 {
     FILE *file = fopen(name.c_str(), "w");
     for(int i = 0; i < mat.rows(); i++){
@@ -153,7 +164,7 @@ void fprintfMat(Eigen::MatrixXd mat, std::string name)
  * @brief printf
  * @param mat
  */
-void printfMat(Eigen::Matrix3d mat)
+void printfMat(Eigen::Matrix3d &mat)
 {
     for(int i = 0; i < 3; i++){
         for(int j = 0; j < 3; j++){
@@ -168,7 +179,7 @@ void printfMat(Eigen::Matrix3d mat)
  * @param info is an array with the center (0 and 1) a scaling factor (3)
  * @return It returns a scaling and shifting matrix.
  */
-Eigen::Matrix3d getShiftScaleMatrix(Eigen::Vector3f info)
+Eigen::Matrix3d getShiftScaleMatrix(Eigen::Vector3f &info)
 {
     Eigen::Matrix3d ret;
 
@@ -188,7 +199,7 @@ Eigen::Matrix3d getShiftScaleMatrix(Eigen::Vector3f info)
  * @param t a translation vector
  * @return It returns a cross product matrix.
  */
-Eigen::Matrix3d CrossProduct(Eigen::Vector3d t)
+Eigen::Matrix3d CrossProduct(Eigen::Vector3d &t)
 {
     Eigen::Matrix3d ret;
     ret(0, 0) =  0.0;  ret(0, 1) = -t[2]; ret(0, 2) =  t[1];

@@ -36,18 +36,29 @@ namespace pic {
 class NelderMeadOptTriangulation: public NelderMeadOptBase<float>
 {
 public:
-    Eigen::MatrixXd M0, M1;
-    Eigen::Vector3d p0, p1;
+
+    std::vector< Eigen::Matrix34d > M;
+    std::vector< Eigen::Vector2f > p;
 
     /**
      * @brief NelderMeadOptTriangulation
      * @param M0
      * @param M1
      */
-    NelderMeadOptTriangulation(Eigen::MatrixXd M0, Eigen::MatrixXd M1) : NelderMeadOptBase()
+    NelderMeadOptTriangulation(Eigen::Matrix34d M0, Eigen::Matrix34d M1) : NelderMeadOptBase()
     {
-        this->M0 = M0;
-        this->M1 = M1;
+        this->M.push_back(M0);
+        this->M.push_back(M1);
+    }
+
+    /**
+     * @brief NelderMeadOptTriangulation
+     * @param M0
+     * @param M1
+     */
+    NelderMeadOptTriangulation(std::vector< Eigen::Matrix34d> &M) : NelderMeadOptBase()
+    {
+        this->M.assign(M.begin(), M.end());
     }
 
     /**
@@ -55,10 +66,22 @@ public:
      * @param p0
      * @param p1
      */
-    void update(Eigen::Vector3d &p0, Eigen::Vector3d &p1)
+    void update(Eigen::Vector2f &p0, Eigen::Vector2f &p1)
     {
-        this->p0 = p0;
-        this->p1 = p1;
+        this->p.clear();
+        this->p.push_back(p0);
+        this->p.push_back(p1);
+    }
+
+    /**
+     * @brief update
+     * @param p0
+     * @param p1
+     */
+    void update(std::vector< Eigen::Vector2f> &p)
+    {
+        this->p.clear();
+        this->p.assign(p.begin(), p.end());
     }
 
     /**
@@ -69,30 +92,22 @@ public:
      */
     float function(float *x, unsigned int n)
     {
-        Eigen::Vector4d p(x[0], x[1], x[2], 1.0);
+        Eigen::Vector4d point(x[0], x[1], x[2], 1.0);
 
-        //First view
-        Eigen::Vector3d proj = M0 * p;
+        double err = 0.0;
+        for(unsigned int i = 0; i < M.size(); i++) {
+            Eigen::Vector3d proj = M[i] * point;
 
-        proj[0] /= proj[2];
-        proj[1] /= proj[2];
+            proj[0] /= proj[2];
+            proj[1] /= proj[2];
 
-        double dx = p0[0] - proj[0];
-        double dy = p0[1] - proj[1];
+            double dx = p[i][0] - proj[0];
+            double dy = p[i][1] - proj[1];
 
-        double err = dx * dx + dy * dy;
+            err += dx * dx + dy * dy;
+        }
 
-        //Second view
-        proj = M1 * p;
-        proj[0] /= proj[2];
-        proj[1] /= proj[2];
-
-        dx = p1[0] - proj[0];
-        dy = p1[1] - proj[1];
-
-        err += dx * dx + dy * dy;
-
-        return err;
+        return float(err);
     }
 };
 
