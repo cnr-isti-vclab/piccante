@@ -4,20 +4,23 @@
 
 #include "piccante.hpp"
 
-class SimpleIOWindow : public pic::OpenGLWindow
+class SimpleOperatorsWindow : public pic::OpenGLWindow
 {
 protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
+    pic::FilterGLOp *op;
 
 public:
-    pic::ImageRAWGL img, *imgOut;
+    pic::ImageRAWGL img, *imgRand, *imgOut, *imgOutTMO;
     glw::program    program;
 
-    SimpleIOWindow() : OpenGLWindow(NULL)
+    SimpleOperatorsWindow() : OpenGLWindow(NULL)
     {
         tmo = NULL;
         imgOut = NULL;
+        imgOutTMO = NULL;
+
     }
 
     void init()
@@ -26,15 +29,22 @@ public:
         img.Read("../data/input/bottles.hdr");
         img.generateTextureGL(false);
 
+        //creating a random image
+        imgRand = new pic::ImageRAWGL(img.frames, img.width, img.height, img.channels, pic::IMG_CPU_GPU);
+        imgRand->SetRand();
+        imgRand->loadFromMemory();
+
         //creating a screen aligned quad
         pic::QuadGL::getProgram(program,
                                 pic::QuadGL::getVertexProgramV3(),
                                 pic::QuadGL::getFragmentProgramForView());
-
         quad = new pic::QuadGL(true);
-        
+
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
+
+        //allocating the add operator
+        op = pic::FilterGLOp::CreateOpAdd(false);
     }
 
     void render()
@@ -45,14 +55,17 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+        //imgoOut = img + imgRand
+        imgOut = op->Process(DoubleGL(&img, imgRand), imgOut);
+
         //simple tone mapping: gamma + exposure correction
-        imgOut = tmo->Process(SingleGL(&img), imgOut);
+        imgOutTMO = tmo->Process(SingleGL(imgOut), imgOutTMO);
 
         //imgOut visualization
         glw::bind_program(program);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, imgOut->getTexture());
+        glBindTexture(GL_TEXTURE_2D, imgOutTMO->getTexture());
 
         quad->Render();
 
@@ -64,7 +77,6 @@ public:
     }
 };
 
-
 int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
@@ -75,7 +87,7 @@ int main(int argc, char **argv)
     format.setMinorVersion(0);
     format.setProfile(QSurfaceFormat::CoreProfile );
 
-    SimpleIOWindow window;
+    SimpleOperatorsWindow window;
     window.setFormat(format);
     window.resize(912, 684);
     window.show();

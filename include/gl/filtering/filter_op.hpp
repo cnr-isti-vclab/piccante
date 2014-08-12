@@ -40,16 +40,35 @@ protected:
     void InitShaders();
 
 public:
-    //Basic constructor
-    FilterGLOp(std::string op, bool bTexelFetch, float *c0, float *c1);
-    ~FilterGLOp() {}
 
-    //Update
+    /**
+     * @brief FilterGLOp
+     * @param op
+     * @param bTexelFetch
+     * @param c0
+     * @param c1
+     */
+    FilterGLOp(std::string op, bool bTexelFetch, float *c0, float *c1);
+
+    /**
+     * @brief Update
+     * @param c0
+     * @param c1
+     */
     void Update(float *c0, float *c1);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
+    /**
+     * @brief CreateOpSetZero
+     * @return
+     */
     static FilterGLOp *CreateOpSetZero()
     {
         float val[4] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -57,84 +76,96 @@ public:
         return filter;
     }
 
+    /**
+     * @brief CreateOpIdentity
+     * @param bType
+     * @return
+     */
     static FilterGLOp *CreateOpIdentity(bool bType)
     {
         FilterGLOp *filter = new FilterGLOp("I0", bType, NULL, NULL);
         return filter;
     }
 
+    /**
+     * @brief CreateOpSegmentation
+     * @param bType
+     * @param minVal
+     * @return
+     */
     static FilterGLOp *CreateOpSegmentation(bool bType, float minVal)
     {
         float tmp[4];
         tmp[0] = tmp[1] = tmp[2] = tmp[3] = minVal;
-        FilterGLOp *filter = new FilterGLOp("(I0.x > 0.0)? floor(log(I0) / 2.3026) : C0 ",
+        FilterGLOp *filter = new FilterGLOp("(I0.x > 0.0) ? floor(log(I0) / 2.3026) : C0 ",
                                             bType, tmp, NULL);
         return filter;
     }
 
+    /**
+     * @brief CreateOpAdd
+     * @param bType
+     * @return
+     */
     static FilterGLOp *CreateOpAdd(bool bType)
     {
         FilterGLOp *filter = new FilterGLOp("I0 + I1", bType, NULL, NULL);
         return filter;
     }
 
+    /**
+     * @brief CreateOpMulNeg
+     * @param bType
+     * @return
+     */
     static FilterGLOp *CreateOpMulNeg(bool bType)
     {
         FilterGLOp *filter = new FilterGLOp("(vec4(1.0) - I1) * I0", bType, NULL, NULL);
         return filter;
     }
 
+    /**
+     * @brief CreateOpMul
+     * @param bType
+     * @return
+     */
     static FilterGLOp *CreateOpMul(bool bType)
     {
         FilterGLOp *filter = new FilterGLOp("I0 * I1", bType, NULL, NULL);
         return filter;
     }
 
+    /**
+     * @brief CreateOpSub
+     * @param bType
+     * @return
+     */
     static FilterGLOp *CreateOpSub(bool bType)
     {
         FilterGLOp *filter = new FilterGLOp("I0 - I1", bType, NULL, NULL);
         return filter;
     }
 
+    /**
+     * @brief CreateOpDiv
+     * @param bType
+     * @return
+     */
     static FilterGLOp *CreateOpDiv(bool bType)
     {
         FilterGLOp *filter = new FilterGLOp("I0 / I1", bType, NULL, NULL);
         return filter;
     }
 
+    /**
+     * @brief CreateOpDivConst
+     * @param bType
+     * @return
+     */
     static FilterGLOp *CreateOpDivConst(bool bType)
     {
         FilterGLOp *filter = new FilterGLOp("I0 / C0", bType, NULL, NULL);
         return filter;
-    }
-
-    //Execute
-    static ImageRAWGL *ExecuteADD(std::string nameIn1, std::string nameIn2,
-                                  std::string nameOut)
-    {
-        ImageRAWGL imgIn1(nameIn1);
-        imgIn1.generateTextureGL(false);
-
-        ImageRAWGL imgIn2(nameIn2);
-        imgIn2.generateTextureGL(false);
-
-        FilterGLOp *flt = FilterGLOp::CreateOpAdd(false);
-        ImageRAWGL *imgOut = flt->Process(DoubleGL(&imgIn1, &imgIn2), NULL);
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
-
-    static ImageRAWGL *ExecuteIdentity(std::string nameIn1, std::string nameOut)
-    {
-        ImageRAWGL imgIn1(nameIn1);
-        imgIn1.generateTextureGL(false);
-
-        FilterGLOp *flt = FilterGLOp::CreateOpIdentity(false);
-        ImageRAWGL *imgOut = flt->Process(SingleGL(&imgIn1), NULL);
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
     }
 };
 
@@ -286,7 +317,6 @@ void FilterGLOp::InitShaders()
     glw::bind_program(0);
 }
 
-//Update
 void FilterGLOp::Update(float *c0, float *c1)
 {
     if(c0 != NULL) {
@@ -309,7 +339,6 @@ void FilterGLOp::Update(float *c0, float *c1)
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLOp::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn[0] == NULL) {

@@ -4,20 +4,22 @@
 
 #include "piccante.hpp"
 
-class SimpleIOWindow : public pic::OpenGLWindow
+class SimpleFilteringWindow : public pic::OpenGLWindow
 {
 protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
+    pic::FilterGLGaussian2D *fltGauss;
 
 public:
-    pic::ImageRAWGL img, *imgOut;
+    pic::ImageRAWGL img, *img_flt, *img_flt_tmo;
     glw::program    program;
 
-    SimpleIOWindow() : OpenGLWindow(NULL)
+    SimpleFilteringWindow() : OpenGLWindow(NULL)
     {
         tmo = NULL;
-        imgOut = NULL;
+        img_flt = NULL;
+        img_flt_tmo = NULL;
     }
 
     void init()
@@ -30,11 +32,13 @@ public:
         pic::QuadGL::getProgram(program,
                                 pic::QuadGL::getVertexProgramV3(),
                                 pic::QuadGL::getFragmentProgramForView());
-
         quad = new pic::QuadGL(true);
-        
+
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
+
+        //allocating a Gaussian filter with sigma = 2.0
+        fltGauss = new pic::FilterGLGaussian2D(2.0);
     }
 
     void render()
@@ -45,14 +49,17 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        //simple tone mapping: gamma + exposure correction
-        imgOut = tmo->Process(SingleGL(&img), imgOut);
+        //imgoOut = img + imgRand
+        img_flt = fltGauss->Process(SingleGL(&img), img_flt);
 
-        //imgOut visualization
+        //simple tone mapping: gamma + exposure correction
+        img_flt_tmo = tmo->Process(SingleGL(img_flt), img_flt_tmo);
+
+        //visualization of the Gaussian filtering
         glw::bind_program(program);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, imgOut->getTexture());
+        glBindTexture(GL_TEXTURE_2D, img_flt_tmo->getTexture());
 
         quad->Render();
 
@@ -64,7 +71,6 @@ public:
     }
 };
 
-
 int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
@@ -73,9 +79,9 @@ int main(int argc, char **argv)
     format.setSamples(4);
     format.setMajorVersion(4);
     format.setMinorVersion(0);
-    format.setProfile(QSurfaceFormat::CoreProfile );
+    format.setProfile(QSurfaceFormat::CoreProfile);
 
-    SimpleIOWindow window;
+    SimpleFilteringWindow window;
     window.setFormat(format);
     window.resize(912, 684);
     window.show();

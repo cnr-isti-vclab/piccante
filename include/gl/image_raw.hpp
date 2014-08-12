@@ -352,6 +352,11 @@ ImageRAWGL::ImageRAWGL(GLuint tex, GLuint target) : ImageRAW()
     }
     break;
 
+    case GL_TEXTURE_CUBE_MAP: {
+
+    }
+    break;
+
     case GL_TEXTURE_2D_ARRAY: {
         glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
         glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_WIDTH, &width);

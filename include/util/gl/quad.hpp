@@ -29,9 +29,11 @@ namespace pic {
 
 #include <string>
 
+/**
+ * @brief The QuadGL class
+ */
 class QuadGL
 {
-
 public:
 
     GLuint vao;		//vertex array object

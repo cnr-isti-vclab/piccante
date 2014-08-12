@@ -68,6 +68,13 @@ public:
         vertex_source = QuadGL::getVertexProgramV3();
     }
 
+    ~FilterGL()
+    {
+        if(quad != NULL) {
+            delete quad;
+        }
+    }
+
     /**
      * @brief setFbo
      * @param fbo
