@@ -28,7 +28,7 @@
 
 #include <assert.h>
 
-#include <GL/glew.h>
+//#include <GL/glew.h>
 
 #define GLW_DISABLE_ASSERT         0
 #define GLW_ASSERT_SETUP_CLEANUP   0
@@ -75,7 +75,7 @@ inline void terminate(void);
 
 inline void initialize(void)
 {
-    glewInit();
+    //glewInit();
 }
 
 inline void terminate(void)

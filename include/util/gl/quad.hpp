@@ -44,6 +44,11 @@ public:
         vbo[1] = 0;
     }
 
+    QuadGL(bool bTextureCoordinates)
+    {
+        Init(bTextureCoordinates);
+    }
+
     ~QuadGL()
     {
         if(vao > 0) {
@@ -59,7 +64,71 @@ public:
         }
     }
 
-    /**Render: renders a quad*/
+    /**
+     * @brief Init initializates the QuadGL by allocating memory on the GPU.
+     * @param bTextCoordinates
+     */
+    void Init(bool bTexCoordinates)
+    {
+        float *data_pos = CreatePosCoord();
+
+        if(bTexCoordinates) {
+            float *data_tex = CreateTexCoord();
+
+            //Init VBO 0
+            glGenBuffers(1, &vbo[0]);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+            glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), data_pos, GL_STATIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+            //Init VBO 1
+            glGenBuffers(1, &vbo[1]);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+            glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), data_tex, GL_STATIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+            //Init VAO
+            glGenVertexArrays(1, &vao);
+            glBindVertexArray(vao);
+
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+            glEnableVertexAttribArray(0);
+
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+            glEnableVertexAttribArray(1);
+
+            glBindVertexArray(0);
+            glDisableVertexAttribArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+            delete[] data_tex;
+        } else {
+            //Init VBO
+            glGenBuffers(1, &vbo[0]);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+            glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), data_pos, GL_STATIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+            //Init VAO
+            glGenVertexArrays(1, &vao);
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+
+            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+            glEnableVertexAttribArray(0);
+            glBindVertexArray(0);
+            glDisableVertexAttribArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        }
+        delete[] data_pos;
+    }
+
+    /**
+     * @brief Render draws a quad on screen.
+     */
     void Render()
     {
         glBindVertexArray(vao);
@@ -67,117 +136,55 @@ public:
         glBindVertexArray(0);
     }
 
-    /**CreatePosCoord: creates position coordiantes for a quad*/
+    /**
+     * @brief CreatePosCoord allocates memory for a position buffer.
+     * @return
+     */
     static float *CreatePosCoord()
     {
         float *data = new float[8];
+
         data[0] = -1.0f;
         data[1] =  1.0f;
+
         data[2] = -1.0f;
         data[3] = -1.0f;
+
         data[4] =  1.0f;
         data[5] =  1.0f;
+
         data[6] =  1.0f;
         data[7] = -1.0f;
         return data;
     }
 
-    /*
-        glTexCoord2f( 0.0f,  0.0f );
-
-        glTexCoord2f( 0.0f,  1.0f );
-
-        glTexCoord2f( 1.0f,  0.0f );
-
-        glTexCoord2f( 1.0f,  1.0f );*/
-
-    /**CreateTexCoord: creates texture coordiantes for a quad*/
+    /**
+     * @brief CreateTexCoord allocates memory for a texture coordinates buffer.
+     * @return
+     */
     static float *CreateTexCoord()
     {
         float *data = new float[8];
+
         data[0] = 0.0f;
         data[1] = 1.0f;
+
         data[2] = 0.0f;
         data[3] = 0.0f;
+
         data[4] = 1.0f;
         data[5] = 1.0f;
+
         data[6] = 1.0f;
         data[7] = 0.0f;
         return data;
     }
 
-    /**CreatePosTexQuad: creates a quad with position attribute*/
-    static QuadGL *CreatePosQuad()
-    {
-        QuadGL *ret = new QuadGL();
-
-        float *data_pos = CreatePosCoord();
-
-        //Init VBO
-        glGenBuffers(1, &ret->vbo[0]);
-        glBindBuffer(GL_ARRAY_BUFFER, ret->vbo[0]);
-        glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), data_pos, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        //Init VAO
-        glGenVertexArrays(1, &ret->vao);
-        glBindVertexArray(ret->vao);
-        glBindBuffer(GL_ARRAY_BUFFER, ret->vbo[0]);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(0);
-        glBindVertexArray(0);
-        glDisableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        delete[] data_pos;
-
-        return ret;
-    }
-
-    /**CreatePosTexQuad: creates a quad with position and texture attributes*/
-    static QuadGL *CreatePosTexQuad()
-    {
-        QuadGL *ret = new QuadGL();
-
-        float *data_pos = CreatePosCoord();
-        float *data_tex = CreateTexCoord();
-
-        //Init VBO 0
-        glGenBuffers(1, &ret->vbo[0]);
-        glBindBuffer(GL_ARRAY_BUFFER, ret->vbo[0]);
-        glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), data_pos, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        //Init VBO 1
-        glGenBuffers(1, &ret->vbo[1]);
-        glBindBuffer(GL_ARRAY_BUFFER, ret->vbo[1]);
-        glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), data_tex, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        //Init VAO
-        glGenVertexArrays(1, &ret->vao);
-        glBindVertexArray(ret->vao);
-
-        glBindBuffer(GL_ARRAY_BUFFER, ret->vbo[0]);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, ret->vbo[1]);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(1);
-
-        glBindVertexArray(0);
-        glDisableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        delete[] data_pos;
-        delete[] data_tex;
-
-        return ret;
-    }
-
-    /**CreateSimpleVP: creates a basic vertex program*/
-    static std::string CreateSimpleVP()
+    /**
+     * @brief getVertexProgramV3 creates a simple vertex program.
+     * @return
+     */
+    static std::string getVertexProgramV3()
     {
         std::string vertex_program = GLW_STRINGFY
                                      (
@@ -191,8 +198,11 @@ public:
         return vertex_program;
     }
 
-    /**CreateSimpleVP_VAO: creates a basic vertex program*/
-    static std::string CreateSimpleVP_VAO()
+    /**
+     * @brief getVertexProgramV2 creates a simple vertex program.
+     * @return
+     */
+    static std::string getVertexProgramV2()
     {
         std::string vertex_program = GLW_STRINGFY
                                      (
@@ -206,7 +216,12 @@ public:
         return vertex_program;
     }
 
-    static std::string CreateSimpleVPT_VAO()
+    /**
+     * @brief getVertexProgramWithTexCoordinates creates a simple vertex program
+     * with texture coordinates as input.
+     * @return
+     */
+    static std::string getVertexProgramWithTexCoordinates()
     {
         std::string vertex_program = GLW_STRINGFY
                                      (
@@ -223,36 +238,67 @@ public:
         return vertex_program;
     }
 
-    //Create a basic program
-    static void CreateSimpleProgram(glw::program &ret)
+    /**
+     * @brief getFragmentProgram
+     * @return
+     */
+    static std::string getFragmentProgram()
     {
-        std::string vertex_source = GLW_STRINGFY
-                                    (
-                                        in vec3 a_position;
 
-        void main(void) {
-            gl_Position = vec4(a_position, 1.0);
-        }
-                                    );
-
-        std::string fragment_source = GLW_STRINGFY
+        std::string fragment_program = GLW_STRINGFY
                                       (
                                           uniform sampler2D u_tex;
                                           out     vec4      f_color;
 
         void main(void) {
-            ivec2 tsize = textureSize2D(u_tex, 0);
             ivec2 coords = ivec2(gl_FragCoord.xy);
-            coords.y = tsize.y - coords.y;
             f_color = vec4(texelFetch(u_tex, coords, 0).xyz, 1.0);
         }
                                       );
 
-        std::string prefix;
-        prefix += glw::version("150");
-        prefix += glw::ext_require("GL_EXT_gpu_shader4");
-        ret.setup(prefix, vertex_source, fragment_source);
-        printf("[Simple Program log]\n%s\n", ret.log().c_str());
+        return fragment_program;
+    }
+
+    /**
+     * @brief getFragmentProgramForView
+     * @return
+     */
+    static std::string getFragmentProgramForView()
+    {
+
+        std::string fragment_program = GLW_STRINGFY
+                                      (
+                                          uniform sampler2D u_tex;
+                                          out     vec4      f_color;
+
+        void main(void) {
+            ivec2 coords = ivec2(gl_FragCoord.xy);
+            ivec2 texSize = textureSize(u_tex, 0);
+            coords.y = texSize.y - coords.y;
+            f_color = vec4(texelFetch(u_tex, coords, 0).xyz, 1.0);
+        }
+                                      );
+
+        return fragment_program;
+    }
+
+    /**
+     * @brief getProgram creates a simple program.
+     * @param ret
+     * @param vp_src
+     * @param fp_src
+     */
+    static void getProgram(glw::program &ret, std::string vp_src = "", std::string fp_src = "")
+    {
+        if(vp_src.empty() || fp_src.empty()) {
+            ret.setup(glw::version("330"), getVertexProgramV3(), getFragmentProgram());
+        } else {
+            ret.setup(glw::version("330"), vp_src, fp_src);
+        }
+
+        #ifdef PIC_DEBUG
+            printf("[QuadGL Program log]\n%s\n", ret.log().c_str());
+        #endif
 
         glw::bind_program(ret);
         ret.attribute_source("a_position", 0);
@@ -261,7 +307,7 @@ public:
 
         glw::bind_program(ret);
         ret.relink();
-        ret.uniform("u_tex",      0);
+        ret.uniform("u_tex", 0);
         glw::bind_program(0);
     }
 
@@ -275,15 +321,18 @@ public:
         //Rendering an aligned quad
         glBegin(GL_TRIANGLE_STRIP);
 
-        glVertex2f(-1.0f,  1.0f);
-        glVertex2f(-1.0f, -1.0f);
-        glVertex2f(1.0f,  1.0f);
-        glVertex2f(1.0f, -1.0f);
+        glVertex2f( -1.0f,  1.0f);
+        glVertex2f( -1.0f, -1.0f);
+        glVertex2f(  1.0f,  1.0f);
+        glVertex2f(  1.0f, -1.0f);
 
         glEnd();
     }
 
-    /**Draw: draws using compability mode (deprecated!)*/
+    /**
+     * @brief Draw draws using compability mode (deprecated!).
+     * @param tex
+     */
     static void Draw(GLuint tex)
     {
         glEnable(GL_TEXTURE_2D);
@@ -296,24 +345,28 @@ public:
         //Rendering an aligned quad
         glBegin(GL_TRIANGLE_STRIP);
 
-        glTexCoord2f(0.0f,  0.0f);
-        glVertex2f(-1.0f,  1.0f);
+        glTexCoord2f( 0.0f,  0.0f);
+        glVertex2f(  -1.0f,  1.0f);
 
-        glTexCoord2f(0.0f,  1.0f);
-        glVertex2f(-1.0f, -1.0f);
+        glTexCoord2f( 0.0f,  1.0f);
+        glVertex2f(  -1.0f, -1.0f);
 
-        glTexCoord2f(1.0f,  0.0f);
-        glVertex2f(1.0f,  1.0f);
+        glTexCoord2f( 1.0f,  0.0f);
+        glVertex2f(   1.0f,  1.0f);
 
-        glTexCoord2f(1.0f,  1.0f);
-        glVertex2f(1.0f, -1.0f);
+        glTexCoord2f( 1.0f,  1.0f);
+        glVertex2f(   1.0f, -1.0f);
 
         glEnd();
 
         glDisable(GL_TEXTURE_2D);
     }
 
-    /**Draw: draws using compability mode (deprecated!)*/
+    /**
+     * @brief Draw draws using compability mode (deprecated!).
+     * @param tex
+     * @param color
+     */
     static void Draw(GLuint tex, float *color)
     {
         glEnable(GL_TEXTURE_2D);
@@ -331,22 +384,29 @@ public:
         glBegin(GL_TRIANGLE_STRIP);
 
         glTexCoord2f(0.0f,  0.0f);
-        glVertex2f(-1.0f,  1.0f);
+        glVertex2f( -1.0f,  1.0f);
 
         glTexCoord2f(0.0f,  1.0f);
-        glVertex2f(-1.0f, -1.0f);
+        glVertex2f( -1.0f, -1.0f);
 
         glTexCoord2f(1.0f,  0.0f);
-        glVertex2f(1.0f,  1.0f);
+        glVertex2f(  1.0f,  1.0f);
 
         glTexCoord2f(1.0f,  1.0f);
-        glVertex2f(1.0f, -1.0f);
+        glVertex2f(  1.0f, -1.0f);
 
         glEnd();
 
         glDisable(GL_TEXTURE_2D);
     }
 
+    /**
+     * @brief Draw
+     * @param texture
+     * @param width
+     * @param height
+     * @param pg
+     */
     static void Draw(GLuint texture, int width, int height, glw::program &pg)
     {
         glFrontFace(GL_CW);

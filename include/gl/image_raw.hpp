@@ -53,6 +53,7 @@ public:
      * @brief ImageRAWGL
      */
     ImageRAWGL();
+
     ~ImageRAWGL();
 
     /**
@@ -111,14 +112,14 @@ public:
      * @param b
      * @param a
      */
-    void	AssignGL(float r, float g, float b, float a);
+    void AssignGL(float r, float g, float b, float a);
 
     /**
      * @brief generateTextureGL
      * @param mipmap
      * @return
      */
-    GLuint	generateTextureGL(bool mipmap);
+    GLuint generateTextureGL(bool mipmap);
 
     /**
      * @brief generateTextureGLU32
@@ -130,65 +131,65 @@ public:
      * @brief loadFromMemory
      * @param mipmap
      */
-    void	loadFromMemory(bool mipmap);
+    void loadFromMemory(bool mipmap);
 
     /**
      * @brief loadToMemory
      */
-    void	loadToMemory();
+    void loadToMemory();
 
     /**
      * @brief generateTexture3DGL
      * @return
      */
-    GLuint	generateTexture3DGL();
+    GLuint generateTexture3DGL();
 
     /**
-     * @brief generateTextureCubeMap
+     * @brief generateTextureCubeMapGL
      * @return
      */
-    GLuint	generateTextureCubeMap();
+    GLuint generateTextureCubeMapGL();
 
     /**
      * @brief generateTextureArrayGL
      * @return
      */
-    GLuint	generateTextureArrayGL();
+    GLuint generateTextureArrayGL();
 
     /**
-     * @brief loadSliceIntoTex
+     * @brief loadSliceIntoTexture
      * @param i
      */
-    void	loadSliceIntoTex(int i);
+    void loadSliceIntoTexture(int i);
 
     /**
      * @brief loadAllSlicesIntoTex
      */
-    void	loadAllSlicesIntoTex();
+    void loadAllSlicesIntoTex();
 
     /**
      * @brief readFromBindedFBO
      */
-    void	readFromBindedFBO();
+    void readFromBindedFBO();
 
     /**
      * @brief readFromFBO
      * @param fbo
      */
-    void	readFromFBO(Fbo *fbo);
+    void readFromFBO(Fbo *fbo);
 
     /**
      * @brief readFromFBO
      * @param fbo
      * @param format
      */
-    void	readFromFBO(Fbo *fbo, GLenum format);
+    void readFromFBO(Fbo *fbo, GLenum format);
 
     /**
      * @brief getTexture
      * @return
      */
-    GLuint	getTexture()
+    GLuint getTexture()
     {
         return texture;
     }
@@ -196,17 +197,17 @@ public:
     /**
      * @brief bindTexture
      */
-    void	bindTexture();
+    void bindTexture();
 
     /**
      * @brief unBindTexture
      */
-    void	unBindTexture();
+    void unBindTexture();
 
     /**
      * @brief updateModeGPU
      */
-    void	updateModeGPU()
+    void updateModeGPU()
     {
         if(mode == IMG_NULL) {
             mode = IMG_GPU;
@@ -220,7 +221,7 @@ public:
     /**
      * @brief updateModeCPU
      */
-    void	updateModeCPU()
+    void updateModeCPU()
     {
         if(mode == IMG_NULL) {
             mode = IMG_CPU;
@@ -313,20 +314,18 @@ public:
     }
 };
 
-ImageRAWGL::ImageRAWGL()
+ImageRAWGL::ImageRAWGL() : ImageRAW()
 {
     notOwnedGL = false;
     texture = 0;
     target = 0;
     mode = IMG_NULL;
     tmpFbo = NULL;
-    SetNULL();
 }
 
-ImageRAWGL::ImageRAWGL(GLuint tex, GLuint target)
+ImageRAWGL::ImageRAWGL(GLuint tex, GLuint target) : ImageRAW()
 {
     notOwnedGL = true;
-    SetNULL();
 
     tmpFbo = NULL;
 
@@ -388,7 +387,6 @@ ImageRAWGL::ImageRAWGL(GLuint tex, GLuint target)
 ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap): ImageRAW()
 {
     notOwnedGL = false;
-    SetNULL();
 
     tmpFbo = NULL;
 
@@ -413,10 +411,9 @@ ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap): ImageRAW()
 }
 
 ImageRAWGL::ImageRAWGL(int frames, int width, int height, int channels,
-                       IMAGESTORE mode)
+                       IMAGESTORE mode) : ImageRAW()
 {
     notOwnedGL = false;
-    SetNULL();
     tmpFbo = NULL;
 
     this->mode = mode;
@@ -546,7 +543,7 @@ GLuint ImageRAWGL::generateTextureGL(bool mipmap = false)
     return texture;
 }
 
-GLuint	ImageRAWGL::generateTextureCubeMap()
+GLuint	ImageRAWGL::generateTextureCubeMapGL()
 {
     if(frames < 6) {
         return 0;
@@ -593,15 +590,16 @@ void ImageRAWGL::loadFromMemory(bool mipmap = false)
 void ImageRAWGL::loadToMemory()
 {
     if(texture == 0) {
-        printf("This texture can not be trasferred from GPU memory\n");
+        #ifdef PIC_DEBUG
+            printf("This texture can not be trasferred from GPU memory\n");
+        #endif
         return;
     }
 
     if(data == NULL) {
-
-#ifdef PIC_DEBUG
-        printf("RAM memory allocated: %d %d %d %d\n", width, height, channels, frames);
-#endif
+        #ifdef PIC_DEBUG
+            printf("RAM memory allocated: %d %d %d %d\n", width, height, channels, frames);
+        #endif
 
         Allocate(width, height, channels, frames);
         this->mode = IMG_CPU_GPU;
@@ -700,7 +698,7 @@ GLuint ImageRAWGL::generateTextureArrayGL()
     return texture;
 }
 
-void ImageRAWGL::loadSliceIntoTex(int i)
+void ImageRAWGL::loadSliceIntoTexture(int i)
 {
     int mode, modeInternalFormat;
     getModesGL(channels, &mode, &modeInternalFormat);
@@ -716,7 +714,7 @@ void ImageRAWGL::loadSliceIntoTex(int i)
 void ImageRAWGL::loadAllSlicesIntoTex()
 {
     for(int i = 0; i < frames; i++) {
-        loadSliceIntoTex(i);
+        loadSliceIntoTexture(i);
     }
 }
 
@@ -768,36 +766,12 @@ void ImageRAWGL::readFromBindedFBO()
 
 void ImageRAWGL::bindTexture()
 {
-    switch(target) {
-    case GL_TEXTURE_2D:
-        glBindTexture(GL_TEXTURE_2D, texture);
-        break;
-
-    case GL_TEXTURE_2D_ARRAY:
-        glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
-        break;
-
-    case GL_TEXTURE_3D:
-        glBindTexture(GL_TEXTURE_3D, texture);
-        break;
-    }
+    glBindTexture(target, texture);
 }
 
 void ImageRAWGL::unBindTexture()
 {
-    switch(target) {
-    case GL_TEXTURE_2D:
-        glBindTexture(GL_TEXTURE_2D, 0);
-        break;
-
-    case GL_TEXTURE_2D_ARRAY:
-        glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-        break;
-
-    case GL_TEXTURE_3D:
-        glBindTexture(GL_TEXTURE_3D, 0);
-        break;
-    }
+    glBindTexture(target, 0);
 }
 
 } // end namespace pic

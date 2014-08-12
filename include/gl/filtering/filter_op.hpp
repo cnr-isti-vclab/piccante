@@ -67,44 +67,44 @@ public:
     {
         float tmp[4];
         tmp[0] = tmp[1] = tmp[2] = tmp[3] = minVal;
-        FilterGLOp *filter = new FilterGLOp("(I0.x>0.0)? floor(log(I0)/2.3026): C0 ",
+        FilterGLOp *filter = new FilterGLOp("(I0.x > 0.0)? floor(log(I0) / 2.3026) : C0 ",
                                             bType, tmp, NULL);
         return filter;
     }
 
     static FilterGLOp *CreateOpAdd(bool bType)
     {
-        FilterGLOp *filter = new FilterGLOp("I0+I1", bType, NULL, NULL);
+        FilterGLOp *filter = new FilterGLOp("I0 + I1", bType, NULL, NULL);
         return filter;
     }
 
     static FilterGLOp *CreateOpMulNeg(bool bType)
     {
-        FilterGLOp *filter = new FilterGLOp("(vec4(1.0)-I1)*I0", bType, NULL, NULL);
+        FilterGLOp *filter = new FilterGLOp("(vec4(1.0) - I1) * I0", bType, NULL, NULL);
         return filter;
     }
 
     static FilterGLOp *CreateOpMul(bool bType)
     {
-        FilterGLOp *filter = new FilterGLOp("I0*I1", bType, NULL, NULL);
+        FilterGLOp *filter = new FilterGLOp("I0 * I1", bType, NULL, NULL);
         return filter;
     }
 
     static FilterGLOp *CreateOpSub(bool bType)
     {
-        FilterGLOp *filter = new FilterGLOp("I0-I1", bType, NULL, NULL);
+        FilterGLOp *filter = new FilterGLOp("I0 - I1", bType, NULL, NULL);
         return filter;
     }
 
     static FilterGLOp *CreateOpDiv(bool bType)
     {
-        FilterGLOp *filter = new FilterGLOp("I0/I1", bType, NULL, NULL);
+        FilterGLOp *filter = new FilterGLOp("I0 / I1", bType, NULL, NULL);
         return filter;
     }
 
     static FilterGLOp *CreateOpDivConst(bool bType)
     {
-        FilterGLOp *filter = new FilterGLOp("I0/C0", bType, NULL, NULL);
+        FilterGLOp *filter = new FilterGLOp("I0 / C0", bType, NULL, NULL);
         return filter;
     }
 
@@ -161,8 +161,8 @@ FilterGLOp::FilterGLOp(std::string op, bool bTexelFetch = false,
     this->bTexelFetch = bTexelFetch;
 
     if(!bTexelFetch) {
-        quad = QuadGL::CreatePosTexQuad();
-        vertex_source = QuadGL::CreateSimpleVPT_VAO();
+        quad = new QuadGL(true);
+        vertex_source = QuadGL::getVertexProgramWithTexCoordinates();
     }
 
     InitShaders();
@@ -183,7 +183,7 @@ void FilterGLOp::InitShaders()
 
         if(I_found != std::string::npos) {
             if(bTexelFetch) {
-                strOp.replace(I_found, 2, "texelFetch(u_tex_0, coords,0)");
+                strOp.replace(I_found, 2, "texelFetch(u_tex_0, coords, 0)");
             } else {
                 strOp.replace(I_found, 2, "texture(u_tex_0, coords)");
             }
@@ -191,7 +191,7 @@ void FilterGLOp::InitShaders()
     } else {
         if(counter > 1) {
             if(bTexelFetch) {
-                strOp = "vec4 tmp0 = texelFetch(u_tex_0, coords,0);\n" + strOp;
+                strOp = "vec4 tmp0 = texelFetch(u_tex_0, coords, 0);\n" + strOp;
             } else {
                 strOp = "vec4 tmp0 = texture(u_tex_0, coords);\n" + strOp;
             }
@@ -264,7 +264,6 @@ void FilterGLOp::InitShaders()
 
     std::string prefix;
     prefix += glw::version("330");
-//	prefix += glw::ext_require("GL_EXT_gpu_shader4");
 
     filteringProgram.setup(prefix, vertex_source, fragment_source);
 #ifdef PIC_DEBUG
@@ -277,13 +276,13 @@ void FilterGLOp::InitShaders()
         filteringProgram.attribute_source("a_tex_coord",  1);
     }
 
-    filteringProgram.fragment_target("f_color",    0);
+    filteringProgram.fragment_target("f_color", 0);
     filteringProgram.relink();
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform("u_tex_0",		0);
-    filteringProgram.uniform("u_tex_1",		1);
-    filteringProgram.uniform4("u_val_0",		c0);
-    filteringProgram.uniform4("u_val_1",		c1);
+    filteringProgram.uniform("u_tex_0",  0);
+    filteringProgram.uniform("u_tex_1",  1);
+    filteringProgram.uniform4("u_val_0", c0);
+    filteringProgram.uniform4("u_val_1", c1);
     glw::bind_program(0);
 }
 
@@ -303,10 +302,10 @@ void FilterGLOp::Update(float *c0, float *c1)
     }
 
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform("u_tex_0",		0);
-    filteringProgram.uniform("u_tex_1",		1);
-    filteringProgram.uniform4("u_val_0",		this->c0);
-    filteringProgram.uniform4("u_val_1",		this->c1);
+    filteringProgram.uniform("u_tex_0",  0);
+    filteringProgram.uniform("u_tex_1",  1);
+    filteringProgram.uniform4("u_val_0", this->c0);
+    filteringProgram.uniform4("u_val_1", this->c1);
     glw::bind_program(0);
 }
 
@@ -316,9 +315,6 @@ ImageRAWGL *FilterGLOp::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     if(imgIn[0] == NULL) {
         return imgOut;
     }
-
-//	if(imgIn[0]->channels!=3)
-//		return imgOut;
 
     int w = imgIn[0]->width;
     int h = imgIn[0]->height;

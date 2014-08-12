@@ -26,7 +26,6 @@ See the GNU Lesser General Public License
 #define PIC_UTIL_GL_FBO_HPP
 
 #include <iostream>
-#include "GL/glew.h"
 
 namespace pic {
 

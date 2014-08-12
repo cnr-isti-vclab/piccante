@@ -43,6 +43,7 @@ See the GNU Lesser General Public License
 #include "util/gl/quad.hpp"
 #include "util/gl/timings.hpp"
 #include "util/gl/tone.hpp"
+#include "util/gl/opengl_window.hpp"
 #endif
 
 #include "util/image_sampler.hpp"

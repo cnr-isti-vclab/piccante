@@ -60,12 +60,12 @@ public:
 
         quad = NULL;
 
-        quad = QuadGL::CreatePosQuad();
+        quad = new QuadGL(false);
 
         target = GL_TEXTURE_2D;
 
-        //Standard Vertex shader
-        vertex_source = QuadGL::CreateSimpleVP();
+        //getting a vertex program for screen aligned quad
+        vertex_source = QuadGL::getVertexProgramV3();
     }
 
     /**

@@ -27,10 +27,11 @@ See the GNU Lesser General Public License
 
 #ifndef PIC_DISABLE_OPENGL
 
-#include <GL/glew.h>
 
 //OpenGL library
 #ifdef PIC_WIN32
+
+#include <GL/glew.h>
 
 #pragma comment( lib, "glew32" )
 #pragma comment( lib, "opengl32" )

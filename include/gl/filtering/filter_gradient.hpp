@@ -59,6 +59,8 @@ public:
 
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
+
+        return imgOut;
     }
 };
 
@@ -75,7 +77,7 @@ void FilterGLGradient::FragmentShader()
     fragment_source = GLW_STRINGFY
                       (
                           uniform sampler2D u_tex; \n
-                          out     vec4      f_color;	\n
+                          out vec4      f_color;	\n
 
     void main(void) {
         \n
@@ -102,12 +104,12 @@ void FilterGLGradient::InitShaders()
 
     std::string prefix;
 
-    prefix += glw::version("150");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
+
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
 #endif
+
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);

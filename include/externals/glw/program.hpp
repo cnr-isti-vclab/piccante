@@ -897,11 +897,12 @@ inline GLuint program::create_program(GLuint vs, GLuint gs, GLuint fs,
 
 inline bool has_program(void)
 {
-    if(GLEW_VERSION_2_0) {
+/*    if(GLEW_VERSION_2_0) {
         return true;
     }
+    return false;*/
+    return true;
 
-    return false;
 }
 
 inline void bind_program(program &p)

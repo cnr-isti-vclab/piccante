@@ -38,9 +38,9 @@ namespace pic {
 PIC_INLINE float *ReadHDR(std::string nameFile, float *data, int &width,
                           int &height)
 {
-    FILE *file;
+    FILE *file = fopen(nameFile.c_str(), "rb");
 
-    if((file = fopen(nameFile.c_str(), "rb")) == NULL) {
+    if(file == NULL) {
         return NULL;
     }
 
