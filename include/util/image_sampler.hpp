@@ -35,30 +35,52 @@ namespace pic {
 			c--x----d
 */
 
-/**Bilinear: calculates 2D bilinear interpolation at the point (x,y)*/
-template<class T> inline T Bilinear(T a, T b, T c, T d, float x, float y)
+/**
+ * @brief Bilinear calculates 2D bilinear interpolation at the point (x,y).
+ * @param a is the NW pixel value.
+ * @param b is the NE pixel value.
+ * @param c is the SW pixel value.
+ * @param d is the SE pixel value.
+ * @param x is the horizontal coordinate.
+ * @param y is the vertical coordinate.
+ * @return the evaluation of the B-spline.
+ */
+
+template<class Scalar> inline Scalar Bilinear(Scalar a, Scalar b, Scalar c, Scalar d, float x, float y)
 {
-    T px0 = a + y * (c - a);
-    T px1 = b + y * (d - b);
+    Scalar px0 = a + y * (c - a);
+    Scalar px1 = b + y * (d - b);
     return px0 + x * (px1 - px0);
 }
 
+/**
+ * @brief invBilinear
+ * @param A
+ * @param dx
+ * @param dy
+ * @param out
+ */
 inline void invBilinear(float A, float dx, float dy, float *out)
 {
+    dx = CLAMPi(dx, 0.0f, 1.0f);
+    dy = CLAMPi(dy, 0.0f, 1.0f);
 
-    dx = CLAMPi(dx, 0.0f, 1.0f);
-    dx = CLAMPi(dx, 0.0f, 1.0f);
     out[0] = A * dx;
     out[1] = A * (1.0f - dx);
 
-    out[2] = out[0] * (1.0f - dy);
-    out[3] = out[1] * (1.0f - dy);
+    float i_dy = 1.0f - dy;
+    out[2] = out[0] * i_dy;
+    out[3] = out[1] * i_dy;
 
     out[0] = out[0] * dy;
     out[1] = out[0] * dy;
 }
 
-/**Rx: BSplines*/
+/**
+ * @brief Rx evaluates B-spline (cubic).
+ * @param x is the curve parameter in [0, 1].
+ * @return the evaluation of the B-spline.
+ */
 inline float Rx(float x)
 {
     float px_1 = MAX(x - 1.0f, 0.0f);

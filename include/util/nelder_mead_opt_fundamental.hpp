@@ -37,10 +37,10 @@ namespace pic {
 
 #ifndef PIC_DISABLE_EIGEN
 
-class NelderMeadOptFundamental: public NelderMeadOptBase<double>
+class NelderMeadOptFundamental: public NelderMeadOptBase<float>
 {
 public:
-    std::vector< pic::Vec<2, float> > m0, m1;
+    std::vector< Eigen::Vector2f > m0, m1;
 
     /**
      * @brief NelderMeadOptFundamental
@@ -48,19 +48,12 @@ public:
      * @param m1
      * @param inliers
      */
-    NelderMeadOptFundamental(std::vector< pic::Vec<2, float> > &m0,
-                             std::vector< pic::Vec<2, float> > &m1,
+    NelderMeadOptFundamental(std::vector< Eigen::Vector2f > &m0,
+                             std::vector< Eigen::Vector2f > &m1,
                              std::vector< unsigned int> inliers) : NelderMeadOptBase()
     {
-        if(!inliers.empty()) {
-            for(unsigned int i = 0; i < inliers.size(); i++) {
-                this->m0.push_back(m0[inliers[i]]);
-                this->m1.push_back(m1[inliers[i]]);
-            }
-        } else {
-            this->m0.assign(m0.begin(), m0.end());
-            this->m1.assign(m1.begin(), m1.end());
-        }
+        filterInliers(m0, inliers, this->m0);
+        filterInliers(m1, inliers, this->m1);
     }
 
     /**
@@ -76,10 +69,7 @@ public:
         double norm = F_p0[0] * F_p0[0] + F_p0[1] * F_p0[1];
         if(norm > 0.0) {
             norm = sqrt(norm);
-
-            F_p0[0] /= norm;
-            F_p0[1] /= norm;
-            F_p0[2] /= norm;
+            F_p0 /= norm;
         }
 
         //computing distance
@@ -95,7 +85,7 @@ public:
      */
     float function(float *x, unsigned int n)
     {
-        Eigen::Matrix3d F = getMatrixFromLinearArray(x, 3, 3);
+        Eigen::Matrix3d F = getMatrixdFromLinearArray(x, 3, 3);
         Eigen::Matrix3d F_t = Eigen::Transpose<Eigen::Matrix3d>(F);
 
         double err = 0.0;

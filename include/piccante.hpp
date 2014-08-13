@@ -2,7 +2,7 @@
 
 PICCANTE
 The hottest HDR imaging library!
-http://vcg.isti.cnr.it/piccante
+http://piccantelib.net
 
 Copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
@@ -26,13 +26,13 @@ See the GNU Lesser General Public License
  *
  * \section intro_sec Introduction
  *
- * <a href="http://vcg.isti.cnr.it/piccante">PICCANTE</a> is a C++11 image processing library aimed
+ * <a href="http://piccantelib.net">PICCANTE</a> is a C++11 image processing library aimed
  * to provide structures and functionalities for enabling
  * both High Dynamic Range (HDR) and standard imaging.
  *
  * \subsection Usage
  *
- * To use <a href="http://vcg.isti.cnr.it/piccante">PICCANTE</a> simply set the wanted options and include \c "piccante.hpp"
+ * To use <a href="http://piccantelib.net">PICCANTE</a> simply set the wanted options and include \c "piccante.hpp"
  *
  * The options are set with a  \c #define and are:
  *
@@ -47,7 +47,7 @@ See the GNU Lesser General Public License
  *
  * \section descr_sec Modules
  *
- * <a href="http://vcg.isti.cnr.it/piccante">PICCANTE</a> is a modular library with different modules. The main classes are
+ * <a href="http://piccantelib.net">PICCANTE</a> is a modular library with different modules. The main classes are
  * pic::Image, pic::ImageRAW and pic::Histogram.
  * \li \c pic::Image is the base class for managing an image. Pixels are stored
  * in an array of interleaved channels float values; i.e. pic::Image::data.
@@ -65,9 +65,9 @@ See the GNU Lesser General Public License
  *
  * The main class of this module is pic::Filter. This is a base class for managing
  * a filter; it provides mechanisms for multi-threading, memory allocation, and so on.
- * Typically, a filter in <a href="http://vcg.isti.cnr.it/piccante">PICCANTE</a> can have multiple pic::ImageRAW images as input, imgIn,
+ * Typically, a filter in <a href="http://piccantelib.net">PICCANTE</a> can have multiple pic::ImageRAW images as input, imgIn,
  * and a single output, imgOut.
- * Many image filters are implemented in <a href="http://vcg.isti.cnr.it/piccante">PICCANTE</a> susch as: linear filters
+ * Many image filters are implemented in <a href="http://piccantelib.net">PICCANTE</a> susch as: linear filters
  * (e.g. Gaussian, gradient based, DCT, etc.), non-linear filters
  * (e.g. bilateral, anisotropic diffusion, guided, median, etc.), and image transforms
  * (e.g. warping).

@@ -25,15 +25,20 @@ See the GNU Lesser General Public License
 #ifndef PIC_NELDER_MEAD_OPT_HOMOGRAPHY_HPP
 #define PIC_NELDER_MEAD_OPT_HOMOGRAPHY_HPP
 
-#include "util/matrix_3_x_3.hpp"
 #include "util/nelder_mead_opt_base.hpp"
 
+#ifndef PIC_DISABLE_EIGEN
+   #include "externals/Eigen/Dense"
+#endif
+
 namespace pic {
+
+#ifndef PIC_DISABLE_EIGEN
 
 class NelderMeadOptHomography: public NelderMeadOptBase<float>
 {
 public:
-    std::vector< pic::Vec<2, float> > m0, m1;
+    std::vector< Eigen::Vector2f > m0, m1;
 
     /**
      * @brief NelderMeadOptHomography
@@ -41,14 +46,12 @@ public:
      * @param m1
      * @param inliers
      */
-    NelderMeadOptHomography(std::vector< pic::Vec<2, float> > &m0,
-                            std::vector< pic::Vec<2, float> > &m1,
+    NelderMeadOptHomography(std::vector< Eigen::Vector2f > &m0,
+                            std::vector< Eigen::Vector2f > &m1,
                             std::vector< unsigned int > inliers) : NelderMeadOptBase()
     {
-        for(unsigned int i = 0; i < inliers.size(); i++) {
-            this->m0.push_back(m0[inliers[i]]);
-            this->m1.push_back(m1[inliers[i]]);
-        }
+        filterInliers(m0, inliers, this->m0);
+        filterInliers(m1, inliers, this->m1);
     }
 
     /**
@@ -57,18 +60,11 @@ public:
      * @param p
      * @return
      */
-    pic::Vec<2, float> Homography(float *H, pic::Vec<2, float> p)
+    Eigen::Vector2f Homography(Eigen::Matrix3f &H, Eigen::Vector2f &p)
     {
-        pic::Vec<2, float> ret;
+        Eigen::Vector3f ret = H * Eigen::Vector3f(p[0], p[1], 1.0f);
 
-        ret[0]  = H[0] * p[0] + H[1] * p[1] + H[2];
-        ret[1]  = H[3] * p[0] + H[4] * p[1] + H[5];
-        float d = H[6] * p[0] + H[7] * p[1] + 1.0f;
-
-        ret[0] /= d;
-        ret[1] /= d;
-
-        return ret;
+        return Eigen::Vector2f(ret[0] / ret[2], ret[1] / ret[2]);
     }
 
     /**
@@ -81,34 +77,27 @@ public:
     {
         float err = 0.0f;
 
-        Matrix3x3 H, H_inv;
+        Eigen::Matrix3f H = getMatrixfFromLinearArray(x, 3, 3);
+        H(2, 2) = 1.0f;
 
-        for(unsigned int i = 0; i < 8; i++) {
-            H.data[i] = x[i];
-        }
-        H.data[8] = 1.0f;
-
-        H.Inverse(&H_inv);
+        Eigen::Matrix3f H_inv = H.inverse();
 
         for(unsigned int i = 0; i < m0.size(); i++) {
-            pic::Vec<2, float> p0 = m0[i];
-            pic::Vec<2, float> p1 = m1[i];
-
             float dU, dV;
 
             // | H p0 - p1 | error
-            pic::Vec<2, float> p0_H = Homography(H.data, p0);
+            Eigen::Vector2f p0_H = Homography(H, m0[i]);
 
-            dU = p1[0] - p0_H[0];
-            dV = p1[1] - p0_H[1];
+            dU = m1[i][0] - p0_H[0];
+            dV = m1[i][1] - p0_H[1];
 
             err += dU * dU + dV * dV;
 
             // | H p1 - p0 | error
-            pic::Vec<2, float> p1_H = Homography(H_inv.data, p1);
+            Eigen::Vector2f p1_H = Homography(H_inv, m1[i]);
 
-            dU = p0[0] - p1_H[0];
-            dV = p0[1] - p1_H[1];
+            dU = m0[i][0] - p1_H[0];
+            dV = m0[i][1] - p1_H[1];
 
             err += dU * dU + dV * dV;
 
@@ -141,6 +130,8 @@ public:
         return x;
     }
 };
+
+#endif
 
 }
 

@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
         printf("\nFAST Corner Detector Test:\n");
         for(unsigned int i = 0; i < corners.size(); i++) {
-            printf("X: %f Y: %f\n", corners[i][0], corners[i][1]);
+            printf("X: %3.2f Y: %3.2f\n", corners[i][0], corners[i][1]);
         }
 
         printf("\n");
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 
         printf("\nHarris Corner Detector Test:\n");
         for(unsigned int i = 0; i < corners_harris.size(); i++) {
-            printf("X: %f Y: %f\n", corners_harris[i][0], corners_harris[i][1]);
+            printf("X: %3.2f Y: %3.2f\n", corners_harris[i][0], corners_harris[i][1]);
         }
         printf("\n");
 
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
         printf("\nSUSAN Corner Detector Test:\n");
         for(unsigned int i = 0; i < corners_susan.size(); i++) {
-            printf("X: %f Y: %f\n", corners_susan[i][0], corners_susan[i][1]);
+            printf("X: %3.2f Y: %3.2f\n", corners_susan[i][0], corners_susan[i][1]);
         }
         printf("\n");
 

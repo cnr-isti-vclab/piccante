@@ -1,0 +1,266 @@
+/*
+
+PICCANTE
+The hottest HDR imaging library!
+http://vcg.isti.cnr.it/piccante
+
+Copyright (C) 2014
+Visual Computing Laboratory - ISTI CNR
+http://vcg.isti.cnr.it
+First author: Francesco Banterle
+
+PICCANTE is free software; you can redistribute it and/or modify
+under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation; either version 3.0 of
+the License, or (at your option) any later version.
+
+PICCANTE is distributed in the hope that it will be useful, but
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License
+( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+
+*/
+
+#include <QCoreApplication>
+
+//This means that OpenGL acceleration layer is disabled
+#define PIC_DISABLE_OPENGL
+
+#include "piccante.hpp"
+
+int main(int argc, char *argv[])
+{
+    Q_UNUSED(argc);
+    Q_UNUSED(argv);
+
+    printf("Reading an LDR images...");
+
+    //estimating K matrix from camera
+    double fx = pic::getFocalLengthPixels(18.0, 22.3, 2592.0);
+    double fy = pic::getFocalLengthPixels(18.0, 14.9, 1728.0);
+    Eigen::Matrix3d K = pic::getIntrinsicsMatrix(fx, fy, 2592.0 / 2.0, 1728.0 / 2.0);
+
+    pic::ImageRAW *img0 = new pic::ImageRAW();
+    img0->Read("../data/input/triangulation/venice_campo_s_polo_left.jpg", pic::LT_NOR);
+
+    pic::ImageRAW *img1 = new pic::ImageRAW();
+    img1->Read("../data/input/triangulation/venice_campo_s_polo_right.jpg", pic::LT_NOR);
+
+    printf("Ok\n");
+
+    printf("Are they both valid? ");
+    if(img0->isValid() && img1->isValid()) {
+        printf("OK\n");
+
+        //output corners
+        std::vector< Eigen::Vector3f > corners_from_img0;
+        std::vector< Eigen::Vector3f > corners_from_img1;
+
+        //computing the luminance images
+        pic::ImageRAW *L0 = pic::FilterLuminance::Execute(img0, NULL, pic::LT_CIE_LUMINANCE);
+        pic::ImageRAW *L1 = pic::FilterLuminance::Execute(img1, NULL, pic::LT_CIE_LUMINANCE);
+
+        //getting corners
+        printf("Extracting corners...\n");
+        pic::HarrisCornerDetector hcd(2.5f, 5);
+        hcd.Compute(L0, &corners_from_img0);
+        hcd.Compute(L1, &corners_from_img1);
+
+        //computing ORB descriptors for each corner and image
+        //Computing luminance images
+        pic::ImageRAW *L0_flt = pic::FilterGaussian2D::Execute(L0, NULL, 2.5f);
+        pic::ImageRAW *L1_flt = pic::FilterGaussian2D::Execute(L1, NULL, 2.5f);
+
+        printf("Computing ORB descriptors...\n");
+
+        pic::ORBDescriptor b_desc(31, 512);
+
+        std::vector< unsigned int *> descs0;
+        for(unsigned int i=0; i<corners_from_img0.size(); i++) {
+            int x = corners_from_img0[i][0];
+            int y = corners_from_img0[i][1];
+
+            descs0.push_back(b_desc.get(L0_flt, x, y));
+        }
+
+        std::vector< unsigned int *> descs1;
+        for(unsigned int i=0; i<corners_from_img1.size(); i++) {
+            int x = corners_from_img1[i][0];
+            int y = corners_from_img1[i][1];
+
+            descs1.push_back(b_desc.get(L1_flt, x, y));
+        }
+
+        printf("Matching ORB descriptors...\n");
+        std::vector< Eigen::Vector3i > matches;
+
+        int n = b_desc.getDescriptorSize();
+
+        printf("Descriptor size: %d\n", n);
+
+        for(unsigned int i =0; i<descs0.size(); i++) {
+
+            unsigned int dist_1 = 0;
+            unsigned int dist_2 = 0;
+
+            int matched_j = -1;
+
+            for(unsigned int j = 0; j < descs1.size(); j++) {
+
+                unsigned int dist = pic::BRIEFDescriptor::match(descs0.at(i), descs1.at(j), n);
+
+                if(dist > 0) {
+                    if(dist > dist_1) {
+                        dist_2 = dist_1;
+                        dist_1 = dist;
+                        matched_j = j;
+                    } else {
+                        if(dist > dist_2) {
+                            dist_2 = dist;
+                        }
+                    }
+                }
+            }
+
+            if((dist_1 * 100 > dist_2 * 105) && matched_j != -1) {
+                matches.push_back(Eigen::Vector3i(i, matched_j, dist_1));
+            }
+        }
+
+        printf("Mathces:\n");
+        std::vector< Eigen::Vector2f > m0, m1;
+
+        for(unsigned int i=0; i<matches.size(); i++) {
+            int I0 = matches[i][0];
+            int I1 = matches[i][1];
+
+            Eigen::Vector2f x, y;
+            x[0] = corners_from_img0[I0][0];
+            x[1] = corners_from_img0[I0][1];
+
+            y[0] = corners_from_img1[I1][0];
+            y[1] = corners_from_img1[I1][1];
+
+            m0.push_back(x);
+            m1.push_back(y);
+
+            printf("I1: %d (%d %d) -- I2: %d (%d %d) -- Score: %d\n", I0, int(x[0]), int(x[1]), I1, int(y[0]), int(y[1]), matches[i][2]);
+        }
+
+        printf("Estimating the fundamental matrix F from the matches...");
+        std::vector< unsigned int > inliers;
+        Eigen::Matrix3d F = pic::EstimateFundamentalRansac(m0, m1, inliers, 10000);
+
+        //non-linear refinement using Nelder-Mead        
+        pic::NelderMeadOptFundamental nmf(m0, m1, inliers);
+
+        float *F_data = pic::getLinearArrayFromMatrix(F);
+        float F_data_opt[9];
+        nmf.run(F_data, 9, 1e-4f, 10000, &F_data_opt[0]);
+        F = pic::getMatrixdFromLinearArray(F_data_opt, 3, 3);
+
+        printf("Ok.\n");
+
+        printf("\nFoundamental matrix: \n");
+        pic::MatrixConvert(F).print();
+
+        //Essential matrix decomposition
+        Eigen::Matrix3d E = pic::computeEssentialMatrix(F, K);
+
+        std::vector< Eigen::Vector2f > m0f, m1f;
+        pic::filterInliers(m0, inliers, m0f);
+        pic::filterInliers(m1, inliers, m1f);
+
+        //Estimating R and t
+        Eigen::Matrix3d R;
+        Eigen::Vector3d t;
+        pic::decomposeEssentialMatrixWithConfiguration(E, K, K, m0f, m1f, R, t);
+
+        //Triangulation
+        pic::ImageRAW imgOut0(1, img0->width, img0->height, 3);
+        imgOut0.SetZero();
+
+        pic::ImageRAW imgOut1(1, img1->width, img1->height, 3);
+        imgOut1.SetZero();
+
+        FILE *file = fopen("../data/output/simple_triangulation_mesh.ply","w");
+
+        if (file == NULL)
+            return 0;
+
+        fprintf(file,"ply\n");
+        fprintf(file,"format ascii 1.0\n");
+        fprintf(file,"element vertex %d\n", int(m0f.size()));
+
+        fprintf(file,"property float x\n");
+        fprintf(file,"property float y\n");
+        fprintf(file,"property float z\n");
+
+        fprintf(file,"property uchar red\n");
+        fprintf(file,"property uchar green\n");
+        fprintf(file,"property uchar blue\n");
+        fprintf(file,"property uchar alpha\n");
+        fprintf(file,"end_header\n");
+
+        Eigen::Matrix34d M0 = pic::getCameraMatrixIdentity(K);
+        Eigen::Matrix34d M1 = pic::getCameraMatrix(K, R, t);
+
+        pic::NelderMeadOptTriangulation nmTri(M0, M1);
+        for(unsigned int i = 0; i < m0f.size(); i++) {
+            //normalized coordinates
+            Eigen::Vector3d p0 = Eigen::Vector3d(m0f[i][0], m0f[i][1], 1.0);
+            Eigen::Vector3d p1 = Eigen::Vector3d(m1f[i][0], m1f[i][1], 1.0);
+
+            Eigen::Vector4d point = pic::triangulationHartleySturm(p0, p1, M0, M1);
+
+            nmTri.update(m0f[i], m1f[i]);
+
+            float tmpp[] = {float(point[0]), float(point[1]), float(point[2])};
+            float out[3];
+            nmTri.run(tmpp, 3, 1e-9f, 10000, &out[0]);
+
+            fprintf(file, "%3.4f %3.4f %3.4f ", out[0],  out[1],  out[2]);
+
+            unsigned char r,g,b;
+            float *color = (*img0)(int(m0f[i][0]), int(m0f[i][1]));
+            r = int(color[0] * 255.0f);
+            g = int(color[1] * 255.0f);
+            b = int(color[2] * 255.0f);
+            fprintf(file, " %d %d %d 255\n",r,g,b);
+
+            Eigen::Vector3d proj;
+
+            proj = M0 * point;
+            proj[0] /= proj[2];
+            proj[1] /= proj[2];
+
+            float *tmp;
+
+            tmp = imgOut0(int(m0f[i][0]), int(m0f[i][1]));
+            tmp[1] = 1.0f;
+
+            tmp = imgOut0(int(proj[0]), int(proj[1]));
+            tmp[0] = 1.0f;
+
+            //second image
+            proj = M1 * point;
+            proj[0] /= proj[2];
+            proj[1] /= proj[2];
+
+            tmp = imgOut1(int(m1f[i][0]), int(m1f[i][1]));
+            tmp[1] = 1.0f;
+
+            tmp = imgOut1(int(proj[0]), int(proj[1]));
+            tmp[0] = 1.0f;
+        }
+        fclose(file);
+
+        imgOut0.Write("../data/output/simple_triangulation_reprojection_left.png");
+        imgOut1.Write("../data/output/simple_triangulation_reprojection_right.png");
+    } else {
+        printf("No it is not a valid file!\n");
+    }
+
+    return 0;
+}

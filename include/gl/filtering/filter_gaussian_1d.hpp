@@ -112,9 +112,9 @@ void FilterGLGaussian1D::FragmentShader()
                                      (
                                          uniform sampler2D	u_tex;
                                          uniform sampler2D	u_weights;
-                                         uniform	int         iX;
-                                         uniform int         iY;
-                                         uniform int         nSamples;
+                                         uniform int        iX;
+                                         uniform int        iY;
+                                         uniform int        nSamples;
                                          out     vec4		f_color;
 
     void main(void) {
@@ -255,10 +255,7 @@ void FilterGLGaussian1D::setSlice(int slice)
 //Generating shaders
 void FilterGLGaussian1D::InitShaders()
 {
-    std::string prefix;
-    prefix += glw::version("150");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());

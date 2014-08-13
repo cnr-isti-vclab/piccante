@@ -24,9 +24,6 @@ See the GNU Lesser General Public License
 
 #include <QCoreApplication>
 
-//This means that we disable Eigen; some functionalities cannot be used.
-//For example, estimating the camera response function
-#define PIC_DISABLE_EIGEN
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
@@ -74,10 +71,11 @@ int main(int argc, char *argv[])
 
         printf("Ok\n");
 
+        printf("Tone mapping using Exposure Fusion...");
         pic::ImageRAW *imgToneMapped = pic::ExposureFusion(stack, NULL, 0.2f, 1.0f, 0.2f);
+        printf("Ok\n");
 
-        printf("Tone mapping using Exposure Fusion..");
-
+        printf("Writing the tone mapped image to disk...\n");
         bool bWritten = imgToneMapped->Write("../data/output/exposure_fusion_tmo.png", pic::LT_NOR);
 
         if(bWritten) {

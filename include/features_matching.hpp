@@ -32,6 +32,7 @@ See the GNU Lesser General Public License
 #include "features_matching/canny_edge_detector.hpp"
 #include "features_matching/lucid_descriptor.hpp"
 #include "features_matching/brief_descriptor.hpp"
+#include "features_matching/poisson_descriptor.hpp"
 #include "features_matching/orb_descriptor.hpp"
 #include "features_matching/dense_sift.hpp"
 #include "features_matching/patch_comp.hpp"

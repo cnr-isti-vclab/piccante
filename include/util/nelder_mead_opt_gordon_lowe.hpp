@@ -52,7 +52,7 @@ public:
         this->m.push_back(m1);
     }    
 
-    static Eigen::MatrixXd parseCameraMatrix(float *x, unsigned int index)
+    static Eigen::Matrix34d parseCameraMatrix(float *x, unsigned int index)
     {
         Eigen::Matrix3d K, R;
         Eigen::Vector3d t;
@@ -91,7 +91,7 @@ public:
 
        double err = 0.0;
 
-       Eigen::MatrixXd P = parseCameraMatrix(x, index);
+       Eigen::Matrix34d P = parseCameraMatrix(x, index);
 
        //offset of vertices
        unsigned int c = GL_PACKED_CAMERA_SIZE * m.size();

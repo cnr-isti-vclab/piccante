@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
         }
 
         printf("Matching ORB descriptors...\n");
-        std::vector< pic::Vec< 3, int>  > matches;
+        std::vector< Eigen::Vector3i > matches;
 
         int n = b_desc.getDescriptorSize();
 
@@ -122,18 +122,19 @@ int main(int argc, char *argv[])
             }
 
             if((dist_1 * 100 > dist_2 * 107) && matched_j != -1) {
-                matches.push_back(pic::Vec<3, int>(i, matched_j, dist_1));
+                matches.push_back(Eigen::Vector3i(i, matched_j, dist_1));
             }
         }
 
         printf("Mathces:\n");
-        std::vector< pic::Vec<2, float> > m0, m0f, m1, m1f;
+        std::vector< Eigen::Vector2f > m0, m0f, m1, m1f;
 
         for(unsigned int i=0; i<matches.size(); i++) {
             int I0 = matches[i][0];
             int I1 = matches[i][1];
 
-            pic::Vec<2, float> x, y;
+            Eigen::Vector2f x, y;
+
             x[0] = corners_from_img0[I0][0];
             x[1] = corners_from_img0[I0][1];
 
@@ -163,10 +164,10 @@ int main(int argc, char *argv[])
 
         fclose(file);
 
-        pic::Matrix3x3 tmp_mtxH = pic::MatrixConvert(H);
         pic::Matrix3x3 mtxH;
+        float *H_array = pic::getLinearArrayFromMatrix(H);
         pic::NelderMeadOptHomography nmoh(m0, m1, inliers);
-        nmoh.run(tmp_mtxH.data, 8, 1e-4f, 1000, mtxH.data);
+        nmoh.run(H_array, 8, 1e-4f, 1000, mtxH.data);
 
         printf("\nHomography matrix:");
         mtxH.print();

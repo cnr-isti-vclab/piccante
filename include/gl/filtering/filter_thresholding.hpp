@@ -58,6 +58,8 @@ public:
 
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
+
+        return imgOut;
     }
 };
 

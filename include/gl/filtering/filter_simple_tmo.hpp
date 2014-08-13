@@ -132,9 +132,9 @@ void FilterGLSimpleTMO::InitShaders()
 
     std::string prefix;
 
-    prefix += glw::version("150");
-//	prefix += glw::ext_require("GL_EXT_gpu_shader4");
+    prefix += glw::version("330");
     filteringProgram.setup(prefix, vertex_source, fragment_source);
+
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
 #endif

@@ -28,6 +28,11 @@ See the GNU Lesser General Public License
 namespace pic {
 
 /**randU: random number in [0,1[*/
+
+/**
+ * @brief randU computes a random number in [0, 1[ using the classic rand().
+ * @return It returns a random value in [0, 1[ using the classic rand().
+ */
 inline float randU()
 {
     return float(rand() % RAND_MAX) / float(RAND_MAX);
@@ -35,6 +40,12 @@ inline float randU()
 
 const float POISSON_RHO = 0.75f;
 
+/**
+ * @brief PoissonRadius estimates the radius of a Poisson-disk like distribution
+ * using nSmaples.
+ * @param nSamples is the number of samples to have.
+ * @return It returns the estimation of the radius.
+ */
 inline float PoissonRadius(int nSamples)
 {
     return (2.0f * POISSON_RHO) / sqrtf(2.0f * sqrtf(3.0f) * float(nSamples));

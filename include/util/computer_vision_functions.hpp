@@ -51,7 +51,7 @@ namespace pic {
  * @param points1 is an array of points computed from image 2.
  * @return It returns the homography matrix H.
  */
-Eigen::Matrix3d EstimateHomography(std::vector< Vec<2, float> > points0, std::vector< Vec<2, float> > points1)
+Eigen::Matrix3d EstimateHomography(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1)
 {
     Eigen::Matrix3d  H;
 
@@ -61,7 +61,7 @@ Eigen::Matrix3d EstimateHomography(std::vector< Vec<2, float> > points0, std::ve
     }
 
     //shifting and scaling points for numerical stability
-    std::vector< Vec<2, float> > tmp_points0, tmp_points1;
+    std::vector< Eigen::Vector2f > tmp_points0, tmp_points1;
     tmp_points0.assign(points0.begin(), points0.end());
     tmp_points1.assign(points1.begin(), points1.end());
 
@@ -101,7 +101,7 @@ Eigen::Matrix3d EstimateHomography(std::vector< Vec<2, float> > points0, std::ve
     }
 
     //Solving the linear system
-    Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeFullV);
     Eigen::MatrixXd V = svd.matrixV();
 
     n = V.cols() - 1;
@@ -131,7 +131,7 @@ Eigen::Matrix3d EstimateHomography(std::vector< Vec<2, float> > points0, std::ve
  * @param maxIterations
  * @return
  */
-Eigen::Matrix3d EstimateHomographyRansac(std::vector< Vec<2, float> > points0, std::vector< Vec<2, float> > points1,
+Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1,
                                          std::vector< unsigned int > &inliers, unsigned int maxIterations = 100, double threshold = 4.0)
 {
     if(points0.size() < 5) {
@@ -139,8 +139,8 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Vec<2, float> > points0, s
     }
 
     Eigen::Matrix3d H;
-    std::vector< Vec<2, float> > sub_points0;
-    std::vector< Vec<2, float> > sub_points1;
+    std::vector< Eigen::Vector2f > sub_points0;
+    std::vector< Eigen::Vector2f > sub_points1;
 
     int nSubSet = 4;
     sub_points0.reserve(nSubSet);
@@ -171,12 +171,8 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Vec<2, float> > points0, s
         std::vector< unsigned int > tmp_inliers;
 
         for(unsigned int j = 0; j < n; j++) {
-
-            Eigen::Vector3d pp;
-            pp[0] = tmpH(0, 0) * points0[j][0] + tmpH(0, 1) * points0[j][1] + tmpH(0, 2);
-            pp[1] = tmpH(1, 0) * points0[j][0] + tmpH(1, 1) * points0[j][1] + tmpH(1, 2);
-            pp[2] = tmpH(2, 0) * points0[j][0] + tmpH(2, 1) * points0[j][1] + tmpH(2, 2);
-
+            Eigen::Vector3d point_hom = Eigen::Vector3d(points0[j][0], points0[j][1], 1.0);
+            Eigen::Vector3d pp = tmpH * point_hom;
             pp /= pp[2];
 
             double dx = points1[j][0] - pp[0];
@@ -223,7 +219,7 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Vec<2, float> > points0, s
  * @param points1 is an array of points computed from image 2.
  * @return It returns the fundamental matrix, F_{1,2}.
  */
-Eigen::Matrix3d EstimateFundamental(std::vector< Vec<2, float> > &points0, std::vector< Vec<2, float> > &points1)
+Eigen::Matrix3d EstimateFundamental(std::vector< Eigen::Vector2f > &points0, std::vector< Eigen::Vector2f > &points1)
 {
     Eigen::Matrix3d F;
 
@@ -233,7 +229,7 @@ Eigen::Matrix3d EstimateFundamental(std::vector< Vec<2, float> > &points0, std::
     }
 
     //shifting and scaling points for numerical stability
-    std::vector< Vec<2, float> > tmp_points0, tmp_points1;
+    std::vector< Eigen::Vector2f > tmp_points0, tmp_points1;
     tmp_points0.assign(points0.begin(), points0.end());
     tmp_points1.assign(points1.begin(), points1.end());
 
@@ -260,8 +256,7 @@ Eigen::Matrix3d EstimateFundamental(std::vector< Vec<2, float> > &points0, std::
     }
 
     //Solving the linear system
-    Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
-    Eigen::MatrixXd U = svd.matrixU();
+    Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeFullV);
     Eigen::MatrixXd V = svd.matrixV();
 
     int n = V.cols() - 1;
@@ -303,7 +298,7 @@ Eigen::Matrix3d EstimateFundamental(std::vector< Vec<2, float> > &points0, std::
  * @param maxIterations
  * @return
  */
-Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Vec<2, float> > points0, std::vector< Vec<2, float> > points1,
+Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1,
                                           std::vector< unsigned int > &inliers, unsigned int maxIterations = 100, double threshold = 0.01)
 {
     if(points0.size() < 9) {
@@ -311,8 +306,8 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Vec<2, float> > points0, 
     }
 
     Eigen::Matrix3d F;
-    std::vector< Vec<2, float> > sub_points0;
-    std::vector< Vec<2, float> > sub_points1;
+    std::vector< Eigen::Vector2f > sub_points0;
+    std::vector< Eigen::Vector2f > sub_points1;
 
     int nSubSet = 8;
     sub_points0.reserve(nSubSet);
@@ -395,7 +390,7 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Vec<2, float> > points0, 
  */
 Eigen::Matrix3d noramalizeFundamentalMatrix(Eigen::Matrix3d F)
 {
-    Eigen::JacobiSVD< Eigen::MatrixXd > svdF(F, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::JacobiSVD< Eigen::Matrix3d > svdF(F, Eigen::ComputeThinU | Eigen::ComputeThinV);
     Eigen::Matrix3d Uf = svdF.matrixU();
     Eigen::Matrix3d Vf = svdF.matrixV();
     Eigen::Vector3d Df = svdF.singularValues();
@@ -403,7 +398,7 @@ Eigen::Matrix3d noramalizeFundamentalMatrix(Eigen::Matrix3d F)
 
     Eigen::Matrix3d F_new = Uf * DiagonalMatrix(Df) * Eigen::Transpose< Eigen::Matrix3d >(Vf);
 
-    float norm = MAX(Df[0], Df[1]);
+    double norm = MAX(Df[0], Df[1]);
     return F_new / norm;
 }
 
@@ -415,15 +410,18 @@ Eigen::Matrix3d noramalizeFundamentalMatrix(Eigen::Matrix3d F)
  * @param e1
  * @return
  */
-Eigen::Matrix3d ExtractFundamentalMatrix(Eigen::MatrixXd &M0, Eigen::MatrixXd &M1, Eigen::VectorXd &e0, Eigen::VectorXd &e1) {
+Eigen::Matrix3d ExtractFundamentalMatrix(Eigen::Matrix34d &M0, Eigen::Matrix34d &M1, Eigen::VectorXd &e0, Eigen::VectorXd &e1) {
+
+    Eigen::Matrix3d M0_3 = getSquareMatrix(M0);
+    Eigen::Matrix3d M1_3 = getSquareMatrix(M1);
 
 
-    Eigen::MatrixXd M0_inv = RemoveLastColumn(M0).inverse();
-    Eigen::VectorXd c0 = - M0_inv * getColumn(M0, 3);
+    Eigen::Matrix3d M0_inv = M0_3.inverse();
+    Eigen::Vector3d c0 = - M0_inv * getLastColumn(M0);
     e1 = M1 * addOne(c0);
 
-    Eigen::MatrixXd M1_inv = RemoveLastColumn(M1).inverse();
-    Eigen::VectorXd c1 = - M1_inv * getColumn(M1, 3);
+    Eigen::Matrix3d M1_inv = M1_3.inverse();
+    Eigen::Vector3d c1 = - M1_inv * getLastColumn(M1);
     e0 = M0 * addOne(c1);
 
     Eigen::Matrix3d F;
@@ -440,9 +438,9 @@ Eigen::Matrix3d ExtractFundamentalMatrix(Eigen::MatrixXd &M0, Eigen::MatrixXd &M
     F(2, 1) =  e1(0);
     F(2, 2) =  0.0;
 
-    F = F * RemoveLastColumn(M1) * M0_inv;
+    F = F * M1_3 * M0_inv;
 
-    Eigen::JacobiSVD< Eigen::MatrixXd > svdF(F, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::JacobiSVD< Eigen::Matrix3d > svdF(F, Eigen::ComputeThinU | Eigen::ComputeThinV);
     Eigen::Vector3d Df = svdF.singularValues();
 
     double norm = MAX(Df[0], MAX(Df[1], Df[2]));
@@ -461,21 +459,13 @@ void filterInliers(std::vector< T > &vec, std::vector< unsigned int > &inliers, 
 {
     vecOut.clear();
 
-    for(unsigned int i = 0; i < inliers.size(); i++) {
-        vecOut.push_back(vec[inliers[i]]);
+    if(!inliers.empty()) {
+        for(unsigned int i = 0; i < inliers.size(); i++) {
+            vecOut.push_back(vec[inliers[i]]);
+        }
+    } else {
+        vecOut.assign(vec.begin(), vec.end());
     }
-}
-
-/**
- * @brief RotationMatrixRefinement
- * @param R
- * @return
- */
-Eigen::Matrix3d RotationMatrixRefinement(Eigen::Matrix3d &R)
-{
-    Eigen::Quaternion<double> reg(R);
-
-    return reg.toRotationMatrix();
 }
 
 /**
@@ -485,7 +475,7 @@ Eigen::Matrix3d RotationMatrixRefinement(Eigen::Matrix3d &R)
  */
 Eigen::Vector3d ComputeEpipole(Eigen::Matrix3d &F)
 {
-    Eigen::JacobiSVD< Eigen::MatrixXd > svdF(F, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::JacobiSVD< Eigen::Matrix3d > svdF(F, Eigen::ComputeFullV);
     Eigen::Matrix3d V = svdF.matrixV();
 
     Eigen::Vector3d e;
@@ -544,6 +534,18 @@ double getFOVAngleFromFocalSensor(double f, double x, double y)
 {
     double d = sqrt(x * x + y * y);
     return 2.0 * atan(d /  (2.0 * f));
+}
+
+/**
+ * @brief getFocalLengthPixels
+ * @param focal_length_mm
+ * @param sensor_size_mm
+ * @param sensor_size_px
+ * @return
+ */
+double getFocalLengthPixels(double focal_length_mm, double sensor_size_mm, double sensor_size_px)
+{
+    return (focal_length_mm * sensor_size_px) / sensor_size_mm;
 }
 
 /**
@@ -621,9 +623,9 @@ Eigen::Vector2d removeLensDistortion(Eigen::Vector2d p, double *k)
  * @param K
  * @return
  */
-Eigen::MatrixXd getCameraMatrixIdentity(Eigen::Matrix3d &K)
+Eigen::Matrix34d getCameraMatrixIdentity(Eigen::Matrix3d &K)
 {
-    Eigen::MatrixXd m(3,4);
+    Eigen::Matrix34d m;
     m.setZero();
 
     m(0, 0) = 1.0;
@@ -640,9 +642,9 @@ Eigen::MatrixXd getCameraMatrixIdentity(Eigen::Matrix3d &K)
  * @param t
  * @return
  */
-Eigen::MatrixXd getCameraMatrix(Eigen::Matrix3d &K, Eigen::Matrix3d &R, Eigen::Vector3d &t)
+Eigen::Matrix34d getCameraMatrix(Eigen::Matrix3d &K, Eigen::Matrix3d &R, Eigen::Vector3d &t)
 {
-    Eigen::MatrixXd m(3,4);
+    Eigen::Matrix34d m;
 
     m(0, 0) = R(0, 0);
     m(1, 0) = R(1, 0);
@@ -755,8 +757,8 @@ Eigen::Vector3d triangulationLonguetHiggins(Eigen::Vector3d &point_0, Eigen::Vec
  * @param t
  * @return
  */
-Eigen::Vector3d triangulationHartleySturm(Eigen::Vector3d point_0, Eigen::Vector3d point_1,
-                                          Eigen::MatrixXd M0, Eigen::MatrixXd M1, int maxIter = 100)
+Eigen::Vector4d triangulationHartleySturm(Eigen::Vector3d point_0, Eigen::Vector3d point_1,
+                                          Eigen::Matrix34d M0, Eigen::Matrix34d M1, int maxIter = 100)
 {
 
     Eigen::Vector4d M0_row[3], M1_row[3];
@@ -789,7 +791,7 @@ Eigen::Vector3d triangulationHartleySturm(Eigen::Vector3d point_0, Eigen::Vector
             A(3, i) = A3[i];
         }
 
-        Eigen::JacobiSVD< Eigen::MatrixXd > svdA(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+        Eigen::JacobiSVD< Eigen::MatrixXd > svdA(A, Eigen::ComputeFullV);
         Eigen::MatrixXd V = svdA.matrixV();
         int n = V.cols() - 1;
 
@@ -820,13 +822,7 @@ Eigen::Vector3d triangulationHartleySturm(Eigen::Vector3d point_0, Eigen::Vector
         printf("triangulationHartleySturm's Iterations: %d\n",j);
     #endif
 
-    Eigen::Vector3d ret;
-
-    ret[0] = x[0];
-    ret[1] = x[1];
-    ret[2] = x[2];
-
-    return ret;
+    return x;
 }
 
 
@@ -842,7 +838,7 @@ Eigen::Vector3d triangulationHartleySturm(Eigen::Vector3d point_0, Eigen::Vector
  * @return
  */
 bool decomposeEssentialMatrixWithConfiguration(Eigen::Matrix3d &E, Eigen::Matrix3d &K0, Eigen::Matrix3d &K1,
-                                               std::vector< Vec<2, float> > &points0, std::vector< Vec<2, float> > &points1,
+                                               std::vector< Eigen::Vector2f > &points0, std::vector< Eigen::Vector2f > &points1,
                                                Eigen::Matrix3d &R, Eigen::Vector3d &t)
 {
     if(points0.size() != points1.size()) {
@@ -869,8 +865,8 @@ bool decomposeEssentialMatrixWithConfiguration(Eigen::Matrix3d &E, Eigen::Matrix
             tmp_T = -T;
         }
 
-        Eigen::MatrixXd M0 = getCameraMatrixIdentity(K0);
-        Eigen::MatrixXd M1 = getCameraMatrix(K1, tmp_R, tmp_T);
+        Eigen::Matrix34d M0 = getCameraMatrixIdentity(K0);
+        Eigen::Matrix34d M1 = getCameraMatrix(K1, tmp_R, tmp_T);
 
         int tmp_counter = 0;
         for(unsigned int i = 0; i < points0.size(); i++) {
@@ -878,10 +874,11 @@ bool decomposeEssentialMatrixWithConfiguration(Eigen::Matrix3d &E, Eigen::Matrix
             Eigen::Vector3d point_0 = Eigen::Vector3d(points0[i][0], points0[i][1], 1.0);
             Eigen::Vector3d point_1 = Eigen::Vector3d(points1[i][0], points1[i][1], 1.0);
 
-            Eigen::Vector3d p_3d_0 = triangulationHartleySturm(point_0, point_1, M0, M1);
-            Eigen::Vector3d p_3d_1 = rigidTransform(p_3d_0, tmp_R, tmp_T);
+            Eigen::Vector4d p0 = triangulationHartleySturm(point_0, point_1, M0, M1);
+            Eigen::Vector3d p0_euc = Eigen::Vector3d(p0[0], p0[1], p0[2]);
+            Eigen::Vector3d p1 = rigidTransform(p0_euc, tmp_R, tmp_T);
 
-            if((p_3d_0[2] >= 0.0) && (p_3d_1[2] >= 0.0)) {
+            if((p0[2] >= 0.0) && (p1[2] >= 0.0)) {
                 tmp_counter++;
             }
 

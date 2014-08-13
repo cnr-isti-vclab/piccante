@@ -250,7 +250,7 @@ PIC_INLINE ImageRAW::~ImageRAW()
 {
 #ifdef PIC_ENABLE_OPEN_EXR
 
-    if(dataEXR == NULL) {
+    if(dataEXR != NULL) {
         delete[] dataEXR;
     }
 
