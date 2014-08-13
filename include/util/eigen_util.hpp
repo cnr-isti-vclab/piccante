@@ -31,10 +31,12 @@ See the GNU Lesser General Public License
 #ifndef PIC_EIGEN_UTIL
 #define PIC_EIGEN_UTIL
 
+#ifndef PIC_DISABLE_EIGEN
 namespace Eigen {
     typedef Matrix<float,  3, 4> Matrix34f;
     typedef Matrix<double, 3, 4> Matrix34d;
 }
+#endif
 
 namespace pic {
 

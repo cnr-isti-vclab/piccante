@@ -51,8 +51,8 @@ int main(int argc, char *argv[])
         pic::ImageRAW *output = NULL;
 
         //Filtering with the bilateral filter
-        printf("Filtering the image with a Fast Bilateral filter.\n");
-        printf("This has sigma_s = 4.0 and sigma_r = 0.05 ... ");
+        printf("Filtering the image with a Fast Bilateral filter;\n");
+        printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
 
         pic::FilterBilateral2DS flt(4.0f, 0.05f);//creating the filter
         output = flt.ProcessP(input, output);//filtering the image
@@ -69,8 +69,8 @@ int main(int argc, char *argv[])
         }
 
         //Filtering with the Anisotropic Diffusion
-        printf("Filtering the image with the Anisotropic Diffusion...");
-        printf("This has sigma_s = 4.0 and sigma_r = 0.05 ... ");
+        printf("Filtering the image with the Anisotropic Diffusion;\n");
+        printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
         output = pic::FilterAnsiotropicDiffusion::AnisotropicDiffusion(input, output, 4.0f, 0.05f);
         printf("Ok!\n");
 
@@ -87,7 +87,6 @@ int main(int argc, char *argv[])
         printf("Filtering the image with the WLS filter...");
         pic::FilterWLS fltWLS;//creating the filter
         output = fltWLS.ProcessP(input, output);//filtering the image
-
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
@@ -103,6 +102,7 @@ int main(int argc, char *argv[])
         printf("Filtering the image with the Kuwahara filter...");
         pic::FilterKuwahara fltK(11);
         output = fltK.ProcessP(input, output);//filtering the image
+
         printf("Writing the file to disk...");
         bWritten = output->Write("../data/output/filtered_kuwahara.hdr");
 
@@ -116,6 +116,7 @@ int main(int argc, char *argv[])
         printf("Filtering the image with the Guided filter...");
         pic::FilterGuided fltG;
         output = fltG.ProcessP(input, output);//filtering the image
+
         printf("Writing the file to disk...");
         bWritten = output->Write("../data/output/filtered_guided.hdr");
 
