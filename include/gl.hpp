@@ -61,6 +61,7 @@ See the GNU Lesser General Public License
 #include "gl/filtering/filter_bilateral_3dsp.hpp"
 #include "gl/filtering/filter_disp.hpp"
 #include "gl/filtering/filter_drago_tmo.hpp"
+#include "gl/filtering/filter_conv_1d.hpp"
 #include "gl/filtering/filter_gaussian_1d.hpp"
 #include "gl/filtering/filter_gaussian_2d.hpp"
 #include "gl/filtering/filter_gaussian_3d.hpp"

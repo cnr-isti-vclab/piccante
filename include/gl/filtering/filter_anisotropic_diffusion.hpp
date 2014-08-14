@@ -60,23 +60,6 @@ public:
 
         return flt->Process(imgIn, imgOut);
     }
-
-    /*
-    //Execute
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut){
-    	ImageRAWGL imgIn(nameIn);
-    	imgIn.generateTextureGL(false);
-
-    	FilterGLAnisotropicDiffusion filter;
-
-    	GLuint testTQ1 = glBeginTimeQuery();
-    	ImageRAWGL *imgOut = filter.Process(SingleGL(&imgIn),NULL);
-    	GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-    	printf("Gradient Filter on GPU time: %g ms\n",double(timeVal)/100000000.0);
-
-    	imgOut->loadToMemory();
-    	imgOut->Write(nameOut);
-    }*/
 };
 
 //Basic constructor
@@ -169,9 +152,7 @@ void FilterGLAnisotropicDiffusion::InitShaders()
 
     std::string prefix;
 
-    prefix += glw::version("150");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());

@@ -90,11 +90,7 @@ void FilterGLLuminance::InitShaders()
     }
                       );
 
-    std::string prefix;
-    prefix += glw::version("150");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
@@ -102,9 +98,9 @@ void FilterGLLuminance::InitShaders()
 
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
-    filteringProgram.fragment_target("f_color",    0);
+    filteringProgram.fragment_target("f_color", 0);
     filteringProgram.relink();
-    filteringProgram.uniform("u_tex",      0);
+    filteringProgram.uniform("u_tex", 0);
     glw::bind_program(0);
 }
 

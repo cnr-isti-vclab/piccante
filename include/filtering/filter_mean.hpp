@@ -78,7 +78,7 @@ public:
             if( data != NULL)
                 delete[] data;
 
-            data = FilterConv1D::getFilterMean(size);
+            data = FilterConv1D::getKernelMean(size);
         }        
     }
 
