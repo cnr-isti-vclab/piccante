@@ -22,22 +22,23 @@ See the GNU Lesser General Public License
 
 */
 
-#ifndef PIC_FILTERING_FILTER_MEAN_HPP
-#define PIC_FILTERING_FILTER_MEAN_HPP
+#ifndef PIC_FILTERING_FILTER_GL_MEAN_HPP
+#define PIC_FILTERING_FILTER_GL_MEAN_HPP
 
-#include "filtering/filter_npasses.hpp"
+#include "gl/filtering/filter_npasses.hpp"
 
 namespace pic {
 
 /**
- * @brief The FilterMean class
+ * @brief The FilterGLMean class
  */
-class FilterMean: public FilterNPasses
+class FilterGLMean: public FilterGLNPasses
 {
 protected:
 
 protected:
-    FilterConv1D    *filter;
+    FilterGLConv1D  *filter;
+    ImageRAWGL      *weights;
     float           *data;
     int             size;    
 
@@ -47,29 +48,31 @@ public:
      * @brief FilterMean
      * @param size
      */
-    FilterMean(int size)
+    FilterGLMean(int size)
     {
         data = NULL;
+        weights = NULL;
         this->size = -1;
 
         Update(size);
 
-        filter = new FilterConv1D(data, size);
+        filter = new FilterGLConv1D(weights, 0, GL_TEXTURE_2D);
 
         InsertFilter(filter);
         InsertFilter(filter);
     }
 
-    ~FilterMean()
+    ~FilterGLMean()
     {
-        Destroy();
-
         if(filter != NULL) {
             delete filter;
+            filter = NULL;
         }
 
-        if( data != NULL)
+        if( data != NULL) {
             delete[] data;
+            data = NULL;
+        }
     }
 
     /**
@@ -86,11 +89,20 @@ public:
         if(this->size != size)
         {
             this->size = size;
-            if( data != NULL)
+            if( data != NULL) {
                 delete[] data;
+                data = NULL;
+            }
 
             data = FilterConv1D::getKernelMean(size);
-        }        
+        }
+
+        if(weights != NULL) {
+            delete weights;
+        }
+
+        weights = new ImageRAWGL(1, size, 1, 1, data);
+        weights->generateTextureGL(false);
     }
 
     /**
@@ -100,10 +112,10 @@ public:
      * @param size
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, int size)
+    static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgOut, int size)
     {
-        FilterMean filter(size);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        FilterGLMean filter(size);
+        return filter.Process(SingleGL(imgIn), imgOut);
     }
 
     /**
@@ -115,8 +127,10 @@ public:
      */
     static ImageRAW *Execute(std::string nameIn, std::string nameOut, int size)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, size);
+        ImageRAWGL imgIn(nameIn);
+        imgIn.generateTextureGL(false);
+        ImageRAWGL *imgOut = Execute(&imgIn, NULL, size);
+        imgOut->loadToMemory();
         imgOut->Write(nameOut);
         return imgOut;
     }
@@ -124,5 +138,5 @@ public:
 
 } // end namespace pic
 
-#endif /* PIC_FILTERING_FILTER_MEAN_HPP */
+#endif /* PIC_FILTERING_FILTER_GL_MEAN_HPP */
 

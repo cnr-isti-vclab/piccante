@@ -33,6 +33,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The PyramidGL class
+ */
 class PyramidGL
 {
 protected:
@@ -61,16 +64,62 @@ protected:
 public:
     std::vector<ImageRAWGL *>	stack;
 
+    /**
+     * @brief PyramidGL
+     * @param img
+     * @param lapGauss
+     * @param limitLevel
+     */
     PyramidGL(ImageRAWGL *img, bool lapGauss, int limitLevel);
+
+    /**
+     * @brief PyramidGL
+     * @param width
+     * @param height
+     * @param channels
+     * @param lapGauss
+     * @param limitLevel
+     */
     PyramidGL(int width, int height, int channels, bool lapGauss, int limitLevel);
+
     ~PyramidGL();
 
+    /**
+     * @brief Update
+     * @param img
+     */
     void Update(ImageRAWGL *img);
+
+    /**
+     * @brief Mul
+     * @param pyr
+     */
     void Mul(const PyramidGL *pyr);
+
+    /**
+     * @brief MulNeg
+     * @param pyr
+     */
     void MulNeg(const PyramidGL *pyr);
+
+    /**
+     * @brief Add
+     * @param pyr
+     */
     void Add(const PyramidGL *pyr);
+
+    /**
+     * @brief Blend
+     * @param pyr
+     * @param weight
+     */
     void Blend(PyramidGL *pyr, PyramidGL *weight);
 
+    /**
+     * @brief Reconstruct
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Reconstruct(ImageRAWGL *imgOut);
 };
 

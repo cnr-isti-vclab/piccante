@@ -32,7 +32,7 @@ class SimpleFilteringWindow : public pic::OpenGLWindow
 protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
-    pic::FilterGLGaussian2D *fltGauss;
+    pic::FilterGLMean *fltGauss;
 
 public:
     pic::ImageRAWGL img, *img_flt, *img_flt_tmo;
@@ -61,7 +61,7 @@ public:
         tmo = new pic::FilterGLSimpleTMO();
 
         //allocating a Gaussian filter with sigma = 2.0
-        fltGauss = new pic::FilterGLGaussian2D(2.0);
+        fltGauss = new pic::FilterGLMean(8);
     }
 
     void render()

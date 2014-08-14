@@ -84,6 +84,23 @@ public:
     }
 
     /**
+     * @brief ImageRAW
+     * @param frames
+     * @param width
+     * @param height
+     * @param channels
+     * @param data
+     */
+    ImageRAWGL(int frames, int width, int height, int channels, float *data) : ImageRAW (frames, width, height, channels, data)
+    {
+        notOwnedGL = false;
+        mode = IMG_CPU;
+        texture = 0;
+        target = 0;
+        tmpFbo = NULL;
+    }
+
+    /**
      * @brief ImageRAWGL
      * @param frames
      * @param width
