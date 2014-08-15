@@ -25,6 +25,7 @@ See the GNU Lesser General Public License
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 
+#define PIC_DEBUG
 #include "piccante.hpp"
 
 class SimpleFilteringWindow : public pic::OpenGLWindow
@@ -33,6 +34,7 @@ protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
     pic::FilterGLGaussian2D *fltGauss;
+    pic::FilterGLBilateral2DS *fltBilG;
 
 public:
     pic::ImageRAWGL img, *img_flt, *img_flt_tmo;
@@ -60,6 +62,8 @@ public:
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
+        fltBilG = new pic::FilterGLBilateral2DS(4.0f, 0.1f);
+
         //allocating a Gaussian filter with sigma = 4.0
         fltGauss = new pic::FilterGLGaussian2D(4.0);
     }
@@ -73,7 +77,7 @@ public:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //Gaussian filtering...
-        img_flt = fltGauss->Process(SingleGL(&img), img_flt);
+        img_flt = fltBilG->Process(SingleGL(&img), img_flt);
 
         //simple tone mapping: gamma + exposure correction
         img_flt_tmo = tmo->Process(SingleGL(img_flt), img_flt_tmo);

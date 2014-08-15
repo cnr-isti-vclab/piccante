@@ -134,10 +134,8 @@ void FilterGLScatter::FragmentShader()
 
     geometry_source = GLW_STRINGFY(
 
-                          //#extension EXT_geometry_shader4 : enable\n
-
                           layout(points) in;
-                          layout(points, max_Vertexs = 1) out;
+                          layout(points, max_vertices = 1) out;
 
                           flat in vec4  v2g_color[1];
                           flat in int   v2g_layer[1];
@@ -146,8 +144,9 @@ void FilterGLScatter::FragmentShader()
     void main(void) {
         g2f_color   = v2g_color[0];
         gl_Layer    = v2g_layer[0];
-        gl_Position = gl_PositionIn[0];
+        gl_Position = gl_in[0].gl_Position;//gl_PositionIn[0];
         EmitVertex();
+
         EndPrimitive();
     }
                       );
@@ -164,12 +163,10 @@ void FilterGLScatter::FragmentShader()
 
 void FilterGLScatter::InitShaders()
 {
-    std::string prefix;
-    prefix += glw::version("330");
+//    std::string prefix;
 //	prefix += glw::ext_require("GL_EXT_gpu_shader4");
 //	prefix += glw::version("120");
-    prefix += glw::ext_enable("EXT_geometry_shader4");
-    filteringProgram.setup(prefix, vertex_source, geometry_source, fragment_source,
+    filteringProgram.setup(glw::version("330"), vertex_source, geometry_source, fragment_source,
                            GL_POINTS, GL_POINTS, 1);
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());

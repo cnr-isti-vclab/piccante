@@ -154,7 +154,7 @@ FilterGLBilateral2DSE::FilterGLBilateral2DSE(float sigma_s, float sigma_p, float
     imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU);
     imageRand->SetRand();
     imageRand->Mul(float(nRand - 1));
-    imageRand->generateTextureGLU32();
+    imageRand->generateTexture2DU32GL();
     nSamplers = nRand;
 
     //Poisson samples

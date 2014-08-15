@@ -49,17 +49,38 @@ protected:
     void FragmentShader();
 
 public:
-    //Init constructors
+    /**
+     * @brief FilterGLBilateral2DS
+     * @param sigma_s
+     * @param sigma_r
+     * @param type
+     */
     FilterGLBilateral2DS(float sigma_s, float sigma_r, BF_TYPE type);
+
     ~FilterGLBilateral2DS();
 
-    //Change parameters
+    /**
+     * @brief Update
+     * @param sigma_s
+     * @param sigma_r
+     */
     void Update(float sigma_s, float sigma_r);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
-
-    //Execute
+\
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
     static ImageRAWGL *Execute(ImageRAWGL *imgIn, float sigma_s, float sigma_r)
     {
         FilterGLBilateral2DS *filter = new FilterGLBilateral2DS(sigma_s, sigma_r,
@@ -76,6 +97,15 @@ public:
         return imgOut;
     }
 
+    /**
+     * @brief Execute
+     * @param nameFile
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @param testing
+     * @return
+     */
     static ImageRAWGL *Execute(std::string nameFile, std::string nameOut,
                                float sigma_s, float sigma_r, int testing = 1)
     {
@@ -126,7 +156,6 @@ public:
 
 };
 
-//Init constructors
 FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma_r,
         BF_TYPE type = BF_CLASSIC): FilterGL()
 {
@@ -153,7 +182,7 @@ FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma_r,
         imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU);
         imageRand->SetRand();
         imageRand->Mul(float(nRand - 1));
-        imageRand->generateTextureGLU32();
+        imageRand->generateTexture2DU32GL();
         nSamplers = nRand;
     }
 
@@ -200,7 +229,7 @@ void FilterGLBilateral2DS::FragmentShader()
         vec3 colRef = texelFetch(u_tex, coordsFrag, 0).xyz;
         float weight = 0.0;
 
-        float shifter = texture2D(u_rand, gl_FragCoord.xy, 0).x;
+        float shifter = texture(u_rand, gl_FragCoord.xy).x;
 
         for(int i = 0; i < TOKEN_BANANA; i++) {
             //Coordinates
@@ -332,10 +361,7 @@ void FilterGLBilateral2DS::InitShaders()
         break;
     }
 
-    std::string prefix;
-    prefix += glw::version("150");
-//	prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_sources[value]);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_sources[value]);
 
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
@@ -346,13 +372,12 @@ void FilterGLBilateral2DS::InitShaders()
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
     glw::bind_program(0);
+
     Update(-1.0f, -1.0f);
 }
 
-//Change parameters
 void FilterGLBilateral2DS::Update(float sigma_s, float sigma_r)
 {
-
     bool flag = false;
 
     if(sigma_s > 0.0f) {

@@ -67,8 +67,9 @@ public:
      * @brief ImageRAWGL
      * @param img
      * @param mipmap
+     * @param target
      */
-    ImageRAWGL(ImageRAW *img, bool mipmap);
+    ImageRAWGL(ImageRAW *img, bool mipmap, GLenum target);
 
     /**
      * @brief ImageRAWGL
@@ -108,7 +109,7 @@ public:
      * @param channels
      * @param mode
      */
-    ImageRAWGL(int frames, int width, int height, int channels, IMAGESTORE mode);
+    ImageRAWGL(int frames, int width, int height, int channels, IMAGESTORE mode, GLenum target);
 
     /**
      * @brief AllocateSimilarOneGL
@@ -132,28 +133,24 @@ public:
     void AssignGL(float r, float g, float b, float a);
 
     /**
-     * @brief generateTextureGL
+     * @brief generate
+     * @param mipmap
+     * @param target
+     */
+    GLuint generateTextureGL(bool mipmap, GLenum target);
+
+    /**
+     * @brief generateTexture2DGL
      * @param mipmap
      * @return
      */
-    GLuint generateTextureGL(bool mipmap);
+    GLuint generateTexture2DGL(bool mipmap);
 
     /**
-     * @brief generateTextureGLU32
+     * @brief generateTexture2DU32GL
      * @return
      */
-    GLuint	generateTextureGLU32();
-
-    /**
-     * @brief loadFromMemory
-     * @param mipmap
-     */
-    void loadFromMemory(bool mipmap);
-
-    /**
-     * @brief loadToMemory
-     */
-    void loadToMemory();
+    GLuint	generateTexture2DU32GL();
 
     /**
      * @brief generateTexture3DGL
@@ -168,10 +165,10 @@ public:
     GLuint generateTextureCubeMapGL();
 
     /**
-     * @brief generateTextureArrayGL
+     * @brief generateTexture2DArrayGL
      * @return
      */
-    GLuint generateTextureArrayGL();
+    GLuint generateTexture2DArrayGL();
 
     /**
      * @brief loadSliceIntoTexture
@@ -183,6 +180,17 @@ public:
      * @brief loadAllSlicesIntoTex
      */
     void loadAllSlicesIntoTex();
+
+    /**
+     * @brief loadFromMemory
+     * @param mipmap
+     */
+    void loadFromMemory(bool mipmap);
+
+    /**
+     * @brief loadToMemory
+     */
+    void loadToMemory();
 
     /**
      * @brief readFromBindedFBO
@@ -406,7 +414,7 @@ ImageRAWGL::ImageRAWGL(GLuint tex, GLuint target) : ImageRAW()
     AllocateAux();
 }
 
-ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap): ImageRAW()
+ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap, GLenum target = GL_TEXTURE_2D): ImageRAW()
 {
     notOwnedGL = false;
 
@@ -420,20 +428,15 @@ ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap): ImageRAW()
 
     CalculateStrides();
 
-    target  = 0;
     texture = 0;
 
-    if(frames > 1) {
-        generateTexture3DGL();
-    } else {
-        generateTextureGL(mipmap);
-    }
+    generateTextureGL(mipmap, target);
 
     mode = IMG_CPU_GPU;
 }
 
 ImageRAWGL::ImageRAWGL(int frames, int width, int height, int channels,
-                       IMAGESTORE mode) : ImageRAW()
+                       IMAGESTORE mode, GLenum target = GL_TEXTURE_2D) : ImageRAW()
 {
     notOwnedGL = false;
     tmpFbo = NULL;
@@ -447,7 +450,7 @@ ImageRAWGL::ImageRAWGL(int frames, int width, int height, int channels,
     switch(this->mode) {
     case IMG_CPU_GPU: {
         Allocate(width, height, channels, frames);
-        generateTextureGL(false);
+        generateTextureGL(false, target);
     }
     break;
 
@@ -465,11 +468,7 @@ ImageRAWGL::ImageRAWGL(int frames, int width, int height, int channels,
 
         AllocateAux();
 
-        if(frames == 1) {
-            generateTextureGL(false);
-        } else {
-            generateTexture3DGL();
-        }
+        generateTextureGL(false, target);
     }
     break;
     }
@@ -478,6 +477,48 @@ ImageRAWGL::ImageRAWGL(int frames, int width, int height, int channels,
 ImageRAWGL::~ImageRAWGL()
 {
     Destroy();
+}
+
+GLuint ImageRAWGL::generateTextureGL(bool mipmap, GLenum target = GL_TEXTURE_2D)
+{
+    this->target  = target;
+
+    switch(target) {
+        case GL_TEXTURE_2D:
+        {
+            generateTexture2DGL(mipmap);
+        } break;
+
+        case GL_TEXTURE_3D:
+        {
+            if(frames > 1) {
+                generateTexture3DGL();
+            } else {
+                generateTexture2DGL(mipmap);
+                this->target = GL_TEXTURE_2D;
+            }
+        } break;
+
+        case GL_TEXTURE_2D_ARRAY: {
+            generateTexture2DArrayGL();
+        } break;
+
+        case GL_TEXTURE_CUBE_MAP: {
+            if(frames > 5) {
+                generateTextureCubeMapGL();
+            } else {
+                if(frames > 1) {
+                    generateTexture2DArrayGL();
+                    this->target = GL_TEXTURE_2D_ARRAY;
+                } else {
+                    generateTexture2DGL(mipmap);
+                    this->target = GL_TEXTURE_2D;
+                }
+            }
+        } break;
+    }
+
+    return texture;
 }
 
 ImageRAWGL *ImageRAWGL::CloneGL()
@@ -529,7 +570,7 @@ void ImageRAWGL::AssignGL(float r = 0.0f, float g = 0.0f, float b = 0.0f,
     tmpFbo->unbind();
 }
 
-GLuint ImageRAWGL::generateTextureGL(bool mipmap = false)
+GLuint ImageRAWGL::generateTexture2DGL(bool mipmap = false)
 {
     if(width <1 || height < 1 || channels < 1) {
         return 0;
@@ -601,47 +642,7 @@ GLuint	ImageRAWGL::generateTextureCubeMapGL()
     return texture;
 }
 
-void ImageRAWGL::loadFromMemory(bool mipmap = false)
-{
-    glBindTexture(target, texture);
-
-    int mode, modeInternalFormat;
-    getModesGL(channels, mode, modeInternalFormat);
-    glTexImage2D(target, 0, modeInternalFormat, width, height, 0,
-                 mode, GL_FLOAT, data);
-
-    glBindTexture(target, 0);
-}
-
-void ImageRAWGL::loadToMemory()
-{
-    if(texture == 0) {
-        #ifdef PIC_DEBUG
-            printf("This texture can not be trasferred from GPU memory\n");
-        #endif
-        return;
-    }
-
-    if(data == NULL) {
-        #ifdef PIC_DEBUG
-            printf("RAM memory allocated: %d %d %d %d\n", width, height, channels, frames);
-        #endif
-
-        Allocate(width, height, channels, frames);
-        this->mode = IMG_CPU_GPU;
-    }
-
-    int mode, modeInternalFormat;
-    getModesGL(channels, mode, modeInternalFormat);
-
-    bindTexture();
-
-    glGetTexImage(target, 0, mode, GL_FLOAT, data);
-
-    unBindTexture();
-}
-
-GLuint ImageRAWGL::generateTextureGLU32()
+GLuint ImageRAWGL::generateTexture2DU32GL()
 {
     if(width <1 || height < 1 || channels < 1) {
         return 0;
@@ -711,7 +712,7 @@ GLuint ImageRAWGL::generateTexture3DGL()
     return texture;
 }
 
-GLuint ImageRAWGL::generateTextureArrayGL()
+GLuint ImageRAWGL::generateTexture2DArrayGL()
 {
     if(width <1 || height < 1 || channels < 1 || frames < 1) {
         return 0;
@@ -735,6 +736,46 @@ GLuint ImageRAWGL::generateTextureArrayGL()
                  0, mode, GL_FLOAT, data);
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     return texture;
+}
+
+void ImageRAWGL::loadFromMemory(bool mipmap = false)
+{
+    glBindTexture(target, texture);
+
+    int mode, modeInternalFormat;
+    getModesGL(channels, mode, modeInternalFormat);
+    glTexImage2D(target, 0, modeInternalFormat, width, height, 0,
+                 mode, GL_FLOAT, data);
+
+    glBindTexture(target, 0);
+}
+
+void ImageRAWGL::loadToMemory()
+{
+    if(texture == 0) {
+        #ifdef PIC_DEBUG
+            printf("This texture can not be trasferred from GPU memory\n");
+        #endif
+        return;
+    }
+
+    if(data == NULL) {
+        #ifdef PIC_DEBUG
+            printf("RAM memory allocated: %d %d %d %d\n", width, height, channels, frames);
+        #endif
+
+        Allocate(width, height, channels, frames);
+        this->mode = IMG_CPU_GPU;
+    }
+
+    int mode, modeInternalFormat;
+    getModesGL(channels, mode, modeInternalFormat);
+
+    bindTexture();
+
+    glGetTexImage(target, 0, mode, GL_FLOAT, data);
+
+    unBindTexture();
 }
 
 void ImageRAWGL::loadSliceIntoTexture(int i)

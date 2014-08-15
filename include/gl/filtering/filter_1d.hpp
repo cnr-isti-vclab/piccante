@@ -149,7 +149,7 @@ void FilterGL1D::ChangePass(int pass, int tPass)
     }
 
 #ifdef PIC_DEBUG
-    printf("%d %d %d\n", dirs[0], dirs[1], dirs[2]);
+//    printf("%d %d %d\n", dirs[0], dirs[1], dirs[2]);
 #endif
 
     SetUniform();
