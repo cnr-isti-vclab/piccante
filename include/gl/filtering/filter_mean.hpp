@@ -26,6 +26,7 @@ See the GNU Lesser General Public License
 #define PIC_FILTERING_FILTER_GL_MEAN_HPP
 
 #include "gl/filtering/filter_npasses.hpp"
+#include "gl/filtering/filter_conv_1d.hpp"
 
 namespace pic {
 
@@ -40,21 +41,21 @@ protected:
     FilterGLConv1D  *filter;
     ImageRAWGL      *weights;
     float           *data;
-    int             size;    
+    int             kernelSize;
 
 public:
 
     /**
      * @brief FilterMean
-     * @param size
+     * @param kernelSize
      */
-    FilterGLMean(int size)
+    FilterGLMean(int kernelSize)
     {
         data = NULL;
         weights = NULL;
-        this->size = -1;
+        this->kernelSize = -1;
 
-        Update(size);
+        Update(kernelSize);
 
         filter = new FilterGLConv1D(weights, 0, GL_TEXTURE_2D);
 
@@ -79,29 +80,29 @@ public:
      * @brief Update
      * @param size
      */
-    void Update(int size)
+    void Update(int kernelSize)
     {
-        if(size < 1)
+        if(kernelSize < 1)
         {
-            size = 3;
+            kernelSize = 3;
         }
 
-        if(this->size != size)
+        if(this->kernelSize != kernelSize)
         {
-            this->size = size;
+            this->kernelSize = kernelSize;
             if( data != NULL) {
                 delete[] data;
                 data = NULL;
             }
 
-            data = FilterConv1D::getKernelMean(size);
+            data = FilterConv1D::getKernelMean(kernelSize);
         }
 
         if(weights != NULL) {
             delete weights;
         }
 
-        weights = new ImageRAWGL(1, size, 1, 1, data);
+        weights = new ImageRAWGL(1, kernelSize, 1, 1, data);
         weights->generateTextureGL(false);
     }
 
@@ -109,12 +110,12 @@ public:
      * @brief Execute
      * @param imgIn
      * @param imgOut
-     * @param size
+     * @param kernelSize
      * @return
      */
-    static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgOut, int size)
+    static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgOut, int kernelSize)
     {
-        FilterGLMean filter(size);
+        FilterGLMean filter(kernelSize);
         return filter.Process(SingleGL(imgIn), imgOut);
     }
 
@@ -122,14 +123,14 @@ public:
      * @brief Execute
      * @param nameIn
      * @param nameOut
-     * @param size
+     * @param kernelSize
      * @return
      */
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, int size)
+    static ImageRAW *Execute(std::string nameIn, std::string nameOut, int kernelSize)
     {
         ImageRAWGL imgIn(nameIn);
         imgIn.generateTextureGL(false);
-        ImageRAWGL *imgOut = Execute(&imgIn, NULL, size);
+        ImageRAWGL *imgOut = Execute(&imgIn, NULL, kernelSize);
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
         return imgOut;

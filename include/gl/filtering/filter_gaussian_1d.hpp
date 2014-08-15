@@ -34,9 +34,6 @@ class FilterGLGaussian1D: public FilterGLConv1D
 protected:
     float		sigma;
 
-    void InitShaders();
-    void FragmentShader();
-
 public:
 
     /**

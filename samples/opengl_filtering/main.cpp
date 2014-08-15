@@ -32,7 +32,7 @@ class SimpleFilteringWindow : public pic::OpenGLWindow
 protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
-    pic::FilterGLMean *fltGauss;
+    pic::FilterGLGaussian2D *fltGauss;
 
 public:
     pic::ImageRAWGL img, *img_flt, *img_flt_tmo;
@@ -60,8 +60,8 @@ public:
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        //allocating a Gaussian filter with sigma = 2.0
-        fltGauss = new pic::FilterGLMean(8);
+        //allocating a Gaussian filter with sigma = 4.0
+        fltGauss = new pic::FilterGLGaussian2D(4.0);
     }
 
     void render()
@@ -72,7 +72,7 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        //imgoOut = img + imgRand
+        //Gaussian filtering...
         img_flt = fltGauss->Process(SingleGL(&img), img_flt);
 
         //simple tone mapping: gamma + exposure correction
