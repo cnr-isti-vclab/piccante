@@ -100,7 +100,7 @@ public:
             width  = EvenOdd(width);
             height = EvenOdd(height);
 
-            ImageRAWGL *tmpImg = new ImageRAWGL(1, width, height, channels, IMG_GPU);
+            ImageRAWGL *tmpImg = new ImageRAWGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
             stack.push_back(tmpImg);
 
             checkSize = MIN(width, height);
@@ -124,7 +124,7 @@ public:
     static ImageRAWGL *ExecuteReduxMean(std::string nameIn, std::string nameOut)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLRedux *filter = CreateReduxMean();
 
@@ -142,7 +142,7 @@ public:
     static ImageRAWGL *ExecuteReduxMax(std::string nameIn, std::string nameOut)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLRedux *filter = CreateReduxMax();
 
@@ -230,7 +230,7 @@ ImageRAWGL *FilterGLRedux::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int f = imgIn[0]->frames;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(f, w, h, 4, IMG_GPU);
+        imgOut = new ImageRAWGL(f, w, h, 4, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(imgOut->width < 1 || imgOut->height < 1) {

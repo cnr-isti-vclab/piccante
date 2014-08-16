@@ -122,7 +122,7 @@ void FilterGLConv1D::FragmentShader()
     std::string fragment_source_3D = GLW_STRINGFY
                                      (
                                          uniform sampler3D  u_tex;
-                                         uniform sampler3D  u_weights;
+                                         uniform sampler2D  u_weights;
                                          uniform int        slice;
                                          uniform int        iX;
                                          uniform int        iY;

@@ -44,17 +44,32 @@ protected:
     float s_S, s_R, mul_E;
 
 public:
-    //Basic constructors
+
+    /**
+     * @brief FilterGLScatter
+     * @param s_S
+     * @param s_R
+     * @param width
+     * @param height
+     */
     FilterGLScatter(float s_S, float s_R, int width, int height);
 
-    //Change parameters
+    /**
+     * @brief Update
+     * @param s_S
+     * @param s_R
+     */
     void Update(float s_S, float s_R);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 };
 
-//Init constructors
 FilterGLScatter::FilterGLScatter(float s_S, float s_R, int width, int height)
 {
     this->s_S = s_S;
@@ -163,13 +178,11 @@ void FilterGLScatter::FragmentShader()
 
 void FilterGLScatter::InitShaders()
 {
-//    std::string prefix;
-//	prefix += glw::ext_require("GL_EXT_gpu_shader4");
-//	prefix += glw::version("120");
-    filteringProgram.setup(glw::version("330"), vertex_source, geometry_source, fragment_source,
+    filteringProgram.setup(glw::version("400"), vertex_source, geometry_source, fragment_source,
                            GL_POINTS, GL_POINTS, 1);
+
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLScatter shader log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
@@ -192,13 +205,12 @@ void FilterGLScatter::Update(float s_S, float s_R)
 
     glw::bind_program(filteringProgram);
     filteringProgram.relink();
-    filteringProgram.uniform("u_tex",      0);
-    filteringProgram.uniform("s_S",	   s_S);
-    filteringProgram.uniform("mul_E",	   mul_E);
+    filteringProgram.uniform("u_tex", 0);
+    filteringProgram.uniform("s_S", s_S);
+    filteringProgram.uniform("mul_E", mul_E);
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLScatter::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn.size() < 1 && imgIn[0] == NULL) {
@@ -212,7 +224,7 @@ ImageRAWGL *FilterGLScatter::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 
     if(imgOut == NULL) {
         imgOut = new ImageRAWGL(range + 1, width + 1, height + 1,
-                                imgIn[0]->channels + 1, IMG_GPU);
+                                imgIn[0]->channels + 1, IMG_GPU, GL_TEXTURE_3D);
     }
 
     if(fbo == NULL) {

@@ -87,7 +87,7 @@ public:
     static ImageRAW *Execute(std::string nameIn, std::string nameOut, int size)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
         ImageRAWGL *imgOut = Execute(&imgIn, NULL, size);
         imgOut->loadToMemory();
         imgOut->Write(nameOut);

@@ -105,7 +105,7 @@ ImageRAWGL *FilterGLRemapping::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int channels = 3;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

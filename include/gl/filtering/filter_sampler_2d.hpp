@@ -46,11 +46,11 @@ public:
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float scale)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLSampler2D filter(scale);
         ImageRAWGL *imgOut = new ImageRAWGL(imgIn.frames, imgIn.width * scale,
-                                            imgIn.height * scale, imgIn.channels, IMG_GPU_CPU);
+                                            imgIn.height * scale, imgIn.channels, IMG_GPU_CPU, GL_TEXTURE_2D);
 
         GLuint testTQ1 = glBeginTimeQuery();
         filter.Process(SingleGL(&imgIn), imgOut);
@@ -129,7 +129,7 @@ ImageRAWGL *FilterGLSampler2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int f = imgIn[0]->frames;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(f, w, h, 4, IMG_GPU);
+        imgOut = new ImageRAWGL(f, w, h, 4, IMG_GPU, imgIn[0]->getTarget());
     }
 
     //Fbo

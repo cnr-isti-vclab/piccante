@@ -59,7 +59,7 @@ public:
     static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgLum, ImageRAWGL *imgOut,
                                float Ld_Max = 100.0f, float b = 0.95f)
     {
-        imgIn->generateTextureGL(false);
+        imgIn->generateTextureGL(false, GL_TEXTURE_2D);
 
         imgLum = FilterGLLuminance::Execute(imgIn, imgLum);
 
@@ -81,7 +81,7 @@ public:
         ImageRAWGL imgIn(nameIn);
 
         ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 4,
-                                            IMG_GPU_CPU);
+                                            IMG_GPU_CPU, GL_TEXTURE_2D);
 
 
         imgOut = Execute(&imgIn, NULL, imgOut, Ld_Max, b);
@@ -246,7 +246,7 @@ ImageRAWGL *FilterGLDragoTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     //Fbo

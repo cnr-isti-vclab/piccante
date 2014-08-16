@@ -79,10 +79,10 @@ FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
     this->sigma_t = sigma_t;
 
     int nRand = 32;
-    imageRand = new ImageRAWGL(1, 256, 256, 1, IMG_CPU);
+    imageRand = new ImageRAWGL(1, 256, 256, 1, IMG_CPU, GL_TEXTURE_2D);
     imageRand->SetRand();
     imageRand->Mul(float(nRand - 1));
-    imageRand->generateTextureGL(false);
+    imageRand->generateTextureGL(false, GL_TEXTURE_2D);
 
     //Precomputation of the Gaussian Kernel
     int kernelSizeSpace = PrecomputedGaussian::KernelSize(sigma_s);
@@ -244,7 +244,7 @@ ImageRAWGL *FilterGLBilateral3DS::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(w, h, 1, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(w, h, 1, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {

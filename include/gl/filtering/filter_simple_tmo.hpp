@@ -53,13 +53,13 @@ public:
                         float fstop)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLSimpleTMO filter(gamma, fstop);
 
         GLuint testTQ1 = glBeginTimeQuery();
         ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 4,
-                                            IMG_GPU_CPU);
+                                            IMG_GPU_CPU, GL_TEXTURE_2D);
 
         int n = 100;
 
@@ -177,7 +177,7 @@ ImageRAWGL *FilterGLSimpleTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     //Fbo

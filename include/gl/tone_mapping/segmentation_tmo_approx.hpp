@@ -112,7 +112,7 @@ public:
         }
 
         if(imgOut == NULL) {
-            imgOut = new ImageRAWGL(1, imgIn->width, imgIn->height, 1, IMG_GPU);
+            imgOut = new ImageRAWGL(1, imgIn->width, imgIn->height, 1, IMG_GPU, GL_TEXTURE_2D);
         }
 
         //Compute luminance

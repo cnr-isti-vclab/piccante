@@ -165,10 +165,10 @@ StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
     size = 4.0f;
     rSize = size / float(max(width, height));
 
-    shape = new ImageRAWGL(1, this->brushSize, this->brushSize, 3, IMG_CPU);
+    shape = new ImageRAWGL(1, this->brushSize, this->brushSize, 3, IMG_CPU, GL_TEXTURE_2D);
 //	shape->EvaluateGaussian(true);
     shape->EvaluateSolid();
-    shape->generateTextureGL(false);
+    shape->generateTextureGL(false, GL_TEXTURE_2D);
 
     if(color != NULL) {
         for(int i = 0; i < 3; i++) {

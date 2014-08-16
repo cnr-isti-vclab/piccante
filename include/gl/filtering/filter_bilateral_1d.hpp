@@ -66,7 +66,7 @@ public:
         glEndTimeQuery(testTQ);
 
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLBilateral1D filter(sigma_s, sigma_r, true, GL_TEXTURE_2D);
 
@@ -298,7 +298,7 @@ ImageRAWGL *FilterGLBilateral1D::Process(ImageRAWGLVec imgIn,
     int f = 1;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(f, w, h, 4, IMG_GPU);
+        imgOut = new ImageRAWGL(f, w, h, 4, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {

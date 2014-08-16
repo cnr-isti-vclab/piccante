@@ -268,6 +268,15 @@ public:
     }
 
     /**
+     * @brief getTarget
+     * @return
+     */
+    GLenum getTarget()
+    {
+        return target;
+    }
+
+    /**
      * @brief GenerateMask creates an opengl mask (a texture) from a buffer of bool values.
      * @param width
      * @param height
@@ -414,7 +423,7 @@ ImageRAWGL::ImageRAWGL(GLuint tex, GLuint target) : ImageRAW()
     AllocateAux();
 }
 
-ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap, GLenum target = GL_TEXTURE_2D): ImageRAW()
+ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap, GLenum target): ImageRAW()
 {
     notOwnedGL = false;
 
@@ -436,7 +445,7 @@ ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap, GLenum target = GL_TEXTURE_2D
 }
 
 ImageRAWGL::ImageRAWGL(int frames, int width, int height, int channels,
-                       IMAGESTORE mode, GLenum target = GL_TEXTURE_2D) : ImageRAW()
+                       IMAGESTORE mode, GLenum target) : ImageRAW()
 {
     notOwnedGL = false;
     tmpFbo = NULL;
@@ -450,6 +459,7 @@ ImageRAWGL::ImageRAWGL(int frames, int width, int height, int channels,
     switch(this->mode) {
     case IMG_CPU_GPU: {
         Allocate(width, height, channels, frames);
+
         generateTextureGL(false, target);
     }
     break;
@@ -479,7 +489,7 @@ ImageRAWGL::~ImageRAWGL()
     Destroy();
 }
 
-GLuint ImageRAWGL::generateTextureGL(bool mipmap, GLenum target = GL_TEXTURE_2D)
+GLuint ImageRAWGL::generateTextureGL(bool mipmap, GLenum target)
 {
     this->target  = target;
 
@@ -525,7 +535,7 @@ ImageRAWGL *ImageRAWGL::CloneGL()
 {
     //TODO: to improve CloneGL
     ImageRAW *tmp = this->Clone();
-    return new ImageRAWGL(tmp, false);
+    return new ImageRAWGL(tmp, false, target);
 }
 
 void ImageRAWGL::Destroy()
@@ -547,7 +557,7 @@ ImageRAWGL *ImageRAWGL::AllocateSimilarOneGL()
     printf("%d %d %d %d %d\n", frames, width, height, channels, mode);
 #endif
 
-    ImageRAWGL *ret = new ImageRAWGL(frames, width, height, channels, mode);
+    ImageRAWGL *ret = new ImageRAWGL(frames, width, height, channels, mode, target);
     return ret;
 }
 

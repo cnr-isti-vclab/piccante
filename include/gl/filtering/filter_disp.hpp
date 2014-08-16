@@ -60,9 +60,9 @@ public:
         ImageRAWGL imgR(nameRight);
         ImageRAWGL imgD(nameDisp);
 
-        imgL.generateTextureGL(false);
-        imgR.generateTextureGL(false);
-        imgD.generateTextureGL(false);
+        imgL.generateTextureGL(false, GL_TEXTURE_2D);
+        imgR.generateTextureGL(false, GL_TEXTURE_2D);
+        imgD.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLDisp filter;
 
@@ -251,7 +251,7 @@ ImageRAWGL *FilterGLDisp::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

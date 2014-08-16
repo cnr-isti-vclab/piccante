@@ -103,7 +103,7 @@ public:
         }
 
         weights = new ImageRAWGL(1, kernelSize, 1, 1, data);
-        weights->generateTextureGL(false);
+        weights->generateTextureGL(false, GL_TEXTURE_2D);
     }
 
     /**
@@ -129,7 +129,7 @@ public:
     static ImageRAW *Execute(std::string nameIn, std::string nameOut, int kernelSize)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
         ImageRAWGL *imgOut = Execute(&imgIn, NULL, kernelSize);
         imgOut->loadToMemory();
         imgOut->Write(nameOut);

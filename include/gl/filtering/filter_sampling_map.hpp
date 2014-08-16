@@ -64,7 +64,7 @@ public:
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLSamplingMap filter(sigma);
 
@@ -74,11 +74,8 @@ public:
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
         printf("Sampling Map Filter on GPU time: %f ms\n", (timeVal) / 100000000.0f);
 
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgRet->width, imgRet->height, 1,
-                                            IMG_CPU);
-        imgOut->readFromFBO(filter.getFbo(), GL_RED);
-        printf("%f %f\n", imgOut->getMaxVal(), imgOut->getMinVal());
-        imgOut->Write(nameOut);
+        imgRet->loadToMemory();
+        imgRet->Write(nameOut);
 
         return imgRet;
     }
@@ -139,7 +136,7 @@ ImageRAWGL *FilterGLSamplingMap::SetupAuxN(ImageRAWGLVec imgIn,
 {
     if(imgOut == NULL) {
         imgOut = new ImageRAWGL(imgIn[0]->frames, imgIn[0]->width * scale,
-                                imgIn[0]->height * scale, imgIn[0]->channels, IMG_GPU);
+                                imgIn[0]->height * scale, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     /*if(fbo==NULL)

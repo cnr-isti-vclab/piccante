@@ -96,7 +96,7 @@ FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
     frame = 0;
 
     int nRand = 32;
-    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU);
+    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
     imageRand->SetRand();
     imageRand->Mul(float(nRand - 1));
     imageRand->generateTexture2DU32GL();
@@ -281,7 +281,7 @@ ImageRAWGL *FilterGLBilateral3DAS::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {
@@ -292,9 +292,9 @@ ImageRAWGL *FilterGLBilateral3DAS::Process(ImageRAWGLVec imgIn,
     if(imgTmp == NULL) {
         float scale = fGLsm->getScale();
         imgFrame = new ImageRAWGL("frame.pfm");
-        imgFrame->generateTextureGL(false);
+        imgFrame->generateTextureGL(false, GL_TEXTURE_2D);
 
-        imgTmp = new ImageRAWGL(1, w * scale, h * scale, 1, IMG_GPU);
+        imgTmp = new ImageRAWGL(1, w * scale, h * scale, 1, IMG_GPU, GL_TEXTURE_2D);
     }
 
     ImageRAWGL *edge, *base;

@@ -34,7 +34,7 @@ protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
     pic::FilterGLGaussian2D *fltGauss;
-    pic::FilterGLBilateral2DS *fltBilG;
+    pic::FilterGLBilateral2DG *fltBilG;
 
 public:
     pic::ImageRAWGL img, *img_flt, *img_flt_tmo;
@@ -50,19 +50,20 @@ public:
     void init()
     {
         //reading an input image
-        img.Read("../data/input/bottles.hdr");
-        img.generateTextureGL(false);
+        img.Read("../data/input/yellow_flowers.png");
+        img.generateTextureGL(false, GL_TEXTURE_2D);
 
         //creating a screen aligned quad
         pic::QuadGL::getProgram(program,
                                 pic::QuadGL::getVertexProgramV3(),
                                 pic::QuadGL::getFragmentProgramForView());
+
         quad = new pic::QuadGL(true);
 
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        fltBilG = new pic::FilterGLBilateral2DS(4.0f, 0.1f);
+        fltBilG = new pic::FilterGLBilateral2DG(4.0f, 0.1f);
 
         //allocating a Gaussian filter with sigma = 4.0
         fltGauss = new pic::FilterGLGaussian2D(4.0);

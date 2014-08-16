@@ -130,7 +130,7 @@ PyramidGL::PyramidGL(ImageRAWGL *img, bool lapGauss, int limitLevel = 0)
 
 PyramidGL::PyramidGL(int width, int height, int channels, bool lapGauss, int limitLevel = 0)
 {
-    ImageRAWGL *tmpImg = new ImageRAWGL(1, width, height, channels, IMG_GPU);
+    ImageRAWGL *tmpImg = new ImageRAWGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
 
     Create(tmpImg, lapGauss, limitLevel);
 }
@@ -193,7 +193,7 @@ ImageRAWGL *PyramidGL::Reconstruct(ImageRAWGL *imgOut)
 
     if(imgOut == NULL) {
         imgOut = new ImageRAWGL(1, stack[0]->width, stack[0]->height,
-                                stack[0]->channels, IMG_GPU);
+                                stack[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     int n = stack.size() - 1;

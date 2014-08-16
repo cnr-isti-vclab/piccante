@@ -62,7 +62,7 @@ public:
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLGaussian1D filter(sigma, true, GL_TEXTURE_2D);
 
@@ -113,13 +113,13 @@ void FilterGLGaussian1D::Update(float sigma)
             delete weights;
         }
 
-        weights = new ImageRAWGL(1, nSamples, 1, 1, IMG_CPU);
+        weights = new ImageRAWGL(1, nSamples, 1, 1, IMG_CPU, 0);
 
         for(int i = -halfKernelSize; i <= halfKernelSize; i++) {
             weights->data[i + halfKernelSize] = expf(-float(i * i) / sigma2);
         }
 
-        weights->generateTextureGL(false);
+        weights->generateTextureGL(false, GL_TEXTURE_2D);
     }
 
     SetUniform();

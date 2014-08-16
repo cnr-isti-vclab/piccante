@@ -80,7 +80,7 @@ public:
 
         if(imgOut == NULL) {
             imgOut = new ImageRAWGL(1, imgIn->width, imgIn->height, imgIn->channels,
-                                    IMG_GPU);
+                                    IMG_GPU, GL_TEXTURE_2D);
         }
 
         float ms, tot_ms;

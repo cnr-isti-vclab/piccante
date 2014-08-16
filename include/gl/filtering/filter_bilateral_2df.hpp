@@ -38,24 +38,49 @@ protected:
     void FragmentShader();
 
 public:
-    //Basic constructors
+
+    /**
+     * @brief FilterGLBilateral2DF
+     */
     FilterGLBilateral2DF();
-    //Init constructors
+
+    /**
+     * @brief FilterGLBilateral2DF
+     * @param sigma_s
+     * @param sigma_r
+     */
     FilterGLBilateral2DF(float sigma_s, float sigma_r);
 
+    /**
+     * @brief Update
+     * @param sigma_s
+     * @param sigma_r
+     */
     void Update(float sigma_s, float sigma_r);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
-    /***/
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
     static ImageRAWGL *Execute(std::string nameIn,
                                std::string nameOut,
                                float sigma_s, float sigma_r)
     {
         //Load the image
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         //Filtering
         FilterGLBilateral2DF filter(sigma_s, sigma_r);
@@ -65,21 +90,16 @@ public:
         long t1 = timeGetTime();
         printf("Full Bilateral Filter time: %ld\n", t1 - t0);
 
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 4, IMG_CPU);
-        imgOut->readFromFBO(filter.getFbo());
-
-        //Write image out
-        imgOut->Write(nameOut);
+        imgRet->loadToMemory();
+        imgRet->Write(nameOut);
         return imgRet;
     }
 };
 
-//Basic constructor
 FilterGLBilateral2DF::FilterGLBilateral2DF(): FilterGL()
 {
 }
 
-//Constructor
 FilterGLBilateral2DF::FilterGLBilateral2DF(float sigma_s,
         float sigma_r): FilterGL()
 {
@@ -131,13 +151,9 @@ void FilterGLBilateral2DF::FragmentShader()
                       );
 }
 
-//Generating shaders
 void FilterGLBilateral2DF::InitShaders()
 {
-    std::string prefix;
-    prefix += glw::version("330");
-//	prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
@@ -147,6 +163,7 @@ void FilterGLBilateral2DF::InitShaders()
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
     glw::bind_program(0);
+
     Update(-1.0f, -1.0f);
 }
 
@@ -182,7 +199,6 @@ void FilterGLBilateral2DF::Update(float sigma_s, float sigma_r)
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLBilateral2DF::Process(ImageRAWGLVec imgIn,
         ImageRAWGL *imgOut)
 {
@@ -194,7 +210,7 @@ ImageRAWGL *FilterGLBilateral2DF::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

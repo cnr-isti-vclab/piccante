@@ -36,24 +36,56 @@ protected:
     float alpha, epsilon;
     bool  bGammaCorrection, bLocal;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
+
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLSigmoidTMO
+     */
     FilterGLSigmoidTMO();
+
+    /**
+     * @brief FilterGLSigmoidTMO
+     * @param alpha
+     * @param bLocal
+     * @param bGammaCorrection
+     */
     FilterGLSigmoidTMO(float alpha, bool bLocal, bool bGammaCorrection);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
+    /**
+     * @brief Update
+     * @param alpha
+     */
     void Update(float alpha);
 
-    static ImageRAWGL *ExecuteReinhardLocal(std::string nameIn, std::string nameOut,
+    /**
+     * @brief ReinhardLocal
+     * @param nameIn
+     * @param nameOut
+     * @param filter
+     * @return
+     */
+    static ImageRAWGL *ReinhardLocal(std::string nameIn, std::string nameOut,
                                             FilterGL *filter)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLLuminance lum;
 
@@ -83,13 +115,19 @@ public:
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
         return imgOut;
-    };
+    }
 
-    static ImageRAWGL *ExecuteReinhardGlobal(std::string nameIn,
+    /**
+     * @brief ReinhardGlobal
+     * @param nameIn
+     * @param nameOut
+     * @return
+     */
+    static ImageRAWGL *ReinhardGlobal(std::string nameIn,
             std::string nameOut)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         float Lav = imgIn.getLogMeanVal()[0];
 
@@ -106,7 +144,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLSigmoidTMO::FilterGLSigmoidTMO(): FilterGL()
 {
     alpha = 0.15f;
@@ -181,14 +218,12 @@ void FilterGLSigmoidTMO::InitShaders()
 {
     FragmentShader();
 
-    std::string prefix;
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
-    prefix += glw::version("330");
-//	prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
 #endif
+
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position",		0);
     filteringProgram.fragment_target("f_color",			0);
@@ -222,7 +257,7 @@ ImageRAWGL *FilterGLSigmoidTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

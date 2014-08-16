@@ -29,6 +29,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLSlicer class
+ */
 class FilterGLSlicer: public FilterGL
 {
 protected:
@@ -39,17 +42,29 @@ protected:
     float s_S, s_R, mul_E;
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLSlicer
+     * @param s_S
+     * @param s_R
+     */
     FilterGLSlicer(float s_S, float s_R);
 
-    //Change parameters
+    /**
+     * @brief Update
+     * @param s_S
+     * @param s_R
+     */
     void Update(float s_S, float s_R);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 };
 
-//Init constructors
 FilterGLSlicer::FilterGLSlicer(float s_S, float s_R): FilterGL()
 {
     this->s_S = s_S;
@@ -93,13 +108,10 @@ void FilterGLSlicer::FragmentShader()
 
 void FilterGLSlicer::InitShaders()
 {
-    std::string prefix;
-    prefix += glw::version("150");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("400"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLSlicer Shader log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
@@ -124,14 +136,13 @@ void FilterGLSlicer::Update(float s_S, float s_R)
 
     glw::bind_program(filteringProgram);
     filteringProgram.relink();
-    filteringProgram.uniform("u_tex",      0);
-    filteringProgram.uniform("u_grid",	 1);
-    filteringProgram.uniform("s_S",	   s_S);
-    filteringProgram.uniform("mul_E",	   mul_E);
+    filteringProgram.uniform("u_tex", 0);
+    filteringProgram.uniform("u_grid", 1);
+    filteringProgram.uniform("s_S", s_S);
+    filteringProgram.uniform("mul_E", mul_E);
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLSlicer::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn[0] == NULL) {
@@ -142,7 +153,7 @@ ImageRAWGL *FilterGLSlicer::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {
@@ -185,7 +196,7 @@ ImageRAWGL *FilterGLSlicer::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     imgIn[0]->unBindTexture();
 
     return imgOut;
-};
+}
 
 } // end namespace pic
 

@@ -110,13 +110,13 @@ public:
                                float sigma_s, float sigma_r, int testing = 1)
     {
         ImageRAWGL imgIn(nameFile);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLBilateral2DS *filter = new FilterGLBilateral2DS(sigma_s, sigma_r,
                 BF_CLASSIC);
 
         ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, imgIn.channels,
-                                            IMG_GPU_CPU);
+                                            IMG_GPU_CPU, GL_TEXTURE_2D);
 
         GLuint testTQ1;
 
@@ -173,13 +173,13 @@ FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma_r,
     int nSamplers;
 
     if(BF_CLASSIC) {
-        imageRand = new ImageRAWGL(3, 128, 128, 1, IMG_CPU);
+        imageRand = new ImageRAWGL(3, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
         imageRand->SetRand();
         imageRand->Sub(0.5f);
-        imageRand->generateTextureGL(false);
+        imageRand->generateTextureGL(false, GL_TEXTURE_2D);
         nSamplers = 1;
     } else {
-        imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU);
+        imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
         imageRand->SetRand();
         imageRand->Mul(float(nRand - 1));
         imageRand->generateTexture2DU32GL();
@@ -432,7 +432,7 @@ ImageRAWGL *FilterGLBilateral2DS::Process(ImageRAWGLVec imgIn,
 
     //TODO: check if other have height and frames swapped
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

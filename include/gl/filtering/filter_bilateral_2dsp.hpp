@@ -53,10 +53,10 @@ public:
         glEndTimeQuery(testTQ);
 
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLBilateral2DSP filter(sigma_s, sigma_r);
-        ImageRAWGL *imgRet = new ImageRAWGL(1, imgIn.width, imgIn.height, 3, IMG_GPU);
+        ImageRAWGL *imgRet = new ImageRAWGL(1, imgIn.width, imgIn.height, 3, IMG_GPU, GL_TEXTURE_2D);
 
         GLuint testTQ1;
 
@@ -87,7 +87,7 @@ public:
             fclose(file);
         }
 
-        ImageRAWGL *imgWrite = new ImageRAWGL(1, imgIn.width, imgIn.height, 4, IMG_CPU);
+        ImageRAWGL *imgWrite = new ImageRAWGL(1, imgIn.width, imgIn.height, 4, IMG_CPU, GL_TEXTURE_2D);
         imgWrite->readFromFBO(filter.getFbo());
         imgWrite->Write(nameOut);
         return imgRet;

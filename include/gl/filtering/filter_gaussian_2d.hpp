@@ -66,7 +66,7 @@ public:
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLGaussian2D *filter = new FilterGLGaussian2D(sigma);
 

@@ -45,17 +45,40 @@ protected:
     void FragmentShader();
 
 public:
-    //Init constructors
+    /**
+     * @brief FilterGLBilateral2DSE
+     * @param sigma_s
+     * @param sigma_p
+     * @param sigma_n
+     * @param sigma_a
+     */
     FilterGLBilateral2DSE(float sigma_s, float sigma_p, float sigma_n, float sigma_a);
+
     ~FilterGLBilateral2DSE();
 
-    //Change parameters
+    /**
+     * @brief Update
+     * @param sigma_s
+     * @param sigma_p
+     * @param sigma_n
+     * @param sigma_a
+     */
     void Update(float sigma_s, float sigma_p, float sigma_n, float sigma_a);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
-    //Execute
+    /**
+     * @brief main
+     * @param argc
+     * @param argv
+     * @return
+     */
     static int main(int argc, char* argv[])
     {
         if(argc < 6) {
@@ -68,6 +91,16 @@ public:
         return 0;
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param sigma_s
+     * @param sigma_p
+     * @param sigma_n
+     * @param sigma_a
+     * @param testing
+     * @return
+     */
     static ImageRAWGL *Execute( std::string nameIn, 
                                 float sigma_s, float sigma_p, float sigma_n, float sigma_a, int testing = 1)
     {
@@ -83,16 +116,16 @@ public:
 
 
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         ImageRAWGL imgPos(namePos);
-        imgPos.generateTextureGL(false);
+        imgPos.generateTextureGL(false, GL_TEXTURE_2D);
 
         ImageRAWGL imgNor(nameNor);
-        imgNor.generateTextureGL(false);
+        imgNor.generateTextureGL(false, GL_TEXTURE_2D);
 
         ImageRAWGL imgAlb(nameAlb);
-        imgAlb.generateTextureGL(false);
+        imgAlb.generateTextureGL(false, GL_TEXTURE_2D);
 
         ImageRAWGLVec vec;
         vec.push_back(&imgIn);
@@ -104,7 +137,7 @@ public:
                     sigma_n, sigma_a);
 
         ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, imgIn.channels,
-                                            IMG_GPU_CPU);
+                                            IMG_GPU_CPU, GL_TEXTURE_2D);
 
         GLuint testTQ1;
 
@@ -134,7 +167,6 @@ public:
 
 };
 
-//Init constructors
 FilterGLBilateral2DSE::FilterGLBilateral2DSE(float sigma_s, float sigma_p, float sigma_n, float sigma_a): FilterGL()
 {
     //protected values are assigned/computed
@@ -151,7 +183,7 @@ FilterGLBilateral2DSE::FilterGLBilateral2DSE(float sigma_s, float sigma_p, float
     int nRand = 32;
     int nSamplers;
 
-    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU);
+    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
     imageRand->SetRand();
     imageRand->Mul(float(nRand - 1));
     imageRand->generateTexture2DU32GL();
@@ -241,10 +273,7 @@ void FilterGLBilateral2DSE::InitShaders()
     printf("Number of samples: %d\n", ms->nSamples);
 #endif
 
-    std::string prefix;
-    prefix += glw::version("150");
-//	prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
@@ -255,10 +284,10 @@ void FilterGLBilateral2DSE::InitShaders()
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
     glw::bind_program(0);
+
     Update(-1.0f, -1.0f, -1.0f, -1.0f);
 }
 
-//Change parameters
 void FilterGLBilateral2DSE::Update(float sigma_s, float sigma_p, float sigma_n, float sigma_a)
 {
 
@@ -329,7 +358,7 @@ ImageRAWGL *FilterGLBilateral2DSE::Process(ImageRAWGLVec imgIn,
 
     //TODO: check if other have height and frames swapped
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

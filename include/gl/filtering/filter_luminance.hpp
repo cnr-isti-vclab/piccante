@@ -52,12 +52,9 @@ public:
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 1, IMG_CPU);
-
-        imgOut = Execute(&imgIn, imgOut);
-
+        ImageRAWGL *imgOut = Execute(&imgIn, NULL);
 
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
@@ -119,7 +116,7 @@ ImageRAWGL *FilterGLLuminance::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, 1, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, 1, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

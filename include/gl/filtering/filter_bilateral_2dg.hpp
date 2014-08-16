@@ -46,18 +46,33 @@ protected:
 public:
     FilterGLSlicer		*slicer;
 
-    //Basic constructors
-    FilterGLBilateral2DG(float sigma_s, float sigma_r, int width, int height);
+    /**
+     * @brief FilterGLBilateral2DG
+     * @param sigma_s
+     * @param sigma_r
+     * @param width
+     * @param height
+     */
+    FilterGLBilateral2DG(float sigma_s, float sigma_r);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
-    //Execute
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
     static ImageRAWGL *Execute(ImageRAWGL *imgIn, float sigma_s, float sigma_r)
     {
-
-        FilterGLBilateral2DG *filter = new FilterGLBilateral2DG(sigma_s, sigma_r,
-                imgIn->width, imgIn->height);//, imgIn.channels);
+        FilterGLBilateral2DG *filter = new FilterGLBilateral2DG(sigma_s, sigma_r);
         GLuint testTQ1 = glBeginTimeQuery();
         ImageRAWGL *imgOut = filter->Process(SingleGL(imgIn), NULL);
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
@@ -76,13 +91,12 @@ public:
         imgIn.Div(maxVal);
         sigma_r = sigma_r / maxVal;
 
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
-        FilterGLBilateral2DG *filter = new FilterGLBilateral2DG(sigma_s, sigma_r,
-                imgIn.width, imgIn.height);//, imgIn.channels);
+        FilterGLBilateral2DG *filter = new FilterGLBilateral2DG(sigma_s, sigma_r);//, imgIn.channels);
 
         ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 4,
-                                            IMG_GPU_CPU);
+                                            IMG_GPU_CPU, GL_TEXTURE_2D);
 
         GLuint testTQ1;
 
@@ -124,28 +138,22 @@ public:
     }
 };
 
-//Basic constructor
-FilterGLBilateral2DG::FilterGLBilateral2DG(float sigma_s, float sigma_r,
-        int width, int height): FilterGL()
+FilterGLBilateral2DG::FilterGLBilateral2DG(float sigma_s, float sigma_r): FilterGL()
 {
     this->sigma_s = sigma_s;
     this->sigma_r = sigma_r;
 
-    this->width = width;
-    this->height = height;
-
-    s_S = 1.0f / sigma_s;	//Spatial Sampling rate
+    s_S = 1.0f / sigma_s; //Spatial Sampling rate
     s_R = 1.0f / sigma_r; //Range Sampling rate
 
     gridGL = NULL;
     gridBlurGL = NULL;
 
-    scatter = new FilterGLScatter(s_S, s_R, width, height);
+    scatter = NULL;
     gauss3D = new FilterGLGaussian3D(1.0f);
     slicer  = new FilterGLSlicer(s_S, s_R);
 }
 
-//Processing
 ImageRAWGL *FilterGLBilateral2DG::Process(ImageRAWGLVec imgIn,
         ImageRAWGL *imgOut)
 {
@@ -155,6 +163,10 @@ ImageRAWGL *FilterGLBilateral2DG::Process(ImageRAWGLVec imgIn,
 
     if(imgOut == NULL) {
         imgOut = imgIn[0]->AllocateSimilarOneGL();
+    }
+
+    if(scatter == NULL) {
+        scatter = new FilterGLScatter(s_S, s_R, imgIn[0]->width, imgIn[0]->height);
     }
 
     //Splatting
