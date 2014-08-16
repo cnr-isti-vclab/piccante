@@ -89,7 +89,6 @@ void FilterGLSlicer::FragmentShader()
         //Fetch texture color
         ivec2 coordsFrag = ivec2(gl_FragCoord.xy);
         vec4 colRef = texelFetch(u_tex, coordsFrag, 0);
-
         //Fetch E
         vec3 tSize3 = vec3(textureSize(u_grid, 0));
         float E = dot(colRef.xyz, vec3(1.0)) * mul_E;
@@ -119,6 +118,7 @@ void FilterGLSlicer::InitShaders()
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
     glw::bind_program(0);
+
     Update(s_S, s_R);
 }
 
@@ -135,7 +135,6 @@ void FilterGLSlicer::Update(float s_S, float s_R)
 #endif
 
     glw::bind_program(filteringProgram);
-    filteringProgram.relink();
     filteringProgram.uniform("u_tex", 0);
     filteringProgram.uniform("u_grid", 1);
     filteringProgram.uniform("s_S", s_S);

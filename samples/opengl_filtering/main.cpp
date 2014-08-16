@@ -50,7 +50,7 @@ public:
     void init()
     {
         //reading an input image
-        img.Read("../data/input/yellow_flowers.png");
+        img.Read("../data/input/bottles.hdr");
         img.generateTextureGL(false, GL_TEXTURE_2D);
 
         //creating a screen aligned quad

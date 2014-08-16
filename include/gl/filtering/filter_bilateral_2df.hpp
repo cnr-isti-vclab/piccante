@@ -29,12 +29,24 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLBilateral2DF class provides
+ * an HW accelerated bilateral filter implementation without
+ * approximations.
+ */
 class FilterGLBilateral2DF: public FilterGL
 {
 protected:
     float sigma_s, sigma_r;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
+
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
 public:
@@ -118,7 +130,7 @@ void FilterGLBilateral2DF::FragmentShader()
                           uniform sampler2D u_tex;
                           uniform float     sigmas2;
                           uniform float     sigmar2;
-                          uniform int       TOKEN_BANANA;
+                          uniform int       halfKernelSize;
                           out     vec4      f_color;
 
     void main(void) {
@@ -130,8 +142,8 @@ void FilterGLBilateral2DF::FragmentShader()
 
         float weight = 0.0;
 
-        for(int i = -TOKEN_BANANA; i < TOKEN_BANANA; i++) {
-            for(int j = -TOKEN_BANANA; j < TOKEN_BANANA; j++) {
+        for(int i = -halfKernelSize; i <= halfKernelSize; i++) {
+            for(int j = -halfKernelSize; j <= halfKernelSize; j++) {
                 //Coordinates
                 ivec2 coords = ivec2(i, j);
                 //Texture fetch
@@ -162,6 +174,7 @@ void FilterGLBilateral2DF::InitShaders()
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
+    filteringProgram.relink();
     glw::bind_program(0);
 
     Update(-1.0f, -1.0f);
@@ -169,7 +182,6 @@ void FilterGLBilateral2DF::InitShaders()
 
 void FilterGLBilateral2DF::Update(float sigma_s, float sigma_r)
 {
-
     if(sigma_s > 0.0f) {
         this->sigma_s = sigma_s;
     }
@@ -182,20 +194,13 @@ void FilterGLBilateral2DF::Update(float sigma_s, float sigma_r)
     float sigmar2 = 2.0 * this->sigma_r * this->sigma_r;
 
     //Precomputation of the Gaussian Kernel
-    int kernelSize = PrecomputedGaussian::KernelSize(this->sigma_s);
-
-    //Poisson samples
-
-#ifdef PIC_DEBUG
-    printf("Window: %d\n", kernelSize);
-#endif
+    int halfKernelSize = PrecomputedGaussian::KernelSize(this->sigma_s) >> 1;
 
     glw::bind_program(filteringProgram);
-    filteringProgram.relink();
-    filteringProgram.uniform("u_tex",           0);
-    filteringProgram.uniform("sigmas2",         sigmas2);
-    filteringProgram.uniform("sigmar2",         sigmar2);
-    filteringProgram.uniform("TOKEN_BANANA",    kernelSize>>1);
+    filteringProgram.uniform("u_tex", 0);
+    filteringProgram.uniform("sigmas2", sigmas2);
+    filteringProgram.uniform("sigmar2", sigmar2);
+    filteringProgram.uniform("halfKernelSize", halfKernelSize);
     glw::bind_program(0);
 }
 

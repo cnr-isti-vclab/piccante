@@ -172,11 +172,15 @@ ImageRAWGL *FilterGLBilateral2DG::Process(ImageRAWGLVec imgIn,
     //Splatting
     gridGL = scatter->Process(imgIn, gridGL);
 
+    gridGL->loadToMemory();
+    gridGL->SetRand();
+    gridGL->loadFromMemory();
+
     //Blurring
     gridBlurGL = gauss3D->Process(SingleGL(gridGL), gridBlurGL);
 
     //Slicing
-    slicer->Process(DoubleGL(imgIn[0], gridBlurGL), imgOut);
+    imgOut = slicer->Process(DoubleGL(imgIn[0], gridBlurGL), imgOut);
 
     return imgOut;
 }

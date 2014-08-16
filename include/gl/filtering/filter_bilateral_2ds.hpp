@@ -176,7 +176,7 @@ FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma_r,
         imageRand = new ImageRAWGL(3, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
         imageRand->SetRand();
         imageRand->Sub(0.5f);
-        imageRand->generateTextureGL(false, GL_TEXTURE_2D);
+        imageRand->loadFromMemory(false);
         nSamplers = 1;
     } else {
         imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
@@ -214,7 +214,7 @@ void FilterGLBilateral2DS::FragmentShader()
                                                   uniform sampler2D  u_tex;
                                                   uniform isampler2D u_poisson;
                                                   uniform sampler2D  u_rand;
-                                                  uniform int   TOKEN_BANANA;
+                                                  uniform int   nSamples;
                                                   uniform float sigmas2;
                                                   uniform float sigmar2;
                                                   uniform int kernelSize;
@@ -231,7 +231,7 @@ void FilterGLBilateral2DS::FragmentShader()
 
         float shifter = texture(u_rand, gl_FragCoord.xy).x;
 
-        for(int i = 0; i < TOKEN_BANANA; i++) {
+        for(int i = 0; i < nSamples; i++) {
             //Coordinates
             ivec3 coords = texelFetch(u_poisson, ivec2(i, shifter), 0).xyz;
 
@@ -255,7 +255,7 @@ void FilterGLBilateral2DS::FragmentShader()
                                             uniform sampler2D	u_edge;
                                             uniform isampler2D	u_poisson;
                                             uniform sampler2D	u_rand;
-                                            uniform int			TOKEN_BANANA;
+                                            uniform int			nSamples;
                                             uniform float		sigmas2;
                                             uniform float		sigmar2;
                                             out     vec4		f_color;
@@ -268,9 +268,9 @@ void FilterGLBilateral2DS::FragmentShader()
         vec3 edgeRef = texelFetch(u_edge, coordsFrag, 0).xyz;
 
         float weight = 0.0;
-        float shifter = texture2D(u_rand, gl_FragCoord.xy, 0).x;
+        float shifter = texture(u_rand, gl_FragCoord.xy, 0).x;
 
-        for(int i = 0; i < TOKEN_BANANA; i++) {
+        for(int i = 0; i < nSamples; i++) {
             //Coordinates
             ivec3 coords = texelFetch(u_poisson, ivec2(i, shifter), 0).xyz;
 
@@ -296,7 +296,7 @@ void FilterGLBilateral2DS::FragmentShader()
                                             uniform isampler2D u_poisson;
                                             uniform sampler2D  u_rand;
                                             uniform sampler2D  u_mask;
-                                            uniform int   TOKEN_BANANA;
+                                            uniform int   nSamples;
                                             uniform float sigmas2;
                                             uniform float sigmar2;
                                             out     vec4      f_color;
@@ -312,9 +312,9 @@ void FilterGLBilateral2DS::FragmentShader()
         if(w > 0.0f) {
             w = min(w, 1.0f);
             float weight = 0.0;
-            float shifter = texture2D(u_rand, gl_FragCoord.xy, 0).x;
+            float shifter = texture(u_rand, gl_FragCoord.xy, 0).x;
 
-            for(int i = 0; i < TOKEN_BANANA; i++) {
+            for(int i = 0; i < nSamples; i++) {
                 //Coordinates
                 ivec3 coords = texelFetch(u_poisson, ivec2(i, shifter), 0).xyz;
                 //Texture fetch
@@ -415,7 +415,7 @@ void FilterGLBilateral2DS::Update(float sigma_s, float sigma_r)
     filteringProgram.uniform("sigmar2",		    sigmar2);
     filteringProgram.uniform("kernelSize",      kernelSize);
     filteringProgram.uniform("kernelSizef",     float(kernelSize));
-    filteringProgram.uniform("TOKEN_BANANA",    ms->nSamples / 2);
+    filteringProgram.uniform("nSamples",    ms->nSamples / 2);
     glw::bind_program(0);
 }
 

@@ -29,23 +29,62 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLBilateral2DSP class provides
+ * an approximated 2D bilateral filter using two
+ * 1D bilateral filtes; i.e. using the separable
+ * approximation.
+ */
 class FilterGLBilateral2DSP: public FilterGLNPasses
 {
 protected:
     FilterGLBilateral1D		*filter;
 
-    void InitShaders() {}
-    void FragmentShader() {}
+    /**
+     * @brief InitShaders
+     */
+    void InitShaders()
+    {
+
+    }
+
+    /**
+     * @brief FragmentShader
+     */
+    void FragmentShader()
+    {
+
+    }
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLBilateral2DSP
+     */
     FilterGLBilateral2DSP();
-    //Init constructors
+
+    /**
+     * @brief FilterGLBilateral2DSP
+     * @param sigma_s
+     * @param sigma_r
+     */
     FilterGLBilateral2DSP(float sigma_s, float sigma_r);
 
-    //Update
+    /**
+    * @brief Update
+    * @param sigma_s
+    * @param sigma_r
+    */
     void Update(float sigma_s, float sigma_r);
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @param testing
+     * @return
+     */
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r, int testing)
     {
@@ -94,13 +133,11 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLBilateral2DSP::FilterGLBilateral2DSP(): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
 }
 
-//Constructor
 FilterGLBilateral2DSP::FilterGLBilateral2DSP(float sigma_s,
         float sigma_r): FilterGLNPasses()
 {

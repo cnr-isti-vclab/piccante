@@ -127,6 +127,10 @@ FilterGL1D::FilterGL1D(int direction, GLenum target): FilterGL()
         dirs[direction % 2] = 1;
         break;
 
+    case GL_TEXTURE_2D_ARRAY:
+        dirs[direction % 3] = 1;
+        break;
+
     case GL_TEXTURE_3D:
         dirs[direction % 3] = 1;
         break;
@@ -142,7 +146,7 @@ void FilterGL1D::ChangePass(int pass, int tPass)
         dirs[(pass + 1) % 2 ] = 0;
     }
 
-    if(target == GL_TEXTURE_3D) {
+    if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY) {
         dirs[  pass % 3 ] = 1;
         dirs[(pass + 1) % 3 ] = 0;
         dirs[(pass + 2) % 3 ] = 0;
@@ -162,7 +166,7 @@ void FilterGL1D::SetUniform()
     filteringProgram.uniform("iX", dirs[0]);
     filteringProgram.uniform("iY", dirs[1]);
 
-    if(target == GL_TEXTURE_3D) {
+    if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY) {
         filteringProgram.uniform("iZ", dirs[2]);
         filteringProgram.uniform("slice", slice);
     }

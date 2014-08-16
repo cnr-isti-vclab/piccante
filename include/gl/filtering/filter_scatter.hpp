@@ -188,6 +188,7 @@ void FilterGLScatter::InitShaders()
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
+    filteringProgram.relink();
     glw::bind_program(0);
 
     Update(s_S, s_R);
@@ -204,7 +205,6 @@ void FilterGLScatter::Update(float s_S, float s_R)
     printf("Rate S: %f Rate R: %f Mul E: %f\n", s_S, s_R, mul_E);
 
     glw::bind_program(filteringProgram);
-    filteringProgram.relink();
     filteringProgram.uniform("u_tex", 0);
     filteringProgram.uniform("s_S", s_S);
     filteringProgram.uniform("mul_E", mul_E);

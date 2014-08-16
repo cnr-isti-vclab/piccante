@@ -29,6 +29,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLSimpleTMO class
+ */
 class FilterGLSimpleTMO: public FilterGL
 {
 protected:
@@ -39,14 +42,31 @@ protected:
     void FragmentShader();
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLSimpleTMO
+     */
     FilterGLSimpleTMO();
-    //Init constructors
+
+    /**
+     * @brief FilterGLSimpleTMO
+     * @param fstop
+     * @param gamma
+     */
     FilterGLSimpleTMO(float fstop, float gamma);
 
+    /**
+     * @brief Update
+     * @param fstop
+     * @param gamma
+     */
     void Update(float fstop, float gamma);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
     ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float gamma,

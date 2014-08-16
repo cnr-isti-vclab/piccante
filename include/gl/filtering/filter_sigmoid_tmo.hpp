@@ -239,14 +239,13 @@ void FilterGLSigmoidTMO::Update(float alpha)
     }
 
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform("u_tex",				0);
-    filteringProgram.uniform("u_tex_adapt",		1);
-    filteringProgram.uniform("alpha",	  this->alpha);
-    filteringProgram.uniform("epsilon",	  epsilon);
+    filteringProgram.uniform("u_tex", 0);
+    filteringProgram.uniform("u_tex_adapt", 1);
+    filteringProgram.uniform("alpha", this->alpha);
+    filteringProgram.uniform("epsilon", epsilon);
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLSigmoidTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn[0] == NULL) {

@@ -387,7 +387,17 @@ ImageRAWGL::ImageRAWGL(GLuint tex, GLuint target) : ImageRAW()
     break;
 
     case GL_TEXTURE_CUBE_MAP: {
+        glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+        glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP, 0, GL_TEXTURE_WIDTH, &width);
+        glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP, 0, GL_TEXTURE_HEIGHT, &height);
+        glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP, 0, GL_TEXTURE_INTERNAL_FORMAT,
+                                 &internalFormat);
 
+        channels = getChannelsFromInternalFormatGL(internalFormat);
+
+        frames = 6;
+
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
     break;
 
