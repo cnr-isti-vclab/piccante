@@ -29,11 +29,20 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLGradient class
+ */
 class FilterGLGradient: public FilterGL
 {
 protected:
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
 public:
@@ -76,7 +85,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLGradient::FilterGLGradient(): FilterGL()
 {
     //protected values are assigned/computed

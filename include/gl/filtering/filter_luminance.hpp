@@ -29,19 +29,39 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLLuminance class
+ */
 class FilterGLLuminance: public FilterGL
 {
 protected:
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
 public:
-    //Basic constructor
+
+    /**
+     * @brief FilterGLLuminance
+     */
     FilterGLLuminance();
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgOut)
     {
         FilterGLLuminance filter;
@@ -49,6 +69,12 @@ public:
         return imgOut;
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @return
+     */
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut)
     {
         ImageRAWGL imgIn(nameIn);
@@ -101,9 +127,12 @@ void FilterGLLuminance::InitShaders()
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLLuminance::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
+    if(imgIn.empty()) {
+        return imgOut;
+    }
+
     if(imgIn[0] == NULL) {
         return imgOut;
     }

@@ -29,20 +29,41 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLSampler2D class
+ */
 class FilterGLSampler2D: public FilterGL
 {
 protected:
     float scale;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterGLSampler2D
+     * @param scale
+     */
     FilterGLSampler2D(float scale);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param scale
+     * @return
+     */
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float scale)
     {
         ImageRAWGL imgIn(nameIn);
@@ -66,7 +87,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLSampler2D::FilterGLSampler2D(float scale): FilterGL()
 {
     this->scale = scale;
@@ -79,7 +99,7 @@ void FilterGLSampler2D::InitShaders()
                       (
                           uniform sampler2D u_tex; \n
                           uniform float   scale; \n
-                          out     vec4      f_color; \n
+                          out     vec4    f_color; \n
 
     void main(void) {
         \n
@@ -92,14 +112,10 @@ void FilterGLSampler2D::InitShaders()
     }
                       );
 
-    std::string prefix;
-    prefix += glw::version("150");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLSampler2D log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
@@ -113,7 +129,6 @@ void FilterGLSampler2D::InitShaders()
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLSampler2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn[0] == NULL) {

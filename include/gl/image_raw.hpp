@@ -760,12 +760,23 @@ GLuint ImageRAWGL::generateTexture2DArrayGL()
 
 void ImageRAWGL::loadFromMemory(bool mipmap = false)
 {
-    glBindTexture(target, texture);
-
     int mode, modeInternalFormat;
     getModesGL(channels, mode, modeInternalFormat);
-    glTexImage2D(target, 0, modeInternalFormat, width, height, 0,
-                 mode, GL_FLOAT, data);
+
+    glBindTexture(target, texture);
+
+    switch(target) {
+        case GL_TEXTURE_2D: {
+            glTexImage2D(target, 0, modeInternalFormat, width, height, 0,
+                         mode, GL_FLOAT, data);
+
+        } break;
+
+        case GL_TEXTURE_3D: {
+            glTexImage3D(GL_TEXTURE_3D, 0, modeInternalFormat, width, height, frames, 0,
+                         mode, GL_FLOAT, data);
+        } break;
+    }
 
     glBindTexture(target, 0);
 }
@@ -796,6 +807,11 @@ void ImageRAWGL::loadToMemory()
     glGetTexImage(target, 0, mode, GL_FLOAT, data);
 
     unBindTexture();
+
+    for(int i=0;i<(frames*width*height*channels); i++){
+        if(data[i]>0)
+            printf("A");
+    }
 }
 
 void ImageRAWGL::loadSliceIntoTexture(int i)

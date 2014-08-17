@@ -89,6 +89,7 @@ void FilterGLSlicer::FragmentShader()
         //Fetch texture color
         ivec2 coordsFrag = ivec2(gl_FragCoord.xy);
         vec4 colRef = texelFetch(u_tex, coordsFrag, 0);
+
         //Fetch E
         vec3 tSize3 = vec3(textureSize(u_grid, 0));
         float E = dot(colRef.xyz, vec3(1.0)) * mul_E;
@@ -114,15 +115,14 @@ void FilterGLSlicer::InitShaders()
 #endif
 
     glw::bind_program(filteringProgram);
-    filteringProgram.relink();
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
+    filteringProgram.relink();
     glw::bind_program(0);
 
     Update(s_S, s_R);
 }
 
-//Change parameters
 void FilterGLSlicer::Update(float s_S, float s_R)
 {
     this->s_S = s_S;
@@ -200,46 +200,3 @@ ImageRAWGL *FilterGLSlicer::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 } // end namespace pic
 
 #endif /* PIC_GL_FILTERING_FILTER_SLICER_HPP */
-
-/*
-void TestSlicerGL(std::string nameIn, std::string nameOut){
-	//Bilateral Grid GPU
-	ImageRAW imgIn2(nameIn);
-
-	FilterBilateral2DG tmp(16.0f,0.1f);
-	ImageRAW *imgFlt = tmp.Process(Single(&imgIn2),NULL);
-	imgFlt->Write("test.pfm");
-
-	//BILATERAL GPU
-	ImageRAWGL imgIn(nameIn);
-	imgIn.Mul(1.0/imgIn.getMaxVal());
-	imgIn.generateTextureGL(false);
-
-	//Splatting
-	ImageRAW *grid = tmp.Splat(NULL,&imgIn);
-
-	//Blurring
-	ImageRAWGL *gridGL = new ImageRAWGL(grid,false);
-
-	FilterGLGaussian3D fltGauss3D(1.0f);
-	Fbo *gridBlurFbo = fltGauss3D.Process(SingleGL(gridGL),NULL);
-	ImageRAWGL *gridBlurGL = new ImageRAWGL(gridBlurFbo->tex,GL_TEXTURE_3D);
-
-	//Blurring
-	FilterGaussian3D *fltG = new FilterGaussian3D(1.0f);
-	ImageRAW *gridBlur = fltG->Process(Single(gridGL),NULL);
-
-	//Slicing
-	FilterGLSlicer fltSlicer(tmp.s_S,tmp.s_R);
-
-	Fbo *fbo = new Fbo();
-	fbo->create(imgIn.width,imgIn.height);
-
-	fltSlicer.Process(DoubleGL(&imgIn, gridBlurGL),fbo);
-
-	//Read from the GPU
-	ImageRAWGL *imgOut = new ImageRAWGL(1,imgIn.width,imgIn.height,4);
-	imgOut->readFromFBO(fbo);
-	imgOut->Write(nameOut);
-}*/
-

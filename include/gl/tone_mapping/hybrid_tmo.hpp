@@ -63,7 +63,7 @@ public:
         Ld_Max = 100.0f;
         b = 0.95f;
 
-        check = FilterGLRedux::CreateReduxCheck();
+        check = FilterGLRedux::CreateCheck();
         fltDragoTMO    = new FilterGLDragoTMO(100.0f, 0.85f, 1e6, true);
         fltReinhardTMO = new FilterGLSigmoidTMO(0.18f, false, true);
     }

@@ -35,10 +35,13 @@ protected:
     pic::FilterGLSimpleTMO *tmo;
     pic::FilterGLGaussian2D *fltGauss;
     pic::FilterGLBilateral2DG *fltBilG;
+    pic::FilterGLRedux *flt;
 
 public:
     pic::ImageRAWGL img, *img_flt, *img_flt_tmo;
     glw::program    program;
+
+    pic::ImageRAWGLVec stack;
 
     SimpleFilteringWindow() : OpenGLWindow(NULL)
     {
@@ -50,7 +53,7 @@ public:
     void init()
     {
         //reading an input image
-        img.Read("../data/input/bottles.hdr");
+        img.Read("../data/input/yellow_flowers.png");
         img.generateTextureGL(false, GL_TEXTURE_2D);
 
         //creating a screen aligned quad
@@ -59,6 +62,10 @@ public:
                                 pic::QuadGL::getFragmentProgramForView());
 
         quad = new pic::QuadGL(true);
+
+        flt = pic::FilterGLRedux::CreateMean();
+         stack = pic::FilterGLRedux::CreateData(img.width, img.height, img.channels,
+                                              1);
 
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
@@ -78,6 +85,11 @@ public:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //Gaussian filtering...
+
+  //      pic::ImageRAWGL *out = flt->Redux(&img, stack);
+//        out->loadToMemory();
+    //    printf("%f\n", out->data[0]);
+
         img_flt = fltBilG->Process(SingleGL(&img), img_flt);
 
         //simple tone mapping: gamma + exposure correction

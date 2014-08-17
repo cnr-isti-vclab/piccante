@@ -32,6 +32,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGL class
+ */
 class FilterGL
 {
 protected:

@@ -29,6 +29,11 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLScatter class implement
+ * the bilateral grid approximation of the bilateral
+ * filter.
+ */
 class FilterGLScatter: public FilterGL
 {
 protected:
@@ -36,9 +41,22 @@ protected:
     GLfloat		*vertex_array;
     int			nVertex_array;
     GLuint		vbo, vao;
+
+    /**
+     * @brief GenerateVA
+     * @param width
+     * @param height
+     */
     void GenerateVA(int width, int height);
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
+
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
     float s_S, s_R, mul_E;
@@ -53,6 +71,8 @@ public:
      * @param height
      */
     FilterGLScatter(float s_S, float s_R, int width, int height);
+
+    ~FilterGLScatter();
 
     /**
      * @brief Update
@@ -81,6 +101,24 @@ FilterGLScatter::FilterGLScatter(float s_S, float s_R, int width, int height)
     InitShaders();
 }
 
+FilterGLScatter::~FilterGLScatter()
+{
+    if(vertex_array != NULL) {
+        delete[] vertex_array;
+        vertex_array = NULL;
+    }
+
+    if(vbo != 0) {
+        glDeleteBuffers(1, &vbo);
+        vbo = 0;
+    }
+
+    if(vao != 0) {
+        glDeleteVertexArrays(1, &vao);
+        vao = 0;
+    }
+}
+
 void FilterGLScatter::GenerateVA(int width, int height)
 {
     vertex_array = new GLfloat[2 * width * height];
@@ -104,22 +142,21 @@ void FilterGLScatter::GenerateVA(int width, int height)
                  GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    //Vertex Array Object
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-
-    glEnableClientState(GL_VERTEX_ARRAY);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glVertexPointer(2, GL_FLOAT, 0, 0);
 
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glEnableVertexAttribArray(0);
     glBindVertexArray(0);
-
+    glDisableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void FilterGLScatter::FragmentShader()
 {
-
     vertex_source = GLW_STRINGFY(
 
                         uniform sampler2D	u_tex;
@@ -136,7 +173,6 @@ void FilterGLScatter::FragmentShader()
         vec4 data = texelFetch(u_tex, ivec2(a_position), 0);
 
         //Output coordinate
-        //vec2 coord = floor(a_position.xy*s_S);
         vec2 coord = vec2(a_position) / vec2(textureSize(u_tex, 0) - ivec2(1));
         coord = coord * 2.0 - vec2(1.0);
 
@@ -159,7 +195,9 @@ void FilterGLScatter::FragmentShader()
     void main(void) {
         g2f_color   = v2g_color[0];
         gl_Layer    = v2g_layer[0];
-        gl_Position = gl_in[0].gl_Position;//gl_PositionIn[0];
+
+        gl_PointSize = 1.0;
+        gl_Position = gl_in[0].gl_Position;
         EmitVertex();
 
         EndPrimitive();
@@ -178,7 +216,7 @@ void FilterGLScatter::FragmentShader()
 
 void FilterGLScatter::InitShaders()
 {
-    filteringProgram.setup(glw::version("400"), vertex_source, geometry_source, fragment_source,
+    filteringProgram.setup(glw::version("330"), vertex_source, geometry_source, fragment_source,
                            GL_POINTS, GL_POINTS, 1);
 
 #ifdef PIC_DEBUG
@@ -186,15 +224,16 @@ void FilterGLScatter::InitShaders()
 #endif
 
     glw::bind_program(filteringProgram);
+
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
+
     glw::bind_program(0);
 
     Update(s_S, s_R);
 }
 
-//Change parameters
 void FilterGLScatter::Update(float s_S, float s_R)
 {
     this->s_S = s_S;
@@ -202,7 +241,9 @@ void FilterGLScatter::Update(float s_S, float s_R)
 
     mul_E = s_R / 3.0f;
 
-    printf("Rate S: %f Rate R: %f Mul E: %f\n", s_S, s_R, mul_E);
+    #ifdef PIC_DEBUG
+        printf("Rate S: %f Rate R: %f Mul E: %f\n", s_S, s_R, mul_E);
+    #endif
 
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex", 0);
@@ -218,9 +259,9 @@ ImageRAWGL *FilterGLScatter::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     }
 
     int width, height, range;
-    width =  int(ceilf(float(imgIn[0]->width) * s_S));
+    width =  int(ceilf(float(imgIn[0]->width)  * s_S));
     height = int(ceilf(float(imgIn[0]->height) * s_S));
-    range =  int(ceilf(1.0f * s_R));
+    range =  int(ceilf(s_R));
 
     if(imgOut == NULL) {
         imgOut = new ImageRAWGL(range + 1, width + 1, height + 1,
@@ -234,10 +275,11 @@ ImageRAWGL *FilterGLScatter::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 
     //Rendering
     fbo->bind();
-    glFramebufferTextureEXT(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                             imgOut->getTexture(), 0);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glViewport(0, 0, (GLsizei)width, (GLsizei)height);

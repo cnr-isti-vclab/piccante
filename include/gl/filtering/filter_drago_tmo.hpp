@@ -30,6 +30,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLDragoTMO class
+ */
 class FilterGLDragoTMO: public FilterGL
 {
 protected:
@@ -37,22 +40,46 @@ protected:
     float constant1, constant2;
     bool bGammaCorrection;
 
+    /**
+     * @brief ComputeConstants
+     */
     void ComputeConstants();
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLDragoTMO
+     */
     FilterGLDragoTMO();
-    //Init constructors
+
+    /**
+     * @brief FilterGLDragoTMO
+     * @param Ld_Max
+     * @param b
+     * @param LMax
+     * @param Lwa
+     * @param bGammaCorrection
+     */
     FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
                      bool bGammaCorrection);
 
     void Update(float Ld_Max, float b, float LMax);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
 
@@ -92,7 +119,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()
 {
     Ld_Max	=  100.0f;
@@ -106,7 +132,6 @@ FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()
     InitShaders();
 }
 
-//Init constructors
 FilterGLDragoTMO::FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
                                    bool bGammaCorrection = false): FilterGL()
 {
@@ -141,7 +166,6 @@ FilterGLDragoTMO::FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
     InitShaders();
 }
 
-//BUG: tn_gamma and tn_exposure are not set!!
 void FilterGLDragoTMO::FragmentShader()
 {
     fragment_source = GLW_STRINGFY
@@ -182,13 +206,10 @@ void FilterGLDragoTMO::ComputeConstants()
 
 void FilterGLDragoTMO::InitShaders()
 {
-    std::string prefix;
-    prefix += glw::version("150");
-//	prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLDragoTMO log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
@@ -231,7 +252,6 @@ void FilterGLDragoTMO::Update(float Ld_Max, float b, float LMax)
     glw::bind_program(0);   
 }
 
-//Processing
 ImageRAWGL *FilterGLDragoTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn.size()<2) {

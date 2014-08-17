@@ -37,47 +37,80 @@ protected:
     void InitShaders();
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterGLRedux
+     * @param reduxOperation
+     */
     FilterGLRedux(std::string reduxOperation);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
-    static FilterGLRedux *CreateReduxMean()
+    /**
+     * @brief CreateMean
+     * @return
+     */
+    static FilterGLRedux *CreateMean()
     {
         FilterGLRedux *filter = new
         FilterGLRedux("color = (color00+color10+color01+color11)*0.25;");
         return filter;
     }
 
-    static FilterGLRedux *CreateReduxMax()
+    /**
+     * @brief CreateMax
+     * @return
+     */
+    static FilterGLRedux *CreateMax()
     {
         FilterGLRedux *filter = new
         FilterGLRedux("color = max(color00,color10);\n color = max(color, color01);\n color = max(color, color11);\n");
         return filter;
     }
 
-    static FilterGLRedux *CreateReduxMin()
+    /**
+     * @brief CreateMin
+     * @return
+     */
+    static FilterGLRedux *CreateMin()
     {
         FilterGLRedux *filter = new
         FilterGLRedux("color = min(color00,color10);\n color = min(color, color01);\n color = min(color, color11);\n");
         return filter;
     }
 
-    static FilterGLRedux *CreateReduxMinPos()
+    /**
+     * @brief CreateMinPos
+     * @return
+     */
+    static FilterGLRedux *CreateMinPos()
     {
         FilterGLRedux *filter = new
         FilterGLRedux("vec4 maxVal = vec4(1e-6); if(color00.x>0.0f) color = color00; if(color01.x>0.0f) color = min(color,color01); if(color10.x>0.0f) color = min(color,color10); if(color11.x>0.0f) color = min(color,color11);\n");
         return filter;
     }
 
-    static FilterGLRedux *CreateReduxCheck()
+    /**
+     * @brief CreateCheck
+     * @return
+     */
+    static FilterGLRedux *CreateCheck()
     {
         FilterGLRedux *filter = new
         FilterGLRedux("vec4 sum = color00 + color01 + color10 + color11; color = sum.x<0.5? vec4(0.0) : sum; color = ((sum.x>0.5)&&sum.x<3.5)? vec4(10.0) : color; color = ((sum.x>3.5)&&sum.x<4.5)? vec4(1.0) : color; color = sum.x>4.5 ? vec4(10.0) : color;\n");
         return filter;
     }
 
+    /**
+     * @brief EvenOdd
+     * @param val
+     * @return
+     */
     static int EvenOdd(int val)
     {
         if((val % 2) == 0) {
@@ -89,7 +122,15 @@ public:
         return val;
     }
 
-    static ImageRAWGLVec CreateReduxData(int width, int height, int channels ,
+    /**
+     * @brief CreateData
+     * @param width
+     * @param height
+     * @param channels
+     * @param minSize
+     * @return
+     */
+    static ImageRAWGLVec CreateData(int width, int height, int channels ,
                                          int minSize = 2)
     {
         int checkSize = EvenOdd(MIN(width, height));
@@ -109,6 +150,12 @@ public:
         return stack;
     }
 
+    /**
+     * @brief Redux
+     * @param imgIn
+     * @param stack
+     * @return
+     */
     ImageRAWGL *Redux(ImageRAWGL *imgIn, ImageRAWGLVec stack)
     {
         ImageRAWGL *imageFlt = imgIn;
@@ -121,14 +168,20 @@ public:
         return stack[stack.size() - 1];
     }
 
+    /**
+     * @brief ExecuteReduxMean
+     * @param nameIn
+     * @param nameOut
+     * @return
+     */
     static ImageRAWGL *ExecuteReduxMean(std::string nameIn, std::string nameOut)
     {
         ImageRAWGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
-        FilterGLRedux *filter = CreateReduxMean();
+        FilterGLRedux *filter = CreateMean();
 
-        ImageRAWGLVec stack = CreateReduxData(imgIn.width, imgIn.height, imgIn.channels,
+        ImageRAWGLVec stack = CreateData(imgIn.width, imgIn.height, imgIn.channels,
                                               1);
 
         ImageRAWGL *out = filter->Redux(&imgIn, stack);
@@ -139,14 +192,20 @@ public:
         return out;
     }
 
+    /**
+     * @brief ExecuteReduxMax
+     * @param nameIn
+     * @param nameOut
+     * @return
+     */
     static ImageRAWGL *ExecuteReduxMax(std::string nameIn, std::string nameOut)
     {
         ImageRAWGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
-        FilterGLRedux *filter = CreateReduxMax();
+        FilterGLRedux *filter = CreateMax();
 
-        ImageRAWGLVec stack = CreateReduxData(imgIn.width, imgIn.height, imgIn.channels,
+        ImageRAWGLVec stack = CreateData(imgIn.width, imgIn.height, imgIn.channels,
                                               1);
 
         ImageRAWGL *out = filter->Redux(&imgIn, stack);
@@ -158,7 +217,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLRedux::FilterGLRedux(std::string reduxOperation): FilterGL()
 {
     this->reduxOperation = reduxOperation;
@@ -198,14 +256,11 @@ void FilterGLRedux::InitShaders()
     size_t processing_found = fragment_source.find("___REDUX_OPERATION___");
     fragment_source.replace(processing_found, 21, reduxOperation);
 
-    std::string prefix;
-    prefix += glw::version("330");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
 #endif
+
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
@@ -214,7 +269,6 @@ void FilterGLRedux::InitShaders()
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLRedux::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn[0] == NULL) {

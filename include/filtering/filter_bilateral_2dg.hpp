@@ -33,6 +33,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterBilateral2DG class
+ */
 class FilterBilateral2DG: public Filter
 {
 protected:
@@ -45,22 +48,38 @@ protected:
     bool		            parallel;
 
 public:
+    float s_S, s_R, mul_E;
 
     std::string Signature()
     {
         return GenBilString("G", sigma_s, sigma_r);
     }
 
-    //Image Splatting into the grid
+    /**
+     * @brief Splat splats values into the grid.
+     * @param base
+     * @param edge
+     * @param channel
+     * @return
+     */
     ImageRAW *Splat(ImageRAW *base, ImageRAW *edge, int channel);
 
-    //Slicing the grid into the output image
+    /**
+     * @brief Slice slices the grid into the output image
+     * @param out
+     * @param base
+     * @param edge
+     * @param channels
+     */
     void Slice(ImageRAW *out, ImageRAW *base, ImageRAW *edge, int channels);
 
-    float s_S, s_R, mul_E;
-
-    //Init constructors
+    /**
+     * @brief FilterBilateral2DG
+     * @param sigma_s
+     * @param sigma_r
+     */
     FilterBilateral2DG(float sigma_s, float sigma_r);
+
     ~FilterBilateral2DG();
 
     //Processing
@@ -69,7 +88,14 @@ public:
     //Processing in parallel
     ImageRAW *ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut);
 
-    //Filtering
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
     static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float sigma_s,
                              float sigma_r)
     {
@@ -83,6 +109,14 @@ public:
         return imgOut;
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
     static ImageRAW *Execute(std::string nameIn,
                              std::string nameOut,
                              float sigma_s, float sigma_r)
@@ -122,7 +156,6 @@ public:
     }
 };
 
-//Init constructors
 FilterBilateral2DG::FilterBilateral2DG(float sigma_s, float sigma_r)
 {
     //protected values are assigned/computed
@@ -152,19 +185,20 @@ FilterBilateral2DG::~FilterBilateral2DG()
     }
 }
 
-//Image Splatting into the grid
 ImageRAW *FilterBilateral2DG::Splat(ImageRAW *base, ImageRAW *edge, int channels)
 {
-    printf("Splatting...\n");
-
     if(grid == NULL) {
-        printf("S Rate: %f R Rate: %f Mul E: %f\n", s_S, s_R, mul_E);
+        #ifdef PIC_DEBUG
+            printf("S Rate: %f R Rate: %f Mul E: %f\n", s_S, s_R, mul_E);
+        #endif
 
         width =  int(ceilf(float(base->width) * s_S));
         height = int(ceilf(float(base->height) * s_S));
         range =  int(ceilf(s_R));
 
-        printf("Grid Size: %d %d %d\n", width, height, range);
+        #ifdef PIC_DEBUG
+            printf("Grid Size: %d %d %d\n", width, height, range);
+        #endif
 
 #ifdef PIC_BILATERAL_GRID_MULTI_PASS
         printf("Grid - Memory Mb: %3.2f\n",
@@ -181,10 +215,7 @@ ImageRAW *FilterBilateral2DG::Splat(ImageRAW *base, ImageRAW *edge, int channels
 #endif
     }
 
-    printf("Set to zero\n");
     grid->SetZero();
-
-    printf("Real Splatting\n");
 
     for(int j = 0; j < base->height; j++) {
         int y = int(lround(float(j) * s_S));
@@ -223,17 +254,12 @@ ImageRAW *FilterBilateral2DG::Splat(ImageRAW *base, ImageRAW *edge, int channels
 #endif
         }
     }
-
-    printf("ok\n");
     return grid;
 }
 
-//Slicing the grid into the output image
 void FilterBilateral2DG::Slice(ImageRAW *out, ImageRAW *base, ImageRAW *edge,
                                int channels)
 {
-
-    printf("Slicing...");
     float widthf = float(grid->width);
     float heightf = float(grid->height);
     float rangef = float(grid->frames);
@@ -289,11 +315,8 @@ void FilterBilateral2DG::Slice(ImageRAW *out, ImageRAW *base, ImageRAW *edge,
 #endif
         }
     }
-
-    printf("ok\n");
 }
 
-//Processing
 ImageRAW *FilterBilateral2DG::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
 {
     if(imgIn[0] == NULL) {
@@ -303,9 +326,6 @@ ImageRAW *FilterBilateral2DG::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
     if(imgOut == NULL) {
         imgOut = imgIn[0]->AllocateSimilarOne();
     }
-
-    /*	grid = NULL;
-    gridBlur = NULL;*/
 
     ImageRAW *base, *edge;
 
@@ -345,15 +365,11 @@ ImageRAW *FilterBilateral2DG::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
         Splat(base, edge, i);
 
         //Blurring
-        printf("Blurring...");
-
         if(parallel) {
             fltG->Process(Single(grid), gridBlur);
         } else {
             fltG->ProcessP(Single(grid), gridBlur);
         }
-
-        printf("ok\n");
 
         //Slicing
         Slice(imgOut, base, edge, i);
@@ -366,7 +382,6 @@ ImageRAW *FilterBilateral2DG::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
     return imgOut;
 }
 
-//Processing in parallel
 ImageRAW *FilterBilateral2DG::ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut)
 {
     parallel = true;

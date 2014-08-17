@@ -31,39 +31,9 @@ namespace pic {
 
 using namespace std;
 
-void CheckFboStatus(GLenum fboStatus)
-{
-    switch(fboStatus) {
-    case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-        cerr << "FBO Incomplete: Attachment" << endl;
-        break;
-
-    case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-        cerr << "FBO Incomplete: Missing Attachment" << endl;
-        break;
-
-    case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-        cerr << "FBO Incomplete: Dimensions" << endl;
-        break;
-
-    case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-        cerr << "FBO Incomplete: Formats" << endl;
-        break;
-
-    case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-        cerr << "FBO Incomplete: Draw Buffer" << endl;
-        break;
-
-    case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-        cerr << "FBO Incomplete: Read Buffer" << endl;
-        break;
-
-    default:
-        cerr << "Undefined FBO error" << endl;
-        break;
-    }
-};
-
+/**
+ * @brief The Fbo class
+ */
 class Fbo
 {
 public:
@@ -76,60 +46,131 @@ public:
     Fbo();
 
     //all this functions must be called with an active OpenGL context!
-    bool create(int width, int height);
+
+    /**
+     * @brief create
+     * @param width
+     * @param height
+     * @param bDepth
+     * @return
+     */
     bool create(int width, int height, bool bDepth);
+
+    /**
+     * @brief create
+     * @param width
+     * @param height
+     * @param depth
+     * @param bDepth
+     * @param tex
+     * @return
+     */
     bool create(int width, int height, int depth, bool bDepth, GLuint tex);
 
     void attachColorBuffer(GLuint tex, GLenum target, int slice = 0);
 
-    void attachColorBuffer2(GLuint tex, GLenum target, int slice)
-    {
-        GLuint texWork = (tex == 0) ? this->tex : tex;
+    /**
+     * @brief attachColorBuffer2
+     * @param tex
+     * @param target
+     * @param slice
+     */
+    void attachColorBuffer2(GLuint tex, GLenum target, int slice);
 
-        switch(target) {
-        case GL_TEXTURE_2D: {
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                                   texWork, 0);
-        }
-        break;
-
-        case GL_TEXTURE_2D_ARRAY: {
-            glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                   GL_TEXTURE_2D_ARRAY, texWork, 0, slice);
-        }
-        break;
-
-        case GL_TEXTURE_3D: {
-            glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_3D,
-                                   texWork, 0, slice);
-        }
-        break;
-        }
-    };
-
+    /**
+     * @brief attachColorBuffer
+     * @param tex
+     */
     void attachColorBuffer(GLuint tex);
 
+    /**
+     * @brief destroy
+     * @return
+     */
     bool destroy();
-    bool resize(int width, int height)
-    {
-        destroy();
-        return create(width, height);
-    }
 
+    /**
+     * @brief resize
+     * @param width
+     * @param height
+     * @return
+     */
+    bool resize(int width, int height);
+
+    /**
+     * @brief bind
+     */
     void bind();
+
+    /**
+     * @brief bind
+     * @param i
+     */
     void bind(unsigned int i);
+
+    /**
+     * @brief unbind
+     */
     void unbind();
 
+    /**
+     * @brief bind2
+     */
     void bind2()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     }
+
+    /**
+     * @brief unbind2
+     */
     void unbind2()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    /**
+     * @brief clone
+     * @return
+     */
     Fbo *clone();
+
+    /**
+     * @brief checkStatus
+     * @param fboStatus
+     */
+    static void checkStatus(GLenum fboStatus)
+    {
+        switch(fboStatus) {
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            cerr << "FBO Incomplete: Attachment" << endl;
+            break;
+
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            cerr << "FBO Incomplete: Missing Attachment" << endl;
+            break;
+
+        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+            cerr << "FBO Incomplete: Dimensions" << endl;
+            break;
+
+        case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+            cerr << "FBO Incomplete: Formats" << endl;
+            break;
+
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+            cerr << "FBO Incomplete: Draw Buffer" << endl;
+            break;
+
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+            cerr << "FBO Incomplete: Read Buffer" << endl;
+            break;
+
+        default:
+            cerr << "Undefined FBO error" << endl;
+            break;
+        }
+    }
 };
 
 Fbo::Fbo()
@@ -139,24 +180,19 @@ Fbo::Fbo()
     tex = 0;
 
     width = height = frames = 0;
-};
+}
 
 Fbo *Fbo::clone()
 {
     Fbo *ret = new Fbo();
     ret->create(width, height, frames, bDepth, 0);
     return ret;
-};
+}
 
-bool Fbo::create(int width, int height)
-{
-    return create(width, height, false);
-};
-
-bool Fbo::create(int width, int height, bool bDepth)
+bool Fbo::create(int width, int height, bool bDepth = false)
 {
     return create(width, height, 1, bDepth, 0);
-};
+}
 
 bool Fbo::create(int width, int height, int frames, bool bDepth, GLuint tex)
 {
@@ -225,12 +261,12 @@ bool Fbo::create(int width, int height, int frames, bool bDepth, GLuint tex)
                                   depth);
     }
 
-#ifdef DEBUG_GL
+#ifdef PIC_DEBUG_GL
     // check framebuffer status
     GLenum fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
     if(fboStatus != GL_FRAMEBUFFER_COMPLETE) {
-        CheckFboStatus(fboStatus);
+        checkStatus(fboStatus);
         glDeleteFramebuffers(1, &fbo);
         fbo = 0;
     }
@@ -240,7 +276,7 @@ bool Fbo::create(int width, int height, int frames, bool bDepth, GLuint tex)
     // unbind framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     return fbo != 0;
-};
+}
 
 //attach a texture in the Fbo as color buffer
 void Fbo::attachColorBuffer(GLuint tex, GLenum target, int slice)
@@ -263,12 +299,12 @@ void Fbo::attachColorBuffer(GLuint tex, GLenum target, int slice)
     break;
     }
 
-#ifdef DEBUG_GL
+#ifdef PIC_DEBUG_GL
     // check framebuffer status
     GLenum fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
     if(fboStatus != GL_FRAMEBUFFER_COMPLETE) {
-        CheckFboStatus(fboStatus);
+        checkStatus(fboStatus);
         glDeleteFramebuffers(1, &fbo);
         fbo = 0;
     }
@@ -276,7 +312,7 @@ void Fbo::attachColorBuffer(GLuint tex, GLenum target, int slice)
 #endif
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-};
+}
 
 void Fbo::attachColorBuffer(GLuint tex)
 {
@@ -293,7 +329,7 @@ void Fbo::attachColorBuffer(GLuint tex)
     GLenum fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
     if(fboStatus != GL_FRAMEBUFFER_COMPLETE) {
-        CheckFboStatus(fboStatus);
+        checkStatus(fboStatus);
         glDeleteFramebuffers(1, &fbo);
         fbo = 0;
     }
@@ -301,10 +337,32 @@ void Fbo::attachColorBuffer(GLuint tex)
 #endif
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-};
+}
 
-//Scattering
-//
+void Fbo::attachColorBuffer2(GLuint tex, GLenum target, int slice)
+{
+    GLuint texWork = (tex == 0) ? this->tex : tex;
+
+    switch(target) {
+    case GL_TEXTURE_2D: {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                               texWork, 0);
+    }
+    break;
+
+    case GL_TEXTURE_2D_ARRAY: {
+        glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                               GL_TEXTURE_2D_ARRAY, texWork, 0, slice);
+    }
+    break;
+
+    case GL_TEXTURE_3D: {
+        glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_3D,
+                               texWork, 0, slice);
+    }
+    break;
+    }
+}
 
 bool Fbo::destroy()
 {
@@ -324,7 +382,7 @@ bool Fbo::destroy()
     }
 
     return true;
-};
+}
 
 void Fbo::bind()
 {
@@ -335,7 +393,7 @@ void Fbo::bind()
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
     glReadBuffer(GL_COLOR_ATTACHMENT0);
-};
+}
 
 void Fbo::unbind()
 {
@@ -346,7 +404,13 @@ void Fbo::unbind()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDrawBuffer(GL_BACK);
     glReadBuffer(GL_BACK);
-};
+}
+
+bool Fbo::resize(int width, int height)
+{
+    destroy();
+    return create(width, height);
+}
 
 } // end namespace pic
 

@@ -54,8 +54,8 @@ public:
 
     SegmentationGL()
     {
-        min = FilterGLRedux::CreateReduxMinPos();
-        max = FilterGLRedux::CreateReduxMax();
+        min = FilterGLRedux::CreateMinPos();
+        max = FilterGLRedux::CreateMax();
         fltNuked = new FilterGLRemoveNuked(0.9f);
         fltBil = NULL;
         fltIt  = NULL;
@@ -120,7 +120,7 @@ public:
 
         //Get min value
         if(stack.empty()) {
-            stack = FilterGLRedux::CreateReduxData(L->width, L->height, L->channels, 1);
+            stack = FilterGLRedux::CreateData(L->width, L->height, L->channels, 1);
         }
 
         ImageRAWGL *min_val = min->Redux(L, stack);

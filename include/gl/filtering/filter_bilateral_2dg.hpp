@@ -32,11 +32,13 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLBilateral2DG class
+ */
 class FilterGLBilateral2DG: public FilterGL
 {
 protected:
     float				sigma_s, sigma_r, s_S, s_R;
-    int					width, height;
 
     FilterGLScatter		*scatter;
     FilterGLGaussian3D	*gauss3D;
@@ -171,10 +173,6 @@ ImageRAWGL *FilterGLBilateral2DG::Process(ImageRAWGLVec imgIn,
 
     //Splatting
     gridGL = scatter->Process(imgIn, gridGL);
-
-    gridGL->loadToMemory();
-    gridGL->SetRand();
-    gridGL->loadFromMemory();
 
     //Blurring
     gridBlurGL = gauss3D->Process(SingleGL(gridGL), gridBlurGL);

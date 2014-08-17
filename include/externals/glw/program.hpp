@@ -718,7 +718,7 @@ inline bool program::do_setup(const char *prefix, const char *vertex_src,
                                        this->m_log);
 
     if(geometry_src != 0) {
-        this->m_gshd = this->create_shader(GL_GEOMETRY_SHADER_EXT, prefix, geometry_src,
+        this->m_gshd = this->create_shader(GL_GEOMETRY_SHADER, prefix, geometry_src,
                                            this->m_log);
     }
 
@@ -766,7 +766,7 @@ inline GLuint program::create_shader(GLenum type, const char *prefix,
         compile_log += "VERTEX";
         break;
 
-    case GL_GEOMETRY_SHADER_EXT:
+    case GL_GEOMETRY_SHADER:
         compile_log += "GEOMETRY";
         break;
 
