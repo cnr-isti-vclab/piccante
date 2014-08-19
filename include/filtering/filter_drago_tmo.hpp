@@ -30,27 +30,56 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterDragoTMO class
+ */
 class FilterDragoTMO: public Filter
 {
 protected:
     float constant1, constant2, Lw_Max_scaled, Lw_a_scaled;
     float b, Ld_Max, Lw_Max, Lw_a;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
 
-    //SetupAux
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterDragoTMO
+     */
     FilterDragoTMO();
+
+    /**
+     * @brief FilterDragoTMO
+     * @param Ld_Max
+     * @param b
+     * @param Lw_Max
+     * @param Lwa
+     */
     FilterDragoTMO(float Ld_Max, float b, float Lw_Max, float Lwa);
 
+    /**
+     * @brief Update
+     * @param Ld_Max
+     * @param b
+     * @param Lw_Max
+     * @param Lwa
+     */
     void Update(float Ld_Max, float b, float Lw_Max, float Lwa);
 };
 
-//Basic constructors
 FilterDragoTMO::FilterDragoTMO()
 {
     Update(100.0f, 0.95f, 1e6f, 0.5f);
@@ -115,7 +144,6 @@ ImageRAW *FilterDragoTMO::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
     return imgOut;
 }
 
-//Process in a box
 void FilterDragoTMO::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 {
     int channels = src[0]->channels;

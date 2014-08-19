@@ -82,41 +82,6 @@ public:
      */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
-
-    static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgLum, ImageRAWGL *imgOut,
-                               float Ld_Max = 100.0f, float b = 0.95f)
-    {
-        imgIn->generateTextureGL(false, GL_TEXTURE_2D);
-
-        imgLum = FilterGLLuminance::Execute(imgIn, imgLum);
-
-        imgLum->loadToMemory();
-
-        float LMax = imgLum->getMaxVal()[0];
-        float Lwa  = imgLum->getLogMeanVal()[0];
-        
-        FilterGLDragoTMO filter(Ld_Max, b, LMax, Lwa, false);
-
-        imgOut = filter.Process(DoubleGL(imgIn, imgLum), imgOut);
-
-        return imgOut;
-    }
-
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut,
-                               float Ld_Max = 100.0f, float b = 0.95f)
-    {
-        ImageRAWGL imgIn(nameIn);
-
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 4,
-                                            IMG_GPU_CPU, GL_TEXTURE_2D);
-
-
-        imgOut = Execute(&imgIn, NULL, imgOut, Ld_Max, b);
-
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
 };
 
 FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()

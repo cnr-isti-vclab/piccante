@@ -39,21 +39,35 @@ const float mtxXYZtoRGB[] = {	3.2406f,   -1.5372f,   -0.4986f,
                                 0.0557f,   -0.2040f,    1.0570f
                             };
 
+/**
+ * @brief The ColorConvRGBtoXYZ class
+ */
 class ColorConvRGBtoXYZ: public ColorConv
 {
 public:
 
+    /**
+     * @brief ColorConvRGBtoXYZ
+     */
     ColorConvRGBtoXYZ()
     {
     }
 
-    //from RGB to XYZ
+    /**
+     * @brief direct
+     * @param colIn
+     * @param colOut
+     */
     void direct(float *colIn, float *colOut)
     {
         apply(mtxRGBtoXYZ, colIn, colOut);
     }
 
-    //from XYZ to RGB
+    /**
+     * @brief inverse
+     * @param colIn
+     * @param colOut
+     */
     void inverse(float *colIn, float *colOut)
     {
         apply(mtxXYZtoRGB, colIn, colOut);

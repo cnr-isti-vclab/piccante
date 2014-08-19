@@ -97,7 +97,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
 {
     gamma = 2.2f;
@@ -107,7 +106,6 @@ FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
     InitShaders();
 }
 
-//Init constructors
 FilterGLSimpleTMO::FilterGLSimpleTMO(float fstop, float gamma): FilterGL()
 {
     //protected values are assigned/computed
@@ -122,7 +120,6 @@ FilterGLSimpleTMO::FilterGLSimpleTMO(float fstop, float gamma): FilterGL()
     InitShaders();
 }
 
-//BUG: tn_gamma and tn_exposure are not set!!
 void FilterGLSimpleTMO::FragmentShader()
 {
     fragment_source = GLW_STRINGFY
@@ -156,7 +153,7 @@ void FilterGLSimpleTMO::InitShaders()
     filteringProgram.setup(prefix, vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLSimpleTMO log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
@@ -186,7 +183,6 @@ void FilterGLSimpleTMO::Update(float fstop, float gamma)
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLSimpleTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn[0] == NULL) {
@@ -216,7 +212,7 @@ ImageRAWGL *FilterGLSimpleTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 
     //Textures
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
+    imgIn[0]->bindTexture();
 
     //Rendering aligned quad
     quad->Render();
@@ -229,7 +225,7 @@ ImageRAWGL *FilterGLSimpleTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 
     //Textures
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    imgIn[0]->unBindTexture();
 
     return imgOut;
 }

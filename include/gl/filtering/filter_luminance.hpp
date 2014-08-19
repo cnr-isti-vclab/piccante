@@ -25,6 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_GL_FILTERING_FILTER_LUMINANCE_HPP
 #define PIC_GL_FILTERING_FILTER_LUMINANCE_HPP
 
+#include "filtering/filter_luminance.hpp"
 #include "gl/filtering/filter.hpp"
 
 namespace pic {
@@ -36,17 +37,30 @@ class FilterGLLuminance: public FilterGL
 {
 protected:
 
+    LUMINANCE_TYPE type;
+    float weights[3];
+
     /**
      * @brief InitShaders
      */
     void InitShaders();
 
 public:
-
     /**
      * @brief FilterGLLuminance
      */
     FilterGLLuminance();
+
+    /**
+     * @brief FilterGLLuminance
+     */
+    FilterGLLuminance(LUMINANCE_TYPE type);
+
+    /**
+     * @brief Update
+     * @param type
+     */
+    void Update(LUMINANCE_TYPE type);
 
     /**
      * @brief Process
@@ -64,7 +78,7 @@ public:
      */
     static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgOut)
     {
-        FilterGLLuminance filter;
+        FilterGLLuminance filter(LT_CIE_LUMINANCE);
         imgOut = filter.Process(SingleGL(imgIn), imgOut);
         return imgOut;
     }
@@ -90,6 +104,15 @@ public:
 
 FilterGLLuminance::FilterGLLuminance(): FilterGL()
 {
+    this->type = LT_CIE_LUMINANCE;
+
+    InitShaders();
+}
+
+FilterGLLuminance::FilterGLLuminance(LUMINANCE_TYPE type): FilterGL()
+{
+    this->type = type;
+
     InitShaders();
 }
 
@@ -98,17 +121,15 @@ void FilterGLLuminance::InitShaders()
     fragment_source = GLW_STRINGFY
                       (
     uniform sampler2D u_tex; \n
-    out     vec4      f_color; \n
-    const vec3 LUM_XYZ =   vec3(0.213, 0.715,  0.072); \n
+    uniform vec3 weights; \n
+    out     vec4 f_color; \n
     \n
     void main(void) {
         \n
-        ivec2 coords = ivec2(gl_FragCoord.xy);\n
-        \n
-        vec3  color = texelFetch(u_tex, coords, 0).xyz;\n
-        \n
-        float L = dot(color, LUM_XYZ);\n
-        f_color = vec4(L, L, L, 1.0);\n
+        ivec2 coords = ivec2(gl_FragCoord.xy); \n
+        vec3 color = texelFetch(u_tex, coords, 0).xyz; \n
+        float L = dot(color, weights); \n
+        f_color = vec4(L, L, L, 1.0); \n
         \n
     }
                       );
@@ -116,14 +137,53 @@ void FilterGLLuminance::InitShaders()
     filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLLuminance log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color", 0);
     filteringProgram.relink();
+    glw::bind_program(0);
+
+    Update(type);
+}
+
+void FilterGLLuminance::Update(LUMINANCE_TYPE type)
+{
+    this->type = type;
+
+    switch(type)
+    {
+    case LT_WARD_LUMINANCE:
+        {
+            weights[0] = 54.0f  / 256.0f;
+            weights[1] = 183.0f / 256.0f;
+            weights[2] = 19.0f  / 256.0f;
+        }
+        break;
+
+    case LT_CIE_LUMINANCE:
+        {
+            weights[0] = 0.213f;
+            weights[1] = 0.715f;
+            weights[2] = 0.072f;
+        }
+        break;
+
+    case LT_MEAN:
+        {
+            float inv_3 = 1.0f / 3.0f;
+            weights[0] = inv_3;
+            weights[1] = inv_3;
+            weights[2] = inv_3;
+        }
+        break;
+    }
+
+    glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex", 0);
+    filteringProgram.uniform("weights", weights[0], weights[1], weights[2]);
     glw::bind_program(0);
 }
 

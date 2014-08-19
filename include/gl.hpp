@@ -46,6 +46,7 @@ See the GNU Lesser General Public License
 #include "externals/glw/program.hpp"
 
 #include "gl/algorithms/pyramid.hpp"
+
 #include "gl/filtering/filter.hpp"
 #include "gl/filtering/filter_anaglyph.hpp"
 #include "gl/filtering/filter_anisotropic_diffusion.hpp"
@@ -89,8 +90,11 @@ See the GNU Lesser General Public License
 #include "gl/image_raw.hpp"
 #include "gl/image_raw_vec.hpp"
 #include "gl/point_samplers/sampler_random_m.hpp"
+
+//Tone mapping
 #include "gl/tone_mapping/hybrid_tmo.hpp"
 #include "gl/tone_mapping/segmentation_tmo_approx.hpp"
+#include "gl/tone_mapping/drago_tmo.hpp"
 
 #endif /* PIC_DISABLE_OPENGL */
 

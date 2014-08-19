@@ -35,6 +35,7 @@ protected:
     pic::FilterGLSimpleTMO *tmo;
     pic::FilterGLGaussian2D *fltGauss;
     pic::FilterGLBilateral2DG *fltBilG;
+    pic::FilterGLLuminance *fltLum;
     pic::FilterGLRedux *flt;
 
 public:
@@ -63,10 +64,8 @@ public:
 
         quad = new pic::QuadGL(true);
 
-        flt = pic::FilterGLRedux::CreateMean();
-         stack = pic::FilterGLRedux::CreateData(img.width, img.height, img.channels,
-                                              1);
 
+         fltLum = new pic::FilterGLLuminance();
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
@@ -74,6 +73,10 @@ public:
 
         //allocating a Gaussian filter with sigma = 4.0
         fltGauss = new pic::FilterGLGaussian2D(4.0);
+
+     //   pic::ImageRAWGL *tmp = pic::DragoTMOGL(&img);
+    //    tmp->loadToMemory();
+    //    tmp->Write("../data/tmp.bmp");
     }
 
     void render()
@@ -90,7 +93,7 @@ public:
 //        out->loadToMemory();
     //    printf("%f\n", out->data[0]);
 
-        img_flt = fltBilG->Process(SingleGL(&img), img_flt);
+        img_flt = fltLum->Process(SingleGL(&img), img_flt);
 
         //simple tone mapping: gamma + exposure correction
         img_flt_tmo = tmo->Process(SingleGL(img_flt), img_flt_tmo);

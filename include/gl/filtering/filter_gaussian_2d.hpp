@@ -30,6 +30,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLGaussian2D class
+ */
 class FilterGLGaussian2D: public FilterGLNPasses
 {
 protected:

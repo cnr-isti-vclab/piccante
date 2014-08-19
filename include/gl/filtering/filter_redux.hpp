@@ -29,11 +29,17 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLRedux class
+ */
 class FilterGLRedux: public FilterGL
 {
 protected:
     std::string reduxOperation;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
 public:
@@ -58,7 +64,7 @@ public:
     static FilterGLRedux *CreateMean()
     {
         FilterGLRedux *filter = new
-        FilterGLRedux("color = (color00+color10+color01+color11)*0.25;");
+        FilterGLRedux("color = (color00+color10+color01+color11) / 4.0;");
         return filter;
     }
 
@@ -130,12 +136,12 @@ public:
      * @param minSize
      * @return
      */
-    static ImageRAWGLVec CreateData(int width, int height, int channels ,
-                                         int minSize = 2)
+    static void CreateData(int width, int height, int channels,
+                           ImageRAWGLVec &stack, int minSize = 2)
     {
         int checkSize = EvenOdd(MIN(width, height));
 
-        ImageRAWGLVec stack;
+        stack.clear();
 
         while(checkSize > minSize) {
             width  = EvenOdd(width);
@@ -146,8 +152,6 @@ public:
 
             checkSize = MIN(width, height);
         }
-
-        return stack;
     }
 
     /**
@@ -156,7 +160,7 @@ public:
      * @param stack
      * @return
      */
-    ImageRAWGL *Redux(ImageRAWGL *imgIn, ImageRAWGLVec stack)
+    ImageRAWGL *Redux(ImageRAWGL *imgIn, ImageRAWGLVec &stack)
     {
         ImageRAWGL *imageFlt = imgIn;
 
@@ -166,54 +170,6 @@ public:
         }
 
         return stack[stack.size() - 1];
-    }
-
-    /**
-     * @brief ExecuteReduxMean
-     * @param nameIn
-     * @param nameOut
-     * @return
-     */
-    static ImageRAWGL *ExecuteReduxMean(std::string nameIn, std::string nameOut)
-    {
-        ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-
-        FilterGLRedux *filter = CreateMean();
-
-        ImageRAWGLVec stack = CreateData(imgIn.width, imgIn.height, imgIn.channels,
-                                              1);
-
-        ImageRAWGL *out = filter->Redux(&imgIn, stack);
-
-        out->loadToMemory();
-        out->Write(nameOut);
-
-        return out;
-    }
-
-    /**
-     * @brief ExecuteReduxMax
-     * @param nameIn
-     * @param nameOut
-     * @return
-     */
-    static ImageRAWGL *ExecuteReduxMax(std::string nameIn, std::string nameOut)
-    {
-        ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-
-        FilterGLRedux *filter = CreateMax();
-
-        ImageRAWGLVec stack = CreateData(imgIn.width, imgIn.height, imgIn.channels,
-                                              1);
-
-        ImageRAWGL *out = filter->Redux(&imgIn, stack);
-
-        out->loadToMemory();
-        out->Write(nameOut);
-
-        return out;
     }
 };
 
@@ -236,7 +192,7 @@ void FilterGLRedux::InitShaders()
         ivec2 texSize = textureSize(u_tex, 0);
         ivec2 coords  = ivec2(gl_FragCoord.xy) * 2;
         \n
-        vec4  color00 = texelFetch(u_tex, coords,            0);
+        vec4  color00 = texelFetch(u_tex, coords               ,0);
         \n
         vec4  color10 = texelFetch(u_tex, coords + ivec2(1, 0), 0);
         \n
@@ -257,15 +213,16 @@ void FilterGLRedux::InitShaders()
     fragment_source.replace(processing_found, 21, reduxOperation);
 
     filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
+
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLRedux log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
-    filteringProgram.fragment_target("f_color",    0);
+    filteringProgram.fragment_target("f_color", 0);
     filteringProgram.relink();
-    filteringProgram.uniform("u_tex",      0);
+    filteringProgram.uniform("u_tex", 0);
     glw::bind_program(0);
 }
 
@@ -284,7 +241,7 @@ ImageRAWGL *FilterGLRedux::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int f = imgIn[0]->frames;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(f, w, h, 4, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageRAWGL(f, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(imgOut->width < 1 || imgOut->height < 1) {
@@ -307,7 +264,7 @@ ImageRAWGL *FilterGLRedux::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 
     //Textures
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
+    imgIn[0]->bindTexture();
 
     //Rendering aligned quad
     quad->Render();
@@ -319,10 +276,8 @@ ImageRAWGL *FilterGLRedux::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     glw::bind_program(0);
 
     //Textures
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    imgIn[0]->unBindTexture();
 
     return imgOut;
 }

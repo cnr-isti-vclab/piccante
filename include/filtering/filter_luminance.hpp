@@ -111,6 +111,7 @@ protected:
     }
 
 public:
+
     /**
      * @brief FilterLuminance
      * @param type

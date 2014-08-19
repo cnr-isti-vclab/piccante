@@ -120,7 +120,7 @@ public:
 
         //Get min value
         if(stack.empty()) {
-            stack = FilterGLRedux::CreateData(L->width, L->height, L->channels, 1);
+            FilterGLRedux::CreateData(L->width, L->height, L->channels, stack, 1);
         }
 
         ImageRAWGL *min_val = min->Redux(L, stack);

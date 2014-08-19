@@ -33,6 +33,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterColorConv class
+ */
 class FilterColorConv: public Filter
 {
 protected:
@@ -40,7 +43,12 @@ protected:
     int							n;
     bool						bDirect;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
     {
         if(n < 1) {
@@ -90,13 +98,22 @@ protected:
     }
 
 public:
-    //Basic constructors
+
+    /**
+     * @brief FilterColorConv
+     * @param conv
+     * @param bDirect
+     */
     FilterColorConv(ColorConv *conv, bool bDirect)
     {
         this->bDirect = bDirect;
         insertColorConv(conv);
     }
 
+    /**
+     * @brief insertColorConv
+     * @param conv
+     */
     void insertColorConv(ColorConv *conv)
     {
         if(conv != NULL) {
@@ -106,12 +123,23 @@ public:
         n = conv_list.size();
     }
 
+    /**
+     * @brief Update
+     * @param bDirect
+     */
     void Update(bool bDirect)
     {
         this->bDirect = bDirect;
     }
 
-    static ImageRAW *ExectueRGBtoLogLuv(ImageRAW *imgIn, ImageRAW *imgOut,
+    /**
+     * @brief RGBtoLogLuv
+     * @param imgIn
+     * @param imgOut
+     * @param bDirect
+     * @return
+     */
+    static ImageRAW *RGBtoLogLuv(ImageRAW *imgIn, ImageRAW *imgOut,
                                         bool bDirect)
     {
         ColorConvRGBtoXYZ       csXYZ;
@@ -125,7 +153,14 @@ public:
         return flt.Process(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *ExectueRGBtoCIELAB(ImageRAW *imgIn, ImageRAW *imgOut,
+    /**
+     * @brief RGBtoCIELAB
+     * @param imgIn
+     * @param imgOut
+     * @param bDirect
+     * @return
+     */
+    static ImageRAW *RGBtoCIELAB(ImageRAW *imgIn, ImageRAW *imgOut,
                                         bool bDirect)
     {
         ColorConvRGBtoXYZ       csXYZ;
@@ -139,7 +174,14 @@ public:
         return flt.Process(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *ExectueCIELABtoRGB(ImageRAW *imgIn, ImageRAW *imgOut,
+    /**
+     * @brief ExectueCIELABtoRGB
+     * @param imgIn
+     * @param imgOut
+     * @param bDirect
+     * @return
+     */
+    static ImageRAW *CIELABtoRGB(ImageRAW *imgIn, ImageRAW *imgOut,
                                         bool bDirect)
     {
         ColorConvRGBtoXYZ       csXYZ;

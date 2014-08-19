@@ -35,19 +35,25 @@ namespace pic {
 
 enum IMAGESTORE {IMG_GPU_CPU, IMG_CPU_GPU, IMG_CPU, IMG_GPU, IMG_NULL};
 
+/**
+ * @brief The ImageRAWGL class
+ */
 class ImageRAWGL: public ImageRAW
 {
 protected:
     GLuint		texture;
     GLenum		target;
     IMAGESTORE	mode;	        //TODO: check if the mode is always correctly updated
-    bool		notOwnedGL;     //do we own the OpenGL texture??
-
+    bool		notOwnedGL;     //do we own the OpenGL texture??    
     Fbo			*tmpFbo;
 
+    /**
+     * @brief Destroy
+     */
     void	Destroy();
 
 public:
+    std::vector<ImageRAWGL *> stack;
 
     /**
      * @brief ImageRAWGL
@@ -807,11 +813,6 @@ void ImageRAWGL::loadToMemory()
     glGetTexImage(target, 0, mode, GL_FLOAT, data);
 
     unBindTexture();
-
-    for(int i=0;i<(frames*width*height*channels); i++){
-        if(data[i]>0)
-            printf("A");
-    }
 }
 
 void ImageRAWGL::loadSliceIntoTexture(int i)
