@@ -22,8 +22,8 @@ See the GNU Lesser General Public License
 
 */
 
-#ifndef PIC_FILTERING_FILTER_TRANSFORM_2D_HPP
-#define PIC_FILTERING_FILTER_TRANSFORM_2D_HPP
+#ifndef PIC_GL_FILTERING_FILTER_WARP_2D_HPP
+#define PIC_GL_FILTERING_FILTER_WARP_2D_HPP
 
 #include "util/matrix_3_x_3.hpp"
 
@@ -32,6 +32,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterWarp2D class
+ */
 class FilterWarp2D: public Filter
 {
 protected:
@@ -85,6 +88,63 @@ protected:
         }
     }
 
+
+
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+    {
+        if(imgOut != NULL) {
+            return imgOut;
+        }
+
+        if(!bSameSize) {
+            ComputingBoundingBox(h, imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax, bCentroid);
+            imgOut = new ImageRAW(1, bmax[0] - bmin[0], bmax[1] - bmin[1], imgIn[0]->channels);
+        } else {
+            bmin[0] = 0;
+            bmin[1] = 0;
+
+            bmax[0] = imgIn[0]->width;
+            bmax[1] = imgIn[0]->height;
+
+            imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, imgIn[0]->channels);
+        }
+
+        return imgOut;
+    }    
+
+    bool bSameSize, bCentroid;
+
+public:
+
+    /**
+     * @brief FilterWarp2D
+     */
+    FilterWarp2D()
+    {
+        this->bCentroid = false;
+        this->bSameSize = false;
+
+        h.Identity();
+        h_inv.Identity();
+    }
+
+    /**
+     * @brief FilterWarp2D
+     * @param h
+     * @param bSameSize
+     * @param bCentroid
+     */
+    FilterWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
+    {
+        Update(h, bSameSize, bCentroid);
+    }
+
     /**
      * @brief ComputingBoundingBox calculates the bounding box of imgOut.
      * @param width
@@ -92,7 +152,7 @@ protected:
      * @param bmin
      * @param bmax
      */
-    void ComputingBoundingBox(float width, float height, int *bmin, int *bmax) {
+    static void ComputingBoundingBox(Matrix3x3 &h, float width, float height, int *bmin, int *bmax, bool bCentroid) {
         float bbox[4][2];
         float bbox_out[4][2];
 
@@ -154,57 +214,16 @@ protected:
 
             if(y > bmax[1]) {
                 bmax[1] = y;
-            }                     
+            }
         }
     }
 
     /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
+     * @brief Update
+     * @param h
+     * @param bSameSize
+     * @param bCentroid
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
-    {
-        if(imgOut != NULL) {
-            return imgOut;
-        }
-
-        if(!bSameSize) {
-            ComputingBoundingBox(imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax);
-            imgOut = new ImageRAW(1, bmax[0] - bmin[0], bmax[1] - bmin[1], imgIn[0]->channels);
-        } else {
-            bmin[0] = 0;
-            bmin[1] = 0;
-
-            bmax[0] = imgIn[0]->width;
-            bmax[1] = imgIn[0]->height;
-
-            imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, imgIn[0]->channels);
-        }
-
-        return imgOut;
-    }    
-
-    bool bSameSize, bCentroid;
-
-public:
-    //Basic constructors
-    FilterWarp2D()
-    {
-        this->bCentroid = false;
-        this->bSameSize = false;
-
-        h.Identity();
-        h_inv.Identity();
-    }
-
-    //Basic constructors
-    FilterWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
-    {
-        Update(h, bSameSize, bCentroid);
-    }
-
     void Update(Matrix3x3 h, bool bSameSize, bool bCentroid = false)
     {
         this->bSameSize = bSameSize;
@@ -214,11 +233,18 @@ public:
         h.Inverse(&h_inv);
     }
 
-    /**Output size*/
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
     void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(!bSameSize) {
-            ComputingBoundingBox(imgIn->widthf, imgIn->heightf, bmin, bmax);
+            ComputingBoundingBox(h, imgIn->widthf, imgIn->heightf, bmin, bmax, bCentroid);
 
             width  = bmax[0] - bmin[0];
             height = bmax[1] - bmin[1];
@@ -241,5 +267,5 @@ public:
 
 } // end namespace pic
 
-#endif /* PIC_FILTERING_FILTER_LUMINANCE_HPP */
+#endif /* PIC_GL_FILTERING_FILTER_WARP_2D_HPP */
 

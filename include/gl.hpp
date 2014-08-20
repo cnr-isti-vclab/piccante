@@ -49,6 +49,7 @@ See the GNU Lesser General Public License
 
 #include "gl/filtering/filter.hpp"
 #include "gl/filtering/filter_anaglyph.hpp"
+#include "gl/filtering/filter_warp_2d.hpp"
 #include "gl/filtering/filter_anisotropic_diffusion.hpp"
 #include "gl/filtering/filter_bilateral_1d.hpp"
 #include "gl/filtering/filter_bilateral_2das.hpp"

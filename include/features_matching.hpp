@@ -25,17 +25,25 @@ See the GNU Lesser General Public License
 #ifndef PIC_FEATURES_MATCHING_HPP
 #define PIC_FEATURES_MATCHING_HPP
 
+//Corner descriptors
 #include "features_matching/general_corner_detector.hpp"
 #include "features_matching/harris_corner_detector.hpp"
 #include "features_matching/susan_corner_detector.hpp"
 #include "features_matching/fast_corner_detector.hpp"
+
+//Edge descriptors
 #include "features_matching/canny_edge_detector.hpp"
+
+//Feature descriptors
 #include "features_matching/lucid_descriptor.hpp"
 #include "features_matching/brief_descriptor.hpp"
+#include "features_matching/poisson_descriptor.hpp"
 #include "features_matching/orb_descriptor.hpp"
+
 #include "features_matching/dense_sift.hpp"
 #include "features_matching/patch_comp.hpp"
 #include "features_matching/transform_data.hpp"
+
 #include "features_matching/ward_alignment.hpp"
 #include "features_matching/motion_estimation.hpp"
 
