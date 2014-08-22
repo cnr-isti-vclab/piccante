@@ -31,6 +31,9 @@ namespace pic {
 
 #define DEBUG_GL
 
+/**
+ * @brief The FilterGLDisp class
+ */
 class FilterGLDisp: public FilterGL
 {
 protected:
@@ -39,6 +42,9 @@ protected:
     float sigma_s;
     float sigma_r;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
 public:

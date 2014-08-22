@@ -30,18 +30,32 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLHSLReplace class
+ */
 class FilterGLHSLReplace: public FilterGL
 {
 protected:
     float delta_hue;
     float delta_saturation;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterGLHSLReplace
+     * @param delta_hue
+     * @param delta_saturation
+     */
     FilterGLHSLReplace(float delta_hue, float delta_saturation);
 
+    /**
+     * @brief setDeltaHue
+     * @param delta_hue
+     */
     void setDeltaHue(float delta_hue)
     {
         this->delta_hue = delta_hue;
@@ -95,19 +109,15 @@ void FilterGLHSLReplace::InitShaders()
     }
                       );
 
-    std::string prefix;
-    prefix += glw::version("150");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-
     //Final fragment source
     std::string final_fragment_source;
     final_fragment_source  = GLSL_RGB2HSL();
     final_fragment_source += GLSL_HSL2RGB();
     final_fragment_source += fragment_source;
 
-    filteringProgram.setup(prefix, vertex_source, final_fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, final_fragment_source);
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLHSLReplace log]\n%s\n", filteringProgram.log().c_str());
 #endif
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
@@ -120,7 +130,6 @@ void FilterGLHSLReplace::InitShaders()
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLHSLReplace::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn[0] == NULL) {
@@ -171,6 +180,7 @@ ImageRAWGL *FilterGLHSLReplace::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     //Textures
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, 0);
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
 

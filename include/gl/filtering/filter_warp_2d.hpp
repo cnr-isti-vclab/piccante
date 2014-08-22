@@ -91,7 +91,7 @@ void FilterGLWarp2D::Update(Matrix3x3 h, bool bSameSize = false, bool bCentroid 
     h.Inverse(&h_inv);
 
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform3x3("h_inv", h.data, true);
+    filteringProgram.uniform3x3("h_inv", h_inv.data, true);
     glw::bind_program(0);
 }
 
@@ -115,7 +115,7 @@ void FilterGLWarp2D::InitShaders()
         vec3 color = vec3(0.0);
         if(point_proj.x >= 0.0 && point_proj.x <= 1.0 &&
            point_proj.y >= 0.0 && point_proj.y <= 1.0) {
-            color    = texture(u_tex, point_proj.xy).xyz;\n
+            color = texture(u_tex, point_proj.xy).xyz;\n
         } \n
         f_color = vec4(color, 1.0); \n
     }

@@ -30,6 +30,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLSigmoidTMO class
+ */
 class FilterGLSigmoidTMO: public FilterGL
 {
 protected:
@@ -152,7 +155,7 @@ void FilterGLSigmoidTMO::InitShaders()
     filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLSigmoidTMO log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
@@ -179,6 +182,10 @@ void FilterGLSigmoidTMO::Update(float alpha)
 
 ImageRAWGL *FilterGLSigmoidTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
+    if(imgIn.empty()) {
+        return imgOut;
+    }
+
     if(imgIn[0] == NULL) {
         return imgOut;
     }

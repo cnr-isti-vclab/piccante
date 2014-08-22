@@ -38,7 +38,7 @@ namespace glw {
 
 class program
 {
-    GLW_DISABLE_COPY(program)
+    //GLW_DISABLE_COPY(program)
 
 public:
 

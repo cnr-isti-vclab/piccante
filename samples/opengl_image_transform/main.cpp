@@ -34,6 +34,7 @@ protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *flt_tmo;
     pic::FilterGLWarp2D *flt_warp;
+    pic::FilterGLColorConvRGBtosRGB *flt_srgb;
 
 public:
     pic::ImageRAWGL img, *img_flt, *img_flt_tmo;
@@ -62,11 +63,11 @@ public:
 
         quad = new pic::QuadGL(true);
 
-
         pic::Matrix3x3 h;
         h.SetRotationMatrix(pic::Deg2Rad(45.0f));
         flt_warp = new pic::FilterGLWarp2D(h, true, true);
 
+        flt_srgb = new pic::FilterGLColorConvRGBtosRGB();
          //allocating a new filter for simple tone mapping
         flt_tmo = new pic::FilterGLSimpleTMO();
     }
@@ -83,7 +84,7 @@ public:
         img_flt = flt_warp->Process(SingleGL(&img), img_flt);
 
         //simple tone mapping: gamma + exposure correction
-        img_flt_tmo = flt_tmo->Process(SingleGL(img_flt), img_flt_tmo);
+        img_flt_tmo = flt_srgb->Process(SingleGL(img_flt), img_flt_tmo);
 
         //visualization of the Gaussian filtering
         glw::bind_program(program);

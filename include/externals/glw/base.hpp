@@ -54,6 +54,7 @@
 		CLASS_NAME (const CLASS_NAME & c); \
 		CLASS_NAME & operator = (const CLASS_NAME & c);
 
+
 /**********************************************************/
 
 

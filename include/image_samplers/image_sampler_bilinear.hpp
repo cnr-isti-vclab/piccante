@@ -73,8 +73,8 @@ PIC_INLINE void ImageSamplerBilinear::SampleImage(Image *img, float x, float y,
     int ind0, ind1, ind2, ind3;
 
     //Coordiantes in [0,width-1]x[0,height-1]
-    x *= float(img->width - 1);
-    y *= float(img->height - 1);
+    x *= img->width1f;
+    y *= img->height1f;
 
     //Coordinates without fractions
     xx = floorf(x);
@@ -155,9 +155,9 @@ PIC_INLINE void ImageSamplerBilinear::SampleImage(Image *img, float x, float y,
     y = CLAMPi(y, 0.0f, 1.0f);
     t = CLAMPi(t, 0.0f, 1.0f);
 
-    x *= float(img->width - 1);
-    y *= float(img->height - 1);
-    t *= float(img->frames - 1);
+    x *= img->width1f;
+    y *= img->height1f;
+    t *= img->frames1f;
 
     float pOut2x = floorf(x);
     float pOut2y = floorf(y);

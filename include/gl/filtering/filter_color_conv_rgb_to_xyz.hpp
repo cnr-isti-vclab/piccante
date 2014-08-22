@@ -22,17 +22,19 @@ See the GNU Lesser General Public License
 
 */
 
-#ifndef PIC_GL_FILTERING_FILTER_REMAPPING_HPP
-#define PIC_GL_FILTERING_FILTER_REMAPPING_HPP
+#ifndef PIC_GL_FILTERING_FILTER_COLOR_CONV_RGB_TO_XYZ_HPP
+#define PIC_GL_FILTERING_FILTER_COLOR_CONV_RGB_TO_XYZ_HPP
 
 #include "gl/filtering/filter.hpp"
+#include "gl/filtering/filter_color_conv.hpp"
+#include "colors/color_conv_rgb_to_xyz.hpp"
 
 namespace pic {
 
 /**
- * @brief The FilterGLRemapping class
+ * @brief The FilterGLColorConvRGBtoXYZ class
  */
-class FilterGLRemapping: public FilterGL
+class FilterGLColorConvRGBtoXYZ: public FilterGLColorConv
 {
 protected:
 
@@ -43,58 +45,69 @@ protected:
 
 public:
     /**
-     * @brief FilterGLRemapping
+     * @brief FilterGLColorConvRGBtoXYZ
      */
-    FilterGLRemapping();
+    FilterGLColorConvRGBtoXYZ();
+
+    /**
+     * @brief Update
+     * @param direct
+     */
+    void Update(bool direct);
 };
 
-FilterGLRemapping::FilterGLRemapping(): FilterGL()
+FilterGLColorConvRGBtoXYZ::FilterGLColorConvRGBtoXYZ(): FilterGLColorConv()
 {
     InitShaders();
 }
 
-void FilterGLRemapping::InitShaders()
+void FilterGLColorConvRGBtoXYZ::InitShaders()
 {
-    /*	0 ---> Drago et al. 2003
-    	1 ---> Reinhard et al. 2002
-    	LumZone     = [-2, -1, 0, 1, 2, 3, 4];
-    	TMOForZone =  [ 0,  0, 1, 0, 1, 0, 0];	*/
-
     fragment_source = GLW_STRINGFY
                       (
-                          uniform sampler2D u_tex; \n
-                          out     vec4      f_color; \n
-
+    uniform sampler2D u_tex; \n
+    uniform mat3 mtx; \n
+    out     vec4 f_color; \n
+    \n
     void main(void) {
         \n
-        ivec2 coords = ivec2(gl_FragCoord.xy);
-        \n
-        int indx = int(texelFetch(u_tex, coords, 0).x + 2.0);
-        \n
-        indx = (indx == 2) ? 1 : 0;
-        \n
-        indx = (indx == 4) ? 1 : indx;
-        \n
-        f_color = vec4(vec3(float(indx)), 1.0);
+        ivec2 coords = ivec2(gl_FragCoord.xy); \n
+        vec3 color = texelFetch(u_tex, coords, 0).xyz; \n
+        f_color = vec4(mtx * color, 1.0); \n
         \n
     }
                       );
 
     filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
+
 #ifdef PIC_DEBUG
-    printf("[FilterGLRemapping log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLColorConvRGBtoXYZ log]\n%s\n", filteringProgram.log().c_str());
 #endif
-    glw::bind_program(filteringProgram);
-    filteringProgram.attribute_source("a_position", 0);
-    filteringProgram.fragment_target("f_color",    0);
-    filteringProgram.relink();
 
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform("u_tex",      0);
+    filteringProgram.attribute_source("a_position", 0);
+    filteringProgram.fragment_target("f_color", 0);
+    filteringProgram.relink();
+    glw::bind_program(0);
+
+    Update(direct);
+}
+
+void FilterGLColorConvRGBtoXYZ::Update(bool direct)
+{
+    this->direct = direct;
+
+    glw::bind_program(filteringProgram);
+    filteringProgram.uniform("u_tex", 0);
+    if(direct) {
+        filteringProgram.uniform3x3("mtx", mtxRGBtoXYZ, true);
+    } else {
+        filteringProgram.uniform3x3("mtx", mtxXYZtoRGB, true);
+    }
     glw::bind_program(0);
 }
 
 } // end namespace pic
 
-#endif /* PIC_GL_FILTERING_FILTER_REMAPPING_HPP */
+#endif /* PIC_GL_FILTERING_FILTER_COLOR_CONV_RGB_TO_XYZ_HPP */
 

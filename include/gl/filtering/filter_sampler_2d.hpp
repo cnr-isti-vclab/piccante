@@ -101,14 +101,10 @@ void FilterGLSampler2D::InitShaders()
                           uniform float   scale; \n
                           out     vec4    f_color; \n
 
-    void main(void) {
-        \n
-        ivec2 coords = ivec2(gl_FragCoord.xy / scale);
-        \n
-        vec3  color = texelFetch(u_tex, coords, 0).xyz;
-        \n
-        f_color = vec4(color.xyz, 1.0);
-        \n
+    void main(void) { \n
+        ivec2 coords = ivec2(gl_FragCoord.xy / scale); \n
+        vec3  color = texelFetch(u_tex, coords, 0).xyz; \n
+        f_color = vec4(color.xyz, 1.0); \n
     }
                       );
 
@@ -120,12 +116,12 @@ void FilterGLSampler2D::InitShaders()
 
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
-    filteringProgram.fragment_target("f_color",    0);
+    filteringProgram.fragment_target("f_color", 0);
     filteringProgram.relink();
 
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform("u_tex",      0);
-    filteringProgram.uniform("scale",      scale);
+    filteringProgram.uniform("u_tex", 0);
+    filteringProgram.uniform("scale", scale);
     glw::bind_program(0);
 }
 

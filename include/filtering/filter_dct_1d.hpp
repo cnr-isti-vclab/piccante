@@ -29,21 +29,39 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterDCT1D class
+ */
 class FilterDCT1D: public Filter
 {
 protected:
-    int					dirs[3];
-    float				*coeff, sqr[2];
-    int					nCoeff;
-    bool				bForward;
+    int     dirs[3];
+    float   *coeff, sqr[2];
+    int     nCoeff;
+    bool    bForward;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+
 public:
-    //Basic constructor
+
+    /**
+     * @brief FilterDCT1D
+     * @param nCoeff
+     * @param bForward
+     */
     FilterDCT1D(int nCoeff, bool bForward);
+
     ~FilterDCT1D();
 
+    /**
+     * @brief SetForward
+     */
     void SetForward()
     {
         this->bForward = true;
@@ -55,6 +73,9 @@ public:
         coeff = CreateCoefficientsTransform(nCoeff);
     }
 
+    /**
+     * @brief SetInverse
+     */
     void SetInverse()
     {
         this->bForward = false;
@@ -66,7 +87,11 @@ public:
         coeff = CreateCoefficientsInverse(nCoeff);
     }
 
-    //Create coefficients
+    /**
+     * @brief CreateCoefficientsTransform
+     * @param size
+     * @return
+     */
     static float *CreateCoefficientsTransform(int size)
     {
         if(size < 1) {
@@ -90,6 +115,11 @@ public:
         return ret;
     }
 
+    /**
+     * @brief CreateCoefficientsInverse
+     * @param size
+     * @return
+     */
     static float *CreateCoefficientsInverse(int size)
     {
         if(size < 1) {
@@ -124,12 +154,22 @@ public:
         return ret;
     }
 
-    //Change data for this pass
+    /**
+     * @brief ChangePass
+     * @param pass
+     * @param tPass
+     */
     void ChangePass(int pass, int tPass);
+
+    /**
+     * @brief ChangePass
+     * @param x
+     * @param y
+     * @param z
+     */
     void ChangePass(int x, int y, int z);
 };
 
-//Basic constructor
 FilterDCT1D::FilterDCT1D(int nCoeff, bool bForward)
 {
     this->nCoeff = nCoeff;
@@ -155,10 +195,8 @@ FilterDCT1D::~FilterDCT1D()
     }
 }
 
-//Change data for this pass
 void FilterDCT1D::ChangePass(int pass, int tPass)
 {
-
     int tMod;
 
     if(tPass > 1) {
@@ -187,7 +225,6 @@ void FilterDCT1D::ChangePass(int x, int y, int z)
     dirs[2] = z;
 }
 
-//Process in a box
 void FilterDCT1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 {
     int channels = dst->channels;
@@ -227,14 +264,9 @@ void FilterDCT1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
                 }
 
                 if(bForward) {
-                    if(ind == 0) {
-                        for(int l = 0; l < channels; l++) {
-                            tmpDst[l] *= sqr[0];
-                        }
-                    } else {
-                        for(int l = 0; l < channels; l++) {
-                            tmpDst[l] *= sqr[1];
-                        }
+                    int select = (ind == 0) ? 0 : 1;
+                    for(int l = 0; l < channels; l++) {
+                        tmpDst[l] *= sqr[select];
                     }
                 }
             }

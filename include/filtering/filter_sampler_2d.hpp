@@ -99,7 +99,6 @@ public:
     }
 };
 
-//Basic constructor
 PIC_INLINE FilterSampler2D::FilterSampler2D(float scale,
         ImageSampler *isb = NULL)
 {
@@ -116,7 +115,6 @@ PIC_INLINE FilterSampler2D::FilterSampler2D(float scale,
     }
 }
 
-//Basic constructor
 PIC_INLINE FilterSampler2D::FilterSampler2D(float scaleX, float scaleY,
         ImageSampler *isb = NULL)
 {
@@ -132,7 +130,6 @@ PIC_INLINE FilterSampler2D::FilterSampler2D(float scaleX, float scaleY,
     }
 }
 
-//Basic constructor
 PIC_INLINE FilterSampler2D::FilterSampler2D(int width, int height,
         ImageSampler *isb = NULL)
 {
@@ -148,7 +145,6 @@ PIC_INLINE FilterSampler2D::FilterSampler2D(int width, int height,
     }
 }
 
-//SetupAux
 PIC_INLINE ImageRAW *FilterSampler2D::SetupAux(ImageRAWVec imgIn,
         ImageRAW *imgOut)
 {
@@ -164,7 +160,6 @@ PIC_INLINE ImageRAW *FilterSampler2D::SetupAux(ImageRAWVec imgIn,
     return imgOut;
 }
 
-//Process in a box
 PIC_INLINE void FilterSampler2D::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
         BBox *box)
 {

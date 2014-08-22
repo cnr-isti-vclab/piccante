@@ -48,6 +48,11 @@ See the GNU Lesser General Public License
 #include "gl/algorithms/pyramid.hpp"
 
 #include "gl/filtering/filter.hpp"
+#include "gl/filtering/filter_luminance.hpp"
+#include "gl/filtering/filter_color_conv.hpp"
+#include "gl/filtering/filter_color_conv_rgb_to_xyz.hpp"
+#include "gl/filtering/filter_color_conv_rgb_to_srgb.hpp"
+
 #include "gl/filtering/filter_anaglyph.hpp"
 #include "gl/filtering/filter_warp_2d.hpp"
 #include "gl/filtering/filter_anisotropic_diffusion.hpp"
@@ -73,9 +78,9 @@ See the GNU Lesser General Public License
 #include "gl/filtering/filter_gaussian_2d.hpp"
 #include "gl/filtering/filter_gaussian_3d.hpp"
 #include "gl/filtering/filter_gradient.hpp"
+#include "gl/filtering/filter_laplacian.hpp"
 #include "gl/filtering/filter_hsl_replace.hpp"
 #include "gl/filtering/filter_iterative.hpp"
-#include "gl/filtering/filter_luminance.hpp"
 #include "gl/filtering/filter_npasses.hpp"
 #include "gl/filtering/filter_op.hpp"
 #include "gl/filtering/filter_redux.hpp"

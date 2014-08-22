@@ -29,13 +29,21 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterKuwahara class
+ */
 class FilterKuwahara: public Filter
 {
 protected:
     unsigned int  kernelSize;
     unsigned int  halfKernelSize;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
     {
         int channels = dst->channels;
@@ -180,12 +188,19 @@ protected:
     }
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterKuwahara
+     * @param kernelSize
+     */
     FilterKuwahara(int kernelSize = 3)
     {
         Update(kernelSize);
     }
 
+    /**
+     * @brief Update
+     * @param kernelSize
+     */
     void Update(int kernelSize)
     {
         if(kernelSize < 3) {
@@ -196,6 +211,13 @@ public:
         halfKernelSize = kernelSize >> 1;
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param kernelSize
+     * @return
+     */
     static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, int kernelSize)
     {
         FilterKuwahara filter(kernelSize);

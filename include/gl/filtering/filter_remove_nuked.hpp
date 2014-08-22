@@ -29,25 +29,38 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLRemoveNuked class
+ */
 class FilterGLRemoveNuked: public FilterGL
 {
 protected:
     float threshold;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
+
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLRemoveNuked
+     * @param threshold
+     */
     FilterGLRemoveNuked(float threshold);
 
+    /**
+     * @brief Update
+     * @param threshold
+     */
     void Update(float threshold);
-
-    //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 };
 
-//Constructor
 FilterGLRemoveNuked::FilterGLRemoveNuked(float threshold): FilterGL()
 {
     this->threshold = threshold;
@@ -103,96 +116,33 @@ void FilterGLRemoveNuked::FragmentShader()
                       );
 }
 
-//Generating shaders
 void FilterGLRemoveNuked::InitShaders()
 {
-    std::string prefix;
-    prefix += glw::version("150");
-//	prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLRemoveNuked log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
+    filteringProgram.relink();
     glw::bind_program(0);
+
     Update(-1.0f);
 }
 
 void FilterGLRemoveNuked::Update(float threshold)
 {
-
     if(threshold > 0.0f) {
         this->threshold = threshold;
     }
 
     glw::bind_program(filteringProgram);
-    filteringProgram.relink();
     filteringProgram.uniform("u_tex",      0);
     filteringProgram.uniform("threshold",  this->threshold);
     glw::bind_program(0);
-}
-
-//Processing
-ImageRAWGL *FilterGLRemoveNuked::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, 1, false, imgOut->getTexture());
-
-    ImageRAWGL *edge, *base;
-
-    if(imgIn.size() == 2) {
-        //Joint/Cross Bilateral Filtering
-        base = imgIn[0];
-        edge = imgIn[1];
-    } else {
-        base = imgIn[0];
-        edge = imgIn[0];
-    }
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    glw::bind_program(filteringProgram);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, base->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    glw::bind_program(0);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic
