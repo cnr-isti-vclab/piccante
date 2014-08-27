@@ -211,8 +211,10 @@ PIC_INLINE ImageRAW *FilterSampler1D::SetupAux(ImageRAWVec imgIn,
             float scaleX = (dirs[X_DIRECTION] == 1) ? scale : 1.0f;
             float scaleY = (dirs[Y_DIRECTION] == 1) ? scale : 1.0f;
 
-            imgOut = new ImageRAW(imgIn[0]->frames, int(imgIn[0]->widthf * scaleX),
-                                  (imgIn[0]->heightf * scaleY), imgIn[0]->channels);
+            imgOut = new ImageRAW(  imgIn[0]->frames,
+                                    int(imgIn[0]->widthf  * scaleX),
+                                    int(imgIn[0]->heightf * scaleY),
+                                    imgIn[0]->channels);
         } else {
             int nWidth  = (dirs[X_DIRECTION] == 1) ? size : imgIn[0]->width;
             int nHeight = (dirs[Y_DIRECTION] == 1) ? size : imgIn[0]->height;

@@ -258,7 +258,7 @@ void StrokeGL::Resample()
     resampledPos.push_back(positions[1]);
 
     float workLen = 0.0f;
-    int nSamples = len / (rSize * 0.25f);
+    int nSamples = int(len / (rSize * 0.25f));
     float deltaL = len / float(nSamples);
 #ifdef PIC_DEBUG
     printf("Len: %f Samples: %d DeltaL: %f\n", len, nSamples, deltaL);
@@ -394,7 +394,7 @@ void StrokeGL::RenderGL()
     if(bPointSprite) {
         glEnable(GL_POINT_SPRITE);
         glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-        glPointSize(brushSize);
+        glPointSize(GLfloat(brushSize));
         glBegin(GL_POINTS);
         glColor3fv(color);
         const int n = size_t(positions.size());

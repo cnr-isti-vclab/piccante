@@ -212,8 +212,8 @@ void FilterGLBilateral1D::InitShaders()
 
 void FilterGLBilateral1D::SetUniformAux()
 {
-    float sigma_s2 = 2.0 * sigma_s * sigma_s;
-    float sigma_r2 = 2.0 * sigma_r * sigma_r;
+    float sigma_s2 = 2.0f * sigma_s * sigma_s;
+    float sigma_r2 = 2.0f * sigma_r * sigma_r;
 
     //Precomputation of the Gaussian Kernel
     int halfKernelSize = PrecomputedGaussian::KernelSize(sigma_s) >> 1;

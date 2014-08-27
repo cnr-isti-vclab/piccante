@@ -86,7 +86,7 @@ public:
             return 0;
         }
 
-        Execute(argv[1], atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
+        Execute(argv[1], float(atof(argv[2])), float(atof(argv[3])), float(atof(argv[4])), float(atof(argv[5])));
 
         return 0;
     }

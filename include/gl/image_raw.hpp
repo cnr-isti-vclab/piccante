@@ -690,7 +690,7 @@ GLuint ImageRAWGL::generateTexture2DU32GL()
     int *buffer = new int[width * height * channels];
 
     for(int i = 0; i < (width * height * channels); i++) {
-        buffer[i] = lround(data[i]);
+        buffer[i] = int(lround(data[i]));
     }
 
     int mode, modeInternalFormat;

@@ -165,7 +165,7 @@ void FilterGLDragoTMO::ComputeConstants()
 {
     Lwa_scaled  = Lwa / powf(1.0f + b - 0.85f, 5.0f);
     LMax_scaled = LMax / Lwa_scaled;
-    constant1   = log(b) / log(0.5);
+    constant1   = logf(b) / logf(0.5f);
     constant2   = (Ld_Max / 100.0f) / (log10(1 + LMax_scaled));
 }
 

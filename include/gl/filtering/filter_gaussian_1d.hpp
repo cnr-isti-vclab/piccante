@@ -106,7 +106,7 @@ void FilterGLGaussian1D::Update(float sigma)
     //Precomputation of the Gaussian Kernel
     int halfKernelSize = PrecomputedGaussian::KernelSize(sigma) >> 1;
     int nSamples = halfKernelSize * 2 + 1;
-    float sigma2 = 2.0 * sigma * sigma;
+    float sigma2 = 2.0f * sigma * sigma;
 
     if(bChanges || weights == NULL) {
         if(weights != NULL) {

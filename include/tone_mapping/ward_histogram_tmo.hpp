@@ -57,8 +57,8 @@ inline ImageRAW *WardHistogramTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL,
     float viewAngleWidth  = 2.0f * atanf(imgIn->width / maxCoordf);
     float viewAngleHeight = 2.0f * atanf(imgIn->height / maxCoordf);
 
-    int fScaleX = (2.0f * tanf(viewAngleWidth / 2.0f) / 0.01745f);
-    int fScaleY = (2.0f * tanf(viewAngleHeight / 2.0f) / 0.01745f);
+    int fScaleX = int((2.0f * tanf(viewAngleWidth / 2.0f) / 0.01745f));
+    int fScaleY = int((2.0f * tanf(viewAngleHeight / 2.0f) / 0.01745f));
 
     ImageRAW *L = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
 

@@ -129,7 +129,7 @@ protected:
         #pragma omp parallel for
 
         for(int i = 0; i < tot; i++) {
-            imgOut->data[i] = x(i);
+            imgOut->data[i] = float(x(i));
         }
 
         return imgOut;
@@ -259,7 +259,7 @@ protected:
                 #pragma omp parallel for
 
                 for(int j = 0; j < tot; j++) {
-                    imgOut->data[j * imgOut->channels + i] = x(j);
+                    imgOut->data[j * imgOut->channels + i] = float(x(j));
                 }
             } else {
                 #ifdef PIC_DEBUG
@@ -338,8 +338,8 @@ public:
         std::string name = removeExtension(nameIn);
         std::string ext = getExtension(nameIn);
 
-        float alpha = atof(argv[2]);
-        float lambda = atof(argv[3]);
+        float alpha = float(atof(argv[2]));
+        float lambda = float(atof(argv[3]));
 
         std::string nameOut = name + "_wls." + ext; 
 

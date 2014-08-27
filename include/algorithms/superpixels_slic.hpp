@@ -104,7 +104,7 @@ protected:
 
         //Updating mPixel
         for(int i = 0; i < labels_distance->size(); i += labels_distance->channels) {
-            int label = labels_distance->data[i];
+            int label = int(labels_distance->data[i]);
 
             if(label < 0) {
                 continue;
@@ -260,7 +260,7 @@ public:
         }
 
         //Init
-        int S = sqrtf(float(img->width * img->height) / float(nSuperPixels));
+        int S = int(sqrtf(img->widthf * img->heightf) / float(nSuperPixels));
 
         if(S < 1) {
             return;
@@ -388,7 +388,7 @@ public:
                 float *pixel = (*imgOut)(j, i);
                 float *l_d   = (*labels_distance)(j, i);
 
-                int label = l_d[0];
+                int label = int(l_d[0]);
 
                 if(label > -1) {
                     for(int k = 0; k < channels; k++) {

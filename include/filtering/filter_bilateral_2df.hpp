@@ -48,7 +48,7 @@ public:
     std::string Signature()
     {
         return GenBilString("F", sigma_s, sigma_r);
-    };
+    }
 
     //Filtering
     static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut,
@@ -114,13 +114,13 @@ void FilterBilateral2DF::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
         edge = src[0];
     }
 
-    double sigma_r2 = (2.0 * sigma_r * sigma_r);
+    float sigma_r2 = (2.0f * sigma_r * sigma_r);
 
     for(int j = box->y0; j < box->y1; j++) {
         for(int i = box->x0; i < box->x1; i++) {
             //Convolution kernel
             float *tmpDst = (*dst)(i, j);
-            double sum = 0.0;
+            float sum = 0.0f;
 
             float *tmpEdge = (*edge)(i, j);
 
@@ -133,24 +133,24 @@ void FilterBilateral2DF::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 
                 for(int l = 0; l < pg->kernelSize; l++) {
                     //Spatial filtering
-                    double Gauss1 = pg->coeff[k] * pg->coeff[l];
+                    float Gauss1 = pg->coeff[k] * pg->coeff[l];
 
                     //Address
                     int ci = i + l - pg->halfKernelSize;
 
                     //Range filtering
-                    double tmp = 0.0;
+                    float tmp = 0.0;
                     float *tmpEdge2 = (*edge)(ci, cj);
 
                     for(int m = 0; m < channels; m++) {
-                        double tmp3 = tmpEdge2[m] - tmpEdge[m];
+                        float tmp3 = tmpEdge2[m] - tmpEdge[m];
                         tmp += tmp3 * tmp3;
                     }
 
-                    double Gauss2 = exp(-tmp / sigma_r2);
+                    float Gauss2 = expf(-tmp / sigma_r2);
 
                     //Weight
-                    double weight = Gauss1 * Gauss2;
+                    float weight = Gauss1 * Gauss2;
 
                     //Filtering
                     float *tmpBase = (*base)(ci, cj);
@@ -164,7 +164,7 @@ void FilterBilateral2DF::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
             }
 
             //Normalization
-            bool sumTest = sum > 0.0;
+            bool sumTest = sum > 0.0f;
 
             float *tmpBase = (*base)(i, j);
 

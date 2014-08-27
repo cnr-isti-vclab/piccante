@@ -159,7 +159,7 @@ public:
     static inline float BilateralStoK(int kernelSize)
     {
         //	float ret = 0.9577f/(0.6466f*float(kernelSize)-0.9175f)+0.4505;
-        float ret = 0.4055f / (0.6437f * float(kernelSize) - 1.1083f) + 0.7347;
+        float ret = 0.4055f / (0.6437f * float(kernelSize) - 1.1083f) + 0.7347f;
 
         if(ret < 0.0f) {
             return 3.0f;
@@ -170,7 +170,7 @@ public:
 
     static inline float BilateralStoK2(int kernelSize)
     {
-        float ret = 0.3233f / (0.5053f * float(kernelSize) - 0.8272f) + 0.7366;
+        float ret = 0.3233f / (0.5053f * float(kernelSize) - 0.8272f) + 0.7366f;
 
         if(ret < 0.0f) {
             return 2.5f;
@@ -252,7 +252,7 @@ PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
     //Poisson samples
     int nMaxSamples = pg->halfKernelSize * pg->halfKernelSize;
 
-    int nSamples = lround(float(pg->kernelSize) * BilateralStoK(int(sigma_s))) * mult;
+    int nSamples = int(lround(float(pg->kernelSize)) * BilateralStoK(int(sigma_s))) * mult;
 
     nSamples = MIN(nSamples, nMaxSamples);
 #ifdef PIC_DEBUG
@@ -403,7 +403,7 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
                     dst->data[c + l] = sumTest ? tmpC[l] / sum : val;
                 } else
 #endif
-                    dst_data[l] = sumTest ? tmpC[l] / sum : base_data[l];
+                    dst_data[l] = sumTest ? float(tmpC[l] / sum) : base_data[l];
         }
     }
 }

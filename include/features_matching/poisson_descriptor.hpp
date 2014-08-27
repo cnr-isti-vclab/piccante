@@ -76,11 +76,11 @@ protected:
         int x[2], y[2];
 
         int c = 0;
-        for(unsigned int i = 0; i < nSamples; i++) {
+        for(int i = 0; i < nSamples; i++) {
             x[0] = rs->samplesR[(i << 1)];
             x[1] = rs->samplesR[(i << 1) + 1];
 
-            for(unsigned int j = 0; j < nSamples; j++) {
+            for(int j = 0; j < nSamples; j++) {
                 if(i == j) {
                     continue;
                 }

@@ -124,7 +124,7 @@ void FilterDragoTMO::Update(float Ld_Max, float b, float Lw_Max,
     Lw_a_scaled  = this->Lw_a / powf(1.0f + b - 0.85f, 5.0f);
     Lw_Max_scaled = this->Lw_Max / Lw_a_scaled;
 
-    constant1 = log(b) / log(0.5);
+    constant1 = logf(b) / logf(0.5f);
     constant2 = (Ld_Max / 100.0f) / (log10f(1.0f + Lw_Max_scaled));
 }
 
@@ -160,7 +160,7 @@ void FilterDragoTMO::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
                 float L_scaled = dataLum[0] / Lw_a_scaled;
 
                 float tmp	= powf((L_scaled / Lw_Max_scaled), constant1);
-                float Ld	= constant2 * logf(1.0 + L_scaled) / logf(2.0f + 8.0f * tmp);
+                float Ld	= constant2 * logf(1.0f + L_scaled) / logf(2.0f + 8.0f * tmp);
 
                 for(int k = 0; k < channels; k++) {
                     dataOut[k] = (dataIn[k] * Ld) / dataLum[0];

@@ -251,8 +251,8 @@ public:
                 tmpAnn[i + 2] = tmpAnn [i - 1];
             }
 
-            tmpAnn[0] = x0;
-            tmpAnn[0] = y0;
+            tmpAnn[0] = float(x0);
+            tmpAnn[0] = float(y0);
             tmpAnn[0] = dist;
 
             xb = x0;

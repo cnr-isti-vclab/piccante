@@ -196,13 +196,13 @@ FilterCrop::FilterCrop(Vec<3, float> min, Vec<3, float> max)
 ImageRAW *FilterCrop::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
 {
     if(flag) {
-        maxi[0] = maxf[0] * imgIn[0]->width;
-        maxi[1] = maxf[1] * imgIn[0]->height;
-        maxi[2] = maxf[2] * imgIn[0]->frames;
+        maxi[0] = int(maxf[0] * imgIn[0]->widthf);
+        maxi[1] = int(maxf[1] * imgIn[0]->heightf);
+        maxi[2] = int(maxf[2] * imgIn[0]->framesf);
 
-        mini[0] = minf[0] * imgIn[0]->width;
-        mini[1] = minf[1] * imgIn[0]->height;
-        mini[2] = minf[2] * imgIn[0]->frames;
+        mini[0] = int(minf[0] * imgIn[0]->widthf);
+        mini[1] = int(minf[1] * imgIn[0]->heightf);
+        mini[2] = int(minf[2] * imgIn[0]->framesf);
     }
 
     if(imgOut == NULL) {

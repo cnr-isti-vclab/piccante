@@ -135,8 +135,10 @@ ImageRAWGL *FilterGLSamplingMap::SetupAuxN(ImageRAWGLVec imgIn,
         ImageRAWGL *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(imgIn[0]->frames, imgIn[0]->width * scale,
-                                imgIn[0]->height * scale, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageRAWGL(    imgIn[0]->frames,
+                                    int(imgIn[0]->widthf  * scale),
+                                    int(imgIn[0]->heightf * scale),
+                                    imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     /*if(fbo==NULL)

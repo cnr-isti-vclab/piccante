@@ -45,6 +45,7 @@ See the GNU Lesser General Public License
 namespace pic {
 
 const double HARMONIC_MEAN_EPSILON = 1e-6;
+const float  HARMONIC_MEAN_EPSILONf = 1e-6f;
 
 /**
  * @brief The Image class stores an image as buffer of float.
@@ -1619,7 +1620,7 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
                 float *tmp_data = (*this)(i, j, k);
 
                 for(int l = 0; l < channels; l++) {
-                    ret[l] += logf(tmp_data[l] + HARMONIC_MEAN_EPSILON);
+                    ret[l] += logf(tmp_data[l] + HARMONIC_MEAN_EPSILONf);
                 }
             }
         }

@@ -27,7 +27,6 @@ See the GNU Lesser General Public License
 
 #ifndef PIC_DISABLE_OPENGL
 
-
 //OpenGL library
 #ifdef PIC_WIN32
 

@@ -107,7 +107,7 @@ ImageRAW *PoissonSolver(ImageRAW *f, ImageRAW *ret)
         int tmpI = i * width;
 
         for(int j = 0; j < width; j++) {
-            (*ret)(j, i)[0] = x(tmpI + j);
+            (*ret)(j, i)[0] = float(x(tmpI + j));
         }
     }
 

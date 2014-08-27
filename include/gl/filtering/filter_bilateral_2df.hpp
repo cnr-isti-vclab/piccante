@@ -190,8 +190,8 @@ void FilterGLBilateral2DF::Update(float sigma_s, float sigma_r)
         this->sigma_r = sigma_r;
     }
 
-    float sigmas2 = 2.0 * this->sigma_s * this->sigma_s;
-    float sigmar2 = 2.0 * this->sigma_r * this->sigma_r;
+    float sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
+    float sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
 
     //Precomputation of the Gaussian Kernel
     int halfKernelSize = PrecomputedGaussian::KernelSize(this->sigma_s) >> 1;

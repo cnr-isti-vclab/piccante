@@ -295,8 +295,8 @@ void FilterGLBilateral2DAS::Update(float sigma_s, float sigma_r)
     ms->updateGL(halfKernelSize, halfKernelSize);
 
     //shader update
-    float sigmas2 = 2.0 * this->sigma_s * this->sigma_s;
-    float sigmar2 = 2.0 * this->sigma_r * this->sigma_r;
+    float sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
+    float sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
 
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex",      0);
@@ -332,7 +332,10 @@ ImageRAWGL *FilterGLBilateral2DAS::Process(ImageRAWGLVec imgIn,
 
     if(imgTmp == NULL) {
         float scale = fGLsm->getScale();
-        imgTmp = new ImageRAWGL(1, w * scale, h * scale, 1, IMG_GPU, GL_TEXTURE_2D);
+        imgTmp = new ImageRAWGL(    1, 
+                                    int(imgIn[0]->widthf  * scale),
+                                    int(imgIn[0]->heightf * scale),
+                                    1, IMG_GPU, GL_TEXTURE_2D);
     }
 
     ImageRAWGL *edge, *base;

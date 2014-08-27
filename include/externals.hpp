@@ -26,9 +26,14 @@ See the GNU Lesser General Public License
 #define PIC_FEATURES_EXTERNALS_HPP
 
 #ifndef PIC_DISABLE_OPENGL
+
+#ifdef PIC_WIN32
+    #include <GL/glew.h>
+#endif // PIC_WIN32
+
 #include "externals/glw/base.hpp"
 #include "externals/glw/program.hpp"
 #include "externals/glw/utility.hpp"
 #endif /* PIC_DISABLE_OPENGL */
 
-#endif
+#endif // PIC_FEATURES_EXTERNALS_HPP

@@ -164,7 +164,7 @@ public:
      * @param ret_size
      * @return
      */
-    static float *prepareInputData(std::vector< Eigen::Matrix3d > &K, std::vector< Eigen::Matrix3d > &R, std::vector< Eigen::Vector3d > &t, std::vector< Eigen::Vector3d > &x, unsigned int &ret_size)
+    static double *prepareInputData(std::vector< Eigen::Matrix3d > &K, std::vector< Eigen::Matrix3d > &R, std::vector< Eigen::Vector3d > &t, std::vector< Eigen::Vector3d > &x, unsigned int &ret_size)
     {
         if(R.size() != t.size()) {
             return NULL;
@@ -176,7 +176,7 @@ public:
 
         unsigned int n = R.size();
         ret_size = GL_PACKED_CAMERA_SIZE * n + GL_3D_POINT_SIZE * x.size();
-        float *ret = new float[ret_size];
+        double *ret = new double[ret_size];
 
         int c = 0;
         for(unsigned int i = 0; i < n; i++) {

@@ -398,8 +398,8 @@ void FilterGLBilateral2DS::Update(float sigma_s, float sigma_r)
     }
 
     //shader update
-    float sigmas2 = 2.0 * this->sigma_s * this->sigma_s;
-    float sigmar2 = 2.0 * this->sigma_r * this->sigma_r;
+    float sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
+    float sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
 
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex",      0);

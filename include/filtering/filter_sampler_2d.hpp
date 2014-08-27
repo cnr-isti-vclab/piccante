@@ -58,8 +58,8 @@ public:
     void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(swh) {
-            width       = imgIn->width  * scaleX;
-            height      = imgIn->height * scaleY;
+            width       = int(imgIn->widthf  * scaleX);
+            height      = int(imgIn->heightf * scaleY);
         } else {
             width       = this->width;
             height      = this->height;
@@ -150,8 +150,10 @@ PIC_INLINE ImageRAW *FilterSampler2D::SetupAux(ImageRAWVec imgIn,
 {
     if(imgOut == NULL) {
         if(swh) {
-            imgOut = new ImageRAW(imgIn[0]->frames, imgIn[0]->width * scaleX,
-                                  imgIn[0]->height * scaleY, imgIn[0]->channels);
+            imgOut = new ImageRAW(  imgIn[0]->frames, 
+                                    int(imgIn[0]->widthf  * scaleX),
+                                    int(imgIn[0]->heightf * scaleY),
+                                    imgIn[0]->channels);
         } else {
             imgOut = new ImageRAW(imgIn[0]->frames, width, height, imgIn[0]->channels);
         }

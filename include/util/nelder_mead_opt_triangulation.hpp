@@ -45,7 +45,7 @@ public:
      * @param M0
      * @param M1
      */
-    NelderMeadOptTriangulation(Eigen::Matrix34d M0, Eigen::Matrix34d M1) : NelderMeadOptBase()
+    NelderMeadOptTriangulation(Eigen::Matrix34d &M0, Eigen::Matrix34d &M1) : NelderMeadOptBase()
     {
         this->M.push_back(M0);
         this->M.push_back(M1);

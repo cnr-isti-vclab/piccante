@@ -70,8 +70,10 @@ public:
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLSampler2D filter(scale);
-        ImageRAWGL *imgOut = new ImageRAWGL(imgIn.frames, imgIn.width * scale,
-                                            imgIn.height * scale, imgIn.channels, IMG_GPU_CPU, GL_TEXTURE_2D);
+        ImageRAWGL *imgOut = new ImageRAWGL(    imgIn.frames,
+                                                int(imgIn.widthf  * scale),
+                                                int(imgIn.heightf * scale),
+                                                imgIn.channels, IMG_GPU_CPU, GL_TEXTURE_2D);
 
         GLuint testTQ1 = glBeginTimeQuery();
         filter.Process(SingleGL(&imgIn), imgOut);
@@ -135,8 +137,8 @@ ImageRAWGL *FilterGLSampler2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
         return imgOut;
     }
 
-    int w = imgIn[0]->width * scale;
-    int h = imgIn[0]->height * scale;
+    int w = int(imgIn[0]->widthf  * scale);
+    int h = int(imgIn[0]->heightf * scale);
     int f = imgIn[0]->frames;
 
     if(imgOut == NULL) {

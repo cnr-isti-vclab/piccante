@@ -44,12 +44,12 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
     break;
 
     case CRF_AKYUZ: {
-        return 1.0f - powf(2.0 * x - 1.0f, 12.0f);
+        return 1.0f - powf(2.0f * x - 1.0f, 12.0f);
     }
     break;
 
     case CRF_HAT: {
-        return 1.0f - powf(2.0 * x - 1.0f, 12.0f);
+        return 1.0f - powf(2.0f * x - 1.0f, 12.0f);
     }
     break;
 

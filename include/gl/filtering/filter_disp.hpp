@@ -188,8 +188,8 @@ void FilterGLDisp::InitShaders()
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
 
-    float sigma_s2 = 2.0 * sigma_s * sigma_s;
-    float sigma_r2 = 2.0 * sigma_r * sigma_r;
+    float sigma_s2 = 2.0f * sigma_s * sigma_s;
+    float sigma_r2 = 2.0f * sigma_r * sigma_r;
     int halfKernelSize = PrecomputedGaussian::KernelSize(sigma_s) >> 1;
 
     filteringProgram.uniform("sigma_s2",	sigma_s2);
@@ -215,8 +215,8 @@ void FilterGLDisp::Update(float sigma, float sigma_s, float sigma_r, bool bUse,
 
     int halfKernelSize = PrecomputedGaussian::KernelSize(sigma_s) >> 1;
 
-    float sigma_s2 = 2.0 * sigma_s * sigma_s;
-    float sigma_r2 = 2.0 * sigma_r * sigma_r;
+    float sigma_s2 = 2.0f * sigma_s * sigma_s;
+    float sigma_r2 = 2.0f * sigma_r * sigma_r;
 
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_texL",      0);

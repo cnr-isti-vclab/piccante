@@ -181,7 +181,7 @@ public:
         }
     }
 
-    void Find(double x, double y, double radius, std::set<int> &out)
+    void Find(float x, float y, float radius, std::set<int> &out)
     {
 
         int pos[2];

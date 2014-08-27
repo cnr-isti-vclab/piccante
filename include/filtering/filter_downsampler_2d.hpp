@@ -135,8 +135,8 @@ PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(float scaleX, float scaleY =
     flt[X_DIRECTION] = NULL;
     flt[Y_DIRECTION] = NULL;
 
-    isg[X_DIRECTION] = new ImageSamplerGaussian(1.0f / (5.0 * scaleX), X_DIRECTION);
-    isg[Y_DIRECTION] = new ImageSamplerGaussian(1.0f / (5.0 * scaleY), Y_DIRECTION);
+    isg[X_DIRECTION] = new ImageSamplerGaussian(1.0f / (5.0f * scaleX), X_DIRECTION);
+    isg[Y_DIRECTION] = new ImageSamplerGaussian(1.0f / (5.0f * scaleY), Y_DIRECTION);
 
     swh = true;
 }
@@ -175,8 +175,8 @@ PIC_INLINE void FilterDownSampler2D::PreProcess(ImageRAWVec imgIn,
         scaleX = float(width)  / imgIn[0]->widthf;
         scaleY = float(height) / imgIn[0]->heightf;
 
-        isg[X_DIRECTION]->Update(1.0f / (5.0 * scaleX), X_DIRECTION);
-        isg[Y_DIRECTION]->Update(1.0f / (5.0 * scaleY), Y_DIRECTION);
+        isg[X_DIRECTION]->Update(1.0f / (5.0f * scaleX), X_DIRECTION);
+        isg[Y_DIRECTION]->Update(1.0f / (5.0f * scaleY), Y_DIRECTION);
     }
 
     if(flt[X_DIRECTION] == NULL) {

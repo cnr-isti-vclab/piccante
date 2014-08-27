@@ -88,7 +88,7 @@ public:
         GLuint testTQ1 = glBeginTimeQuery();
         seg_map = seg.Compute(imgIn, seg_map);
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        ms = double(timeVal) / 1000000.0;
+        ms = float(double(timeVal) / 1000000.0);
         tot_ms = ms;
 
 #ifdef PIC_DEBUG
@@ -113,7 +113,7 @@ public:
         check_value->loadToMemory();
         int value = int(check_value->data[0]);
         timeVal = glEndTimeQuery(testTQ1);
-        ms = double(timeVal) / 1000000.0;
+        ms = float(double(timeVal) / 1000000.0);
         tot_ms += ms;
 
 #ifdef PIC_DEBUG
@@ -171,7 +171,7 @@ public:
         }
 
         timeVal = glEndTimeQuery(testTQ1);
-        ms = double(timeVal) / 1000000.0;
+        ms = float(double(timeVal) / 1000000.0);
         tot_ms += ms;
 
 #ifdef PIC_DEBUG

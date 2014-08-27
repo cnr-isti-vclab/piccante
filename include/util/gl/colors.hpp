@@ -60,7 +60,7 @@ std::string GLSL_RGB2HSL()
     };
           );
     return ret;
-};
+}
 
 /**GLSL_HSL2RGB: converts HSL values into RGB ones*/
 std::string GLSL_HSL2RGB()
@@ -87,7 +87,7 @@ std::string GLSL_HSL2RGB()
     };
           );
     return ret;
-};
+}
 
 } // end namespace pic
 

@@ -174,9 +174,9 @@ void FilterGLBilateral3DS::InitShaders()
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
 
-    sigmas2 = 2.0 * sigma_s * sigma_s;
-    sigmat2 = 2.0 * sigma_t *sigma_t;
-    sigmar2 = 2.0 * sigma_r * sigma_r;
+    sigmas2 = 2.0f * sigma_s * sigma_s;
+    sigmat2 = 2.0f * sigma_t *sigma_t;
+    sigmar2 = 2.0f * sigma_r * sigma_r;
     UpdateUniform();
 }
 
@@ -210,9 +210,9 @@ void FilterGLBilateral3DS::Update(float sigma_s, float sigma_r, float sigma_t)
     ms->updateGL(halfKernelSize, halfKernelSize);
 
     //shader update
-    sigmas2 = 2.0 * this->sigma_s * this->sigma_s;
-    sigmat2 = 2.0 * this->sigma_t *this->sigma_t;
-    sigmar2 = 2.0 * this->sigma_r * this->sigma_r;
+    sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
+    sigmat2 = 2.0f * this->sigma_t *this->sigma_t;
+    sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
     UpdateUniform();
 }
 
