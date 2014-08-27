@@ -27,6 +27,12 @@ See the GNU Lesser General Public License
 
 #include "piccante.hpp"
 
+#include <QtGui/QWindow>
+#include <QtCore/QCoreApplication>
+#include <QtGui/QPainter>
+
+#include "../opengl_common_code/opengl_window.hpp"
+
 class SimpleIOWindow : public pic::OpenGLWindow
 {
 protected:
@@ -47,7 +53,7 @@ public:
     {
         //reading an input image
         img.Read("../data/input/bottles.hdr");
-        img.generateTextureGL(false);
+        img.generateTextureGL(false, GL_TEXTURE_2D);
 
         //creating a screen aligned quad
         pic::QuadGL::getProgram(program,

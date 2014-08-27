@@ -29,9 +29,7 @@ namespace pic {
 
 #ifndef PIC_DISABLE_QT
 
-#include <QtGui/QWindow>
-#include <QtCore/QCoreApplication>
-#include <QtGui/QPainter>
+
 
 /**
  * @brief The OpenGLWindow class

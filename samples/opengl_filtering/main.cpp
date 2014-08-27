@@ -28,6 +28,12 @@ See the GNU Lesser General Public License
 #define PIC_DEBUG
 #include "piccante.hpp"
 
+#include <QtGui/QWindow>
+#include <QtCore/QCoreApplication>
+#include <QtGui/QPainter>
+
+#include "../opengl_common_code/opengl_window.hpp"
+
 class SimpleFilteringWindow : public pic::OpenGLWindow
 {
 protected:

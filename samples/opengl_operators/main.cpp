@@ -27,6 +27,12 @@ See the GNU Lesser General Public License
 
 #include "piccante.hpp"
 
+#include <QtGui/QWindow>
+#include <QtCore/QCoreApplication>
+#include <QtGui/QPainter>
+
+#include "../opengl_common_code/opengl_window.hpp"
+
 class SimpleOperatorsWindow : public pic::OpenGLWindow
 {
 protected:
@@ -50,10 +56,10 @@ public:
     {
         //reading an input image
         img.Read("../data/input/bottles.hdr");
-        img.generateTextureGL(false);
+        img.generateTextureGL(false, GL_TEXTURE_2D);
 
         //creating a random image
-        imgRand = new pic::ImageRAWGL(img.frames, img.width, img.height, img.channels, pic::IMG_CPU_GPU);
+        imgRand = new pic::ImageRAWGL(img.frames, img.width, img.height, img.channels, pic::IMG_CPU_GPU, GL_TEXTURE_2D);
         imgRand->SetRand();
         imgRand->loadFromMemory();
 

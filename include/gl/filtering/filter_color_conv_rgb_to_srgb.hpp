@@ -63,7 +63,7 @@ public:
     void Update(bool direct);
 };
 
-FilterGLColorConvRGBtosRGB::FilterGLColorConvRGBtosRGB(bool direct = true): FilterGLColorConv()
+FilterGLColorConvRGBtosRGB::FilterGLColorConvRGBtosRGB(bool direct): FilterGLColorConv()
 {
     this->direct = direct;
 

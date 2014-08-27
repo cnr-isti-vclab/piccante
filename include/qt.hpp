@@ -54,11 +54,11 @@ See the GNU Lesser General Public License
 #include <QtGui/QColor>
 #include <QtGui/QImage>
 
-//#ifdef PIC_MAC_OS_X
+#ifdef PIC_MAC_OS_X
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLPaintDevice>
-//#endif
+#endif
 
 #elif (QT_VERSION >= QT_VERSION_CHECK(4, 0, 0))
 /* we got Qt 4 */
