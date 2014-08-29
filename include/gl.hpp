@@ -53,6 +53,7 @@ See the GNU Lesser General Public License
 #include "gl/colors/color_conv.hpp"
 #include "gl/colors/color_conv_rgb_to_xyz.hpp"
 #include "gl/colors/color_conv_rgb_to_srgb.hpp"
+#include "gl/colors/color_conv_rgb_to_hsl.hpp"
 #include "gl/filtering/filter_color_conv.hpp"
 
 #include "gl/filtering/filter_anaglyph.hpp"

@@ -25,8 +25,8 @@ See the GNU Lesser General Public License
 #ifndef PIC_GL_FILTERING_FILTER_HSL_REPLACE_HPP
 #define PIC_GL_FILTERING_FILTER_HSL_REPLACE_HPP
 
+#include "gl/colors/color_conv_rgb_to_hsl.hpp"
 #include "gl/filtering/filter.hpp"
-#include "util/gl/colors.hpp"
 
 namespace pic {
 
@@ -111,8 +111,8 @@ void FilterGLHSLReplace::InitShaders()
 
     //Final fragment source
     std::string final_fragment_source;
-    final_fragment_source  = GLSL_RGB2HSL();
-    final_fragment_source += GLSL_HSL2RGB();
+    final_fragment_source  = ColorConvGLRGBtoHSL::getDirect();
+    final_fragment_source += ColorConvGLRGBtoHSL::getInverse();
     final_fragment_source += fragment_source;
 
     filteringProgram.setup(glw::version("330"), vertex_source, final_fragment_source);
