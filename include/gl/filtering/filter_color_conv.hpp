@@ -36,13 +36,20 @@ class FilterGLColorConv: public FilterGL
 {
 protected:
 
-    bool direct;
+    ColorConvGL *color_conv;
+
+    /**
+     * @brief InitShaders
+     */
+    void InitShaders();
 
 public:
     /**
      * @brief FilterGLColorConv
      */
-    FilterGLColorConv();
+    FilterGLColorConv(ColorConvGL *color_conv, bool direct);
+
+    void setTransform(bool direct);
 
     /**
      * @brief Process
@@ -51,11 +58,26 @@ public:
      * @return
      */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+
 };
 
-FilterGLColorConv::FilterGLColorConv(): FilterGL()
+FilterGLColorConv::FilterGLColorConv(ColorConvGL *color_conv, bool direct = true): FilterGL()
 {
-    direct = true;
+    this->color_conv = color_conv;
+
+    InitShaders();
+    setTransform(direct);
+}
+
+void FilterGLColorConv::InitShaders()
+{
+    color_conv->generatePrograms(vertex_source);
+}
+
+void FilterGLColorConv::setTransform(bool direct)
+{
+    color_conv->setTransform(direct);
+    color_conv->setUniforms();
 }
 
 ImageRAWGL *FilterGLColorConv::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
@@ -93,7 +115,7 @@ ImageRAWGL *FilterGLColorConv::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 
     //Shaders
-    glw::bind_program(filteringProgram);
+    color_conv->bindProgram();
 
     //Textures
     glActiveTexture(GL_TEXTURE0);
@@ -106,7 +128,7 @@ ImageRAWGL *FilterGLColorConv::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     fbo->unbind();
 
     //Shaders
-    glw::bind_program(0);
+    color_conv->unbindProgram();
 
     //Textures
     glActiveTexture(GL_TEXTURE0);

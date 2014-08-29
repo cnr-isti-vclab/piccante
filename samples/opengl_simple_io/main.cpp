@@ -37,7 +37,7 @@ class SimpleIOWindow : public pic::OpenGLWindow
 {
 protected:
     pic::QuadGL *quad;
-    pic::FilterGLSimpleTMO *tmo;
+    pic::FilterGLColorConv *tmo;
 
 public:
     pic::ImageRAWGL img, *imgOut;
@@ -63,7 +63,7 @@ public:
         quad = new pic::QuadGL(true);
         
         //allocating a new filter for simple tone mapping
-        tmo = new pic::FilterGLSimpleTMO();
+        tmo = new pic::FilterGLColorConv(new pic::ColorConvGLRGBtosRGB());
     }
 
     void render()
