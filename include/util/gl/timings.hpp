@@ -35,17 +35,17 @@ inline GLuint glBeginTimeQuery()
     GLuint ret;
     glGenQueries(1, &ret);
     glFinish();
-    glBeginQuery(GL_TIME_ELAPSED, ret);
+    glBeginQuery(GL_TIME_ELAPSED_EXT, ret);
     return ret;
 }
 
 inline GLuint64EXT glEndTimeQuery(GLuint ret)
 {
     //Timing
-    glEndQuery(GL_TIME_ELAPSED);
+    glEndQuery(GL_TIME_ELAPSED_EXT);
 //	GLint available = 0;
     GLuint64 timeVal = 0;
-    glGetQueryObjectui64v(ret, GL_QUERY_RESULT, &timeVal);
+    glGetQueryObjectui64vEXT(ret, GL_QUERY_RESULT, &timeVal);
     return timeVal;
 }
 

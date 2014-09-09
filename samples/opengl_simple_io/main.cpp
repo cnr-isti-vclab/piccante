@@ -23,13 +23,8 @@ See the GNU Lesser General Public License
 */
 
 
-#include <QtGui/QGuiApplication>
-#include <QtGui/QScreen>
 #include "piccante.hpp"
 
-#include <QtGui/QWindow>
-#include <QtCore/QCoreApplication>
-#include <QtGui/QPainter>
 
 #include "../opengl_common_code/opengl_window.hpp"
 

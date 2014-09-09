@@ -25,11 +25,16 @@
 #ifndef CLASS_OPENGL_WINDOW_HPP
 #define CLASS_OPENGL_WINDOW_HPP
 
-namespace pic {
-
 #ifndef PIC_DISABLE_QT
 
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
+#include <QtGui/QWindow>
+#include <QtCore/QCoreApplication>
+#include <QtGui/QPainter>
 #include <QOpenGLFunctions>
+
+namespace pic {
 
 /**
  * @brief The OpenGLWindow class
@@ -181,8 +186,8 @@ public slots:
     }
 };
 
-#endif
-
 }  // end namespace pic
+
+#endif
 
 #endif // CLASS_OPENGL_WINDOW_HPP
