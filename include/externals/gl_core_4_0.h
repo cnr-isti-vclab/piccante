@@ -147,8 +147,6 @@ typedef unsigned int GLhandleARB;
 		typedef struct __GLsync *GLsync;
 		struct _cl_context;
 		struct _cl_event;
-		typedef void (APIENTRY *GLDEBUGPROC)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam);
-		typedef void (APIENTRY *GLDEBUGPROCARB)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam);
 		typedef void (APIENTRY *GLDEBUGPROCAMD)(GLuint id,GLenum category,GLenum severity,GLsizei length,const GLchar *message,void *userParam);
 		typedef unsigned short GLhalfNV;
 		typedef GLintptr GLvdpauSurfaceNV;

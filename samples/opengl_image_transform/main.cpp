@@ -22,6 +22,9 @@ See the GNU Lesser General Public License
 
 */
 
+#define PIC_DISABLE_OPENGL_NON_CORE
+
+#include "../opengl_common_code/gl_core_4_0.h"
 
 #define PIC_DEBUG
 #include "piccante.hpp"
@@ -51,6 +54,10 @@ public:
 
     void init()
     {
+        if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+            printf("OpenGL functions are not loaded!\n");
+        }
+
         //reading an input image
         img.Read("../data/input/bottles.hdr");
         img.generateTextureGL(false, GL_TEXTURE_2D);

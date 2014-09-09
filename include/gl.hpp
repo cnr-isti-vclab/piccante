@@ -30,12 +30,7 @@ See the GNU Lesser General Public License
 //OpenGL library
 #ifdef PIC_WIN32
 
-#define PIC_DISABLE_OPENGL_NON_CORE
-
-#include "externals/gl_core_4_0.h"
 #include <GL/GL.h>
-//#include <GL/glew.h>
-//#pragma comment( lib, "glew32" )
 #pragma comment( lib, "opengl32" )
 
 #else /* PIC_MAC_OS_X or PIC_UNIX */
