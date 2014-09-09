@@ -106,7 +106,7 @@ public:
      * @brief Size
      * @return
      */
-    int Size()
+    unsigned int Size()
     {
         return positions.size();
     }
@@ -357,6 +357,8 @@ void StrokeGL::RenderBrushGL(int x, int y)
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, shape->getTexture());
 
+    #ifndef PIC_DISABLE_OPENGL_NON_CORE
+
     glBegin(GL_QUADS);
 
     if(annotation < 0.0f) {
@@ -378,6 +380,7 @@ void StrokeGL::RenderBrushGL(int x, int y)
     glVertex2f(xf - halfBrushSizeXf,	yf + halfBrushSizeYf);
 
     glEnd();
+    #endif
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
 }
@@ -391,6 +394,7 @@ void StrokeGL::RenderGL()
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, shape->getTexture());
 
+    #ifndef PIC_DISABLE_OPENGL_NON_CORE
     if(bPointSprite) {
         glEnable(GL_POINT_SPRITE);
         glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
@@ -431,8 +435,8 @@ void StrokeGL::RenderGL()
         }
 
         glEnd();
-
     }
+    #endif
 
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
@@ -457,6 +461,7 @@ void StrokeGL::RenderAnnotationGL()
     float halfBrushSizeXf = float(halfBrushSize) / float(width);
     float halfBrushSizeYf = float(halfBrushSize) / float(height);
 
+    #ifndef PIC_DISABLE_OPENGL_NON_CORE
     glBegin(GL_QUADS);
     const int n = size_t(positions.size());
 
@@ -475,6 +480,7 @@ void StrokeGL::RenderAnnotationGL()
     }
 
     glEnd();
+    #endif
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);

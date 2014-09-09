@@ -201,9 +201,6 @@ See the GNU Lesser General Public License
 // Qt stuff
 #include "qt.hpp"
 
-// External code: Eigen and GLW
-#include "externals.hpp"
-
 // base stuff
 #include "base.hpp"
 #include "image.hpp"

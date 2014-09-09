@@ -337,7 +337,10 @@ public:
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         }
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8 , width, height, 0, GL_LUMINANCE,
+        //Note: GL_LUMINANCE is deprecated since OpenGL 3.1
+        /*glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8 , width, height, 0, GL_LUMINANCE,
+                     GL_UNSIGNED_BYTE, data);*/
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED,
                      GL_UNSIGNED_BYTE, data);
 
         if(mipmap && bGen) {

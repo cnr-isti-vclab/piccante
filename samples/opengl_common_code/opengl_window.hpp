@@ -29,7 +29,7 @@ namespace pic {
 
 #ifndef PIC_DISABLE_QT
 
-
+#include <QOpenGLFunctions>
 
 /**
  * @brief The OpenGLWindow class
@@ -91,11 +91,6 @@ public:
         , device(0)
     {
         setSurfaceType(QWindow::OpenGLSurface);
-    }
-
-    ~OpenGLWindow()
-    {
-        delete device;
     }
 
     /**

@@ -150,6 +150,7 @@ public:
             cerr << "FBO Incomplete: Missing Attachment" << endl;
             break;
 
+            /*
         case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
             cerr << "FBO Incomplete: Dimensions" << endl;
             break;
@@ -157,6 +158,7 @@ public:
         case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
             cerr << "FBO Incomplete: Formats" << endl;
             break;
+            */
 
         case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
             cerr << "FBO Incomplete: Draw Buffer" << endl;

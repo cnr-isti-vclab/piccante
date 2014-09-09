@@ -44,7 +44,7 @@ protected:
         int width = dst->width;
         int channels = dst->channels;
 
-        int n = src.size();
+        unsigned int n = src.size();
 
         for(int j = box->y0; j < box->y1; j++) {
             int ind = j * width;
@@ -62,7 +62,7 @@ protected:
                     float weight_norm = 0.0f;
                     float acc = 0.0f;
 
-                    for(int l = 0; l < n; l++) {
+                    for(unsigned int l = 0; l < n; l++) {
                         float x = src[l]->data[c + k];
 
                         float weight = WeightFunction(x, weight_type);

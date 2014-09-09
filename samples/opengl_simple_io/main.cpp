@@ -22,9 +22,9 @@ See the GNU Lesser General Public License
 
 */
 
+
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
-
 #include "piccante.hpp"
 
 #include <QtGui/QWindow>

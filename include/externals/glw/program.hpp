@@ -373,7 +373,7 @@ inline void program::fragment_target(const char *name, unsigned int color_index)
     GLW_ASSERT(this->m_prog != GLW_NULL_OBJECT);
     GLW_ASSERT(name         != 0);
 
-    glBindFragDataLocationEXT(this->m_prog, GLuint(color_index), name);
+    glBindFragDataLocation(this->m_prog, GLuint(color_index), name);
 }
 
 inline GLint program::uniform_location(const char *name)
@@ -391,7 +391,7 @@ inline void program::uniform_buffer(GLint location, GLuint buffer)
     GLW_ASSERT(buffer       != 0);
     GLW_ASSERT_ULOC(location);
 
-    glUniformBufferEXT(this->m_prog, location, buffer);
+    //glUniformBufferEXT(this->m_prog, location, buffer);
 }
 
 inline void program::uniform(GLint location, int v0)
@@ -841,12 +841,14 @@ inline GLuint program::create_program(GLuint vs, GLuint gs, GLuint fs,
     }
 
     if(gs != 0) {
+        /*
         glProgramParameteriEXT(prog, GL_GEOMETRY_INPUT_TYPE_EXT,
                                GLint(primitive_input_type));
         glProgramParameteriEXT(prog, GL_GEOMETRY_OUTPUT_TYPE_EXT,
                                GLint(primitive_output_type));
         glProgramParameteriEXT(prog, GL_GEOMETRY_VERTICES_OUT_EXT,
                                GLint(max_output_vertices));
+        */
     }
 
     glLinkProgram(prog);

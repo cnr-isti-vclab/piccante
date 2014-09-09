@@ -27,10 +27,6 @@ See the GNU Lesser General Public License
 
 #ifndef PIC_DISABLE_OPENGL
 
-#ifdef PIC_WIN32
-    #include <GL/glew.h>
-#endif // PIC_WIN32
-
 #include "externals/glw/base.hpp"
 #include "externals/glw/program.hpp"
 #include "externals/glw/utility.hpp"

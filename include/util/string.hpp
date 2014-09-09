@@ -64,8 +64,8 @@ inline std::string stdStringRep(std::string str, std::string strSub,
 inline std::string stdStringRepAll(std::string str, std::string strSub,
                                    std::string strRep)
 {
-    int n = strSub.size();
-    int n2 = strRep.size();
+    unsigned int n = strSub.size();
+    unsigned int n2 = strRep.size();
 
     std::string ret = str;
     std::string::size_type pos = ret.find(strSub);
@@ -124,7 +124,7 @@ inline std::string getExtension(std::string name)
     std::string ext = "";
 
     if(pos != std::string::npos) {
-        int n = (name.length() - pos);
+        int n = int(name.length() - pos);
         ext = name.substr(n, n);
     }
 

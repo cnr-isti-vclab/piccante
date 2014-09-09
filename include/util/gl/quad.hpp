@@ -318,6 +318,8 @@ public:
     {
         glDisable(GL_DEPTH_TEST);
 
+        #ifndef PIC_DISABLE_OPENGL_NON_CORE
+
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         //Rendering an aligned quad
@@ -329,6 +331,7 @@ public:
         glVertex2f(  1.0f, -1.0f);
 
         glEnd();
+        #endif
     }
 
     /**
@@ -342,6 +345,8 @@ public:
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex);
 
+
+        #ifndef PIC_DISABLE_OPENGL_NON_CORE
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         //Rendering an aligned quad
@@ -360,6 +365,7 @@ public:
         glVertex2f(   1.0f, -1.0f);
 
         glEnd();
+        #endif
 
         glDisable(GL_TEXTURE_2D);
     }
@@ -375,6 +381,8 @@ public:
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex);
+
+        #ifndef PIC_DISABLE_OPENGL_NON_CORE
 
         if(color == NULL) {
             glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -398,6 +406,7 @@ public:
         glVertex2f(  1.0f, -1.0f);
 
         glEnd();
+        #endif
 
         glDisable(GL_TEXTURE_2D);
     }
@@ -412,6 +421,8 @@ public:
     static void Draw(GLuint texture, int width, int height, glw::program &pg)
     {
         glFrontFace(GL_CW);
+
+        #ifndef PIC_DISABLE_OPENGL_NON_CORE
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -439,6 +450,7 @@ public:
         glVertex2f(-1.0f,  1.0f);
 
         glEnd();
+        #endif
 
         glDisable(GL_TEXTURE_2D);
         glw::bind_program(0);

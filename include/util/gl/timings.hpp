@@ -35,19 +35,19 @@ inline GLuint glBeginTimeQuery()
     GLuint ret;
     glGenQueries(1, &ret);
     glFinish();
-    glBeginQuery(GL_TIME_ELAPSED_EXT, ret);
+    glBeginQuery(GL_TIME_ELAPSED, ret);
     return ret;
-};
+}
 
 inline GLuint64EXT glEndTimeQuery(GLuint ret)
 {
     //Timing
-    glEndQuery(GL_TIME_ELAPSED_EXT);
+    glEndQuery(GL_TIME_ELAPSED);
 //	GLint available = 0;
-    GLuint64EXT timeVal = 0;
-    glGetQueryObjectui64vEXT(ret, GL_QUERY_RESULT, &timeVal);
+    GLuint64 timeVal = 0;
+    glGetQueryObjectui64v(ret, GL_QUERY_RESULT, &timeVal);
     return timeVal;
-};
+}
 
 } // end namespace pic
 

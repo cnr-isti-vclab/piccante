@@ -40,7 +40,7 @@ class FilterColorConv: public Filter
 {
 protected:
     std::vector<ColorConv *>    conv_list;
-    int							n;
+    unsigned int				n;
     bool						bDirect;
 
     /**
@@ -81,13 +81,13 @@ protected:
 
                 if(bDirect) { //Direct color transform                    
                     conv_list[0]->direct(dataIn, tmp[0]);
-                    for(int k = 1; k < n; k++) {
+                    for(unsigned int k = 1; k < n; k++) {
                         conv_list[k]->direct(tmp[(k + 1) % 2], tmp[k % 2]);
                     }
 
                 } else { //Inverse color transform
                     conv_list[n - 1]->inverse(dataIn, tmp[0]);
-                    for(int k = 1; k < n; k++) {
+                    for(unsigned int k = 1; k < n; k++) {
                         conv_list[n - k - 1]->inverse(tmp[(k + 1) % 2], tmp[k % 2]);
                     }
                 }

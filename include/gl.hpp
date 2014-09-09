@@ -30,19 +30,30 @@ See the GNU Lesser General Public License
 //OpenGL library
 #ifdef PIC_WIN32
 
-#include <GL/glew.h>
+#define PIC_DISABLE_OPENGL_NON_CORE
 
-#pragma comment( lib, "glew32" )
+#include "externals/gl_core_4_0.h"
+#include <GL/GL.h>
+//#include <GL/glew.h>
+//#pragma comment( lib, "glew32" )
 #pragma comment( lib, "opengl32" )
 
 #else /* PIC_MAC_OS_X or PIC_UNIX */
+
+#ifdef PIC_QT
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLPaintDevice>
+#endif
 
 #include <OpenGL/OpenGL.h>
 
 #endif /* os selection */
 
 //GLW
+#include "externals/glw/base.hpp"
 #include "externals/glw/program.hpp"
+#include "externals/glw/utility.hpp"
 
 #include "gl/algorithms/pyramid.hpp"
 
