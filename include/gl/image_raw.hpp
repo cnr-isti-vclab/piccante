@@ -338,10 +338,15 @@ public:
         }
 
         //Note: GL_LUMINANCE is deprecated since OpenGL 3.1
-        /*glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8 , width, height, 0, GL_LUMINANCE,
-                     GL_UNSIGNED_BYTE, data);*/
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED,
+        #ifndef PIC_DISABLE_OPENGL_NON_CORE
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8 , width, height, 0, GL_LUMINANCE,
                      GL_UNSIGNED_BYTE, data);
+        #endif
+
+        #ifdef PIC_DISABLE_OPENGL_NON_CORE
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED,
+                         GL_UNSIGNED_BYTE, data);
+        #endif
 
         if(mipmap && bGen) {
             glGenerateMipmap(GL_TEXTURE_2D);
