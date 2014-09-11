@@ -25,40 +25,22 @@ See the GNU Lesser General Public License
 #ifndef PIC_TONE_MAPPING_EXPOSURE_FUSION_HPP
 #define PIC_TONE_MAPPING_EXPOSURE_FUSION_HPP
 
+#include "colors/saturation.hpp"
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_laplacian.hpp"
 #include "algorithms/pyramid.hpp"
 
 namespace pic {
 
-inline float computeSaturation(float *data, int channels = 3)
-{
-    if(channels == 1) {
-        return 1.0f;
-    }
-
-    float tmp, var, tmpMu;
-
-    tmpMu = 0.0f;
-
-    for(int i = 0; i < channels; i++) {
-        tmpMu += data[i];
-    }
-
-    tmpMu /= float(channels);
-
-    var = 0.0f;
-
-    for(int i = 0; i < channels; i++) {
-        tmp = data[i] - tmpMu;
-        var += tmp * tmp;
-    }
-
-    var = sqrtf(var / float(channels));
-
-    return var;
-}
-
+/**
+ * @brief ExposureFusion
+ * @param imgIn
+ * @param imgOut
+ * @param wC
+ * @param wE
+ * @param wS
+ * @return
+ */
 ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
                          float wE = 1.0f, float wS = 1.0f)
 {
@@ -85,10 +67,15 @@ ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
 
     ImageRAWVec weights_list;
 
+    float mu = 0.5f;
+    float sigma = 0.2f;
+    float sigma2 = 2.0f * sigma * sigma;
+
     for(int j = 0; j < n; j++) {
         #ifdef PIC_DEBUG
             printf("Processing image %d\n", j);
         #endif
+
         ImageRAW *curWeight = new ImageRAW(1, width, height, 1,
                                            &weights->data[size * j]);
         weights_list.push_back(curWeight);
@@ -96,10 +83,6 @@ ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
         fltL.ProcessP(Single(imgIn[j]), L);
 
         fltLap.ProcessP(Single(L), curWeight);
-
-        float mu = 0.5f;
-        float sigma = 0.2f;
-        float sigma2 = 2.0f * sigma * sigma;
 
         float *data = imgIn[j]->data;
 
@@ -137,8 +120,8 @@ ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
     #ifdef PIC_DEBUG
         printf("Blending...");
     #endif
-    Pyramid *pW = new Pyramid(width, height, 1, false, 0);
 
+    Pyramid *pW   = new Pyramid(width, height, 1, false, 0);
     Pyramid *pI   = new Pyramid(width, height, channels, true, 0);
     Pyramid *pOut = new Pyramid(width, height, channels, true, 0);
     
@@ -164,6 +147,7 @@ ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
     #pragma omp parallel for
 
     for(int i = 0; i < imgOut->size(); i++) {
+        if(imgOut->data[i])
         imgOut->data[i] = imgOut->data[i] > 0.0f ? imgOut->data[i] : 0.0f;
     }
 

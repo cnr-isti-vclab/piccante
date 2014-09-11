@@ -22,24 +22,45 @@ See the GNU Lesser General Public License
 
 */
 
+#ifndef PIC_COLORS_SATURATION_HPP
+#define PIC_COLORS_SATURATION_HPP
 
-#ifndef PIC_COLORS_HPP
-#define PIC_COLORS_HPP
+namespace pic {
+/**
+ * @brief computeSaturation
+ * @param data
+ * @param channels
+ * @return
+ */
+inline float computeSaturation(float *data, int channels = 3)
+{
+    if(channels == 1) {
+        return 1.0f;
+    }
 
-#include "colors/color_3.hpp"
+    float tmp, var, tmpMu;
 
-#include "colors/color_conv.hpp"
-#include "colors/color_conv_rgb_to_srgb.hpp"
-#include "colors/color_conv_rgb_to_xyz.hpp"
-#include "colors/color_conv_xyz_to_cieluv.hpp"
-#include "colors/color_conv_xyz_to_logluv.hpp"
+    tmpMu = 0.0f;
 
-#include "colors/color_conv_xyz_to_cielab.hpp"
-#include "colors/color_conv_xyz_to_hdrlab.hpp"
+    for(int i = 0; i < channels; i++) {
+        tmpMu += data[i];
+    }
 
-#include "colors/saturation.hpp"
+    tmpMu /= float(channels);
 
-#include "colors/rgbe.hpp"
+    var = 0.0f;
 
-#endif /* PIC_COLORS_HPP */
+    for(int i = 0; i < channels; i++) {
+        tmp = data[i] - tmpMu;
+        var += tmp * tmp;
+    }
 
+    var = sqrtf(var / float(channels));
+
+    return var;
+}
+
+
+} // end namespace pic
+
+#endif /* PIC_COLORS_SATURATION_HPP */
