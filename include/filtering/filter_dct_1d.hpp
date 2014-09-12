@@ -68,6 +68,7 @@ public:
 
         if(coeff != NULL) {
             delete[] coeff;
+            coeff = NULL;
         }
 
         coeff = CreateCoefficientsTransform(nCoeff);
@@ -82,6 +83,7 @@ public:
 
         if(coeff != NULL) {
             delete[] coeff;
+            coeff = NULL;
         }
 
         coeff = CreateCoefficientsInverse(nCoeff);
@@ -172,6 +174,7 @@ public:
 
 FilterDCT1D::FilterDCT1D(int nCoeff, bool bForward)
 {
+    this->coeff = NULL;
     this->nCoeff = nCoeff;
 
     if(bForward) {

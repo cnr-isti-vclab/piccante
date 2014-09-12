@@ -30,13 +30,20 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterDCT2D class
+ */
 class FilterDCT2D: public FilterNPasses
 {
 protected:
     FilterDCT1D *fltDCT1D;
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterDCT2D
+     * @param nCoeff
+     * @param bForward
+     */
     FilterDCT2D(int nCoeff, bool bForward)
     {
         //DCT 1D filter
@@ -57,21 +64,42 @@ public:
         fltDCT1D = NULL;
     }
 
+    /**
+     * @brief SetForward
+     */
     void SetForward()
     {
         fltDCT1D->SetForward();
     }
+
+    /**
+     * @brief SetInverse
+     */
     void SetInverse()
     {
         fltDCT1D->SetInverse();
     }
 
+    /**
+     * @brief Transform
+     * @param imgIn
+     * @param imgOut
+     * @param nCoeff
+     * @return
+     */
     static ImageRAW *Transform(ImageRAW *imgIn, ImageRAW *imgOut, int nCoeff)
     {
         FilterDCT2D filter(nCoeff, true);
         return filter.Process(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Inverse
+     * @param imgIn
+     * @param imgOut
+     * @param nCoeff
+     * @return
+     */
     static ImageRAW *Inverse(ImageRAW *imgIn, ImageRAW *imgOut, int nCoeff)
     {
         FilterDCT2D filter(nCoeff, false);
