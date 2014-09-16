@@ -46,7 +46,7 @@ namespace pic {
 
         FilterChannel flc(0);
         int channels = imgIn->channels;
-        for(int i=0; i<channels; i++) {
+        for(int i = 0; i < channels; i++) {
             flc.setChannel(i);
 
             img_vec.push_back(flc.ProcessP(input, NULL));

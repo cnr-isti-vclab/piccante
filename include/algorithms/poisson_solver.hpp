@@ -34,6 +34,12 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief PoissonSolver
+ * @param f
+ * @param ret
+ * @return
+ */
 ImageRAW *PoissonSolver(ImageRAW *f, ImageRAW *ret)
 {
     if(f == NULL) {

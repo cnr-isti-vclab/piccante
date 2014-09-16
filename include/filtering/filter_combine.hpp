@@ -29,18 +29,43 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterCombine class
+ */
 class FilterCombine: public Filter
 {
 protected:
-    //Process in a box
+
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
 
 public:
 
-    //Basic constructors
+    /**
+     * @brief FilterCombine
+     */
     FilterCombine() {}
 
+    /**
+     * @brief AddAlpha
+     * @param imgIn
+     * @param imgOut
+     * @param value
+     * @return
+     */
     static ImageRAW *AddAlpha(ImageRAW *imgIn, ImageRAW *imgOut, float value)
     {
         //Create an alpha channel
@@ -59,20 +84,35 @@ public:
         return imgOut;
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     static ImageRAW *Execute(ImageRAWVec imgIn, ImageRAW *imgOut)
     {
         FilterCombine filterC;
         return filterC.Process(imgIn, imgOut);
     }
 
+    /**
+     * @brief ExecuteTest
+     * @param nameIn
+     * @param nameOut
+     * @return
+     */
     static ImageRAW *ExecuteTest(std::string nameIn, std::string nameOut)
     {
         ImageRAW imgIn(nameIn);
+
         FilterChannel filter(0);
         ImageRAW *outR = filter.Process(Single(&imgIn), NULL);
-        filter.channel = 1;
+
+        filter.setChannel(1);
         ImageRAW *outG = filter.Process(Single(&imgIn), NULL);
-        filter.channel = 2;
+
+        filter.setChannel(2);
         ImageRAW *outB = filter.Process(Single(&imgIn), NULL);
 
         ImageRAWVec src;
@@ -88,7 +128,6 @@ public:
     }
 };
 
-//Setup
 ImageRAW *FilterCombine::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
 {
     if(imgOut == NULL) {
@@ -105,7 +144,6 @@ ImageRAW *FilterCombine::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
     return imgOut;
 }
 
-//Process in a box
 void FilterCombine::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 {
     for(int p = box->z0; p < box->z1; p++) {

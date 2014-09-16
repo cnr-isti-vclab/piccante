@@ -54,6 +54,7 @@ See the GNU Lesser General Public License
 
 #include "gl/filtering/filter.hpp"
 #include "gl/filtering/filter_luminance.hpp"
+#include "gl/filtering/filter_channel.hpp"
 
 //color conversion
 #include "gl/colors/color_conv.hpp"
