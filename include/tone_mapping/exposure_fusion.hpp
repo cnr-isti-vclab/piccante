@@ -78,6 +78,7 @@ ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
 
         ImageRAW *curWeight = new ImageRAW(1, width, height, 1,
                                            &weights->data[size * j]);
+
         weights_list.push_back(curWeight);
 
         fltL.ProcessP(Single(imgIn[j]), L);
@@ -100,11 +101,9 @@ ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
             float pWE = expf(-(tmpL * tmpL) / sigma2);
 
             //Final weights
-            float weight =	powf(pCon, wC) *
-                            powf(pWE,  wE) *
-                            powf(pSat, wS);
-
-            curWeight->data[ind] = weight;
+            curWeight->data[ind] =  powf(pCon, wC) *
+                                    powf(pWE,  wE) *
+                                    powf(pSat, wS);
         }
 
         acc->Add(curWeight);

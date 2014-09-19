@@ -22,8 +22,8 @@ See the GNU Lesser General Public License
 
 */
 
-#ifndef PIC_ALGORITHMS_PUSHPULL_GL_HPP
-#define PIC_ALGORITHMS_PUSHPULL_GL_HPP
+#ifndef PIC_GL_ALGORITHMS_PUSHPULL_HPP
+#define PIC_GL_ALGORITHMS_PUSHPULL_HPP
 
 #include "gl/image_raw.hpp"
 
@@ -39,88 +39,6 @@ protected:
     bool            noMore;
     ImageRAWVec 	stack;
     float           threshold;
-
-    /**
-     * @brief distance
-     * @param a
-     * @param b
-     * @param channels
-     * @return
-     */
-    float distance(float *a, float *b, int channels)
-    {
-        float dist = 0.0f;
-        for(int i = 0; i < channels; i++) {
-            float tmp = a[i] -  b[i];
-            dist += tmp * tmp;
-        }
-
-        return dist;
-    }
-
-    /**
-     * @brief down
-     * @param img
-     * @return
-     */
-    ImageRAW *down(ImageRAW *img)
-    {
-
-        if(img->width < 2 || img->height < 2) {
-            noMore = true;
-            return NULL;
-        }
-
-        ImageRAW *ret = new ImageRAW(1, img->width >> 1, img->height >> 1,
-                                     img->channels);
-
-        int channels = img->channels;
-        noMore = true;
-
-        for(int i = 0; i < img->height; i += 2) {
-            for(int j = 0; j < img->width; j += 2) {
-
-                float *tmp[4];
-
-                tmp[0] = (*img)(j    , i);
-                tmp[1] = (*img)(j + 1, i);
-                tmp[2] = (*img)(j    , i + 1);
-                tmp[3] = (*img)(j + 1, i + 1);
-
-                int counter = 0;
-                float *tmp_ret = (*ret)(j >> 1, i >> 1);
-
-                for(int l = 0; l < channels; l++) {
-                    tmp_ret[l] = 0.0f;
-                }
-
-                for(unsigned k = 0; k < 4; k++) {
-                    if(distance(tmp[k], value, channels) > threshold) {
-                        counter++;
-
-                        for(int l = 0; l < channels; l++) {
-                            tmp_ret[l] += tmp[k][l];
-                        }
-                    } else {
-                        noMore = false;
-                    }
-                }
-
-                if(counter > 0) {
-                    float counter_f = float(counter);
-                    for(int l = 0; l < channels; l++) {
-                        tmp_ret[l] /= counter_f;
-                    }
-                } else {
-                    for(int l = 0; l < channels; l++) {
-                        tmp_ret[l] = value[l];
-                    }
-                }
-            }
-        }
-
-        return ret;
-    }
 
     //TODO: to create a filter out of this function
     /**
@@ -254,5 +172,5 @@ public:
 
 } // end namespace pic
 
-#endif /* PIC_ALGORITHMS_PUSHPULL_GL_HPP */
+#endif /* PIC_GL_ALGORITHMS_PUSHPULL_HPP */
 

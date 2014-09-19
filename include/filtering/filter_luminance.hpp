@@ -64,7 +64,7 @@ protected:
                 int ind = indOut * channels;
 
                 float sum = 0.0f;
-                for(int k=0;k<transformChannels;k++)
+                for(int k = 0; k < transformChannels; k++)
                 {
                     sum += data[ind + k] * weights[k];
                 }
