@@ -24,7 +24,9 @@ See the GNU Lesser General Public License
 
 #define PIC_DISABLE_OPENGL_NON_CORE
 
-#include "../opengl_common_code/gl_core_4_0.h"
+#ifdef _MSC_VER
+    #include "../opengl_common_code/gl_core_4_0.h"
+#endif
 
 #define PIC_DEBUG
 
@@ -50,9 +52,11 @@ public:
 
     void init()
     {
-        if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
-            printf("OpenGL functions are not loaded!\n");
-        }
+        #ifdef PIC_WIN32
+            if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+                printf("OpenGL functions are not loaded!\n");
+            }
+        #endif
 
         //reading an input image
         img.Read("../data/input/bottles.hdr");

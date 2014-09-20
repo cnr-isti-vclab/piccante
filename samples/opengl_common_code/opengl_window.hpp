@@ -30,6 +30,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtGui/QWindow>
+
 #include <QtCore/QCoreApplication>
 #include <QtGui/QPainter>
 #include <QOpenGLFunctions>

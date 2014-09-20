@@ -39,7 +39,7 @@ class ColorConvGLRGBtoXYZ: public ColorConvGL
 public:
 
     /**
-     * @brief ColorConv
+     * @brief ColorConvGLRGBtoXYZ
      */
     ColorConvGLRGBtoXYZ(bool direct = true) : ColorConvGL(direct)
     {
