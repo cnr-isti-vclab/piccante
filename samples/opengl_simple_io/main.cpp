@@ -24,7 +24,13 @@ See the GNU Lesser General Public License
 
 #define PIC_DISABLE_OPENGL_NON_CORE
 
+/**
+ * NOTE: if you do not want to use this OpenGL functions loader,
+ * please change it with your favorite one. This is just
+ * a suggestion for running examples.
+*/
 #ifdef _MSC_VER
+    #define PIC_DISABLE_OPENGL_NON_CORE
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
@@ -52,12 +58,6 @@ public:
 
     void init()
     {
-        #ifdef PIC_WIN32
-            if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
-                printf("OpenGL functions are not loaded!\n");
-            }
-        #endif
-
         //reading an input image
         img.Read("../data/input/bottles.hdr");
         img.generateTextureGL(false, GL_TEXTURE_2D);

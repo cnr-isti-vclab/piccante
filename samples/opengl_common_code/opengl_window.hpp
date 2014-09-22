@@ -35,6 +35,11 @@
 #include <QtGui/QPainter>
 #include <QOpenGLFunctions>
 
+#ifdef PIC_WIN32
+    #define PIC_DISABLE_OPENGL_NON_CORE
+    #include "../opengl_common_code/gl_core_4_0.h"
+#endif
+
 namespace pic {
 
 /**
@@ -175,6 +180,13 @@ public slots:
 
         if(toInit) {
             initializeOpenGLFunctions();
+
+            #ifdef PIC_WIN32
+                if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+                    printf("OpenGL functions are not loaded!\n");
+                }
+            #endif
+
             init();
         }
 
