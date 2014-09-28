@@ -45,8 +45,6 @@ protected:
     pic::FilterGLSimpleTMO *tmo;
     pic::FilterGLGaussian2D *fltGauss;
     pic::FilterGLBilateral2DG *fltBilG;
-    pic::FilterGLLuminance *fltLum;
-    pic::FilterGLRedux *flt;
 
 public:
     pic::ImageRAWGL img, *img_flt, *img_flt_tmo;
@@ -74,19 +72,11 @@ public:
 
         quad = new pic::QuadGL(true);
 
-
-         fltLum = new pic::FilterGLLuminance();
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
+        //allocating a new bilateral filter
         fltBilG = new pic::FilterGLBilateral2DG(4.0f, 0.1f);
-
-        //allocating a Gaussian filter with sigma = 4.0
-        fltGauss = new pic::FilterGLGaussian2D(4.0);
-
-     //   pic::ImageRAWGL *tmp = pic::DragoTMOGL(&img);
-    //    tmp->loadToMemory();
-    //    tmp->Write("../data/tmp.bmp");
     }
 
     void render()
@@ -97,13 +87,8 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        //Gaussian filtering...
-
-  //      pic::ImageRAWGL *out = flt->Redux(&img, stack);
-//        out->loadToMemory();
-    //    printf("%f\n", out->data[0]);
-
-        img_flt = fltLum->Process(SingleGL(&img), img_flt);
+        //Bilateral filtering...
+        img_flt = fltBilG->Process(SingleGL(&img), img_flt);
 
         //simple tone mapping: gamma + exposure correction
         img_flt_tmo = tmo->Process(SingleGL(img_flt), img_flt_tmo);
@@ -136,7 +121,7 @@ int main(int argc, char **argv)
 
     SimpleFilteringWindow window;
     window.setFormat(format);
-    window.resize(912, 684);
+    window.resize(800, 533);
     window.show();
 
     window.setAnimating(true);
