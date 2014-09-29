@@ -26,6 +26,7 @@ See the GNU Lesser General Public License
 #define PIC_UTIL_GL_STROKE_HPP
 
 #include "gl/image_raw.hpp"
+#include "util/gl/quad.hpp"
 #include "externals/glw/program.hpp"
 
 namespace pic {
@@ -39,15 +40,17 @@ class StrokeGL
 {
 protected:
     int					width, height, brushSize;
-    bool				bPointSprite;
     ImageRAWGL			*shape;
     float				size, rSize;
     float				color[4];
     float				tmpColor[3];
 
+    QuadGL              *quad;
+
     std::vector<float>	positions;
 
-    glw::program		brushProgram;
+    glw::program		annotationProgram;
+    glw::program        brushProgram;
 
 public:
     float				annotation;
@@ -156,11 +159,22 @@ StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
 {
     annotation = 1.0f;
 
+
     this->width = width;
     this->height = height;
-    this->brushSize = brushSize;
 
-    bPointSprite = false;
+    if(brushSize > 1) {
+        this->brushSize = brushSize;
+    } else {
+        this->brushSize = 2;
+    }
+
+    int halfBrushSize = this->brushSize >> 1;
+
+    float halfBrushSizeXf = float(halfBrushSize) / float(width);
+    float halfBrushSizeYf = float(halfBrushSize) / float(height);
+    printf("%f %f\n", halfBrushSizeXf, halfBrushSizeYf);
+    this->quad = new QuadGL(true, halfBrushSizeXf, halfBrushSizeYf);
 
     size = 4.0f;
     rSize = size / float(max(width, height));
@@ -192,40 +206,78 @@ StrokeGL::~StrokeGL()
 
 void StrokeGL::SetupShaders()
 {
+    //common vertex program
     std::string vertex_source = GLW_STRINGFY
                                 (
-                                    varying vec2 o_texcoord;
+    in vec2 a_position;
+    in vec2 a_tex_coord;
+    uniform vec2 shift_position;
+    out vec2 v_tex_coord;
 
     void main(void) {
-        o_texcoord  = gl_MultiTexCoord0.xy;
-        gl_Position = gl_Vertex;
+        v_tex_coord  = a_tex_coord;
+        gl_Position = vec4(a_position + shift_position, 0.0, 1.0);
     }
                                 );
 
+    //rendering
     std::string fragment_source = GLW_STRINGFY
                                   (
-                                      uniform sampler2D	u_tex;
-                                      uniform float		annotation;
-                                      varying vec2		o_texcoord;
+    uniform sampler2D   u_tex;
+    uniform vec4        current_color;
+    in vec2             v_tex_coord;
+    out vec4            f_color;
 
     void main(void) {
-        float shape = texture2D(u_tex, o_texcoord).x;
-        float shapeVal = shape * annotation;
-        gl_FragColor = vec4(shapeVal, shapeVal, shapeVal, shape);
+        float shape = texture2D(u_tex, v_tex_coord).x;
+        f_color = vec4(current_color * shape);
     }
                                   );
 
-    std::string prefix;
-    //prefix += glw::version("150");
-    //prefix += glw::ext_require("GL_EXT_gpu_shader4");
+    brushProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
-    brushProgram.setup(prefix, vertex_source, fragment_source);
-#ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", brushProgram.log().c_str());
-#endif
+    printf("[StrokeGL log]\n%s\n", brushProgram.log().c_str());
+    
     glw::bind_program(brushProgram);
-    brushProgram.uniform("u_tex",      0);
-    brushProgram.uniform("annotation", annotation);
+    brushProgram.attribute_source("a_position", 0);
+    brushProgram.attribute_source("a_tex_coord", 1);
+    brushProgram.fragment_target("f_color", 0);
+    brushProgram.relink();
+
+    brushProgram.uniform("u_tex", 0);
+    brushProgram.uniform("shift_position", 0.0f, 0.0f);
+    brushProgram.uniform("current_color", 1.0f, 1.0f, 1.0f, 1.0f);
+    glw::bind_program(0);
+
+    //Annotation
+    std::string fragment_source_annotation = GLW_STRINGFY
+                                  (
+    uniform sampler2D   u_tex;
+    uniform float       annotation;
+    in vec2             v_tex_coord;
+    out vec4            f_color;
+
+    void main(void) {
+        float shape = texture2D(u_tex, v_tex_coord).x;
+        float shapeVal = shape * annotation;
+        f_color = vec4(shapeVal, shapeVal, shapeVal, shape);
+    }
+                                  );
+
+    annotationProgram.setup(glw::version("330"), vertex_source, fragment_source_annotation);
+
+    printf("[StrokeGL log]\n%s\n", annotationProgram.log().c_str());
+
+
+    glw::bind_program(annotationProgram);
+    annotationProgram.attribute_source("a_position", 0);
+    annotationProgram.attribute_source("a_tex_coord", 1);
+    annotationProgram.fragment_target("f_color", 0);
+    annotationProgram.relink();
+
+    annotationProgram.uniform("u_tex", 0);
+    annotationProgram.uniform("shift_position", 0.0f, 0.0f);
+    annotationProgram.uniform("annotation", annotation);
     glw::bind_program(0);
 }
 
@@ -260,6 +312,7 @@ void StrokeGL::Resample()
     float workLen = 0.0f;
     int nSamples = int(len / (rSize * 0.25f));
     float deltaL = len / float(nSamples);
+
 #ifdef PIC_DEBUG
     printf("Len: %f Samples: %d DeltaL: %f\n", len, nSamples, deltaL);
 #endif
@@ -347,54 +400,97 @@ void StrokeGL::RenderBrushGL(int x, int y)
 {
     float xf = (x / float(width)  - 0.5f) * 2.0f;
     float yf = (y / float(height) - 0.5f) * 2.0f;
-    int halfBrushSize = brushSize >> 1;
-
-    float halfBrushSizeXf = float(halfBrushSize) / float(width);
-    float halfBrushSizeYf = float(halfBrushSize) / float(height);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
+
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, shape->getTexture());
 
-    #ifndef PIC_DISABLE_OPENGL_NON_CORE
-
-    glBegin(GL_QUADS);
-
+    glActiveTexture(GL_TEXTURE0);
+    shape->bindTexture();
+      
+    glw::bind_program(brushProgram);
+        
     if(annotation < 0.0f) {
-        glColor4f(1.0f - color[0], 1.0f - color[1], 1.0f - color[2], 1.0f);
+        brushProgram.uniform("current_color", 1.0f - color[0], 1.0f - color[1], 1.0f - color[2], 1.0f);
     } else {
-        glColor4f(color[0], color[1], color[2], 0.5f);
+        brushProgram.uniform("current_color", color[0], color[1], color[2], 0.5f);
     }
+    
+    brushProgram.uniform("shift_position", xf, yf);
 
-    glTexCoord2f(0.0, 0.0f);
-    glVertex2f(xf - halfBrushSizeXf,	yf - halfBrushSizeYf);
+    quad->Render();
 
-    glTexCoord2f(1.0, 0.0f);
-    glVertex2f(xf + halfBrushSizeXf,	yf - halfBrushSizeYf);
+    glw::bind_program(0);
 
-    glTexCoord2f(1.0, 1.0f);
-    glVertex2f(xf + halfBrushSizeXf,	yf + halfBrushSizeYf);
+    shape->unBindTexture();
 
-    glTexCoord2f(0.0, 1.0f);
-    glVertex2f(xf - halfBrushSizeXf,	yf + halfBrushSizeYf);
-
-    glEnd();
-    #endif
-    glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
+    glDisable(GL_TEXTURE_2D);
 }
 
 void StrokeGL::RenderGL()
 {
-    //glEnable(GL_POINT_SMOOTH);
-
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
     glEnable(GL_TEXTURE_2D);
+
+    glActiveTexture(GL_TEXTURE0);
+    shape->bindTexture();
+
     glBindTexture(GL_TEXTURE_2D, shape->getTexture());
 
-    #ifndef PIC_DISABLE_OPENGL_NON_CORE
+    glw::bind_program(brushProgram);
+
+    brushProgram.uniform("current_color", color[0], color[1], color[2], 1.0f);
+    const int n = size_t(positions.size());
+
+    for(int i = 0; i < n; i += 2) {
+        brushProgram.uniform("shift_position", positions[i], positions[i + 1]);
+        quad->Render();
+    }
+    glEnd();
+
+    glw::bind_program(0);
+
+    shape->unBindTexture();
+
+    glDisable(GL_BLEND);
+    glDisable(GL_TEXTURE_2D);
+}
+
+void StrokeGL::RenderAnnotationGL()
+{
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    glw::bind_program(annotationProgram);
+
+#ifdef PIC_DEBUG
+    printf("Annotation value: %f\n", annotation);
+#endif
+    annotationProgram.uniform("annotation",  annotation);
+
+    glEnable(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE0);
+    shape->bindTexture();
+
+    const int n = size_t(positions.size());
+
+    for(int i = 0; i < n; i += 2) {
+        annotationProgram.uniform("shift_position", positions[i], positions[i + 1]);
+        quad->Render();
+    }
+
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_TEXTURE_2D);
+    glw::bind_program(0);
+    glDisable(GL_BLEND);
+}
+
+/*
     if(bPointSprite) {
         glEnable(GL_POINT_SPRITE);
         glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
@@ -411,104 +507,9 @@ void StrokeGL::RenderGL()
 
         //glDisable(GL_POINT_SMOOTH);
         glDisable(GL_POINT_SPRITE);
-    } else {
-        int halfBrushSize = brushSize >> 1;
-        float halfBrushSizeXf = float(halfBrushSize) / float(width);
-        float halfBrushSizeYf = float(halfBrushSize) / float(height);
-
-        glBegin(GL_QUADS);
-        glColor3fv(color);
-        const int n = size_t(positions.size());
-
-        for(int i = 0; i < n; i += 2) {
-            glTexCoord2f(0.0, 0.0f);
-            glVertex2f(positions[i] - halfBrushSizeXf,	positions[i + 1] - halfBrushSizeYf);
-
-            glTexCoord2f(1.0, 0.0f);
-            glVertex2f(positions[i] + halfBrushSizeXf,	positions[i + 1] - halfBrushSizeYf);
-
-            glTexCoord2f(1.0, 1.0f);
-            glVertex2f(positions[i] + halfBrushSizeXf,	positions[i + 1] + halfBrushSizeYf);
-
-            glTexCoord2f(0.0, 1.0f);
-            glVertex2f(positions[i] - halfBrushSizeXf,	positions[i + 1] + halfBrushSizeYf);
-        }
-
-        glEnd();
-    }
-    #endif
-
-    glDisable(GL_TEXTURE_2D);
-    glDisable(GL_BLEND);
-}
-
-void StrokeGL::RenderAnnotationGL()
-{
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
-
-    glw::bind_program(brushProgram);
-#ifdef PIC_DEBUG
-    printf("Annotation value: %f\n", annotation);
-#endif
-    brushProgram.uniform("annotation",  annotation);
-
-    glEnable(GL_TEXTURE_2D);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, shape->getTexture());
-
-    int halfBrushSize = brushSize >> 1;
-    float halfBrushSizeXf = float(halfBrushSize) / float(width);
-    float halfBrushSizeYf = float(halfBrushSize) / float(height);
-
-    #ifndef PIC_DISABLE_OPENGL_NON_CORE
-    glBegin(GL_QUADS);
-    const int n = size_t(positions.size());
-
-    for(int i = 0; i < n; i += 2) {
-        glVertex2f(positions[i] - halfBrushSizeXf,	positions[i + 1] - halfBrushSizeYf);
-        glTexCoord2f(0.0, 0.0f);
-
-        glVertex2f(positions[i] + halfBrushSizeXf,	positions[i + 1] - halfBrushSizeYf);
-        glTexCoord2f(1.0, 0.0f);
-
-        glVertex2f(positions[i] + halfBrushSizeXf,	positions[i + 1] + halfBrushSizeYf);
-        glTexCoord2f(1.0, 1.0f);
-
-        glVertex2f(positions[i] - halfBrushSizeXf,	positions[i + 1] + halfBrushSizeYf);
-        glTexCoord2f(0.0, 1.0f);
-    }
-
-    glEnd();
-    #endif
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDisable(GL_TEXTURE_2D);
-    glw::bind_program(0);
-    glDisable(GL_BLEND);
-}
-
-/*
-void RenderBrush(){
-	glEnable(GL_POINT_SMOOTH);
-	fboBrush->bind();
-	glClearColor(0.0f,0.0f,0.0f,1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(0,0,(GLsizei)image.width,(GLsizei)image.height);
-
-	glPointSize(140.0f);
-	glBegin(GL_POINTS);
-	const int n = size_t(positions.size());
-	for(int i=0;i<n;i+=2){
-		glVertex2f(positions[i+0],positions[i+1]);
-	}
-	glEnd();
-
-	glDisable(GL_POINT_SMOOTH);
-};
 */
+
 
 } // end namespace pic
 
 #endif /* PIC_UTIL_GL_STROKE_HPP */
-

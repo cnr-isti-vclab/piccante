@@ -46,9 +46,9 @@ public:
         vbo[1] = 0;
     }
 
-    QuadGL(bool bTextureCoordinates)
+    QuadGL(bool bTextureCoordinates, float halfSizeX = 1.0f, float halfSizeY = 1.0f)
     {
-        Init(bTextureCoordinates);
+        Init(bTextureCoordinates, halfSizeX, halfSizeY);
     }
 
     ~QuadGL()
@@ -70,9 +70,9 @@ public:
      * @brief Init initializates the QuadGL by allocating memory on the GPU.
      * @param bTextCoordinates
      */
-    void Init(bool bTexCoordinates)
+    void Init(bool bTexCoordinates, float halfSizeX = 1.0f, float halfSizeY = 1.0f)
     {
-        float *data_pos = CreatePosCoord();
+        float *data_pos = CreatePosCoord(halfSizeX, halfSizeY);
 
         if(bTexCoordinates) {
             float *data_tex = CreateTexCoord();
@@ -142,21 +142,21 @@ public:
      * @brief CreatePosCoord allocates memory for a position buffer.
      * @return
      */
-    static float *CreatePosCoord()
+    static float *CreatePosCoord(float halfSizeX = 1.0f, float halfSizeY = 1.0f)
     {
         float *data = new float[8];
 
-        data[0] = -1.0f;
-        data[1] =  1.0f;
+        data[0] = -halfSizeX;
+        data[1] =  halfSizeY;
 
-        data[2] = -1.0f;
-        data[3] = -1.0f;
+        data[2] = -halfSizeX;
+        data[3] = -halfSizeY;
 
-        data[4] =  1.0f;
-        data[5] =  1.0f;
+        data[4] =  halfSizeX;
+        data[5] =  halfSizeY;
 
-        data[6] =  1.0f;
-        data[7] = -1.0f;
+        data[6] =  halfSizeX;
+        data[7] = -halfSizeY;
         return data;
     }
 
@@ -290,7 +290,7 @@ public:
      * @param vp_src
      * @param fp_src
      */
-    static void getProgram(glw::program &ret, std::string vp_src = "", std::string fp_src = "")
+    static void getProgram(glw::program &ret, std::string vp_src = "", std::string fp_src = "", bool bTextureCoordinates = false)
     {
         if(vp_src.empty() || fp_src.empty()) {
             ret.setup(glw::version("330"), getVertexProgramV3(), getFragmentProgram());
@@ -304,10 +304,13 @@ public:
 
         glw::bind_program(ret);
         ret.attribute_source("a_position", 0);
-        ret.fragment_target("f_color",    0);
-        glw::bind_program(0);
 
-        glw::bind_program(ret);
+        if(bTextureCoordinates) {
+            ret.attribute_source("a_tex_coord", 1);
+        }
+
+        ret.fragment_target("f_color",    0);
+
         ret.relink();
         ret.uniform("u_tex", 0);
         glw::bind_program(0);
