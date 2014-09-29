@@ -45,19 +45,11 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("OK\n");
 
-        //Adding black pixels to the image
-        int n = img.nPixels() / 10;
+        pic::ImageRAW img_black(1, 32, 32, 3);
+        img_black.SetZero();
 
-        for(int i = 0; i < n; i++) {
-            int x = rand() % img.width;
-            int y = rand() % img.height;
-
-            float *data = img(x, y);
-
-            for(int i = 0; i < img.channels; i++) {
-                data[i] = 0.0f;
-            }
-        }
+        //Adding a hole in the image
+        img.CopySubImage(&img_black, 292, 130);
 
         img.Write("../data/output/bottles_black_pixels_pp.hdr");
 
