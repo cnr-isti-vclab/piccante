@@ -31,6 +31,7 @@ See the GNU Lesser General Public License
 #include "filtering/filter_up_pp.hpp"
 #include "filtering/filter_integral_image.hpp"
 #include "filtering/filter_reconstruct.hpp"
+#include "filtering/filter_local_extrema.hpp"
 #include "filtering/filter_warp_2d.hpp"
 #include "filtering/filter_absolute_difference.hpp"
 #include "filtering/filter_anisotropic_diffusion.hpp"
