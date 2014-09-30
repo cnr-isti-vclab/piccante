@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 
         printf("Descriptor size: %d\n", n);
 
-        for(unsigned int i =0; i<descs0.size(); i++) {
+        for(unsigned int i = 0; i < descs0.size(); i++) {
 
             unsigned int dist_1 = 0;
             unsigned int dist_2 = 0;
