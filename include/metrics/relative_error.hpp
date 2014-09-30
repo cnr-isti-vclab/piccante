@@ -47,14 +47,14 @@ double RelativeError(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = fals
     double relErr = 0.0f;
     int count = 0;
 
-    float largeDifferences = C_LARGE_DIFFERENCES;
+    float largeDifferences = C_LARGE_DIFFERENCESf;
     if(!bLargeDifferences) {
         largeDifferences = FLT_MAX;
     }
 
     for(int i = 0; i < size; i++) {
-        double valO = ori->data[i];
-        double valC = cmp->data[i];
+        double valO = double(ori->data[i]);
+        double valC = double(cmp->data[i]);
 
         double delta = fabs(valO - valC);
 

@@ -30,6 +30,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLDragoTMO class
+ */
 class FilterGLDragoTMO: public FilterGL
 {
 protected:
@@ -37,62 +40,50 @@ protected:
     float constant1, constant2;
     bool bGammaCorrection;
 
+    /**
+     * @brief ComputeConstants
+     */
     void ComputeConstants();
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLDragoTMO
+     */
     FilterGLDragoTMO();
-    //Init constructors
+
+    /**
+     * @brief FilterGLDragoTMO
+     * @param Ld_Max
+     * @param b
+     * @param LMax
+     * @param Lwa
+     * @param bGammaCorrection
+     */
     FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
                      bool bGammaCorrection);
 
     void Update(float Ld_Max, float b, float LMax);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
-
-    static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgLum, ImageRAWGL *imgOut,
-                               float Ld_Max = 100.0f, float b = 0.95f)
-    {
-        imgIn->generateTextureGL(false);
-
-        imgLum = FilterGLLuminance::Execute(imgIn, imgLum);
-
-        imgLum->loadToMemory();
-
-        float LMax = imgLum->getMaxVal()[0];
-        float Lwa  = imgLum->getLogMeanVal()[0];
-        
-        FilterGLDragoTMO filter(Ld_Max, b, LMax, Lwa, false);
-
-        imgOut = filter.Process(DoubleGL(imgIn, imgLum), imgOut);
-
-        return imgOut;
-    }
-
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut,
-                               float Ld_Max = 100.0f, float b = 0.95f)
-    {
-        ImageRAWGL imgIn(nameIn);
-
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 4,
-                                            IMG_GPU_CPU);
-
-
-        imgOut = Execute(&imgIn, NULL, imgOut, Ld_Max, b);
-
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
 };
 
-//Basic constructor
 FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()
 {
     Ld_Max	=  100.0f;
@@ -106,7 +97,6 @@ FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()
     InitShaders();
 }
 
-//Init constructors
 FilterGLDragoTMO::FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
                                    bool bGammaCorrection = false): FilterGL()
 {
@@ -141,7 +131,6 @@ FilterGLDragoTMO::FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
     InitShaders();
 }
 
-//BUG: tn_gamma and tn_exposure are not set!!
 void FilterGLDragoTMO::FragmentShader()
 {
     fragment_source = GLW_STRINGFY
@@ -176,19 +165,16 @@ void FilterGLDragoTMO::ComputeConstants()
 {
     Lwa_scaled  = Lwa / powf(1.0f + b - 0.85f, 5.0f);
     LMax_scaled = LMax / Lwa_scaled;
-    constant1   = log(b) / log(0.5);
+    constant1   = logf(b) / logf(0.5f);
     constant2   = (Ld_Max / 100.0f) / (log10(1 + LMax_scaled));
 }
 
 void FilterGLDragoTMO::InitShaders()
 {
-    std::string prefix;
-    prefix += glw::version("150");
-//	prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLDragoTMO log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
@@ -231,7 +217,6 @@ void FilterGLDragoTMO::Update(float Ld_Max, float b, float LMax)
     glw::bind_program(0);   
 }
 
-//Processing
 ImageRAWGL *FilterGLDragoTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn.size()<2) {
@@ -246,7 +231,7 @@ ImageRAWGL *FilterGLDragoTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     //Fbo

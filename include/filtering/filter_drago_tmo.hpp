@@ -30,27 +30,56 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterDragoTMO class
+ */
 class FilterDragoTMO: public Filter
 {
 protected:
     float constant1, constant2, Lw_Max_scaled, Lw_a_scaled;
     float b, Ld_Max, Lw_Max, Lw_a;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
 
-    //SetupAux
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterDragoTMO
+     */
     FilterDragoTMO();
+
+    /**
+     * @brief FilterDragoTMO
+     * @param Ld_Max
+     * @param b
+     * @param Lw_Max
+     * @param Lwa
+     */
     FilterDragoTMO(float Ld_Max, float b, float Lw_Max, float Lwa);
 
+    /**
+     * @brief Update
+     * @param Ld_Max
+     * @param b
+     * @param Lw_Max
+     * @param Lwa
+     */
     void Update(float Ld_Max, float b, float Lw_Max, float Lwa);
 };
 
-//Basic constructors
 FilterDragoTMO::FilterDragoTMO()
 {
     Update(100.0f, 0.95f, 1e6f, 0.5f);
@@ -95,7 +124,7 @@ void FilterDragoTMO::Update(float Ld_Max, float b, float Lw_Max,
     Lw_a_scaled  = this->Lw_a / powf(1.0f + b - 0.85f, 5.0f);
     Lw_Max_scaled = this->Lw_Max / Lw_a_scaled;
 
-    constant1 = log(b) / log(0.5);
+    constant1 = logf(b) / logf(0.5f);
     constant2 = (Ld_Max / 100.0f) / (log10f(1.0f + Lw_Max_scaled));
 }
 
@@ -115,7 +144,6 @@ ImageRAW *FilterDragoTMO::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
     return imgOut;
 }
 
-//Process in a box
 void FilterDragoTMO::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 {
     int channels = src[0]->channels;
@@ -132,7 +160,7 @@ void FilterDragoTMO::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
                 float L_scaled = dataLum[0] / Lw_a_scaled;
 
                 float tmp	= powf((L_scaled / Lw_Max_scaled), constant1);
-                float Ld	= constant2 * logf(1.0 + L_scaled) / logf(2.0f + 8.0f * tmp);
+                float Ld	= constant2 * logf(1.0f + L_scaled) / logf(2.0f + 8.0f * tmp);
 
                 for(int k = 0; k < channels; k++) {
                     dataOut[k] = (dataIn[k] * Ld) / dataLum[0];

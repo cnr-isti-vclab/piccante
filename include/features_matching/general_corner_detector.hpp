@@ -142,7 +142,7 @@ public:
             ret[2] += sqrtf(dx * dx + dy * dy);
         }
 
-        ret[2] = ret[2] / n / sqrt(2.0);
+        ret[2] = ret[2] / n / sqrtf(2.0f);
 
         for(unsigned int i = 0; i < points.size(); i++) {
             points[i][0] -= ret[0];

@@ -29,38 +29,31 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLAnaglyph class
+ */
 class FilterGLAnaglyph: public FilterGL
 {
 protected:
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterGLAnaglyph
+     */
     FilterGLAnaglyph();
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
-
-    static ImageRAWGL *Execute(std::string nameLeft, std::string nameRight,
-                               std::string nameOut)
-    {
-        ImageRAWGL imgLeft(nameLeft);
-        ImageRAWGL imgRight(nameRight);
-
-        imgLeft.generateTextureGL(false);
-        imgRight.generateTextureGL(false);
-
-        FilterGLAnaglyph filter;
-
-        //ImageRAWGL *imgRet = filter.Process(DoubleGL(&imgLeft, &imgRight), NULL);
-
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgLeft.width, imgLeft.height, 4,
-                                            IMG_CPU);
-        imgOut->readFromFBO(filter.getFbo());
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
 };
 
 FilterGLAnaglyph::FilterGLAnaglyph(): FilterGL()
@@ -91,14 +84,13 @@ void FilterGLAnaglyph::InitShaders()
     }
                       );
 
-    std::string prefix;
-    prefix += glw::version("150");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
 
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
+
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
 #endif
+
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
@@ -119,7 +111,7 @@ ImageRAWGL *FilterGLAnaglyph::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

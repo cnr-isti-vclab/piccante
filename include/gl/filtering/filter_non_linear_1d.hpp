@@ -1,0 +1,179 @@
+/*
+
+PICCANTE
+The hottest HDR imaging library!
+http://vcg.isti.cnr.it/piccante
+
+Copyright (C) 2014
+Visual Computing Laboratory - ISTI CNR
+http://vcg.isti.cnr.it
+First author: Francesco Banterle
+
+PICCANTE is free software; you can redistribute it and/or modify
+under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation; either version 3.0 of
+the License, or (at your option) any later version.
+
+PICCANTE is distributed in the hope that it will be useful, but
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License
+( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+
+*/
+
+#ifndef PIC_GL_FILTERING_FILTER_NON_LINEAR_1D_HPP
+#define PIC_GL_FILTERING_FILTER_NON_LINEAR_1D_HPP
+
+#include "gl/filtering/filter_1d.hpp"
+
+namespace pic {
+
+/**
+ * @brief The FilterGLNonLinear1D class
+ */
+class FilterGLNonLinear1D: public FilterGL1D
+{
+protected:
+    int kernelSize, halfKernelSize;
+    std::string acc_operator;
+
+    /**
+     * @brief FragmentShader
+     * @param weights
+     * @param direction
+     * @param target
+     */
+    void FragmentShader(ImageRAWGL *weights, int direction, GLenum target)
+    {
+        std::string fragment_source_2D = GLW_STRINGFY
+                                         (
+                                             uniform sampler2D	u_tex;
+                                             uniform int        iX;
+                                             uniform int        iY;
+                                             uniform int        halfKernelSize;
+                                             uniform int        kernelSize;
+                                             out     vec4		f_color;
+
+        void main(void) {
+            ivec2 coordsFrag = ivec2(gl_FragCoord.xy);
+            vec4 tmpCol;
+
+            //Texture fetch
+            ivec2 coords = ivec2(-halfKernelSize * iX, -halfKernelSize * iY);
+            vec4 color = texelFetch(u_tex, coordsFrag.xy + coords.xy, 0);
+
+            for(int i = 1; i < kernelSize; i++) {
+                //Coordinates
+                int j = i - halfKernelSize;
+                ivec2 coords = ivec2(j * iX, j * iY);
+                //Texture fetch
+                tmpCol = texelFetch(u_tex, coordsFrag.xy + coords.xy, 0);
+                color = _ACC_FUNCTION(color, tmpCol);
+            }
+
+            f_color = color;
+        }
+                                         );
+
+        std::string fragment_source_3D = GLW_STRINGFY
+                                         (
+                                             uniform sampler3D  u_tex;
+                                             uniform int        slice;
+                                             uniform int        iX;
+                                             uniform int        iY;
+                                             uniform int        iZ;
+                                             uniform int        halfKernelSize;
+                                             uniform int        kernelSize;
+                                             out     vec4       f_color;
+
+        void main(void) {
+            vec4  color = vec4(0.0);
+            ivec3 coordsFrag = ivec3(ivec2(gl_FragCoord.xy), slice);
+            vec4 tmpCol;
+
+            for(int i = 0; i < kernelSize; i++) {
+                //Coordinates
+                int j = i - halfKernelSize;
+                ivec3 coords = coordsFrag.xyz + ivec3(j * iX, j * iY, j * iZ);
+                //Texture fetch
+                tmpCol = texelFetch(u_tex, coords.xyz, 0);
+                color = _ACC_FUNCTION(color, tmpCol);
+            }
+
+            f_color = color;
+        }
+                                         );
+
+        switch(target) {
+        case GL_TEXTURE_2D: {
+            fragment_source = fragment_source_2D;
+        }
+        break;
+
+        case GL_TEXTURE_3D: {
+            fragment_source = fragment_source_3D;
+        }
+        break;
+        }
+
+        size_t I_found = fragment_source.find("_ACC_FUNCTION");
+
+        if(I_found != std::string::npos) {
+                fragment_source.replace(I_found, 13, acc_operator);
+        }
+    }
+
+public:
+
+    /**
+     * @brief FilterGLNonLinear1D
+     */
+    FilterGLNonLinear1D(int kernelSize, std::string acc_operator) : FilterGL1D(0, GL_TEXTURE_2D)
+    {
+        this->acc_operator = acc_operator;
+
+        Setup(kernelSize);
+
+        FragmentShader(NULL, 0, GL_TEXTURE_2D);
+        InitShaders();
+    }
+
+    ~FilterGLNonLinear1D()
+    {
+
+    }
+
+    /**
+     * @brief SetUniformAux
+     */
+    void SetUniformAux()
+    {
+        filteringProgram.uniform("halfKernelSize", halfKernelSize);
+        filteringProgram.uniform("kernelSize", kernelSize);
+    }
+
+    /**
+     * @brief Setup
+     * @param kernelSize
+     */
+    void Setup(int kernelSize)
+    {
+        if(kernelSize < 1) {
+            kernelSize = 3;
+        }
+
+        if((kernelSize % 2) == 0) {
+            kernelSize++;
+        }
+
+        this->kernelSize = kernelSize;
+        halfKernelSize = kernelSize >> 1;
+    }
+};
+
+
+} // end namespace pic
+
+#endif /* PIC_GL_FILTERING_FILTER_NON_LINEAR_1D_HPP */
+

@@ -25,9 +25,23 @@
 #ifndef CLASS_OPENGL_WINDOW_HPP
 #define CLASS_OPENGL_WINDOW_HPP
 
+#ifndef PIC_DISABLE_QT
+
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
+#include <QtGui/QWindow>
+
+#include <QtCore/QCoreApplication>
+#include <QtGui/QPainter>
+#include <QOpenGLFunctions>
+
+#ifdef PIC_WIN32
+    #define PIC_DISABLE_OPENGL_NON_CORE
+    #include "../opengl_common_code/gl_core_4_0.h"
+#endif
+
 namespace pic {
 
-#ifndef PIC_DISABLE_QT
 /**
  * @brief The OpenGLWindow class
  */
@@ -88,11 +102,6 @@ public:
         , device(0)
     {
         setSurfaceType(QWindow::OpenGLSurface);
-    }
-
-    ~OpenGLWindow()
-    {
-        delete device;
     }
 
     /**
@@ -171,6 +180,13 @@ public slots:
 
         if(toInit) {
             initializeOpenGLFunctions();
+
+            #ifdef PIC_WIN32
+                if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+                    printf("OpenGL functions are not loaded!\n");
+                }
+            #endif
+
             init();
         }
 
@@ -183,8 +199,8 @@ public slots:
     }
 };
 
-#endif
-
 }  // end namespace pic
+
+#endif
 
 #endif // CLASS_OPENGL_WINDOW_HPP

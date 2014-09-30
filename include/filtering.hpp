@@ -27,6 +27,8 @@ See the GNU Lesser General Public License
 #define PIC_FILTERING_HPP
 
 #include "filtering/filter.hpp"
+#include "filtering/filter_down_pp.hpp"
+#include "filtering/filter_up_pp.hpp"
 #include "filtering/filter_integral_image.hpp"
 #include "filtering/filter_reconstruct.hpp"
 #include "filtering/filter_warp_2d.hpp"

@@ -25,39 +25,76 @@ See the GNU Lesser General Public License
 #ifndef PIC_GL_FILTERING_FILTER_LUMINANCE_HPP
 #define PIC_GL_FILTERING_FILTER_LUMINANCE_HPP
 
+#include "filtering/filter_luminance.hpp"
 #include "gl/filtering/filter.hpp"
 
 namespace pic {
 
+/**
+ * @brief The FilterGLLuminance class
+ */
 class FilterGLLuminance: public FilterGL
 {
 protected:
 
+    LUMINANCE_TYPE type;
+    float weights[3];
+
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterGLLuminance
+     */
     FilterGLLuminance();
 
-    //Processing
+    /**
+     * @brief FilterGLLuminance
+     */
+    FilterGLLuminance(LUMINANCE_TYPE type);
+
+    /**
+     * @brief Update
+     * @param type
+     */
+    void Update(LUMINANCE_TYPE type);
+
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgOut)
     {
-        FilterGLLuminance filter;
+        FilterGLLuminance filter(LT_CIE_LUMINANCE);
         imgOut = filter.Process(SingleGL(imgIn), imgOut);
         return imgOut;
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @return
+     */
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 1, IMG_CPU);
-
-        imgOut = Execute(&imgIn, imgOut);
-
+        ImageRAWGL *imgOut = Execute(&imgIn, NULL);
 
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
@@ -67,6 +104,15 @@ public:
 
 FilterGLLuminance::FilterGLLuminance(): FilterGL()
 {
+    this->type = LT_CIE_LUMINANCE;
+
+    InitShaders();
+}
+
+FilterGLLuminance::FilterGLLuminance(LUMINANCE_TYPE type): FilterGL()
+{
+    this->type = type;
+
     InitShaders();
 }
 
@@ -75,42 +121,78 @@ void FilterGLLuminance::InitShaders()
     fragment_source = GLW_STRINGFY
                       (
     uniform sampler2D u_tex; \n
-    out     vec4      f_color; \n
-    const vec3 LUM_XYZ =   vec3(0.213, 0.715,  0.072); \n
+    uniform vec3 weights; \n
+    out     vec4 f_color; \n
     \n
     void main(void) {
         \n
-        ivec2 coords = ivec2(gl_FragCoord.xy);\n
-        \n
-        vec3  color = texelFetch(u_tex, coords, 0).xyz;\n
-        \n
-        float L = dot(color, LUM_XYZ);\n
-        f_color = vec4(L, L, L, 1.0);\n
+        ivec2 coords = ivec2(gl_FragCoord.xy); \n
+        vec3 color = texelFetch(u_tex, coords, 0).xyz; \n
+        float L = dot(color, weights); \n
+        f_color = vec4(L, L, L, 1.0); \n
         \n
     }
                       );
 
-    std::string prefix;
-    prefix += glw::version("150");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLLuminance log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
-    filteringProgram.fragment_target("f_color",    0);
+    filteringProgram.fragment_target("f_color", 0);
     filteringProgram.relink();
-    filteringProgram.uniform("u_tex",      0);
+    glw::bind_program(0);
+
+    Update(type);
+}
+
+void FilterGLLuminance::Update(LUMINANCE_TYPE type)
+{
+    this->type = type;
+
+    switch(type)
+    {
+    case LT_WARD_LUMINANCE:
+        {
+            weights[0] = 54.0f  / 256.0f;
+            weights[1] = 183.0f / 256.0f;
+            weights[2] = 19.0f  / 256.0f;
+        }
+        break;
+
+    case LT_CIE_LUMINANCE:
+        {
+            weights[0] = 0.213f;
+            weights[1] = 0.715f;
+            weights[2] = 0.072f;
+        }
+        break;
+
+    case LT_MEAN:
+        {
+            float inv_3 = 1.0f / 3.0f;
+            weights[0] = inv_3;
+            weights[1] = inv_3;
+            weights[2] = inv_3;
+        }
+        break;
+    }
+
+    glw::bind_program(filteringProgram);
+    filteringProgram.uniform("u_tex", 0);
+    filteringProgram.uniform("weights", weights[0], weights[1], weights[2]);
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLLuminance::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
+    if(imgIn.empty()) {
+        return imgOut;
+    }
+
     if(imgIn[0] == NULL) {
         return imgOut;
     }
@@ -123,7 +205,7 @@ ImageRAWGL *FilterGLLuminance::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, 1, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, 1, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

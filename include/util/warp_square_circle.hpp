@@ -36,15 +36,15 @@ void WarpSquareCircle(float x, float y, float *xo, float *yo)
 //	float b = 2*O.y - 1;
     if(x * x > y * y) {
         r = x;
-        phi = (C_PI / 4.0) * (y / x);
+        phi = (C_PI / 4.0f) * (y / x);
     } else {
         r = y;
-        phi = (C_PI / 4.0) * (x / y) + (C_PI / 2.0);
+        phi = (C_PI / 4.0f) * (x / y) + (C_PI / 2.0f);
     }
 
     *xo = r * cos(phi);
     *yo = r * sin(phi);
-};
+}
 
 } // end namespace pic
 

@@ -45,6 +45,7 @@ See the GNU Lesser General Public License
 namespace pic {
 
 const double HARMONIC_MEAN_EPSILON = 1e-6;
+const float  HARMONIC_MEAN_EPSILONf = 1e-6f;
 
 /**
  * @brief The Image class stores an image as buffer of float.
@@ -91,7 +92,7 @@ public:
 
     int tstride, ystride, xstride;
 
-    float widthf, width1f, heightf, height1f;
+    float widthf, width1f, heightf, height1f, framesf, frames1f;
 
     std::string nameFile;
 
@@ -817,6 +818,8 @@ PIC_INLINE void Image::AllocateAux()
     this->width1f  = float(width - 1);
     this->heightf  = float(height);
     this->height1f = float(height - 1);
+    this->framesf  = float(frames);
+    this->frames1f = float(frames -1);
 
     CalculateStrides();
 }
@@ -1617,7 +1620,7 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
                 float *tmp_data = (*this)(i, j, k);
 
                 for(int l = 0; l < channels; l++) {
-                    ret[l] += logf(tmp_data[l] + HARMONIC_MEAN_EPSILON);
+                    ret[l] += logf(tmp_data[l] + HARMONIC_MEAN_EPSILONf);
                 }
             }
         }

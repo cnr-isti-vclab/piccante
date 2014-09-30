@@ -31,6 +31,9 @@ namespace pic {
 
 #define DEBUG_GL
 
+/**
+ * @brief The FilterGLDisp class
+ */
 class FilterGLDisp: public FilterGL
 {
 protected:
@@ -39,6 +42,9 @@ protected:
     float sigma_s;
     float sigma_r;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
 public:
@@ -60,9 +66,9 @@ public:
         ImageRAWGL imgR(nameRight);
         ImageRAWGL imgD(nameDisp);
 
-        imgL.generateTextureGL(false);
-        imgR.generateTextureGL(false);
-        imgD.generateTextureGL(false);
+        imgL.generateTextureGL(false, GL_TEXTURE_2D);
+        imgR.generateTextureGL(false, GL_TEXTURE_2D);
+        imgD.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLDisp filter;
 
@@ -182,8 +188,8 @@ void FilterGLDisp::InitShaders()
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
 
-    float sigma_s2 = 2.0 * sigma_s * sigma_s;
-    float sigma_r2 = 2.0 * sigma_r * sigma_r;
+    float sigma_s2 = 2.0f * sigma_s * sigma_s;
+    float sigma_r2 = 2.0f * sigma_r * sigma_r;
     int halfKernelSize = PrecomputedGaussian::KernelSize(sigma_s) >> 1;
 
     filteringProgram.uniform("sigma_s2",	sigma_s2);
@@ -209,8 +215,8 @@ void FilterGLDisp::Update(float sigma, float sigma_s, float sigma_r, bool bUse,
 
     int halfKernelSize = PrecomputedGaussian::KernelSize(sigma_s) >> 1;
 
-    float sigma_s2 = 2.0 * sigma_s * sigma_s;
-    float sigma_r2 = 2.0 * sigma_r * sigma_r;
+    float sigma_s2 = 2.0f * sigma_s * sigma_s;
+    float sigma_r2 = 2.0f * sigma_r * sigma_r;
 
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_texL",      0);
@@ -251,7 +257,7 @@ ImageRAWGL *FilterGLDisp::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

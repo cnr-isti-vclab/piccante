@@ -29,26 +29,39 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLGradient class
+ */
 class FilterGLGradient: public FilterGL
 {
 protected:
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
 public:
-    //Basic constructors
+
+    /**
+     * @brief FilterGLGradient
+     */
     FilterGLGradient();
 
-    //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
-
-    //Execute
-
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @return
+     */
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLGradient filter;
 
@@ -64,7 +77,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLGradient::FilterGLGradient(): FilterGL()
 {
     //protected values are assigned/computed
@@ -81,18 +93,13 @@ void FilterGLGradient::FragmentShader()
 
     void main(void) {
         \n
-        ivec2 coords = ivec2(gl_FragCoord.xy);
-        \n
-        vec3  c0 = texelFetch(u_tex, coords + ivec2(1, 0), 0).xyz;
-        \n
-        vec3  c1 = texelFetch(u_tex, coords - ivec2(1, 0), 0).xyz;
-        \n
-        vec3  c2 = texelFetch(u_tex, coords + ivec2(0, 1), 0).xyz;
-        \n
-        vec3  c3 = texelFetch(u_tex, coords - ivec2(0, 1), 0).xyz;
-        \n
-        vec3 Gx = c1 - c0; //X gradient
-        vec3 Gy = c2 - c3; //Y gradient
+        ivec2 coords = ivec2(gl_FragCoord.xy); \n
+        vec3  c0 = texelFetch(u_tex, coords + ivec2(1, 0), 0).xyz; \n
+        vec3  c1 = texelFetch(u_tex, coords - ivec2(1, 0), 0).xyz; \n
+        vec3  c2 = texelFetch(u_tex, coords + ivec2(0, 1), 0).xyz; \n
+        vec3  c3 = texelFetch(u_tex, coords - ivec2(0, 1), 0).xyz; \n
+        vec3 Gx = c1 - c0; \n
+        vec3 Gy = c2 - c3; \n
         f_color = vec4(sqrt(Gx.xyz * Gx.xyz + Gy.xyz * Gy.xyz), 1.0); //Magnitude
     }\n
                       );
@@ -116,52 +123,6 @@ void FilterGLGradient::InitShaders()
     filteringProgram.relink();
     filteringProgram.uniform("u_tex",      0);
     glw::bind_program(0);
-}
-
-//Processing
-ImageRAWGL *FilterGLGradient::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    glw::bind_program(filteringProgram);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    glw::bind_program(0);
-
-    //Textures
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

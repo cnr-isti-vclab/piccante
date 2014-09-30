@@ -31,37 +31,41 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
-    ImageRAW *ColorToGray(ImageRAW *imgIn, ImageRAW *imgOut)
-    {
-        if(imgIn == NULL){
-            return imgOut;
-        }
-
-        if(imgOut == NULL){
-            imgOut = new ImageRAW(1, imgIn->width, imgIn->height, 1);
-        }
-
-        ImageRAWVec img_vec;
-        ImageRAWVec input = Single(imgIn);
-
-        FilterChannel flc(0);
-        int channels = imgIn->channels;
-        for(int i=0; i<channels; i++) {
-            flc.setChannel(i);
-
-            img_vec.push_back(flc.ProcessP(input, NULL));
-        }
-
-        imgOut = ExposureFusion(img_vec, imgOut, 1.0f, 1.0f, 0.0f);
-
-        for(int i=0; i<channels; i++) {
-            delete img_vec[i];
-        }
-
+/**
+ * @brief ColorToGray
+ * @param imgIn
+ * @param imgOut
+ * @return
+ */
+ImageRAW *ColorToGray(ImageRAW *imgIn, ImageRAW *imgOut)
+{
+    if(imgIn == NULL){
         return imgOut;
     }
 
+    if(imgOut == NULL){
+        imgOut = new ImageRAW(1, imgIn->width, imgIn->height, 1);
+    }
+
+    ImageRAWVec img_vec;
+    ImageRAWVec input = Single(imgIn);
+
+    FilterChannel flc(0);
+    int channels = imgIn->channels;
+    for(int i = 0; i < channels; i++) {
+        flc.setChannel(i);
+        img_vec.push_back(flc.ProcessP(input, NULL));
+    }
+
+    imgOut = ExposureFusion(img_vec, imgOut, 1.0f, 1.0f, 0.0f);
+
+    for(int i=0; i<channels; i++) {
+        delete img_vec[i];
+    }
+    return imgOut;
+}
+
 } // end namespace pic
 
-#endif /* PIC_ALGORITHMS_CALCULATE_DIVERGENCE_HPP */
+#endif /* PIC_ALGORITHMS_COLOR_TO_GRAY_HPP */
 

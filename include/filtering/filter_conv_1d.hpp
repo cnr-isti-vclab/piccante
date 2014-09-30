@@ -37,22 +37,67 @@ protected:
     float				*data;
     int					n;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
 
 public:
-    //Basic constructor
-    FilterConv1D(float *data, int n);
+
+    /**
+     * @brief FilterConv1D
+     */
+    FilterConv1D();
+
+    /**
+     * @brief FilterConv1D
+     * @param data
+     * @param n
+     * @param direction
+     */
+    FilterConv1D(float *data, int n, int direction);
+
     ~FilterConv1D();
 
-    //Change data for this pass
+    /**
+     * @brief Init
+     * @param data
+     * @param n
+     * @param direction
+     */
+    void Init(float *data, int n, int direction);
+
+    /**
+     * @brief ChangePass
+     * @param pass
+     * @param tPass
+     */
     void ChangePass(int pass, int tPass);
+
+    /**
+     * @brief ChangePass
+     * @param x
+     * @param y
+     * @param z
+     */
     void ChangePass(int x, int y, int z);
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param data
+     * @param n
+     * @param XorY
+     * @return
+     */
     static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float *data, int n,
                              bool XorY = true)
     {
-        FilterConv1D filter(data, n);
+        FilterConv1D filter(data, n, 0);
 
         if(XorY) {
             filter.ChangePass(1, 0, 0);
@@ -63,14 +108,26 @@ public:
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    /** */
-    static float *getFilterMean(int kernelSize) 
+    /**
+     * @brief getKernelMean creates an 1D mean kernel.
+     * @param kernelSize
+     * @return
+     */
+    static float *getKernelMean(int kernelSize)
     {
+        if(kernelSize < 3) {
+            kernelSize = 3;
+        }
+        
+        if((kernelSize % 2) == 0) {
+            kernelSize++;
+        }
+        
         float *kernel = new float[kernelSize];
 
-        float val = 1.0f/float(kernelSize);
+        float val = 1.0f / float(kernelSize);
 
-        for(int i=0;i<kernelSize;i++) {
+        for(int i = 0; i < kernelSize; i++) {
             kernel[i] = val;
         }
 
@@ -78,8 +135,22 @@ public:
     }
 };
 
-//Basic constructor
-FilterConv1D::FilterConv1D(float *data, int n)
+FilterConv1D::FilterConv1D()
+{
+    n = 0;
+    data = NULL;
+
+    dirs[0] = 0;
+    dirs[1] = 0;
+    dirs[2] = 0;
+}
+
+FilterConv1D::FilterConv1D(float *data, int n, int direction = 0)
+{
+    Init(data, n, direction);
+}
+
+void FilterConv1D::Init(float *data, int n, int direction)
 {
     if(data == NULL || n < 0) {
         return;
@@ -88,9 +159,9 @@ FilterConv1D::FilterConv1D(float *data, int n)
     this->data = data;
     this->n = n;
 
-    dirs[0] = 1;
-    dirs[1] = 0;
-    dirs[2] = 0;
+    dirs[ direction      % 3] = 1;
+    dirs[(direction + 1) % 3] = 0;
+    dirs[(direction + 2) % 3] = 0;
 }
 
 FilterConv1D::~FilterConv1D()
@@ -99,10 +170,8 @@ FilterConv1D::~FilterConv1D()
     n = -1;
 }
 
-//Change data for this pass
 void FilterConv1D::ChangePass(int pass, int tPass)
 {
-
     int tMod;
 
     if(tPass > 1) {
@@ -121,8 +190,10 @@ void FilterConv1D::ChangePass(int pass, int tPass)
     for(int i = 1; i < tMod; i++) {
         dirs[(pass + i) % tMod] = 0;
     }
-
-//	printf("%d %d %d\n",dirs[0],dirs[1],dirs[2]);
+    
+    #ifdef PIC_DEBUG
+        printf("%d %d %d\n",dirs[0],dirs[1],dirs[2]);
+    #endif
 }
 
 void FilterConv1D::ChangePass(int x, int y, int z)
@@ -132,7 +203,6 @@ void FilterConv1D::ChangePass(int x, int y, int z)
     dirs[2] = z;
 }
 
-//Process in a box
 void FilterConv1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 {
     int channels = dst->channels;

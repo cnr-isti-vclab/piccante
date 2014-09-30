@@ -139,10 +139,9 @@ void FilterBilateral2DAS::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
     int channels = dst->channels;
 
     //Filtering
-    double Gauss1, Gauss2;
-    double I_val[3];
-    double  tmp, tmpC[3], tmp2, tmp3, sum;
-    int c, c2, ci, cj;
+    float Gauss1, Gauss2;
+    float  tmp, tmp2, tmp3, sum;
+    int c2, ci, cj;
 
     ImageRAW *edge, *base, *samplingMap;
 
@@ -158,7 +157,7 @@ void FilterBilateral2DAS::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 
     ImageSamplerBilinear	isb;
 
-    double sigma_r2 = (sigma_r * sigma_r * 2.0);
+    float sigma_r2 = (sigma_r * sigma_r * 2.0f);
     bool sumTest;
 
     RandomSampler<2> *ps;
@@ -171,12 +170,14 @@ void FilterBilateral2DAS::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
         float x = float(i) / float(width);
 
         for(int j = box->y0; j < box->y1; j++) {
+
             //Convolution kernel
-            c = (j * width + i) * channels;
+            float *tmp_dst  = (*dst)(j, i);
+            float *tmp_base = (*base)(j, i);
+            float *tmp_edge = (*edge)(j, i);
 
             for(int l = 0; l < channels; l++) {
-                I_val[l] = edge->data[c + l];
-                tmpC[l] = 0.0;
+                tmp_dst[l] = 0.0f;
             }
 
             ps = ms->getSampler(&m);
@@ -194,8 +195,8 @@ void FilterBilateral2DAS::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
             int levelsRsize = (ps->levelsR.size() - 1);
             if(levelInt < levelsRsize) {
                 if((levelVal - float(levelInt)) > 0.0f) {
-                    nSamples += (ps->levelsR[levelInt + 1] - ps->levelsR[levelInt]) *
-                                (levelVal - float(levelInt));
+                    nSamples += int(float(ps->levelsR[levelInt + 1] - ps->levelsR[levelInt]) *
+                                (levelVal - float(levelInt)));
                 }
             }
 
@@ -205,7 +206,7 @@ void FilterBilateral2DAS::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 
             nSamples = MIN(nSamples, pg->halfKernelSize * pg->halfKernelSize * 2);
 
-            sum = 0.0;
+            sum = 0.0f;
 
             for(int k = 0; k < nSamples; k += 2) {
                 //Spatial Gaussian kernel
@@ -218,14 +219,14 @@ void FilterBilateral2DAS::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
                 c2 = (cj * width + ci) * channels;
 
                 //Range Gaussian Kernel
-                tmp = 0.0;
+                tmp = 0.0f;
 
                 for(int l = 0; l < channels; l++) {
-                    tmp3 = edge->data[c2 + l] - I_val[l];
+                    tmp3 = edge->data[c2 + l] - tmp_edge[l];
                     tmp += tmp3 * tmp3;
                 }
 
-                Gauss2 = exp(-tmp / sigma_r2);
+                Gauss2 = expf(-tmp / sigma_r2);
 
                 //Weight
                 tmp2 = Gauss1 * Gauss2;
@@ -233,15 +234,15 @@ void FilterBilateral2DAS::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 
                 //Filtering
                 for(int l = 0; l < channels; l++) {
-                    tmpC[l] += base->data[c2 + l] * tmp2;
+                    tmp_dst[l] += base->data[c2 + l] * tmp2;
                 }
             }
 
             //Normalization
-            sumTest = sum > 0.0;
+            sumTest = sum > 0.0f;
 
             for(int l = 0; l < channels; l++) {
-                dst->data[c + l] = sumTest ? tmpC[l] / sum : base->data[c + l];
+                tmp_dst[l] = sumTest ? tmp_dst[l] / sum : tmp_base[l];
             }
         }
     }

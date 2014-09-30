@@ -29,6 +29,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLThresholding class
+ */
 class FilterGLThresholding: public FilterGL
 {
 protected:
@@ -37,17 +40,29 @@ protected:
     void FragmentShader();
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLThresholding
+     */
     FilterGLThresholding();
 
-    /**Process: processing*/
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
-    /**Execute: short-cut*/
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @return
+     */
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLThresholding filter;
 
@@ -63,7 +78,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLThresholding::FilterGLThresholding(): FilterGL()
 {
     //protected values are assigned/computed
@@ -101,14 +115,12 @@ void FilterGLThresholding::InitShaders()
 {
     FragmentShader();
 
-    std::string prefix;
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
-    prefix += glw::version("150");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
 #endif
+
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
@@ -117,7 +129,6 @@ void FilterGLThresholding::InitShaders()
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLThresholding::Process(ImageRAWGLVec imgIn,
         ImageRAWGL *imgOut)
 {
@@ -129,7 +140,7 @@ ImageRAWGL *FilterGLThresholding::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(w, h, imgIn[0]->frames, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

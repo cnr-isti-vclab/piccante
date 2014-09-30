@@ -53,7 +53,7 @@ ImageRAWVec getAllExposures(ImageRAW *imgIn)
 
     ImageRAWVec input = Single(imgIn);
 
-    for(unsigned int i=0; i<exposures.size(); i++) {
+    for(unsigned int i = 0; i < exposures.size(); i++) {
         flt.Update(2.2f, exposures[i]);
         ImageRAW *expo = flt.ProcessP(input, NULL);
 

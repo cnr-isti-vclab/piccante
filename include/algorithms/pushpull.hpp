@@ -27,6 +27,8 @@ See the GNU Lesser General Public License
 
 #include "image_raw.hpp"
 #include "image_samplers/image_sampler_bsplines.hpp"
+#include "filtering/filter_down_pp.hpp"
+#include "filtering/filter_up_pp.hpp"
 
 namespace pic {
 
@@ -36,122 +38,17 @@ namespace pic {
 class PushPull
 {
 protected:
-    float			*value;
-    bool            noMore;
-    ImageRAWVec 	stack;
+
+    FilterDownPP    *flt_down;
+    FilterUpPP      *flt_up;
+
     float           threshold;
+    float			*value;
+    ImageRAWVec 	stack;
 
     /**
-     * @brief distance
-     * @param a
-     * @param b
-     * @param channels
-     * @return
+     * @brief Release
      */
-    float distance(float *a, float *b, int channels)
-    {
-        float dist = 0.0f;
-        for(int i = 0; i < channels; i++) {
-            float tmp = a[i] -  b[i];
-            dist += tmp * tmp;
-        }
-
-        return dist;
-    }
-
-    /**
-     * @brief down
-     * @param img
-     * @return
-     */
-    ImageRAW *down(ImageRAW *img)
-    {
-
-        if(img->width < 2 || img->height < 2) {
-            noMore = true;
-            return NULL;
-        }
-
-        ImageRAW *ret = new ImageRAW(1, img->width >> 1, img->height >> 1,
-                                     img->channels);
-
-        int channels = img->channels;
-        noMore = true;
-
-        for(int i = 0; i < img->height; i += 2) {
-            for(int j = 0; j < img->width; j += 2) {
-
-                float *tmp[4];
-
-                tmp[0] = (*img)(j    , i);
-                tmp[1] = (*img)(j + 1, i);
-                tmp[2] = (*img)(j    , i + 1);
-                tmp[3] = (*img)(j + 1, i + 1);
-
-                int counter = 0;
-                float *tmp_ret = (*ret)(j >> 1, i >> 1);
-
-                for(int l = 0; l < channels; l++) {
-                    tmp_ret[l] = 0.0f;
-                }
-
-                for(unsigned k = 0; k < 4; k++) {
-                    if(distance(tmp[k], value, channels) > threshold) {
-                        counter++;
-
-                        for(int l = 0; l < channels; l++) {
-                            tmp_ret[l] += tmp[k][l];
-                        }
-                    } else {
-                        noMore = false;
-                    }
-                }
-
-                if(counter > 0) {
-                    float counter_f = float(counter);
-                    for(int l = 0; l < channels; l++) {
-                        tmp_ret[l] /= counter_f;
-                    }
-                } else {
-                    for(int l = 0; l < channels; l++) {
-                        tmp_ret[l] = value[l];
-                    }
-                }
-            }
-        }
-
-        return ret;
-    }
-
-    //TODO: to create a filter out of this function
-    /**
-     * @brief up
-     * @param imgUp
-     * @param imgDown
-     */
-    void up(ImageRAW *imgUp, ImageRAW *imgDown)
-    {
-        ImageSamplerBSplines isb;
-        float *vOut = new float[imgUp->channels];
-
-        for(int i = 0; i < imgUp->height; i++) {
-            float y = float(i) / imgUp->heightf;
-
-            for(int j = 0; j < imgUp->width; j++) {
-                float x = float(j) / imgUp->widthf;
-
-                float *data = (*imgUp)(j, i);
-
-                for(int k = 0; k < imgUp->channels; k++) {
-                    if(data[k] == value[k]) {
-                        isb.SampleImage(imgDown, x, y, vOut);
-                        data[k] = vOut[k];
-                    }
-                }
-            }
-        }
-    }
-
     void Release() {
         for(unsigned int i = 1; i < stack.size(); i++) {
             if(stack[i] != NULL){
@@ -169,9 +66,10 @@ public:
      */
     PushPull()
     {
-        threshold = 1e-4f;
+        flt_down = NULL;
+        flt_up = NULL;
+        threshold = 1e-6f;
         value = NULL;
-        noMore = false;
     }
 
     ~PushPull()
@@ -193,16 +91,30 @@ public:
 
         if(imgOut == NULL) {
             imgOut = imgIn->Clone();
+        } else {
+            imgOut->Assign(imgIn);
+        }
+
+        this->value = value;
+
+        if(flt_down == NULL) {
+            flt_down = new FilterDownPP(value, threshold);
+        } else {
+            flt_down->Update(value, threshold);
+        }
+
+        if(flt_up == NULL) {
+            flt_up = new FilterUpPP(value, threshold);
+        } else {
+            flt_up->Update(value, threshold);
         }
 
         //creating the pyramid: Pull
-        this->value = value;
-        noMore = false;
         stack.push_back(imgOut);
         ImageRAW *work = imgOut;
 
-        while(!noMore) {
-            ImageRAW *tmp = down(work);
+        while(MIN(work->width, work->height) > 1) {
+            ImageRAW *tmp = flt_down->Process(Single(work), NULL);
 
             if(tmp != NULL) {
                 stack.push_back(tmp);
@@ -214,7 +126,7 @@ public:
         int n = (stack.size() - 2);
 
         for(int i = n; i >= 0; i--) {
-            up(stack[i], stack[i + 1]);
+            stack[i] = flt_up->ProcessP(Single(stack[i + 1]), stack[i]);
         }
 
         return imgOut;

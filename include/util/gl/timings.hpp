@@ -29,25 +29,37 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief glBeginTimeQuery
+ * @return
+ */
 inline GLuint glBeginTimeQuery()
 {
     //Timing
     GLuint ret;
     glGenQueries(1, &ret);
     glFinish();
+    #ifndef PIC_DISABLE_OPENGL_NON_CORE
     glBeginQuery(GL_TIME_ELAPSED_EXT, ret);
+    #endif
     return ret;
-};
+}
 
+/**
+ * @brief glEndTimeQuery
+ * @param ret
+ * @return
+ */
 inline GLuint64EXT glEndTimeQuery(GLuint ret)
 {
+    GLuint64 timeVal = 0;
     //Timing
+    #ifndef PIC_DISABLE_OPENGL_NON_CORE
     glEndQuery(GL_TIME_ELAPSED_EXT);
-//	GLint available = 0;
-    GLuint64EXT timeVal = 0;
     glGetQueryObjectui64vEXT(ret, GL_QUERY_RESULT, &timeVal);
+    #endif
     return timeVal;
-};
+}
 
 } // end namespace pic
 

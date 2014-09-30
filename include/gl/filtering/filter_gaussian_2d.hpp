@@ -30,6 +30,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLGaussian2D class
+ */
 class FilterGLGaussian2D: public FilterGLNPasses
 {
 protected:
@@ -39,18 +42,34 @@ protected:
     void FragmentShader() {}
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLGaussian2D
+     */
     FilterGLGaussian2D();
-    //Init constructors
+
+    /**
+     * @brief FilterGLGaussian2D
+     * @param sigma
+     */
     FilterGLGaussian2D(float sigma);
 
-    //Update
+    /**
+     * @brief Update
+     * @param sigma
+     */
     void Update(float sigma);
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma
+     * @return
+     */
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLGaussian2D *filter = new FilterGLGaussian2D(sigma);
 
@@ -73,7 +92,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLGaussian2D::FilterGLGaussian2D(): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
@@ -83,7 +101,6 @@ FilterGLGaussian2D::FilterGLGaussian2D(): FilterGLNPasses()
     InsertFilter(filter);
 }
 
-//Constructor
 FilterGLGaussian2D::FilterGLGaussian2D(float sigma): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;

@@ -387,7 +387,7 @@ PIC_INLINE unsigned char *ConvertHDR2LDR(const float *dataIn, unsigned char *dat
         #pragma omp parallel for
 
         for(int i = 0; i < size; i++) {
-            dataOut[i] = CLAMP(lround(dataIn[i]), 256);
+            dataOut[i] = CLAMPi(int(lround(dataIn[i])), 0, 255);
         }
     }
     break;
@@ -397,7 +397,7 @@ PIC_INLINE unsigned char *ConvertHDR2LDR(const float *dataIn, unsigned char *dat
         #pragma omp parallel for
 
         for(int i = 0; i < size; i++) {
-            dataOut[i] = CLAMP(lround(dataIn[i] * 255.0f), 256);
+            dataOut[i] = CLAMPi(int(lround(dataIn[i] * 255.0f)), 0, 255);
         }
     }
     break;
@@ -408,7 +408,7 @@ PIC_INLINE unsigned char *ConvertHDR2LDR(const float *dataIn, unsigned char *dat
 
         for(int i = 0; i < size; i++) {
             float tmp = powf(dataIn[i], invGamma);
-            dataOut[i] = CLAMP(lround(tmp * 255.0f), 256);
+            dataOut[i] = CLAMPi(int(lround(tmp * 255.0f)), 0, 255);
         }
     }
     break;

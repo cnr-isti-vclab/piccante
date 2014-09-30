@@ -29,85 +29,107 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
-inline void getModesGL(int channels, int *mode, int *modeInternalFormat)
+/**
+ * @brief getModesGL
+ * @param channels
+ * @param mode
+ * @param modeInternalFormat
+ */
+inline void getModesGL(int channels, int &mode, int &modeInternalFormat)
 {
-    *mode = 0;
-    *modeInternalFormat = 0;
+    mode = 0;
+    modeInternalFormat = 0;
 
     switch(channels) {
     case 1: {
-        *mode = GL_RED;
-        *modeInternalFormat = GL_R32F;
+        mode = GL_RED;
+        modeInternalFormat = GL_R32F;
     }
     break;
 
     case 3: {
-        *mode = GL_RGB;
-        *modeInternalFormat = GL_RGB32F;
+        mode = GL_RGB;
+        modeInternalFormat = GL_RGB32F;
     }
     break;
 
     case 4: {
-        *mode = GL_RGBA;
-        *modeInternalFormat = GL_RGBA32F;
+        mode = GL_RGBA;
+        modeInternalFormat = GL_RGBA32F;
     }
     break;
     }
 }
 
-inline void getModesHalfGL(int channels, int *mode, int *modeInternalFormat)
+/**
+ * @brief getModesHalfGL
+ * @param channels
+ * @param mode
+ * @param modeInternalFormat
+ */
+inline void getModesHalfGL(int channels, int &mode, int &modeInternalFormat)
 {
-    *mode = 0;
-    *modeInternalFormat = 0;
+    mode = 0;
+    modeInternalFormat = 0;
 
     switch(channels) {
     case 1: {
-        *mode = GL_RED;
-        *modeInternalFormat = GL_R16F;
+        mode = GL_RED;
+        modeInternalFormat = GL_R16F;
     }
     break;
 
     case 3: {
-        *mode = GL_RGB;
-        *modeInternalFormat = GL_RGB16F;
+        mode = GL_RGB;
+        modeInternalFormat = GL_RGB16F;
     }
     break;
 
     case 4: {
-        *mode = GL_RGBA;
-        *modeInternalFormat = GL_RGBA16F;
+        mode = GL_RGBA;
+        modeInternalFormat = GL_RGBA16F;
     }
     break;
     }
 }
 
-inline void getModesIntegerGL(int channels, int *mode, int *modeInternalFormat)
+/**
+ * @brief getModesIntegerGL
+ * @param channels
+ * @param mode
+ * @param modeInternalFormat
+ */
+inline void getModesIntegerGL(int channels, int &mode, int &modeInternalFormat)
 {
-    *mode = 0;
-    *modeInternalFormat = 0;
+    mode = 0;
+    modeInternalFormat = 0;
 
     switch(channels) {
     case 1: {
-        *mode = GL_RED_INTEGER;
-        *modeInternalFormat = GL_R32I;
+        mode = GL_RED_INTEGER;
+        modeInternalFormat = GL_R32I;
     }
     break;
 
     case 3: {
-        *mode = GL_RGB_INTEGER;
-        *modeInternalFormat = GL_RGB32I;
+        mode = GL_RGB_INTEGER;
+        modeInternalFormat = GL_RGB32I;
     }
     break;
 
     case 4: {
-        *mode = GL_RGBA_INTEGER;
-        *modeInternalFormat = GL_RGBA32I;
+        mode = GL_RGBA_INTEGER;
+        modeInternalFormat = GL_RGBA32I;
     }
     break;
     }
 }
 
-/**getChannelsFromInternalFormat: returns the number of channels given an internal format*/
+/**
+ * @brief getChannelsFromInternalFormatGL returns the number of channels given an internal format.
+ * @param internalFormat
+ * @return
+ */
 inline int getChannelsFromInternalFormatGL(int internalFormat)
 {
     int channels = -1;

@@ -29,6 +29,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLIterative class
+ */
 class FilterGLIterative: public FilterGL
 {
 protected:
@@ -39,25 +42,46 @@ protected:
     void FragmentShader() {}
 
 public:
-    //Basic constructors
+
+    /**
+     * @brief FilterGLIterative
+     */
     FilterGLIterative();
 
+    /**
+     * @brief FilterGLIterative
+     * @param flt
+     * @param iterations
+     */
     FilterGLIterative(FilterGL *flt, int iterations);
 
+    /**
+     * @brief SetupAuxN
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     virtual ImageRAWGL *SetupAuxN(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
+    /**
+     * @brief Update
+     * @param flt
+     * @param iterations
+     */
     void Update(FilterGL *flt, int iterations);
 
+    /**
+     * @brief getFbo
+     * @return
+     */
     Fbo  *getFbo()
     {
         return filters.back()->getFbo();
     }
 
-    //Processing
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 };
 
-//Basic constructor
 FilterGLIterative::FilterGLIterative(): FilterGL()
 {
     imgTmp[0] = imgTmp[1] = NULL;
@@ -121,7 +145,6 @@ ImageRAWGL *FilterGLIterative::SetupAuxN(ImageRAWGLVec imgIn,
     return imgOut;
 }
 
-//Processing
 ImageRAWGL *FilterGLIterative::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn.size() < 1 || imgIn[0] == NULL) {

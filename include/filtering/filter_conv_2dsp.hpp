@@ -30,35 +30,61 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
-class FilterConv2D: public FilterNPasses
+class FilterConv2DSP: public FilterNPasses
 {
 protected:
-    FilterConv1D *conv1DFlt;
+    FilterConv1D *conv1DFltX, *conv1DFltY;
 
 public:
-    //Basic constructor
-    FilterConv2D(float *data, int n)
+    /**
+     * @brief FilterConv2DSP
+     * @param data
+     * @param n
+     */
+    FilterConv2DSP(float *data, int n)
     {
-        conv1DFlt = new FilterConv1D(data, n);
+        conv1DFltX = new FilterConv1D(data, n);
 
-        InsertFilter(conv1DFlt);
-        InsertFilter(conv1DFlt);
+        InsertFilter(conv1DFltX);
+        InsertFilter(conv1DFltX);
     }
 
-    ~FilterConv2D()
+    /**
+     * @brief FilterConv2DSP
+     * @param dataX
+     * @param nX
+     * @param dataY
+     * @param nY
+     */
+    FilterConv2DSP(float *dataX, int nX, float *dataY, int nY)
+    {
+        conv1DFltX = new FilterConv1D(dataX, nX);
+        InsertFilter(conv1DFltX);
+
+        conv1DFltY = new FilterConv1D(dataY, nY);
+        InsertFilter(conv1DFltY);
+    }
+
+    ~FilterConv2DSP()
     {
         Destroy();
 
-        if(conv1DFlt != NULL) {
-            delete conv1DFlt;
+        if(conv1DFltX != NULL) {
+            delete conv1DFltX;
         }
 
-        conv1DFlt = NULL;
+        conv1DFltX = NULL;
+
+        if(conv1DFltY != NULL) {
+            delete conv1DFltY;
+        }
+
+        conv1DFltY = NULL;
     }
 
     static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float *data, int n)
     {
-        FilterConv2D filter(data, n);
+        FilterConv2DSP filter(data, n);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 

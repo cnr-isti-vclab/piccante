@@ -29,10 +29,19 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
-class FilterConv: public Filter
+/**
+ * @brief The FilterConv2D class
+ */
+class FilterConv2D: public Filter
 {
 protected:
-    //Process in a box
+
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
     {
         if(src.size() != 2) {
@@ -75,15 +84,34 @@ protected:
     }
 
 public:
-    //Standard constructor
-    FilterConv() {};
 
+    /**
+     * @brief FilterConv2D
+     */
+    FilterConv2D()
+    {
+
+    }
+
+    /**
+     * @brief Execute
+     * @param img
+     * @param conv
+     * @param imgOut
+     * @return
+     */
     static ImageRAW *Execute(ImageRAW *img, ImageRAW *conv, ImageRAW *imgOut)
     {
-        FilterConv flt;
+        FilterConv2D flt;
         return flt.ProcessP(Double(img, conv), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameImg
+     * @param nameConv
+     * @param nameOut
+     */
     static void Execute(std::string nameImg, std::string nameConv,
                         std::string nameOut)
     {

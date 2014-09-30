@@ -30,6 +30,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterCrop class
+ */
 class FilterCrop: public Filter
 {
 protected:
@@ -37,17 +40,60 @@ protected:
     Vec<4, int>		maxi, mini;
     Vec<3, float>	maxf, minf;
 
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
 
 public:
 
+    /**
+     * @brief FilterCrop
+     * @param min
+     * @param max
+     */
     FilterCrop(Vec<2, int>   min, Vec<2, int>   max);
+
+    /**
+     * @brief FilterCrop
+     * @param min
+     * @param max
+     */
     FilterCrop(Vec<3, int>   min, Vec<3, int>   max);
+
+    /**
+     * @brief FilterCrop
+     * @param min
+     * @param max
+     */
     FilterCrop(Vec<4, int>   min, Vec<4, int>   max);
+
+    /**
+     * @brief FilterCrop
+     * @param min
+     * @param max
+     */
     FilterCrop(Vec<3, float> min, Vec<3, float> max);
 
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param min
+     * @param max
+     * @return
+     */
     static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, Vec<4, int> min,
                              Vec<4, int> max)
     {
@@ -55,6 +101,14 @@ public:
         return fltCrop.Process(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param min
+     * @param max
+     * @return
+     */
     static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, Vec<2, int> min,
                              Vec<2, int> max)
     {
@@ -62,6 +116,14 @@ public:
         return fltCrop.Process(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param fileInput
+     * @param fileOutput
+     * @param min
+     * @param max
+     * @return
+     */
     static ImageRAW *Execute(std::string fileInput, std::string fileOutput,
                              Vec<2, int> min, Vec<2, int> max)
     {
@@ -71,6 +133,9 @@ public:
         return out;
     }
 
+    /**
+     * @brief TestCrop2D
+     */
     static void TestCrop2D()
     {
         ImageRAW img(1, 512, 512, 3);
@@ -131,13 +196,13 @@ FilterCrop::FilterCrop(Vec<3, float> min, Vec<3, float> max)
 ImageRAW *FilterCrop::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
 {
     if(flag) {
-        maxi[0] = maxf[0] * imgIn[0]->width;
-        maxi[1] = maxf[1] * imgIn[0]->height;
-        maxi[2] = maxf[2] * imgIn[0]->frames;
+        maxi[0] = int(maxf[0] * imgIn[0]->widthf);
+        maxi[1] = int(maxf[1] * imgIn[0]->heightf);
+        maxi[2] = int(maxf[2] * imgIn[0]->framesf);
 
-        mini[0] = minf[0] * imgIn[0]->width;
-        mini[1] = minf[1] * imgIn[0]->height;
-        mini[2] = minf[2] * imgIn[0]->frames;
+        mini[0] = int(minf[0] * imgIn[0]->widthf);
+        mini[1] = int(minf[1] * imgIn[0]->heightf);
+        mini[2] = int(minf[2] * imgIn[0]->framesf);
     }
 
     if(imgOut == NULL) {
@@ -177,19 +242,14 @@ ImageRAW *FilterCrop::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
     return imgOut;
 }
 
-//Process in a box
 void FilterCrop::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 {
 
     maxi[3] = MIN(maxi[3], src[0]->channels);
 
     for(int p = box->z0; p < box->z1; p++) {
-//		int pi = (p-box->z0)*dst->tstride;
         for(int j = box->y0; j < box->y1; j++) {
-//			int ji = (j-box->y0)*dst->ystride;
             for(int i = box->x0; i < box->x1; i++) {
-//				int c = pi + ji + (i-box->x0)*dst->xstride;
-//				int c2 = p*source->tstride + j*source->ystride + i*source->xstride;
                 float *dst_data = (*dst)(i - mini[0], j - mini[1], p - mini[2]);
                 float *src_data = (*src[0])(i, j, p);
 

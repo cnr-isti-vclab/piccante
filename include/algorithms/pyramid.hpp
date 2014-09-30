@@ -33,6 +33,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The Pyramid class
+ */
 class Pyramid
 {
 protected:
@@ -46,29 +49,87 @@ protected:
 public:
     std::vector<ImageRAW *>  stack;
 
+    /**
+     * @brief Pyramid
+     * @param img
+     * @param lapGauss
+     * @param limitLevel
+     */
     Pyramid(ImageRAW *img, bool lapGauss, int limitLevel);
+
+    /**
+     * @brief Pyramid
+     * @param width
+     * @param height
+     * @param channels
+     * @param lapGauss
+     * @param limitLevel
+     */
     Pyramid(int width, int height, int channels, bool lapGauss, int limitLevel);
 
     ~Pyramid();
 
+    /**
+     * @brief SetLapGauss
+     * @param lapGauss
+     */
     void SetLapGauss(bool lapGauss)
     {
         this->lapGauss = lapGauss;
     }
 
+    /**
+     * @brief Update recomputes the pyramid given a compatible image, img.
+     * @param img
+     */
     void Update(ImageRAW *img);
+
+    /**
+     * @brief Mul is the mul operator ( *= ) between pyramids.
+     * @param pyr
+     */
     void Mul(const Pyramid *pyr);
+
+    /**
+     * @brief MulSNeg
+     * @param pyr
+     */
     void MulSNeg(const Pyramid *pyr);
+
+    /**
+     * @brief Mul is the add operator ( += ) between pyramids.
+     * @param pyr
+     */
     void Add(const Pyramid *pyr);
+
+    /**
+     * @brief Blend
+     * @param pyr
+     * @param weight
+     */
     void Blend(Pyramid *pyr, Pyramid *weight);
 
+    /**
+     * @brief Reconstruct evaluates a Gaussian/Laplacian pyramid.
+     * @param imgOut
+     * @return
+     */
     ImageRAW *Reconstruct(ImageRAW *imgOut);
 
+    /**
+     * @brief size
+     * @return
+     */
     int size()
     {
         return stack.size();
     }
 
+    /**
+     * @brief get
+     * @param index
+     * @return
+     */
     ImageRAW *get(int index)
     {
         return stack[index % stack.size()];
@@ -148,7 +209,6 @@ void Pyramid::Create(ImageRAW *img, bool lapGauss, int limitLevel = 0)
 #endif
 }
 
-/**Reconstruct: evaluates a Gaussian/Laplacian pyramid*/
 ImageRAW *Pyramid::Reconstruct(ImageRAW *imgOut)
 {
     if(stack.size() < 2) {
@@ -183,7 +243,6 @@ ImageRAW *Pyramid::Reconstruct(ImageRAW *imgOut)
     return imgOut;
 }
 
-/**Update: recomputes the pyramid given a compatible img*/
 void Pyramid::Update(ImageRAW *img)
 {
     //TODO: check if the image and the pyramid are compatible
@@ -222,7 +281,6 @@ void Pyramid::Update(ImageRAW *img)
     }
 }
 
-/**Mul: mul operator ( *= ) between pyramids; */
 void Pyramid::Mul(const Pyramid *pyr)
 {
     if(stack.size() != pyr->stack.size()) {
@@ -238,7 +296,6 @@ void Pyramid::Mul(const Pyramid *pyr)
     }
 }
 
-/**Add: add operator ( += ) between pyramids; */
 void Pyramid::Add(const Pyramid *pyr)
 {
     if(stack.size() != pyr->stack.size()) {
@@ -250,7 +307,6 @@ void Pyramid::Add(const Pyramid *pyr)
     }
 }
 
-/**MulSNeg: mul operator ( *= ) between pyramids; */
 void Pyramid::MulSNeg(const Pyramid *pyr)
 {
     if((stack.size() != pyr->stack.size()) && (pyr->stack.size() > 0)) {
@@ -262,7 +318,6 @@ void Pyramid::MulSNeg(const Pyramid *pyr)
     }
 }
 
-/**Blend*/
 void Pyramid::Blend(Pyramid *pyr, Pyramid *weight)
 {
     MulSNeg(weight);

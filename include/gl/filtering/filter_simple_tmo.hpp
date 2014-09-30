@@ -29,6 +29,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLSimpleTMO class
+ */
 class FilterGLSimpleTMO: public FilterGL
 {
 protected:
@@ -39,27 +42,44 @@ protected:
     void FragmentShader();
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLSimpleTMO
+     */
     FilterGLSimpleTMO();
-    //Init constructors
+
+    /**
+     * @brief FilterGLSimpleTMO
+     * @param fstop
+     * @param gamma
+     */
     FilterGLSimpleTMO(float fstop, float gamma);
 
+    /**
+     * @brief Update
+     * @param fstop
+     * @param gamma
+     */
     void Update(float fstop, float gamma);
 
-    //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
-
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param gamma
+     * @param fstop
+     * @return
+     */
     ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float gamma,
                         float fstop)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLSimpleTMO filter(gamma, fstop);
 
         GLuint testTQ1 = glBeginTimeQuery();
         ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 4,
-                                            IMG_GPU_CPU);
+                                            IMG_GPU_CPU, GL_TEXTURE_2D);
 
         int n = 100;
 
@@ -77,7 +97,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
 {
     gamma = 2.2f;
@@ -87,7 +106,6 @@ FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
     InitShaders();
 }
 
-//Init constructors
 FilterGLSimpleTMO::FilterGLSimpleTMO(float fstop, float gamma): FilterGL()
 {
     //protected values are assigned/computed
@@ -102,7 +120,6 @@ FilterGLSimpleTMO::FilterGLSimpleTMO(float fstop, float gamma): FilterGL()
     InitShaders();
 }
 
-//BUG: tn_gamma and tn_exposure are not set!!
 void FilterGLSimpleTMO::FragmentShader()
 {
     fragment_source = GLW_STRINGFY
@@ -126,17 +143,13 @@ void FilterGLSimpleTMO::FragmentShader()
 
 void FilterGLSimpleTMO::InitShaders()
 {
-
     float invGamma = 1.0f / gamma;
     float exposure = powf(2.0f, fstop);
 
-    std::string prefix;
-
-    prefix += glw::version("330");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLSimpleTMO log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
@@ -144,7 +157,6 @@ void FilterGLSimpleTMO::InitShaders()
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
 
-    glw::bind_program(filteringProgram);
     filteringProgram.uniform("tn_gamma",   invGamma);
     filteringProgram.uniform("tn_exposure", exposure);
     filteringProgram.uniform("u_tex",      0);
@@ -164,54 +176,6 @@ void FilterGLSimpleTMO::Update(float fstop, float gamma)
     filteringProgram.uniform("tn_gamma",		invGamma);
     filteringProgram.uniform("tn_exposure",	exposure);
     glw::bind_program(0);
-}
-
-//Processing
-ImageRAWGL *FilterGLSimpleTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
-    }
-
-    //Fbo
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, 1, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    glw::bind_program(filteringProgram);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    glw::bind_program(0);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

@@ -48,7 +48,7 @@ double MSE(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences=false)
 
     int count = 0;
 
-    float largeDifferences = C_LARGE_DIFFERENCES;
+    float largeDifferences = C_LARGE_DIFFERENCESf;
     if(!bLargeDifferences) {
         largeDifferences = FLT_MAX;
     }

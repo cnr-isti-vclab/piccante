@@ -71,7 +71,7 @@ protected:
     int *shifter;
     float *cos_angles, *sin_angles;
 
-    FilterConv fltConv;
+    FilterConv2D fltConv;
 
 public:
 
@@ -256,7 +256,7 @@ public:
         }
 
         //Convolution of the orientations using a low-pass filter
-        I_orientation_flt = FilterConv2D::Execute(I_orientation, I_orientation_flt,
+        I_orientation_flt = FilterConv2DSP::Execute(I_orientation, I_orientation_flt,
                             GenKernel(patch_size, num_bins), patch_size);
 
         //Final dense sift

@@ -115,7 +115,7 @@ void FilterBilateral1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 {
     int channels = dst->channels;
 
-    double inv_sigma_r2 = 1.0 / (2.0 * sigma_r * sigma_r);
+    float inv_sigma_r2 = 1.0f / (2.0f * sigma_r * sigma_r);
 
     //Filtering
     ImageRAW *edge, *base;
@@ -137,10 +137,10 @@ void FilterBilateral1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
                 float *tmpEdge = (*edge)(i, j, m);
 
                 for(int l = 0; l < channels; l++) {
-                    tmpDst[l] = 0.0;
+                    tmpDst[l] = 0.0f;
                 }
 
-                double sum = 0.0;
+                float sum = 0.0f;
 
                 for(int k = 0; k < pg->kernelSize; k++) {
                     //Spatial filtering
@@ -157,13 +157,13 @@ void FilterBilateral1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 
                     //Range filtering
                     float *curEdge = (*edge)(ci, cj, cm); 
-                    double tmp = 0.0;
+                    float tmp = 0.0f;
                     for(int l = 0; l < channels; l++) {
-                        double diff = curEdge[l] - tmpEdge[l];
+                        float diff = curEdge[l] - tmpEdge[l];
                         tmp += diff * diff;
                     }
 
-                    double gauss2 = exp(-tmp * inv_sigma_r2);
+                    float gauss2 = expf(-tmp * inv_sigma_r2);
 
                     //Weight
                     tmp = gauss1 * gauss2;
@@ -178,7 +178,7 @@ void FilterBilateral1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
                 }
 
                 //Normalization
-                bool sumTest = sum > 0.0;
+                bool sumTest = sum > 0.0f;
 
                 for(int l = 0; l < channels; l++) {
                     tmpDst[l] = sumTest ? tmpDst[l] / sum : 0.0f;

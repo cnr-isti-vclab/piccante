@@ -48,7 +48,7 @@ inline float LischinskiFunction(float Lcur, float Lref, float param[2],
 
 inline float LischinskiFunctionGauss(float Lcur, float Lref, float param[2])
 {
-    return expf(-powf(Lcur - Lref, 2.0f) / 0.1);
+    return expf(-powf(Lcur - Lref, 2.0f) * 10.0f);
 }
 
 ImageRAW *LischinskiMinimization(ImageRAW *L, ImageRAW *g,
@@ -145,7 +145,7 @@ ImageRAW *LischinskiMinimization(ImageRAW *L, ImageRAW *g,
         int counter = i * width;
 
         for(int j = 0; j < width; j++) {
-            (*ret)(j, i)[0] = x(counter + j);
+            (*ret)(j, i)[0] = float(x(counter + j));
         }
     }
 

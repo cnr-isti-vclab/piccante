@@ -68,8 +68,8 @@ public:
         float tmp = (colIn[0] + 16.0f) / 116.0f;
 
         colOut[1] = white_point[1] * f_inv(tmp);
-        colOut[0] = white_point[0] * f_inv(tmp + colIn[1]/500.0f);
-        colOut[2] = white_point[2] * f_inv(tmp - colIn[2]/200.0f);
+        colOut[0] = white_point[0] * f_inv(tmp + colIn[1] / 500.0f);
+        colOut[2] = white_point[2] * f_inv(tmp - colIn[2] / 200.0f);
     }
 
     static float f(float t)
@@ -84,7 +84,7 @@ public:
 
     static float f_inv(float t)
     {
-        if(t > C_SIX_OVER_TWENTY_NINE ){
+        if(t > C_SIX_OVER_TWENTY_NINE ) {
             return powf(t, 3.0f);
         } else {
             return (t - C_FOUR_OVER_TWENTY_NINE) * C_CIELAB_C1_INV;

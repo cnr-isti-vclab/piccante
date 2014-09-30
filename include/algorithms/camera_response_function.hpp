@@ -44,12 +44,12 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
     break;
 
     case CRF_AKYUZ: {
-        return 1.0f - powf(2.0 * x - 1.0f, 12.0f);
+        return 1.0f - powf(2.0f * x - 1.0f, 12.0f);
     }
     break;
 
     case CRF_HAT: {
-        return 1.0f - powf(2.0 * x - 1.0f, 12.0f);
+        return 1.0f - powf(2.0f * x - 1.0f, 12.0f);
     }
     break;
 
@@ -209,7 +209,7 @@ protected:
         }
 
         int channels  = stack[0]->channels;
-        int exposures = stack.size();
+        unsigned int exposures = stack.size();
         
         Histogram *h = new Histogram[exposures * channels];
         
@@ -220,7 +220,7 @@ protected:
         #endif
         
         for(int j = 0; j < channels; j++) {
-            for(int i = 0; i < exposures; i++) {
+            for(unsigned int i = 0; i < exposures; i++) {
                 h[c].Calculate(stack[i], VS_LDR, 256, j);
                 h[c].cumulativef(true);
                 c++;
@@ -242,7 +242,7 @@ protected:
 
                 float u = float(i)/float(nSamples);
                 
-                for(int j = 0; j < exposures; j++) {
+                for(unsigned int j = 0; j < exposures; j++) {
         
                     int ind = k * exposures + j;
 

@@ -66,12 +66,20 @@ public:
      */
     void SampleImage(Image *img, float x, float y, float *vOut);
 
-    /**SampleImage: samples an image in uniform coordiantes*/
+    /**
+     * @brief SampleImage
+     * @param img
+     * @param x
+     * @param y
+     * @param t
+     * @param vOut
+     */
     void SampleImage(Image *img, float x, float y, float t, float *vOut) {}
 };
 
 PIC_INLINE ImageSamplerGaussian::ImageSamplerGaussian()
 {
+    Update(1.0f, 0);
 }
 
 PIC_INLINE ImageSamplerGaussian::ImageSamplerGaussian(float sigma,
@@ -84,9 +92,10 @@ PIC_INLINE void ImageSamplerGaussian::Update(float sigma, int direction)
 {
     this->sigma = sigma;
     sigma2      = 2.0f * sigma * sigma;
-    halfSize    = MAX(int(sigma * 5.0f), 1);
 
-    dirs[ direction     ] = 1;
+    halfSize    = MAX(int(sigma * 2.5f), 1);
+
+    dirs[ direction      % 3] = 1;
     dirs[(direction + 1) % 3] = 0;
     dirs[(direction + 2) % 3] = 0;
 }
@@ -114,7 +123,8 @@ PIC_INLINE void ImageSamplerGaussian::SampleImage(Image *img, float x, float y,
         float tmpWeight = expf(-(t * t) / sigma2);
 
         for(int k = 0; k < img->channels; k++) {
-            vOut[k] += img->data[ind + k] * tmpWeight;
+            vOut[k] += img->data[ind] * tmpWeight;
+            ind++;
         }
 
         weight += tmpWeight;

@@ -120,7 +120,7 @@ public:
             Ys = 0.5f;
         }
 
-        float sf = 1.25f - 0.25f * (Ys / 0.184);
+        float sf = 1.25f - 0.25f * (Ys / 0.184f);
 
         float lf = log(318.0f) / log(Yabs);
 

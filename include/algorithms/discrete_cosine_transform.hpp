@@ -25,24 +25,33 @@ See the GNU Lesser General Public License
 #ifndef PIC_ALGORITHMS_DISCRETE_COSINE_TRANSFORM_HPP
 #define PIC_ALGORITHMS_DISCRETE_COSINE_TRANSFORM_HPP
 
-/**
-* Reference DCT implementation
-**/
-
 #include "image_raw.hpp"
 #include "util/tile_list.hpp"
 
 namespace pic {
 
+/**
+ * @brief The DCT class provides a reference
+ * implementation for Discret Cosine Transform.
+ */
 class DCT
 {
 public:
 
+    /**
+     * @brief DCT
+     */
     DCT()
     {
     }
 
-    //Forward transform
+    /**
+     * @brief Transform
+     * @param imgIn
+     * @param imgOut
+     * @param size
+     * @return
+     */
     static ImageRAW *Transform(ImageRAW *imgIn, ImageRAW *imgOut, int size = 8)
     {
         if(imgIn == NULL) {
@@ -122,7 +131,13 @@ public:
         return imgOut;
     }
 
-    //Forward transform
+    /**
+     * @brief Inverse
+     * @param imgIn
+     * @param imgOut
+     * @param size
+     * @return
+     */
     static ImageRAW *Inverse(ImageRAW *imgIn, ImageRAW *imgOut, int size = 8)
     {
         if(imgIn == NULL) {

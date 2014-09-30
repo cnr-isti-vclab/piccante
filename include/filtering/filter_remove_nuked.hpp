@@ -29,12 +29,20 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterRemoveNuked class
+ */
 class FilterRemoveNuked: public Filter
 {
 protected:
     float threshold_nuked;
 
-    /**ProcessBBox:*/
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
     {
         float maxVal;
@@ -82,12 +90,22 @@ protected:
      
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterRemoveNuked
+     * @param threshold_nuked
+     */
     FilterRemoveNuked(float threshold_nuked = 1e4f)
     {
         this->threshold_nuked = threshold_nuked;
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param threshold_nuked
+     * @return
+     */
     static ImageRAW* Execute(ImageRAW *imgIn, ImageRAW *imgOut, float threshold_nuked = 1e4)
     {
         FilterRemoveNuked filter(threshold_nuked);
@@ -95,6 +113,13 @@ public:
         return imgOut;
     }
 
+    /**
+     * @brief Execute
+     * @param nameFileIn
+     * @param nameFileOut
+     * @param threshold_nuked
+     * @return
+     */
     static ImageRAW* Execute(std::string nameFileIn, std::string nameFileOut, float threshold_nuked = 1e4)
     {
         ImageRAW imgIn(nameFileIn);

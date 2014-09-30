@@ -30,83 +30,54 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLSigmoidTMO class
+ */
 class FilterGLSigmoidTMO: public FilterGL
 {
 protected:
     float alpha, epsilon;
     bool  bGammaCorrection, bLocal;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
+
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLSigmoidTMO
+     */
     FilterGLSigmoidTMO();
+
+    /**
+     * @brief FilterGLSigmoidTMO
+     * @param alpha
+     * @param bLocal
+     * @param bGammaCorrection
+     */
     FilterGLSigmoidTMO(float alpha, bool bLocal, bool bGammaCorrection);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
+    /**
+     * @brief Update
+     * @param alpha
+     */
     void Update(float alpha);
-
-    static ImageRAWGL *ExecuteReinhardLocal(std::string nameIn, std::string nameOut,
-                                            FilterGL *filter)
-    {
-        ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
-
-        FilterGLLuminance lum;
-
-        ImageRAWGL *L = lum.Process(SingleGL(&imgIn), NULL);
-        L->loadToMemory();
-        L->Write("lum.pfm");
-
-        GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *adapt = filter->Process(SingleGL(L), NULL);
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        printf("Bilateral 2DG Filter on GPU time: %f ms\n",
-               double(timeVal) / 1000000.0);
-
-        adapt->loadToMemory();
-        adapt->Write("adapt.pfm");
-
-        float Lav = imgIn.getLogMeanVal()[0];
-
-        FilterGLSigmoidTMO *tmo = new FilterGLSigmoidTMO(0.18f / Lav, true, true);
-
-        testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgOut = tmo->Process(DoubleGL(&imgIn, adapt), NULL);
-        timeVal = glEndTimeQuery(testTQ1);
-        printf("Sigmoid Local Filter on GPU time: %f ms\n",
-               double(timeVal) / 1000000.0);
-
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
-    };
-
-    static ImageRAWGL *ExecuteReinhardGlobal(std::string nameIn,
-            std::string nameOut)
-    {
-        ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
-
-        float Lav = imgIn.getLogMeanVal()[0];
-
-        FilterGLSigmoidTMO *filter = new FilterGLSigmoidTMO(0.18f / Lav, false, true);
-
-        GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgOut = filter->Process(SingleGL(&imgIn), NULL);
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        printf("Sigmoid Filter on GPU time: %f ms\n", double(timeVal) / 1000000.0);
-
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
 };
 
-//Basic constructor
 FilterGLSigmoidTMO::FilterGLSigmoidTMO(): FilterGL()
 {
     alpha = 0.15f;
@@ -181,14 +152,12 @@ void FilterGLSigmoidTMO::InitShaders()
 {
     FragmentShader();
 
-    std::string prefix;
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
-    prefix += glw::version("330");
-//	prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLSigmoidTMO log]\n%s\n", filteringProgram.log().c_str());
 #endif
+
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position",		0);
     filteringProgram.fragment_target("f_color",			0);
@@ -204,16 +173,19 @@ void FilterGLSigmoidTMO::Update(float alpha)
     }
 
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform("u_tex",				0);
-    filteringProgram.uniform("u_tex_adapt",		1);
-    filteringProgram.uniform("alpha",	  this->alpha);
-    filteringProgram.uniform("epsilon",	  epsilon);
+    filteringProgram.uniform("u_tex", 0);
+    filteringProgram.uniform("u_tex_adapt", 1);
+    filteringProgram.uniform("alpha", this->alpha);
+    filteringProgram.uniform("epsilon", epsilon);
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLSigmoidTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
+    if(imgIn.empty()) {
+        return imgOut;
+    }
+
     if(imgIn[0] == NULL) {
         return imgOut;
     }
@@ -222,7 +194,7 @@ ImageRAWGL *FilterGLSigmoidTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

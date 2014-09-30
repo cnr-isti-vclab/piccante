@@ -1,0 +1,20 @@
+How to install Piccante:
+========================
+
+Before starting:
+================
+Piccante is a header based library, which means that
+you do not need to compile it, and there are no
+platform dependencies. 
+
+Instructions:
+=============
+1) Unzip the file .zip in your favorite location on 
+your machine drive;
+
+2) Using your favorite IDE, please add the “piccante/include”
+directory in the INCLUDE path of the project where you want
+to use Piccante;
+
+3) Include "piccante.hpp" in your project in the source file
+where you need it.

@@ -73,14 +73,17 @@ PIC_INLINE void ImageSamplerBSplines::SampleImage(Image *img, float x, float y,
     float xx, yy, dx, dy;
 
     //Coordiantes in [0,width-1]x[0,height-1]
-    x *= float(img->width - 1);
-    y *= float(img->height - 1);
+    x *= img->width1f;
+    y *= img->height1f;
+    
     //Coordinates without fractions
     xx = floorf(x);
     yy = floorf(y);
+    
     //Interpolation values
     dx = (x - xx);
     dy = (y - yy);
+    
     //Integer coordinates
     int ix = int(xx);
     int iy = int(yy);
@@ -96,13 +99,11 @@ PIC_INLINE void ImageSamplerBSplines::SampleImage(Image *img, float x, float y,
 
     for(int j = 0; j < 4; j++) {
         ry = Rx(float(j) - 1.0f - dy);
-        ey = (iy + j) % img->height;
+        ey = CLAMP(iy + j, img->height);
 
         for(int i = 0; i < 4; i++) {
-            rx = Rx(float(i) - 1.0f - dx);
-            rx *= ry;
-
-            ex = (ix + i) % img->width;
+            rx = Rx(float(i) - 1.0f - dx) * ry;
+            ex = CLAMP(ix + i, img->width);
             int ind = (ey * img->width + ex) * img->channels;
 
             for(int k = 0; k < img->channels; k++) {

@@ -29,18 +29,23 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLRemapping class
+ */
 class FilterGLRemapping: public FilterGL
 {
 protected:
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterGLRemapping
+     */
     FilterGLRemapping();
-
-    //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 };
 
 FilterGLRemapping::FilterGLRemapping(): FilterGL()
@@ -75,13 +80,9 @@ void FilterGLRemapping::InitShaders()
     }
                       );
 
-    std::string prefix;
-    prefix += glw::version("330");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLRemapping log]\n%s\n", filteringProgram.log().c_str());
 #endif
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
@@ -91,54 +92,6 @@ void FilterGLRemapping::InitShaders()
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex",      0);
     glw::bind_program(0);
-}
-
-//Processing
-ImageRAWGL *FilterGLRemapping::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-    int channels = 3;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, channels, IMG_GPU);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, channels, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    glw::bind_program(filteringProgram);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    glw::bind_program(0);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

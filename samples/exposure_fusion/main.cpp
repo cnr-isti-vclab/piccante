@@ -59,14 +59,14 @@ int main(int argc, char *argv[])
         pic::FilterSimpleTMO fltTMO(2.2f, 0.0f);
         std::vector< float > exposures = hst.ExposureCovering(8, 0.5f);
         pic::ImageRAWVec stack;
-        for(unsigned int i=0; i<exposures.size(); i++) {
+        for(unsigned int i = 0; i < exposures.size(); i++) {
             fltTMO.Update(2.2f, exposures[i]);
             pic::ImageRAW *tmp = fltTMO.ProcessP(input, NULL);
             tmp->clamp(0.0f, 1.0f);
             stack.push_back(tmp);
 
             //writing the extraced exposure image
-            tmp->Write("../data/output/exposure_"+pic::NumberToString(i)+".png", pic::LT_NOR);
+            tmp->Write("../data/output/exposure_" + pic::NumberToString(i) + ".png", pic::LT_NOR);
         }
 
         printf("Ok\n");

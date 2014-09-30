@@ -82,11 +82,11 @@ public:
                                float sigma_s, float sigma_r, int testing)
     {
         ImageRAWGL imgIn(nameFile);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLBilateral2DAS filter(sigma_s, sigma_r);
 
-        ImageRAWGL *imgRet = new ImageRAWGL(1, imgIn.width, imgIn.height, 3, IMG_GPU);
+        ImageRAWGL *imgRet = new ImageRAWGL(1, imgIn.width, imgIn.height, 3, IMG_GPU, GL_TEXTURE_2D);
         GLuint testTQ1;
 
         if(testing > 1) {
@@ -117,10 +117,8 @@ public:
         }
 
         //Read from the GPU
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 4, IMG_CPU);
-        imgOut->readFromFBO(filter.getFbo());
-        imgOut->Write(nameOut);
-
+        imgRet->loadToMemory();
+        imgRet->Write(nameOut);
         return imgRet;
     }
 };
@@ -154,10 +152,10 @@ FilterGLBilateral2DAS::FilterGLBilateral2DAS(float sigma_s,
     imgTmp = NULL;
 
     int nRand = 32;
-    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU);
+    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
     imageRand->SetRand();
     imageRand->Mul(float(nRand - 1));
-    imageRand->generateTextureGLU32();
+    imageRand->generateTexture2DU32GL();
 
     //Precomputation of the Gaussian Kernel
     int kernelSize = PrecomputedGaussian::KernelSize(sigma_s);
@@ -297,8 +295,8 @@ void FilterGLBilateral2DAS::Update(float sigma_s, float sigma_r)
     ms->updateGL(halfKernelSize, halfKernelSize);
 
     //shader update
-    float sigmas2 = 2.0 * this->sigma_s * this->sigma_s;
-    float sigmar2 = 2.0 * this->sigma_r * this->sigma_r;
+    float sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
+    float sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
 
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex",      0);
@@ -324,7 +322,7 @@ ImageRAWGL *FilterGLBilateral2DAS::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {
@@ -334,7 +332,10 @@ ImageRAWGL *FilterGLBilateral2DAS::Process(ImageRAWGLVec imgIn,
 
     if(imgTmp == NULL) {
         float scale = fGLsm->getScale();
-        imgTmp = new ImageRAWGL(1, w * scale, h * scale, 1, IMG_GPU);
+        imgTmp = new ImageRAWGL(    1, 
+                                    int(imgIn[0]->widthf  * scale),
+                                    int(imgIn[0]->heightf * scale),
+                                    1, IMG_GPU, GL_TEXTURE_2D);
     }
 
     ImageRAWGL *edge, *base;

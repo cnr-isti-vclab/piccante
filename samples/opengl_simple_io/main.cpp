@@ -22,16 +22,29 @@ See the GNU Lesser General Public License
 
 */
 
-#include <QtGui/QGuiApplication>
-#include <QtGui/QScreen>
+#define PIC_DISABLE_OPENGL_NON_CORE
+
+/**
+ * NOTE: if you do not want to use this OpenGL functions loader,
+ * please change it with your favorite one. This is just
+ * a suggestion for running examples.
+*/
+#ifdef _MSC_VER
+    #define PIC_DISABLE_OPENGL_NON_CORE
+    #include "../opengl_common_code/gl_core_4_0.h"
+#endif
+
+#define PIC_DEBUG
 
 #include "piccante.hpp"
+
+#include "../opengl_common_code/opengl_window.hpp"
 
 class SimpleIOWindow : public pic::OpenGLWindow
 {
 protected:
     pic::QuadGL *quad;
-    pic::FilterGLSimpleTMO *tmo;
+    pic::FilterGLColorConv *tmo;
 
 public:
     pic::ImageRAWGL img, *imgOut;
@@ -47,7 +60,7 @@ public:
     {
         //reading an input image
         img.Read("../data/input/bottles.hdr");
-        img.generateTextureGL(false);
+        img.generateTextureGL(false, GL_TEXTURE_2D);
 
         //creating a screen aligned quad
         pic::QuadGL::getProgram(program,
@@ -57,7 +70,7 @@ public:
         quad = new pic::QuadGL(true);
         
         //allocating a new filter for simple tone mapping
-        tmo = new pic::FilterGLSimpleTMO();
+        tmo = new pic::FilterGLColorConv(new pic::ColorConvGLRGBtosRGB());
     }
 
     void render()
@@ -90,6 +103,7 @@ public:
 
 int main(int argc, char **argv)
 {
+
     QGuiApplication app(argc, argv);
 
     QSurfaceFormat format;

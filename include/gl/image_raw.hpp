@@ -35,19 +35,25 @@ namespace pic {
 
 enum IMAGESTORE {IMG_GPU_CPU, IMG_CPU_GPU, IMG_CPU, IMG_GPU, IMG_NULL};
 
+/**
+ * @brief The ImageRAWGL class
+ */
 class ImageRAWGL: public ImageRAW
 {
 protected:
     GLuint		texture;
     GLenum		target;
     IMAGESTORE	mode;	        //TODO: check if the mode is always correctly updated
-    bool		notOwnedGL;     //do we own the OpenGL texture??
-
+    bool		notOwnedGL;     //do we own the OpenGL texture??    
     Fbo			*tmpFbo;
 
+    /**
+     * @brief Destroy
+     */
     void	Destroy();
 
 public:
+    std::vector<ImageRAWGL *> stack;
 
     /**
      * @brief ImageRAWGL
@@ -67,14 +73,32 @@ public:
      * @brief ImageRAWGL
      * @param img
      * @param mipmap
+     * @param target
      */
-    ImageRAWGL(ImageRAW *img, bool mipmap);
+    ImageRAWGL(ImageRAW *img, bool mipmap, GLenum target);
 
     /**
      * @brief ImageRAWGL
      * @param nameFile
      */
     ImageRAWGL(std::string nameFile): ImageRAW(nameFile)
+    {
+        notOwnedGL = false;
+        mode = IMG_CPU;
+        texture = 0;
+        target = 0;
+        tmpFbo = NULL;
+    }
+
+    /**
+     * @brief ImageRAW
+     * @param frames
+     * @param width
+     * @param height
+     * @param channels
+     * @param data
+     */
+    ImageRAWGL(int frames, int width, int height, int channels, float *data) : ImageRAW (frames, width, height, channels, data)
     {
         notOwnedGL = false;
         mode = IMG_CPU;
@@ -91,7 +115,7 @@ public:
      * @param channels
      * @param mode
      */
-    ImageRAWGL(int frames, int width, int height, int channels, IMAGESTORE mode);
+    ImageRAWGL(int frames, int width, int height, int channels, IMAGESTORE mode, GLenum target);
 
     /**
      * @brief AllocateSimilarOneGL
@@ -115,28 +139,24 @@ public:
     void AssignGL(float r, float g, float b, float a);
 
     /**
-     * @brief generateTextureGL
+     * @brief generate
+     * @param mipmap
+     * @param target
+     */
+    GLuint generateTextureGL(bool mipmap, GLenum target);
+
+    /**
+     * @brief generateTexture2DGL
      * @param mipmap
      * @return
      */
-    GLuint generateTextureGL(bool mipmap);
+    GLuint generateTexture2DGL(bool mipmap);
 
     /**
-     * @brief generateTextureGLU32
+     * @brief generateTexture2DU32GL
      * @return
      */
-    GLuint	generateTextureGLU32();
-
-    /**
-     * @brief loadFromMemory
-     * @param mipmap
-     */
-    void loadFromMemory(bool mipmap);
-
-    /**
-     * @brief loadToMemory
-     */
-    void loadToMemory();
+    GLuint	generateTexture2DU32GL();
 
     /**
      * @brief generateTexture3DGL
@@ -151,10 +171,10 @@ public:
     GLuint generateTextureCubeMapGL();
 
     /**
-     * @brief generateTextureArrayGL
+     * @brief generateTexture2DArrayGL
      * @return
      */
-    GLuint generateTextureArrayGL();
+    GLuint generateTexture2DArrayGL();
 
     /**
      * @brief loadSliceIntoTexture
@@ -166,6 +186,17 @@ public:
      * @brief loadAllSlicesIntoTex
      */
     void loadAllSlicesIntoTex();
+
+    /**
+     * @brief loadFromMemory
+     * @param mipmap
+     */
+    void loadFromMemory(bool mipmap);
+
+    /**
+     * @brief loadToMemory
+     */
+    void loadToMemory();
 
     /**
      * @brief readFromBindedFBO
@@ -243,6 +274,15 @@ public:
     }
 
     /**
+     * @brief getTarget
+     * @return
+     */
+    GLenum getTarget()
+    {
+        return target;
+    }
+
+    /**
      * @brief GenerateMask creates an opengl mask (a texture) from a buffer of bool values.
      * @param width
      * @param height
@@ -297,8 +337,16 @@ public:
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         }
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8 , width, height, 0, GL_LUMINANCE,
+        //Note: GL_LUMINANCE is deprecated since OpenGL 3.1
+        #ifndef PIC_DISABLE_OPENGL_NON_CORE
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8 , width, height, 0, GL_LUMINANCE,
                      GL_UNSIGNED_BYTE, data);
+        #endif
+
+        #ifdef PIC_DISABLE_OPENGL_NON_CORE
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED,
+                         GL_UNSIGNED_BYTE, data);
+        #endif
 
         if(mipmap && bGen) {
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -353,7 +401,17 @@ ImageRAWGL::ImageRAWGL(GLuint tex, GLuint target) : ImageRAW()
     break;
 
     case GL_TEXTURE_CUBE_MAP: {
+        glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+        glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP, 0, GL_TEXTURE_WIDTH, &width);
+        glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP, 0, GL_TEXTURE_HEIGHT, &height);
+        glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP, 0, GL_TEXTURE_INTERNAL_FORMAT,
+                                 &internalFormat);
 
+        channels = getChannelsFromInternalFormatGL(internalFormat);
+
+        frames = 6;
+
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
     break;
 
@@ -389,7 +447,7 @@ ImageRAWGL::ImageRAWGL(GLuint tex, GLuint target) : ImageRAW()
     AllocateAux();
 }
 
-ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap): ImageRAW()
+ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap, GLenum target): ImageRAW()
 {
     notOwnedGL = false;
 
@@ -403,20 +461,15 @@ ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap): ImageRAW()
 
     CalculateStrides();
 
-    target  = 0;
     texture = 0;
 
-    if(frames > 1) {
-        generateTexture3DGL();
-    } else {
-        generateTextureGL(mipmap);
-    }
+    generateTextureGL(mipmap, target);
 
     mode = IMG_CPU_GPU;
 }
 
 ImageRAWGL::ImageRAWGL(int frames, int width, int height, int channels,
-                       IMAGESTORE mode) : ImageRAW()
+                       IMAGESTORE mode, GLenum target) : ImageRAW()
 {
     notOwnedGL = false;
     tmpFbo = NULL;
@@ -430,7 +483,8 @@ ImageRAWGL::ImageRAWGL(int frames, int width, int height, int channels,
     switch(this->mode) {
     case IMG_CPU_GPU: {
         Allocate(width, height, channels, frames);
-        generateTextureGL(false);
+
+        generateTextureGL(false, target);
     }
     break;
 
@@ -448,11 +502,7 @@ ImageRAWGL::ImageRAWGL(int frames, int width, int height, int channels,
 
         AllocateAux();
 
-        if(frames == 1) {
-            generateTextureGL(false);
-        } else {
-            generateTexture3DGL();
-        }
+        generateTextureGL(false, target);
     }
     break;
     }
@@ -463,11 +513,53 @@ ImageRAWGL::~ImageRAWGL()
     Destroy();
 }
 
+GLuint ImageRAWGL::generateTextureGL(bool mipmap, GLenum target)
+{
+    this->target  = target;
+
+    switch(target) {
+        case GL_TEXTURE_2D:
+        {
+            generateTexture2DGL(mipmap);
+        } break;
+
+        case GL_TEXTURE_3D:
+        {
+            if(frames > 1) {
+                generateTexture3DGL();
+            } else {
+                generateTexture2DGL(mipmap);
+                this->target = GL_TEXTURE_2D;
+            }
+        } break;
+
+        case GL_TEXTURE_2D_ARRAY: {
+            generateTexture2DArrayGL();
+        } break;
+
+        case GL_TEXTURE_CUBE_MAP: {
+            if(frames > 5) {
+                generateTextureCubeMapGL();
+            } else {
+                if(frames > 1) {
+                    generateTexture2DArrayGL();
+                    this->target = GL_TEXTURE_2D_ARRAY;
+                } else {
+                    generateTexture2DGL(mipmap);
+                    this->target = GL_TEXTURE_2D;
+                }
+            }
+        } break;
+    }
+
+    return texture;
+}
+
 ImageRAWGL *ImageRAWGL::CloneGL()
 {
     //TODO: to improve CloneGL
     ImageRAW *tmp = this->Clone();
-    return new ImageRAWGL(tmp, false);
+    return new ImageRAWGL(tmp, false, target);
 }
 
 void ImageRAWGL::Destroy()
@@ -489,7 +581,7 @@ ImageRAWGL *ImageRAWGL::AllocateSimilarOneGL()
     printf("%d %d %d %d %d\n", frames, width, height, channels, mode);
 #endif
 
-    ImageRAWGL *ret = new ImageRAWGL(frames, width, height, channels, mode);
+    ImageRAWGL *ret = new ImageRAWGL(frames, width, height, channels, mode, target);
     return ret;
 }
 
@@ -512,8 +604,12 @@ void ImageRAWGL::AssignGL(float r = 0.0f, float g = 0.0f, float b = 0.0f,
     tmpFbo->unbind();
 }
 
-GLuint ImageRAWGL::generateTextureGL(bool mipmap = false)
+GLuint ImageRAWGL::generateTexture2DGL(bool mipmap = false)
 {
+    if(width <1 || height < 1 || channels < 1) {
+        return 0;
+    }
+
     updateModeGPU();
 
     target = GL_TEXTURE_2D;
@@ -535,7 +631,7 @@ GLuint ImageRAWGL::generateTextureGL(bool mipmap = false)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     int mode, modeInternalFormat;
-    getModesGL(channels, &mode, &modeInternalFormat);
+    getModesGL(channels, mode, modeInternalFormat);
     glTexImage2D(GL_TEXTURE_2D, 0, modeInternalFormat, width, height, 0,
                  mode, GL_FLOAT, data);
 
@@ -550,7 +646,7 @@ GLuint ImageRAWGL::generateTextureGL(bool mipmap = false)
 
 GLuint	ImageRAWGL::generateTextureCubeMapGL()
 {
-    if(frames < 6) {
+    if(width <1 || height < 1 || channels < 1 || frames < 6) {
         return 0;
     }
 
@@ -559,7 +655,7 @@ GLuint	ImageRAWGL::generateTextureCubeMapGL()
     target = GL_TEXTURE_CUBE_MAP;
 
     int mode, modeInternalFormat;
-    getModesGL(channels, &mode, &modeInternalFormat);
+    getModesGL(channels, mode, modeInternalFormat);
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
@@ -580,14 +676,121 @@ GLuint	ImageRAWGL::generateTextureCubeMapGL()
     return texture;
 }
 
-void ImageRAWGL::loadFromMemory(bool mipmap = false)
+GLuint ImageRAWGL::generateTexture2DU32GL()
 {
-    glBindTexture(target, texture);
+    if(width <1 || height < 1 || channels < 1) {
+        return 0;
+    }
+
+    target = GL_TEXTURE_2D;
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    int *buffer = new int[width * height * channels];
+
+    for(int i = 0; i < (width * height * channels); i++) {
+        buffer[i] = int(lround(data[i]));
+    }
 
     int mode, modeInternalFormat;
-    getModesGL(channels, &mode, &modeInternalFormat);
-    glTexImage2D(target, 0, modeInternalFormat, width, height, 0,
+    getModesIntegerGL(channels, mode, modeInternalFormat);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, modeInternalFormat, width, height, 0,
+                 mode, GL_INT, buffer);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    delete[] buffer;
+
+    return texture;
+}
+
+GLuint ImageRAWGL::generateTexture3DGL()
+{
+    if(width <1 || height < 1 || channels < 1 || frames < 1) {
+        return 0;
+    }
+
+    updateModeGPU();
+
+    target = GL_TEXTURE_3D;
+
+    int mode, modeInternalFormat;
+    getModesGL(channels, mode, modeInternalFormat);
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_3D, texture);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glTexImage3D(GL_TEXTURE_3D, 0, modeInternalFormat, width, height, frames, 0,
                  mode, GL_FLOAT, data);
+
+    glBindTexture(GL_TEXTURE_3D, 0);
+
+//	for(int i=0;i<frames;i++)
+//		glTexSubImage3D(GL_TEXTURE_3D,0,0,0,i,width,height,1,mode,GL_FLOAT,&data[i*tstride]);
+
+    return texture;
+}
+
+GLuint ImageRAWGL::generateTexture2DArrayGL()
+{
+    if(width <1 || height < 1 || channels < 1 || frames < 1) {
+        return 0;
+    }
+
+    updateModeGPU();
+
+    target = GL_TEXTURE_2D_ARRAY;
+
+    int mode, modeInternalFormat;
+    getModesGL(channels, mode, modeInternalFormat);
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, modeInternalFormat, width, height, frames,
+                 0, mode, GL_FLOAT, data);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+    return texture;
+}
+
+void ImageRAWGL::loadFromMemory(bool mipmap = false)
+{
+    int mode, modeInternalFormat;
+    getModesGL(channels, mode, modeInternalFormat);
+
+    glBindTexture(target, texture);
+
+    switch(target) {
+        case GL_TEXTURE_2D: {
+            glTexImage2D(target, 0, modeInternalFormat, width, height, 0,
+                         mode, GL_FLOAT, data);
+
+        } break;
+
+        case GL_TEXTURE_3D: {
+            glTexImage3D(GL_TEXTURE_3D, 0, modeInternalFormat, width, height, frames, 0,
+                         mode, GL_FLOAT, data);
+        } break;
+    }
 
     glBindTexture(target, 0);
 }
@@ -611,7 +814,7 @@ void ImageRAWGL::loadToMemory()
     }
 
     int mode, modeInternalFormat;
-    getModesGL(channels, &mode, &modeInternalFormat);
+    getModesGL(channels, mode, modeInternalFormat);
 
     bindTexture();
 
@@ -620,93 +823,10 @@ void ImageRAWGL::loadToMemory()
     unBindTexture();
 }
 
-GLuint ImageRAWGL::generateTextureGLU32()
-{
-    target = GL_TEXTURE_2D;
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    int *buffer = new int[width * height * channels];
-
-    for(int i = 0; i < (width * height * channels); i++) {
-        buffer[i] = lround(data[i]);
-    }
-
-    int mode, modeInternalFormat;
-    getModesIntegerGL(channels, &mode, &modeInternalFormat);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, modeInternalFormat, width, height, 0,
-                 mode, GL_INT, buffer);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    delete[] buffer;
-
-    return texture;
-}
-
-GLuint ImageRAWGL::generateTexture3DGL()
-{
-    updateModeGPU();
-
-    target = GL_TEXTURE_3D;
-
-    int mode, modeInternalFormat;
-    getModesGL(channels, &mode, &modeInternalFormat);
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_3D, texture);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    glTexImage3D(GL_TEXTURE_3D, 0, modeInternalFormat, width, height, frames, 0,
-                 mode, GL_FLOAT, data);
-
-    glBindTexture(GL_TEXTURE_3D, 0);
-
-//	for(int i=0;i<frames;i++)
-//		glTexSubImage3D(GL_TEXTURE_3D,0,0,0,i,width,height,1,mode,GL_FLOAT,&data[i*tstride]);
-
-    return texture;
-}
-
-GLuint ImageRAWGL::generateTextureArrayGL()
-{
-    updateModeGPU();
-
-    target = GL_TEXTURE_2D_ARRAY;
-
-    int mode, modeInternalFormat;
-    getModesGL(channels, &mode, &modeInternalFormat);
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, modeInternalFormat, width, height, frames,
-                 0, mode, GL_FLOAT, data);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-    return texture;
-}
-
 void ImageRAWGL::loadSliceIntoTexture(int i)
 {
     int mode, modeInternalFormat;
-    getModesGL(channels, &mode, &modeInternalFormat);
+    getModesGL(channels, mode, modeInternalFormat);
 
     glBindTexture(target, texture);
     i = i % frames;
@@ -756,10 +876,12 @@ void ImageRAWGL::readFromBindedFBO()
 {
 
     int mode, modeInternalFormat;
-    getModesGL(channels, &mode, &modeInternalFormat);
+    getModesGL(channels, mode, modeInternalFormat);
 
     if(mode == 0x0) {
-        printf("void ImageRAWGL::readFromBindedFBO(): error unknown format!");
+        #ifdef PIC_DEBUG
+            printf("void ImageRAWGL::readFromBindedFBO(): error unknown format!");
+        #endif
         return;
     }
 

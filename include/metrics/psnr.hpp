@@ -53,7 +53,7 @@ double PSNR(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
 }
 
 /**PSNR: relative Peak Signal to Noise Ratio*/
-float rPSNR(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
+double rPSNR(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -68,7 +68,7 @@ float rPSNR(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
     double acc = 0.0;
     int count = 0;
 
-    float largeDifferences = C_LARGE_DIFFERENCES;
+    double largeDifferences = C_LARGE_DIFFERENCES;
     if(!bLargeDifferences) {
         largeDifferences = FLT_MAX;
     }

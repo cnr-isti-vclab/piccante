@@ -29,12 +29,20 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterMin class
+ */
 class FilterMin: public Filter
 {
 protected:
     int halfSize;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
     {
         int width = dst->width;
@@ -66,18 +74,36 @@ protected:
     }
 
 public:
-    //Basic constructor
+
+    /**
+     * @brief FilterMin
+     * @param size
+     */
     FilterMin(int size)
     {
         this->halfSize = checkHalfSize(size);
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param size
+     * @return
+     */
     static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, int size)
     {
         FilterMed filter(size);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param size
+     * @return
+     */
     static ImageRAW *Execute(std::string nameIn, std::string nameOut, int size)
     {
         ImageRAW imgIn(nameIn);

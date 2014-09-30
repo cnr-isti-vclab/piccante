@@ -138,6 +138,16 @@ See the GNU Lesser General Public License
  * \li \c Edges: Canny's method, Ward's MTB.
  * \li \c Key-point descriptors: BRIEF, ORB, and LUCID.
  *
+ * \subsection gl_module OpenGL
+ * This module provides GPU acceleration for some functionalities of PICCANTE through OpenGL.
+ * In particular, the module uses OpenGL 4.0 Core profile only, and it is independent from OpenGL
+ * loading extensions libraries; users are free to use their favourite ones.
+ * Note that when using OpenGL and QT together; QT will load OpenGL functions by default
+ * in order to avoid clashes.
+ * In the examples (folder "samples"), we generated .h and .c files for loading OpenGL extensions
+ * using glLoadGen. This is meant for learning purposes only; we do not want to force users to use
+ * it; e.g. GLEW or other libraries can be employed instead.
+ *
  * \subsection utils_module Utilities
  *
  * This module provides different utilies for manipulating strings,
@@ -200,9 +210,6 @@ See the GNU Lesser General Public License
 
 // Qt stuff
 #include "qt.hpp"
-
-// External code
-#include "externals.hpp"
 
 // base stuff
 #include "base.hpp"

@@ -29,6 +29,7 @@ namespace pic {
 
 const double C_SINGULARITY = 1e-6;
 const double C_LARGE_DIFFERENCES = 1e6;
+const float  C_LARGE_DIFFERENCESf = 1e6f;
 
 } // end namespace pic
 

@@ -22,10 +22,19 @@ See the GNU Lesser General Public License
 
 */
 
-#include <QtGui/QGuiApplication>
-#include <QtGui/QScreen>
+/**
+ * NOTE: if you do not want to use this OpenGL functions loader,
+ * please change it with your favorite one. This is just
+ * a suggestion for running examples.
+*/
+#ifdef _MSC_VER
+    #define PIC_DISABLE_OPENGL_NON_CORE
+    #include "../opengl_common_code/gl_core_4_0.h"
+#endif
 
 #include "piccante.hpp"
+
+#include "../opengl_common_code/opengl_window.hpp"
 
 class SimpleOperatorsWindow : public pic::OpenGLWindow
 {
@@ -50,10 +59,10 @@ public:
     {
         //reading an input image
         img.Read("../data/input/bottles.hdr");
-        img.generateTextureGL(false);
+        img.generateTextureGL(false, GL_TEXTURE_2D);
 
         //creating a random image
-        imgRand = new pic::ImageRAWGL(img.frames, img.width, img.height, img.channels, pic::IMG_CPU_GPU);
+        imgRand = new pic::ImageRAWGL(img.frames, img.width, img.height, img.channels, pic::IMG_CPU_GPU, GL_TEXTURE_2D);
         imgRand->SetRand();
         imgRand->loadFromMemory();
 

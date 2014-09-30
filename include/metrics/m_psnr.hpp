@@ -63,8 +63,8 @@ double mPSNR(ImageRAW *ori, ImageRAW *cmp, int minFstop, int maxFstop)
         float tminFstop = logf(commonMin) / logf(2.0f);
         float tmaxFstop = logf(commonMax) / logf(2.0f);
 
-        minFstop = lround(tminFstop);
-        maxFstop = lround(tmaxFstop);
+        minFstop = int(lround(tminFstop));
+        maxFstop = int(lround(tmaxFstop));
 
         int halfFstops = (maxFstop - minFstop + 1) / 2;
         minFstop = -halfFstops + 1;
