@@ -31,6 +31,13 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief LischinskiTMO
+ * @param imgIn
+ * @param imgOut
+ * @param alpha
+ * @return
+ */
 ImageRAW *LischinskiTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL,
                         float alpha = 0.5f)
 {

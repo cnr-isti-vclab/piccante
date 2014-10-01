@@ -40,17 +40,42 @@ namespace pic {
 *
 **/
 
+/**
+ * @brief LischinskiFunction
+ * @param Lcur
+ * @param Lref
+ * @param param
+ * @param LISCHINSKI_EPSILON
+ * @return
+ */
 inline float LischinskiFunction(float Lcur, float Lref, float param[2],
                                 float LISCHINSKI_EPSILON = 0.0001f)
 {
     return -param[1] / (powf(fabsf(Lcur - Lref), param[0]) + LISCHINSKI_EPSILON);
 }
 
+/**
+ * @brief LischinskiFunctionGauss
+ * @param Lcur
+ * @param Lref
+ * @param param
+ * @return
+ */
 inline float LischinskiFunctionGauss(float Lcur, float Lref, float param[2])
 {
     return expf(-powf(Lcur - Lref, 2.0f) * 10.0f);
 }
 
+/**
+ * @brief LischinskiMinimization
+ * @param L
+ * @param g
+ * @param omega
+ * @param alpha
+ * @param lambda
+ * @param LISCHINSKI_EPSILON
+ * @return
+ */
 ImageRAW *LischinskiMinimization(ImageRAW *L, ImageRAW *g,
                                  ImageRAW *omega = NULL, float alpha = 1.0f, float lambda = 0.2f,
                                  float LISCHINSKI_EPSILON = 0.0001f)
@@ -75,7 +100,9 @@ ImageRAW *LischinskiMinimization(ImageRAW *L, ImageRAW *g,
     Eigen::VectorXd b, x;
     b = Eigen::VectorXd::Zero(tot);
 
-    printf("Init matrix...");
+    #ifdef PIC_DEBUG
+        printf("Init matrix...");
+    #endif
 
     std::vector< Eigen::Triplet< double > > tL;
 
@@ -124,7 +151,9 @@ ImageRAW *LischinskiMinimization(ImageRAW *L, ImageRAW *g,
         }
     }
 
-    printf("Ok\n");
+    #ifdef PIC_DEBUG
+        printf("Ok\n");
+    #endif
 
     Eigen::SparseMatrix<double> A = Eigen::SparseMatrix<double>(tot, tot);
     A.setFromTriplets(tL.begin(), tL.end());
@@ -133,11 +162,15 @@ ImageRAW *LischinskiMinimization(ImageRAW *L, ImageRAW *g,
     x = solver.solve(b);
 
     if(solver.info() != Eigen::Success) {
-        printf("SOLVER FAILED!\n");
+        #ifdef PIC_DEBUG
+            printf("SOLVER FAILED!\n");
+        #endif
         return NULL;
     }
 
-    printf("SOLVER SUCCESS!\n");
+    #ifdef PIC_DEBUG
+        printf("SOLVER SUCCESS!\n");
+    #endif
 
     ImageRAW *ret = L->AllocateSimilarOne();
 

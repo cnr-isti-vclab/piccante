@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     Q_UNUSED(argc);
     Q_UNUSED(argv);
 
-    printf("Reading an HDR file...");
+    printf("Reading an LDR file...");
 
     pic::ImageRAW img;
     img.Read("../data/input/singapore.png");
@@ -61,7 +61,6 @@ int main(int argc, char *argv[])
         printf(" Ok\n");
 
         pic::ImageRAW *imgOut = pic::FilterDCT2D::Inverse(img_dct, NULL, 8);
-
 
         printf("Writing the file to disk...");
         bool bWritten = imgOut->Write("../data/output/simple_dct.png");
