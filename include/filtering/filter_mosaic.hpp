@@ -29,11 +29,19 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterMosaic class
+ */
 class FilterMosaic: public Filter
 {
 protected:
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
     {
         if(src[0]->channels != 3){
@@ -73,6 +81,12 @@ protected:
         }
     }
 
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
     {
         if(imgOut == NULL) {
@@ -83,10 +97,22 @@ protected:
     }
 
 public:
-    //Basic constructors
-    FilterMosaic() {}
+    /**
+     * @brief FilterMosaic
+     */
+    FilterMosaic()
+    {
 
-    /**Output size*/
+    }
+
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
     void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
     {
         width       = imgIn->width;
@@ -95,13 +121,24 @@ public:
         frames      = imgIn->frames;
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut)
     {
         FilterMosaic flt;
         return flt.ProcessP(Single(imgIn), imgOut);
     }
 
-    //Filtering
+    /**
+     * @brief Execute
+     * @param fileInput
+     * @param fileOutput
+     * @return
+     */
     static ImageRAW *Execute(std::string fileInput, std::string fileOutput)
     {
         ImageRAW imgIn(fileInput);
