@@ -296,12 +296,11 @@ public:
     void MulS(Image *img);
 
     /**
-     * @brief MulSNeg is a multiplication operator for Image.
-     * @param img is an Image which has one color channel.
-     * (1.0 - img) is multiplied by the current Image.
-     * They need to have the same width and height.
+     * @brief Blend
+     * @param img
+     * @param weight
      */
-    void MulSNeg(Image *img);
+    void Blend(Image *img, Image *weight);
 
     /**
      * @brief Mul is the multiplication operator for Image.
@@ -1254,13 +1253,13 @@ PIC_INLINE void Image::MulS(Image *img)
     }
 }
 
-PIC_INLINE void Image::MulSNeg(Image *img)
+PIC_INLINE void Image::Blend(Image *img, Image *weight)
 {
     if(img == NULL) {
         return;
     }
 
-    if(img->channels != 1) {
+    if(weight->channels != 1) {
         return;
     }
 
@@ -1271,8 +1270,13 @@ PIC_INLINE void Image::MulSNeg(Image *img)
     for(int ind = 0; ind < size; ind++) {
         int i = ind * channels;
 
+        float w0 = weight->data[ind];
+        float w1 = 1.0f - w0;
+
         for(int j = 0; j < channels; j++) {
-            data[i + j] *= (1.0f - img->data[ind]);
+            int indx = i + j;
+            data[indx] *= w0;
+            data[indx] += img->data[indx] * w1;
         }
     }
 }

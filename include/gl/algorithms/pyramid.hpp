@@ -44,13 +44,12 @@ protected:
 
     FilterGLGaussian2D		*fltG;
     FilterGLSampler2D		*fltS;
-    FilterGLOp				*fltSub, *fltId, *fltMul, *fltAdd, *fltMulNeg;
+    FilterGLOp				*fltSub, *fltId, *fltMul, *fltAdd;
 
     void InitFilters()
     {
         fltG = new FilterGLGaussian2D(1.0f);
         fltS = new FilterGLSampler2D(0.5f);
-        fltMulNeg = FilterGLOp::CreateOpMulNeg(false);
         fltSub  = FilterGLOp::CreateOpSub(false);
         fltMul  = FilterGLOp::CreateOpMul(false);
         fltAdd  = FilterGLOp::CreateOpAdd(false);
@@ -161,10 +160,10 @@ void PyramidGL::Create(ImageRAWGL *img, bool lapGauss, int limitLevel = 0)
         tmpG = fltG->Process(SingleGL(tmpImg), NULL);
         tmpD = fltS->Process(SingleGL(tmpG), NULL);
 
-        if(lapGauss) {	//Laplacian Pyramid
+        if(lapGauss) {  //Laplacian Pyramid
             fltSub->Process(DoubleGL(tmpImg, tmpD), tmpG);
             stack.push_back(tmpG);
-        } else {			//Gaussian Pyramid
+        } else {        //Gaussian Pyramid
             fltId->Process(SingleGL(tmpImg), tmpG);
             stack.push_back(tmpG);
         }
@@ -230,17 +229,6 @@ void PyramidGL::Mul(const PyramidGL *pyr)
     }
 }
 
-void PyramidGL::MulNeg(const PyramidGL *pyr)
-{
-    if(stack.size() != pyr->stack.size()) {
-        return;
-    }
-
-    for(unsigned int i = 0; i < stack.size(); i++) {
-        fltMulNeg->Process(DoubleGL(stack[i], pyr->stack[i]), stack[i]);
-    }
-}
-
 void PyramidGL::Add(const PyramidGL *pyr)
 {
     if(stack.size() != pyr->stack.size()) {
@@ -254,9 +242,14 @@ void PyramidGL::Add(const PyramidGL *pyr)
 
 void PyramidGL::Blend(PyramidGL *pyr, PyramidGL *weight)
 {
-    MulNeg(weight);
-    pyr->Mul(weight);
-    Add(pyr);
+    if(stack.size() != pyr->stack.size() ||
+       stack.size() != weight->stack.size()) {
+        return;
+    }
+
+    for(unsigned int i = 0; i < stack.size(); i++) {
+        //fltBlend->Process(Triple(stack[i], pyr->stack[i], weight->stack[i]), stack[i]);
+    }
 }
 
 void PyramidGL::Update(ImageRAWGL *img)

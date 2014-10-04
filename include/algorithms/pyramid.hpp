@@ -91,12 +91,6 @@ public:
     void Mul(const Pyramid *pyr);
 
     /**
-     * @brief MulSNeg
-     * @param pyr
-     */
-    void MulSNeg(const Pyramid *pyr);
-
-    /**
      * @brief Mul is the add operator ( += ) between pyramids.
      * @param pyr
      */
@@ -307,22 +301,15 @@ void Pyramid::Add(const Pyramid *pyr)
     }
 }
 
-void Pyramid::MulSNeg(const Pyramid *pyr)
+void Pyramid::Blend(Pyramid *pyr, Pyramid *weight)
 {
     if((stack.size() != pyr->stack.size()) && (pyr->stack.size() > 0)) {
         return;
     }
 
     for(unsigned int i = 0; i < stack.size(); i++) {
-        stack[i]->MulSNeg(pyr->stack[i]);
+        stack[i]->Blend(pyr->stack[i], weight->stack[i]);
     }
-}
-
-void Pyramid::Blend(Pyramid *pyr, Pyramid *weight)
-{
-    MulSNeg(weight);
-    pyr->Mul(weight);
-    Add(pyr);
 }
 
 } // end namespace pic

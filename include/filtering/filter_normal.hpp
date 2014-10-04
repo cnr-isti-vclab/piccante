@@ -203,6 +203,7 @@ void genLight(float *L, int x, int y, int width, int height)
         L[2] *= norm;
     };
 };
+*/
 
 
 } // end namespace pic
