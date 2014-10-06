@@ -1474,6 +1474,10 @@ PIC_INLINE float *Image::getSumVal(BBox *box = NULL, float *ret = NULL)
 
 PIC_INLINE float *Image::getMeanVal(BBox *box = NULL, float *ret = NULL)
 {
+    if(box == NULL) {
+        box = &fullBox;
+    }
+
     ret = getSumVal(box, ret);
 
     float totf = float(box->Size());

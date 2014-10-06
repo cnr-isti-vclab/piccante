@@ -26,8 +26,6 @@ See the GNU Lesser General Public License
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
-//This means we do not use QT for I/O
-#define PIC_DISABLE_QT
 
 #include "piccante.hpp"
 
@@ -40,7 +38,6 @@ int main(int argc, char *argv[])
 
     pic::ImageRAW img;
     img.Read("../data/input/bottles.hdr");
-
     printf("Ok\n");
 
     printf("Is it valid? ");
@@ -60,7 +57,7 @@ int main(int argc, char *argv[])
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bool bWritten = output->Write("../data/output/filtered_bilateral.hdr");
+        bool bWritten = output->Write("../data/output/filtered_bilateral.png");
 
         if(bWritten) {
             printf("Ok\n");
@@ -75,7 +72,7 @@ int main(int argc, char *argv[])
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_anisotropic_diffusion.hdr");
+        bWritten = output->Write("../data/output/filtered_anisotropic_diffusion.png");
 
         if(bWritten) {
             printf("Ok\n");
@@ -90,7 +87,7 @@ int main(int argc, char *argv[])
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_wls.hdr");
+        bWritten = output->Write("../data/output/filtered_wls.png");
 
         if(bWritten) {
             printf("Ok\n");
@@ -104,7 +101,7 @@ int main(int argc, char *argv[])
         output = fltK.ProcessP(input, output);//filtering the image
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_kuwahara.hdr");
+        bWritten = output->Write("../data/output/filtered_kuwahara.png");
 
         if(bWritten) {
             printf("Ok\n");
@@ -118,7 +115,7 @@ int main(int argc, char *argv[])
         output = fltG.ProcessP(input, output);//filtering the image
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_guided.hdr");
+        bWritten = output->Write("../data/output/filtered_guided.png");
 
         if(bWritten) {
             printf("Ok\n");

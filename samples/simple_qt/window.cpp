@@ -284,6 +284,8 @@ void Window::update_pixmap()
     if(image==NULL){
         return;
     }
+
+    image->Div(image->getMeanVal()[0] * 4.0f);
     QImage *qimage = image->ConvertToQImage();
 
     if(qimage->isNull()) {

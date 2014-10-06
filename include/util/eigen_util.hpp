@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #include "util/matrix_3_x_3.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/eigen/LU"
+#include "externals/Eigen/LU"
 #endif
 
 #ifndef PIC_EIGEN_UTIL

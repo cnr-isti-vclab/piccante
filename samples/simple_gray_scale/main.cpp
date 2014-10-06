@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     Q_UNUSED(argv);
 
 
-    printf("Reading an HDR file...");
+    printf("Reading an LDR file...");
 
     pic::ImageRAW img;
     img.Read("../data/input/singapore.png");

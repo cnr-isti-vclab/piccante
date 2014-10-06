@@ -34,6 +34,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The WardAlignment class
+ */
 class WardAlignment
 {
 protected:
@@ -43,6 +46,9 @@ public:
     ImageRAWVec             img1_v, img2_v, luminance;
     std::vector< bool* >    tb1_v, tb2_v, eb2_shifted_v, tb2_shifted_v;
 
+    /**
+     * @brief WardAlignment
+     */
     WardAlignment()
     {
         Update(0.5f, 0.015625f);
@@ -79,7 +85,11 @@ public:
         }
     }
 
-    /**Update: setting up parameters for MTB*/
+    /**
+     * @brief Update sets parameters up for MTB
+     * @param percentile
+     * @param tolerance
+     */
     void Update(float percentile, float tolerance)
     {
         if(percentile < 0.0f && percentile > 1.0f) {
@@ -94,7 +104,12 @@ public:
         this->tolerance = tolerance;
     }
 
-    /**MTB: computes the median threshold mask*/
+    /**
+     * @brief MTB computes the median threshold mask
+     * @param img
+     * @param L
+     * @return
+     */
     bool *MTB(ImageRAW *img, ImageRAW *L)
     {
         bool bDelete = (L == NULL);
@@ -128,7 +143,13 @@ public:
         return maskThr;
     }
 
-    /**GetExpShift: computes the shift vector for moving an img1 onto img2 */
+    /**
+     * @brief GetExpShift computes the shift vector for moving an img1 onto img2
+     * @param img1
+     * @param img2
+     * @param shift_bits
+     * @return
+     */
     Vec<2, int> GetExpShift(ImageRAW *img1, ImageRAW *img2,
                                    int shift_bits = 6)
     {
@@ -240,7 +261,13 @@ public:
         return cur_shift;
     }
 
-    /*Execute: aligns an imgTarget to imgSource*/
+    /**
+     * @brief Execute aligns imgSource to imgTarget
+     * @param imgTarget
+     * @param imgSource
+     * @param shift
+     * @return
+     */
     static ImageRAW *Execute(ImageRAW *imgTarget, ImageRAW *imgSource, Vec<2, int> &shift)
     {
         WardAlignment wa;

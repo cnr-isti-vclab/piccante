@@ -89,7 +89,13 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
 
 enum IMG_LIN {LIN_LIN, LIN_2_2, LIN_ICFR};
 
-/***/
+/**
+ * @brief Linearize
+ * @param x
+ * @param type
+ * @param icrf
+ * @return
+ */
 inline float Linearize(float x, IMG_LIN type, float *icrf = NULL)
 {
     switch(type) {

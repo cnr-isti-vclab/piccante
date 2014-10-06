@@ -49,12 +49,12 @@ int main(int argc, char *argv[])
 
         printf("Filtering the image with a Gaussian filter with sigma_s = 4.0...");
 
-        pic::ImageRAW *output = pic::FilterGaussian2D::Execute(&img, NULL, 4.0f);
+        pic::ImageRAW *output = pic::FilterKuwahara::Execute(&img, NULL, 15);
 
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bool bWritten = output->Write("../data/output/filtered_gaussiang_4_0.hdr");
+        bool bWritten = output->Write("../data/output/filtered_gaussian_4_0.hdr");
 
         if(bWritten) {
             printf("Ok\n");
