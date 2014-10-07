@@ -63,8 +63,10 @@ FilterSampler3D::FilterSampler3D(float scale, ImageSampler *isb)
 ImageRAW *FilterSampler3D::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = new ImageRAW(imgIn[0]->frames * scale, imgIn[0]->width * scale,
-                              imgIn[0]->height * scale, imgIn[0]->channels);
+        imgOut = new ImageRAW(  int(imgIn[0]->framesf * scale),
+                                int(imgIn[0]->widthf  * scale),
+                                int(imgIn[0]->heightf * scale),
+                                imgIn[0]->channels);
     }
 
     return imgOut;

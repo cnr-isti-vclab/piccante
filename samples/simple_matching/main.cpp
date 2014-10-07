@@ -72,7 +72,8 @@ int main(int argc, char *argv[])
 
         printf("Computing ORB descriptors...\n");
 
-        pic::ORBDescriptor b_desc(31, 512);
+        pic::PoissonDescriptor b_desc(8);
+//        pic::ORBDescriptor b_desc(31, 512);
 
         std::vector< unsigned int *> descs0;
         for(unsigned int i=0; i<corners_from_img0.size(); i++) {
@@ -97,7 +98,7 @@ int main(int argc, char *argv[])
 
         printf("Descriptor size: %d\n", n);
 
-        for(unsigned int i =0; i<descs0.size(); i++) {
+        for(unsigned int i = 0; i < descs0.size(); i++) {
 
             unsigned int dist_1 = 0;
             unsigned int dist_2 = 0;

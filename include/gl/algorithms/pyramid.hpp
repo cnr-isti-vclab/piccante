@@ -33,6 +33,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The PyramidGL class
+ */
 class PyramidGL
 {
 protected:
@@ -41,13 +44,12 @@ protected:
 
     FilterGLGaussian2D		*fltG;
     FilterGLSampler2D		*fltS;
-    FilterGLOp				*fltSub, *fltId, *fltMul, *fltAdd, *fltMulNeg;
+    FilterGLOp				*fltSub, *fltId, *fltMul, *fltAdd;
 
     void InitFilters()
     {
         fltG = new FilterGLGaussian2D(1.0f);
         fltS = new FilterGLSampler2D(0.5f);
-        fltMulNeg = FilterGLOp::CreateOpMulNeg(false);
         fltSub  = FilterGLOp::CreateOpSub(false);
         fltMul  = FilterGLOp::CreateOpMul(false);
         fltAdd  = FilterGLOp::CreateOpAdd(false);
@@ -61,16 +63,62 @@ protected:
 public:
     std::vector<ImageRAWGL *>	stack;
 
+    /**
+     * @brief PyramidGL
+     * @param img
+     * @param lapGauss
+     * @param limitLevel
+     */
     PyramidGL(ImageRAWGL *img, bool lapGauss, int limitLevel);
+
+    /**
+     * @brief PyramidGL
+     * @param width
+     * @param height
+     * @param channels
+     * @param lapGauss
+     * @param limitLevel
+     */
     PyramidGL(int width, int height, int channels, bool lapGauss, int limitLevel);
+
     ~PyramidGL();
 
+    /**
+     * @brief Update
+     * @param img
+     */
     void Update(ImageRAWGL *img);
+
+    /**
+     * @brief Mul
+     * @param pyr
+     */
     void Mul(const PyramidGL *pyr);
+
+    /**
+     * @brief MulNeg
+     * @param pyr
+     */
     void MulNeg(const PyramidGL *pyr);
+
+    /**
+     * @brief Add
+     * @param pyr
+     */
     void Add(const PyramidGL *pyr);
+
+    /**
+     * @brief Blend
+     * @param pyr
+     * @param weight
+     */
     void Blend(PyramidGL *pyr, PyramidGL *weight);
 
+    /**
+     * @brief Reconstruct
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Reconstruct(ImageRAWGL *imgOut);
 };
 
@@ -81,7 +129,7 @@ PyramidGL::PyramidGL(ImageRAWGL *img, bool lapGauss, int limitLevel = 0)
 
 PyramidGL::PyramidGL(int width, int height, int channels, bool lapGauss, int limitLevel = 0)
 {
-    ImageRAWGL *tmpImg = new ImageRAWGL(1, width, height, channels, IMG_GPU);
+    ImageRAWGL *tmpImg = new ImageRAWGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
 
     Create(tmpImg, lapGauss, limitLevel);
 }
@@ -112,10 +160,10 @@ void PyramidGL::Create(ImageRAWGL *img, bool lapGauss, int limitLevel = 0)
         tmpG = fltG->Process(SingleGL(tmpImg), NULL);
         tmpD = fltS->Process(SingleGL(tmpG), NULL);
 
-        if(lapGauss) {	//Laplacian Pyramid
+        if(lapGauss) {  //Laplacian Pyramid
             fltSub->Process(DoubleGL(tmpImg, tmpD), tmpG);
             stack.push_back(tmpG);
-        } else {			//Gaussian Pyramid
+        } else {        //Gaussian Pyramid
             fltId->Process(SingleGL(tmpImg), tmpG);
             stack.push_back(tmpG);
         }
@@ -144,7 +192,7 @@ ImageRAWGL *PyramidGL::Reconstruct(ImageRAWGL *imgOut)
 
     if(imgOut == NULL) {
         imgOut = new ImageRAWGL(1, stack[0]->width, stack[0]->height,
-                                stack[0]->channels, IMG_GPU);
+                                stack[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     int n = stack.size() - 1;
@@ -181,17 +229,6 @@ void PyramidGL::Mul(const PyramidGL *pyr)
     }
 }
 
-void PyramidGL::MulNeg(const PyramidGL *pyr)
-{
-    if(stack.size() != pyr->stack.size()) {
-        return;
-    }
-
-    for(unsigned int i = 0; i < stack.size(); i++) {
-        fltMulNeg->Process(DoubleGL(stack[i], pyr->stack[i]), stack[i]);
-    }
-}
-
 void PyramidGL::Add(const PyramidGL *pyr)
 {
     if(stack.size() != pyr->stack.size()) {
@@ -205,9 +242,14 @@ void PyramidGL::Add(const PyramidGL *pyr)
 
 void PyramidGL::Blend(PyramidGL *pyr, PyramidGL *weight)
 {
-    MulNeg(weight);
-    pyr->Mul(weight);
-    Add(pyr);
+    if(stack.size() != pyr->stack.size() ||
+       stack.size() != weight->stack.size()) {
+        return;
+    }
+
+    for(unsigned int i = 0; i < stack.size(); i++) {
+        //fltBlend->Process(Triple(stack[i], pyr->stack[i], weight->stack[i]), stack[i]);
+    }
 }
 
 void PyramidGL::Update(ImageRAWGL *img)

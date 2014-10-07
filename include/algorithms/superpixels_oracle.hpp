@@ -98,7 +98,7 @@ public:
         delete root;
     }
 
-    void Query(double x, double y, double r, std::set<int> &out)
+    void Query(float x, float y, float r, std::set<int> &out)
     {
         root->Find(x, y, r, out);
     }

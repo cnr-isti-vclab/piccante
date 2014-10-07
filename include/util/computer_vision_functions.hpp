@@ -286,7 +286,7 @@ Eigen::Matrix3d EstimateFundamental(std::vector< Eigen::Vector2f > &points0, std
 
     Eigen::Matrix3d F_new = Uf * DiagonalMatrix(Df) * Eigen::Transpose< Eigen::Matrix3d >(Vf);
 
-    float norm = MAX(Df[0], Df[1]);
+    double norm = MAX(Df[0], Df[1]);
     return F_new / norm;
 }
 
@@ -520,7 +520,7 @@ Eigen::Matrix3d computeEssentialMatrix(Eigen::Matrix3d &F, Eigen::Matrix3d &K)
  */
 double getFocalLengthFromFOVAngle(double fovy)
 {
-    return 1.0 / tanf(fovy / 2.0);
+    return 1.0 / tan(fovy / 2.0);
 }
 
 /**
@@ -598,7 +598,7 @@ Eigen::Matrix3d getIntrinsicsMatrix(double focal_length_x, double focal_length_y
  * @param K
  * @return
  */
-Eigen::Vector2d removeLensDistortion(Eigen::Vector2d p, double *k)
+Eigen::Vector2d removeLensDistortion(Eigen::Vector2d &p, double k[5])
 {
     Eigen::Vector2d ret;
 
@@ -612,8 +612,6 @@ Eigen::Vector2d removeLensDistortion(Eigen::Vector2d p, double *k)
     dx[1] = k[2] * (r_2 + 2 * p[1] * p[1]) + 2.0 * k[3] * p[0] * p[1];
 
     ret = p * c + dx;
-
-    printf("%f %f\n", c, ret[1]);
 
     return ret;
 }
@@ -757,8 +755,8 @@ Eigen::Vector3d triangulationLonguetHiggins(Eigen::Vector3d &point_0, Eigen::Vec
  * @param t
  * @return
  */
-Eigen::Vector4d triangulationHartleySturm(Eigen::Vector3d point_0, Eigen::Vector3d point_1,
-                                          Eigen::Matrix34d M0, Eigen::Matrix34d M1, int maxIter = 100)
+Eigen::Vector4d triangulationHartleySturm(Eigen::Vector3d &point_0, Eigen::Vector3d &point_1,
+                                          Eigen::Matrix34d &M0, Eigen::Matrix34d &M1, int maxIter = 100)
 {
 
     Eigen::Vector4d M0_row[3], M1_row[3];
@@ -769,8 +767,8 @@ Eigen::Vector4d triangulationHartleySturm(Eigen::Vector3d point_0, Eigen::Vector
     }
 
     Eigen::Vector4d x;
-    float weight0 = 1.0;
-    float weight0_prev = 1.0;
+    double weight0 = 1.0;
+    double weight0_prev = 1.0;
 
     double weight1 = 1.0;
     double weight1_prev = 1.0;

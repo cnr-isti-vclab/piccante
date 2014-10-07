@@ -63,7 +63,7 @@ public:
         Ld_Max = 100.0f;
         b = 0.95f;
 
-        check = FilterGLRedux::CreateReduxCheck();
+        check = FilterGLRedux::CreateCheck();
         fltDragoTMO    = new FilterGLDragoTMO(100.0f, 0.85f, 1e6, true);
         fltReinhardTMO = new FilterGLSigmoidTMO(0.18f, false, true);
     }
@@ -80,7 +80,7 @@ public:
 
         if(imgOut == NULL) {
             imgOut = new ImageRAWGL(1, imgIn->width, imgIn->height, imgIn->channels,
-                                    IMG_GPU);
+                                    IMG_GPU, GL_TEXTURE_2D);
         }
 
         float ms, tot_ms;
@@ -88,7 +88,7 @@ public:
         GLuint testTQ1 = glBeginTimeQuery();
         seg_map = seg.Compute(imgIn, seg_map);
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        ms = double(timeVal) / 1000000.0;
+        ms = float(double(timeVal) / 1000000.0);
         tot_ms = ms;
 
 #ifdef PIC_DEBUG
@@ -113,7 +113,7 @@ public:
         check_value->loadToMemory();
         int value = int(check_value->data[0]);
         timeVal = glEndTimeQuery(testTQ1);
-        ms = double(timeVal) / 1000000.0;
+        ms = float(double(timeVal) / 1000000.0);
         tot_ms += ms;
 
 #ifdef PIC_DEBUG
@@ -171,7 +171,7 @@ public:
         }
 
         timeVal = glEndTimeQuery(testTQ1);
-        ms = double(timeVal) / 1000000.0;
+        ms = float(double(timeVal) / 1000000.0);
         tot_ms += ms;
 
 #ifdef PIC_DEBUG

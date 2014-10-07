@@ -29,28 +29,51 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLSampler2D class
+ */
 class FilterGLSampler2D: public FilterGL
 {
 protected:
     float scale;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterGLSampler2D
+     * @param scale
+     */
     FilterGLSampler2D(float scale);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param scale
+     * @return
+     */
     static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float scale)
     {
         ImageRAWGL imgIn(nameIn);
-        imgIn.generateTextureGL(false);
+        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLSampler2D filter(scale);
-        ImageRAWGL *imgOut = new ImageRAWGL(imgIn.frames, imgIn.width * scale,
-                                            imgIn.height * scale, imgIn.channels, IMG_GPU_CPU);
+        ImageRAWGL *imgOut = new ImageRAWGL(    imgIn.frames,
+                                                int(imgIn.widthf  * scale),
+                                                int(imgIn.heightf * scale),
+                                                imgIn.channels, IMG_GPU_CPU, GL_TEXTURE_2D);
 
         GLuint testTQ1 = glBeginTimeQuery();
         filter.Process(SingleGL(&imgIn), imgOut);
@@ -66,7 +89,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLSampler2D::FilterGLSampler2D(float scale): FilterGL()
 {
     this->scale = scale;
@@ -79,41 +101,32 @@ void FilterGLSampler2D::InitShaders()
                       (
                           uniform sampler2D u_tex; \n
                           uniform float   scale; \n
-                          out     vec4      f_color; \n
+                          out     vec4    f_color; \n
 
-    void main(void) {
-        \n
-        ivec2 coords = ivec2(gl_FragCoord.xy / scale);
-        \n
-        vec3  color = texelFetch(u_tex, coords, 0).xyz;
-        \n
-        f_color = vec4(color.xyz, 1.0);
-        \n
+    void main(void) { \n
+        ivec2 coords = ivec2(gl_FragCoord.xy / scale); \n
+        vec3  color = texelFetch(u_tex, coords, 0).xyz; \n
+        f_color = vec4(color.xyz, 1.0); \n
     }
                       );
 
-    std::string prefix;
-    prefix += glw::version("150");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLSampler2D log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
-    filteringProgram.fragment_target("f_color",    0);
+    filteringProgram.fragment_target("f_color", 0);
     filteringProgram.relink();
 
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform("u_tex",      0);
-    filteringProgram.uniform("scale",      scale);
+    filteringProgram.uniform("u_tex", 0);
+    filteringProgram.uniform("scale", scale);
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLSampler2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn[0] == NULL) {
@@ -124,12 +137,12 @@ ImageRAWGL *FilterGLSampler2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
         return imgOut;
     }
 
-    int w = imgIn[0]->width * scale;
-    int h = imgIn[0]->height * scale;
+    int w = int(imgIn[0]->widthf  * scale);
+    int h = int(imgIn[0]->heightf * scale);
     int f = imgIn[0]->frames;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(f, w, h, 4, IMG_GPU);
+        imgOut = new ImageRAWGL(f, w, h, 4, IMG_GPU, imgIn[0]->getTarget());
     }
 
     //Fbo

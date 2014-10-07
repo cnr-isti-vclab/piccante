@@ -37,6 +37,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterSampler1D class
+ */
 class FilterSampler1D: public Filter
 {
 protected:
@@ -45,24 +48,75 @@ protected:
     int				size;
     bool			swh;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
 
-    //SetupAux
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
 
+    /**
+     * @brief SetDirection
+     * @param direction
+     */
     void SetDirection(int direction);
+
+    /**
+     * @brief SetImageSampler
+     * @param isb
+     */
     void SetImageSampler(ImageSampler *isb);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterSampler1D
+     * @param scale
+     * @param direction
+     * @param isb
+     */
     FilterSampler1D(float scale, int direction, ImageSampler *isb);
+
+    /**
+     * @brief FilterSampler1D
+     * @param size
+     * @param direction
+     * @param isb
+     */
     FilterSampler1D(int size, int direction, ImageSampler *isb);
 
+    /**
+     * @brief Update
+     * @param scale
+     * @param direction
+     * @param isb
+     */
     void Update(float scale, int direction, ImageSampler *isb);
+
+    /**
+     * @brief Update
+     * @param size
+     * @param direction
+     * @param isb
+     */
     void Update(int size, int direction, ImageSampler *isb);
 
-    /**Output size*/
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
     void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(swh) {
@@ -80,6 +134,15 @@ public:
         frames      = imgIn->frames;
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param scale
+     * @param direction
+     * @param isb
+     * @return
+     */
     static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float scale,
                              int direction, ImageSampler *isb)
     {
@@ -88,7 +151,6 @@ public:
     }
 };
 
-//Basic constructor
 PIC_INLINE FilterSampler1D::FilterSampler1D(float scale, int direction = 0,
         ImageSampler *isb = NULL)
 {
@@ -96,7 +158,6 @@ PIC_INLINE FilterSampler1D::FilterSampler1D(float scale, int direction = 0,
     Update(scale, direction, isb);
 }
 
-//Basic constructor
 PIC_INLINE FilterSampler1D::FilterSampler1D(int size, int direction = 0,
         ImageSampler *isb = NULL)
 {
@@ -126,7 +187,7 @@ PIC_INLINE void FilterSampler1D::Update(int size, int direction,
 
 PIC_INLINE void FilterSampler1D::SetDirection(int direction = 0)
 {
-    dirs[ direction         ] = 1;
+    dirs[ direction      % 3] = 1;
     dirs[(direction + 1) % 3] = 0;
     dirs[(direction + 2) % 3] = 0;
 }
@@ -142,7 +203,6 @@ PIC_INLINE void FilterSampler1D::SetImageSampler(ImageSampler *isb)
     }
 }
 
-//SetupAux
 PIC_INLINE ImageRAW *FilterSampler1D::SetupAux(ImageRAWVec imgIn,
         ImageRAW *imgOut)
 {
@@ -151,8 +211,10 @@ PIC_INLINE ImageRAW *FilterSampler1D::SetupAux(ImageRAWVec imgIn,
             float scaleX = (dirs[X_DIRECTION] == 1) ? scale : 1.0f;
             float scaleY = (dirs[Y_DIRECTION] == 1) ? scale : 1.0f;
 
-            imgOut = new ImageRAW(imgIn[0]->frames, imgIn[0]->width * scaleX,
-                                  imgIn[0]->height * scaleY, imgIn[0]->channels);
+            imgOut = new ImageRAW(  imgIn[0]->frames,
+                                    int(imgIn[0]->widthf  * scaleX),
+                                    int(imgIn[0]->heightf * scaleY),
+                                    imgIn[0]->channels);
         } else {
             int nWidth  = (dirs[X_DIRECTION] == 1) ? size : imgIn[0]->width;
             int nHeight = (dirs[Y_DIRECTION] == 1) ? size : imgIn[0]->height;
@@ -164,7 +226,6 @@ PIC_INLINE ImageRAW *FilterSampler1D::SetupAux(ImageRAWVec imgIn,
     return imgOut;
 }
 
-//Process in a box
 PIC_INLINE void FilterSampler1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
         BBox *box)
 {

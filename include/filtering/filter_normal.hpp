@@ -29,25 +29,56 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterNormal class
+ */
 class FilterNormal: public Filter
 {
 protected:
     int colorChannel;
 
-    //Setup Aux
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterNormal
+     */
     FilterNormal();
+
+    /**
+     * @brief FilterNormal
+     * @param colorChannel
+     */
     FilterNormal(int colorChannel);
 
+    /**
+     * @brief Update
+     * @param colorChannel
+     */
     void Update(int colorChannel); 
 
-    /**Output size*/
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
     void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
     {
         width       = imgIn->width;
@@ -62,7 +93,6 @@ FilterNormal::FilterNormal()
     Update(0);
 }
 
-//Basic constructor
 FilterNormal::FilterNormal(int colorChannel)
 {
     Update(colorChannel);
@@ -77,7 +107,6 @@ void FilterNormal::Update(int colorChannel)
     this->colorChannel = colorChannel;
 }
 
-//Processing
 ImageRAW *FilterNormal::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
 {
     if(imgOut == NULL) {
@@ -87,7 +116,6 @@ ImageRAW *FilterNormal::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
     return imgOut;
 }
 
-//Process in a box
 void FilterNormal::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 {
     int width    = dst->width;
@@ -175,35 +203,8 @@ void genLight(float *L, int x, int y, int width, int height)
         L[2] *= norm;
     };
 };
+*/
 
-void TestFilterNormal()
-{
-    ImageRAW imgIn("depth0.pfm");
-
-    FilterNormal *filter = new FilterNormal(1);
-
-    ImageRAW *out = filter->Process(Single(&imgIn), NULL);
-
-    float *L = new float[3];
-
-    for(int i = 0; i < out->width; i++) {
-        for(int j = 0; j < out->height; j++) {
-            int c = (j * out->width + i) * 3;
-            genLight(L, i, j, out->width, out->height);
-
-            float val =
-                fabsf(L[0] * out->data[c] +
-                      L[1] * out->data[c + 1] +
-                      L[2] * out->data[c + 2]) / (imgIn.data[c] * imgIn.data[c]);
-
-            out->data[c] = val;
-            out->data[c + 1] = val;
-            out->data[c + 2] = val;
-        }
-    }
-
-    out->Write("normal.pfm");
-};*/
 
 } // end namespace pic
 

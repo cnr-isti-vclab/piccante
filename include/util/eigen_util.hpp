@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #include "util/matrix_3_x_3.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/eigen/LU"
+#include "externals/Eigen/LU"
 #endif
 
 #ifndef PIC_EIGEN_UTIL
@@ -268,17 +268,17 @@ Matrix3x3 MatrixConvert(Eigen::Matrix3f &mat)
 Matrix3x3 MatrixConvert(Eigen::Matrix3d &mat)
 {
     Matrix3x3 mtx;
-    mtx.data[0] = mat(0, 0);
-    mtx.data[1] = mat(0, 1);
-    mtx.data[2] = mat(0, 2);
+    mtx.data[0] = float(mat(0, 0));
+    mtx.data[1] = float(mat(0, 1));
+    mtx.data[2] = float(mat(0, 2));
 
-    mtx.data[3] = mat(1, 0);
-    mtx.data[4] = mat(1, 1);
-    mtx.data[5] = mat(1, 2);
+    mtx.data[3] = float(mat(1, 0));
+    mtx.data[4] = float(mat(1, 1));
+    mtx.data[5] = float(mat(1, 2));
 
-    mtx.data[6] = mat(2, 0);
-    mtx.data[7] = mat(2, 1);
-    mtx.data[8] = mat(2, 2);
+    mtx.data[6] = float(mat(2, 0));
+    mtx.data[7] = float(mat(2, 1));
+    mtx.data[8] = float(mat(2, 2));
 
     return mtx;
 }
@@ -296,7 +296,7 @@ float *getLinearArrayFromMatrix(Eigen::Matrix3d &mat)
     int c = 0;
     for(int i = 0; i < mat.rows(); i++) {
         for(int j = 0; j < mat.cols(); j++) {
-            ret[c] = mat(i, j);
+            ret[c] = float(mat(i, j));
             c++;
         }
     }

@@ -29,6 +29,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterNPasses class
+ */
 class FilterNPasses: public Filter
 {
 protected:
@@ -41,39 +44,83 @@ protected:
 
 public:
 
-    //Basic constructor
+    /**
+     * @brief FilterNPasses
+     */
     FilterNPasses();
 
-    //Basic
     ~FilterNPasses();
 
+    /**
+     * @brief Destroy
+     */
     void Destroy();
 
+    /**
+     * @brief PreProcess
+     * @param imgIn
+     * @param imgOut
+     */
     virtual void PreProcess(ImageRAWVec imgIn, ImageRAW *imgOut){}
 
-    //Setup NPasses Gen
+    /**
+     * @brief SetupAuxNGen
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     virtual ImageRAW *SetupAuxNGen(ImageRAWVec imgIn, ImageRAW *imgOut);
 
-    //Setup NPasses Same
+    /**
+     * @brief SetupAuxNSame
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     virtual ImageRAW *SetupAuxNSame(ImageRAWVec imgIn, ImageRAW *imgOut);
 
-    //Process Gen
+    /**
+     * @brief ProcessGen
+     * @param imgIn
+     * @param imgOut
+     * @param parallel
+     * @return
+     */
     ImageRAW *ProcessGen(ImageRAWVec imgIn, ImageRAW *imgOut, bool parallel);
 
-    //Process Same
+    /**
+     * @brief ProcessSame
+     * @param imgIn
+     * @param imgOut
+     * @param parallel
+     * @return
+     */
     ImageRAW *ProcessSame(ImageRAWVec imgIn, ImageRAW *imgOut, bool parallel);
 
-
+    /**
+     * @brief InsertFilter
+     * @param flt
+     */
     void InsertFilter(Filter *flt);
 
-    //Process in parallel
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @param parallel
+     * @return
+     */
     ImageRAW *Process(ImageRAWVec imgIn, ImageRAW *imgOut, bool parallel);
 
-    //Process in parallel
+    /**
+     * @brief ProcessP
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAW *ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut);
 };
 
-//Basic constructor
 PIC_INLINE FilterNPasses::FilterNPasses()
 {
     bSame = true;
@@ -83,7 +130,6 @@ PIC_INLINE FilterNPasses::FilterNPasses()
     }
 }
 
-//Basic
 PIC_INLINE FilterNPasses::~FilterNPasses()
 {
     Destroy();
@@ -145,7 +191,6 @@ PIC_INLINE void FilterNPasses::InsertFilter(Filter *flt)
     }
 }
 
-//Setup NPasses
 PIC_INLINE ImageRAW *FilterNPasses::SetupAuxNGen(ImageRAWVec imgIn,
         ImageRAW *imgOut)
 {   
@@ -158,7 +203,6 @@ PIC_INLINE ImageRAW *FilterNPasses::SetupAuxNGen(ImageRAWVec imgIn,
     return imgOut;
 }
 
-//Setup NPasses
 PIC_INLINE ImageRAW *FilterNPasses::SetupAuxNSame(ImageRAWVec imgIn,
         ImageRAW *imgOut)
 {
@@ -194,7 +238,6 @@ PIC_INLINE ImageRAW *FilterNPasses::SetupAuxNSame(ImageRAWVec imgIn,
     return imgOut;
 }
 
-//Processing Gen
 PIC_INLINE ImageRAW *FilterNPasses::ProcessGen(ImageRAWVec imgIn, ImageRAW *imgOut,
         bool parallel = false)
 {
@@ -224,7 +267,6 @@ PIC_INLINE ImageRAW *FilterNPasses::ProcessGen(ImageRAWVec imgIn, ImageRAW *imgO
     return imgOut;
 }
 
-//Processing Same
 PIC_INLINE ImageRAW *FilterNPasses::ProcessSame(ImageRAWVec imgIn, ImageRAW *imgOut,
         bool parallel = false)
 {
@@ -273,7 +315,6 @@ PIC_INLINE ImageRAW *FilterNPasses::Process(ImageRAWVec imgIn,
     }
 }
  
-//Processing in parallel
 PIC_INLINE ImageRAW *FilterNPasses::ProcessP(ImageRAWVec imgIn,
         ImageRAW *imgOut)
 {

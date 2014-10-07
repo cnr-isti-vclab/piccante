@@ -32,6 +32,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGL class
+ */
 class FilterGL
 {
 protected:
@@ -117,10 +120,7 @@ public:
      * @param imgOut
      * @return
      */
-    virtual ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
-    {
-        return imgOut;
-    }
+    virtual ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
     /**
      * @brief GammaCorrection
@@ -145,6 +145,52 @@ public:
         return fragment_source;
     }
 };
+
+ImageRAWGL *FilterGL::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+{
+    if(imgIn[0] == NULL) {
+        return imgOut;
+    }
+
+    int w = imgIn[0]->width;
+    int h = imgIn[0]->height;
+
+    if(imgOut == NULL) {
+        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+    }
+
+    if(fbo == NULL) {
+        fbo = new Fbo();
+    }
+
+    fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
+
+    //Rendering
+    fbo->bind();
+    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+
+    //Shaders
+    glw::bind_program(filteringProgram);
+
+    //Textures
+    glActiveTexture(GL_TEXTURE0);
+    imgIn[0]->bindTexture();
+
+    //Rendering aligned quad
+    quad->Render();
+
+    //Fbo
+    fbo->unbind();
+
+    //Shaders
+    glw::bind_program(0);
+
+    //Textures
+    imgIn[0]->unBindTexture();
+
+    return imgOut;
+}
+
 
 } // end namespace pic
 

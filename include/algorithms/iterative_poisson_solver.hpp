@@ -45,7 +45,7 @@ ImageRAW *IterativePoissonSolver(ImageRAW *img,
     ImageRAW *tmpSwap = NULL;
 
     int c, coord, x, y;
-    double workValue;
+    float workValue;
 
     for(int i = 0; i < maxSteps; i++) {
         for(unsigned int j = 0; j < coords.size(); j++) {
@@ -62,7 +62,7 @@ ImageRAW *IterativePoissonSolver(ImageRAW *img,
             c = img->Address(x, y - 1);
             workValue += img->data[c];
 
-            tmpImg->data[coord] = workValue / 4.0;
+            tmpImg->data[coord] = workValue / 4.0f;
         }
 
         tmpSwap = img;

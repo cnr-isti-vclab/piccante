@@ -29,12 +29,15 @@ See the GNU Lesser General Public License
 #include "colors/color_3.hpp"
 
 #include "colors/color_conv.hpp"
+#include "colors/color_conv_rgb_to_srgb.hpp"
 #include "colors/color_conv_rgb_to_xyz.hpp"
 #include "colors/color_conv_xyz_to_cieluv.hpp"
 #include "colors/color_conv_xyz_to_logluv.hpp"
 
 #include "colors/color_conv_xyz_to_cielab.hpp"
 #include "colors/color_conv_xyz_to_hdrlab.hpp"
+
+#include "colors/saturation.hpp"
 
 #include "colors/rgbe.hpp"
 

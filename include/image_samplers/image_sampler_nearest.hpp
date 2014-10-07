@@ -64,16 +64,18 @@ PIC_INLINE void ImageSamplerNearest::SampleImage(Image *img, float x, float y,
     y = CLAMPi(y, 0.0f, 1.0f);
 
     //Coordiantes in [0,width-1]x[0,height-1]
-    x = lround(x * float(img->width - 1));
-    y = lround(y * float(img->height - 1));
+    x = lround(x * img->width1f);
+    y = lround(y * img->height1f);
+    
     //Integer coordinates
     int ix = int(x);
     int iy = int(y);
+    
     //Bilinear interpolation indicies
-    float *data = (*img)(ix, iy);
+    int ind = (ix * img->xstride + iy * img->ystride);
 
     for(int i = 0; i < img->channels; i++) {
-        vOut[i] = data[i];
+        vOut[i] = img->data[ind + i];
     }
 }
 
@@ -85,13 +87,15 @@ PIC_INLINE void ImageSamplerNearest::SampleImage(Image *img, float x, float y,
     t = CLAMPi(t, 0.0f, 1.0f);
 
     //Coordiantes in [0,width-1]x[0,height-1]x[0,frames-1]
-    x = lround(x * float(img->width - 1));
-    y = lround(y * float(img->height - 1));
-    t = lround(t * float(img->frames - 1));
+    x = lround(x * img->width1f);
+    y = lround(y * img->height1f);
+    t = lround(t * img->frames1f);
+    
     //Integer coordinates
     int ix = int(x);
     int iy = int(y);
     int it = int(t);
+    
     //Bilinear interpolation indicies
     int ind = (ix * img->xstride + iy * img->ystride + it * img->tstride);
 

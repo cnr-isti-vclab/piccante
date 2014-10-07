@@ -31,6 +31,13 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief LischinskiTMO
+ * @param imgIn
+ * @param imgOut
+ * @param alpha
+ * @return
+ */
 ImageRAW *LischinskiTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL,
                         float alpha = 0.5f)
 {
@@ -59,7 +66,7 @@ ImageRAW *LischinskiTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL,
     float minL_log = log2f(minL);
     float Lav = lum->getLogMeanVal()[0];
 
-    int Z = ceilf(maxL_log - minL_log);
+    int Z = int(ceilf(maxL_log - minL_log));
 
     if(Z <= 0) {
         return NULL;

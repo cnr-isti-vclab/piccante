@@ -37,13 +37,11 @@ See the GNU Lesser General Public License
 
 #ifndef PIC_DISABLE_OPENGL
 #include "util/gl/stroke.hpp"
-#include "util/gl/colors.hpp"
 #include "util/gl/fbo.hpp"
 #include "util/gl/formats.hpp"
 #include "util/gl/quad.hpp"
 #include "util/gl/timings.hpp"
 #include "util/gl/tone.hpp"
-#include "util/gl/opengl_window.hpp"
 #endif
 
 #include "util/image_sampler.hpp"

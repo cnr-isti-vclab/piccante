@@ -22,10 +22,21 @@ See the GNU Lesser General Public License
 
 */
 
-#include <QtGui/QGuiApplication>
-#include <QtGui/QScreen>
+/**
+ * NOTE: if you do not want to use this OpenGL functions loader,
+ * please change it with your favorite one. This is just
+ * a suggestion for running examples.
+*/
+#ifdef _MSC_VER
+    #define PIC_DISABLE_OPENGL_NON_CORE
+    #include "../opengl_common_code/gl_core_4_0.h"
+#endif
+
+#define PIC_DEBUG
 
 #include "piccante.hpp"
+
+#include "../opengl_common_code/opengl_window.hpp"
 
 class SimpleFilteringWindow : public pic::OpenGLWindow
 {
@@ -33,10 +44,13 @@ protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
     pic::FilterGLGaussian2D *fltGauss;
+    pic::FilterGLBilateral2DG *fltBilG;
 
 public:
     pic::ImageRAWGL img, *img_flt, *img_flt_tmo;
     glw::program    program;
+
+    pic::ImageRAWGLVec stack;
 
     SimpleFilteringWindow() : OpenGLWindow(NULL)
     {
@@ -48,20 +62,21 @@ public:
     void init()
     {
         //reading an input image
-        img.Read("../data/input/bottles.hdr");
-        img.generateTextureGL(false);
+        img.Read("../data/input/yellow_flowers.png");
+        img.generateTextureGL(false, GL_TEXTURE_2D);
 
         //creating a screen aligned quad
         pic::QuadGL::getProgram(program,
                                 pic::QuadGL::getVertexProgramV3(),
                                 pic::QuadGL::getFragmentProgramForView());
+
         quad = new pic::QuadGL(true);
 
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        //allocating a Gaussian filter with sigma = 2.0
-        fltGauss = new pic::FilterGLGaussian2D(2.0);
+        //allocating a new bilateral filter
+        fltBilG = new pic::FilterGLBilateral2DG(4.0f, 0.1f);
     }
 
     void render()
@@ -72,8 +87,8 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        //imgoOut = img + imgRand
-        img_flt = fltGauss->Process(SingleGL(&img), img_flt);
+        //Bilateral filtering...
+        img_flt = fltBilG->Process(SingleGL(&img), img_flt);
 
         //simple tone mapping: gamma + exposure correction
         img_flt_tmo = tmo->Process(SingleGL(img_flt), img_flt_tmo);
@@ -106,7 +121,7 @@ int main(int argc, char **argv)
 
     SimpleFilteringWindow window;
     window.setFormat(format);
-    window.resize(912, 684);
+    window.resize(800, 533);
     window.show();
 
     window.setAnimating(true);

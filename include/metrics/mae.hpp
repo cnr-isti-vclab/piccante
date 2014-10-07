@@ -47,7 +47,7 @@ double MAE(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
     double acc = 0.0;
     int count = 0;
 
-    float largeDifferences = C_LARGE_DIFFERENCES;
+    double largeDifferences = C_LARGE_DIFFERENCES;
     if(!bLargeDifferences) {
         largeDifferences = FLT_MAX;
     }

@@ -51,11 +51,11 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         printf("We now align bright and dark exposure images to the well-exposed one...\n");
-        pic::Vec<2, int> shift_dark;
+        Eigen::Vector2i shift_dark;
         pic::ImageRAW *img_dark = pic::WardAlignment::Execute(&img[0], &img[1], shift_dark);
         img_dark->Write("../data/output/stack_aligned_dark.jpg", pic::LT_NOR);
 
-        pic::Vec<2, int> shift_bright;
+        Eigen::Vector2i shift_bright;
         pic::ImageRAW *img_bright = pic::WardAlignment::Execute(&img[0], &img[2], shift_bright);
         img_bright->Write("../data/output/stack_aligned_bright.jpg", pic::LT_NOR);
         printf("\nOk\n");
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        max_bound[0] = img[0].width - max_bound[0];
+        max_bound[0] = img[0].width  - max_bound[0];
         max_bound[1] = img[0].height - max_bound[1];
 
 

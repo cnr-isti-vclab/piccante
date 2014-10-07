@@ -29,6 +29,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterMean class
+ */
 class FilterMean: public FilterNPasses
 {
 protected:
@@ -39,7 +42,11 @@ protected:
     int             size;    
 
 public:
-    //Basic constructor
+
+    /**
+     * @brief FilterMean
+     * @param size
+     */
     FilterMean(int size)
     {
         data = NULL;
@@ -65,6 +72,10 @@ public:
             delete[] data;
     }
 
+    /**
+     * @brief Update
+     * @param size
+     */
     void Update(int size)
     {
         if(size < 1)
@@ -78,16 +89,30 @@ public:
             if( data != NULL)
                 delete[] data;
 
-            data = FilterConv1D::getFilterMean(size);
+            data = FilterConv1D::getKernelMean(size);
         }        
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param size
+     * @return
+     */
     static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, int size)
     {
         FilterMean filter(size);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param size
+     * @return
+     */
     static ImageRAW *Execute(std::string nameIn, std::string nameOut, int size)
     {
         ImageRAW imgIn(nameIn);

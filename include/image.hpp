@@ -45,6 +45,7 @@ See the GNU Lesser General Public License
 namespace pic {
 
 const double HARMONIC_MEAN_EPSILON = 1e-6;
+const float  HARMONIC_MEAN_EPSILONf = 1e-6f;
 
 /**
  * @brief The Image class stores an image as buffer of float.
@@ -91,7 +92,7 @@ public:
 
     int tstride, ystride, xstride;
 
-    float widthf, width1f, heightf, height1f;
+    float widthf, width1f, heightf, height1f, framesf, frames1f;
 
     std::string nameFile;
 
@@ -295,12 +296,11 @@ public:
     void MulS(Image *img);
 
     /**
-     * @brief MulSNeg is a multiplication operator for Image.
-     * @param img is an Image which has one color channel.
-     * (1.0 - img) is multiplied by the current Image.
-     * They need to have the same width and height.
+     * @brief Blend
+     * @param img
+     * @param weight
      */
-    void MulSNeg(Image *img);
+    void Blend(Image *img, Image *weight);
 
     /**
      * @brief Mul is the multiplication operator for Image.
@@ -817,6 +817,8 @@ PIC_INLINE void Image::AllocateAux()
     this->width1f  = float(width - 1);
     this->heightf  = float(height);
     this->height1f = float(height - 1);
+    this->framesf  = float(frames);
+    this->frames1f = float(frames -1);
 
     CalculateStrides();
 }
@@ -1251,13 +1253,13 @@ PIC_INLINE void Image::MulS(Image *img)
     }
 }
 
-PIC_INLINE void Image::MulSNeg(Image *img)
+PIC_INLINE void Image::Blend(Image *img, Image *weight)
 {
     if(img == NULL) {
         return;
     }
 
-    if(img->channels != 1) {
+    if(weight->channels != 1) {
         return;
     }
 
@@ -1268,8 +1270,13 @@ PIC_INLINE void Image::MulSNeg(Image *img)
     for(int ind = 0; ind < size; ind++) {
         int i = ind * channels;
 
+        float w0 = weight->data[ind];
+        float w1 = 1.0f - w0;
+
         for(int j = 0; j < channels; j++) {
-            data[i + j] *= (1.0f - img->data[ind]);
+            int indx = i + j;
+            data[indx] *= w0;
+            data[indx] += img->data[indx] * w1;
         }
     }
 }
@@ -1467,6 +1474,10 @@ PIC_INLINE float *Image::getSumVal(BBox *box = NULL, float *ret = NULL)
 
 PIC_INLINE float *Image::getMeanVal(BBox *box = NULL, float *ret = NULL)
 {
+    if(box == NULL) {
+        box = &fullBox;
+    }
+
     ret = getSumVal(box, ret);
 
     float totf = float(box->Size());
@@ -1617,7 +1628,7 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
                 float *tmp_data = (*this)(i, j, k);
 
                 for(int l = 0; l < channels; l++) {
-                    ret[l] += logf(tmp_data[l] + HARMONIC_MEAN_EPSILON);
+                    ret[l] += logf(tmp_data[l] + HARMONIC_MEAN_EPSILONf);
                 }
             }
         }

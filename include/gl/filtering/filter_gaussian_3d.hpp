@@ -26,6 +26,7 @@ See the GNU Lesser General Public License
 #define PIC_GL_FILTERING_FILTER_GAUSSIAN_3D_HPP
 
 #include "gl/filtering/filter_npasses.hpp"
+#include "gl/filtering/filter_gaussian_1d.hpp"
 
 namespace pic {
 
@@ -38,27 +39,29 @@ protected:
     void FragmentShader() {}
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLGaussian3D
+     */
     FilterGLGaussian3D();
-    //Init constructors
+
+    /**
+     * @brief FilterGLGaussian3D
+     * @param sigma
+     */
     FilterGLGaussian3D(float sigma);
 
-    //Update
+    /**
+     * @brief Update
+     * @param sigma
+     */
     void Update(float sigma);
-
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float sigma)
-    {
-        return NULL;
-    }
 };
 
-//Basic constructor
 FilterGLGaussian3D::FilterGLGaussian3D(): FilterGLNPasses()
 {
     target = GL_TEXTURE_3D;
 }
 
-//Constructor
 FilterGLGaussian3D::FilterGLGaussian3D(float sigma): FilterGLNPasses()
 {
     filter = new FilterGLGaussian1D(sigma, 0, GL_TEXTURE_3D);

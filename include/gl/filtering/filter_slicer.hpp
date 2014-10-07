@@ -29,6 +29,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLSlicer class
+ */
 class FilterGLSlicer: public FilterGL
 {
 protected:
@@ -39,17 +42,29 @@ protected:
     float s_S, s_R, mul_E;
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLSlicer
+     * @param s_S
+     * @param s_R
+     */
     FilterGLSlicer(float s_S, float s_R);
 
-    //Change parameters
+    /**
+     * @brief Update
+     * @param s_S
+     * @param s_R
+     */
     void Update(float s_S, float s_R);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 };
 
-//Init constructors
 FilterGLSlicer::FilterGLSlicer(float s_S, float s_R): FilterGL()
 {
     this->s_S = s_S;
@@ -93,24 +108,21 @@ void FilterGLSlicer::FragmentShader()
 
 void FilterGLSlicer::InitShaders()
 {
-    std::string prefix;
-    prefix += glw::version("150");
-    prefix += glw::ext_require("GL_EXT_gpu_shader4");
-    filteringProgram.setup(prefix, vertex_source, fragment_source);
+    filteringProgram.setup(glw::version("400"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLSlicer Shader log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
-    filteringProgram.relink();
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
+    filteringProgram.relink();
     glw::bind_program(0);
+
     Update(s_S, s_R);
 }
 
-//Change parameters
 void FilterGLSlicer::Update(float s_S, float s_R)
 {
     this->s_S = s_S;
@@ -123,15 +135,13 @@ void FilterGLSlicer::Update(float s_S, float s_R)
 #endif
 
     glw::bind_program(filteringProgram);
-    filteringProgram.relink();
-    filteringProgram.uniform("u_tex",      0);
-    filteringProgram.uniform("u_grid",	 1);
-    filteringProgram.uniform("s_S",	   s_S);
-    filteringProgram.uniform("mul_E",	   mul_E);
+    filteringProgram.uniform("u_tex", 0);
+    filteringProgram.uniform("u_grid", 1);
+    filteringProgram.uniform("s_S", s_S);
+    filteringProgram.uniform("mul_E", mul_E);
     glw::bind_program(0);
 }
 
-//Processing
 ImageRAWGL *FilterGLSlicer::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 {
     if(imgIn[0] == NULL) {
@@ -142,7 +152,7 @@ ImageRAWGL *FilterGLSlicer::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {
@@ -185,51 +195,8 @@ ImageRAWGL *FilterGLSlicer::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     imgIn[0]->unBindTexture();
 
     return imgOut;
-};
+}
 
 } // end namespace pic
 
 #endif /* PIC_GL_FILTERING_FILTER_SLICER_HPP */
-
-/*
-void TestSlicerGL(std::string nameIn, std::string nameOut){
-	//Bilateral Grid GPU
-	ImageRAW imgIn2(nameIn);
-
-	FilterBilateral2DG tmp(16.0f,0.1f);
-	ImageRAW *imgFlt = tmp.Process(Single(&imgIn2),NULL);
-	imgFlt->Write("test.pfm");
-
-	//BILATERAL GPU
-	ImageRAWGL imgIn(nameIn);
-	imgIn.Mul(1.0/imgIn.getMaxVal());
-	imgIn.generateTextureGL(false);
-
-	//Splatting
-	ImageRAW *grid = tmp.Splat(NULL,&imgIn);
-
-	//Blurring
-	ImageRAWGL *gridGL = new ImageRAWGL(grid,false);
-
-	FilterGLGaussian3D fltGauss3D(1.0f);
-	Fbo *gridBlurFbo = fltGauss3D.Process(SingleGL(gridGL),NULL);
-	ImageRAWGL *gridBlurGL = new ImageRAWGL(gridBlurFbo->tex,GL_TEXTURE_3D);
-
-	//Blurring
-	FilterGaussian3D *fltG = new FilterGaussian3D(1.0f);
-	ImageRAW *gridBlur = fltG->Process(Single(gridGL),NULL);
-
-	//Slicing
-	FilterGLSlicer fltSlicer(tmp.s_S,tmp.s_R);
-
-	Fbo *fbo = new Fbo();
-	fbo->create(imgIn.width,imgIn.height);
-
-	fltSlicer.Process(DoubleGL(&imgIn, gridBlurGL),fbo);
-
-	//Read from the GPU
-	ImageRAWGL *imgOut = new ImageRAWGL(1,imgIn.width,imgIn.height,4);
-	imgOut->readFromFBO(fbo);
-	imgOut->Write(nameOut);
-}*/
-

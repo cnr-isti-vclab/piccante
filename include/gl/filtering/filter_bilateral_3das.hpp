@@ -96,10 +96,10 @@ FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
     frame = 0;
 
     int nRand = 32;
-    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU);
+    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
     imageRand->SetRand();
     imageRand->Mul(float(nRand - 1));
-    imageRand->generateTextureGLU32();
+    imageRand->generateTexture2DU32GL();
 
     //Precomputation of the Gaussian Kernel
     int kernelSize = PrecomputedGaussian::KernelSize(sigma_s);
@@ -251,9 +251,9 @@ void FilterGLBilateral3DAS::Update(float sigma_s, float sigma_r, float sigma_t)
     ms->updateGL(halfKernelSize, halfKernelSize);
 
     //shader update
-    float sigmas2 = 2.0 * this->sigma_s * this->sigma_s;
-    float sigmar2 = 2.0 * this->sigma_r * this->sigma_r;
-    float sigmat2 = 2.0 * this->sigma_t *this->sigma_t;
+    float sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
+    float sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
+    float sigmat2 = 2.0f * this->sigma_t *this->sigma_t;
 
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex",      0);
@@ -281,7 +281,7 @@ ImageRAWGL *FilterGLBilateral3DAS::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {
@@ -291,10 +291,12 @@ ImageRAWGL *FilterGLBilateral3DAS::Process(ImageRAWGLVec imgIn,
 
     if(imgTmp == NULL) {
         float scale = fGLsm->getScale();
-        imgFrame = new ImageRAWGL("frame.pfm");
-        imgFrame->generateTextureGL(false);
+        imgFrame->generateTextureGL(false, GL_TEXTURE_2D);
 
-        imgTmp = new ImageRAWGL(1, w * scale, h * scale, 1, IMG_GPU);
+        imgTmp = new ImageRAWGL(    1,
+                                    int(imgIn[0]->widthf  * scale),
+                                    int(imgIn[0]->heightf * scale),
+                                    1, IMG_GPU, GL_TEXTURE_2D);
     }
 
     ImageRAWGL *edge, *base;

@@ -29,11 +29,19 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterChannel class
+ */
 class FilterChannel: public Filter
 {
 protected:
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
     {
         int tmpChannel;
@@ -53,6 +61,12 @@ protected:
         }
     }
 
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
     {
         if(imgOut == NULL) {
@@ -62,27 +76,44 @@ protected:
         return imgOut;
     }
 
-public:
     int channel;
 
-    //Basic constructors
+public:
+
+    /**
+     * @brief FilterChannel
+     * @param channel
+     */
     FilterChannel(int channel)
     {
         setChannel(channel);
     }
 
+    /**
+     * @brief setChannel
+     * @param channel
+     */
     void setChannel(int channel)
     {
         this->channel = channel;
     }
 
-    //Filtering
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param channel
+     * @return
+     */
     static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, int channel = 0)
     {
         FilterChannel fltCh(channel);
         return fltCh.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Test
+     */
     static void Test()
     {
         ImageRAW imgIn(1, 512, 512, 3);

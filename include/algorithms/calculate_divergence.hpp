@@ -29,7 +29,12 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
-/**CalculateDivergence: calculates divergence of a 1-channel image*/
+/**
+ * @brief CalculateDivergence calculates divergence of an image
+ * @param f
+ * @param div
+ * @return
+ */
 ImageRAW *CalculateDivergence(ImageRAW *f, ImageRAW *div)
 {
     if(f == NULL) {
@@ -40,25 +45,23 @@ ImageRAW *CalculateDivergence(ImageRAW *f, ImageRAW *div)
         div = f->AllocateSimilarOne();
     }
 
+    ImageRAW *f_dx2, *f_dy2;
+
+    float kernelGrad[] = { -0.5f, 0.0f, 0.5f};
+    float kernelDiv[] = { -1.0f, 1.0f, 0.0f};
+
     //Calculate first order gradient
-    float kernelGrad[] = { -1.0f, 0.0f, 1.0f};
     ImageRAW *f_dx = FilterConv1D::Execute(f, NULL, kernelGrad, 3, true);
     ImageRAW *f_dy = FilterConv1D::Execute(f, NULL, kernelGrad, 3, false);
-    f_dx->Mul(0.5f);
-    f_dy->Mul(0.5f);
 
     //Calculate divergence using backward differences
-    float kernelDiv[] = { -1.0f, 1.0f, 0.0f};
-    ImageRAW *f_dx2 = FilterConv1D::Execute(f_dx, div , kernelDiv, 3, true);
-    ImageRAW *f_dy2 = FilterConv1D::Execute(f_dy, NULL, kernelDiv, 3, false);
+    f_dx2 = FilterConv1D::Execute(f_dx, div , kernelDiv, 3, true);
+    f_dy2 = FilterConv1D::Execute(f_dy, f_dx, kernelDiv, 3, false);
 
-    div->Assign(f_dx2);
     div->Add(f_dy2);
 
     delete f_dx;
     delete f_dy;
-    delete f_dx2;
-    delete f_dy2;
 
     return div;
 }

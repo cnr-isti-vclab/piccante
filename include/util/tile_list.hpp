@@ -328,13 +328,13 @@ PIC_INLINE bool TileList::Write(std::string name)
     }
 
     //Number of tiles
-    int n = tiles.size();
+    unsigned int n = tiles.size();
     fprintf(file, "NUMBER_OF_TILES: %d\n", n);
 
     //flag
     fprintf(file, "FLAG: NONE\n");
 
-    for(int i = 0; i < n; i++) { //for each tile
+    for(unsigned int i = 0; i < n; i++) { //for each tile
 
         bool bName = !tiles[i].name.empty();
         if(bName) {

@@ -31,6 +31,15 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief DragoTMO tone maps an image using Drago et al. 2003 tone mapping
+ * operator.
+ * @param imgIn
+ * @param Ld_Max
+ * @param b
+ * @param imgOut
+ * @return
+ */
 ImageRAW *DragoTMO(ImageRAW *imgIn, float Ld_Max = 100.0f, float b = 0.95f, ImageRAW *imgOut = NULL)
 {
     //Computing luminance and its statistics

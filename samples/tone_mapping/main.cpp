@@ -24,9 +24,6 @@ See the GNU Lesser General Public License
 
 #include <QCoreApplication>
 
-//This means that we disable Eigen; some functionalities cannot be used.
-//For example, estimating the camera response function
-#define PIC_DISABLE_EIGEN
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
@@ -49,7 +46,6 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         printf("Tone mapping using Reinhard et al.'s TMO...");
-        //Tone mapping using Reinhard et al.'s TMO
         pic::ImageRAW *imgToneMapped_reinhard = pic::ReinhardTMO(&img);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
@@ -65,7 +61,6 @@ int main(int argc, char *argv[])
         }
 
         printf("Tone mapping using Drago et al.'s TMO...");
-        //Tone mapping using Drago et al.'s TMO
         pic::ImageRAW *imgToneMapped_drago = pic::DragoTMO(&img);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
@@ -82,7 +77,6 @@ int main(int argc, char *argv[])
 
 
         printf("Tone mapping using Ward Histogram Adjustment TMO...");
-        //Tone mapping using Drago et al.'s TMO
         pic::ImageRAW *imgToneMapped_ward = pic::WardHistogramTMO(&img);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
@@ -90,6 +84,21 @@ int main(int argc, char *argv[])
           Note that pic::WardTMO tone maps an HDR image
           but it does not apply gamma.*/
         bWritten = imgToneMapped_ward->Write("../data/output/ward_tmo.png", pic::LT_NOR_GAMMA);
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+
+        printf("Tone mapping using Lischinski et al. 2006 automatic TMO...");
+        pic::ImageRAW *imgToneMapped_lischinski = pic::LischinskiTMO(&img, NULL, 0.5f);
+
+        /*pic::LT_NOR_GAMMA implies that when we save the image,
+          this is quantized at 8-bit and gamma is applied.
+          Note that pic::WardTMO tone maps an HDR image
+          but it does not apply gamma.*/
+        bWritten = imgToneMapped_lischinski->Write("../data/output/lischinski_tmo.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");

@@ -155,12 +155,23 @@ inline T Clamp(T x, T a, T b)
 /**lround: double rounding*/
 inline long lround(double x)
 {
-    if(x > 0) {
+    if(x > 0.0) {
         return (x - floor(x) < 0.5) ? (long)floor(x) : (long)ceil(x);
     } else {
         return (x - floor(x) <= 0.5) ? (long)floor(x) : (long)ceil(x);
     }
 }
+
+/**lround: float rounding*/
+inline float lround(float x)
+{
+    if(x > 0.0f) {
+        return (x - floorf(x) < 0.5f)  ? floorf(x) : ceilf(x);
+    } else {
+        return (x - floorf(x) <= 0.5f) ? floorf(x) : ceilf(x);
+    }
+}
+
 
 /**lerp: Linear interpolation*/
 inline float lerp(float t, float x0, float x1)
@@ -220,8 +231,8 @@ float logPlus(float x)
 /**expMinus: pow10f removing an 1.0*/
 inline float expMinus(float x)
 {
-    double tmp = pow(10.0f, x) - 1.0f;
-    return MAX(tmp, 0.0);
+    float tmp = powf(10.0f, x) - 1.0f;
+    return MAX(tmp, 0.0f);
 }
 
 /**logPlusEpsilon: log10f plus a small epsilon*/

@@ -245,7 +245,7 @@ public:
             if(T < tolerance) {
                 bFlag = false;
             } else {
-                float ceiling = T * k;
+                unsigned int ceiling = int(T * k);
 
                 for(int i = 0; i < nBin; i++) {
                     if(bin[i] > ceiling) {

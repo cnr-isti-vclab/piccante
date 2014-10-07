@@ -39,7 +39,7 @@ std::string GLSL_SIMPLE_EXPOSURE_GAMMA()
           );
 
     return ret;
-};
+}
 
 /**GLSL_DRAGO_TMO: Drago et al.'s TMO*/
 std::string GLSL_DRAGO_TMO()
@@ -59,7 +59,7 @@ std::string GLSL_DRAGO_TMO()
           );
 
     return ret;
-};
+}
 
 } // end namespace pic
 

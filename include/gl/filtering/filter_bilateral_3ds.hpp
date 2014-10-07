@@ -79,10 +79,10 @@ FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
     this->sigma_t = sigma_t;
 
     int nRand = 32;
-    imageRand = new ImageRAWGL(1, 256, 256, 1, IMG_CPU);
+    imageRand = new ImageRAWGL(1, 256, 256, 1, IMG_CPU, GL_TEXTURE_2D);
     imageRand->SetRand();
     imageRand->Mul(float(nRand - 1));
-    imageRand->generateTextureGL(false);
+    imageRand->generateTextureGL(false, GL_TEXTURE_2D);
 
     //Precomputation of the Gaussian Kernel
     int kernelSizeSpace = PrecomputedGaussian::KernelSize(sigma_s);
@@ -174,9 +174,9 @@ void FilterGLBilateral3DS::InitShaders()
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
 
-    sigmas2 = 2.0 * sigma_s * sigma_s;
-    sigmat2 = 2.0 * sigma_t *sigma_t;
-    sigmar2 = 2.0 * sigma_r * sigma_r;
+    sigmas2 = 2.0f * sigma_s * sigma_s;
+    sigmat2 = 2.0f * sigma_t *sigma_t;
+    sigmar2 = 2.0f * sigma_r * sigma_r;
     UpdateUniform();
 }
 
@@ -210,9 +210,9 @@ void FilterGLBilateral3DS::Update(float sigma_s, float sigma_r, float sigma_t)
     ms->updateGL(halfKernelSize, halfKernelSize);
 
     //shader update
-    sigmas2 = 2.0 * this->sigma_s * this->sigma_s;
-    sigmat2 = 2.0 * this->sigma_t *this->sigma_t;
-    sigmar2 = 2.0 * this->sigma_r * this->sigma_r;
+    sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
+    sigmat2 = 2.0f * this->sigma_t *this->sigma_t;
+    sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
     UpdateUniform();
 }
 
@@ -244,7 +244,7 @@ ImageRAWGL *FilterGLBilateral3DS::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(w, h, 1, imgIn[0]->channels, IMG_GPU);
+        imgOut = new ImageRAWGL(w, h, 1, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {
