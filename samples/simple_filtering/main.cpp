@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
         printf("Filtering the image with a Gaussian filter with sigma_s = 4.0...");
 
-        pic::ImageRAW *output = pic::FilterKuwahara::Execute(&img, NULL, 15);
+        pic::ImageRAW *output = pic::FilterGaussian2D::Execute(&img, NULL, 4.0f);
 
         printf("Ok!\n");
 
