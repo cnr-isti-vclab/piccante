@@ -32,7 +32,13 @@ See the GNU Lesser General Public License
 #include "filtering/filter_downsampler_2D.hpp"
 #include "filtering/filter_luminance.hpp"
 
+#ifndef PIC_DISABLE_EIGEN
+#include "externals/Eigen/Dense"
+#endif
+
 namespace pic {
+
+#ifndef PIC_DISABLE_EIGEN
 
 /**
  * @brief The WardAlignment class
@@ -150,15 +156,15 @@ public:
      * @param shift_bits
      * @return
      */
-    Vec<2, int> GetExpShift(ImageRAW *img1, ImageRAW *img2,
+    Eigen::Vector2i GetExpShift(ImageRAW *img1, ImageRAW *img2,
                                    int shift_bits = 6)
     {
         if(img1 == NULL || img2 == NULL) {
-            return Vec<2, int>(0, 0);
+            return Eigen::Vector2i(0, 0.0);
         }
 
         if(!img1->SimilarType(img2)) {
-            return Vec<2, int>(0, 0);
+            return Eigen::Vector2i(0, 0);
         }
 
         ImageRAW *L1, *L2;
@@ -182,10 +188,10 @@ public:
              shift_bits = MAX(log2(min_coord) - 1, 1);
          }
 
-        Vec<2, int> cur_shift, ret_shift;
+        Eigen::Vector2i cur_shift, ret_shift;
 
-        cur_shift = Vec<2, int>(0, 0);
-        ret_shift = Vec<2, int>(0, 0);
+        cur_shift = Eigen::Vector2i(0, 0);
+        ret_shift = Eigen::Vector2i(0, 0);
 
         ImageRAW *sml_img1 = NULL;
         ImageRAW *sml_img2 = NULL;
@@ -268,7 +274,7 @@ public:
      * @param shift
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgTarget, ImageRAW *imgSource, Vec<2, int> &shift)
+    static ImageRAW *Execute(ImageRAW *imgTarget, ImageRAW *imgSource, Eigen::Vector2i &shift)
     {
         WardAlignment wa;
 
@@ -295,6 +301,8 @@ public:
         return ret;
     }
 };
+
+#endif
 
 } // end namespace pic
 
