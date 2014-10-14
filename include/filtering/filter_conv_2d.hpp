@@ -67,8 +67,8 @@ protected:
                     dst_data[c] = 0.0f;
                 }
 
-                for(int k = -c_height_h; k < c_height_h; k++) {
-                    for(int l = -c_width_h; l < c_width_h; l++) {
+                for(int k = -c_height_h; k <= c_height_h; k++) {
+                    for(int l = -c_width_h; l <= c_width_h; l++) {
 
                         float *img_data  = (*img)(i + l, j + k);
                         float kernel_val = (*conv)(l + c_width_h, k + c_height_h)[0];

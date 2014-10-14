@@ -42,6 +42,7 @@ See the GNU Lesser General Public License
 #include "algorithms/superpixels_oracle.hpp"
 #include "algorithms/superpixels_slic.hpp"
 #include "algorithms/color_to_gray.hpp"
+#include "algorithms/richardson_lucy_deconvolution.hpp"
 
 #endif /* PIC_ALGORITHMS_HPP */
 
