@@ -63,7 +63,11 @@ ImageRAW *RichardsonLucyDeconvolution(ImageRAW *imgIn, ImageRAW *psf, int nItera
     ImageRAW *img_err = NULL;
 
     for(int i = 0; i < nIterations; i++) {
-        printf("%d\n", i);
+
+        #ifdef PIC_DEBUG
+            printf("%d\n", i);
+        #endif
+
         img_est_conv = FilterConv2D::Execute(imgOut, psf, img_est_conv);
 
         img_rel_blur->Assign(imgIn);
