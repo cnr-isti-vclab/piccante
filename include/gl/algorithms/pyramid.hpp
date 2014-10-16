@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_GL_ALGORITHMS_PYRAMID_HPP
 #define PIC_GL_ALGORITHMS_PYRAMID_HPP
 
-#include "gl/image_raw.hpp"
+#include "gl/image.hpp"
 
 #include "gl/filtering/filter_gaussian_2d.hpp"
 #include "gl/filtering/filter_sampler_2d.hpp"
@@ -56,12 +56,12 @@ protected:
         fltId   = FilterGLOp::CreateOpIdentity(false);
     }
 
-    std::vector<ImageRAWGL *> trackerRec, trackerUp;
+    std::vector<ImageGL *> trackerRec, trackerUp;
 
-    void Create(ImageRAWGL *img, bool lapGauss, int limitLevel);
+    void Create(ImageGL *img, bool lapGauss, int limitLevel);
 
 public:
-    std::vector<ImageRAWGL *>	stack;
+    std::vector<ImageGL *>	stack;
 
     /**
      * @brief PyramidGL
@@ -69,7 +69,7 @@ public:
      * @param lapGauss
      * @param limitLevel
      */
-    PyramidGL(ImageRAWGL *img, bool lapGauss, int limitLevel);
+    PyramidGL(ImageGL *img, bool lapGauss, int limitLevel);
 
     /**
      * @brief PyramidGL
@@ -87,7 +87,7 @@ public:
      * @brief Update
      * @param img
      */
-    void Update(ImageRAWGL *img);
+    void Update(ImageGL *img);
 
     /**
      * @brief Mul
@@ -119,17 +119,17 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Reconstruct(ImageRAWGL *imgOut);
+    ImageGL *Reconstruct(ImageGL *imgOut);
 };
 
-PyramidGL::PyramidGL(ImageRAWGL *img, bool lapGauss, int limitLevel = 0)
+PyramidGL::PyramidGL(ImageGL *img, bool lapGauss, int limitLevel = 0)
 {
     Create(img, lapGauss, limitLevel);
 }
 
 PyramidGL::PyramidGL(int width, int height, int channels, bool lapGauss, int limitLevel = 0)
 {
-    ImageRAWGL *tmpImg = new ImageRAWGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
+    ImageGL *tmpImg = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
 
     Create(tmpImg, lapGauss, limitLevel);
 }
@@ -143,16 +143,16 @@ PyramidGL::~PyramidGL()
     }
 }
 
-void PyramidGL::Create(ImageRAWGL *img, bool lapGauss, int limitLevel = 0)
+void PyramidGL::Create(ImageGL *img, bool lapGauss, int limitLevel = 0)
 {
     this->lapGauss = lapGauss;
     this->limitLevel  = limitLevel;
 
     InitFilters();
 
-    ImageRAWGL *tmpImg = img;
-    ImageRAWGL *tmpG   = NULL;
-    ImageRAWGL *tmpD   = NULL;
+    ImageGL *tmpImg = img;
+    ImageGL *tmpG   = NULL;
+    ImageGL *tmpD   = NULL;
 
     int levels = MAX(log2(MIN(tmpImg->width, tmpImg->height)) - limitLevel, 1);
 
@@ -184,23 +184,23 @@ void PyramidGL::Create(ImageRAWGL *img, bool lapGauss, int limitLevel = 0)
 #endif
 }
 
-ImageRAWGL *PyramidGL::Reconstruct(ImageRAWGL *imgOut)
+ImageGL *PyramidGL::Reconstruct(ImageGL *imgOut)
 {
     if(stack.size() < 2) {
         return imgOut;
     }
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, stack[0]->width, stack[0]->height,
+        imgOut = new ImageGL(1, stack[0]->width, stack[0]->height,
                                 stack[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     int n = stack.size() - 1;
-    ImageRAWGL *tmp = stack[n];
+    ImageGL *tmp = stack[n];
 
     if(trackerRec.empty()) {
         for(int i = n; i >= 2; i--) {
-            ImageRAWGL *tmp2 = fltAdd->Process(DoubleGL(stack[i - 1], tmp), NULL);
+            ImageGL *tmp2 = fltAdd->Process(DoubleGL(stack[i - 1], tmp), NULL);
             trackerRec.push_back(tmp2);
             tmp = tmp2;
         }
@@ -252,7 +252,7 @@ void PyramidGL::Blend(PyramidGL *pyr, PyramidGL *weight)
     }
 }
 
-void PyramidGL::Update(ImageRAWGL *img)
+void PyramidGL::Update(ImageGL *img)
 {
     if(img == NULL) {
         return;
@@ -262,7 +262,7 @@ void PyramidGL::Update(ImageRAWGL *img)
         return;
     }
 
-    ImageRAWGL *tmpImg = img;
+    ImageGL *tmpImg = img;
 
     int levels = MAX(log2(MIN(tmpImg->width, tmpImg->height)) - limitLevel, 1);
 

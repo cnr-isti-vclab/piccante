@@ -25,12 +25,12 @@ See the GNU Lesser General Public License
 #ifndef PIC_ALGORITHMS_REGION_BORDER_HPP
 #define PIC_ALGORITHMS_REGION_BORDER_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
 //Border of a region
-std::set<int> *SetBorder(ImageRAW *img, std::set<int> *coordsBorder)
+std::set<int> *SetBorder(Image *img, std::set<int> *coordsBorder)
 {
     //Second border
     int ind, c, x, y;
@@ -74,7 +74,7 @@ std::set<int> *SetBorder(ImageRAW *img, std::set<int> *coordsBorder)
 }
 
 //Large border of a region
-std::set<int> *SetBorderNth(ImageRAW *img, std::set<int> *coordsBorder,
+std::set<int> *SetBorderNth(Image *img, std::set<int> *coordsBorder,
                             int widthBorder)
 {
     std::set<int> *ret = new std::set<int>;

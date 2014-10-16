@@ -63,18 +63,18 @@ public:
         }
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float sigma_1,
+    static Image *Execute(Image *imgIn, Image *imgOut, float sigma_1,
                              float sigma_2)
     {
         FilterDiffGauss filter(sigma_1, sigma_2);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, float sigma_1,
+    static Image *Execute(std::string nameIn, std::string nameOut, float sigma_1,
                              float sigma_2)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, sigma_1, sigma_2);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL, sigma_1, sigma_2);
         imgOut->Write(nameOut);
         return imgOut;
     }

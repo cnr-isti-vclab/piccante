@@ -27,7 +27,7 @@ See the GNU Lesser General Public License
 
 #include "util/buffer.hpp"
 #include "util/mask.hpp"
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
@@ -39,7 +39,7 @@ protected:
 
     bool		*mask;
     bool		*maskPoisson;
-    ImageRAW	*imgTmp;
+    Image	*imgTmp;
 
 public:
 
@@ -78,7 +78,7 @@ public:
         }
     }
 
-    void Update(ImageRAW *imgOut, ImageRAW *imgIn)
+    void Update(Image *imgOut, Image *imgIn)
     {
         imgOut->Assign(imgIn);
 
@@ -160,7 +160,7 @@ public:
         }
     }
 
-    ImageRAW *Compute(ImageRAW *imgIn, ImageRAW *imgOut, float value)
+    Image *Compute(Image *imgIn, Image *imgOut, float value)
     {
         if(imgIn == NULL) {
             return NULL;
@@ -197,7 +197,7 @@ public:
 
         maskPoisson = MaskClone(mask, maskPoisson, imgIn->width, imgIn->height);
 
-        ImageRAW *work[2];
+        Image *work[2];
         work[0] = imgTmp;
         work[1] = imgOut;
 

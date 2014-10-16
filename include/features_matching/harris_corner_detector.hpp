@@ -27,7 +27,7 @@ See the GNU Lesser General Public License
 
 #include "util/vec.hpp"
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_gaussian_2d.hpp"
 #include "filtering/filter_conv_1d.hpp"
@@ -45,9 +45,9 @@ namespace pic {
 class HarrisCornerDetector: public GeneralCornerDetector
 {
 protected:
-    ImageRAW *Ix, *Iy, *Ixy, *ret;
-    ImageRAW *Ix2_flt, *Iy2_flt, *Ixy_flt;
-    ImageRAW *filtered;
+    Image *Ix, *Iy, *Ixy, *ret;
+    Image *Ix2_flt, *Iy2_flt, *Ixy_flt;
+    Image *filtered;
 
     //Harris Corners detector parameters
     float sigma, threshold;
@@ -152,7 +152,7 @@ public:
         this->threshold = threshold;
     }
 
-    void Compute(ImageRAW *img, std::vector< Eigen::Vector3f > *corners)
+    void Compute(Image *img, std::vector< Eigen::Vector3f > *corners)
     {
         if(img == NULL) {
             return;

@@ -85,17 +85,17 @@ public:
      * @param testing
      * @return
      */
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut,
+    static ImageGL *Execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r, int testing)
     {
         GLuint testTQ = glBeginTimeQuery();
         glEndTimeQuery(testTQ);
 
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLBilateral2DSP filter(sigma_s, sigma_r);
-        ImageRAWGL *imgRet = new ImageRAWGL(1, imgIn.width, imgIn.height, 3, IMG_GPU, GL_TEXTURE_2D);
+        ImageGL *imgRet = new ImageGL(1, imgIn.width, imgIn.height, 3, IMG_GPU, GL_TEXTURE_2D);
 
         GLuint testTQ1;
 
@@ -126,7 +126,7 @@ public:
             fclose(file);
         }
 
-        ImageRAWGL *imgWrite = new ImageRAWGL(1, imgIn.width, imgIn.height, 4, IMG_CPU, GL_TEXTURE_2D);
+        ImageGL *imgWrite = new ImageGL(1, imgIn.width, imgIn.height, 4, IMG_CPU, GL_TEXTURE_2D);
         imgWrite->readFromFBO(filter.getFbo());
         imgWrite->Write(nameOut);
         return imgRet;

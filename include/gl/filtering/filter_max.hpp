@@ -71,7 +71,7 @@ public:
      * @param size
      * @return
      */
-    static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgOut, int size)
+    static ImageGL *Execute(ImageGL *imgIn, ImageGL *imgOut, int size)
     {
         FilterGLMax filter(size);
         return filter.Process(SingleGL(imgIn), imgOut);
@@ -84,11 +84,11 @@ public:
      * @param size
      * @return
      */
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, int size)
+    static Image *Execute(std::string nameIn, std::string nameOut, int size)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-        ImageRAWGL *imgOut = Execute(&imgIn, NULL, size);
+        ImageGL *imgOut = Execute(&imgIn, NULL, size);
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
         return imgOut;

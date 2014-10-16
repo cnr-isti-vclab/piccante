@@ -49,7 +49,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int channels = src[0]->channels;
 
@@ -96,7 +96,7 @@ protected:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut != NULL) {
             return imgOut;
@@ -104,7 +104,7 @@ protected:
 
         if(!bSameSize) {
             ComputingBoundingBox(h, imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax, bCentroid);
-            imgOut = new ImageRAW(1, bmax[0] - bmin[0], bmax[1] - bmin[1], imgIn[0]->channels);
+            imgOut = new Image(1, bmax[0] - bmin[0], bmax[1] - bmin[1], imgIn[0]->channels);
         } else {
             bmin[0] = 0;
             bmin[1] = 0;
@@ -112,7 +112,7 @@ protected:
             bmax[0] = imgIn[0]->width;
             bmax[1] = imgIn[0]->height;
 
-            imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, imgIn[0]->channels);
+            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, imgIn[0]->channels);
         }
 
         return imgOut;
@@ -241,7 +241,7 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(!bSameSize) {
             ComputingBoundingBox(h, imgIn->widthf, imgIn->heightf, bmin, bmax, bCentroid);
@@ -257,7 +257,7 @@ public:
         channels = imgIn->channels;
     }
 
-    static ImageRAW *Execute(ImageRAW *img, ImageRAW *imgOut, Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
+    static Image *Execute(Image *img, Image *imgOut, Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
     {
         FilterWarp2D flt(h, bSameSize, bCentroid);
         imgOut = flt.ProcessP(Single(img), imgOut);

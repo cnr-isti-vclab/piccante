@@ -26,7 +26,7 @@ See the GNU Lesser General Public License
 #define PIC_UTIL_CONVERT_RAW_TO_IMAGES_HPP
 
 #include "util/string.hpp"
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
@@ -43,7 +43,7 @@ void ConvertRAWtoImages(std::string nameDirectory, std::string format,
     StringVec vec;
     FileLister::List(nameDirectory, "raw", &vec);
 
-    ImageRAW img;
+    Image img;
 
     for(unsigned int i = 0; i < vec.size(); i++) {
         img.ReadRAW(vec[i], "NULL", RAW_U16_RGGB, width, height);
@@ -74,7 +74,7 @@ void ConvertDetect(std::string nameDirectory, std::string format, int width,
     FileLister::List(nameDirectory, "raw", &vec);
 
     RAW<unsigned short> tmp;
-    ImageRAW img;
+    Image img;
 
     for(unsigned int i = 0; i < vec.size(); i++) {
         tmp.Read(vec[i], width * height);

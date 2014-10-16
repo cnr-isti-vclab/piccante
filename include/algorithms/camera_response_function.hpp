@@ -127,7 +127,7 @@ inline float Linearize(float x, IMG_LIN type, float *icrf = NULL)
 
 #include "externals/Eigen/SVD"
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "point_samplers/sampler_random.hpp"
 #include "histogram.hpp"
 #include "filtering/filter_mean.hpp"
@@ -200,11 +200,11 @@ protected:
 
     /**
     * \brief This function creates a low resolution version of the stack using Grossberg and Nayar sampling.
-    * \param stack is a stack of ImageRAW* at different exposures
+    * \param stack is a stack of Image* at different exposures
     * \param nSamples output number of samples
     * \return samples an array of unsigned char values which is the low resolution stack
     */
-    unsigned char *subSampleGrossberg(std::vector<ImageRAW *> stack, int nSamples = 100)
+    unsigned char *subSampleGrossberg(std::vector<Image *> stack, int nSamples = 100)
     {        
         if(stack.size() < 1) {
             return NULL;
@@ -272,11 +272,11 @@ protected:
     
     /**
     * \brief This function creates a low resolution version of the stack.
-    * \param stack is a stack of ImageRAW* at different exposures
+    * \param stack is a stack of Image* at different exposures
     * \param nSamples output number of samples
     * \return samples an array of unsigned char values which is the low resolution stack
     */
-    unsigned char *subSample(std::vector<ImageRAW *> stack, int &nSamples)
+    unsigned char *subSample(std::vector<Image *> stack, int &nSamples)
     {
         if(stack.size() < 1) {
             return NULL;
@@ -333,7 +333,7 @@ public:
         
     }
     
-    CameraResponseFunction(ImageRAWVec stack, float *exposure, CRF_WEIGHT type = CRF_DEB97, int nSamples = 100, float lambda = 10.0f)
+    CameraResponseFunction(ImageVec stack, float *exposure, CRF_WEIGHT type = CRF_DEB97, int nSamples = 100, float lambda = 10.0f)
     {
         DebevecMalik(stack, exposure, type, nSamples, lambda);
     }
@@ -352,7 +352,7 @@ public:
     }
 
     /**This method computes the CRF by exploiting the couple RAW/JPEG from cameras*/
-    void FromRAWJPEG(ImageRAW *img_raw, ImageRAW *img_jpg, int filteringSize = 11)
+    void FromRAWJPEG(Image *img_raw, Image *img_jpg, int filteringSize = 11)
     {
         if((img_raw==NULL) || (img_jpg==NULL))
             return;
@@ -419,9 +419,9 @@ public:
             }
             
             if(filteringSize>0) {
-                ImageRAW toBeFiltered(1, 256, 1, 1, ret_c);
+                Image toBeFiltered(1, 256, 1, 1, ret_c);
 
-                ImageRAW *filtered = FilterMean::Execute(&toBeFiltered, NULL, filteringSize);
+                Image *filtered = FilterMean::Execute(&toBeFiltered, NULL, filteringSize);
                 
                 icrf.push_back(filtered->data);
 
@@ -433,7 +433,7 @@ public:
 
     /**This method computes the CRF of a camera using multiple exposures value following Debevec and Malik
     1997's method.*/
-    void DebevecMalik(ImageRAWVec stack, float *exposure, CRF_WEIGHT type = CRF_DEB97, int nSamples = 100, float lambda = 10.0f)
+    void DebevecMalik(ImageVec stack, float *exposure, CRF_WEIGHT type = CRF_DEB97, int nSamples = 100, float lambda = 10.0f)
     {
         if( stack.size()<1 || (exposure==NULL) )
             return;
@@ -476,8 +476,8 @@ public:
             float *icrf_channel = gsolve(&samples[i * stride], log_exposure, lambda, nSamples,
                                         nExposure);
 
-            //Wrapping into an ImageRAW for normalization
-            ImageRAW img(1, 256, 1, 1, icrf_channel);
+            //Wrapping into an Image for normalization
+            Image img(1, 256, 1, 1, icrf_channel);
 
             float *max_val = img.getMaxVal(NULL, NULL);
             if(max_val[0] > 0.0f) {
@@ -492,7 +492,7 @@ public:
     }
 
     /**Linearize: linearize the image signal applying the iCRF*/
-    void Linearize(ImageRAW *img)
+    void Linearize(Image *img)
     {
         if(img==NULL){
             return;

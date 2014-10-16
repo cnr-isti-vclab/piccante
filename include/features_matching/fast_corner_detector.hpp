@@ -27,7 +27,7 @@ See the GNU Lesser General Public License
 
 #include "util/vec.hpp"
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_luminance.hpp"
 
 #include "features_matching/general_corner_detector.hpp"
@@ -43,7 +43,7 @@ namespace pic {
 class FastCornerDetector: public GeneralCornerDetector
 {
 protected:
-    ImageRAW *lum_flt;
+    Image *lum_flt;
     bool      bComputeThreshold;
 
     float     sigma, threshold;
@@ -84,7 +84,7 @@ public:
         }
     }
 
-    void Compute(ImageRAW *img, std::vector< Eigen::Vector3f > *corners)
+    void Compute(Image *img, std::vector< Eigen::Vector3f > *corners)
     {
         if(img == NULL) {
             return;
@@ -118,7 +118,7 @@ public:
 
         memset(corners_map, 0, sizeof(bool) * width *  height);
 
-        ImageRAW V(1,width, height, 1);
+        Image V(1,width, height, 1);
         V.SetZero();
 
         for(int i=3; i<(height - 3); i++) {

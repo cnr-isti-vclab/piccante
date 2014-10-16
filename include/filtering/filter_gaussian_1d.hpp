@@ -60,7 +60,7 @@ public:
 
     ~FilterGaussian1D();
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float sigma,
+    static Image *Execute(Image *imgIn, Image *imgOut, float sigma,
                              int direction)
     {
         FilterGaussian1D filter(sigma, direction);

@@ -42,7 +42,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     /**
      * @brief SetupAux
@@ -50,7 +50,7 @@ protected:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
 
@@ -66,14 +66,14 @@ public:
      * @param value
      * @return
      */
-    static ImageRAW *AddAlpha(ImageRAW *imgIn, ImageRAW *imgOut, float value)
+    static Image *AddAlpha(Image *imgIn, Image *imgOut, float value)
     {
         //Create an alpha channel
-        ImageRAW *alpha = new ImageRAW(imgIn->frames, imgIn->width, imgIn->height, 1);
+        Image *alpha = new Image(imgIn->frames, imgIn->width, imgIn->height, 1);
         alpha->Assign(value);
 
         //Add the channel to the image
-        ImageRAWVec src;
+        ImageVec src;
         src.push_back(imgIn);
         src.push_back(alpha);
 
@@ -90,7 +90,7 @@ public:
      * @param imgOut
      * @return
      */
-    static ImageRAW *Execute(ImageRAWVec imgIn, ImageRAW *imgOut)
+    static Image *Execute(ImageVec imgIn, Image *imgOut)
     {
         FilterCombine filterC;
         return filterC.Process(imgIn, imgOut);
@@ -102,33 +102,33 @@ public:
      * @param nameOut
      * @return
      */
-    static ImageRAW *ExecuteTest(std::string nameIn, std::string nameOut)
+    static Image *ExecuteTest(std::string nameIn, std::string nameOut)
     {
-        ImageRAW imgIn(nameIn);
+        Image imgIn(nameIn);
 
         FilterChannel filter(0);
-        ImageRAW *outR = filter.Process(Single(&imgIn), NULL);
+        Image *outR = filter.Process(Single(&imgIn), NULL);
 
         filter.setChannel(1);
-        ImageRAW *outG = filter.Process(Single(&imgIn), NULL);
+        Image *outG = filter.Process(Single(&imgIn), NULL);
 
         filter.setChannel(2);
-        ImageRAW *outB = filter.Process(Single(&imgIn), NULL);
+        Image *outB = filter.Process(Single(&imgIn), NULL);
 
-        ImageRAWVec src;
+        ImageVec src;
         src.push_back(outR);
         src.push_back(outG);
         src.push_back(outB);
 
         FilterCombine filterC;
-        ImageRAW *ret = filterC.Process(src, NULL);
+        Image *ret = filterC.Process(src, NULL);
 
         ret->Write(nameOut);
         return ret;
     }
 };
 
-ImageRAW *FilterCombine::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterCombine::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         int channels = 0;
@@ -137,14 +137,14 @@ ImageRAW *FilterCombine::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
             channels += imgIn[i]->channels;
         }
 
-        imgOut = new ImageRAW(imgIn[0]->frames, imgIn[0]->width, imgIn[0]->height,
+        imgOut = new Image(imgIn[0]->frames, imgIn[0]->width, imgIn[0]->height,
                               channels);
     }
 
     return imgOut;
 }
 
-void FilterCombine::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterCombine::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     for(int p = box->z0; p < box->z1; p++) {
         for(int j = box->y0; j < box->y1; j++) {

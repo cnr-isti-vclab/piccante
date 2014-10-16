@@ -59,17 +59,17 @@ public:
         }
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float sigma)
+    static Image *Execute(Image *imgIn, Image *imgOut, float sigma)
     {
         FilterGaussian3D filter(sigma);
-        ImageRAW *ret = filter.Process(Single(imgIn), imgOut);
+        Image *ret = filter.Process(Single(imgIn), imgOut);
         return ret;
     }
 
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, float sigma)
+    static Image *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, sigma);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL, sigma);
         imgOut->Write(nameOut);
         return imgOut;
     }

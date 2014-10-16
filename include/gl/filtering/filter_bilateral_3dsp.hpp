@@ -54,7 +54,7 @@ public:
     //Update
     void Update(float sigma_s,  float sigma_r, float sigma_t);
 
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut,
+    static ImageGL *Execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r, float sigma_t)
     {
         return NULL;

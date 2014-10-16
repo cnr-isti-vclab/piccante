@@ -28,7 +28,6 @@ See the GNU Lesser General Public License
 #include "algorithms/calculate_divergence.hpp"
 #include "algorithms/camera_response_function.hpp"
 #include "algorithms/connected_components.hpp"
-#include "algorithms/demosaic.hpp"
 #include "algorithms/discrete_cosine_transform.hpp"
 #include "algorithms/edge_enhancement.hpp"
 #include "algorithms/flash_photography.hpp"

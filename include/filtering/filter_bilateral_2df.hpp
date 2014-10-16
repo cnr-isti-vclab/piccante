@@ -37,7 +37,7 @@ protected:
     PrecomputedGaussian *pg;
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     //Basic constructors
@@ -51,28 +51,28 @@ public:
     }
 
     //Filtering
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut,
+    static Image *Execute(Image *imgIn, Image *imgOut,
                              float sigma_s, float sigma_r)
     {
         //Filtering
         FilterBilateral2DF filter(sigma_s, sigma_r);
         long t0 = timeGetTime();
-        ImageRAW *out = filter.ProcessP(Single(imgIn), imgOut);
+        Image *out = filter.ProcessP(Single(imgIn), imgOut);
         long t1 = timeGetTime();
         printf("Full Bilateral Filter time: %ld\n", t1 - t0);
         return out;
     }
 
     //Filtering
-    static ImageRAW *Execute(std::string nameIn,
+    static Image *Execute(std::string nameIn,
                              std::string nameOut,
                              float sigma_s, float sigma_r)
     {
         //Load the image
-        ImageRAW imgIn(nameIn);
+        Image imgIn(nameIn);
 
         //Filter
-        ImageRAW *imgOut = FilterBilateral2DF::Execute(&imgIn, NULL, sigma_s, sigma_r);
+        Image *imgOut = FilterBilateral2DF::Execute(&imgIn, NULL, sigma_s, sigma_r);
 
         //Write image out
         imgOut->Write(nameOut);
@@ -98,12 +98,12 @@ FilterBilateral2DF::FilterBilateral2DF(float sigma_s, float sigma_r)
 }
 
 //Process in a box
-void FilterBilateral2DF::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterBilateral2DF::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 
     //Filtering
-    ImageRAW *edge, *base;
+    Image *edge, *base;
 
     if(src.size() == 2) {
         //Joint/Cross Bilateral Filtering

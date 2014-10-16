@@ -35,13 +35,13 @@ protected:
     MRSamplersGL<3> *ms;
 
     //Random numbers tile
-    ImageRAWGL *imageRand;
+    ImageGL *imageRand;
 
     //Sampling map
     FilterGLSamplingMap *fGLsm;
 
-    ImageRAWGL			*imgFrame;
-    ImageRAWGL			*imgTmp;
+    ImageGL			*imgFrame;
+    ImageGL			*imgTmp;
 
     void InitShaders();
     void FragmentShader();
@@ -61,7 +61,7 @@ public:
         Update(-1.0f, -1.0f, -1.0f);
     }
     //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
 //Basic constructor
@@ -96,7 +96,7 @@ FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
     frame = 0;
 
     int nRand = 32;
-    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
+    imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
     imageRand->SetRand();
     imageRand->Mul(float(nRand - 1));
     imageRand->generateTexture2DU32GL();
@@ -270,8 +270,8 @@ void FilterGLBilateral3DAS::Update(float sigma_s, float sigma_r, float sigma_t)
 }
 
 //Processing
-ImageRAWGL *FilterGLBilateral3DAS::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLBilateral3DAS::Process(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -281,7 +281,7 @@ ImageRAWGL *FilterGLBilateral3DAS::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {
@@ -293,13 +293,13 @@ ImageRAWGL *FilterGLBilateral3DAS::Process(ImageRAWGLVec imgIn,
         float scale = fGLsm->getScale();
         imgFrame->generateTextureGL(false, GL_TEXTURE_2D);
 
-        imgTmp = new ImageRAWGL(    1,
+        imgTmp = new ImageGL(    1,
                                     int(imgIn[0]->widthf  * scale),
                                     int(imgIn[0]->heightf * scale),
                                     1, IMG_GPU, GL_TEXTURE_2D);
     }
 
-    ImageRAWGL *edge, *base;
+    ImageGL *edge, *base;
 
     if(imgIn.size() == 2) {
         //Joint/Cross Bilateral Filtering

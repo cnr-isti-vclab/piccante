@@ -42,10 +42,10 @@ protected:
     bool			swh;
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     //SetupAux
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     //Basic constructors
@@ -55,7 +55,7 @@ public:
     FilterSampler2D(int width, int height, ImageSampler *isb);
 
     /**Output size*/
-    void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(swh) {
             width       = int(imgIn->widthf  * scaleX);
@@ -69,21 +69,21 @@ public:
         frames      = imgIn->frames;
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float scale,
+    static Image *Execute(Image *imgIn, Image *imgOut, float scale,
                              ImageSampler *isb)
     {
         FilterSampler2D filter(scale, isb);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float scaleX,
+    static Image *Execute(Image *imgIn, Image *imgOut, float scaleX,
                              float scaleY, ImageSampler *isb)
     {
         FilterSampler2D filter(scaleX, scaleY, isb);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, int width,
+    static Image *Execute(Image *imgIn, Image *imgOut, int width,
                              int height, ImageSampler *isb)
     {
         FilterSampler2D filter(width, height, isb);
@@ -93,8 +93,8 @@ public:
     static void Execute(std::string nameIn, std::string nameOut, float scale,
                         ImageSampler *isb)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, scale, isb);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL, scale, isb);
         imgOut->Write(nameOut);
     }
 };
@@ -145,27 +145,27 @@ PIC_INLINE FilterSampler2D::FilterSampler2D(int width, int height,
     }
 }
 
-PIC_INLINE ImageRAW *FilterSampler2D::SetupAux(ImageRAWVec imgIn,
-        ImageRAW *imgOut)
+PIC_INLINE Image *FilterSampler2D::SetupAux(ImageVec imgIn,
+        Image *imgOut)
 {
     if(imgOut == NULL) {
         if(swh) {
-            imgOut = new ImageRAW(  imgIn[0]->frames, 
+            imgOut = new Image(  imgIn[0]->frames, 
                                     int(imgIn[0]->widthf  * scaleX),
                                     int(imgIn[0]->heightf * scaleY),
                                     imgIn[0]->channels);
         } else {
-            imgOut = new ImageRAW(imgIn[0]->frames, width, height, imgIn[0]->channels);
+            imgOut = new Image(imgIn[0]->frames, width, height, imgIn[0]->channels);
         }
     }
 
     return imgOut;
 }
 
-PIC_INLINE void FilterSampler2D::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
+PIC_INLINE void FilterSampler2D::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
-    ImageRAW *source = src[0];
+    Image *source = src[0];
 
     float width1f  = float(box->width  - 1);
     float height1f = float(box->height - 1);

@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_HISTOGRAM_HPP
 #define PIC_HISTOGRAM_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "util/array.hpp"
 
 namespace pic {
@@ -34,7 +34,7 @@ enum VALUE_SPACE {VS_LDR, VS_LIN, VS_LOG_2, VS_LOG_E, VS_LOG_10};
 
 /**
  * @brief The Histogram class is a class for creating,
- * managing, loading, and saving histogram for an ImageRAW.
+ * managing, loading, and saving histogram for an Image.
  */
 class Histogram
 {
@@ -310,13 +310,13 @@ public:
     }
 
     /**
-     * @brief Write saves the Histogram as an ImageRAW into a file.
+     * @brief Write saves the Histogram as an Image into a file.
      * @param name is the filename where to save the Histogram.
      * @param bNor is a boolean value for normalizing or not the Histogram.
      */
     void Write(std::string name, bool bNor)
     {
-        ImageRAW img(1, nBin, 1, 1);
+        Image img(1, nBin, 1, 1);
 
         if(bNor) {
             getNormalized();

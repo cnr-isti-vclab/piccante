@@ -29,7 +29,7 @@ See the GNU Lesser General Public License
 #include <set>
 #include <map>
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_luminance.hpp"
 
 namespace pic {
@@ -83,8 +83,8 @@ public:
  * @param channel
  * @return
  */
-ImageRAW *ConnectedComponents(ImageRAW *img, std::vector<LabelOutput> &ret,
-                              ImageRAW *comp = NULL, float thr = 0.05f)
+Image *ConnectedComponents(Image *img, std::vector<LabelOutput> &ret,
+                              Image *comp = NULL, float thr = 0.05f)
 {
     //Check input paramters
     if(img == NULL) {
@@ -98,7 +98,7 @@ ImageRAW *ConnectedComponents(ImageRAW *img, std::vector<LabelOutput> &ret,
     int n = height * width;
 
     if(comp == NULL) {
-        comp = new ImageRAW(1, width, height, 1);
+        comp = new Image(1, width, height, 1);
     }
 
     comp->SetZero();

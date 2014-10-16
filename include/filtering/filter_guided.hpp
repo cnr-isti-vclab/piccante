@@ -39,9 +39,9 @@ protected:
     float	e_regularization, nPixels;
 
     //Process in a box
-    void Process1Channel(ImageRAW *I, ImageRAW *p, ImageRAW *q, BBox *box);
-    void Process3Channel(ImageRAW *I, ImageRAW *p, ImageRAW *q, BBox *box);
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void Process1Channel(Image *I, Image *p, Image *q, BBox *box);
+    void Process3Channel(Image *I, Image *p, Image *q, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     //Basic constructor
@@ -56,7 +56,7 @@ public:
 
     void Update(int radius, float e_regularization);
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *guide, ImageRAW *imgOut,
+    static Image *Execute(Image *imgIn, Image *guide, Image *imgOut,
                              int radius, float e_regularization)
     {
         FilterGuided filter(radius, e_regularization);
@@ -71,7 +71,7 @@ void FilterGuided::Update(int radius, float e_regularization)
     nPixels = float(radius * radius * 4);
 }
 
-void FilterGuided::Process1Channel(ImageRAW *I, ImageRAW *p, ImageRAW *q,
+void FilterGuided::Process1Channel(Image *I, Image *p, Image *q,
                                    BBox *box)
 {
     float I_mean, I_var;
@@ -111,8 +111,8 @@ void FilterGuided::Process1Channel(ImageRAW *I, ImageRAW *p, ImageRAW *q,
     delete p_mean;
 }
 
-PIC_INLINE void FilterGuided::Process3Channel(ImageRAW *I, ImageRAW *p,
-        ImageRAW *q, BBox *box)
+PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
+        Image *q, BBox *box)
 {
     int channels = p->channels;
 
@@ -189,10 +189,10 @@ PIC_INLINE void FilterGuided::Process3Channel(ImageRAW *I, ImageRAW *p,
 }
 
 //Process in a box
-PIC_INLINE void FilterGuided::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
+PIC_INLINE void FilterGuided::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
-    ImageRAW *I, *p;
+    Image *I, *p;
 
     if(src.size() == 2) {
         p = src[0];

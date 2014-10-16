@@ -44,7 +44,7 @@ protected:
      * @param direction
      * @param target
      */
-    void FragmentShader(ImageRAWGL *weights, int direction, GLenum target)
+    void FragmentShader(ImageGL *weights, int direction, GLenum target)
     {
         std::string fragment_source_2D = GLW_STRINGFY
                                          (

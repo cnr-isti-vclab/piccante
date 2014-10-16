@@ -38,9 +38,9 @@ class FilterWLS: public Filter
 {
 protected:
     /**WLSFilter: smoothing WLS filter for gray-scale images*/
-    ImageRAW *SingleChannel(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *SingleChannel(ImageVec imgIn, Image *imgOut)
     {
-        ImageRAW *L = imgIn[0];
+        Image *L = imgIn[0];
 
         int width  = L->width;
         int height = L->height;
@@ -136,9 +136,9 @@ protected:
     }
 
     /**MultiChannel: smoothing WLS filter for color images*/
-    ImageRAW *MultiChannel(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *MultiChannel(ImageVec imgIn, Image *imgOut)
     {
-        ImageRAW *img = imgIn[0];
+        Image *img = imgIn[0];
 
         int width  = img->width;
         int height = img->height;
@@ -302,7 +302,7 @@ public:
         this->lambda = lambda;
     }
 
-    ImageRAW *Process(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *Process(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() < 1){
             return imgOut;
@@ -322,7 +322,7 @@ public:
         }
     }
 
-    ImageRAW *ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *ProcessP(ImageVec imgIn, Image *imgOut)
     {
         return Process(imgIn, imgOut);
     }
@@ -343,7 +343,7 @@ public:
 
         std::string nameOut = name + "_wls." + ext; 
 
-        ImageRAW img(nameIn);
+        Image img(nameIn);
 
         FilterWLS *filter = new FilterWLS(alpha, lambda);
 

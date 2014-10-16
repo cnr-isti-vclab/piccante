@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_ALGORITHMS_DISCRETE_COSINE_TRANSFORM_HPP
 #define PIC_ALGORITHMS_DISCRETE_COSINE_TRANSFORM_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "util/tile_list.hpp"
 
 namespace pic {
@@ -52,7 +52,7 @@ public:
      * @param size
      * @return
      */
-    static ImageRAW *Transform(ImageRAW *imgIn, ImageRAW *imgOut, int size = 8)
+    static Image *Transform(Image *imgIn, Image *imgOut, int size = 8)
     {
         if(imgIn == NULL) {
             return imgOut;
@@ -138,7 +138,7 @@ public:
      * @param size
      * @return
      */
-    static ImageRAW *Inverse(ImageRAW *imgIn, ImageRAW *imgOut, int size = 8)
+    static Image *Inverse(Image *imgIn, Image *imgOut, int size = 8)
     {
         if(imgIn == NULL) {
             return imgOut;

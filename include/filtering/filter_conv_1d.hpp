@@ -43,7 +43,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
 
@@ -94,7 +94,7 @@ public:
      * @param XorY
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float *data, int n,
+    static Image *Execute(Image *imgIn, Image *imgOut, float *data, int n,
                              bool XorY = true)
     {
         FilterConv1D filter(data, n, 0);
@@ -203,11 +203,11 @@ void FilterConv1D::ChangePass(int x, int y, int z)
     dirs[2] = z;
 }
 
-void FilterConv1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterConv1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 
-    ImageRAW *source = src[0];
+    Image *source = src[0];
 
     int halfKernelSize = n >> 1;
 

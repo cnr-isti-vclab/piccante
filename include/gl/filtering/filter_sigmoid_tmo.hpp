@@ -69,7 +69,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief Update
@@ -180,7 +180,7 @@ void FilterGLSigmoidTMO::Update(float alpha)
     glw::bind_program(0);
 }
 
-ImageRAWGL *FilterGLSigmoidTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLSigmoidTMO::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.empty()) {
         return imgOut;
@@ -194,7 +194,7 @@ ImageRAWGL *FilterGLSigmoidTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {
@@ -203,7 +203,7 @@ ImageRAWGL *FilterGLSigmoidTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 
     fbo->create(w, h, 1, false, imgOut->getTexture());
 
-    ImageRAWGL *ori, *adapt;
+    ImageGL *ori, *adapt;
 
     if(imgIn.size() == 2) {
         ori   = imgIn[0];

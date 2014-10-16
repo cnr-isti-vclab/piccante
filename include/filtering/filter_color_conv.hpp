@@ -49,7 +49,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         if(n < 1) {
             return;
@@ -139,7 +139,7 @@ public:
      * @param bDirect
      * @return
      */
-    static ImageRAW *RGBtoLogLuv(ImageRAW *imgIn, ImageRAW *imgOut,
+    static Image *RGBtoLogLuv(Image *imgIn, Image *imgOut,
                                         bool bDirect)
     {
         ColorConvRGBtoXYZ       csXYZ;
@@ -160,7 +160,7 @@ public:
      * @param bDirect
      * @return
      */
-    static ImageRAW *RGBtoCIELAB(ImageRAW *imgIn, ImageRAW *imgOut,
+    static Image *RGBtoCIELAB(Image *imgIn, Image *imgOut,
                                         bool bDirect)
     {
         ColorConvRGBtoXYZ       csXYZ;
@@ -181,7 +181,7 @@ public:
      * @param bDirect
      * @return
      */
-    static ImageRAW *CIELABtoRGB(ImageRAW *imgIn, ImageRAW *imgOut,
+    static Image *CIELABtoRGB(Image *imgIn, Image *imgOut,
                                         bool bDirect)
     {
         ColorConvRGBtoXYZ       csXYZ;

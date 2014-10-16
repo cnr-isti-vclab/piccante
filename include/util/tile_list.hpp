@@ -97,7 +97,7 @@ public:
      * @brief Read loads a TileList from a file.
      * @param name is the file name.
      * @param flag is a boolean value. If it is true, this loads
-     * an ImageRAW from the tile name. Otherwise, an ImageRAW of the tile
+     * an Image from the tile name. Otherwise, an Image of the tile
      * size is allocated.
      * @return This function returns true if it is successfull.
      */
@@ -112,9 +112,9 @@ public:
 
     /**
      * @brief WriteIntoMemory copies tiles inside an output image.
-     * @param output is the ImageRAW where tiles will be copied to.
+     * @param output is the Image where tiles will be copied to.
      */
-    void WriteIntoMemory(ImageRAW *output);
+    void WriteIntoMemory(Image *output);
 };
 
 PIC_INLINE TileList::TileList()
@@ -244,7 +244,7 @@ PIC_INLINE void TileList::Create(int tileSize, int width, int height)
     }
 }
 
-PIC_INLINE void TileList::WriteIntoMemory(ImageRAW *output)
+PIC_INLINE void TileList::WriteIntoMemory(Image *output)
 {
     if(output == NULL) {
         return;
@@ -307,9 +307,9 @@ PIC_INLINE bool TileList::Read(std::string name, bool flag)
 
         tmpTile.name = tmp_name;
         if(flag) {
-            tmpTile.tile = new ImageRAW(tmpTile.name);
+            tmpTile.tile = new Image(tmpTile.name);
         } else {
-            tmpTile.tile = new ImageRAW(1, tmpTile.width, tmpTile.height, 3);
+            tmpTile.tile = new Image(1, tmpTile.width, tmpTile.height, 3);
         }
 
         tiles.push_back(tmpTile);

@@ -104,8 +104,8 @@ See the GNU Lesser General Public License
 #include "gl/filtering/filter_simple_tmo.hpp"
 #include "gl/filtering/filter_slicer.hpp"
 #include "gl/filtering/filter_thresholding.hpp"
-#include "gl/image_raw.hpp"
-#include "gl/image_raw_vec.hpp"
+#include "gl/image.hpp"
+#include "gl/image_vec.hpp"
 #include "gl/point_samplers/sampler_random_m.hpp"
 
 //Tone mapping

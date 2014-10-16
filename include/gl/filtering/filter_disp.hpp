@@ -52,19 +52,19 @@ public:
     FilterGLDisp();
 
     //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     //Update
     void Update(float sigma, float sigma_s, float sigma_r, bool bUse, bool bLeft);
 
-    static ImageRAWGL *Execute(std::string nameLeft,
+    static ImageGL *Execute(std::string nameLeft,
                                std::string nameRight,
                                std::string nameDisp,
                                std::string nameOut)
     {
-        ImageRAWGL imgL(nameLeft);
-        ImageRAWGL imgR(nameRight);
-        ImageRAWGL imgD(nameDisp);
+        ImageGL imgL(nameLeft);
+        ImageGL imgR(nameRight);
+        ImageGL imgD(nameDisp);
 
         imgL.generateTextureGL(false, GL_TEXTURE_2D);
         imgR.generateTextureGL(false, GL_TEXTURE_2D);
@@ -72,7 +72,7 @@ public:
 
         FilterGLDisp filter;
 
-        ImageRAWGL *imgOut = filter.Process(TripleGL(&imgL, &imgR, &imgD), NULL);
+        ImageGL *imgOut = filter.Process(TripleGL(&imgL, &imgR, &imgD), NULL);
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
         return imgOut;
@@ -243,7 +243,7 @@ void FilterGLDisp::Update(float sigma, float sigma_s, float sigma_r, bool bUse,
 }
 
 //Processing
-ImageRAWGL *FilterGLDisp::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLDisp::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -257,7 +257,7 @@ ImageRAWGL *FilterGLDisp::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

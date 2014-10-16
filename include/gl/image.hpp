@@ -25,7 +25,8 @@ See the GNU Lesser General Public License
 #ifndef PIC_GL_IMAGE_RAW_HPP
 #define PIC_GL_IMAGE_RAW_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
+
 #include "gl.hpp"
 #include "util/gl/fbo.hpp"
 #include "util/gl/formats.hpp"
@@ -36,9 +37,9 @@ namespace pic {
 enum IMAGESTORE {IMG_GPU_CPU, IMG_CPU_GPU, IMG_CPU, IMG_GPU, IMG_NULL};
 
 /**
- * @brief The ImageRAWGL class
+ * @brief The ImageGL class
  */
-class ImageRAWGL: public ImageRAW
+class ImageGL: public Image
 {
 protected:
     GLuint		texture;
@@ -53,35 +54,35 @@ protected:
     void	Destroy();
 
 public:
-    std::vector<ImageRAWGL *> stack;
+    std::vector<ImageGL *> stack;
 
     /**
-     * @brief ImageRAWGL
+     * @brief ImageGL
      */
-    ImageRAWGL();
+    ImageGL();
 
-    ~ImageRAWGL();
+    ~ImageGL();
 
     /**
-     * @brief ImageRAWGL
+     * @brief ImageGL
      * @param tex
      * @param target
      */
-    ImageRAWGL(GLuint tex, GLenum target);
+    ImageGL(GLuint tex, GLenum target);
 
     /**
-     * @brief ImageRAWGL
+     * @brief ImageGL
      * @param img
      * @param mipmap
      * @param target
      */
-    ImageRAWGL(ImageRAW *img, bool mipmap, GLenum target);
+    ImageGL(Image *img, bool mipmap, GLenum target);
 
     /**
-     * @brief ImageRAWGL
+     * @brief ImageGL
      * @param nameFile
      */
-    ImageRAWGL(std::string nameFile): ImageRAW(nameFile)
+    ImageGL(std::string nameFile): Image(nameFile)
     {
         notOwnedGL = false;
         mode = IMG_CPU;
@@ -91,14 +92,14 @@ public:
     }
 
     /**
-     * @brief ImageRAW
+     * @brief Image
      * @param frames
      * @param width
      * @param height
      * @param channels
      * @param data
      */
-    ImageRAWGL(int frames, int width, int height, int channels, float *data) : ImageRAW (frames, width, height, channels, data)
+    ImageGL(int frames, int width, int height, int channels, float *data) : Image (frames, width, height, channels, data)
     {
         notOwnedGL = false;
         mode = IMG_CPU;
@@ -108,26 +109,26 @@ public:
     }
 
     /**
-     * @brief ImageRAWGL
+     * @brief ImageGL
      * @param frames
      * @param width
      * @param height
      * @param channels
      * @param mode
      */
-    ImageRAWGL(int frames, int width, int height, int channels, IMAGESTORE mode, GLenum target);
+    ImageGL(int frames, int width, int height, int channels, IMAGESTORE mode, GLenum target);
 
     /**
      * @brief AllocateSimilarOneGL
      * @return
      */
-    ImageRAWGL *AllocateSimilarOneGL();
+    ImageGL *AllocateSimilarOneGL();
 
     /**
      * @brief CloneGL
      * @return
      */
-    ImageRAWGL *CloneGL();
+    ImageGL *CloneGL();
 
     /**
      * @brief AssignGL
@@ -362,7 +363,7 @@ public:
     }
 };
 
-ImageRAWGL::ImageRAWGL() : ImageRAW()
+ImageGL::ImageGL() : Image()
 {
     notOwnedGL = false;
     texture = 0;
@@ -371,7 +372,7 @@ ImageRAWGL::ImageRAWGL() : ImageRAW()
     tmpFbo = NULL;
 }
 
-ImageRAWGL::ImageRAWGL(GLuint tex, GLuint target) : ImageRAW()
+ImageGL::ImageGL(GLuint tex, GLuint target) : Image()
 {
     notOwnedGL = true;
 
@@ -447,7 +448,7 @@ ImageRAWGL::ImageRAWGL(GLuint tex, GLuint target) : ImageRAW()
     AllocateAux();
 }
 
-ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap, GLenum target): ImageRAW()
+ImageGL::ImageGL(Image *img, bool mipmap, GLenum target): Image()
 {
     notOwnedGL = false;
 
@@ -468,8 +469,8 @@ ImageRAWGL::ImageRAWGL(ImageRAW *img, bool mipmap, GLenum target): ImageRAW()
     mode = IMG_CPU_GPU;
 }
 
-ImageRAWGL::ImageRAWGL(int frames, int width, int height, int channels,
-                       IMAGESTORE mode, GLenum target) : ImageRAW()
+ImageGL::ImageGL(int frames, int width, int height, int channels,
+                       IMAGESTORE mode, GLenum target) : Image()
 {
     notOwnedGL = false;
     tmpFbo = NULL;
@@ -508,12 +509,12 @@ ImageRAWGL::ImageRAWGL(int frames, int width, int height, int channels,
     }
 }
 
-ImageRAWGL::~ImageRAWGL()
+ImageGL::~ImageGL()
 {
     Destroy();
 }
 
-GLuint ImageRAWGL::generateTextureGL(bool mipmap, GLenum target)
+GLuint ImageGL::generateTextureGL(bool mipmap, GLenum target)
 {
     this->target  = target;
 
@@ -555,14 +556,14 @@ GLuint ImageRAWGL::generateTextureGL(bool mipmap, GLenum target)
     return texture;
 }
 
-ImageRAWGL *ImageRAWGL::CloneGL()
+ImageGL *ImageGL::CloneGL()
 {
     //TODO: to improve CloneGL
-    ImageRAW *tmp = this->Clone();
-    return new ImageRAWGL(tmp, false, target);
+    Image *tmp = this->Clone();
+    return new ImageGL(tmp, false, target);
 }
 
-void ImageRAWGL::Destroy()
+void ImageGL::Destroy()
 {
     if(notOwnedGL) {
         return;
@@ -575,17 +576,17 @@ void ImageRAWGL::Destroy()
     }
 }
 
-ImageRAWGL *ImageRAWGL::AllocateSimilarOneGL()
+ImageGL *ImageGL::AllocateSimilarOneGL()
 {
 #ifdef PIC_DEBUG
     printf("%d %d %d %d %d\n", frames, width, height, channels, mode);
 #endif
 
-    ImageRAWGL *ret = new ImageRAWGL(frames, width, height, channels, mode, target);
+    ImageGL *ret = new ImageGL(frames, width, height, channels, mode, target);
     return ret;
 }
 
-void ImageRAWGL::AssignGL(float r = 0.0f, float g = 0.0f, float b = 0.0f,
+void ImageGL::AssignGL(float r = 0.0f, float g = 0.0f, float b = 0.0f,
                           float a = 1.0f)
 {
     if(tmpFbo == NULL) {
@@ -604,7 +605,7 @@ void ImageRAWGL::AssignGL(float r = 0.0f, float g = 0.0f, float b = 0.0f,
     tmpFbo->unbind();
 }
 
-GLuint ImageRAWGL::generateTexture2DGL(bool mipmap = false)
+GLuint ImageGL::generateTexture2DGL(bool mipmap = false)
 {
     if(width <1 || height < 1 || channels < 1) {
         return 0;
@@ -644,7 +645,7 @@ GLuint ImageRAWGL::generateTexture2DGL(bool mipmap = false)
     return texture;
 }
 
-GLuint	ImageRAWGL::generateTextureCubeMapGL()
+GLuint	ImageGL::generateTextureCubeMapGL()
 {
     if(width <1 || height < 1 || channels < 1 || frames < 6) {
         return 0;
@@ -676,7 +677,7 @@ GLuint	ImageRAWGL::generateTextureCubeMapGL()
     return texture;
 }
 
-GLuint ImageRAWGL::generateTexture2DU32GL()
+GLuint ImageGL::generateTexture2DU32GL()
 {
     if(width <1 || height < 1 || channels < 1) {
         return 0;
@@ -714,7 +715,7 @@ GLuint ImageRAWGL::generateTexture2DU32GL()
     return texture;
 }
 
-GLuint ImageRAWGL::generateTexture3DGL()
+GLuint ImageGL::generateTexture3DGL()
 {
     if(width <1 || height < 1 || channels < 1 || frames < 1) {
         return 0;
@@ -746,7 +747,7 @@ GLuint ImageRAWGL::generateTexture3DGL()
     return texture;
 }
 
-GLuint ImageRAWGL::generateTexture2DArrayGL()
+GLuint ImageGL::generateTexture2DArrayGL()
 {
     if(width <1 || height < 1 || channels < 1 || frames < 1) {
         return 0;
@@ -772,7 +773,7 @@ GLuint ImageRAWGL::generateTexture2DArrayGL()
     return texture;
 }
 
-void ImageRAWGL::loadFromMemory(bool mipmap = false)
+void ImageGL::loadFromMemory(bool mipmap = false)
 {
     int mode, modeInternalFormat;
     getModesGL(channels, mode, modeInternalFormat);
@@ -795,7 +796,7 @@ void ImageRAWGL::loadFromMemory(bool mipmap = false)
     glBindTexture(target, 0);
 }
 
-void ImageRAWGL::loadToMemory()
+void ImageGL::loadToMemory()
 {
     if(texture == 0) {
         #ifdef PIC_DEBUG
@@ -823,7 +824,7 @@ void ImageRAWGL::loadToMemory()
     unBindTexture();
 }
 
-void ImageRAWGL::loadSliceIntoTexture(int i)
+void ImageGL::loadSliceIntoTexture(int i)
 {
     int mode, modeInternalFormat;
     getModesGL(channels, mode, modeInternalFormat);
@@ -836,14 +837,14 @@ void ImageRAWGL::loadSliceIntoTexture(int i)
     glBindTexture(target, 0);
 }
 
-void ImageRAWGL::loadAllSlicesIntoTex()
+void ImageGL::loadAllSlicesIntoTex()
 {
     for(int i = 0; i < frames; i++) {
         loadSliceIntoTexture(i);
     }
 }
 
-void ImageRAWGL::readFromFBO(Fbo *fbo, GLenum format)
+void ImageGL::readFromFBO(Fbo *fbo, GLenum format)
 {
     //TO DO: check data
     bool bCheck =	(fbo->width  != width) ||
@@ -863,7 +864,7 @@ void ImageRAWGL::readFromFBO(Fbo *fbo, GLenum format)
     	glBindTexture(GL_TEXTURE_2D, 0);*/
 }
 
-void ImageRAWGL::readFromFBO(Fbo *fbo)
+void ImageGL::readFromFBO(Fbo *fbo)
 {
     if(mode == IMG_NULL) {
         mode = IMG_CPU;
@@ -872,7 +873,7 @@ void ImageRAWGL::readFromFBO(Fbo *fbo)
     readFromFBO(fbo, GL_RGBA);
 }
 
-void ImageRAWGL::readFromBindedFBO()
+void ImageGL::readFromBindedFBO()
 {
 
     int mode, modeInternalFormat;
@@ -880,7 +881,7 @@ void ImageRAWGL::readFromBindedFBO()
 
     if(mode == 0x0) {
         #ifdef PIC_DEBUG
-            printf("void ImageRAWGL::readFromBindedFBO(): error unknown format!");
+            printf("void ImageGL::readFromBindedFBO(): error unknown format!");
         #endif
         return;
     }
@@ -891,12 +892,12 @@ void ImageRAWGL::readFromBindedFBO()
     FlipV();
 }
 
-void ImageRAWGL::bindTexture()
+void ImageGL::bindTexture()
 {
     glBindTexture(target, texture);
 }
 
-void ImageRAWGL::unBindTexture()
+void ImageGL::unBindTexture()
 {
     glBindTexture(target, 0);
 }

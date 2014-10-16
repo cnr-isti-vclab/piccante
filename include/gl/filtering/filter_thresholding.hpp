@@ -51,7 +51,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief Execute
@@ -59,15 +59,15 @@ public:
      * @param nameOut
      * @return
      */
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut)
+    static ImageGL *Execute(std::string nameIn, std::string nameOut)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLThresholding filter;
 
         GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgOut = filter.Process(SingleGL(&imgIn), NULL);
+        ImageGL *imgOut = filter.Process(SingleGL(&imgIn), NULL);
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
         printf("Gradient Filter on GPU time: %g ms\n", double(timeVal) / 100000000.0);
 
@@ -129,8 +129,8 @@ void FilterGLThresholding::InitShaders()
     glw::bind_program(0);
 }
 
-ImageRAWGL *FilterGLThresholding::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLThresholding::Process(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -140,7 +140,7 @@ ImageRAWGL *FilterGLThresholding::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

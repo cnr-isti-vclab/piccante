@@ -25,12 +25,12 @@ See the GNU Lesser General Public License
 #ifndef PIC_ALGORITHMS_ITERATIVE_POISSON_SOLVER_HPP
 #define PIC_ALGORITHMS_ITERATIVE_POISSON_SOLVER_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
-ImageRAW *IterativePoissonSolver(ImageRAW *img,
-                                 ImageRAW *laplacian,
+Image *IterativePoissonSolver(Image *img,
+                                 Image *laplacian,
                                  std::vector<int> coords,
                                  int maxSteps = 100)
 {
@@ -41,8 +41,8 @@ ImageRAW *IterativePoissonSolver(ImageRAW *img,
         maxSteps = 20000;
     }
 
-    ImageRAW *tmpImg = img->Clone();
-    ImageRAW *tmpSwap = NULL;
+    Image *tmpImg = img->Clone();
+    Image *tmpSwap = NULL;
 
     int c, coord, x, y;
     float workValue;

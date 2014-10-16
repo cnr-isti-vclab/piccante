@@ -27,7 +27,7 @@ See the GNU Lesser General Public License
 
 #include "util/vec.hpp"
 
-#include "image_raw.hpp"
+#include "image.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
 #include "externals/Eigen/Dense"
@@ -41,7 +41,7 @@ class GeneralCornerDetector
 {
 protected:
     bool     bLum;
-    ImageRAW *lum;
+    Image *lum;
 
 public:
     GeneralCornerDetector()
@@ -60,7 +60,7 @@ public:
      * @param img
      * @param corners
      */
-    virtual void Compute(ImageRAW *img, std::vector< Eigen::Vector3f > *corners)
+    virtual void Compute(Image *img, std::vector< Eigen::Vector3f > *corners)
     {
     }
 
@@ -71,8 +71,8 @@ public:
      * @param bColor
      * @return
      */
-    ImageRAW *getCornersImage(std::vector< Eigen::Vector3f > *corners,
-                              ImageRAW *imgOut = NULL, bool bColor = true)
+    Image *getCornersImage(std::vector< Eigen::Vector3f > *corners,
+                              Image *imgOut = NULL, bool bColor = true)
     {
         if(corners == NULL) {
             return imgOut;
@@ -165,10 +165,10 @@ public:
             return;
         }
 
-        ImageRAW full_image(1, 512, 512, 3);
+        Image full_image(1, 512, 512, 3);
         full_image.SetZero();
 
-        ImageRAW quad(1, 128, 128, 3);
+        Image quad(1, 128, 128, 3);
         quad.Assign(1.0f);
 
         full_image.CopySubImage(&quad, 192, 192);
@@ -184,7 +184,7 @@ public:
 
         printf("\n");
 
-        ImageRAW *img_corners = gcd->getCornersImage(&corners);
+        Image *img_corners = gcd->getCornersImage(&corners);
         img_corners->Write("general_corner_test_image.hdr");
     }
 };

@@ -48,7 +48,7 @@ See the GNU Lesser General Public License
  * \section descr_sec Modules
  *
  * <a href="http://piccantelib.net">PICCANTE</a> is a modular library with different modules. The main classes are
- * pic::Image, pic::ImageRAW and pic::Histogram.
+ * pic::Image, pic::Image and pic::Histogram.
  * \li \c pic::Image is the base class for managing an image. Pixels are stored
  * in an array of interleaved channels float values; i.e. pic::Image::data.
  * Pixels are stored as float values, because the library is meant mostly for accurate and HDR
@@ -56,7 +56,7 @@ See the GNU Lesser General Public License
  * image statistics (e.g. maximum value, minimum value, mean value, etc.), image operators
  * (e.g. add, sub, mul, div, etc.) and memory management functions (e.g. allocation, cloning, etc.).
  * Note that this class supports multi-channels (e.g. alpha channel) and temporal/volumetric images.
- * \li \c pic::ImageRAW inherits from pic::Image, and it provides an I/O interface for reading different
+ * \li \c pic::Image inherits from pic::Image, and it provides an I/O interface for reading different
  * file formats (ppm, pgm, pbm, bmp, tga, hdr, pfm, etc.) natively in Piccante and through other optional
  * external libraries (e.g. OpenEXR and QT).
  * \li \c pic::Histogram is a class for creating, managing, and processing LDR/HDR image histograms.
@@ -65,7 +65,7 @@ See the GNU Lesser General Public License
  *
  * The main class of this module is pic::Filter. This is a base class for managing
  * a filter; it provides mechanisms for multi-threading, memory allocation, and so on.
- * Typically, a filter in <a href="http://piccantelib.net">PICCANTE</a> can have multiple pic::ImageRAW images as input, imgIn,
+ * Typically, a filter in <a href="http://piccantelib.net">PICCANTE</a> can have multiple pic::Image images as input, imgIn,
  * and a single output, imgOut.
  * Many image filters are implemented in <a href="http://piccantelib.net">PICCANTE</a> susch as: linear filters
  * (e.g. Gaussian, gradient based, DCT, etc.), non-linear filters
@@ -214,8 +214,7 @@ See the GNU Lesser General Public License
 // base stuff
 #include "base.hpp"
 #include "image.hpp"
-#include "image_raw.hpp"
-#include "image_raw_vec.hpp"
+#include "image_vec.hpp"
 #include "histogram.hpp"
 
 // sub dirs

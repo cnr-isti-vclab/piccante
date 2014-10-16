@@ -80,7 +80,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
 };
 
@@ -217,7 +217,7 @@ void FilterGLDragoTMO::Update(float Ld_Max, float b, float LMax)
     glw::bind_program(0);   
 }
 
-ImageRAWGL *FilterGLDragoTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLDragoTMO::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.size()<2) {
         return imgOut;
@@ -231,7 +231,7 @@ ImageRAWGL *FilterGLDragoTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     //Fbo

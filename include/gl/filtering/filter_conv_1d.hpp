@@ -54,7 +54,7 @@ public:
      * @param direction
      * @param target
      */
-    FilterGLConv1D(ImageRAWGL *weights, int direction, GLenum target);
+    FilterGLConv1D(ImageGL *weights, int direction, GLenum target);
 
     /**
      * @brief SetUniformAux
@@ -76,7 +76,7 @@ public:
     }
 };
 
-FilterGLConv1D::FilterGLConv1D(ImageRAWGL *weights, int direction,
+FilterGLConv1D::FilterGLConv1D(ImageGL *weights, int direction,
                                        GLenum target): FilterGL1D(direction, target)
 {
     this->weights = weights;

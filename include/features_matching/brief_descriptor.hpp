@@ -27,7 +27,7 @@ See the GNU Lesser General Public License
 
 #include <random>
 #include "util/math.hpp"
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
@@ -105,7 +105,7 @@ protected:
      * @param desc
      * @return
      */
-    unsigned int *getAux(ImageRAW *img, int x0, int y0, int *x, int *y, unsigned int *desc = NULL)
+    unsigned int *getAux(Image *img, int x0, int y0, int *x, int *y, unsigned int *desc = NULL)
     {
         unsigned int bits = sizeof(unsigned int) * 8;
         unsigned int subBlock = n / bits;
@@ -199,7 +199,7 @@ public:
      * @param desc
      * @return
      */
-    unsigned int *get(ImageRAW *img, int x0, int y0, unsigned int *desc = NULL)
+    unsigned int *get(Image *img, int x0, int y0, unsigned int *desc = NULL)
     {
         if(img == NULL) {
             return NULL;

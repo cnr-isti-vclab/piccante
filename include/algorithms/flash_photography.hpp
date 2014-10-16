@@ -25,28 +25,28 @@ See the GNU Lesser General Public License
 #ifndef PIC_ALGORITHMS_FLASH_PHOTOGRAPHY_HPP
 #define PIC_ALGORITHMS_FLASH_PHOTOGRAPHY_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter.hpp"
 #include "filtering/filter_bilateral_2df.hpp"
 
 namespace pic {
 
 /**FlashPhotography: implements flash photography*/
-ImageRAW *FlashPhotography(std::string nameFlash, std::string nameNoFlash,
+Image *FlashPhotography(std::string nameFlash, std::string nameNoFlash,
                            std::string nameOut,
                            Filter *filter)
 {
 
     //Loading Images
     printf("Read flash image...");
-    ImageRAW imgFlash(nameFlash);
+    Image imgFlash(nameFlash);
     printf("ok\n");
     printf("Read no-flash image...");
-    ImageRAW imgNoFlash(nameNoFlash);
+    Image imgNoFlash(nameNoFlash);
     printf("ok\n");
 
     //Filter
-    ImageRAW *imgOut = filter->ProcessP(Double(&imgNoFlash, &imgFlash), NULL);
+    Image *imgOut = filter->ProcessP(Double(&imgNoFlash, &imgFlash), NULL);
 
     //Write image
     imgOut->Write(nameOut);
@@ -54,7 +54,7 @@ ImageRAW *FlashPhotography(std::string nameFlash, std::string nameNoFlash,
     return imgOut;
 }
 
-ImageRAW *FlashPhotography2DF(std::string nameFlash, std::string nameNoFlash,
+Image *FlashPhotography2DF(std::string nameFlash, std::string nameNoFlash,
                               std::string nameOut,
                               float sigma_s, float sigma_r)
 {
@@ -62,7 +62,7 @@ ImageRAW *FlashPhotography2DF(std::string nameFlash, std::string nameNoFlash,
     return FlashPhotography(nameFlash, nameNoFlash, nameOut, (Filter *)&filter);
 }
 
-ImageRAW *FlashPhotography2DS(std::string nameFlash, std::string nameNoFlash,
+Image *FlashPhotography2DS(std::string nameFlash, std::string nameNoFlash,
                               std::string nameOut,
                               float sigma_s, float sigma_r)
 {

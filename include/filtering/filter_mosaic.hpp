@@ -42,7 +42,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         if(src[0]->channels != 3){
             return;
@@ -87,10 +87,10 @@ protected:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut == NULL) {
-            imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, 1);
+            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
         }
 
         return imgOut;
@@ -113,7 +113,7 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         width       = imgIn->width;
         height      = imgIn->height;
@@ -127,7 +127,7 @@ public:
      * @param imgOut
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut)
+    static Image *Execute(Image *imgIn, Image *imgOut)
     {
         FilterMosaic flt;
         return flt.ProcessP(Single(imgIn), imgOut);
@@ -139,10 +139,10 @@ public:
      * @param fileOutput
      * @return
      */
-    static ImageRAW *Execute(std::string fileInput, std::string fileOutput)
+    static Image *Execute(std::string fileInput, std::string fileOutput)
     {
-        ImageRAW imgIn(fileInput);
-        ImageRAW *out = FilterMosaic::Execute(&imgIn, NULL);
+        Image imgIn(fileInput);
+        Image *out = FilterMosaic::Execute(&imgIn, NULL);
         out->Write(fileOutput);
         return out;
     }

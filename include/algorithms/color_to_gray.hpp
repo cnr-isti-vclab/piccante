@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_ALGORITHMS_COLOR_TO_GRAY_HPP
 #define PIC_ALGORITHMS_COLOR_TO_GRAY_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_channel.hpp"
 #include "tone_mapping/exposure_fusion.hpp"
 
@@ -37,18 +37,18 @@ namespace pic {
  * @param imgOut
  * @return
  */
-ImageRAW *ColorToGray(ImageRAW *imgIn, ImageRAW *imgOut)
+Image *ColorToGray(Image *imgIn, Image *imgOut)
 {
     if(imgIn == NULL){
         return imgOut;
     }
 
     if(imgOut == NULL){
-        imgOut = new ImageRAW(1, imgIn->width, imgIn->height, 1);
+        imgOut = new Image(1, imgIn->width, imgIn->height, 1);
     }
 
-    ImageRAWVec img_vec;
-    ImageRAWVec input = Single(imgIn);
+    ImageVec img_vec;
+    ImageVec input = Single(imgIn);
 
     FilterChannel flc(0);
     int channels = imgIn->channels;

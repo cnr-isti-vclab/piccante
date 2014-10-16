@@ -39,9 +39,9 @@ protected:
     float			mask[3];
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
     void CreateMask();
 
@@ -52,7 +52,7 @@ public:
     void Setup(int colorChannel, GRADIENT_TYPE type);
     
     /**Output size*/
-    void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         width       = imgIn->width;
         height      = imgIn->height;
@@ -61,7 +61,7 @@ public:
     }
 
     //Filtering
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut = NULL,
+    static Image *Execute(Image *imgIn, Image *imgOut = NULL,
                              GRADIENT_TYPE type = G_SOBEL, int colorChannel = 0)
     {
         FilterGradient filter(colorChannel, type);
@@ -69,10 +69,10 @@ public:
     }
 
     //Filtering
-    static ImageRAW *Execute(std::string fileInput, std::string fileOutput)
+    static Image *Execute(std::string fileInput, std::string fileOutput)
     {
-        ImageRAW imgIn(fileInput);
-        ImageRAW *out = FilterGradient::Execute(&imgIn, NULL);
+        Image imgIn(fileInput);
+        Image *out = FilterGradient::Execute(&imgIn, NULL);
         out->Write(fileOutput);
         return out;
     }
@@ -123,22 +123,22 @@ PIC_INLINE void FilterGradient::CreateMask()
 }
 
 //Processing
-PIC_INLINE ImageRAW *FilterGradient::SetupAux(ImageRAWVec imgIn,
-        ImageRAW *imgOut)
+PIC_INLINE Image *FilterGradient::SetupAux(ImageVec imgIn,
+        Image *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, 3);
+        imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
     }
 
     return imgOut;
 }
 
 //Process in a box
-PIC_INLINE void FilterGradient::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
+PIC_INLINE void FilterGradient::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
     //Filtering
-    ImageRAW *img = src[0];
+    Image *img = src[0];
 
     int channels = img->channels;
 

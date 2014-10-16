@@ -37,7 +37,7 @@ protected:
     ImageSampler	*isb;
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     //Basic constructors
@@ -48,7 +48,7 @@ public:
 
     void Update(ImageSampler *isb);
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, ImageSampler *isb)
+    static Image *Execute(Image *imgIn, Image *imgOut, ImageSampler *isb)
     {
         FilterSampler2DSub filter(isb);
         return filter.ProcessP(Single(imgIn), imgOut);
@@ -56,8 +56,8 @@ public:
 
     static void Execute(std::string nameIn, std::string nameOut, ImageSampler *isb)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, isb);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL, isb);
         imgOut->Write(nameOut);
     }
 };
@@ -93,7 +93,7 @@ void FilterSampler2DSub::Update(ImageSampler *isb)
 }
 
 //Process in a box
-void FilterSampler2DSub::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterSampler2DSub::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
 
     if(src.size() != 2) {
@@ -102,8 +102,8 @@ void FilterSampler2DSub::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
 
     int channels = dst->channels;
 
-    ImageRAW *src0 = src[0];
-    ImageRAW *src1 = src[1];
+    Image *src0 = src[0];
+    Image *src1 = src[1];
 
     float *vOut = new float[channels];
 

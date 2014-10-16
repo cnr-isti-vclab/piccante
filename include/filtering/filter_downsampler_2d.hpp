@@ -73,7 +73,7 @@ public:
      * @param imgIn
      * @param imgOut
      */
-    void PreProcess(ImageRAWVec imgIn, ImageRAW *imgOut);
+    void PreProcess(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief Execute
@@ -83,7 +83,7 @@ public:
      * @param height
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, int width,
+    static Image *Execute(Image *imgIn, Image *imgOut, int width,
                              int height)
     {
         FilterDownSampler2D flt(width, height);
@@ -98,7 +98,7 @@ public:
      * @param scaleY
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float scaleX,
+    static Image *Execute(Image *imgIn, Image *imgOut, float scaleX,
                              float scaleY)
     {
         FilterDownSampler2D flt(scaleX, scaleY);
@@ -112,7 +112,7 @@ public:
      * @param scaleXY
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float scaleXY)
+    static Image *Execute(Image *imgIn, Image *imgOut, float scaleXY)
     {
         FilterDownSampler2D flt(scaleXY, scaleXY);
         return flt.ProcessP(Single(imgIn), imgOut);
@@ -168,8 +168,8 @@ PIC_INLINE FilterDownSampler2D::~FilterDownSampler2D()
     }
 }
 
-PIC_INLINE void FilterDownSampler2D::PreProcess(ImageRAWVec imgIn,
-        ImageRAW *imgOut)
+PIC_INLINE void FilterDownSampler2D::PreProcess(ImageVec imgIn,
+        Image *imgOut)
 {
     if(!swh) {
         scaleX = float(width)  / imgIn[0]->widthf;

@@ -35,7 +35,7 @@ protected:
     int halfSize;
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;
         int channels = dst->channels;
@@ -75,16 +75,16 @@ public:
         this->halfSize = checkHalfSize(size);
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, int size)
+    static Image *Execute(Image *imgIn, Image *imgOut, int size)
     {
         FilterMax filter(size);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, int size)
+    static Image *Execute(std::string nameIn, std::string nameOut, int size)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, size);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL, size);
         imgOut->Write(nameOut);
         return imgOut;
     }

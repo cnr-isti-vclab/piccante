@@ -27,7 +27,7 @@ See the GNU Lesser General Public License
 
 #include <vector>
 
-#include "gl/image_raw.hpp"
+#include "gl/image.hpp"
 #include "gl/filtering/filter_redux.hpp"
 
 namespace pic {
@@ -58,7 +58,7 @@ public:
      * @param flt
      * @return
      */
-    float *getVal(ImageRAWGL *imgIn, float *ret, FilterGLRedux *flt) {
+    float *getVal(ImageGL *imgIn, float *ret, FilterGLRedux *flt) {
         if(imgIn == NULL) {
             return NULL;
         }
@@ -68,7 +68,7 @@ public:
                                       imgIn->channels, imgIn->stack, 1);
         }
 
-        ImageRAWGL *out = flt->Redux(imgIn, imgIn->stack);
+        ImageGL *out = flt->Redux(imgIn, imgIn->stack);
 
         out->loadToMemory();
 
@@ -89,7 +89,7 @@ public:
      * @param ret
      * @return
      */
-    float *getMaxVal(ImageRAWGL *imgIn, float *ret = NULL) {
+    float *getMaxVal(ImageGL *imgIn, float *ret = NULL) {
         return getVal(imgIn, ret, flt_max);
     }
 
@@ -98,7 +98,7 @@ public:
      * @param imgIn
      * @return
      */
-    float *getMinVal(ImageRAWGL *imgIn, float *ret = NULL) {
+    float *getMinVal(ImageGL *imgIn, float *ret = NULL) {
         return getVal(imgIn, ret, flt_min);
     }
 
@@ -107,7 +107,7 @@ public:
      * @param imgIn
      * @return
      */
-    float *getMeanVal(ImageRAWGL *imgIn, float *ret = NULL) {
+    float *getMeanVal(ImageGL *imgIn, float *ret = NULL) {
         return getVal(imgIn, ret, flt_mean);
     }
 

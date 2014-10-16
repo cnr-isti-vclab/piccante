@@ -35,29 +35,29 @@ protected:
     int colorChannel;
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     //Basic constructors
     FilterDivergence() {}
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut)
+    static Image *Execute(Image *imgIn, Image *imgOut)
     {
         FilterDivergence filter;
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut)
+    static Image *Execute(std::string nameIn, std::string nameOut)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL);
         imgOut->Write(nameOut);
         return imgOut;
     }
 };
 
 //Process in a box
-void FilterDivergence::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterDivergence::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
 
     int width = dst->width;

@@ -42,7 +42,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int channels = dst->channels;
 
@@ -76,7 +76,7 @@ public:
      * @param threshold_nuked
      * @return
      */
-    static ImageRAW* Execute(ImageRAW *imgIn, ImageRAW *imgOut)
+    static Image* Execute(Image *imgIn, Image *imgOut)
     {
         FilterRemoveNegative filter;
         imgOut = filter.ProcessP(Single(imgIn), imgOut);
@@ -89,10 +89,10 @@ public:
      * @param nameFileOut
      * @return
      */
-    static ImageRAW* Execute(std::string nameFileIn, std::string nameFileOut)
+    static Image* Execute(std::string nameFileIn, std::string nameFileOut)
     {
-        ImageRAW imgIn(nameFileIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL);
+        Image imgIn(nameFileIn);
+        Image *imgOut = Execute(&imgIn, NULL);
         imgOut->Write(nameFileOut);
 
         return imgOut;

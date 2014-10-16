@@ -26,14 +26,14 @@ See the GNU Lesser General Public License
 #define PIC_METRICS_PSNR_HPP
 
 #include <math.h>
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "metrics/base.hpp"
 #include "metrics/mse.hpp"
 
 namespace pic {
 
 /**PSNR: Peak Signal to Noise Ratio for images in [0, 1]*/
-double PSNR(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
+double PSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -53,7 +53,7 @@ double PSNR(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
 }
 
 /**PSNR: relative Peak Signal to Noise Ratio*/
-double rPSNR(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
+double rPSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;

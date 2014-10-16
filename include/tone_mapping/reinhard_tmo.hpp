@@ -66,7 +66,7 @@ inline float EstimateWhitePoint(float LMax, float LMin)
     return 1.5f * powf(2.0f, (log2Max - log2Min - 5.0f));
 }
 
-ImageRAW *ReinhardTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL, float alpha = -1.0f,
+Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
                       float whitePoint = -1.0f, float phi = 8.0f)
 {
     if(imgIn == NULL) {
@@ -78,7 +78,7 @@ ImageRAW *ReinhardTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL, float alpha = -1
     }
 
     //luminance image
-    ImageRAW *lum = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);
+    Image *lum = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);
 
     float LMax = lum->getMaxVal()[0];
     float LMin = lum->getMinVal()[0];
@@ -100,7 +100,7 @@ ImageRAW *ReinhardTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL, float alpha = -1
 
     float sigma_r = powf(2.0f, phi) * alpha / (s_max * s_max);
 
-    ImageRAW *filteredLum = FilterBilateral2DS::Execute(lum, NULL, sigma_s,
+    Image *filteredLum = FilterBilateral2DS::Execute(lum, NULL, sigma_s,
                             sigma_r);
 
     lum->ApplyFunction(&SigmoidInv);
@@ -109,7 +109,7 @@ ImageRAW *ReinhardTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL, float alpha = -1
 
     //Applying a sigmoid filter
     FilterSigmoidTMO fSTMO(SIG_TMO, alpha, whitePoint, LogAverage);
-    ImageRAW *tonemapped = fSTMO.Process(Double(lum, filteredLum), NULL);
+    Image *tonemapped = fSTMO.Process(Double(lum, filteredLum), NULL);
 
     //Removing HDR luminance and replacing it with LDR one
     imgOut->changeLum(lum, tonemapped);

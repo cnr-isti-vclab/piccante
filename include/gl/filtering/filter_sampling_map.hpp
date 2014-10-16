@@ -46,7 +46,7 @@ protected:
     void InitShaders() {}
     void FragmentShader() {}
     void Setup(float sigma, float scale);
-    ImageRAWGL *SetupAuxN(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
 public:
     //Basic constructors
@@ -61,15 +61,15 @@ public:
 
     Fbo *getFbo();
 
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float sigma)
+    static ImageGL *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLSamplingMap filter(sigma);
 
         GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgRet = filter.Process(SingleGL(&imgIn), NULL);
+        ImageGL *imgRet = filter.Process(SingleGL(&imgIn), NULL);
 
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
         printf("Sampling Map Filter on GPU time: %f ms\n", (timeVal) / 100000000.0f);
@@ -131,11 +131,11 @@ Fbo *FilterGLSamplingMap::getFbo()
     return filters[filters.size() - 1]->getFbo();
 }
 
-ImageRAWGL *FilterGLSamplingMap::SetupAuxN(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLSamplingMap::SetupAuxN(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(    imgIn[0]->frames,
+        imgOut = new ImageGL(    imgIn[0]->frames,
                                     int(imgIn[0]->widthf  * scale),
                                     int(imgIn[0]->heightf * scale),
                                     imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);

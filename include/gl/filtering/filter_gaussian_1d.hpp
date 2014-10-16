@@ -59,15 +59,15 @@ public:
      * @param sigma
      * @return
      */
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float sigma)
+    static ImageGL *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLGaussian1D filter(sigma, true, GL_TEXTURE_2D);
 
         GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgOut = filter.Process(SingleGL(&imgIn), NULL);
+        ImageGL *imgOut = filter.Process(SingleGL(&imgIn), NULL);
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
         printf("Gaussian 1D Filter on GPU time: %g ms\n",
                double(timeVal) / 100000000.0);
@@ -113,7 +113,7 @@ void FilterGLGaussian1D::Update(float sigma)
             delete weights;
         }
 
-        weights = new ImageRAWGL(1, nSamples, 1, 1, IMG_CPU, 0);
+        weights = new ImageGL(1, nSamples, 1, 1, IMG_CPU, 0);
 
         for(int i = -halfKernelSize; i <= halfKernelSize; i++) {
             weights->data[i + halfKernelSize] = expf(-float(i * i) / sigma2);

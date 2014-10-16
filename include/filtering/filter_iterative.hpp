@@ -32,7 +32,7 @@ namespace pic {
 class FilterIterative: public Filter
 {
 protected:
-    ImageRAW	*imgTmp[2];
+    Image	*imgTmp[2];
 
     bool		parallel;
     int			iterations;
@@ -48,14 +48,14 @@ public:
     void Destroy();
 
     //Setup NPasses
-    virtual ImageRAW *SetupAuxN(ImageRAWVec imgIn, ImageRAW *imgOut);
+    virtual Image *SetupAuxN(ImageVec imgIn, Image *imgOut);
 
     void Update(Filter *flt, int iterations);
 
     //Process
-    ImageRAW *Process(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *Process(ImageVec imgIn, Image *imgOut);
     //Process in parallel
-    ImageRAW *ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *ProcessP(ImageVec imgIn, Image *imgOut);
 };
 
 //Basic constructor
@@ -119,7 +119,7 @@ void FilterIterative::Update(Filter *flt, int iterations)
 }
 
 //Setup NPasses
-ImageRAW *FilterIterative::SetupAuxN(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterIterative::SetupAuxN(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->AllocateSimilarOne();
@@ -143,7 +143,7 @@ ImageRAW *FilterIterative::SetupAuxN(ImageRAWVec imgIn, ImageRAW *imgOut)
 };
 
 //Processing
-ImageRAW *FilterIterative::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterIterative::Process(ImageVec imgIn, Image *imgOut)
 {
     if(imgIn.size() < 1 || imgIn[0] == NULL) {
         return imgOut;
@@ -173,7 +173,7 @@ ImageRAW *FilterIterative::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
 }
 
 //Processing in parallel
-ImageRAW *FilterIterative::ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterIterative::ProcessP(ImageVec imgIn, Image *imgOut)
 {
     parallel = true;
     return Process(imgIn, imgOut);

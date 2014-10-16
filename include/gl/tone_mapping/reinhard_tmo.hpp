@@ -38,20 +38,20 @@ namespace pic {
  * @param filter
  * @return
  */
-static ImageRAWGL *ReinhardLocal(ImageRAWGL imstd::string nameIn, std::string nameOut,
+static ImageGL *ReinhardLocal(ImageGL imstd::string nameIn, std::string nameOut,
                                         FilterGL *filter)
 {
-    ImageRAWGL imgIn(nameIn);
+    ImageGL imgIn(nameIn);
     imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
     FilterGLLuminance lum;
 
-    ImageRAWGL *L = lum.Process(SingleGL(&imgIn), NULL);
+    ImageGL *L = lum.Process(SingleGL(&imgIn), NULL);
     L->loadToMemory();
     L->Write("lum.pfm");
 
     GLuint testTQ1 = glBeginTimeQuery();
-    ImageRAWGL *adapt = filter->Process(SingleGL(L), NULL);
+    ImageGL *adapt = filter->Process(SingleGL(L), NULL);
     GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
     printf("Bilateral 2DG Filter on GPU time: %f ms\n",
            double(timeVal) / 1000000.0);
@@ -64,7 +64,7 @@ static ImageRAWGL *ReinhardLocal(ImageRAWGL imstd::string nameIn, std::string na
     FilterGLSigmoidTMO *tmo = new FilterGLSigmoidTMO(0.18f / Lav, true, true);
 
     testTQ1 = glBeginTimeQuery();
-    ImageRAWGL *imgOut = tmo->Process(DoubleGL(&imgIn, adapt), NULL);
+    ImageGL *imgOut = tmo->Process(DoubleGL(&imgIn, adapt), NULL);
     timeVal = glEndTimeQuery(testTQ1);
     printf("Sigmoid Local Filter on GPU time: %f ms\n",
            double(timeVal) / 1000000.0);
@@ -80,9 +80,9 @@ static ImageRAWGL *ReinhardLocal(ImageRAWGL imstd::string nameIn, std::string na
  * @param nameOut
  * @return
  */
-ImageRAWGL *ReinhardGlobal(std::string nameIn, std::string nameOut)
+ImageGL *ReinhardGlobal(std::string nameIn, std::string nameOut)
 {
-    ImageRAWGL imgIn(nameIn);
+    ImageGL imgIn(nameIn);
     imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
     float Lav = imgIn.getLogMeanVal()[0];
@@ -90,7 +90,7 @@ ImageRAWGL *ReinhardGlobal(std::string nameIn, std::string nameOut)
     FilterGLSigmoidTMO *filter = new FilterGLSigmoidTMO(0.18f / Lav, false, true);
 
     GLuint testTQ1 = glBeginTimeQuery();
-    ImageRAWGL *imgOut = filter->Process(SingleGL(&imgIn), NULL);
+    ImageGL *imgOut = filter->Process(SingleGL(&imgIn), NULL);
     GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
     printf("Sigmoid Filter on GPU time: %f ms\n", double(timeVal) / 1000000.0);
 

@@ -25,14 +25,14 @@ See the GNU Lesser General Public License
 #ifndef PIC_TONE_MAPPING_WARD_HISTOGRAM_TMO_HPP
 #define PIC_TONE_MAPPING_WARD_HISTOGRAM_TMO_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "histogram.hpp"
 #include "util/array.hpp"
 #include "filtering/filter_sampler_2d.hpp"
 
 namespace pic {
 
-inline ImageRAW *WardHistogramTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL,
+inline Image *WardHistogramTMO(Image *imgIn, Image *imgOut = NULL,
                                   int nBin = 256, float LdMax = 100.0f, float LdMin = 1.0f)
 {
     if(imgIn == NULL) {
@@ -60,10 +60,10 @@ inline ImageRAW *WardHistogramTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL,
     int fScaleX = int((2.0f * tanf(viewAngleWidth / 2.0f) / 0.01745f));
     int fScaleY = int((2.0f * tanf(viewAngleHeight / 2.0f) / 0.01745f));
 
-    ImageRAW *L = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
+    Image *L = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
 
     ImageSamplerBilinear isb;
-    ImageRAW *Lscaled = FilterSampler2D::Execute(L, NULL, fScaleX, fScaleY, &isb);
+    Image *Lscaled = FilterSampler2D::Execute(L, NULL, fScaleX, fScaleY, &isb);
 
     float LMin = Lscaled->getGT(0.0f);
     float LMax = Lscaled->getMaxVal()[0];

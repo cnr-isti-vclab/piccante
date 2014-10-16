@@ -26,13 +26,13 @@ See the GNU Lesser General Public License
 #define PIC_METRICS_LOG_RMSE_HPP
 
 #include <math.h>
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "metrics/base.hpp"
 
 namespace pic {
 
 //RMSE in the log domain
-double logRMSE(ImageRAW *ori, ImageRAW *cmp)
+double logRMSE(Image *ori, Image *cmp)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;

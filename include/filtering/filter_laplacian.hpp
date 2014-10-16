@@ -34,7 +34,7 @@ class FilterLaplacian: public Filter
 protected:
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;
         int height = dst->height;
@@ -80,7 +80,7 @@ public:
     //Basic constructor
     FilterLaplacian() {}
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut)
+    static Image *Execute(Image *imgIn, Image *imgOut)
     {
         FilterLaplacian filter;
         return filter.ProcessP(Single(imgIn), imgOut);
@@ -88,8 +88,8 @@ public:
 
     static void Execute(std::string nameIn, std::string nameOut)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL);
         imgOut->Write(nameOut);
     }
 };

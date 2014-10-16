@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_UTIL_TILE_HPP
 #define PIC_UTIL_TILE_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "util/bbox.hpp"
 
 namespace pic {
@@ -37,7 +37,7 @@ public:
     int				startX, startY;
     int				width,  height;
     std::string     name;
-    ImageRAW		*tile;
+    Image		    *tile;
 
     Tile()
     {

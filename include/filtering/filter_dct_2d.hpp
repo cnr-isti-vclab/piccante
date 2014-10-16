@@ -87,7 +87,7 @@ public:
      * @param nCoeff
      * @return
      */
-    static ImageRAW *Transform(ImageRAW *imgIn, ImageRAW *imgOut, int nCoeff)
+    static Image *Transform(Image *imgIn, Image *imgOut, int nCoeff)
     {
         FilterDCT2D filter(nCoeff, true);
         return filter.Process(Single(imgIn), imgOut);
@@ -100,7 +100,7 @@ public:
      * @param nCoeff
      * @return
      */
-    static ImageRAW *Inverse(ImageRAW *imgIn, ImageRAW *imgOut, int nCoeff)
+    static Image *Inverse(Image *imgIn, Image *imgOut, int nCoeff)
     {
         FilterDCT2D filter(nCoeff, false);
         return filter.ProcessP(Single(imgIn), imgOut);

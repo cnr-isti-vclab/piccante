@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_ALGORITHMS_PUSHPULL_HPP
 #define PIC_ALGORITHMS_PUSHPULL_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "image_samplers/image_sampler_bsplines.hpp"
 #include "filtering/filter_down_pp.hpp"
 #include "filtering/filter_up_pp.hpp"
@@ -44,7 +44,7 @@ protected:
 
     float           threshold;
     float			*value;
-    ImageRAWVec 	stack;
+    ImageVec 	stack;
 
     /**
      * @brief Release
@@ -83,7 +83,7 @@ public:
      * @param value
      * @return
      */
-    ImageRAW *Process(ImageRAW *imgIn, ImageRAW *imgOut, float *value)
+    Image *Process(Image *imgIn, Image *imgOut, float *value)
     {
         if(imgIn == NULL || value == NULL) {
             return NULL;
@@ -111,10 +111,10 @@ public:
 
         //creating the pyramid: Pull
         stack.push_back(imgOut);
-        ImageRAW *work = imgOut;
+        Image *work = imgOut;
 
         while(MIN(work->width, work->height) > 1) {
-            ImageRAW *tmp = flt_down->Process(Single(work), NULL);
+            Image *tmp = flt_down->Process(Single(work), NULL);
 
             if(tmp != NULL) {
                 stack.push_back(tmp);
@@ -138,7 +138,7 @@ public:
      * @param value
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *img, float value)
+    static Image *Execute(Image *img, float value)
     {
         PushPull pp;
 
@@ -156,10 +156,10 @@ public:
      * @param nameOut
      * @return
      */
-    static ImageRAW *Execute(std::string name, std::string nameOut)
+    static Image *Execute(std::string name, std::string nameOut)
     {
-        ImageRAW img(name);
-        ImageRAW *imgOut = Execute(&img, 0.0f);
+        Image img(name);
+        Image *imgOut = Execute(&img, 0.0f);
         imgOut->Write(nameOut);
         return imgOut;
     }

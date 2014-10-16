@@ -26,13 +26,13 @@ See the GNU Lesser General Public License
 #define PIC_METRICS_MAE_HPP
 
 #include <math.h>
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "metrics/base.hpp"
 
 namespace pic {
 
 /**MAE: mean absolute error*/
-double MAE(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
+double MAE(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;

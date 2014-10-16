@@ -66,7 +66,7 @@ protected:
     int		num_angles, num_bins, num_samples;
     float   CONST_GRADIENT_SUPRESSIO_THRESHOLD;
 
-    ImageRAW *gauss, *L, *L_X, *L_Y, *gX, *gY, *grad, *I_orientation,
+    Image *gauss, *L, *L_X, *L_Y, *gX, *gY, *grad, *I_orientation,
              *I_orientation_flt, *I_mag, *I_theta;
     int *shifter;
     float *cos_angles, *sin_angles;
@@ -89,7 +89,7 @@ public:
 
         CONST_GRADIENT_SUPRESSIO_THRESHOLD = 0.2f;
 
-        gauss = new ImageRAW(1, 5, 5, 1);
+        gauss = new Image(1, 5, 5, 1);
         gauss->EvaluateGaussian(-1.0f, true);
 
         SetNULL();
@@ -184,7 +184,7 @@ public:
         }
     }
 
-    ImageRAW *get(ImageRAW *img, ImageRAW *sift_arr = NULL, float alpha = 9.0f)
+    Image *get(Image *img, Image *sift_arr = NULL, float alpha = 9.0f)
     {
         if(img == NULL) {
             return NULL;
@@ -235,7 +235,7 @@ public:
         int height = L->height;
 
         if(I_orientation == NULL) {
-            I_orientation = new ImageRAW(1, width, height, num_angles);
+            I_orientation = new Image(1, width, height, num_angles);
         }
 
         int size_n = size * num_angles;
@@ -261,7 +261,7 @@ public:
 
         //Final dense sift
         if(sift_arr == NULL) {
-            sift_arr = new ImageRAW(1, width, height, num_bins * num_bins * num_angles);
+            sift_arr = new Image(1, width, height, num_bins * num_bins * num_angles);
         }
 
         sift_arr->SetZero();
@@ -293,7 +293,7 @@ public:
         return sift_arr;
     }
 
-    void Normalization(ImageRAW *sift_arr) //normalziation of the sift
+    void Normalization(Image *sift_arr) //normalziation of the sift
     {
         for(int i = 0; i < sift_arr->height; i++) {
             for(int j = 0; j < sift_arr->width; j++) {

@@ -35,7 +35,7 @@ namespace pic {
  * @param div
  * @return
  */
-ImageRAW *CalculateDivergence(ImageRAW *f, ImageRAW *div)
+Image *CalculateDivergence(Image *f, Image *div)
 {
     if(f == NULL) {
         return div;
@@ -45,14 +45,14 @@ ImageRAW *CalculateDivergence(ImageRAW *f, ImageRAW *div)
         div = f->AllocateSimilarOne();
     }
 
-    ImageRAW *f_dx2, *f_dy2;
+    Image *f_dx2, *f_dy2;
 
     float kernelGrad[] = { -0.5f, 0.0f, 0.5f};
     float kernelDiv[] = { -1.0f, 1.0f, 0.0f};
 
     //Calculate first order gradient
-    ImageRAW *f_dx = FilterConv1D::Execute(f, NULL, kernelGrad, 3, true);
-    ImageRAW *f_dy = FilterConv1D::Execute(f, NULL, kernelGrad, 3, false);
+    Image *f_dx = FilterConv1D::Execute(f, NULL, kernelGrad, 3, true);
+    Image *f_dy = FilterConv1D::Execute(f, NULL, kernelGrad, 3, false);
 
     //Calculate divergence using backward differences
     f_dx2 = FilterConv1D::Execute(f_dx, div , kernelDiv, 3, true);

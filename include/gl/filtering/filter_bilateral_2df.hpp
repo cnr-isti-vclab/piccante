@@ -76,7 +76,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief Execute
@@ -86,19 +86,19 @@ public:
      * @param sigma_r
      * @return
      */
-    static ImageRAWGL *Execute(std::string nameIn,
+    static ImageGL *Execute(std::string nameIn,
                                std::string nameOut,
                                float sigma_s, float sigma_r)
     {
         //Load the image
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         //Filtering
         FilterGLBilateral2DF filter(sigma_s, sigma_r);
 
         long t0 = timeGetTime();
-        ImageRAWGL *imgRet = filter.Process(SingleGL(&imgIn), NULL);
+        ImageGL *imgRet = filter.Process(SingleGL(&imgIn), NULL);
         long t1 = timeGetTime();
         printf("Full Bilateral Filter time: %ld\n", t1 - t0);
 
@@ -204,8 +204,8 @@ void FilterGLBilateral2DF::Update(float sigma_s, float sigma_r)
     glw::bind_program(0);
 }
 
-ImageRAWGL *FilterGLBilateral2DF::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLBilateral2DF::Process(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -215,7 +215,7 @@ ImageRAWGL *FilterGLBilateral2DF::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {
@@ -224,7 +224,7 @@ ImageRAWGL *FilterGLBilateral2DF::Process(ImageRAWGLVec imgIn,
 
     fbo->create(w, h, 1, false, imgOut->getTexture());
 
-    ImageRAWGL *edge, *base;
+    ImageGL *edge, *base;
 
     if(imgIn.size() == 2) {
         //Joint/Cross Bilateral Filtering

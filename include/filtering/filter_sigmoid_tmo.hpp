@@ -38,12 +38,12 @@ protected:
     float			c, alpha, epsilon, wp, wp2;
     SIGMOID_MODE	type;
 
-    float CalculateEpsilon(ImageRAWVec imgIn);
+    float CalculateEpsilon(ImageVec imgIn);
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
     //SetupAux
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     //Basic constructors
@@ -51,16 +51,16 @@ public:
     FilterSigmoidTMO(SIGMOID_MODE type, float alpha, float wp, float epsilon,
                      bool temporal);
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut)
+    static Image *Execute(Image *imgIn, Image *imgOut)
     {
         FilterSigmoidTMO filter;
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut)
+    static Image *Execute(std::string nameIn, std::string nameOut)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL);
         imgOut->Write(nameOut);
         return imgOut;
     }
@@ -89,7 +89,7 @@ FilterSigmoidTMO::FilterSigmoidTMO(SIGMOID_MODE type, float alpha,
     this->temporal = temporal;
 }
 
-float FilterSigmoidTMO::CalculateEpsilon(ImageRAWVec imgIn)
+float FilterSigmoidTMO::CalculateEpsilon(ImageVec imgIn)
 {
     float tmpEpsilon, retEpsilon;
 
@@ -123,7 +123,7 @@ float FilterSigmoidTMO::CalculateEpsilon(ImageRAWVec imgIn)
     return retEpsilon;
 }
 
-ImageRAW *FilterSigmoidTMO::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterSigmoidTMO::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(epsilon <= 0.0f || temporal) {
         epsilon = CalculateEpsilon(imgIn);
@@ -138,7 +138,7 @@ ImageRAW *FilterSigmoidTMO::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
 }
 
 //Process in a box
-void FilterSigmoidTMO::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
 
     float *data, *dataFlt;

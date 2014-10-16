@@ -41,7 +41,7 @@ namespace pic {
  * @param wS
  * @return
  */
-ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
+Image *ExposureFusion(ImageVec imgIn, Image *imgOut, float wC = 1.0f,
                          float wE = 1.0f, float wS = 1.0f)
 {
     int n = imgIn.size();
@@ -59,13 +59,13 @@ ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
     FilterLuminance fltL;
     FilterLaplacian fltLap;
 
-    ImageRAW *L       = new ImageRAW(1, width, height, 1);
-    ImageRAW *weights = new ImageRAW(n, width, height, 1);
-    ImageRAW *acc     = new ImageRAW(1, width, height, 1);
+    Image *L       = new Image(1, width, height, 1);
+    Image *weights = new Image(n, width, height, 1);
+    Image *acc     = new Image(1, width, height, 1);
 
     acc->SetZero();
 
-    ImageRAWVec weights_list;
+    ImageVec weights_list;
 
     float mu = 0.5f;
     float sigma = 0.2f;
@@ -76,7 +76,7 @@ ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
             printf("Processing image %d\n", j);
         #endif
 
-        ImageRAW *curWeight = new ImageRAW(1, width, height, 1,
+        Image *curWeight = new Image(1, width, height, 1,
                                            &weights->data[size * j]);
 
         weights_list.push_back(curWeight);

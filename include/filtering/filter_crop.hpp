@@ -46,7 +46,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
 
@@ -84,7 +84,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief Execute
@@ -94,7 +94,7 @@ public:
      * @param max
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, Vec<4, int> min,
+    static Image *Execute(Image *imgIn, Image *imgOut, Vec<4, int> min,
                              Vec<4, int> max)
     {
         FilterCrop fltCrop(min, max);
@@ -109,7 +109,7 @@ public:
      * @param max
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, Vec<2, int> min,
+    static Image *Execute(Image *imgIn, Image *imgOut, Vec<2, int> min,
                              Vec<2, int> max)
     {
         FilterCrop fltCrop(min, max);
@@ -124,11 +124,11 @@ public:
      * @param max
      * @return
      */
-    static ImageRAW *Execute(std::string fileInput, std::string fileOutput,
+    static Image *Execute(std::string fileInput, std::string fileOutput,
                              Vec<2, int> min, Vec<2, int> max)
     {
-        ImageRAW imgIn(fileInput);
-        ImageRAW *out = FilterCrop::Execute(&imgIn, NULL, min, max);
+        Image imgIn(fileInput);
+        Image *out = FilterCrop::Execute(&imgIn, NULL, min, max);
         out->Write(fileOutput);
         return out;
     }
@@ -138,12 +138,12 @@ public:
      */
     static void TestCrop2D()
     {
-        ImageRAW img(1, 512, 512, 3);
+        Image img(1, 512, 512, 3);
         img.Assign(1.0f);
 
         FilterCrop flt(Vec<2, int>(100, 100), Vec<2, int>(200, 200));
 
-        ImageRAW *out = flt.Process(Single(&img), NULL);
+        Image *out = flt.Process(Single(&img), NULL);
 
         out->Write("test_crop_2d_output.pfm");
     }
@@ -193,7 +193,7 @@ FilterCrop::FilterCrop(Vec<3, float> min, Vec<3, float> max)
     flag = true;
 }
 
-ImageRAW *FilterCrop::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterCrop::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(flag) {
         maxi[0] = int(maxf[0] * imgIn[0]->widthf);
@@ -236,13 +236,13 @@ ImageRAW *FilterCrop::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
             mini[2]  = 0;
         }
 
-        imgOut = new ImageRAW(delta[2], delta[0], delta[1], channels);
+        imgOut = new Image(delta[2], delta[0], delta[1], channels);
     }
 
     return imgOut;
 }
 
-void FilterCrop::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterCrop::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
 
     maxi[3] = MIN(maxi[3], src[0]->channels);

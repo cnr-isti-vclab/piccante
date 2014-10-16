@@ -33,37 +33,37 @@ class FilterBackwardDifference: public Filter
 {
 protected:
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     //Basic constructor
     FilterBackwardDifference() {}
 
     //Filtering
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut)
+    static Image *Execute(Image *imgIn, Image *imgOut)
     {
         FilterBackwardDifference filter;
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
     //Filtering
-    static ImageRAW *Execute(std::string fileInput, std::string fileOutput)
+    static Image *Execute(std::string fileInput, std::string fileOutput)
     {
-        ImageRAW imgIn(fileInput);
-        ImageRAW *out = FilterBackwardDifference::Execute(&imgIn, NULL);
+        Image imgIn(fileInput);
+        Image *out = FilterBackwardDifference::Execute(&imgIn, NULL);
         out->Write(fileOutput);
         return out;
     }
 };
 
 //Processing
-ImageRAW *FilterBackwardDifference::SetupAux(ImageRAWVec imgIn,
-        ImageRAW *imgOut)
+Image *FilterBackwardDifference::SetupAux(ImageVec imgIn,
+        Image *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height,
+        imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height,
                               2 * imgIn[0]->channels);
     }
 
@@ -71,11 +71,11 @@ ImageRAW *FilterBackwardDifference::SetupAux(ImageRAWVec imgIn,
 }
 
 //Process in a box
-void FilterBackwardDifference::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
+void FilterBackwardDifference::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
     //Filtering
-    ImageRAW *img = src[0];
+    Image *img = src[0];
     int channels = img->channels;
 
     for(int j = box->y0; j < box->y1; j++) {

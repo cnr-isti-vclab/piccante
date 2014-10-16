@@ -62,7 +62,7 @@ public:
     }
 
     //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
 //Basic constructor
@@ -130,7 +130,7 @@ void FilterGLHSLReplace::InitShaders()
     glw::bind_program(0);
 }
 
-ImageRAWGL *FilterGLHSLReplace::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLHSLReplace::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return NULL;

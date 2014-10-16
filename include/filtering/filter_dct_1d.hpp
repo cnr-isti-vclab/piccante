@@ -46,7 +46,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
 
@@ -228,11 +228,11 @@ void FilterDCT1D::ChangePass(int x, int y, int z)
     dirs[2] = z;
 }
 
-void FilterDCT1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterDCT1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 
-    ImageRAW *source = src[0];
+    Image *source = src[0];
 
     for(int m = box->z0; m < box->z1; m++) {
         for(int j = box->y0; j < box->y1; j++) {

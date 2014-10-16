@@ -27,7 +27,7 @@ See the GNU Lesser General Public License
 
 #include "util/vec.hpp"
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_luminance.hpp"
 
 #include "features_matching/general_corner_detector.hpp"
@@ -42,7 +42,7 @@ namespace pic {
 class SusanCornerDetector: public GeneralCornerDetector
 {
 protected:
-    ImageRAW *lum_flt;
+    Image *lum_flt;
     bool      bComputeThreshold;
 
     float     sigma, threshold;
@@ -95,7 +95,7 @@ public:
         }
     }
 
-    void Compute(ImageRAW *img, std::vector< Eigen::Vector3f > *corners)
+    void Compute(Image *img, std::vector< Eigen::Vector3f > *corners)
     {
         if(img == NULL) {
             return;
@@ -147,7 +147,7 @@ public:
 
         float g = C * 0.5f; //Geometric constant for determing corners
 
-        ImageRAW R(1,width, height, 1);
+        Image R(1,width, height, 1);
         R.SetZero();
         for(int i=radius; i<(height - radius - 1); i++) {
             for(int j=radius; j<(width - radius - 1); j++) {

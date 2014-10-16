@@ -37,7 +37,7 @@ public:
     {
     }
 
-    ImageRAW *Process(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *Process(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() < 1){
             return imgOut;
@@ -100,7 +100,7 @@ public:
         return imgOut;
     }
 
-    ImageRAW *ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *ProcessP(ImageVec imgIn, Image *imgOut)
     {
         return Process(imgIn, imgOut);
     }

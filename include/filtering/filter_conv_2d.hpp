@@ -42,14 +42,14 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         if(src.size() != 2) {
             return;
         }
 
-        ImageRAW *img  = src[0];
-        ImageRAW *conv = src[1];
+        Image *img  = src[0];
+        Image *conv = src[1];
 
         int channels = dst->channels;
 
@@ -100,7 +100,7 @@ public:
      * @param imgOut
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *img, ImageRAW *conv, ImageRAW *imgOut)
+    static Image *Execute(Image *img, Image *conv, Image *imgOut)
     {
         FilterConv2D flt;
         return flt.ProcessP(Double(img, conv), imgOut);
@@ -115,13 +115,13 @@ public:
     static void Execute(std::string nameImg, std::string nameConv,
                         std::string nameOut)
     {
-        ImageRAW img(nameImg, LT_NOR_GAMMA);
-        ImageRAW conv(nameConv, LT_NOR_GAMMA);
+        Image img(nameImg, LT_NOR_GAMMA);
+        Image conv(nameConv, LT_NOR_GAMMA);
 
         float *sumVal = conv.getSumVal(NULL, NULL);
         conv.Div(sumVal[0]);
 
-        ImageRAW *imgOut = Execute(&img, &conv, NULL);
+        Image *imgOut = Execute(&img, &conv, NULL);
 
         imgOut->Write(nameOut);
     }

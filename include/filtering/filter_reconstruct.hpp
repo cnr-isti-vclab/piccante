@@ -34,7 +34,7 @@ class FilterReconstruct: public Filter
 protected:
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         if(src.size() < 2) {
             return;
@@ -66,7 +66,7 @@ public:
     {
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *ann, ImageRAW *imgOut = NULL)
+    static Image *Execute(Image *imgIn, Image *ann, Image *imgOut = NULL)
     {
         FilterReconstruct fltRec;
         return fltRec.ProcessP(Double(imgIn, ann), imgOut);

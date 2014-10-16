@@ -26,7 +26,7 @@ See the GNU Lesser General Public License
 #define PIC_METRICS_M_PSNR_HPP
 
 #include <math.h>
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "metrics/base.hpp"
 #include "util/indexed_array.hpp"
 #include "metrics/mse.hpp"
@@ -34,7 +34,7 @@ See the GNU Lesser General Public License
 namespace pic {
 
 /**mPSNR: multiple-exposure peak signal-to-noise ratio*/
-double mPSNR(ImageRAW *ori, ImageRAW *cmp, int minFstop, int maxFstop)
+double mPSNR(Image *ori, Image *cmp, int minFstop, int maxFstop)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -46,8 +46,8 @@ double mPSNR(ImageRAW *ori, ImageRAW *cmp, int minFstop, int maxFstop)
 
     //TO DO: Calculate fstop
     if(minFstop == maxFstop) {
-        ImageRAW *oriLum = FilterLuminance::Execute(ori, NULL, LT_CIE_LUMINANCE);
-        ImageRAW *cmpLum = FilterLuminance::Execute(cmp, NULL, LT_CIE_LUMINANCE);
+        Image *oriLum = FilterLuminance::Execute(ori, NULL, LT_CIE_LUMINANCE);
+        Image *cmpLum = FilterLuminance::Execute(cmp, NULL, LT_CIE_LUMINANCE);
 
         int nData = oriLum->width * oriLum->height;
 

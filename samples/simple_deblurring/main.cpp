@@ -46,7 +46,6 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         printf("Filtering the image with a PSF read from file...");
-
         pic::ImageRAW psf("../data/input/kernel_psf.png");
 
         //normalization of the PSF

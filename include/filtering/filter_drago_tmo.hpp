@@ -45,7 +45,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     /**
      * @brief SetupAux
@@ -53,7 +53,7 @@ protected:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     /**
@@ -128,7 +128,7 @@ void FilterDragoTMO::Update(float Ld_Max, float b, float Lw_Max,
     constant2 = (Ld_Max / 100.0f) / (log10f(1.0f + Lw_Max_scaled));
 }
 
-ImageRAW *FilterDragoTMO::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterDragoTMO::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgIn.size() < 2) {
         #ifdef PIC_DEBUG
@@ -144,7 +144,7 @@ ImageRAW *FilterDragoTMO::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
     return imgOut;
 }
 
-void FilterDragoTMO::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterDragoTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = src[0]->channels;
 

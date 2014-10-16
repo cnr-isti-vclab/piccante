@@ -66,9 +66,9 @@ public:
      * @param sigma
      * @return
      */
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float sigma)
+    static ImageGL *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLGaussian2D *filter = new FilterGLGaussian2D(sigma);
@@ -77,7 +77,7 @@ public:
         GLuint testTQ1 = glBeginTimeQuery();
 #endif
 
-        ImageRAWGL *imgOut = filter->Process(SingleGL(&imgIn), NULL);
+        ImageGL *imgOut = filter->Process(SingleGL(&imgIn), NULL);
 
 #ifdef PIC_DEBUG
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);

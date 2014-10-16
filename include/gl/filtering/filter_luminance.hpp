@@ -68,7 +68,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief Execute
@@ -76,7 +76,7 @@ public:
      * @param imgOut
      * @return
      */
-    static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgOut)
+    static ImageGL *Execute(ImageGL *imgIn, ImageGL *imgOut)
     {
         FilterGLLuminance filter(LT_CIE_LUMINANCE);
         imgOut = filter.Process(SingleGL(imgIn), imgOut);
@@ -89,12 +89,12 @@ public:
      * @param nameOut
      * @return
      */
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut)
+    static ImageGL *Execute(std::string nameIn, std::string nameOut)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
-        ImageRAWGL *imgOut = Execute(&imgIn, NULL);
+        ImageGL *imgOut = Execute(&imgIn, NULL);
 
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
@@ -187,7 +187,7 @@ void FilterGLLuminance::Update(LUMINANCE_TYPE type)
     glw::bind_program(0);
 }
 
-ImageRAWGL *FilterGLLuminance::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLLuminance::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.empty()) {
         return imgOut;
@@ -205,7 +205,7 @@ ImageRAWGL *FilterGLLuminance::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, 1, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(1, w, h, 1, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

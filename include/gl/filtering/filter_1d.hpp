@@ -35,7 +35,7 @@ namespace pic {
 class FilterGL1D: public FilterGL
 {
 protected:
-    ImageRAWGL	*weights;
+    ImageGL	*weights;
 
     int			dirs[3];
     int			slice;
@@ -108,7 +108,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
 FilterGL1D::FilterGL1D(int direction, GLenum target): FilterGL()
@@ -192,7 +192,7 @@ void FilterGL1D::InitShaders()
     SetUniform();
 }
 
-ImageRAWGL *FilterGL1D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGL1D::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn[0] == NULL || imgIn.size() > 1) {
         return imgOut;
@@ -203,7 +203,7 @@ ImageRAWGL *FilterGL1D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int f = imgIn[0]->frames;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(f, w, h, 4, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(f, w, h, 4, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {
@@ -212,7 +212,7 @@ ImageRAWGL *FilterGL1D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 
     fbo->create(w, h, f, false, imgOut->getTexture());
 
-    ImageRAWGL *base = imgIn[0];
+    ImageGL *base = imgIn[0];
 
     //Textures
     glActiveTexture(GL_TEXTURE0);

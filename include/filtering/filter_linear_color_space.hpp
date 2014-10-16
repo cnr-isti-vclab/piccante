@@ -36,7 +36,7 @@ protected:
     int			nMatrix;
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         if(src[0]->channels != nMatrix) {
             return;
@@ -123,7 +123,7 @@ public:
         return matrix;
     }
 
-    static ImageRAW *Execute_RGB_to_XYZ(ImageRAW *imgIn, ImageRAW *imgOut)
+    static Image *Execute_RGB_to_XYZ(Image *imgIn, Image *imgOut)
     {
         FilterLinearColorSpace flt;
 
@@ -132,7 +132,7 @@ public:
         return flt.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute_XYZ_to_RGB(ImageRAW *imgIn, ImageRAW *imgOut)
+    static Image *Execute_XYZ_to_RGB(Image *imgIn, Image *imgOut)
     {
         FilterLinearColorSpace flt;
 

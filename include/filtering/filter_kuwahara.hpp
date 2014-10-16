@@ -44,11 +44,11 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int channels = dst->channels;
 
-        ImageRAW *source = src[0];
+        Image *source = src[0];
 
         float *buf = new float[channels * 8];
 
@@ -218,7 +218,7 @@ public:
      * @param kernelSize
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, int kernelSize)
+    static Image *Execute(Image *imgIn, Image *imgOut, int kernelSize)
     {
         FilterKuwahara filter(kernelSize);
         return filter.ProcessP(Single(imgIn), imgOut);

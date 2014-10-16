@@ -30,7 +30,7 @@ See the GNU Lesser General Public License
 #include "externals/Eigen/Sparse"
 #include "externals/Eigen/src/SparseCore/SparseMatrix.h"
 
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 /**
@@ -76,8 +76,8 @@ inline float LischinskiFunctionGauss(float Lcur, float Lref, float param[2])
  * @param LISCHINSKI_EPSILON
  * @return
  */
-ImageRAW *LischinskiMinimization(ImageRAW *L, ImageRAW *g,
-                                 ImageRAW *omega = NULL, float alpha = 1.0f, float lambda = 0.2f,
+Image *LischinskiMinimization(Image *L, Image *g,
+                                 Image *omega = NULL, float alpha = 1.0f, float lambda = 0.2f,
                                  float LISCHINSKI_EPSILON = 0.0001f)
 {
     if(L == NULL || g == NULL) {
@@ -172,7 +172,7 @@ ImageRAW *LischinskiMinimization(ImageRAW *L, ImageRAW *g,
         printf("SOLVER SUCCESS!\n");
     #endif
 
-    ImageRAW *ret = L->AllocateSimilarOne();
+    Image *ret = L->AllocateSimilarOne();
 
     for(int i = 0; i < height; i++) {
         int counter = i * width;

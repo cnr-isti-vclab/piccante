@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_UTIL_GL_STROKE_HPP
 #define PIC_UTIL_GL_STROKE_HPP
 
-#include "gl/image_raw.hpp"
+#include "gl/image.hpp"
 #include "util/gl/quad.hpp"
 #include "externals/glw/program.hpp"
 
@@ -40,7 +40,7 @@ class StrokeGL
 {
 protected:
     int					width, height, brushSize;
-    ImageRAWGL			*shape;
+    ImageGL			*shape;
     float				size, rSize;
     float				color[4];
     float				tmpColor[3];
@@ -179,7 +179,7 @@ StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
     size = 4.0f;
     rSize = size / float(max(width, height));
 
-    shape = new ImageRAWGL(1, this->brushSize, this->brushSize, 3, IMG_CPU, GL_TEXTURE_2D);
+    shape = new ImageGL(1, this->brushSize, this->brushSize, 3, IMG_CPU, GL_TEXTURE_2D);
 //	shape->EvaluateGaussian(true);
     shape->EvaluateSolid();
     shape->generateTextureGL(false, GL_TEXTURE_2D);

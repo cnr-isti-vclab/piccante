@@ -63,7 +63,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief CreateOpSetZero
@@ -339,7 +339,7 @@ void FilterGLOp::Update(float *c0, float *c1)
     glw::bind_program(0);
 }
 
-ImageRAWGL *FilterGLOp::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLOp::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -350,7 +350,7 @@ ImageRAWGL *FilterGLOp::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 
     if(imgOut == NULL) {
         //TO DO: it does not work for frames!
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

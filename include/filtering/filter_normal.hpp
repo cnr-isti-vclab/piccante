@@ -43,7 +43,7 @@ protected:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief ProcessBBox
@@ -51,7 +51,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     /**
@@ -79,7 +79,7 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         width       = imgIn->width;
         height      = imgIn->height;
@@ -107,16 +107,16 @@ void FilterNormal::Update(int colorChannel)
     this->colorChannel = colorChannel;
 }
 
-ImageRAW *FilterNormal::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterNormal::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, 3);
+        imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
     }
 
     return imgOut;
 }
 
-void FilterNormal::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterNormal::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int width    = dst->width;
     int height   = dst->height;

@@ -27,7 +27,7 @@ See the GNU Lesser General Public License
 
 #include <vector>
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "features_matching/brief_descriptor.hpp"
 
 namespace pic {
@@ -117,7 +117,7 @@ public:
      * @param desc
      * @return
      */
-    unsigned int *get(ImageRAW *img, int x0, int y0, unsigned int *desc = NULL)
+    unsigned int *get(Image *img, int x0, int y0, unsigned int *desc = NULL)
     {
         if(img == NULL){
             return NULL;

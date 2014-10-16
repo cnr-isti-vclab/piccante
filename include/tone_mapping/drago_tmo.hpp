@@ -40,11 +40,11 @@ namespace pic {
  * @param imgOut
  * @return
  */
-ImageRAW *DragoTMO(ImageRAW *imgIn, float Ld_Max = 100.0f, float b = 0.95f, ImageRAW *imgOut = NULL)
+Image *DragoTMO(Image *imgIn, float Ld_Max = 100.0f, float b = 0.95f, Image *imgOut = NULL)
 {
     //Computing luminance and its statistics
     FilterLuminance filterLum;
-    ImageRAW *imgLum = filterLum.ProcessP(Single(imgIn), NULL);
+    Image *imgLum = filterLum.ProcessP(Single(imgIn), NULL);
 
     float Lw_Max = imgLum->getMaxVal()[0];
     float Lw_a = imgLum->getMaxVal()[0];

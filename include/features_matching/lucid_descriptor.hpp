@@ -27,7 +27,7 @@ See the GNU Lesser General Public License
 
 #include <random>
 #include "util/math.hpp"
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
@@ -68,7 +68,7 @@ public:
      * @param nDesc
      * @return
      */
-    unsigned int *get(ImageRAW *img, int x0, int y0, unsigned int *desc, unsigned int &nDesc)
+    unsigned int *get(Image *img, int x0, int y0, unsigned int *desc, unsigned int &nDesc)
     {
         if(img == NULL) {
             return NULL;

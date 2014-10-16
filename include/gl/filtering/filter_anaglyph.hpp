@@ -53,7 +53,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
 FilterGLAnaglyph::FilterGLAnaglyph(): FilterGL()
@@ -101,7 +101,7 @@ void FilterGLAnaglyph::InitShaders()
 }
 
 //Processing
-ImageRAWGL *FilterGLAnaglyph::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLAnaglyph::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if((imgIn[0] == NULL) && (imgIn[0]->channels != 3)) {
         return imgOut;
@@ -111,7 +111,7 @@ ImageRAWGL *FilterGLAnaglyph::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

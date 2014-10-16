@@ -34,7 +34,7 @@ class FilterAnsiotropicDiffusion: public Filter
 {
 protected:
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     float			k, delta_t;
     unsigned int	mode;
@@ -43,7 +43,7 @@ public:
     //Basic constructor
     FilterAnsiotropicDiffusion(float k, unsigned int mode);
 
-    static ImageRAW *AnisotropicDiffusion(ImageRAWVec imgIn, ImageRAW *imgOut,
+    static Image *AnisotropicDiffusion(ImageVec imgIn, Image *imgOut,
                                           float k, unsigned int mode, unsigned int iterations)
     {
         FilterAnsiotropicDiffusion ansio_flt(k, mode);
@@ -52,7 +52,7 @@ public:
         return imgOut;
     }
 
-    static ImageRAW *AnisotropicDiffusion(ImageRAWVec imgIn, ImageRAW *imgOut,
+    static Image *AnisotropicDiffusion(ImageVec imgIn, Image *imgOut,
                                           float sigma_s, float sigma_r)
     {
 
@@ -93,11 +93,11 @@ FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
 }
 
 //Process in a box
-void FilterAnsiotropicDiffusion::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
+void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
     //Filtering
-    ImageRAW *img = src[0];
+    Image *img = src[0];
     int channels = img->channels;
 
     float *gN = new float [channels];

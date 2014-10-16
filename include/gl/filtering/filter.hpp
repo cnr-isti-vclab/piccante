@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_GL_FILTERING_FILTER_HPP
 #define PIC_GL_FILTERING_FILTER_HPP
 
-#include "gl/image_raw_vec.hpp"
+#include "gl/image_vec.hpp"
 #include "util/gl/quad.hpp"
 
 #include "externals/glw/program.hpp"
@@ -120,7 +120,7 @@ public:
      * @param imgOut
      * @return
      */
-    virtual ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    virtual ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief GammaCorrection
@@ -146,7 +146,7 @@ public:
     }
 };
 
-ImageRAWGL *FilterGL::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -156,7 +156,7 @@ ImageRAWGL *FilterGL::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {

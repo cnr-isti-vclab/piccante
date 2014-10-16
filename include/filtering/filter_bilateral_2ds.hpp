@@ -44,7 +44,7 @@ protected:
     PrecomputedGaussian		*pg;
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     int nSamples;
@@ -83,26 +83,26 @@ public:
     bool Read(std::string filename);
 
     //Filtering
-    static ImageRAW *Execute(ImageRAW *imgIn,
+    static Image *Execute(Image *imgIn,
                              float sigma_s, float sigma_r)
     {
         //Filtering
         FilterBilateral2DS filter(sigma_s, sigma_r, 1);
         //long t0 = timeGetTime();
-        ImageRAW *imgOut = filter.ProcessP(Single(imgIn), NULL);
+        Image *imgOut = filter.ProcessP(Single(imgIn), NULL);
         //long t1 = timeGetTime();
         //printf("Stochastic Bilateral Filter time: %ld\n",t1-t0);
         return imgOut;
     }
 
     //Filtering
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgEdge,
+    static Image *Execute(Image *imgIn, Image *imgEdge,
                              float sigma_s, float sigma_r)
     {
         //Filtering
         FilterBilateral2DS filter(sigma_s, sigma_r, 1);
         //long t0 = timeGetTime();
-        ImageRAW *imgOut;
+        Image *imgOut;
 
         if(imgEdge == NULL) {
             imgOut = filter.ProcessP(Single(imgIn), NULL);
@@ -115,17 +115,17 @@ public:
         return imgOut;
     }
 
-    static ImageRAW *Execute(std::string nameIn,
+    static Image *Execute(std::string nameIn,
                              std::string nameOut,
                              float sigma_s, float sigma_r, SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
     {
         //Load the image
-        ImageRAW imgIn(nameIn);
+        Image imgIn(nameIn);
 
         //Filtering
         FilterBilateral2DS filter(type, sigma_s, sigma_r, mult);
         //long t0 = timeGetTime();
-        ImageRAW *imgOut = filter.ProcessP(Single(&imgIn), NULL);
+        Image *imgOut = filter.ProcessP(Single(&imgIn), NULL);
         //long t1 = timeGetTime();
         //printf("Stochastic Bilateral Filter time: %ld\n",t1-t0);
 
@@ -135,19 +135,19 @@ public:
     }
 
     //Filtering
-    static ImageRAW *Execute(std::string nameIn,
+    static Image *Execute(std::string nameIn,
                              std::string nameIn2,
                              std::string nameOut,
                              float sigma_s, float sigma_r, SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
     {
         //Load the image
-        ImageRAW imgIn(nameIn);
-        ImageRAW imgIn2(nameIn2);
+        Image imgIn(nameIn);
+        Image imgIn2(nameIn2);
 
         //Filtering
         FilterBilateral2DS filter(type, sigma_s, sigma_r, mult);
         //long t0 = timeGetTime();
-        ImageRAW *imgOut = filter.ProcessP(Double(&imgIn, &imgIn2), NULL);
+        Image *imgOut = filter.ProcessP(Double(&imgIn, &imgIn2), NULL);
         //long t1 = timeGetTime();
         //printf("Stochastic Bilateral Filter time: %ld\n",t1-t0);
 
@@ -264,7 +264,7 @@ PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
 }
 
 //Process in a box
-PIC_INLINE void FilterBilateral2DS::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
+PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
     //Filtering
@@ -272,7 +272,7 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
     double I_val[4], tmpC[4];
     double  tmp, tmp2, tmp3, sum;
 
-    ImageRAW *edge, *base, *selector;
+    Image *edge, *base, *selector;
     selector = NULL;
 
     int nImg = src.size();

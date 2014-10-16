@@ -33,7 +33,7 @@ See the GNU Lesser General Public License
 #include <random>
 
 #include "base.hpp"
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "util/math.hpp"
 #include "util/point_samplers.hpp"
 
@@ -390,7 +390,7 @@ template <unsigned int N>  PIC_INLINE void RandomSampler<N>::Render2Int()
 template <unsigned int N> PIC_INLINE void RandomSampler<N>::Write(
     std::string name, int level)
 {
-    ImageRAW img(1, window[0] * 2 + 1, window[1] * 2 + 1, 1);
+    Image img(1, window[0] * 2 + 1, window[1] * 2 + 1, 1);
     img.SetZero();
 
     int start, end;

@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_ALGORITHMS_RICHARDSON_LUCY_DECONVOLUTION_HPP
 #define PIC_ALGORITHMS_RICHARDSON_LUCY_DECONVOLUTION_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_conv_2d.hpp"
 
 namespace pic {
@@ -38,7 +38,7 @@ namespace pic {
  * @param imgOut
  * @return
  */
-ImageRAW *RichardsonLucyDeconvolution(ImageRAW *imgIn, ImageRAW *psf, int nIterations = 10, ImageRAW *imgOut = NULL)
+Image *RichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterations = 10, Image *imgOut = NULL)
 {
     if(imgIn == NULL) {
         return imgOut;
@@ -52,15 +52,15 @@ ImageRAW *RichardsonLucyDeconvolution(ImageRAW *imgIn, ImageRAW *psf, int nItera
         nIterations = 10;
     }
 
-    ImageRAW *psf_hat = psf->Clone();
+    Image *psf_hat = psf->Clone();
     psf_hat->FlipHV();
 
     imgOut->Assign(0.5f);
 
-    ImageRAW *img_rel_blur = imgIn->AllocateSimilarOne();
+    Image *img_rel_blur = imgIn->AllocateSimilarOne();
 
-    ImageRAW *img_est_conv = NULL;
-    ImageRAW *img_err = NULL;
+    Image *img_est_conv = NULL;
+    Image *img_err = NULL;
 
     for(int i = 0; i < nIterations; i++) {
 

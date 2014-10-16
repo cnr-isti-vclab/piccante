@@ -30,7 +30,7 @@ See the GNU Lesser General Public License
 #include "externals/Eigen/Sparse"
 #include "externals/Eigen/src/SparseCore/SparseMatrix.h"
 
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
@@ -40,7 +40,7 @@ namespace pic {
  * @param ret
  * @return
  */
-ImageRAW *PoissonSolver(ImageRAW *f, ImageRAW *ret)
+Image *PoissonSolver(Image *f, Image *ret)
 {
     if(f == NULL) {
         return NULL;

@@ -35,19 +35,19 @@ class FilterSampler3D: public Filter
 protected:
     ImageSampler *isb;
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     //SetupAux
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     //Basic constructors
     FilterSampler3D(float scale, ImageSampler *isb);
 
-    static ImageRAW *Execute(ImageRAW *in, ImageSampler *isb, float scale)
+    static Image *Execute(Image *in, ImageSampler *isb, float scale)
     {
         FilterSampler3D filterUp(scale, isb);
-        ImageRAW *out = filterUp.Process(Single(in), NULL);
+        Image *out = filterUp.Process(Single(in), NULL);
         return out;
     }
 };
@@ -60,10 +60,10 @@ FilterSampler3D::FilterSampler3D(float scale, ImageSampler *isb)
 }
 
 //SetupAux
-ImageRAW *FilterSampler3D::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterSampler3D::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = new ImageRAW(  int(imgIn[0]->framesf * scale),
+        imgOut = new Image(  int(imgIn[0]->framesf * scale),
                                 int(imgIn[0]->widthf  * scale),
                                 int(imgIn[0]->heightf * scale),
                                 imgIn[0]->channels);
@@ -73,11 +73,11 @@ ImageRAW *FilterSampler3D::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
 }
 
 //Process in a box
-void FilterSampler3D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterSampler3D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 
-    ImageRAW *source = src[0];
+    Image *source = src[0];
 
     int i, j, k, p, c;
     float x, y, t;

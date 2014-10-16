@@ -39,7 +39,7 @@ protected:
     std::vector<float *>    *icrf;
 
     /**ProcessBBox: assembling an HDR image*/
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;
         int channels = dst->channels;
@@ -105,51 +105,6 @@ public:
 
         this->linearization_type = linearization_type;
         this->icrf = icrf;
-    }
-
-    //Assemble an HDR image from RAW images
-    static void FromRAWs(std::string nameFileIn, std::string nameFileOut)
-    {
-        FILE *file = fopen(nameFileIn.c_str(), "r");
-
-        if(file == NULL) {
-            return;
-        }
-
-        //Read header
-        int width, height, bits;
-        char tmp[64];
-        fscanf(file, "%s", tmp);
-        fscanf(file, "%d", &width);
-        fscanf(file, "%s", tmp);
-        fscanf(file, "%d", &height);
-        fscanf(file, "%s", tmp);
-        fscanf(file, "%d", &bits);
-
-        ImageRAWVec stack;
-        int i = 0;
-
-        while(!feof(file)) {
-            char name[1024];
-            float exposure;
-            fscanf(file, "%f", &exposure);
-            fscanf(file, "%s", name);
-
-            printf("Processing image: %s\n", name);
-
-            ImageRAW *img = new ImageRAW();
-
-            img->ReadRAW(name, "NULL", RAW_U16_RGGB, width, height);
-            img->exposure = exposure;
-            stack.push_back(img);
-            i++;
-        }
-
-        fclose(file);
-
-        FilterAssembleHDR fAHDR;
-        ImageRAW *imgOut = fAHDR.ProcessP(stack, NULL);
-        imgOut->Write(nameFileOut);
     }
 };
 

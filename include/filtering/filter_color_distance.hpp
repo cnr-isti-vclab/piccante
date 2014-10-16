@@ -36,7 +36,7 @@ protected:
     float	sigma;
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;
         int channels = src[0]->channels;
@@ -63,10 +63,10 @@ protected:
         }
     }
 
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut == NULL) {
-            imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, 1);
+            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
         }
 
         return imgOut;
@@ -81,7 +81,7 @@ public:
         this->sigma = sigma;
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float *color,
+    static Image *Execute(Image *imgIn, Image *imgOut, float *color,
                              float sigma)
     {
         FilterColorDistance fltColDst(color, sigma);
@@ -89,11 +89,11 @@ public:
     }
 
     //Filtering
-    static ImageRAW *Execute(std::string fileInput, std::string fileOutput,
+    static Image *Execute(std::string fileInput, std::string fileOutput,
                              float *color, float sigma)
     {
-        ImageRAW imgIn(fileInput);
-        ImageRAW *out = FilterColorDistance::Execute(&imgIn, NULL, color, sigma);
+        Image imgIn(fileInput);
+        Image *out = FilterColorDistance::Execute(&imgIn, NULL, color, sigma);
         out->Write(fileOutput);
         return out;
     }

@@ -48,7 +48,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width    = src[0]->width;
         int channels = src[0]->channels;
@@ -80,15 +80,15 @@ protected:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut == NULL) {
-            imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, 1);
+            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
         } else {
             if((imgIn[0]->width  != imgOut->width)  ||
                (imgIn[0]->height != imgOut->height) ||
                (imgOut->channels != 1)) {
-                imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, 1);
+                imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
             }
         }
 
@@ -186,7 +186,7 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         width       = imgIn->width;
         height      = imgIn->height;
@@ -201,7 +201,7 @@ public:
      * @param type
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, LUMINANCE_TYPE type = LT_CIE_LUMINANCE)
+    static Image *Execute(Image *imgIn, Image *imgOut, LUMINANCE_TYPE type = LT_CIE_LUMINANCE)
     {
         FilterLuminance fltLum(type);
         return fltLum.ProcessP(Single(imgIn), imgOut);
@@ -213,10 +213,10 @@ public:
      * @param fileOutput
      * @return
      */
-    static ImageRAW *Execute(std::string fileInput, std::string fileOutput)
+    static Image *Execute(std::string fileInput, std::string fileOutput)
     {
-        ImageRAW imgIn(fileInput);
-        ImageRAW *out = FilterLuminance::Execute(&imgIn, NULL, LT_CIE_LUMINANCE);
+        Image imgIn(fileInput);
+        Image *out = FilterLuminance::Execute(&imgIn, NULL, LT_CIE_LUMINANCE);
         out->Write(fileOutput);
         return out;
     }

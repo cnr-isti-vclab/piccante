@@ -39,7 +39,7 @@ protected:
     MRSamplersGL<2> *ms;
 
     //Random numbers tile
-    ImageRAWGL *imageRand;
+    ImageGL *imageRand;
 
     void InitShaders();
     void FragmentShader();
@@ -71,7 +71,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief main
@@ -101,7 +101,7 @@ public:
      * @param testing
      * @return
      */
-    static ImageRAWGL *Execute( std::string nameIn, 
+    static ImageGL *Execute( std::string nameIn, 
                                 float sigma_s, float sigma_p, float sigma_n, float sigma_a, int testing = 1)
     {
 
@@ -115,19 +115,19 @@ public:
         std::string nameAlb = name +"_alb." + ext;
 
 
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
-        ImageRAWGL imgPos(namePos);
+        ImageGL imgPos(namePos);
         imgPos.generateTextureGL(false, GL_TEXTURE_2D);
 
-        ImageRAWGL imgNor(nameNor);
+        ImageGL imgNor(nameNor);
         imgNor.generateTextureGL(false, GL_TEXTURE_2D);
 
-        ImageRAWGL imgAlb(nameAlb);
+        ImageGL imgAlb(nameAlb);
         imgAlb.generateTextureGL(false, GL_TEXTURE_2D);
 
-        ImageRAWGLVec vec;
+        ImageGLVec vec;
         vec.push_back(&imgIn);
         vec.push_back(&imgPos);
         vec.push_back(&imgNor);
@@ -136,7 +136,7 @@ public:
         FilterGLBilateral2DSE *filter = new FilterGLBilateral2DSE(sigma_s, sigma_p,
                     sigma_n, sigma_a);
 
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, imgIn.channels,
+        ImageGL *imgOut = new ImageGL(1, imgIn.width, imgIn.height, imgIn.channels,
                                             IMG_GPU_CPU, GL_TEXTURE_2D);
 
         GLuint testTQ1;
@@ -183,7 +183,7 @@ FilterGLBilateral2DSE::FilterGLBilateral2DSE(float sigma_s, float sigma_p, float
     int nRand = 32;
     int nSamplers;
 
-    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
+    imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
     imageRand->SetRand();
     imageRand->Mul(float(nRand - 1));
     imageRand->generateTexture2DU32GL();
@@ -346,8 +346,8 @@ void FilterGLBilateral2DSE::Update(float sigma_s, float sigma_p, float sigma_n, 
 }
 
 //Processing
-ImageRAWGL *FilterGLBilateral2DSE::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLBilateral2DSE::Process(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -358,7 +358,7 @@ ImageRAWGL *FilterGLBilateral2DSE::Process(ImageRAWGLVec imgIn,
 
     //TODO: check if other have height and frames swapped
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {
@@ -367,10 +367,10 @@ ImageRAWGL *FilterGLBilateral2DSE::Process(ImageRAWGLVec imgIn,
 
     fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
 
-    ImageRAWGL *base     = imgIn[0];
-    ImageRAWGL *edge_pos = imgIn[1];
-    ImageRAWGL *edge_nor = imgIn[2];
-    ImageRAWGL *edge_alb = imgIn[3];
+    ImageGL *base     = imgIn[0];
+    ImageGL *edge_pos = imgIn[1];
+    ImageGL *edge_nor = imgIn[2];
+    ImageGL *edge_alb = imgIn[3];
 
     //Rendering
     fbo->bind();

@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_FILTERING_FILTER_HPP
 #define PIC_FILTERING_FILTER_HPP
 
-#include "image_raw_vec.hpp"
+#include "image_vec.hpp"
 #include "util/tile_list.hpp"
 #include "util/string.hpp"
 
@@ -51,7 +51,7 @@ protected:
      * @param src
      * @param box
      */
-    virtual void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box) {}
+    virtual void ProcessBBox(Image *dst, ImageVec src, BBox *box) {}
 
     /**
      * @brief SetupAux
@@ -59,7 +59,7 @@ protected:
      * @param imgOut
      * @return
      */
-    virtual ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    virtual Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     bool cachedOnly;
@@ -122,7 +122,7 @@ public:
      * @param nameIn
      * @return
      */
-    ImageRAW *CachedProcess(ImageRAWVec imgIn, ImageRAW *imgOut,
+    Image *CachedProcess(ImageVec imgIn, Image *imgOut,
                             std::string nameIn);
 
     /**
@@ -133,7 +133,7 @@ public:
      * @param channels
      * @param frames
      */
-    virtual void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+    virtual void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         width       = imgIn->width;
         height      = imgIn->height;
@@ -156,7 +156,7 @@ public:
      * @param imgOut
      * @return
      */
-    virtual ImageRAW *Process(ImageRAWVec imgIn, ImageRAW *imgOut);
+    virtual Image *Process(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief ProcessPAux
@@ -164,7 +164,7 @@ public:
      * @param imgOut
      * @param tiles
      */
-    virtual void	  ProcessPAux(ImageRAWVec imgIn, ImageRAW *imgOut,
+    virtual void	  ProcessPAux(ImageVec imgIn, Image *imgOut,
                                   TileList *tiles);
 
     /**
@@ -173,10 +173,10 @@ public:
      * @param imgOut
      * @return
      */
-    virtual ImageRAW *ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut);
+    virtual Image *ProcessP(ImageVec imgIn, Image *imgOut);
 };
 
-PIC_INLINE ImageRAW *Filter::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+PIC_INLINE Image *Filter::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->AllocateSimilarOne();
@@ -206,13 +206,13 @@ PIC_INLINE std::string Filter::GetOutPutName(std::string nameIn)
     return outputName;
 }
 
-PIC_INLINE ImageRAW *Filter::CachedProcess(ImageRAWVec imgIn, ImageRAW *imgOut,
+PIC_INLINE Image *Filter::CachedProcess(ImageVec imgIn, Image *imgOut,
         std::string nameIn)
 {
     std::string outputName = GetOutPutName(nameIn);
 
     //Check if it is chaced
-    ImageRAW *imgOut2 = new ImageRAW(outputName);
+    Image *imgOut2 = new Image(outputName);
 
     printf("%s\n", outputName.c_str());
 
@@ -235,7 +235,7 @@ PIC_INLINE ImageRAW *Filter::CachedProcess(ImageRAWVec imgIn, ImageRAW *imgOut,
 }
 
 /**Process: filters the imgIn and stores it in imgOut*/
-PIC_INLINE ImageRAW *Filter::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
+PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
 {
     if(imgIn[0] == NULL) {
         return NULL;
@@ -251,7 +251,7 @@ PIC_INLINE ImageRAW *Filter::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
 }
 
 /**ProcessPAux: filters the imgIn and stores it in imgOut*/
-PIC_INLINE void Filter::ProcessPAux(ImageRAWVec imgIn, ImageRAW *imgOut,
+PIC_INLINE void Filter::ProcessPAux(ImageVec imgIn, Image *imgOut,
                                     TileList *tiles)
 {
     bool state = true;
@@ -272,7 +272,7 @@ PIC_INLINE void Filter::ProcessPAux(ImageRAWVec imgIn, ImageRAW *imgOut,
 }
 
 /**This function filters  imgIn and stores it in imgOut using multi-threading*/
-PIC_INLINE ImageRAW *Filter::ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut)
+PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
 {
 #ifndef PIC_DISABLE_THREAD
     if(imgIn[0] == NULL) {

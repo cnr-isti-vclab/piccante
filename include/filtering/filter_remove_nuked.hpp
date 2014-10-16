@@ -43,7 +43,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         float maxVal;
         float values[9];
@@ -106,7 +106,7 @@ public:
      * @param threshold_nuked
      * @return
      */
-    static ImageRAW* Execute(ImageRAW *imgIn, ImageRAW *imgOut, float threshold_nuked = 1e4)
+    static Image* Execute(Image *imgIn, Image *imgOut, float threshold_nuked = 1e4)
     {
         FilterRemoveNuked filter(threshold_nuked);
         imgOut = filter.ProcessP(Single(imgIn), imgOut);
@@ -120,10 +120,10 @@ public:
      * @param threshold_nuked
      * @return
      */
-    static ImageRAW* Execute(std::string nameFileIn, std::string nameFileOut, float threshold_nuked = 1e4)
+    static Image* Execute(std::string nameFileIn, std::string nameFileOut, float threshold_nuked = 1e4)
     {
-        ImageRAW imgIn(nameFileIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, threshold_nuked);
+        Image imgIn(nameFileIn);
+        Image *imgOut = Execute(&imgIn, NULL, threshold_nuked);
         imgOut->Write(nameFileOut);
 
         return imgOut;

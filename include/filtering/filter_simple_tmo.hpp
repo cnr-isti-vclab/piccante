@@ -35,7 +35,7 @@ protected:
     float gamma, fstop, exposure;
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     //Basic constructors
@@ -44,18 +44,18 @@ public:
     //Update the filter
     void Update(float gamma, float fstop);
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float gamma,
+    static Image *Execute(Image *imgIn, Image *imgOut, float gamma,
                              float fstop)
     {
         FilterSimpleTMO filter(gamma, fstop);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, float gamma,
+    static Image *Execute(std::string nameIn, std::string nameOut, float gamma,
                              float fstop)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, gamma, fstop);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL, gamma, fstop);
         imgOut->Write(nameOut);
         return imgOut;
     }
@@ -76,7 +76,7 @@ void FilterSimpleTMO::Update(float gamma, float fstop)
 }
 
 //Process in a box
-void FilterSimpleTMO::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterSimpleTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
 
     int width = dst->width;

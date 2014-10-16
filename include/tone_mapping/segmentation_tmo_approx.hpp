@@ -36,7 +36,7 @@ class Segmentation
 protected:
     FilterIterative			*fltIt;
     FilterBilateral2DS		*fltBil;
-    ImageRAW				*L, *imgIn_flt;
+    Image				*L, *imgIn_flt;
 
     int						iterations;
     float					perCent, nLayer;
@@ -80,7 +80,7 @@ public:
         }
     }
 
-    void ComputeStatistics(ImageRAW *imgIn)
+    void ComputeStatistics(Image *imgIn)
     {
         float nLevels, area;
 
@@ -90,7 +90,7 @@ public:
         iterations	= MAX(int(sqrtf(area)) / 2, 1);
     }
 
-    ImageRAW *SegmentationBilatearal(ImageRAW *imgIn)
+    Image *SegmentationBilatearal(Image *imgIn)
     {
         ComputeStatistics(imgIn);
 
@@ -104,21 +104,21 @@ public:
         printf("Layer: %f iterations: %d\n", nLayer, iterations);
 #endif
         //Iterative bilateral filtering
-        ImageRAW *imgOut = fltIt->ProcessP(Single(imgIn), imgIn_flt);
+        Image *imgOut = fltIt->ProcessP(Single(imgIn), imgIn_flt);
 
         //imgOut->Write("filtered.pfm");
         return imgOut;
     }
 
-    ImageRAW *SegmentationSuperPixels(ImageRAW *imgIn, int nSuperPixels = 4096)
+    Image *SegmentationSuperPixels(Image *imgIn, int nSuperPixels = 4096)
     {
         Slic sp;
         sp.Process(imgIn, nSuperPixels);
-        ImageRAW *imgOut = sp.getMeanImage(NULL);
+        Image *imgOut = sp.getMeanImage(NULL);
         return imgOut;
     }
 
-    ImageRAW *Compute(ImageRAW *imgIn, ImageRAW *imgOut)
+    Image *Compute(Image *imgIn, Image *imgOut)
     {
         if(imgIn == NULL) {
             return NULL;
@@ -129,7 +129,7 @@ public:
         }
 
         if(imgOut == NULL) {
-            imgOut = new ImageRAW(1, imgIn->width, imgIn->height, 1);
+            imgOut = new Image(1, imgIn->width, imgIn->height, 1);
         }
 
         //Compute luminance
@@ -139,7 +139,7 @@ public:
         maxVal = imgOut->getMaxVal()[0];
         minVal = imgOut->getMinVal()[0] + 1e-9f;
 
-        ImageRAW *imgIn_flt = SegmentationBilatearal(imgIn);
+        Image *imgIn_flt = SegmentationBilatearal(imgIn);
 
         //Thresholding
         float minShift = floorf(log10f(minVal));

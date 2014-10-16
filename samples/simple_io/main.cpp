@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an HDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/bottles.hdr");
     printf("Ok\n");
 

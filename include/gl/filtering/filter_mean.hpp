@@ -39,7 +39,7 @@ protected:
 
 protected:
     FilterGLConv1D  *filter;
-    ImageRAWGL      *weights;
+    ImageGL      *weights;
     float           *data;
     int             kernelSize;
 
@@ -102,7 +102,7 @@ public:
             delete weights;
         }
 
-        weights = new ImageRAWGL(1, kernelSize, 1, 1, data);
+        weights = new ImageGL(1, kernelSize, 1, 1, data);
         weights->generateTextureGL(false, GL_TEXTURE_2D);
     }
 
@@ -113,7 +113,7 @@ public:
      * @param kernelSize
      * @return
      */
-    static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgOut, int kernelSize)
+    static ImageGL *Execute(ImageGL *imgIn, ImageGL *imgOut, int kernelSize)
     {
         FilterGLMean filter(kernelSize);
         return filter.Process(SingleGL(imgIn), imgOut);
@@ -126,11 +126,11 @@ public:
      * @param kernelSize
      * @return
      */
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, int kernelSize)
+    static Image *Execute(std::string nameIn, std::string nameOut, int kernelSize)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-        ImageRAWGL *imgOut = Execute(&imgIn, NULL, kernelSize);
+        ImageGL *imgOut = Execute(&imgIn, NULL, kernelSize);
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
         return imgOut;

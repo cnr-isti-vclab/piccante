@@ -26,13 +26,13 @@ See the GNU Lesser General Public License
 #define PIC_METRICS_MSE_HPP
 
 #include <math.h>
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "metrics/base.hpp"
 
 namespace pic {
 
 /**MSE: mean squared error*/
-double MSE(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences=false)
+double MSE(Image *ori, Image *cmp, bool bLargeDifferences=false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -66,7 +66,7 @@ double MSE(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences=false)
 }
 
 /** MSE: single exposure MSE at 8-bit*/
-double MSE(ImageRAW *ori, ImageRAW *cmp, float gamma, float fstop)
+double MSE(Image *ori, Image *cmp, float gamma, float fstop)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -100,7 +100,7 @@ double MSE(ImageRAW *ori, ImageRAW *cmp, float gamma, float fstop)
 }
 
 /** RMSE: root mean squared error*/
-double RMSE(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
+double RMSE(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     return sqrt(MSE(ori, cmp, bLargeDifferences));
 }

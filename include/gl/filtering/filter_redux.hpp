@@ -55,7 +55,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief CreateMean
@@ -137,7 +137,7 @@ public:
      * @return
      */
     static void CreateData(int width, int height, int channels,
-                           ImageRAWGLVec &stack, int minSize = 2)
+                           ImageGLVec &stack, int minSize = 2)
     {
         int checkSize = EvenOdd(MIN(width, height));
 
@@ -147,7 +147,7 @@ public:
             width  = EvenOdd(width);
             height = EvenOdd(height);
 
-            ImageRAWGL *tmpImg = new ImageRAWGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
+            ImageGL *tmpImg = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
             stack.push_back(tmpImg);
 
             checkSize = MIN(width, height);
@@ -160,9 +160,9 @@ public:
      * @param stack
      * @return
      */
-    ImageRAWGL *Redux(ImageRAWGL *imgIn, ImageRAWGLVec &stack)
+    ImageGL *Redux(ImageGL *imgIn, ImageGLVec &stack)
     {
-        ImageRAWGL *imageFlt = imgIn;
+        ImageGL *imageFlt = imgIn;
 
         for(unsigned int i = 0; i < stack.size(); i++) {
             Process(SingleGL(imageFlt), stack[i]);
@@ -226,7 +226,7 @@ void FilterGLRedux::InitShaders()
     glw::bind_program(0);
 }
 
-ImageRAWGL *FilterGLRedux::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLRedux::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return NULL;
@@ -241,7 +241,7 @@ ImageRAWGL *FilterGLRedux::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int f = imgIn[0]->frames;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(f, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(imgOut->width < 1 || imgOut->height < 1) {

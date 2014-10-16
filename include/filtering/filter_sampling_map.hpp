@@ -62,13 +62,13 @@ public:
     }
 
     //Filtering
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, float sigma,
+    static Image *Execute(std::string nameIn, std::string nameOut, float sigma,
                              float scale)
     {
-        ImageRAW imgIn(nameIn);
+        Image imgIn(nameIn);
 
         FilterSamplingMap filter(sigma, scale);
-        ImageRAW *imgOut = filter.Process(Single(&imgIn), NULL);
+        Image *imgOut = filter.Process(Single(&imgIn), NULL);
 
         imgOut->Write(nameOut);
         return imgOut;

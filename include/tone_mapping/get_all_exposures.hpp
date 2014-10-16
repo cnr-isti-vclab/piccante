@@ -25,16 +25,16 @@ See the GNU Lesser General Public License
 #ifndef PIC_GET_ALL_EXPOSURES_HPP
 #define PIC_GET_ALL_EXPOSURES_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "histogram.hpp"
 #include "filtering/filter_luminance.hpp"
 
 namespace pic {
 
 //This function converts an HDR image into a stack of LDR images
-ImageRAWVec getAllExposures(ImageRAW *imgIn)
+ImageVec getAllExposures(Image *imgIn)
 {
-    ImageRAWVec ret;
+    ImageVec ret;
 
     if(imgIn == NULL) {
         return ret;
@@ -44,18 +44,18 @@ ImageRAWVec getAllExposures(ImageRAW *imgIn)
         return ret;
     }
         
-    ImageRAW *lum = FilterLuminance::Execute(imgIn, NULL);
+    Image *lum = FilterLuminance::Execute(imgIn, NULL);
     Histogram m(lum, VS_LOG_2, 1024);
 
     std::vector< float > exposures = m.ExposureCovering();
 
     FilterSimpleTMO flt(1.0f, 0.0f);
 
-    ImageRAWVec input = Single(imgIn);
+    ImageVec input = Single(imgIn);
 
     for(unsigned int i = 0; i < exposures.size(); i++) {
         flt.Update(2.2f, exposures[i]);
-        ImageRAW *expo = flt.ProcessP(input, NULL);
+        Image *expo = flt.ProcessP(input, NULL);
 
         ret.push_back(expo);
     }

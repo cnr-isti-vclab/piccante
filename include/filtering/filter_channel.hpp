@@ -42,7 +42,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int tmpChannel;
         tmpChannel = MAX(channel, 0);
@@ -67,10 +67,10 @@ protected:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut == NULL) {
-            imgOut = new ImageRAW(imgIn[0]->frames, imgIn[0]->width, imgIn[0]->height, 1);
+            imgOut = new Image(imgIn[0]->frames, imgIn[0]->width, imgIn[0]->height, 1);
         }
 
         return imgOut;
@@ -105,7 +105,7 @@ public:
      * @param channel
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, int channel = 0)
+    static Image *Execute(Image *imgIn, Image *imgOut, int channel = 0)
     {
         FilterChannel fltCh(channel);
         return fltCh.ProcessP(Single(imgIn), imgOut);
@@ -116,17 +116,17 @@ public:
      */
     static void Test()
     {
-        ImageRAW imgIn(1, 512, 512, 3);
+        Image imgIn(1, 512, 512, 3);
         imgIn.Assign(1.0f);
 
         FilterChannel filter(0);
-        ImageRAW *outR = filter.Process(Single(&imgIn), NULL);
+        Image *outR = filter.Process(Single(&imgIn), NULL);
 
         filter.setChannel(1);
-        ImageRAW *outG = filter.Process(Single(&imgIn), NULL);
+        Image *outG = filter.Process(Single(&imgIn), NULL);
 
         filter.setChannel(2);
-        ImageRAW *outB = filter.Process(Single(&imgIn), NULL);
+        Image *outB = filter.Process(Single(&imgIn), NULL);
 
         outR->Write("channel_R.pfm");
         outG->Write("channel_G.pfm");

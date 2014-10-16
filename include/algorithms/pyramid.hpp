@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_ALGORITHMS_PYRAMID_HPP
 #define PIC_ALGORITHMS_PYRAMID_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_gaussian_2d.hpp"
 #include "filtering/filter_sampler_2d.hpp"
 #include "filtering/filter_sampler_2dsub.hpp"
@@ -42,12 +42,12 @@ protected:
     bool    lapGauss;
     int     limitLevel;
 
-    std::vector<ImageRAW *> trackerRec, trackerUp;
+    std::vector<Image *> trackerRec, trackerUp;
 
-    void Create(ImageRAW *img, bool lapGauss, int limitLevel);
+    void Create(Image *img, bool lapGauss, int limitLevel);
 
 public:
-    std::vector<ImageRAW *>  stack;
+    std::vector<Image *>  stack;
 
     /**
      * @brief Pyramid
@@ -55,7 +55,7 @@ public:
      * @param lapGauss
      * @param limitLevel
      */
-    Pyramid(ImageRAW *img, bool lapGauss, int limitLevel);
+    Pyramid(Image *img, bool lapGauss, int limitLevel);
 
     /**
      * @brief Pyramid
@@ -82,7 +82,7 @@ public:
      * @brief Update recomputes the pyramid given a compatible image, img.
      * @param img
      */
-    void Update(ImageRAW *img);
+    void Update(Image *img);
 
     /**
      * @brief Mul is the mul operator ( *= ) between pyramids.
@@ -108,7 +108,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAW *Reconstruct(ImageRAW *imgOut);
+    Image *Reconstruct(Image *imgOut);
 
     /**
      * @brief size
@@ -124,13 +124,13 @@ public:
      * @param index
      * @return
      */
-    ImageRAW *get(int index)
+    Image *get(int index)
     {
         return stack[index % stack.size()];
     }
 };
 
-Pyramid::Pyramid(ImageRAW *img, bool lapGauss, int limitLevel = 0)
+Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 0)
 {
     Create(img, lapGauss, limitLevel);
 }
@@ -138,7 +138,7 @@ Pyramid::Pyramid(ImageRAW *img, bool lapGauss, int limitLevel = 0)
 
 Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, int limitLevel = 0)
 {
-    ImageRAW *tmpImg = new ImageRAW(1, width, height, channels);
+    Image *tmpImg = new Image(1, width, height, channels);
     tmpImg->SetZero();
 
     Create(tmpImg, lapGauss, limitLevel);
@@ -159,7 +159,7 @@ Pyramid::~Pyramid()
     }
 }
 
-void Pyramid::Create(ImageRAW *img, bool lapGauss, int limitLevel = 0)
+void Pyramid::Create(Image *img, bool lapGauss, int limitLevel = 0)
 {
     this->lapGauss  = lapGauss;
     this->limitLevel = limitLevel;
@@ -168,19 +168,19 @@ void Pyramid::Create(ImageRAW *img, bool lapGauss, int limitLevel = 0)
     FilterSampler2D		fltS(0.5f);
     FilterSampler2DSub	fSub;
 
-    ImageRAW *tmpImg = img;
+    Image *tmpImg = img;
 
     int levels = MAX(log2(MIN(img->width, img->height)) - limitLevel, 1);
 
-    ImageRAW *tmpG = NULL;
-    ImageRAW *tmpD = NULL;
+    Image *tmpG = NULL;
+    Image *tmpD = NULL;
 
     for(int i = 0; i < levels; i++) {
         tmpG = fltG.ProcessP(Single(tmpImg), NULL);
         tmpD = fltS.ProcessP(Single(tmpG), NULL);
 
         if(lapGauss) {	//Laplacian Pyramid
-            ImageRAW *tmpDiff = fSub.ProcessP(Double(tmpImg, tmpD), tmpG);
+            Image *tmpDiff = fSub.ProcessP(Double(tmpImg, tmpD), tmpG);
             stack.push_back(tmpDiff);
         } else {			//Gaussian Pyramid
             tmpG->Assign(tmpImg);
@@ -203,7 +203,7 @@ void Pyramid::Create(ImageRAW *img, bool lapGauss, int limitLevel = 0)
 #endif
 }
 
-ImageRAW *Pyramid::Reconstruct(ImageRAW *imgOut)
+Image *Pyramid::Reconstruct(Image *imgOut)
 {
     if(stack.size() < 2) {
         return imgOut;
@@ -215,11 +215,11 @@ ImageRAW *Pyramid::Reconstruct(ImageRAW *imgOut)
 
     FilterSampler2DAdd fltAdd;
     int n = stack.size() - 1;
-    ImageRAW *tmp = stack[n];
+    Image *tmp = stack[n];
 
     if(trackerRec.empty()) {
         for(int i = n; i >= 2; i--) {
-            ImageRAW *tmp2 = fltAdd.ProcessP(Double(stack[i - 1], tmp), NULL);
+            Image *tmp2 = fltAdd.ProcessP(Double(stack[i - 1], tmp), NULL);
             trackerRec.push_back(tmp2);
             tmp = tmp2;
         }
@@ -237,7 +237,7 @@ ImageRAW *Pyramid::Reconstruct(ImageRAW *imgOut)
     return imgOut;
 }
 
-void Pyramid::Update(ImageRAW *img)
+void Pyramid::Update(Image *img)
 {
     //TODO: check if the image and the pyramid are compatible
     if(img == NULL) {
@@ -252,7 +252,7 @@ void Pyramid::Update(ImageRAW *img)
     FilterSampler2D		fltS(0.5f);
     FilterSampler2DSub	fSub;
 
-    ImageRAW *tmpImg = img;
+    Image *tmpImg = img;
 
     unsigned int levels = MAX(log2(MIN(img->width, img->height)) - limitLevel, 1);
 

@@ -26,19 +26,19 @@ See the GNU Lesser General Public License
 #define PIC_TONE_MAPPING_HISTOGRAM_TMO_HPP
 
 #include <vector>
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_luminance.hpp"
 
 namespace pic {
 
-inline ImageRAW *HistogramTMO(ImageRAW *imgOut, ImageRAW *imgIn)
+inline Image *HistogramTMO(Image *imgOut, Image *imgIn)
 {
     if(imgOut == NULL) {
         imgOut = imgIn->Clone();
     }
 
-    ImageRAW *lum    = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
-    ImageRAW *lumOld = lum->Clone();
+    Image *lum    = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
+    Image *lumOld = lum->Clone();
     lum->sort();
 
     int size = lum->width * lum->height * lum->frames;

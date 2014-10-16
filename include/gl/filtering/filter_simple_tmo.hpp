@@ -69,16 +69,16 @@ public:
      * @param fstop
      * @return
      */
-    ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float gamma,
+    ImageGL *Execute(std::string nameIn, std::string nameOut, float gamma,
                         float fstop)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLSimpleTMO filter(gamma, fstop);
 
         GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 4,
+        ImageGL *imgOut = new ImageGL(1, imgIn.width, imgIn.height, 4,
                                             IMG_GPU_CPU, GL_TEXTURE_2D);
 
         int n = 100;

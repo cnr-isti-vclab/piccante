@@ -32,7 +32,7 @@ See the GNU Lesser General Public License
 #include "util/mask.hpp"
 #include "util/cached_table.hpp"
 #include "util/compability.hpp"
-#include "util/convert_raw_to_images.hpp"
+//#include "util/convert_raw_to_images.hpp"
 #include "util/file_lister.hpp"
 
 #ifndef PIC_DISABLE_OPENGL

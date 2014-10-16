@@ -25,7 +25,7 @@ See the GNU Lesser General Public License
 #ifndef PIC_ALGORITHMS_SUPERPIXELS_SLIC_HPP
 #define PIC_ALGORITHMS_SUPERPIXELS_SLIC_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_laplacian.hpp"
 
 namespace pic {
@@ -40,7 +40,7 @@ class Slic
 protected:
 
     int				nSuperPixels;
-    ImageRAW		*labels_distance;
+    Image		*labels_distance;
     SlicoCenter		*centers;
     unsigned int	*prevX, *prevY, *counter;
     float			*col_values, *mPixel;
@@ -65,7 +65,7 @@ protected:
         return tx * tx + ty * ty;
     }
 
-    bool Pass(ImageRAW *img, int S)
+    bool Pass(Image *img, int S)
     {
         float Sf = float(S);
         float Sf2 = Sf * Sf;
@@ -235,7 +235,7 @@ public:
         mPixel = NULL;
     }
 
-    Slic(ImageRAW *img, int nSuperPixels = 64)
+    Slic(Image *img, int nSuperPixels = 64)
     {
         labels_distance = NULL;
         centers = NULL;
@@ -253,7 +253,7 @@ public:
         Destroy();
     }
     
-    void Process(ImageRAW *img, int nSuperPixels = 64)
+    void Process(Image *img, int nSuperPixels = 64)
     {
         if(img == NULL) {
             return;
@@ -266,7 +266,7 @@ public:
             return;
         }
 
-        labels_distance = new ImageRAW(1, img->width, img->height, 3);
+        labels_distance = new Image(1, img->width, img->height, 3);
 
         for(int i = 0; i < labels_distance->size(); i += labels_distance->channels) {
             labels_distance->data[i    ] = -1.0f;
@@ -279,7 +279,7 @@ public:
         channels = img->channels;
 
         FilterLaplacian lap;
-        ImageRAW *lap_img = lap.ProcessP(Single(img), NULL);
+        Image *lap_img = lap.ProcessP(Single(img), NULL);
 
         nSuperPixels = (img->width / S) * (img->height / S);
 
@@ -377,10 +377,10 @@ public:
         return out;
     }
 
-    ImageRAW *getMeanImage(ImageRAW *imgOut)
+    Image *getMeanImage(Image *imgOut)
     {
         if(imgOut == NULL) {
-            imgOut = new ImageRAW(1, width, height, channels);
+            imgOut = new Image(1, width, height, channels);
         }
 
         for(int i = 0; i < height; i++) {

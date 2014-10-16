@@ -55,7 +55,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief Execute
@@ -64,13 +64,13 @@ public:
      * @param scale
      * @return
      */
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float scale)
+    static ImageGL *Execute(std::string nameIn, std::string nameOut, float scale)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLSampler2D filter(scale);
-        ImageRAWGL *imgOut = new ImageRAWGL(    imgIn.frames,
+        ImageGL *imgOut = new ImageGL(    imgIn.frames,
                                                 int(imgIn.widthf  * scale),
                                                 int(imgIn.heightf * scale),
                                                 imgIn.channels, IMG_GPU_CPU, GL_TEXTURE_2D);
@@ -127,7 +127,7 @@ void FilterGLSampler2D::InitShaders()
     glw::bind_program(0);
 }
 
-ImageRAWGL *FilterGLSampler2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLSampler2D::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return NULL;
@@ -142,7 +142,7 @@ ImageRAWGL *FilterGLSampler2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int f = imgIn[0]->frames;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(f, w, h, 4, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(f, w, h, 4, IMG_GPU, imgIn[0]->getTarget());
     }
 
     //Fbo

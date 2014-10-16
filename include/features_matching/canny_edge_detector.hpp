@@ -27,7 +27,7 @@ See the GNU Lesser General Public License
 
 #include "util/vec.hpp"
 
-#include "image_raw.hpp"
+#include "image.hpp"
 
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_gaussian_2d.hpp"
@@ -39,7 +39,7 @@ class CannyEdgeDetector
 {
 protected:
     bool     bLum;
-    ImageRAW *lum;
+    Image *lum;
 
     float    sigma, threshold_1, threshold_2;
 
@@ -95,7 +95,7 @@ public:
         }
     }
 
-    ImageRAW *Compute(ImageRAW *img, ImageRAW *imgEdges)
+    Image *Compute(Image *img, Image *imgEdges)
     {
         if(img == NULL) {
             return imgEdges;
@@ -111,10 +111,10 @@ public:
 
         //Filtering the image
         FilterGaussian2D flt(sigma);
-        ImageRAW *lum_flt = flt.ProcessP(Single(lum), NULL);
+        Image *lum_flt = flt.ProcessP(Single(lum), NULL);
 
         FilterGradient fltGrad(0, G_SOBEL);
-        ImageRAW *grad = fltGrad.ProcessP(Single(lum_flt), NULL);
+        Image *grad = fltGrad.ProcessP(Single(lum_flt), NULL);
 
         //non-maximum suppression
         if(imgEdges == NULL) {

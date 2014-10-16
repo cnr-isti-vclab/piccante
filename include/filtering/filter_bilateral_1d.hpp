@@ -36,7 +36,7 @@ protected:
     int					dirs[3];
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     float sigma_s, sigma_r;
@@ -111,14 +111,14 @@ void FilterBilateral1D::ChangePass(int pass, int tPass)
 }
 
 //Process in a box
-void FilterBilateral1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterBilateral1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 
     float inv_sigma_r2 = 1.0f / (2.0f * sigma_r * sigma_r);
 
     //Filtering
-    ImageRAW *edge, *base;
+    Image *edge, *base;
 
     if(src.size() == 2) {
         //Joint/Cross Bilateral Filtering

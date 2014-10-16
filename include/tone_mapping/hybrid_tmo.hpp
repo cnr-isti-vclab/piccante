@@ -41,7 +41,7 @@ protected:
     Pyramid				*pyrA, *pyrB, *pyrWeight;
     float				Ld_Max, b;
 
-    ImageRAW			*imgDrago, *imgReinhard, *seg_map;
+    Image			*imgDrago, *imgReinhard, *seg_map;
 
 public:
     HybridTMO()
@@ -63,7 +63,7 @@ public:
         alpha1		= 1.0f / (2.0f * sqrtf(2.0f));	//sigma_s
     }
 
-    ImageRAW *Compute(ImageRAW *imgIn, ImageRAW *imgOut)
+    Image *Compute(Image *imgIn, Image *imgOut)
     {
         if(imgIn == NULL) {
             return NULL;
@@ -74,7 +74,7 @@ public:
         }
 
         if(imgOut == NULL) {
-            imgOut = new ImageRAW(1, imgIn->width, imgIn->height, imgIn->channels);
+            imgOut = new Image(1, imgIn->width, imgIn->height, imgIn->channels);
         }
 
         //Compute segmentation map

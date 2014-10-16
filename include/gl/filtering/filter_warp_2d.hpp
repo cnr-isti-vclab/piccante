@@ -72,7 +72,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
 FilterGLWarp2D::FilterGLWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false) : FilterGL()
@@ -135,7 +135,7 @@ void FilterGLWarp2D::InitShaders()
     glw::bind_program(0);
 }
 
-ImageRAWGL *FilterGLWarp2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLWarp2D::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.empty()) {
         return imgOut;
@@ -152,7 +152,7 @@ ImageRAWGL *FilterGLWarp2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     if(imgOut == NULL) {
         if(!bSameSize) {
             FilterWarp2D::ComputingBoundingBox(h, imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax, bCentroid);
-            imgOut = new ImageRAWGL(1, bmax[0] - bmin[0], bmax[1] - bmin[1], channels, IMG_GPU, GL_TEXTURE_2D);
+            imgOut = new ImageGL(1, bmax[0] - bmin[0], bmax[1] - bmin[1], channels, IMG_GPU, GL_TEXTURE_2D);
         } else {
             bmin[0] = 0;
             bmin[1] = 0;
@@ -160,7 +160,7 @@ ImageRAWGL *FilterGLWarp2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
             bmax[0] = imgIn[0]->width;
             bmax[1] = imgIn[0]->height;
 
-            imgOut = new ImageRAWGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
+            imgOut = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
         }
     }
 

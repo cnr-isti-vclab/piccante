@@ -41,8 +41,8 @@ namespace pic {
  * @param imgStat
  * @return
  */
-ImageRAWGL *DragoTMOGL(ImageRAWGL *imgIn, float Ld_Max = 100.0f, float b = 0.95f,
-                     ImageRAWGL *imgOut = NULL, ImageStatisticsGL *imgStat = NULL)
+ImageGL *DragoTMOGL(ImageGL *imgIn, float Ld_Max = 100.0f, float b = 0.95f,
+                     ImageGL *imgOut = NULL, ImageStatisticsGL *imgStat = NULL)
 {
     if(imgIn == NULL) {
         return imgOut;
@@ -52,7 +52,7 @@ ImageRAWGL *DragoTMOGL(ImageRAWGL *imgIn, float Ld_Max = 100.0f, float b = 0.95f
         imgStat = new ImageStatisticsGL();
     }
 
-    ImageRAWGL *img_lum = FilterGLLuminance::Execute(imgIn, NULL);
+    ImageGL *img_lum = FilterGLLuminance::Execute(imgIn, NULL);
 
     float LMax, Lwa;
     imgStat->getMaxVal(img_lum, &LMax);

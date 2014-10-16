@@ -29,7 +29,7 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
-inline ImageRAW *EdgeEnhancement(ImageRAW *imgIn, float sigma_s = 4.0f,
+inline Image *EdgeEnhancement(Image *imgIn, float sigma_s = 4.0f,
                                  float sigma_r = 0.05f)
 {
     if(imgIn == NULL) {
@@ -44,8 +44,8 @@ inline ImageRAW *EdgeEnhancement(ImageRAW *imgIn, float sigma_s = 4.0f,
         sigma_r = 0.05f;
     }
 
-    ImageRAW *imgBase = FilterBilateral2DS::Execute(imgIn, sigma_s, sigma_r);
-    ImageRAW *detail = imgIn->Clone();
+    Image *imgBase = FilterBilateral2DS::Execute(imgIn, sigma_s, sigma_r);
+    Image *detail = imgIn->Clone();
 
     detail->Div(imgBase);
     imgBase->Assign(imgIn);

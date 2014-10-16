@@ -22,63 +22,57 @@ See the GNU Lesser General Public License
 
 */
 
-#ifndef PIC_GL_IMAGE_RAW_VEC_HPP
-#define PIC_GL_IMAGE_RAW_VEC_HPP
+#ifndef PIC_IMAGE_RAW_VEC_HPP
+#define PIC_IMAGE_RAW_VEC_HPP
 
 #include <vector>
-
-#include "gl/image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
-/**
- * @brief ImageRAWGLVec an std::vector of pic::ImageRAWGL
- */
-typedef	std::vector<ImageRAWGL *> ImageRAWGLVec;
+//An dynamic array of Image*
+typedef	std::vector<Image *> ImageVec;
 
-/**
- * @brief SingleGL creates a single for filters input.
- * @param img
- * @return
- */
-ImageRAWGLVec SingleGL(ImageRAWGL *img)
+/**Single: creates a single for filters input*/
+PIC_INLINE ImageVec Single(Image *img)
 {
-    ImageRAWGLVec ret;
+    ImageVec ret;
     ret.push_back(img);
     return ret;
 }
 
-/**
- * @brief DoubleGL creates a couple for filters input.
- * @param img1
- * @param img2
- * @return
- */
-ImageRAWGLVec DoubleGL(ImageRAWGL *img1, ImageRAWGL *img2)
+/**Double: creates a couple input for filters input*/
+PIC_INLINE ImageVec Double(Image *img1, Image *img2)
 {
-    ImageRAWGLVec ret;
+    ImageVec ret;
     ret.push_back(img1);
     ret.push_back(img2);
     return ret;
 }
 
-/**
- * @brief TripleGL creates a triple for filters input.
- * @param img1
- * @param img2
- * @param img3
- * @return
- */
-ImageRAWGLVec TripleGL(ImageRAWGL *img1, ImageRAWGL *img2, ImageRAWGL *img3)
+/**Triple: creates a triple for filters input*/
+PIC_INLINE ImageVec Triple(Image *img1, Image *img2, Image *img3)
 {
-    ImageRAWGLVec ret;
+    ImageVec ret;
     ret.push_back(img1);
     ret.push_back(img2);
     ret.push_back(img3);
     return ret;
 }
 
+/**Quad: creates a quaduple for filters input*/
+PIC_INLINE ImageVec Quad(Image *img1, Image *img2, Image *img3,
+                            Image *img4)
+{
+    ImageVec ret;
+    ret.push_back(img1);
+    ret.push_back(img2);
+    ret.push_back(img3);
+    ret.push_back(img4);
+    return ret;
+}
+
 } // end namespace pic
 
-#endif /* PIC_GL_IMAGE_RAW_VEC_HPP */
+#endif /* PIC_IMAGE_RAW_VEC_HPP */
 

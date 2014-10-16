@@ -38,7 +38,7 @@ namespace pic {
  * @param alpha
  * @return
  */
-ImageRAW *LischinskiTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL,
+Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL,
                         float alpha = 0.5f)
 {
     if(imgIn == NULL) {
@@ -55,9 +55,9 @@ ImageRAW *LischinskiTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL,
 
     //extract luminance
     FilterLuminance fltLum;
-    ImageRAW *lum = fltLum.ProcessP(Single(imgIn), NULL);
+    Image *lum = fltLum.ProcessP(Single(imgIn), NULL);
 
-    ImageRAW *lum_log = lum->Clone();
+    Image *lum_log = lum->Clone();
     lum_log->ApplyFunction(log2f);
 
     float maxL = lum->getMaxVal()[0];
@@ -116,7 +116,7 @@ ImageRAW *LischinskiTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL,
     }
 
     //Create fstop maps
-    ImageRAW *fstopMap = lum->AllocateSimilarOne();
+    Image *fstopMap = lum->AllocateSimilarOne();
 
     for(int i = 0; i < lum->height; i++) {
         for(int j = 0; j < lum->width; j++) {
@@ -130,7 +130,7 @@ ImageRAW *LischinskiTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL,
     }
 
     //Lischinski minimization
-    ImageRAW *tmp = lum->AllocateSimilarOne();
+    Image *tmp = lum->AllocateSimilarOne();
     tmp->Assign(0.007f);
     fstopMap = LischinskiMinimization(lum_log, fstopMap, tmp);
 

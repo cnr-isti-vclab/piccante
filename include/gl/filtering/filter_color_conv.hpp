@@ -57,7 +57,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
 };
 
@@ -80,7 +80,7 @@ void FilterGLColorConv::setTransform(bool direct)
     color_conv->setUniforms();
 }
 
-ImageRAWGL *FilterGLColorConv::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLColorConv::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.empty()) {
         return imgOut;
@@ -101,7 +101,7 @@ ImageRAWGL *FilterGLColorConv::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, 3, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(1, w, h, 3, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

@@ -22,57 +22,63 @@ See the GNU Lesser General Public License
 
 */
 
-#ifndef PIC_IMAGE_RAW_VEC_HPP
-#define PIC_IMAGE_RAW_VEC_HPP
+#ifndef PIC_GL_IMAGE_RAW_VEC_HPP
+#define PIC_GL_IMAGE_RAW_VEC_HPP
 
 #include <vector>
-#include "image_raw.hpp"
+
+#include "gl/image.hpp"
 
 namespace pic {
 
-//An dynamic array of ImageRAW*
-typedef	std::vector<ImageRAW *> ImageRAWVec;
+/**
+ * @brief ImageGLVec an std::vector of pic::ImageGL
+ */
+typedef	std::vector<ImageGL *> ImageGLVec;
 
-/**Single: creates a single for filters input*/
-PIC_INLINE ImageRAWVec Single(ImageRAW *img)
+/**
+ * @brief SingleGL creates a single for filters input.
+ * @param img
+ * @return
+ */
+ImageGLVec SingleGL(ImageGL *img)
 {
-    ImageRAWVec ret;
+    ImageGLVec ret;
     ret.push_back(img);
     return ret;
 }
 
-/**Double: creates a couple input for filters input*/
-PIC_INLINE ImageRAWVec Double(ImageRAW *img1, ImageRAW *img2)
+/**
+ * @brief DoubleGL creates a couple for filters input.
+ * @param img1
+ * @param img2
+ * @return
+ */
+ImageGLVec DoubleGL(ImageGL *img1, ImageGL *img2)
 {
-    ImageRAWVec ret;
+    ImageGLVec ret;
     ret.push_back(img1);
     ret.push_back(img2);
     return ret;
 }
 
-/**Triple: creates a triple for filters input*/
-PIC_INLINE ImageRAWVec Triple(ImageRAW *img1, ImageRAW *img2, ImageRAW *img3)
+/**
+ * @brief TripleGL creates a triple for filters input.
+ * @param img1
+ * @param img2
+ * @param img3
+ * @return
+ */
+ImageGLVec TripleGL(ImageGL *img1, ImageGL *img2, ImageGL *img3)
 {
-    ImageRAWVec ret;
+    ImageGLVec ret;
     ret.push_back(img1);
     ret.push_back(img2);
     ret.push_back(img3);
-    return ret;
-}
-
-/**Quad: creates a quaduple for filters input*/
-PIC_INLINE ImageRAWVec Quad(ImageRAW *img1, ImageRAW *img2, ImageRAW *img3,
-                            ImageRAW *img4)
-{
-    ImageRAWVec ret;
-    ret.push_back(img1);
-    ret.push_back(img2);
-    ret.push_back(img3);
-    ret.push_back(img4);
     return ret;
 }
 
 } // end namespace pic
 
-#endif /* PIC_IMAGE_RAW_VEC_HPP */
+#endif /* PIC_GL_IMAGE_RAW_VEC_HPP */
 

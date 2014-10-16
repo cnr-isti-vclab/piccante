@@ -27,7 +27,7 @@ See the GNU Lesser General Public License
 
 #include <vector>
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "image_samplers/image_sampler_bilinear.hpp"
 #include "filtering/filter_downsampler_2D.hpp"
 #include "filtering/filter_luminance.hpp"
@@ -49,7 +49,7 @@ protected:
     float tolerance, percentile;
 
 public:
-    ImageRAWVec             img1_v, img2_v, luminance;
+    ImageVec             img1_v, img2_v, luminance;
     std::vector< bool* >    tb1_v, tb2_v, eb2_shifted_v, tb2_shifted_v;
 
     /**
@@ -116,7 +116,7 @@ public:
      * @param L
      * @return
      */
-    bool *MTB(ImageRAW *img, ImageRAW *L)
+    bool *MTB(Image *img, Image *L)
     {
         bool bDelete = (L == NULL);
 
@@ -156,7 +156,7 @@ public:
      * @param shift_bits
      * @return
      */
-    Eigen::Vector2i GetExpShift(ImageRAW *img1, ImageRAW *img2,
+    Eigen::Vector2i GetExpShift(Image *img1, Image *img2,
                                    int shift_bits = 6)
     {
         if(img1 == NULL || img2 == NULL) {
@@ -167,7 +167,7 @@ public:
             return Eigen::Vector2i(0, 0);
         }
 
-        ImageRAW *L1, *L2;
+        Image *L1, *L2;
 
         if(img1->channels == 1) {
             L1 = img1;
@@ -193,8 +193,8 @@ public:
         cur_shift = Eigen::Vector2i(0, 0);
         ret_shift = Eigen::Vector2i(0, 0);
 
-        ImageRAW *sml_img1 = NULL;
-        ImageRAW *sml_img2 = NULL;
+        Image *sml_img1 = NULL;
+        Image *sml_img2 = NULL;
 
         while(shift_bits > 0) {
             float scale = powf(2.0f, float(-shift_bits));
@@ -274,7 +274,7 @@ public:
      * @param shift
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgTarget, ImageRAW *imgSource, Eigen::Vector2i &shift)
+    static Image *Execute(Image *imgTarget, Image *imgSource, Eigen::Vector2i &shift)
     {
         WardAlignment wa;
 
@@ -286,7 +286,7 @@ public:
             return NULL;
         }
 
-        ImageRAW *ret = imgTarget->AllocateSimilarOne();
+        Image *ret = imgTarget->AllocateSimilarOne();
         ret->SetZero();
 
         shift = wa.GetExpShift(imgTarget, imgSource);

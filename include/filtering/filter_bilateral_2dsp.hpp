@@ -61,18 +61,18 @@ public:
         return GenBilString("SP", bilateralFilter->sigma_s, bilateralFilter->sigma_r);
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float sigma_s,
+    static Image *Execute(Image *imgIn, Image *imgOut, float sigma_s,
                              float sigma_r)
     {
         FilterBilateral2DSP filter(sigma_s, sigma_r);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, float sigma_s,
+    static Image *Execute(std::string nameIn, std::string nameOut, float sigma_s,
                              float sigma_r)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, sigma_s, sigma_r);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL, sigma_s, sigma_r);
         imgOut->Write(nameOut);
         return imgOut;
     }

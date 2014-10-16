@@ -48,7 +48,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         for(int i = box->y0; i < box->y1; i++) {
             float y = float(i) / dst->heightf;
@@ -71,10 +71,10 @@ protected:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut == NULL) {
-            imgOut = new ImageRAW(1, imgIn[0]->width << 1, imgIn[0]->height << 1, imgIn[0]->channels);
+            imgOut = new Image(1, imgIn[0]->width << 1, imgIn[0]->height << 1, imgIn[0]->channels);
         }
 
         return imgOut;
@@ -127,7 +127,7 @@ public:
      * @param type
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut)
+    static Image *Execute(Image *imgIn, Image *imgOut)
     {
         FilterUpPP flt(NULL, 1e-6f);
         return flt.ProcessP(Single(imgIn), imgOut);
@@ -139,10 +139,10 @@ public:
      * @param fileOutput
      * @return
      */
-    static ImageRAW *Execute(std::string fileInput, std::string fileOutput)
+    static Image *Execute(std::string fileInput, std::string fileOutput)
     {
-        ImageRAW imgIn(fileInput);
-        ImageRAW *out = FilterUpPP::Execute(&imgIn, NULL);
+        Image imgIn(fileInput);
+        Image *out = FilterUpPP::Execute(&imgIn, NULL);
         out->Write(fileOutput);
         return out;
     }

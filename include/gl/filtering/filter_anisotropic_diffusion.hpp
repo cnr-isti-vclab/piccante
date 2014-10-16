@@ -49,10 +49,10 @@ public:
     void Update(float k);
 
     //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     //Anisotropic Diffusion
-    ImageRAWGL *AnisotropicDiffusion(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+    ImageGL *AnisotropicDiffusion(ImageGLVec imgIn, ImageGL *imgOut)
     {
         if(flt == NULL) {
             flt = new FilterGLIterative(this, iterations);
@@ -181,8 +181,8 @@ void FilterGLAnisotropicDiffusion::Update(float k)
 }
 
 //Processing
-ImageRAWGL *FilterGLAnisotropicDiffusion::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLAnisotropicDiffusion::Process(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -192,7 +192,7 @@ ImageRAWGL *FilterGLAnisotropicDiffusion::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

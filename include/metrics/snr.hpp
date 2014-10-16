@@ -25,11 +25,11 @@ See the GNU Lesser General Public License
 #ifndef PIC_METRICS_SNR_HPP
 #define PIC_METRICS_SNR_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
-float SNR(ImageRAW *ori, ImageRAW *cmp, BBox *box)
+float SNR(Image *ori, Image *cmp, BBox *box)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0f;

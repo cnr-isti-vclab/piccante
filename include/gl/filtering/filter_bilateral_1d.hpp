@@ -69,19 +69,19 @@ public:
      * @param sigma_r
      * @return
      */
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut,
+    static ImageGL *Execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r)
     {
         GLuint testTQ = glBeginTimeQuery();
         glEndTimeQuery(testTQ);
 
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLBilateral1D filter(sigma_s, sigma_r, true, GL_TEXTURE_2D);
 
         GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgOut = filter.Process(SingleGL(&imgIn), NULL);
+        ImageGL *imgOut = filter.Process(SingleGL(&imgIn), NULL);
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
         printf("Gaussian 1D Filter on GPU time: %g ms\n",
                double(timeVal) / 100000000.0);

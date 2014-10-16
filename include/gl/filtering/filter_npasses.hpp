@@ -32,7 +32,7 @@ namespace pic {
 class FilterGLNPasses: public FilterGL
 {
 protected:
-    ImageRAWGL *imgTmp[2];
+    ImageGL *imgTmp[2];
 
     void InitShaders() {}
     void FragmentShader() {}
@@ -41,7 +41,7 @@ public:
     //Basic constructors
     FilterGLNPasses();
 
-    virtual ImageRAWGL *SetupAuxN(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    virtual ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
     void InsertFilter(FilterGL *flt);
 
@@ -51,7 +51,7 @@ public:
     }
 
     //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
 //Basic constructor
@@ -80,7 +80,7 @@ void FilterGLNPasses::InsertFilter(FilterGL *flt)
     }
 }
 
-ImageRAWGL *FilterGLNPasses::SetupAuxN(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLNPasses::SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->AllocateSimilarOneGL();
@@ -113,7 +113,7 @@ ImageRAWGL *FilterGLNPasses::SetupAuxN(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 }
 
 //Processing
-ImageRAWGL *FilterGLNPasses::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLNPasses::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.size() < 1 || imgIn[0] == NULL) {
         return imgOut;

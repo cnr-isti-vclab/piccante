@@ -87,7 +87,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
 FilterGLScatter::FilterGLScatter(float s_S, float s_R, int width, int height)
@@ -252,7 +252,7 @@ void FilterGLScatter::Update(float s_S, float s_R)
     glw::bind_program(0);
 }
 
-ImageRAWGL *FilterGLScatter::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLScatter::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.size() < 1 && imgIn[0] == NULL) {
         return imgOut;
@@ -264,7 +264,7 @@ ImageRAWGL *FilterGLScatter::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     range =  int(ceilf(s_R));
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(range + 1, width + 1, height + 1,
+        imgOut = new ImageGL(range + 1, width + 1, height + 1,
                                 imgIn[0]->channels + 1, IMG_GPU, GL_TEXTURE_3D);
     }
 

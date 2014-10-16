@@ -43,13 +43,13 @@ protected:
     FilterGLIterative		*fltIt;
     FilterGLBilateral2DS	*fltBil;
     FilterGLOp				*fltSeg;
-    ImageRAWGL				*L, *imgIn_flt;
+    ImageGL				*L, *imgIn_flt;
 
     float					perCent, nLayer;
     int						iterations;
 
 public:
-    ImageRAWGLVec			stack;
+    ImageGLVec			stack;
     float					minVal, maxVal;
 
     SegmentationGL()
@@ -91,7 +91,7 @@ public:
         delete fltNuked;
     }
 
-    void ComputeStatistics(ImageRAW *imgIn)
+    void ComputeStatistics(Image *imgIn)
     {
         float nLevels, area;
 
@@ -101,7 +101,7 @@ public:
         iterations	= MAX(int(sqrtf(area)) / 8, 1);
     }
 
-    ImageRAWGL *Compute(ImageRAWGL *imgIn, ImageRAWGL *imgOut)
+    ImageGL *Compute(ImageGL *imgIn, ImageGL *imgOut)
     {
         if(imgIn == NULL) {
             return NULL;
@@ -112,7 +112,7 @@ public:
         }
 
         if(imgOut == NULL) {
-            imgOut = new ImageRAWGL(1, imgIn->width, imgIn->height, 1, IMG_GPU, GL_TEXTURE_2D);
+            imgOut = new ImageGL(1, imgIn->width, imgIn->height, 1, IMG_GPU, GL_TEXTURE_2D);
         }
 
         //Compute luminance
@@ -123,12 +123,12 @@ public:
             FilterGLRedux::CreateData(L->width, L->height, L->channels, stack, 1);
         }
 
-        ImageRAWGL *min_val = min->Redux(L, stack);
+        ImageGL *min_val = min->Redux(L, stack);
         min_val->loadToMemory();
         minVal = min_val->data[0];
 
         //Get max value
-        ImageRAWGL *max_val = max->Redux(L, stack);
+        ImageGL *max_val = max->Redux(L, stack);
         max_val->loadToMemory();
         maxVal = max_val->data[0];
 
