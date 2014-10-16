@@ -449,7 +449,6 @@ void StrokeGL::RenderGL()
         brushProgram.uniform("shift_position", positions[i], positions[i + 1]);
         quad->Render();
     }
-    glEnd();
 
     glw::bind_program(0);
 
@@ -481,8 +480,6 @@ void StrokeGL::RenderAnnotationGL()
         annotationProgram.uniform("shift_position", positions[i], positions[i + 1]);
         quad->Render();
     }
-
-    glEnd();
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);

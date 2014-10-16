@@ -47,10 +47,10 @@ protected:
     pic::FilterGLBilateral2DG *fltBilG;
 
 public:
-    pic::ImageRAWGL img, *img_flt, *img_flt_tmo;
+    pic::ImageGL img, *img_flt, *img_flt_tmo;
     glw::program    program;
 
-    pic::ImageRAWGLVec stack;
+    pic::ImageGLVec stack;
 
     SimpleFilteringWindow() : OpenGLWindow(NULL)
     {
