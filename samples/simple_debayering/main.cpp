@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an HDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/yellow_flowers.png");
 
     printf("Is it valid? ");
@@ -44,12 +44,12 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         printf("Creating an image with bayering RGGB...");
-        pic::ImageRAW *imgRGGB = pic::FilterMosaic::Execute(&img, NULL);
+        pic::Image *imgRGGB = pic::FilterMosaic::Execute(&img, NULL);
         printf("Ok\n");
 
         printf("Debayering the image...");
-        pic::ImageRAW out(1, img.width, img.height, 3);
-        pic::Demosaic(imgRGGB, &out);
+        pic::Image out(1, img.width, img.height, 3);
+        pic::FilterDemosaic::Execute(imgRGGB, &out);
         printf("Ok\n");
 
         printf("Computing the difference image...");

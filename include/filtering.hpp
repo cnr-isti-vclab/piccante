@@ -72,6 +72,7 @@ See the GNU Lesser General Public License
 #include "filtering/filter_med.hpp"
 #include "filtering/filter_min.hpp"
 #include "filtering/filter_mosaic.hpp"
+#include "filtering/filter_demosaic.hpp"
 #include "filtering/filter_normal.hpp"
 #include "filtering/filter_npasses.hpp"
 #include "filtering/filter_nswe.hpp"

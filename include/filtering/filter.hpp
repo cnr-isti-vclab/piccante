@@ -189,7 +189,6 @@ PIC_INLINE Image *Filter::SetupAux(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-/**GetOutPutName: creates a name for cached processes*/
 PIC_INLINE std::string Filter::GetOutPutName(std::string nameIn)
 {
     std::string outputName = nameIn;
@@ -234,7 +233,6 @@ PIC_INLINE Image *Filter::CachedProcess(ImageVec imgIn, Image *imgOut,
     }
 }
 
-/**Process: filters the imgIn and stores it in imgOut*/
 PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
 {
     if(imgIn[0] == NULL) {
@@ -250,7 +248,6 @@ PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-/**ProcessPAux: filters the imgIn and stores it in imgOut*/
 PIC_INLINE void Filter::ProcessPAux(ImageVec imgIn, Image *imgOut,
                                     TileList *tiles)
 {
@@ -271,7 +268,6 @@ PIC_INLINE void Filter::ProcessPAux(ImageVec imgIn, Image *imgOut,
     }
 }
 
-/**This function filters  imgIn and stores it in imgOut using multi-threading*/
 PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
 {
 #ifndef PIC_DISABLE_THREAD
