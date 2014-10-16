@@ -161,6 +161,13 @@ public:
     */
     Image(int width, int height, int channels);
 
+   /**
+   * @brief Image embeds an array of float inside an Image.
+   * @param color is the pointer to an array of float values.
+   * @param channels is the color's number of elements.
+   */
+    Image(float *color, int channels);
+
     /**
      * @brief Image is a constructor which initializes an image defined by
      * the input properties.
@@ -881,6 +888,17 @@ PIC_INLINE Image::Image(std::string nameFile, LDR_type typeLoad = LT_NOR_GAMMA)
 {
     SetNULL();
     Read(nameFile, typeLoad);
+}
+
+PIC_INLINE Image::Image(float *color, int channels)
+{
+    typeLoad = LT_NONE;
+    SetNULL();
+
+    if(color != NULL) {
+        Allocate(1, 1, channels, 1);
+        memcpy(data, color, channels);
+    }
 }
 
 PIC_INLINE Image::~Image()
