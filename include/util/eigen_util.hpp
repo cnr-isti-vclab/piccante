@@ -25,7 +25,9 @@ See the GNU Lesser General Public License
 #include "util/matrix_3_x_3.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/LU"
+    #include "externals/Eigen/LU"
+    #include "externals/Eigen/Geometry"
+
 #endif
 
 #ifndef PIC_EIGEN_UTIL
@@ -389,8 +391,6 @@ Eigen::Matrix3f MatrixConvert(Matrix3x3 &mat)
 
     return mtx;
 }
-
-
 
 #endif
 

@@ -25,6 +25,8 @@ See the GNU Lesser General Public License
 #ifndef PIC_FEATURES_MATCHING_HPP
 #define PIC_FEATURES_MATCHING_HPP
 
+#include "util/eigen_util.hpp"
+
 //Corner descriptors
 #include "features_matching/general_corner_detector.hpp"
 #include "features_matching/harris_corner_detector.hpp"

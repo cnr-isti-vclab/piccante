@@ -27,6 +27,8 @@ See the GNU Lesser General Public License
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
+#define EIGEN_DONT_VECTORIZE
+#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -148,7 +150,7 @@ int main(int argc, char *argv[])
             printf("I1: %d (%d %d) -- I2: %d (%d %d) -- Score: %d\n", I0, int(x[0]), int(x[1]), I1, int(y[0]), int(y[1]), matches[i][2]);
         }
 
-        printf("Estimating the fundamental matrix F from the matches...");
+        printf("\nEstimating the fundamental matrix F from the matches...");
         std::vector< unsigned int > inliers;
         Eigen::Matrix3d F = pic::EstimateFundamentalRansac(m0, m1, inliers, 10000);
 

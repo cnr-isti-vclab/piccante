@@ -25,8 +25,6 @@ See the GNU Lesser General Public License
 #ifndef PIC_FEATURES_MATCHING_GENERAL_CORNER_DETECTOR_HPP
 #define PIC_FEATURES_MATCHING_GENERAL_CORNER_DETECTOR_HPP
 
-#include "util/vec.hpp"
-
 #include "image.hpp"
 
 #ifndef PIC_DISABLE_EIGEN

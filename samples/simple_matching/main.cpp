@@ -36,10 +36,10 @@ int main(int argc, char *argv[])
 
     printf("Reading an LDR images...");
 
-    pic::ImageRAW *img0 = new pic::ImageRAW();
+    pic::Image *img0 = new pic::Image();
     img0->Read("../data/input/features/balcony_0.png", pic::LT_NOR);
 
-    pic::ImageRAW *img1 = new pic::ImageRAW();
+    pic::Image *img1 = new pic::Image();
     img1->Read("../data/input/features/balcony_1.png", pic::LT_NOR);
 
     img0->Write("../data/output/simple_matching_img_0.png", pic::LT_NOR);
@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
         std::vector< Eigen::Vector3f > corners_from_img1;
 
         //computing the luminance images
-        pic::ImageRAW *L0 = pic::FilterLuminance::Execute(img0, NULL, pic::LT_CIE_LUMINANCE);
-        pic::ImageRAW *L1 = pic::FilterLuminance::Execute(img1, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *L0 = pic::FilterLuminance::Execute(img0, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *L1 = pic::FilterLuminance::Execute(img1, NULL, pic::LT_CIE_LUMINANCE);
 
         //getting corners
         printf("Extracting corners...\n");
@@ -67,8 +67,8 @@ int main(int argc, char *argv[])
 
         //computing ORB descriptors for each corner and image
         //Computing luminance images
-        pic::ImageRAW *L0_flt = pic::FilterGaussian2D::Execute(L0, NULL, 2.5f);
-        pic::ImageRAW *L1_flt = pic::FilterGaussian2D::Execute(L1, NULL, 2.5f);
+        pic::Image *L0_flt = pic::FilterGaussian2D::Execute(L0, NULL, 2.5f);
+        pic::Image *L1_flt = pic::FilterGaussian2D::Execute(L1, NULL, 2.5f);
 
         printf("Computing ORB descriptors...\n");
 
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
         mtxH.print();
 
         printf("Applying H to the first image..");
-        pic::ImageRAW *img0_H = pic::FilterWarp2D::Execute(img0, NULL, mtxH, true, false);
+        pic::Image *img0_H = pic::FilterWarp2D::Execute(img0, NULL, mtxH, true, false);
         img0_H->Write("../data/output/simple_matching_img_0_H_applied.png", pic::LT_NOR);
         printf("Ok.\n");
 
