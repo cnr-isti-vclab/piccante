@@ -29,13 +29,21 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
-Image *IterativePoissonSolver(Image *img,
-                                 Image *laplacian,
-                                 std::vector<int> coords,
-                                 int maxSteps = 100)
+/**
+ * @brief IterativePoissonSolver
+ * @param img
+ * @param laplacian
+ * @param coords
+ * @param maxSteps
+ * @return
+ */
+Image *IterativePoissonSolver(Image *img, Image *laplacian,
+                              std::vector<int> coords,
+                              int maxSteps = 100)
 {
-    //Iterative Poisson solver
-    printf("Iterative Poisson solver... ");
+    #ifdef PIC_DEBUG
+        printf("Iterative Poisson solver... ");
+    #endif
 
     if(maxSteps < 1) {
         maxSteps = 20000;
@@ -53,12 +61,16 @@ Image *IterativePoissonSolver(Image *img,
             img->ReverseAddress(coord, x, y);
 
             workValue = -laplacian->data[coord];
+
             c = img->Address(x + 1, y);
             workValue += img->data[c];
+
             c = img->Address(x - 1, y);
             workValue += img->data[c];
+
             c = img->Address(x, y + 1);
             workValue += img->data[c];
+
             c = img->Address(x, y - 1);
             workValue += img->data[c];
 
@@ -70,7 +82,10 @@ Image *IterativePoissonSolver(Image *img,
         tmpImg  = tmpSwap;
     }
 
-    printf("done.\n");
+    #ifdef PIC_DEBUG
+        printf("done.\n");
+    #endif
+
     return img;
 }
 

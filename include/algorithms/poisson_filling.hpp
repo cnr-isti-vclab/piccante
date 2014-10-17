@@ -39,7 +39,7 @@ protected:
 
     bool		*mask;
     bool		*maskPoisson;
-    Image	*imgTmp;
+    Image       *imgTmp;
 
 public:
 
@@ -60,6 +60,9 @@ public:
         CleanUp();
     }
 
+    /**
+     * @brief CleanUp
+     */
     void CleanUp()
     {
         if(mask != NULL) {
@@ -78,6 +81,11 @@ public:
         }
     }
 
+    /**
+     * @brief Update
+     * @param imgOut
+     * @param imgIn
+     */
     void Update(Image *imgOut, Image *imgIn)
     {
         imgOut->Assign(imgIn);
@@ -160,6 +168,13 @@ public:
         }
     }
 
+    /**
+     * @brief Compute
+     * @param imgIn
+     * @param imgOut
+     * @param value
+     * @return
+     */
     Image *Compute(Image *imgIn, Image *imgOut, float value)
     {
         if(imgIn == NULL) {
