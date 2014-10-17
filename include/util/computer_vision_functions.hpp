@@ -151,7 +151,7 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0,
     sub_points0.reserve(nSubSet);
     sub_points1.reserve(nSubSet);
 
-    std::mt19937 m(0);
+    std::mt19937 m(rand()%10000);
 
     unsigned int n = points0.size();
 
@@ -324,7 +324,7 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
     sub_points0.reserve(nSubSet);
     sub_points1.reserve(nSubSet);
 
-    std::mt19937 m(0);
+    std::mt19937 m(rand()%10000);
 
     unsigned int n = points0.size();
 
