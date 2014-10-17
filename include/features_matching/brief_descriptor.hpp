@@ -155,7 +155,7 @@ public:
      */
     BRIEFDescriptor(int S = 32, int n = 256)
     {
-        m = new std::mt19937(rand() % 10000);
+        m = new std::mt19937(0);
 
         this->S = S;
         this->sigma2 = float(S * S) / 25.0f;
