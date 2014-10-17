@@ -220,7 +220,7 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0,
  * @param points1 is an array of points computed from image 2.
  * @return It returns the fundamental matrix, F_{1,2}.
  */
-Eigen::Matrix3d EstimateFundamental(std::vector< Eigen::Vector2f > &points0, std::vector< Eigen::Vector2f > &points1)
+Eigen::Matrix3d EstimateFundamental(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1)
 {
     Eigen::Matrix3d F;
 
@@ -315,7 +315,7 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
     Eigen::Matrix3d F;
     int nSubSet = 8;
 
-    std::mt19937 m(rand()%10000);
+    std::mt19937 m(rand() % 10000);
 
     unsigned int n = points0.size();
 
@@ -330,8 +330,9 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
         std::vector< Eigen::Vector2f > sub_points1;
 
         for(int j = 0; j < nSubSet; j++) {
-            sub_points0.push_back(points0[subSet[j]]);
-            sub_points1.push_back(points1[subSet[j]]);
+            unsigned int k = subSet[j];
+            sub_points0.push_back(points0[k]);
+            sub_points1.push_back(points1[k]);
         }
 
         Eigen::Matrix3d tmpF = EstimateFundamental(sub_points0, sub_points1);
@@ -340,8 +341,8 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
         std::vector< unsigned int > tmp_inliers;
 
         for(unsigned int j = 0; j < n; j++) {
-            Eigen::Vector3d p0 = Eigen::Vector3d(points0[j][0], points0[j][1], 1.0f);
-            Eigen::Vector3d p1 = Eigen::Vector3d(points1[j][0], points1[j][1], 1.0f);
+            Eigen::Vector3d p0 = Eigen::Vector3d(points0[j][0], points0[j][1], 1.0);
+            Eigen::Vector3d p1 = Eigen::Vector3d(points1[j][0], points1[j][1], 1.0);
 
             Eigen::Vector3d tmpF_p0 = tmpF * p0;
             double n0 = sqrt(tmpF_p0[0] * tmpF_p0[0] + tmpF_p0[1] * tmpF_p0[1]);
@@ -358,6 +359,7 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
 
         //getting the inliers
         if(tmp_inliers.size() > inliers.size()) {
+            printf("%d\n", tmp_inliers.size());
             F = tmpF;
             inliers.clear();
             inliers.assign(tmp_inliers.begin(), tmp_inliers.end());
