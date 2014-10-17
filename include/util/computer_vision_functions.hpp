@@ -350,7 +350,7 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
                 tmpF_p0 /= n0;
             }
 
-            double err = abs(tmpF_p0.dot(p1));
+            double err = fabs(tmpF_p0.dot(p1));
 
             if(err < threshold){
                 tmp_inliers.push_back(j);
@@ -359,7 +359,6 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
 
         //getting the inliers
         if(tmp_inliers.size() > inliers.size()) {
-            printf("%d\n", tmp_inliers.size());
             F = tmpF;
             inliers.clear();
             inliers.assign(tmp_inliers.begin(), tmp_inliers.end());
