@@ -31,7 +31,7 @@ See the GNU Lesser General Public License
 #include "algorithms/discrete_cosine_transform.hpp"
 #include "algorithms/edge_enhancement.hpp"
 #include "algorithms/flash_photography.hpp"
-#include "algorithms/iterative_poisson_solver.hpp"
+#include "algorithms/poisson_solver_iterative.hpp"
 #include "algorithms/poisson_filling.hpp"
 #include "algorithms/poisson_solver.hpp"
 #include "algorithms/pushpull.hpp"

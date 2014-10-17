@@ -41,10 +41,10 @@ int main(int argc, char *argv[])
     double fy = pic::getFocalLengthPixels(18.0, 14.9, 1728.0);
     Eigen::Matrix3d K = pic::getIntrinsicsMatrix(fx, fy, 2592.0 / 2.0, 1728.0 / 2.0);
 
-    pic::ImageRAW *img0 = new pic::ImageRAW();
+    pic::Image *img0 = new pic::Image();
     img0->Read("../data/input/triangulation/venice_campo_s_polo_left.jpg", pic::LT_NOR);
 
-    pic::ImageRAW *img1 = new pic::ImageRAW();
+    pic::Image *img1 = new pic::Image();
     img1->Read("../data/input/triangulation/venice_campo_s_polo_right.jpg", pic::LT_NOR);
 
     printf("Ok\n");
@@ -58,8 +58,8 @@ int main(int argc, char *argv[])
         std::vector< Eigen::Vector3f > corners_from_img1;
 
         //computing the luminance images
-        pic::ImageRAW *L0 = pic::FilterLuminance::Execute(img0, NULL, pic::LT_CIE_LUMINANCE);
-        pic::ImageRAW *L1 = pic::FilterLuminance::Execute(img1, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *L0 = pic::FilterLuminance::Execute(img0, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *L1 = pic::FilterLuminance::Execute(img1, NULL, pic::LT_CIE_LUMINANCE);
 
         //getting corners
         printf("Extracting corners...\n");
@@ -69,12 +69,12 @@ int main(int argc, char *argv[])
 
         //computing ORB descriptors for each corner and image
         //Computing luminance images
-        pic::ImageRAW *L0_flt = pic::FilterGaussian2D::Execute(L0, NULL, 2.5f);
-        pic::ImageRAW *L1_flt = pic::FilterGaussian2D::Execute(L1, NULL, 2.5f);
+        pic::Image *L0_flt = pic::FilterGaussian2D::Execute(L0, NULL, 2.5f);
+        pic::Image *L1_flt = pic::FilterGaussian2D::Execute(L1, NULL, 2.5f);
 
         printf("Computing ORB descriptors...\n");
 
-        pic::PoissonDescriptor b_desc(16);//31, 512);
+        pic::ORBDescriptor b_desc(31, 512);
 
         std::vector< unsigned int *> descs0;
         for(unsigned int i=0; i<corners_from_img0.size(); i++) {
@@ -178,10 +178,10 @@ int main(int argc, char *argv[])
         pic::decomposeEssentialMatrixWithConfiguration(E, K, K, m0f, m1f, R, t);
 
         //Triangulation
-        pic::ImageRAW imgOut0(1, img0->width, img0->height, 3);
+        pic::Image imgOut0(1, img0->width, img0->height, 3);
         imgOut0.SetZero();
 
-        pic::ImageRAW imgOut1(1, img1->width, img1->height, 3);
+        pic::Image imgOut1(1, img1->width, img1->height, 3);
         imgOut1.SetZero();
 
         FILE *file = fopen("../data/output/simple_triangulation_mesh.ply","w");
