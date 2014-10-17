@@ -22,12 +22,13 @@ See the GNU Lesser General Public License
 
 */
 
+#include <vector>
+
 #include "util/matrix_3_x_3.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
     #include "externals/Eigen/LU"
     #include "externals/Eigen/Geometry"
-
 #endif
 
 #ifndef PIC_EIGEN_UTIL
@@ -390,6 +391,45 @@ Eigen::Matrix3f MatrixConvert(Matrix3x3 &mat)
     mtx(2, 2) = mat.data[8];
 
     return mtx;
+}
+
+/**
+ * @brief ComputeNormalizationTransform
+ * @param points
+ * @return
+ */
+Eigen::Vector3f ComputeNormalizationTransform(std::vector< Eigen::Vector2f > &points)
+{
+    Eigen::Vector3f ret;
+
+    if(points.size() < 2) {
+        return ret;
+    }
+
+    ret[0] = 0.0f;
+    ret[1] = 0.0f;
+
+    for(unsigned int i = 0; i < points.size(); i++) {
+        ret[0] += points[i][0];
+        ret[1] += points[i][1];
+    }
+
+    float n = float(points.size());
+    ret[0] /= n;
+    ret[1] /= n;
+
+    ret[2] = 0.0;
+    for(unsigned int i = 0; i < points.size(); i++) {
+
+        float dx = points[i][0] - ret[0];
+        float dy = points[i][1] - ret[1];
+
+        ret[2] += sqrtf(dx * dx + dy * dy);
+    }
+
+    ret[2] = ret[2] / n / sqrtf(2.0f);
+
+    return ret;
 }
 
 #endif

@@ -104,55 +104,6 @@ public:
         return imgOut;
     }
 
-
-    /**
-     * @brief NormalizePoints normalizes points coordinates to have
-     * points' center in (0,0) and maximum length at sqrt(2).
-     * @param points
-     * @return It returns the scaling factor and the original center.
-     */
-    static Eigen::Vector3f NormalizePoints(std::vector< Eigen::Vector2f > &points)
-    {
-        Eigen::Vector3f ret;
-
-        if(points.size() < 2) {
-            return ret;
-        }
-
-        ret[0] = 0.0f;
-        ret[1] = 0.0f;
-
-        for(unsigned int i = 0; i < points.size(); i++) {
-            ret[0] += points[i][0];
-            ret[1] += points[i][1];
-        }
-
-        float n = float(points.size());
-        ret[0] /= n;
-        ret[1] /= n;
-
-        ret[2] = 0.0;
-        for(unsigned int i = 0; i < points.size(); i++) {
-
-            float dx = points[i][0] - ret[0];
-            float dy = points[i][1] - ret[1];
-
-            ret[2] += sqrtf(dx * dx + dy * dy);
-        }
-
-        ret[2] = ret[2] / n / sqrtf(2.0f);
-
-        for(unsigned int i = 0; i < points.size(); i++) {
-            points[i][0] -= ret[0];
-            points[i][0] /= ret[2];
-
-            points[i][1] -= ret[1];
-            points[i][1] /= ret[2];
-        }
-
-        return ret;
-    }
-
     /**
      * @brief Test
      * @param gcd

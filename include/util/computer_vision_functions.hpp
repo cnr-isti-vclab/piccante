@@ -60,44 +60,49 @@ Eigen::Matrix3d EstimateHomography(std::vector< Eigen::Vector2f > points0, std::
         return H;
     }
 
-    //shifting and scaling points for numerical stability
-    std::vector< Eigen::Vector2f > tmp_points0, tmp_points1;
-    tmp_points0.assign(points0.begin(), points0.end());
-    tmp_points1.assign(points1.begin(), points1.end());
+    Eigen::Vector3f transform_0 = ComputeNormalizationTransform(points0);
+    Eigen::Vector3f transform_1 = ComputeNormalizationTransform(points1);
 
-    Eigen::Vector3f tmp_points0_info = GeneralCornerDetector::NormalizePoints(tmp_points0);
-    Eigen::Vector3f tmp_points1_info = GeneralCornerDetector::NormalizePoints(tmp_points1);
+    Eigen::Matrix3d mat_0 = getShiftScaleMatrix(transform_0);
+    Eigen::Matrix3d mat_1 = getShiftScaleMatrix(transform_1);
 
-    Eigen::Matrix3d mat_0 = getShiftScaleMatrix(tmp_points0_info);
-    Eigen::Matrix3d mat_1 = getShiftScaleMatrix(tmp_points1_info);
-
-    unsigned int n = tmp_points0.size();
+    unsigned int n = points0.size();
     Eigen::MatrixXd A(n * 2, 9);
 
     //setting up the linear system
-    for(unsigned int j = 0; j < n; j++) {
-        int i = j * 2;
-        A(i, 0) = 0.0;
-        A(i, 1) = 0.0;
-        A(i, 2) = 0.0;
-        A(i, 3) = tmp_points0[j][0];
-        A(i, 4) = tmp_points0[j][1];
-        A(i, 5) = 1.0;
-        A(i, 6) = -tmp_points1[j][1] * tmp_points0[j][0];
-        A(i, 7) = -tmp_points1[j][1] * tmp_points0[j][1];
-        A(i, 8) = -tmp_points1[j][1];
+    for(unsigned int i = 0; i < n; i++) {
+        //transforming coordinates for increasing stability of the system
+        Eigen::Vector2f p0 = points0[i];
+        Eigen::Vector2f p1 = points1[i];
 
-        i++;
+        p0[0] = (p0[0] - transform_0[0]) / transform_0[2];
+        p0[1] = (p0[1] - transform_0[1]) / transform_0[2];
 
-        A(i, 0) = tmp_points0[j][0];
-        A(i, 1) = tmp_points0[j][1];
-        A(i, 2) = 1.0;
-        A(i, 3) = 0.0;
-        A(i, 4) = 0.0;
-        A(i, 5) = 0.0;
-        A(i, 6) = -tmp_points1[j][0] * tmp_points0[j][0];
-        A(i, 7) = -tmp_points1[j][0] * tmp_points0[j][1];
-        A(i, 8) = -tmp_points1[j][0];
+        p1[0] = (p1[0] - transform_1[0]) / transform_1[2];
+        p1[1] = (p1[1] - transform_1[1]) / transform_1[2];
+
+        int j = i * 2;
+        A(j, 0) = 0.0;
+        A(j, 1) = 0.0;
+        A(j, 2) = 0.0;
+        A(j, 3) = p0[0];
+        A(j, 4) = p0[1];
+        A(j, 5) = 1.0;
+        A(j, 6) = -p1[1] * p0[0];
+        A(j, 7) = -p1[1] * p0[1];
+        A(j, 8) = -p1[1];
+
+        j++;
+
+        A(j, 0) = p0[0];
+        A(j, 1) = p0[1];
+        A(j, 2) = 1.0;
+        A(j, 3) = 0.0;
+        A(j, 4) = 0.0;
+        A(j, 5) = 0.0;
+        A(j, 6) = -p1[0] * p0[0];
+        A(j, 7) = -p1[0] * p0[1];
+        A(j, 8) = -p1[0];
     }
 
     //Solving the linear system
@@ -229,29 +234,35 @@ Eigen::Matrix3d EstimateFundamental(std::vector< Eigen::Vector2f > &points0, std
     }
 
     //shifting and scaling points for numerical stability
-    std::vector< Eigen::Vector2f > tmp_points0, tmp_points1;
-    tmp_points0.assign(points0.begin(), points0.end());
-    tmp_points1.assign(points1.begin(), points1.end());
+    Eigen::Vector3f transform_0 = ComputeNormalizationTransform(points0);
+    Eigen::Vector3f transform_1 = ComputeNormalizationTransform(points1);
 
-    Eigen::Vector3f tmp_points0_info = GeneralCornerDetector::NormalizePoints(tmp_points0);
-    Eigen::Vector3f tmp_points1_info = GeneralCornerDetector::NormalizePoints(tmp_points1);
+    Eigen::Matrix3d mat_0 = getShiftScaleMatrix(transform_0);
+    Eigen::Matrix3d mat_1 = getShiftScaleMatrix(transform_1);
 
-    Eigen::Matrix3d mat_0 = getShiftScaleMatrix(tmp_points0_info);
-    Eigen::Matrix3d mat_1 = getShiftScaleMatrix(tmp_points1_info);
-
-    Eigen::MatrixXd A(tmp_points0.size(), 9);
+    Eigen::MatrixXd A(points0.size(), 9);
 
     //setting up the linear system
-    for(unsigned int i = 0; i < tmp_points0.size(); i++) {
+    for(unsigned int i = 0; i < points0.size(); i++) {
 
-        A(i, 0) = tmp_points0[i][0] * tmp_points1[i][0];
-        A(i, 1) = tmp_points0[i][0] * tmp_points1[i][1];
-        A(i, 2) = tmp_points0[i][0];
-        A(i, 3) = tmp_points0[i][1] * tmp_points1[i][0];
-        A(i, 4) = tmp_points0[i][1] * tmp_points1[i][1];
-        A(i, 5) = tmp_points0[i][1];
-        A(i, 6) = tmp_points1[i][0];
-        A(i, 7) = tmp_points1[i][1];
+        //transforming coordinates for increasing stability of the system
+        Eigen::Vector2f p0 = points0[i];
+        Eigen::Vector2f p1 = points1[i];
+
+        p0[0] = (p0[0] - transform_0[0]) / transform_0[2];
+        p0[1] = (p0[1] - transform_0[1]) / transform_0[2];
+
+        p1[0] = (p1[0] - transform_1[0]) / transform_1[2];
+        p1[1] = (p1[1] - transform_1[1]) / transform_1[2];
+
+        A(i, 0) = p0[0] * p1[0];
+        A(i, 1) = p0[0] * p1[1];
+        A(i, 2) = p0[0];
+        A(i, 3) = p0[1] * p1[0];
+        A(i, 4) = p0[1] * p1[1];
+        A(i, 5) = p0[1];
+        A(i, 6) = p1[0];
+        A(i, 7) = p1[1];
         A(i, 8) = 1.0;
     }
 
