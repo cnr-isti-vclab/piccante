@@ -144,14 +144,9 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0,
     }
 
     Eigen::Matrix3d H;
-    std::vector< Eigen::Vector2f > sub_points0;
-    std::vector< Eigen::Vector2f > sub_points1;
-
     int nSubSet = 4;
-    sub_points0.reserve(nSubSet);
-    sub_points1.reserve(nSubSet);
 
-    std::mt19937 m(rand()%10000);
+    std::mt19937 m(rand() % 10000);
 
     unsigned int n = points0.size();
 
@@ -160,10 +155,11 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0,
     inliers.clear();
 
     for(unsigned int i = 0; i < maxIterations; i++) {       
+
         getPermutation(m, subSet, nSubSet, n);
 
-        sub_points0.clear();
-        sub_points1.clear();
+        std::vector< Eigen::Vector2f > sub_points0;
+        std::vector< Eigen::Vector2f > sub_points1;
 
         for(int j = 0; j < nSubSet; j++) {
             sub_points0.push_back(points0[subSet[j]]);
@@ -204,8 +200,8 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0,
             printf("Better estimate using inliers only.\n");
         #endif
 
-        sub_points0.clear();
-        sub_points1.clear();
+        std::vector< Eigen::Vector2f > sub_points0;
+        std::vector< Eigen::Vector2f > sub_points1;
 
         for(unsigned int i = 0; i < inliers.size(); i++) {
             sub_points0.push_back(points0[inliers[i]]);
@@ -317,12 +313,7 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
     }
 
     Eigen::Matrix3d F;
-    std::vector< Eigen::Vector2f > sub_points0;
-    std::vector< Eigen::Vector2f > sub_points1;
-
     int nSubSet = 8;
-    sub_points0.reserve(nSubSet);
-    sub_points1.reserve(nSubSet);
 
     std::mt19937 m(rand()%10000);
 
@@ -335,8 +326,8 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
     for(unsigned int i = 0; i < maxIterations; i++) {
         getPermutation(m, subSet, nSubSet, n);
 
-        sub_points0.clear();
-        sub_points1.clear();
+        std::vector< Eigen::Vector2f > sub_points0;
+        std::vector< Eigen::Vector2f > sub_points1;
 
         for(int j = 0; j < nSubSet; j++) {
             sub_points0.push_back(points0[subSet[j]]);
@@ -380,8 +371,8 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
             printf("Better estimate using inliers only.\n");
         #endif
 
-        sub_points0.clear();
-        sub_points1.clear();
+        std::vector< Eigen::Vector2f > sub_points0;
+        std::vector< Eigen::Vector2f > sub_points1;
 
         for(unsigned int i = 0; i < inliers.size(); i++) {
             sub_points0.push_back(points0[inliers[i]]);
