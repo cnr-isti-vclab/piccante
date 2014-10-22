@@ -30,38 +30,38 @@ See the GNU Lesser General Public License
 namespace pic {
 
 /**
- * @brief CalculateDivergence calculates divergence of an image
- * @param f
- * @param div
+ * @brief CalculateDivergence calculates divergence of the gradient of an image.
+ * @param img is an input image.
+ * @param div is the output divergence of the gradient of img; i.e. Laplacian.
  * @return
  */
-Image *CalculateDivergence(Image *f, Image *div)
+Image *CalculateDivergence(Image *img, Image *div)
 {
-    if(f == NULL) {
+    if(img == NULL) {
         return div;
     }
 
     if(div == NULL) {
-        div = f->AllocateSimilarOne();
+        div = img->AllocateSimilarOne();
     }
 
-    Image *f_dx2, *f_dy2;
+    Image *img_dx2, *img_dy2;
 
     float kernelGrad[] = { -0.5f, 0.0f, 0.5f};
     float kernelDiv[] = { -1.0f, 1.0f, 0.0f};
 
-    //Calculate first order gradient
-    Image *f_dx = FilterConv1D::Execute(f, NULL, kernelGrad, 3, true);
-    Image *f_dy = FilterConv1D::Execute(f, NULL, kernelGrad, 3, false);
+    //calculating the gradient of img
+    Image *img_dx = FilterConv1D::Execute(img, NULL, kernelGrad, 3, true);
+    Image *img_dy = FilterConv1D::Execute(img, NULL, kernelGrad, 3, false);
 
-    //Calculate divergence using backward differences
-    f_dx2 = FilterConv1D::Execute(f_dx, div , kernelDiv, 3, true);
-    f_dy2 = FilterConv1D::Execute(f_dy, f_dx, kernelDiv, 3, false);
+    //calculating the divergence using backward differences
+    img_dx2 = FilterConv1D::Execute(img_dx, div , kernelDiv, 3, true);
+    img_dy2 = FilterConv1D::Execute(img_dy, img_dx, kernelDiv, 3, false);
 
-    div->Add(f_dy2);
+    div->Add(img_dy2);
 
-    delete f_dx;
-    delete f_dy;
+    delete img_dx;
+    delete img_dy;
 
     return div;
 }
