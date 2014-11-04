@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 
         printf("\nEstimating the fundamental matrix F from the matches...");
         std::vector< unsigned int > inliers;
-        Eigen::Matrix3d F = pic::EstimateFundamentalRansac(m0, m1, inliers, 100000);
+        Eigen::Matrix3d F = pic::EstimateFundamentalRansac(m0, m1, inliers, 1000000, 0.5);
 
         //non-linear refinement using Nelder-Mead        
         pic::NelderMeadOptFundamental nmf(m0, m1, inliers);
