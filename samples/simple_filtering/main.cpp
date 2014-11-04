@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an HDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/bottles.hdr");
 
     printf("Ok\n");
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
         printf("Filtering the image with a Gaussian filter with sigma_s = 4.0...");
 
-        pic::ImageRAW *output = pic::FilterGaussian2D::Execute(&img, NULL, 4.0f);
+        pic::Image *output = pic::FilterGaussian2D::Execute(&img, NULL, 4.0f);
 
         printf("Ok!\n");
 

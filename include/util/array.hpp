@@ -90,7 +90,7 @@ public:
     }
 
     /**
-     * @brief normalizeArray
+     * @brief normalize
      * @param data
      * @param n
      * @param norm

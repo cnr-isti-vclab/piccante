@@ -359,7 +359,6 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
 
         //getting the inliers
         if(tmp_inliers.size() > inliers.size()) {
-            printf("%d\n", tmp_inliers.size());
             F = tmpF;
             inliers.clear();
             inliers.assign(tmp_inliers.begin(), tmp_inliers.end());

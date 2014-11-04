@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 
         printf("Computing ORB descriptors...\n");
 
-        pic::ORBDescriptor b_desc(31, 512);
+        pic::PoissonDescriptor b_desc(16);//(31, 512);
 
         std::vector< unsigned int *> descs0;
         for(unsigned int i=0; i<corners_from_img0.size(); i++) {
@@ -155,7 +155,11 @@ int main(int argc, char *argv[])
 
         printf("\nEstimating the fundamental matrix F from the matches...");
         std::vector< unsigned int > inliers;
+<<<<<<< HEAD
         Eigen::Matrix3d F = pic::EstimateFundamentalRansac(m0, m1, inliers, 1000000, 0.5);
+=======
+        Eigen::Matrix3d F = pic::EstimateFundamentalRansac(m0, m1, inliers, 1000000, 1.0);
+>>>>>>> FETCH_HEAD
 
         //non-linear refinement using Nelder-Mead        
         pic::NelderMeadOptFundamental nmf(m0, m1, inliers);

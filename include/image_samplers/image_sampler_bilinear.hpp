@@ -66,8 +66,8 @@ public:
 PIC_INLINE void ImageSamplerBilinear::SampleImage(Image *img, float x, float y,
         float *vOut)
 {
-//	x=CLAMPi(x,0.0f,1.0f);
-//	y=CLAMPi(y,0.0f,1.0f);
+//	x = CLAMPi(x,0.0f,1.0f);
+//	y = CLAMPi(y,0.0f,1.0f);
 
     float xx, yy, dx, dy;
     int ind0, ind1, ind2, ind3;
@@ -99,12 +99,13 @@ PIC_INLINE void ImageSamplerBilinear::SampleImage(Image *img, float x, float y,
     ind2 = (ix  + t1) * img->channels;
     ind3 = (ix1 + t1) * img->channels;
 
-    for(int i = 0; i < img->channels; i++)
+    for(int i = 0; i < img->channels; i++) {
         vOut[i] = Bilinear<float>(img->data[ind0 + i],
                                   img->data[ind1 + i],
                                   img->data[ind2 + i],
                                   img->data[ind3 + i],
                                   dx, dy);
+    }
 }
 
 PIC_INLINE void ImageSamplerBilinear::SampleImageUC(Image *img, float x,
@@ -136,12 +137,13 @@ PIC_INLINE void ImageSamplerBilinear::SampleImageUC(Image *img, float x,
     ind2 = (ix  + t1) * img->channels;
     ind3 = (ix1 + t1) * img->channels;
 
-    for(int i = 0; i < img->channels; i++)
+    for(int i = 0; i < img->channels; i++) {
         vOut[i] = Bilinear<float>(img->data[ind0 + i],
                                   img->data[ind1 + i],
                                   img->data[ind2 + i],
                                   img->data[ind3 + i],
                                   dx, dy);
+    }
 }
 
 PIC_INLINE void ImageSamplerBilinear::SampleImage(Image *img, float x, float y,
@@ -180,17 +182,17 @@ PIC_INLINE void ImageSamplerBilinear::SampleImage(Image *img, float x, float y,
 
     for(int i = 0; i < img->channels; i++) {
         val[0] = Bilinear<float>(
-                     *((*img)(ix,	iy,	iz) + i),
-                     *((*img)(ix1,	iy,	iz) + i),
+                     *((*img)(ix,	iy,	iz)  + i),
+                     *((*img)(ix1,	iy,	iz)  + i),
                      *((*img)(ix,	iy,	iz1) + i),
                      *((*img)(ix1,	iy,	iz1) + i),
                      deltax, deltaz);
 
         val[1] = Bilinear<float>(
-                     *((*img)(ix,	iy1,	iz) + i),
-                     *((*img)(ix1,	iy1,	iz) + i),
-                     *((*img)(ix,	iy1,	iz1) + i),
-                     *((*img)(ix1,	iy1,	iz1) + i),
+                     *((*img)(ix,	iy1,    iz)  + i),
+                     *((*img)(ix1,	iy1,    iz)  + i),
+                     *((*img)(ix,	iy1,    iz1) + i),
+                     *((*img)(ix1,	iy1,    iz1) + i),
                      deltax, deltaz);
 
         vOut[i] = val[0] + deltay * (val[1] - val[0]);
