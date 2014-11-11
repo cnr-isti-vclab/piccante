@@ -49,7 +49,7 @@ See the GNU Lesser General Public License
 #include <QtCore/qvariant.h>
 
 #include <QtCore/qdir.h>
-#include <QtCore/QTextStream.h>
+#include <QtCore/QTextStream>
 
 #include <QtGui/QColor>
 #include <QtGui/QImage>

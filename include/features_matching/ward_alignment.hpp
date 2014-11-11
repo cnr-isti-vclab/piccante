@@ -29,7 +29,7 @@ See the GNU Lesser General Public License
 
 #include "image.hpp"
 #include "image_samplers/image_sampler_bilinear.hpp"
-#include "filtering/filter_downsampler_2D.hpp"
+#include "filtering/filter_downsampler_2d.hpp"
 #include "filtering/filter_luminance.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
