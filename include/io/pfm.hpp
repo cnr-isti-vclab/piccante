@@ -60,10 +60,11 @@ float convertFloatEndianess(float value)
  * @param data
  * @param width
  * @param height
+ * @param channel
  * @return
  */
 PIC_INLINE float *ReadPFM(std::string nameFile, float *data, int &width,
-                          int &height)
+                          int &height, int &channel)
 {
     FILE *file = fopen(nameFile.c_str(), "rb");
 
@@ -73,14 +74,39 @@ PIC_INLINE float *ReadPFM(std::string nameFile, float *data, int &width,
 
     char  flagc;
     float flag;
-    fgetc(file);
-    fgetc(file);
+    char P = fgetc(file);
+
+    if(P != 'P') {
+        fclose(file);
+        return NULL;
+    }
+
+    char F = fgetc(file);
+
+    bool fCheck = false;
+
+    if(F == 'f') {
+        fCheck = true;
+        channel = 1;
+    }
+
+    if(F == 'F') {
+        fCheck = true;
+        channel = 3;
+    }
+
+    if(!fCheck) {
+        fclose(file);
+        return NULL;
+    }
+
+
     fgetc(file);
     fscanf(file, "%d %d%c", &width, &height, &flagc);
     fscanf(file, "%f%c", &flag, &flagc);
 
     if(data == NULL) {
-        data = new float[width * height * 3];
+        data = new float[width * height * channel];
     }
 
     if(flag < 0.0f) {
@@ -90,9 +116,9 @@ PIC_INLINE float *ReadPFM(std::string nameFile, float *data, int &width,
             int ind = i * width;
 
             for(int j = 0; j < width; j++) {
-                int tmpInd = (ind + j) * 3;
+                int tmpInd = (ind + j) * channel;
 
-                fread(&data[tmpInd], sizeof(float), 3, file);
+                fread(&data[tmpInd], sizeof(float), channel, file);
             }
         }
     } else {
@@ -102,11 +128,11 @@ PIC_INLINE float *ReadPFM(std::string nameFile, float *data, int &width,
             int ind = i * width;
 
             for(int j = 0; j < width; j++) {
-                int tmpInd = (ind + j) * 3;
+                int tmpInd = (ind + j) * channel;
 
-                fread(&data[tmpInd], sizeof(float), 3, file);
+                fread(&data[tmpInd], sizeof(float), channel, file);
 
-                for(int k = 0; k < 3; k++) {
+                for(int k = 0; k < channel; k++) {
                     data[tmpInd + k] = convertFloatEndianess(data[tmpInd + k]);
                 }
             }
