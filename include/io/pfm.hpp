@@ -32,7 +32,36 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
-/** ReadPFM: reads a .pfm file*/
+/**
+ * @brief convertFloatEndianess converts a float from little-endian to big-endian
+ * or viceversa.
+ * @param value is the input float to be converted.
+ * @return It returns a big-endian float if value was stored as little-endian. Otherwise,
+ * it rerturns a little-endian.
+ */
+float convertFloatEndianess(float value)
+{
+    float ret;
+
+    unsigned char *c_v = (unsigned char*) &value;
+    unsigned char *c_r = (unsigned char*) &ret;
+
+    c_r[0] = c_v[3];
+    c_r[1] = c_v[2];
+    c_r[2] = c_v[1];
+    c_r[3] = c_v[0];
+
+    return ret;
+}
+
+/**
+ * @brief ReadPFM loads a portable float map from a file.
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @return
+ */
 PIC_INLINE float *ReadPFM(std::string nameFile, float *data, int &width,
                           int &height)
 {
@@ -54,13 +83,33 @@ PIC_INLINE float *ReadPFM(std::string nameFile, float *data, int &width,
         data = new float[width * height * 3];
     }
 
-    for(int i = height - 1; i > -1; i--) {
-        int ind = i * width;
+    if(flag < 0.0f) {
+        //little-endian encoding
 
-        for(int j = 0; j < width; j++) {
-            int tmpInd = (ind + j) * 3;
+        for(int i = height - 1; i > -1; i--) {
+            int ind = i * width;
 
-            fread(&data[tmpInd], sizeof(float), 3, file);
+            for(int j = 0; j < width; j++) {
+                int tmpInd = (ind + j) * 3;
+
+                fread(&data[tmpInd], sizeof(float), 3, file);
+            }
+        }
+    } else {
+        //big-endian encoding
+
+        for(int i = height - 1; i > -1; i--) {
+            int ind = i * width;
+
+            for(int j = 0; j < width; j++) {
+                int tmpInd = (ind + j) * 3;
+
+                fread(&data[tmpInd], sizeof(float), 3, file);
+
+                for(int k = 0; k < 3; k++) {
+                    data[tmpInd + k] = convertFloatEndianess(data[tmpInd + k]);
+                }
+            }
         }
     }
 
@@ -68,7 +117,15 @@ PIC_INLINE float *ReadPFM(std::string nameFile, float *data, int &width,
     return data;
 }
 
-/** WritePFM: writes a .pfm file*/
+/**
+ * @brief WritePFM writes an HDR image in the portable float map format into a file.
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @return
+ */
 PIC_INLINE bool WritePFM(std::string nameFile, const float *data, int width,
                          int height, int channels = 3)
 {
@@ -91,7 +148,7 @@ PIC_INLINE bool WritePFM(std::string nameFile, const float *data, int width,
     fprintf(file, "%d %d", width, height);
     fputc(0x0a, file);
 
-    //flag
+    //flag: writing little-endian only
     fprintf(file, "%f", -1.0f);
     fputc(0x0a, file);
 
@@ -115,7 +172,7 @@ PIC_INLINE bool WritePFM(std::string nameFile, const float *data, int width,
         for(int j = 0; j < width; j++) {
             int tmpInd = (ind + j) * channels;
 
-            fwrite(&data[tmpInd     ], sizeof(float), 1, file);
+            fwrite(&data[tmpInd     ],   sizeof(float), 1, file);
             fwrite(&data[tmpInd + ind1], sizeof(float), 1, file);
             fwrite(&data[tmpInd + ind2], sizeof(float), 1, file);
         }
