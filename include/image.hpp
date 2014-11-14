@@ -2072,7 +2072,7 @@ PIC_INLINE bool Image::Read(std::string nameFile,
             break;
 
         case IO_PFM:
-            tmp = ReadPFM(nameFile, dataReader, width, height);
+            tmp = ReadPFM(nameFile, dataReader, width, height, channels);
             break;
 
         case IO_EXR:
