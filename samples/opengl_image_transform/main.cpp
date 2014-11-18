@@ -39,10 +39,10 @@ protected:
     pic::FilterGLWarp2D *flt_warp;
 
 public:
-    pic::ImageRAWGL img, *img_flt, *img_flt_tmo;
+    pic::ImageGL img, *img_flt, *img_flt_tmo;
     glw::program    program;
 
-    pic::ImageRAWGLVec stack;
+    pic::ImageGLVec stack;
 
     SimpleImageTransformWindow() : OpenGLWindow(NULL)
     {
