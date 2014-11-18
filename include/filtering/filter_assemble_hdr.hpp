@@ -68,7 +68,7 @@ protected:
                         float weight = WeightFunction(x, weight_type);
 
                         float x_lin;
-                        if((icrf != NULL) || (linearization_type != LIN_ICFR)) {
+                        if((icrf != NULL) && (linearization_type == LIN_ICFR)) {
                             x_lin = Linearize(x, linearization_type, icrf->at(k));
                         } else {
                             x_lin = x;
@@ -98,12 +98,19 @@ protected:
     }
 
 public:
-    //Basic constructors
+
+    /**
+     * @brief FilterAssembleHDR
+     * @param weight_type
+     * @param linearization_type
+     * @param icrf
+     */
     FilterAssembleHDR(CRF_WEIGHT weight_type = CRF_GAUSS, IMG_LIN linearization_type = LIN_LIN, std::vector<float *> *icrf = NULL)
     {
         this->weight_type = weight_type;
 
         this->linearization_type = linearization_type;
+
         this->icrf = icrf;
     }
 };

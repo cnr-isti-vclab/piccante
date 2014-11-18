@@ -321,6 +321,18 @@ protected:
         return samples;
     }
 
+    /**
+     * @brief Destroy frees memory.
+     */
+    void Destroy()
+    {
+        for(unsigned int i=0; i<icrf.size(); i++) {
+            if(icrf[i] != NULL) {
+                delete[] icrf[i];
+            }
+        }
+    }
+
     CRF_WEIGHT              type;
     float                   w[256];
     
@@ -328,11 +340,22 @@ public:
 
     std::vector<float *>    icrf;
     
+    /**
+     * @brief CameraResponseFunction
+     */
     CameraResponseFunction()
     {
         
     }
     
+    /**
+     * @brief CameraResponseFunction
+     * @param stack
+     * @param exposure
+     * @param type
+     * @param nSamples
+     * @param lambda
+     */
     CameraResponseFunction(ImageVec stack, float *exposure, CRF_WEIGHT type = CRF_DEB97, int nSamples = 100, float lambda = 10.0f)
     {
         DebevecMalik(stack, exposure, type, nSamples, lambda);
@@ -340,21 +363,18 @@ public:
 
     ~CameraResponseFunction()
     {
-        Destroy();
+        //Destroy();
     }
 
-    /**Destroy: dellacating memory*/
-    void Destroy()
-    {
-        for(unsigned int i=0; i<icrf.size(); i++) {
-            delete[] icrf[i];
-        }
-    }
-
-    /**This method computes the CRF by exploiting the couple RAW/JPEG from cameras*/
+    /**
+     * @brief FromRAWJPEG computes the CRF by exploiting the couple RAW/JPEG from cameras.
+     * @param img_raw
+     * @param img_jpg
+     * @param filteringSize
+     */
     void FromRAWJPEG(Image *img_raw, Image *img_jpg, int filteringSize = 11)
     {
-        if((img_raw==NULL) || (img_jpg==NULL))
+        if((img_raw == NULL) || (img_jpg == NULL))
             return;
 
         if(!img_raw->SimilarType(img_jpg))
@@ -382,8 +402,8 @@ public:
                 float *data_jpg = (*img_jpg)(j, i);               
 
                 for(int k=0;k<channels;k++) {
-                    int i_raw = CLAMPi(int(255.0f*data_raw[k]), 0, 255);
-                    int i_jpg = CLAMPi(int(255.0f*data_jpg[k]), 0, 255);
+                    int i_raw = CLAMPi(int(255.0f * data_raw[k]), 0, 255);
+                    int i_jpg = CLAMPi(int(255.0f * data_jpg[k]), 0, 255);
 
                     int addr = (i_raw * 256 + i_jpg ) * channels;
 
@@ -414,7 +434,7 @@ public:
 
                 if(coords.size()>0) {//getting the median value
                     std::sort (coords.begin(), coords.end());  
-                    ret_c[j] = float(coords[coords.size()>>1]) / 255.0f; 
+                    ret_c[j] = float(coords[coords.size() >> 1]) / 255.0f;
                 }
             }
             
@@ -431,12 +451,20 @@ public:
         }
     }
 
-    /**This method computes the CRF of a camera using multiple exposures value following Debevec and Malik
-    1997's method.*/
+    /**
+     * @brief DebevecMalik computes the CRF of a camera using multiple exposures value following Debevec and Malik
+    1997's method.
+     * @param stack
+     * @param exposure
+     * @param type
+     * @param nSamples
+     * @param lambda
+     */
     void DebevecMalik(ImageVec stack, float *exposure, CRF_WEIGHT type = CRF_DEB97, int nSamples = 100, float lambda = 10.0f)
     {
-        if( stack.size()<1 || (exposure==NULL) )
+        if( stack.empty() || (exposure == NULL) ) {
             return;
+        }
             
         icrf.clear();
 
@@ -449,7 +477,7 @@ public:
         int channels = stack[0]->channels;
                 
         //Subsampling the image stack
-        if(nSamples<1) {
+        if(nSamples < 1) {
             nSamples = 100;
         }
     
@@ -491,18 +519,21 @@ public:
         delete[] samples;
     }
 
-    /**Linearize: linearize the image signal applying the iCRF*/
+    /**
+     * @brief Linearize linearizes the image signal applying the iCRF.
+     * @param img
+     */
     void Linearize(Image *img)
     {
-        if(img==NULL){
+        if(img == NULL) {
             return;
         }
 
-        if(!img->isValid()){
+        if(!img->isValid()) {
             return;
         }
 
-        if(icrf.size() != img->channels){
+        if(icrf.size() != img->channels) {
         #ifdef PIC_DEBUG
             printf("Warning: img cannot be linearized.\n");
         #endif

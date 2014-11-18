@@ -134,9 +134,9 @@ public:
     }
 
     /**
-     * @brief TestCrop2D
+     * @brief test
      */
-    static void TestCrop2D()
+    static void test()
     {
         Image img(1, 512, 512, 3);
         img.Assign(1.0f);
@@ -244,7 +244,6 @@ Image *FilterCrop::SetupAux(ImageVec imgIn, Image *imgOut)
 
 void FilterCrop::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-
     maxi[3] = MIN(maxi[3], src[0]->channels);
 
     for(int p = box->z0; p < box->z1; p++) {
