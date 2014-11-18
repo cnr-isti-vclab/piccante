@@ -167,7 +167,13 @@ PIC_INLINE bool WritePFM(std::string nameFile, const float *data, int width,
 
     //header
     fputc('P', file);
-    fputc('F', file);
+
+    if(channels != 1) {
+        fputc('F', file);
+    } else {
+        fputc('f', file);
+    }
+
     fputc(0x0a, file);
 
     //width and height
@@ -182,11 +188,6 @@ PIC_INLINE bool WritePFM(std::string nameFile, const float *data, int width,
     int ind1 = 1;
     int ind2 = 2;
 
-    if(channels == 1) {
-        ind1 = 0;
-        ind2 = 0;
-    }
-
     if(channels == 2) {
         ind1 = 1;
         ind2 = 1;
@@ -198,9 +199,12 @@ PIC_INLINE bool WritePFM(std::string nameFile, const float *data, int width,
         for(int j = 0; j < width; j++) {
             int tmpInd = (ind + j) * channels;
 
-            fwrite(&data[tmpInd     ],   sizeof(float), 1, file);
-            fwrite(&data[tmpInd + ind1], sizeof(float), 1, file);
-            fwrite(&data[tmpInd + ind2], sizeof(float), 1, file);
+            fwrite(&data[tmpInd], sizeof(float), 1, file);
+
+            if(channels > 1) {
+                fwrite(&data[tmpInd + ind1], sizeof(float), 1, file);
+                fwrite(&data[tmpInd + ind2], sizeof(float), 1, file);
+            }
         }
     }
 

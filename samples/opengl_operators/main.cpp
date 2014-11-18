@@ -44,7 +44,7 @@ protected:
     pic::FilterGLOp *op;
 
 public:
-    pic::ImageRAWGL img, *imgRand, *imgOut, *imgOutTMO;
+    pic::ImageGL img, *imgRand, *imgOut, *imgOutTMO;
     glw::program    program;
 
     SimpleOperatorsWindow() : OpenGLWindow(NULL)
@@ -62,7 +62,7 @@ public:
         img.generateTextureGL(false, GL_TEXTURE_2D);
 
         //creating a random image
-        imgRand = new pic::ImageRAWGL(img.frames, img.width, img.height, img.channels, pic::IMG_CPU_GPU, GL_TEXTURE_2D);
+        imgRand = new pic::ImageGL(img.frames, img.width, img.height, img.channels, pic::IMG_CPU_GPU, GL_TEXTURE_2D);
         imgRand->SetRand();
         imgRand->loadFromMemory();
 
