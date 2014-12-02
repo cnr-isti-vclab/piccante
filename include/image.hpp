@@ -1857,7 +1857,7 @@ PIC_INLINE bool *Image::ConvertToMask(float *color, float threshold,
     
     bool bColorAllocated = false;
 
-    if(color==NULL) {
+    if(color == NULL) {
         bColorAllocated = true;
         color = new float[channels];
 
@@ -1868,7 +1868,7 @@ PIC_INLINE bool *Image::ConvertToMask(float *color, float threshold,
 
     int n = width * height;
 
-    if(mask==NULL) {
+    if(mask == NULL) {
         mask = new bool[n];
     }
 
