@@ -28,6 +28,7 @@ See the GNU Lesser General Public License
 #define PIC_DISABLE_OPENGL
 
 #define EIGEN_DONT_VECTORIZE
+
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 
 #include "piccante.hpp"

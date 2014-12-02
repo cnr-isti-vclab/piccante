@@ -22,13 +22,13 @@ See the GNU Lesser General Public License
 
 */
 
-#include <QCoreApplication>
-
 //This means that we disable Eigen; some functionalities cannot be used.
 //For example, estimating the camera response function
 #define PIC_DISABLE_EIGEN
+
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
+
 //This means we do not use QT for I/O
 #define PIC_DISABLE_QT
 
@@ -36,12 +36,9 @@ See the GNU Lesser General Public License
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
-
     printf("Reading an HDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/bottles.hdr");
 
     printf("Ok\n");
@@ -57,7 +54,7 @@ int main(int argc, char *argv[])
 
         pic::FilterSimpleTMO fltSimpleTMO(2.2f, fstop);
 
-        pic::ImageRAW *imgToneMapped = fltSimpleTMO.Process(Single(&img), NULL);
+        pic::Image *imgToneMapped = fltSimpleTMO.Process(Single(&img), NULL);
 
         /*pic::LT_NOR implies that when we save the image
           we just convert it to 8-bit withou applying gamma.

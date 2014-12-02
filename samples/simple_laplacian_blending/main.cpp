@@ -22,8 +22,6 @@ See the GNU Lesser General Public License
 
 */
 
-#include <QCoreApplication>
-
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
@@ -31,44 +29,44 @@ See the GNU Lesser General Public License
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
 
-    printf("Reading an HDR file...");
+    printf("Reading images...");
 
-    pic::Image img;
-    img.Read("../data/input/bottles.hdr", pic::LT_NOR);
+    pic::Image imgA, imgB, maskA;
+    imgA.Read("../data/input/laplacian/image.png");
+    imgB.Read("../data/input/laplacian/target.png");
+    maskA.Read("../data/input/laplacian/mask.png");
 
     printf("Ok\n");
 
-    printf("Is it valid? ");
-    if(img.isValid()) {
+    printf("Are images valid? ");
+    if( imgA.isValid() && imgB.isValid() && maskA.isValid()) {
         printf("OK\n");
 
-        pic::Image img_black(1, 32, 32, 3);
-        img_black.SetZero();
+        pic::Image maskB(maskA.width, maskA.height, maskA.channels);
+        maskB.Assign(1.0f);
+        maskB.Sub(&maskA);
 
-        //Adding a hole in the image
-        img.CopySubImage(&img_black, 292, 130);
+        //Creating Laplacian pyramids
+        pic::Pyramid pyrA(&imgA, true);
+        pic::Pyramid pyrB(&imgB, true);
 
-        img.Write("../data/output/bottles_black_pixels_pp.hdr");
+        //Creating Gaussian pyramids
+        pic::Pyramid pyrMA(&maskA, false);
+        pic::Pyramid pyrMB(&maskB, false);
 
-        //Recovering black pixels with push-pull
-        pic::PushPull pp;
+        //Blending
+        pyrA.Mul(&pyrMA);
+        pyrB.Mul(&pyrMB);
 
-        pic::Image *imgOut = pp.Execute(&img, 0.0f);
+        pyrA.Add(&pyrB);
 
-        printf("Writing recovered result using Push-Pull... ");
+        pic::Image *imgOut = pyrA.Reconstruct();
 
-        bool bWritten = imgOut->Write("../data/output/bottles_rec_pp.hdr");
+        imgOut->Write("../data/output/laplacian_blending_result.png");
 
-        if(bWritten) {
-            printf("Ok\n");
-        } else {
-            printf("Writing had some issues!\n");
-        }
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No images are not valid!\n");
     }
 
     return 0;

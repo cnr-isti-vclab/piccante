@@ -22,10 +22,10 @@ See the GNU Lesser General Public License
 
 */
 
-#include <QCoreApplication>
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
+
 //This means we do not use QT for I/O
 #define PIC_DISABLE_QT
 
@@ -33,9 +33,6 @@ See the GNU Lesser General Public License
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
-
     printf("Reading an HDR file...");
 
     pic::Image img;

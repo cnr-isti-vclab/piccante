@@ -52,7 +52,8 @@ public:
     /**
      * @brief Pyramid
      * @param img
-     * @param lapGauss
+     * @param lapGauss is a boolean parameter. If it is true, a Laplacian pyramid
+     * will be created, otherwise a Gaussian one.
      * @param limitLevel
      */
     Pyramid(Image *img, bool lapGauss, int limitLevel);
@@ -62,7 +63,8 @@ public:
      * @param width
      * @param height
      * @param channels
-     * @param lapGauss
+     * @param lapGauss is a boolean parameter. If it is true, a Laplacian pyramid
+     * will be created, otherwise a Gaussian one.
      * @param limitLevel
      */
     Pyramid(int width, int height, int channels, bool lapGauss, int limitLevel);
@@ -71,7 +73,8 @@ public:
 
     /**
      * @brief SetLapGauss
-     * @param lapGauss
+     * @param lapGauss is a boolean parameter. If it is true, a Laplacian pyramid
+     * will be created, otherwise a Gaussian one.
      */
     void SetLapGauss(bool lapGauss)
     {
@@ -97,18 +100,18 @@ public:
     void Add(const Pyramid *pyr);
 
     /**
-     * @brief Blend
-     * @param pyr
-     * @param weight
-     */
-    void Blend(Pyramid *pyr, Pyramid *weight);
-
-    /**
      * @brief Reconstruct evaluates a Gaussian/Laplacian pyramid.
      * @param imgOut
      * @return
      */
     Image *Reconstruct(Image *imgOut);
+
+    /**
+     * @brief Blend
+     * @param pyr
+     * @param weight
+     */
+    void Blend(Pyramid *pyr, Pyramid *weight);
 
     /**
      * @brief size
@@ -203,7 +206,7 @@ void Pyramid::Create(Image *img, bool lapGauss, int limitLevel = 0)
 #endif
 }
 
-Image *Pyramid::Reconstruct(Image *imgOut)
+Image *Pyramid::Reconstruct(Image *imgOut = NULL)
 {
     if(stack.size() < 2) {
         return imgOut;

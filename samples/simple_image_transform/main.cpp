@@ -22,13 +22,13 @@ See the GNU Lesser General Public License
 
 */
 
-#include <QCoreApplication>
-
 //This means that we disable Eigen; some functionalities cannot be used.
 //For example, estimating the camera response function
 #define PIC_DISABLE_EIGEN
+
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
+
 //This means we do not use QT for I/O
 #define PIC_DISABLE_QT
 
@@ -36,12 +36,9 @@ See the GNU Lesser General Public License
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
-
     printf("Reading an HDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/bottles.hdr");
 
     printf("Ok\n");
@@ -57,7 +54,7 @@ int main(int argc, char *argv[])
         pic::Matrix3x3 h;
         h.SetTranslationMatrix(64.0f, 64.0f);
 
-        pic::ImageRAW *imgOut_tra = pic::FilterWarp2D::Execute(&img, NULL, h, bSameSize);
+        pic::Image *imgOut_tra = pic::FilterWarp2D::Execute(&img, NULL, h, bSameSize);
         printf("Ok\n");
 
         printf("Writing the output...");
@@ -73,7 +70,7 @@ int main(int argc, char *argv[])
         printf("\nRotating the image of 45 degrees...");
         h.SetRotationMatrix(pic::Deg2Rad(45.0f));
 
-        pic::ImageRAW *imgOut_rot = pic::FilterWarp2D::Execute(&img, NULL, h, bSameSize, true);
+        pic::Image *imgOut_rot = pic::FilterWarp2D::Execute(&img, NULL, h, bSameSize, true);
         printf("Ok\n");
 
         printf("Writing the output...");
@@ -88,7 +85,7 @@ int main(int argc, char *argv[])
         //setting up a shear degree rotation matrix
         printf("\nApplying shear transform to the image...");
         h.SetShearMatrix(0.2f, 0.1f);        
-        pic::ImageRAW *imgOut_sheared = pic::FilterWarp2D::Execute(&img, NULL, h, bSameSize, true);
+        pic::Image *imgOut_sheared = pic::FilterWarp2D::Execute(&img, NULL, h, bSameSize, true);
 
         printf("Ok\n");
 
@@ -104,7 +101,7 @@ int main(int argc, char *argv[])
         //setting up a scaling matrix
         printf("\nApplying a scaling transform to the image...");
         h.SetScaleMatrix(2.0f, 0.5f);
-        pic::ImageRAW *imgOut_scaled = pic::FilterWarp2D::Execute(&img, NULL, h, bSameSize, true);
+        pic::Image *imgOut_scaled = pic::FilterWarp2D::Execute(&img, NULL, h, bSameSize, true);
 
         printf("Ok\n");
 

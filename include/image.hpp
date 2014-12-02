@@ -1410,28 +1410,31 @@ PIC_INLINE void Image::MulS(Image *img)
 
 PIC_INLINE void Image::Blend(Image *img, Image *weight)
 {
-    if(img == NULL) {
+    if(img == NULL || weight == NULL) {
         return;
     }
 
-    if(weight->channels != 1) {
+    if( (weight->channels != 1) &&
+        (weight->channels != img->channels)) {
         return;
     }
 
-    int size = frames * height * width;
+    int size = height * width;
 
     #pragma omp parallel for
 
     for(int ind = 0; ind < size; ind++) {
         int i = ind * channels;
 
-        float w0 = weight->data[ind];
+        int indx_w = ind * weight->channels;
+        //int indx_w = i_w;// + (j % weight->channels);
+        float w0 = weight->data[indx_w];
         float w1 = 1.0f - w0;
 
         for(int j = 0; j < channels; j++) {
             int indx = i + j;
-            data[indx] *= w0;
-            data[indx] += img->data[indx] * w1;
+
+            data[indx] = data[indx] * w0 + img->data[indx] * w1;
         }
     }
 }

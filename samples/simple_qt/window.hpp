@@ -37,7 +37,7 @@ class QScrollBar;
 QT_END_NAMESPACE
 
 namespace pic{
-class ImageRAW;
+class Image;
 }
 
 class Window : public QMainWindow
@@ -65,7 +65,7 @@ protected:
     void adjust_scrollbar(QScrollBar *scrollbar, double factor);
     void update_pixmap();
 
-    pic::ImageRAW *image;
+    pic::Image *image;
     QString *last_filename;
 
     QLabel *image_label;

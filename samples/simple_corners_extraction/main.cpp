@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an LDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/features/balcony_1.png", pic::LT_NOR);
 
     printf("Ok\n");
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
         printf("\n");
 
-        pic::ImageRAW *imgCorners = fcd.getCornersImage(&corners);
+        pic::Image *imgCorners = fcd.getCornersImage(&corners);
 
         bWritten = imgCorners->Write("../data/output/fast_corner_image.png");
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
         }
         printf("\n");
 
-        pic::ImageRAW *imgCorners_harris = fcd.getCornersImage(&corners_harris);
+        pic::Image *imgCorners_harris = fcd.getCornersImage(&corners_harris);
         bWritten = imgCorners_harris->Write("../data/output/harris_corner_image.png");
 
 
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
         }
         printf("\n");
 
-        pic::ImageRAW *imgCorners_susan = scd.getCornersImage(&corners_susan);
+        pic::Image *imgCorners_susan = scd.getCornersImage(&corners_susan);
 
         bWritten = imgCorners_susan->Write("../data/output/susan_corner_image.png");
 

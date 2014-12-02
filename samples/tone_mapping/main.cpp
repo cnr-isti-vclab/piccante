@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an HDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/bottles.hdr");
 
     printf("Ok\n");
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         printf("Tone mapping using Reinhard et al.'s TMO...");
-        pic::ImageRAW *imgToneMapped_reinhard = pic::ReinhardTMO(&img);
+        pic::Image *imgToneMapped_reinhard = pic::ReinhardTMO(&img);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
         }
 
         printf("Tone mapping using Drago et al.'s TMO...");
-        pic::ImageRAW *imgToneMapped_drago = pic::DragoTMO(&img);
+        pic::Image *imgToneMapped_drago = pic::DragoTMO(&img);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 
 
         printf("Tone mapping using Ward Histogram Adjustment TMO...");
-        pic::ImageRAW *imgToneMapped_ward = pic::WardHistogramTMO(&img);
+        pic::Image *imgToneMapped_ward = pic::WardHistogramTMO(&img);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
         }
 
         printf("Tone mapping using Lischinski et al. 2006 automatic TMO...");
-        pic::ImageRAW *imgToneMapped_lischinski = pic::LischinskiTMO(&img, NULL, 0.5f);
+        pic::Image *imgToneMapped_lischinski = pic::LischinskiTMO(&img, NULL, 0.5f);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.

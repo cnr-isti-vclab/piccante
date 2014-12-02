@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an HDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/bottles.hdr");
 
     printf("Ok\n");
@@ -46,19 +46,19 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         printf("Filtering the image with a PSF read from file...");
-        pic::ImageRAW psf("../data/input/kernel_psf.png");
+        pic::Image psf("../data/input/kernel_psf.png");
 
         //normalization of the PSF
         float *norm = psf.getSumVal(NULL, NULL);
         psf.Div(norm[0]);
 
-        pic::ImageRAW *conv = pic::FilterConv2D::Execute(&img, &psf, NULL);
+        pic::Image *conv = pic::FilterConv2D::Execute(&img, &psf, NULL);
         conv->Write("../data/output/bottles_conv_kernel_psf.hdr");
 
         printf("Ok!\n");
 
         printf("Filtering the image with a PSF read from file...");
-        pic::ImageRAW *deconv = pic::RichardsonLucyDeconvolution(conv, &psf, 1000, NULL);
+        pic::Image *deconv = pic::RichardsonLucyDeconvolution(conv, &psf, 1000, NULL);
 
         printf("Ok!\n");
 

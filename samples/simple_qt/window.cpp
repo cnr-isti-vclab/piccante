@@ -76,7 +76,7 @@ void Window::open()
         return;
     }
 
-    pic::ImageRAW *pic_im = new pic::ImageRAW;
+    pic::Image *pic_im = new pic::Image;
     pic_im->Read(fileName.toStdString());
 
     if(!pic_im->isValid()) {
@@ -93,11 +93,12 @@ void Window::open()
         return;
     }
 
-    if(last_filename != NULL){
+    if(last_filename != NULL) {
         delete last_filename;
     }
+
     last_filename = new QString(fileName);
-    if(image!=NULL){
+    if(image != NULL) {
         delete image;
     }
     image = pic_im;
@@ -254,7 +255,7 @@ void Window::zoom_fit()
 
 void Window::gaussian_blur()
 {
-    pic::ImageRAW *output = pic::FilterGaussian2D::Execute(image, NULL, 4.0f);
+    pic::Image *output = pic::FilterGaussian2D::Execute(image, NULL, 4.0f);
     delete image;
     image = output;
     update_pixmap();

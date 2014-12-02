@@ -27,6 +27,7 @@ See the GNU Lesser General Public License
 //This means that we disable Eigen; some functionalities cannot be used.
 //For example, estimating the camera response function
 #define PIC_DISABLE_EIGEN
+
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an LDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/singapore.png");
 
     printf("Ok\n");
@@ -49,7 +50,7 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         printf("DCT transform...");
-        pic::ImageRAW *img_dct = pic::FilterDCT2D::Transform(&img, NULL, 8);
+        pic::Image *img_dct = pic::FilterDCT2D::Transform(&img, NULL, 8);
         printf(" Ok\n");
 
         printf("Removing small coefficients...");
@@ -60,7 +61,7 @@ int main(int argc, char *argv[])
         }
         printf(" Ok\n");
 
-        pic::ImageRAW *imgOut = pic::FilterDCT2D::Inverse(img_dct, NULL, 8);
+        pic::Image *imgOut = pic::FilterDCT2D::Inverse(img_dct, NULL, 8);
 
         printf("Writing the file to disk...");
         bool bWritten = imgOut->Write("../data/output/simple_dct.png");
