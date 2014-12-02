@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
         imgOut->Write("../data/output/laplacian_blending_result.png", pic::LT_NOR);
 
     } else {
-        printf("No images are not valid!\n");
+        printf("All images are not valid!\n");
     }
 
     return 0;
