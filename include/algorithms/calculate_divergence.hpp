@@ -35,7 +35,7 @@ namespace pic {
  * @param div is the output divergence of the gradient of img; i.e. Laplacian.
  * @return
  */
-Image *CalculateDivergence(Image *img, Image *div)
+Image *CalculateDivergence(Image *img, Image *div = NULL)
 {
     if(img == NULL) {
         return div;
@@ -55,7 +55,7 @@ Image *CalculateDivergence(Image *img, Image *div)
     Image *img_dy = FilterConv1D::Execute(img, NULL, kernelGrad, 3, false);
 
     //calculating the divergence using backward differences
-    img_dx2 = FilterConv1D::Execute(img_dx, div , kernelDiv, 3, true);
+    img_dx2 = FilterConv1D::Execute(img_dx, div ,   kernelDiv, 3, true);
     img_dy2 = FilterConv1D::Execute(img_dy, img_dx, kernelDiv, 3, false);
 
     div->Add(img_dy2);

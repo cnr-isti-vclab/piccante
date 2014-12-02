@@ -40,18 +40,20 @@ namespace pic {
  * @param ret
  * @return
  */
-Image *PoissonSolver(Image *f, Image *ret)
+Image *PoissonSolver(Image *f, Image *ret = NULL)
 {
     if(f == NULL) {
         return NULL;
     }
 
+    //Allocating the output
+    if(ret == NULL) {
+        ret = f->AllocateSimilarOne();
+    }
+
     int width = f->width;
     int height = f->height;
     int tot = height * width;
-
-    Eigen::VectorXd b, x;
-    b = Eigen::VectorXd::Zero(tot);
 
     #ifdef PIC_DEBUG
         printf("Init matrix...");
@@ -64,7 +66,6 @@ Image *PoissonSolver(Image *f, Image *ret)
 
         for(int j = 0; j < width; j++) {
             int indI = tmpI + j;
-            b[indI] = -f->data[indI];
 
             tL.push_back(Eigen::Triplet< double > (indI, indI, 4.0f));
 
@@ -86,34 +87,45 @@ Image *PoissonSolver(Image *f, Image *ret)
         printf("Ok\n");
     #endif
 
-    //Solving the linear system
+    //Solving the system for each color channel
     Eigen::SparseMatrix<double> A = Eigen::SparseMatrix<double>(tot, tot);
     A.setFromTriplets(tL.begin(), tL.end());
-
     Eigen::SimplicialCholesky<Eigen::SparseMatrix<double> > solver(A);
-    x = solver.solve(b);
 
-    if(solver.info() != Eigen::Success) {
+    for(int k=0; k< f->channels; k++) {
+
+        Eigen::VectorXd b, x;
+        b = Eigen::VectorXd::Zero(tot);
+
+        //copying values from f to b
+        for(int i = 0; i < height; i++) {
+            int tmpI = i * width;
+            for(int j = 0; j < width; j++) {
+                int indI = (tmpI + j);
+                b[indI] = - f->data[indI * f->channels + k];
+            }
+        }
+
+        x = solver.solve(b);
+
+        if(solver.info() != Eigen::Success) {
+            #ifdef PIC_DEBUG
+                printf("SOLVER FAILED!\n");
+            #endif
+
+            return NULL;
+        }
+
         #ifdef PIC_DEBUG
-            printf("SOLVER FAILED!\n");
+            printf("SOLVER SUCCESS!\n");
         #endif
-        return NULL;
-    }
 
-    #ifdef PIC_DEBUG
-        printf("SOLVER SUCCESS!\n");
-    #endif
+        for(int i = 0; i < height; i++) {
+            int tmpI = i * width;
 
-    //Copy from x to ret
-    if(ret == NULL) {
-        ret = f->AllocateSimilarOne();
-    }
-
-    for(int i = 0; i < height; i++) {
-        int tmpI = i * width;
-
-        for(int j = 0; j < width; j++) {
-            (*ret)(j, i)[0] = float(x(tmpI + j));
+            for(int j = 0; j < width; j++) {
+                (*ret)(j, i)[k] = float(x(tmpI + j));
+            }
         }
     }
 

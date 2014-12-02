@@ -27,6 +27,11 @@ See the GNU Lesser General Public License
 
 #include "piccante.hpp"
 
+float logDelta(float x)
+{
+    return log(x + 1e-6f);
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -48,22 +53,23 @@ int main(int argc, char *argv[])
         maskB.Sub(&maskA);
 
         //Creating Laplacian pyramids
-        pic::Pyramid pyrA(&imgA, true, 4);
-        pic::Pyramid pyrB(&imgB, true, 4);
+        imgA.ApplyFunction(logDelta);
+        imgB.ApplyFunction(logDelta);
+        pic::Image *div_imgA = pic::CalculateDivergence(&imgA);
+        pic::Image *div_imgB = pic::CalculateDivergence(&imgB);
 
-        //Creating Gaussian pyramids
-        pic::Pyramid pyrMA(&maskA, false, 4);
-        pic::Pyramid pyrMB(&maskB, false, 4);
+        div_imgA->Mul(&maskA);
+        div_imgB->Mul(&maskB);
 
-        //Blending
-        pyrA.Mul(&pyrMA);
-        pyrB.Mul(&pyrMB);
+        div_imgA->Add(div_imgB);
 
-        pyrA.Add(&pyrB);
+        div_imgA->Write("../data/output/div.pfm");
 
-        pic::Image *imgOut = pyrA.Reconstruct();
+        pic::Image *imgOut = PoissonSolver(div_imgA);
+        imgOut->ApplyFunction(expf);
 
-        imgOut->Write("../data/output/laplacian_blending_result.png", pic::LT_NOR);
+        imgOut->Write("../data/output/poisson_blending_result.png", pic::LT_NOR);
+
 
     } else {
         printf("No images are not valid!\n");
