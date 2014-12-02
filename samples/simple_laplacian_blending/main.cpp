@@ -48,16 +48,18 @@ int main(int argc, char *argv[])
         maskB.Sub(&maskA);
 
         //Creating Laplacian pyramids
-        pic::Pyramid pyrA(&imgA, true);
-        pic::Pyramid pyrB(&imgB, true);
+        pic::Pyramid pyrA(&imgA, true, 4);
+        pic::Pyramid pyrB(&imgB, true, 4);
 
         //Creating Gaussian pyramids
-        pic::Pyramid pyrMA(&maskA, false);
-        pic::Pyramid pyrMB(&maskB, false);
+        pic::Pyramid pyrMA(&maskA, false, 4);
+        pic::Pyramid pyrMB(&maskB, false, 4);
 
         //Blending
         pyrA.Mul(&pyrMA);
         pyrB.Mul(&pyrMB);
+
+        pyrB.Reconstruct()->Write("../data/output/laplacian_blending_resul1t.png");
 
         pyrA.Add(&pyrB);
 
