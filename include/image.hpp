@@ -1848,10 +1848,10 @@ PIC_INLINE void Image::ConvertFromMask(bool *mask, int width, int height)
     }
 }
 
-PIC_INLINE bool *Image::ConvertToMask(float *color, float threshold,
+PIC_INLINE bool *Image::ConvertToMask(float *color = NULL, float threshold = 0.5f,
                                       bool cmp = true,  bool *mask = NULL)
 {
-    if(!isValid() || (color==NULL)) {
+    if(!isValid() || (color == NULL)) {
         return NULL;
     }
     

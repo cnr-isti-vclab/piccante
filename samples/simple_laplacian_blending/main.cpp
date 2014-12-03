@@ -29,13 +29,15 @@ See the GNU Lesser General Public License
 
 int main(int argc, char *argv[])
 {
+    Q_UNUSED(argc);
+    Q_UNUSED(argv);
 
     printf("Reading images...");
 
     pic::Image imgA, imgB, maskA;
-    imgA.Read("../data/input/laplacian/image.png", pic::LT_NOR);
-    imgB.Read("../data/input/laplacian/target.png", pic::LT_NOR);
-    maskA.Read("../data/input/laplacian/mask.png", pic::LT_NOR);
+    img_target.Read("../data/input/laplacian/target.png", pic::LT_NOR);
+    img_source.Read("../data/input/laplacian/source.png", pic::LT_NOR);
+    mask_target.Read("../data/input/laplacian/mask.png", pic::LT_NOR);
 
     printf("Ok\n");
 
@@ -43,25 +45,25 @@ int main(int argc, char *argv[])
     if( imgA.isValid() && imgB.isValid() && maskA.isValid()) {
         printf("OK\n");
 
-        pic::Image maskB(maskA.width, maskA.height, maskA.channels);
-        maskB.Assign(1.0f);
-        maskB.Sub(&maskA);
+        pic::Image mask_source(mask_target.width, mask_target.height, mask_target.channels);
+        mask_source.Assign(1.0f);
+        mask_source.Sub(&mask_target);
 
         //Creating Laplacian pyramids
-        pic::Pyramid pyrA(&imgA, true, 4);
-        pic::Pyramid pyrB(&imgB, true, 4);
+        pic::Pyramid pyr_target(&img_target, true, 4);
+        pic::Pyramid pyr_source(&img_source, true, 4);
 
         //Creating Gaussian pyramids
-        pic::Pyramid pyrMA(&maskA, false, 4);
-        pic::Pyramid pyrMB(&maskB, false, 4);
+        pic::Pyramid pyr_mask_target(&mask_target, false, 4);
+        pic::Pyramid pyr_mask_source(&mask_source, false, 4);
 
         //Blending
-        pyrA.Mul(&pyrMA);
-        pyrB.Mul(&pyrMB);
+        pyr_target.Mul(&pyr_mask_target);
+        pyr_source.Mul(&pyr_mask_source);
 
-        pyrA.Add(&pyrB);
+        pyr_target.Add(&pyr_source);
 
-        pic::Image *imgOut = pyrA.Reconstruct();
+        pic::Image *imgOut = pyr_target.Reconstruct();
 
         imgOut->Write("../data/output/laplacian_blending_result.png", pic::LT_NOR);
 

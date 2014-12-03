@@ -25,33 +25,37 @@ See the GNU Lesser General Public License
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
+#define PIC_DEBUG
+
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
+    Q_UNUSED(argc);
+    Q_UNUSED(argv);
 
     printf("Reading images...");
 
-    pic::Image imgA, imgB, maskA;
-    imgA.Read("../data/input/laplacian/image.png", pic::LT_NOR);
-    imgB.Read("../data/input/laplacian/target.png", pic::LT_NOR);
-    maskA.Read("../data/input/laplacian/mask.png", pic::LT_NOR);
+    pic::Image img_target, img_source, mask_source;
+    img_target.Read("../data/input/poisson/target.png", pic::LT_NOR);
+    img_source.Read("../data/input/poisson/source.png", pic::LT_NOR);
+    mask_source.Read("../data/input/poisson/mask.png", pic::LT_NOR);
 
     printf("Ok\n");
 
     printf("Are images valid? ");
-    if( imgA.isValid() && imgB.isValid() && maskA.isValid()) {
+    if( img_target.isValid() && img_source.isValid() && mask_source.isValid()) {
         printf("OK\n");
 
-        pic::Image maskB(maskA.width, maskA.height, maskA.channels);
-        maskB.Assign(1.0f);
-        maskB.Sub(&maskA);
+        float color[] = {1.0f, 1.0f, 1.0f};
+        bool *mask = mask_source.ConvertToMask(color, 0.1f, false);
 
-        imgOut->Write("../data/output/poisson_blending_result.png", pic::LT_NOR);
+        pic::Image *imgOut = PoissonImageEditing(&img_source, &img_target, mask);
+        imgOut->Write("../data/output/poisson_blending_result.pfm");
 
 
     } else {
-        printf("No images are not valid!\n");
+        printf("Images are not valid!\n");
     }
 
     return 0;

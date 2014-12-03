@@ -34,6 +34,7 @@ See the GNU Lesser General Public License
 #include "algorithms/poisson_solver_iterative.hpp"
 #include "algorithms/poisson_filling.hpp"
 #include "algorithms/poisson_solver.hpp"
+#include "algorithms/poisson_image_editing.hpp"
 #include "algorithms/pushpull.hpp"
 #include "algorithms/pyramid.hpp"
 #include "algorithms/quadtree.hpp"

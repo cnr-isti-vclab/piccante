@@ -31,6 +31,7 @@ See the GNU Lesser General Public License
 #include "externals/Eigen/src/SparseCore/SparseMatrix.h"
 
 #include "image.hpp"
+#include "filtering/filter_laplacian.hpp"
 
 namespace pic {
 
@@ -42,7 +43,7 @@ namespace pic {
  * @param ret
  * @return
  */
-Image *PoissonImageEditing(Image *source, Image *target, Image *mask, Image *ret = NULL)
+Image *PoissonImageEditing(Image *source, Image *target, bool *mask, Image *ret = NULL)
 {
     if((source == NULL) || (target == NULL) || (mask == NULL)) {
         return NULL;
@@ -50,72 +51,121 @@ Image *PoissonImageEditing(Image *source, Image *target, Image *mask, Image *ret
 
     //Allocating the output
     if(ret == NULL) {
-        ret = f->AllocateSimilarOne();
+        ret = target->Clone();
     }
 
-    int width = f->width;
-    int height = f->height;
-    int tot = height * width;
+    int width  = target->width;
+    int height = target->height;
 
     #ifdef PIC_DEBUG
         printf("Init matrix...");
     #endif
 
+    Image *lap_source = FilterLaplacian::Execute(source, NULL);
+
     std::vector< Eigen::Triplet< double > > tL;
 
+    //indices pass
+    int *index = new int[width * height];
+    int count = 0;
     for(int i = 0; i < height; i++) {
         int tmpI = i * width;
 
         for(int j = 0; j < width; j++) {
             int indI = tmpI + j;
 
-            if((*mask)(j,i)[0] > 0.5f) {
-
-                tL.push_back(Eigen::Triplet< double > (indI, indI, 4.0f));
-
-                if(((indI + 1) < tot) &&
-                   ((indI % width) != (width - 1))) {
-
-                    tL.push_back(Eigen::Triplet< double > (indI, indI + 1, -1.0f));
-                    tL.push_back(Eigen::Triplet< double > (indI + 1, indI, -1.0f));
-                }
+            if(mask[indI]) {
+                index[indI] = count;
+                count++;
             } else {
-                tL.push_back(Eigen::Triplet< double > (indI, indI, 1.0f));
+                index[indI] = 0;
             }
         }
     }
 
-    /*
-    for(int i = 0; i < (tot - width); i++) {
-        tL.push_back(Eigen::Triplet< double > (i + width, i         , -1.0f));
-        tL.push_back(Eigen::Triplet< double > (i        , i +  width, -1.0f));
-    }*/
+    //matrix A pass
+    count = 0;
+    for(int i = 0; i < height; i++) {
+        int tmpI = i * width;
+
+        for(int j = 0; j < width; j++) {
+            int indI = tmpI + j;
+
+            if(mask[indI]) {
+
+                float n = 0.0f;
+                if(i < (width - 1) && mask[indI + 1]) {
+                    n += 1.0f;
+                    tL.push_back(Eigen::Triplet< double > (count, index[indI + 1], -1.0));
+                }
+
+                if(i > 0 && mask[indI - 1]) {
+                    n += 1.0f;
+                    tL.push_back(Eigen::Triplet< double > (count, index[indI - 1], -1.0));
+                }
+
+                if(j < (height - 1) && mask[indI + width]) {
+                    n += 1.0f;
+                    tL.push_back(Eigen::Triplet< double > (count, index[indI + width], -1.0));
+                }
+
+                if(j > 0 && mask[indI - width]) {
+                    n += 1.0f;
+                    tL.push_back(Eigen::Triplet< double > (count, index[indI - width], -1.0));
+                }
+
+                tL.push_back(Eigen::Triplet< double > (count, count , 4.0));
+
+                count++;
+            }
+        }
+    }
+
+    int tot = count;
+    Eigen::SparseMatrix<double> A = Eigen::SparseMatrix<double>(tot, tot);
+    A.setFromTriplets(tL.begin(), tL.end());
 
     #ifdef PIC_DEBUG
         printf("Ok\n");
     #endif
 
     //Solving the system for each color channel
-    Eigen::SparseMatrix<double> A = Eigen::SparseMatrix<double>(tot, tot);
-    A.setFromTriplets(tL.begin(), tL.end());
     Eigen::SimplicialCholesky<Eigen::SparseMatrix<double> > solver(A);
 
-    for(int k=0; k< f->channels; k++) {
+    for(int k=0; k< target->channels; k++) {
 
         Eigen::VectorXd b, x;
         b = Eigen::VectorXd::Zero(tot);
 
-        //copying values from f to b
+        //assigning values to b
+        int count = 0;
         for(int i = 0; i < height; i++) {
             int tmpI = i * width;
+
             for(int j = 0; j < width; j++) {
                 int indI = (tmpI + j);
-                int indI_k = indI * target->channels + k;
 
-                if(mask->data[indI * mask->channels] <= 0.5f ) {
-                    b[indI] = target->data[indI_k];
-                } else {
-                    b[indI] = target->data[indI_k];
+                if(mask[indI]) {
+
+                    b[count] = -(*lap_source)(j, i)[k];
+
+                    if(i < (width - 1) && !mask[indI + 1]) {
+                        b[count] += (*target)(j + 1, i)[k];
+                    }
+
+                    if(i > 0 && !mask[indI - 1]) {
+                        b[count] += (*target)(j - 1, i)[k];
+                    }
+
+                    if(i < (height - 1) && !mask[indI + width]) {
+                        b[count] += (*target)(j, i + 1)[k];
+                    }
+
+                    if(j > 0 && !mask[indI - width]) {
+                        b[count] += (*target)(j, i - 1)[k];
+                    }
+
+                    count++;
                 }
             }
         }
@@ -134,11 +184,18 @@ Image *PoissonImageEditing(Image *source, Image *target, Image *mask, Image *ret
             printf("SOLVER SUCCESS!\n");
         #endif
 
+        count = 0;
         for(int i = 0; i < height; i++) {
             int tmpI = i * width;
 
             for(int j = 0; j < width; j++) {
-                (*ret)(j, i)[k] = float(x(tmpI + j));
+                int indI = (tmpI + j);
+
+                if(mask[indI]) {
+                    float val = float(x(count));
+                    (*ret)(j, i)[k] = val > 0.0f ? val : 0.0f;
+                    count++;
+                }
             }
         }
     }
@@ -150,5 +207,5 @@ Image *PoissonImageEditing(Image *source, Image *target, Image *mask, Image *ret
 
 #endif
 
-#endif /* PIC_ALGORITHMS_POISSON_SOLVER_HPP */
+#endif /* PIC_ALGORITHMS_POISSON_IMAGE_EDITING_HPP */
 
