@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         bool *mask = mask_source.ConvertToMask(color, 0.1f, false);
 
         pic::Image *imgOut = PoissonImageEditing(&img_source, &img_target, mask);
-        imgOut->Write("../data/output/poisson_blending_result.pfm");
+        imgOut->Write("../data/output/poisson_blending_result.png", pic::LT_NOR);
 
 
     } else {
