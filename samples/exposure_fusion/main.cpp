@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an HDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/bottles.hdr");
 
     printf("Ok\n");
@@ -47,9 +47,9 @@ int main(int argc, char *argv[])
 
         printf("Computing HDR Image histogram...");
 
-        pic::ImageRAWVec input = Single(&img);
+        pic::ImageVec input = Single(&img);
         pic::FilterLuminance fLum;
-        pic::ImageRAW *lum = fLum.ProcessP(input, NULL);
+        pic::Image *lum = fLum.ProcessP(input, NULL);
 
         pic::Histogram hst;
         hst.Calculate(lum, pic::VS_LOG_2, 256, 0);
@@ -58,10 +58,10 @@ int main(int argc, char *argv[])
         printf("Extracting exposures from the HDR image...");
         pic::FilterSimpleTMO fltTMO(2.2f, 0.0f);
         std::vector< float > exposures = hst.ExposureCovering(8, 0.5f);
-        pic::ImageRAWVec stack;
+        pic::ImageVec stack;
         for(unsigned int i = 0; i < exposures.size(); i++) {
             fltTMO.Update(2.2f, exposures[i]);
-            pic::ImageRAW *tmp = fltTMO.ProcessP(input, NULL);
+            pic::Image *tmp = fltTMO.ProcessP(input, NULL);
             tmp->clamp(0.0f, 1.0f);
             stack.push_back(tmp);
 
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         printf("Tone mapping using Exposure Fusion...");
-        pic::ImageRAW *imgToneMapped = pic::ExposureFusion(stack, NULL, 0.2f, 1.0f, 0.2f);
+        pic::Image *imgToneMapped = pic::ExposureFusion(stack, NULL, 0.2f, 1.0f, 0.2f);
         printf("Ok\n");
 
         printf("Writing the tone mapped image to disk...\n");

@@ -176,8 +176,8 @@ public:
 
         float delta = maxL - minL;
 
-        lum->Sub(minL);
-        lum->Mul(delta);
+        *lum -= minL;
+        *lum *= delta;
 
         if(corners == NULL) {
             corners = new std::vector< Eigen::Vector3f >;
@@ -197,10 +197,10 @@ public:
             Ixy->Assign(Ix);
         }
 
-        Ixy->Mul(Iy);
+        *Ixy *= *Iy;
 
-        Ix->Mul(Ix);
-        Iy->Mul(Iy);
+        *Ix *= *Ix;
+        *Iy *= *Iy;
 
         float eps = 2.2204e-16f;
 
@@ -211,7 +211,7 @@ public:
         Ixy_flt = flt.ProcessP(Single(Ixy), Ixy_flt);
 
         //ret = (Ix2.*Iy2 - Ixy.^2)./(Ix2 + Iy2 + eps);
-        Ixy_flt->Mul(Ixy_flt);//Ixy.^2
+        *Ixy_flt *= *Ixy_flt; //Ixy.^2
 
         if(ret == NULL) {
             ret = Ix2_flt->Clone();
@@ -219,13 +219,13 @@ public:
             ret->Assign(Ix2_flt);
         }
 
-        ret->Mul(Iy2_flt);//Ix2.*Iy2
-        ret->Sub(Ixy_flt);
+        *ret *= *Iy2_flt; //Ix2.*Iy2
+        *ret -= *Ixy_flt;
 
-        Ix2_flt->Add(Iy2_flt);
-        Ix2_flt->Add(eps);
+        *Ix2_flt += *Iy2_flt;
+        *Ix2_flt += eps;
 
-        ret->Div(Ix2_flt);
+        *ret /= *Ix2_flt;
 
         //Maximal supression
         filtered = FilterMax::Execute(ret, filtered, radius * 2 + 1);

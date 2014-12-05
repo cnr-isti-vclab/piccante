@@ -192,7 +192,7 @@ public:
 
         L = FilterLuminance::Execute(img, L, LT_CIE_LUMINANCE);
         float maxVal = L->getMaxVal()[0];
-        L->Div(maxVal);
+        * L *= maxVal;
 
         grad = FilterGradient::Execute(gauss, grad);
 
@@ -207,8 +207,8 @@ public:
             sY += fabsf(gY->data[i]);
         }
 
-        gX->Mul(2.0f / sX);
-        gY->Mul(2.0f / sY);
+        *gX *= (2.0f / sX);
+        *gY *= (2.0f / sY);
 
         L_X = fltConv.ProcessP(Double(L, gX), L_X);
         L_Y = fltConv.ProcessP(Double(L, gY), L_Y);

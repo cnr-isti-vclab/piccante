@@ -47,9 +47,9 @@ inline Image *EdgeEnhancement(Image *imgIn, float sigma_s = 4.0f,
     Image *imgBase = FilterBilateral2DS::Execute(imgIn, sigma_s, sigma_r);
     Image *detail = imgIn->Clone();
 
-    detail->Div(imgBase);
+    *detail /= *imgBase;
     imgBase->Assign(imgIn);
-    imgBase->Mul(detail);
+    *imgBase *= *detail;
     return imgBase;
 }
 

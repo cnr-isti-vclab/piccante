@@ -119,7 +119,7 @@ public:
         Image conv(nameConv, LT_NOR_GAMMA);
 
         float *sumVal = conv.getSumVal(NULL, NULL);
-        conv.Div(sumVal[0]);
+        conv /= sumVal[0];
 
         Image *imgOut = Execute(&img, &conv, NULL);
 

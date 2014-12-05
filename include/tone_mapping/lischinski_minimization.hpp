@@ -86,7 +86,7 @@ Image *LischinskiMinimization(Image *L, Image *g,
 
     if(omega == NULL) {
         omega = L->AllocateSimilarOne();
-        omega->Assign(0.0f);
+        *omega = 0.0f;
     }
 
     int width = L->width;

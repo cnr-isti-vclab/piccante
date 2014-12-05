@@ -509,7 +509,7 @@ public:
 
             float *max_val = img.getMaxVal(NULL, NULL);
             if(max_val[0] > 0.0f) {
-                img.Div(max_val[0]);
+                img /= max_val[0];
             }
 
             icrf.push_back(icrf_channel);

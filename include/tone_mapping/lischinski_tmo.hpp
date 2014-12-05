@@ -131,7 +131,7 @@ Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL,
 
     //Lischinski minimization
     Image *tmp = lum->AllocateSimilarOne();
-    tmp->Assign(0.007f);
+    *tmp = 0.007f;
     fstopMap = LischinskiMinimization(lum_log, fstopMap, tmp);
 
     for(int i = 0; i < lum->height; i++) {

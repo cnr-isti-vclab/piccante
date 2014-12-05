@@ -106,7 +106,7 @@ Image *ExposureFusion(ImageVec imgIn, Image *imgOut, float wC = 1.0f,
                                     powf(pSat, wS);
         }
 
-        acc->Add(curWeight);
+        *acc += *curWeight;
     }
 
     for(int i=0; i<acc->size(); i++) {
@@ -126,7 +126,7 @@ Image *ExposureFusion(ImageVec imgIn, Image *imgOut, float wC = 1.0f,
     
     for(int j = 0; j < n; j++) {
         //normalization
-        weights_list[j]->Div(acc);
+        *weights_list[j] /= *acc;
 
         pW->Update(weights_list[j]);
 

@@ -118,7 +118,7 @@ public:
         full_image.SetZero();
 
         Image quad(1, 128, 128, 3);
-        quad.Assign(1.0f);
+        quad = 1.0f;
 
         full_image.CopySubImage(&quad, 192, 192);
 

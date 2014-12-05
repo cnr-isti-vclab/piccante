@@ -117,7 +117,7 @@ public:
     static void Test()
     {
         Image imgIn(1, 512, 512, 3);
-        imgIn.Assign(1.0f);
+        imgIn = 1.0f;
 
         FilterChannel filter(0);
         Image *outR = filter.Process(Single(&imgIn), NULL);

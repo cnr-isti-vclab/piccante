@@ -70,7 +70,7 @@ public:
     {
         //Create an alpha channel
         Image *alpha = new Image(imgIn->frames, imgIn->width, imgIn->height, 1);
-        alpha->Assign(value);
+        *alpha = value;
 
         //Add the channel to the image
         ImageVec src;

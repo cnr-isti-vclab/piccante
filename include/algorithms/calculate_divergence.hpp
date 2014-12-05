@@ -58,7 +58,7 @@ Image *CalculateDivergence(Image *img, Image *div = NULL)
     img_dx2 = FilterConv1D::Execute(img_dx, div ,   kernelDiv, 3, true);
     img_dy2 = FilterConv1D::Execute(img_dy, img_dx, kernelDiv, 3, false);
 
-    div->Add(img_dy2);
+    *div += *img_dy2;
 
     delete img_dx;
     delete img_dy;

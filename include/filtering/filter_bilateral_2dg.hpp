@@ -335,7 +335,7 @@ Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
         base = imgIn[0];
         edge = imgIn[1];
         maxVal = MAX(base->getMaxVal()[0], edge->getMaxVal()[0]);
-        edge->Div(maxVal);
+        *edge /= maxVal;
     } else {
         base = imgIn[0];
         edge = imgIn[0];
@@ -343,7 +343,7 @@ Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
     }
 
     //Range in [0,1]
-    base->Div(maxVal);
+    *base /= maxVal;
     float tmpSigma_r = sigma_r;
     sigma_r /= maxVal;
 
@@ -375,7 +375,7 @@ Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
         Slice(imgOut, base, edge, i);
     }
 
-    imgOut->Mul(maxVal);
+    *imgOut *= maxVal;
     sigma_r = tmpSigma_r;
     parallel = false;
 

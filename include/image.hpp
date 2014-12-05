@@ -37,6 +37,7 @@ See the GNU Lesser General Public License
 #include "util/compability.hpp"
 #include "util/bbox.hpp"
 #include "util/buffer.hpp"
+#include "util/low_dynamic_range.hpp"
 
 #include "util/math.hpp"
 
@@ -54,9 +55,6 @@ See the GNU Lesser General Public License
 #include "util/io.hpp"
 
 namespace pic {
-
-const double HARMONIC_MEAN_EPSILON = 1e-6;
-const float  HARMONIC_MEAN_EPSILONf = 1e-6f;
 
 /**
  * @brief The Image class stores an image as buffer of float.
@@ -279,54 +277,12 @@ public:
      */
     bool SimilarType(Image *img);
 
+
     /**
-     * @brief Assign is the assignment operator for Image.
-     * @param imgIn is the Image to be assigned to the current Image.
-     * They need to have the same width, height and color channels.
+     * @brief Assign
+     * @param imgIn
      */
     void Assign(Image *imgIn);
-
-    /**
-     * @brief Assign is the assignment operator for Image.
-     * @param val is a single value to be assigned to the current Image.
-     */
-    void Assign(float val);
-
-    /**
-     * @brief Add is the addition operator for Image.
-     * @param img is an Image to be added to the current Image.
-     * They need to have the same width, height and color channels.
-     */
-    void Add(Image *img);
-
-    /**
-     * @brief Add is the addition operator for Image.
-     * @param val is a single value to be added to the current Image.
-     */
-    void Add(float val);
-
-    /**
-     * @brief Sub is the subtraction operator for Image.
-     * @param img is an Image and the subtrahend for the operator,
-     * while the current Image is the minuend.
-     * They need to have the same width, height and color channels.
-     */
-    void Sub(Image *img);
-
-    /**
-     * @brief Sub is the subtraction operator for Image.
-     * @param val is a single value, which is subtrahend while
-     * the current Image is the minuend.
-     */
-    void Sub(float val);
-
-    /**
-     * @brief Mul is the multiplication operator for Image.
-     * @param img is an Image and the multiplier while
-     * the current Image is the multiplicand.
-     * They need to have the same width, height and color channels.
-     */
-    void Mul(Image *img);
 
     /**
      * @brief MulS is the same function as Mul, where img has
@@ -345,28 +301,6 @@ public:
     void Blend(Image *img, Image *weight);
 
     /**
-     * @brief Mul is the multiplication operator for Image.
-     * @param val is a single value  and the multiplier while
-     * the current Image is the multiplicand.
-     */
-    void Mul(float val);
-
-    /**
-     * @brief Div is the division operator for Image.
-     * @param img is an Image and the divisor, while the
-     * current Image is the quotient. They need to have the
-     * same width, height and color channels.
-     */
-    void Div(Image *img);
-
-    /**
-     * @brief Div is the division operator for Image.
-     * @param val is a single value which is the divisor, while
-     * the current Image is the quotient.
-     */
-    void Div(float val);
-
-    /**
      * @brief Minimum is the minimum operator for Image.
      * @param img is a and Image and the operand. This
      * and the current Image need to have the same width,
@@ -381,21 +315,6 @@ public:
      * height, and color channels.
      */
     void Maximum(Image *img);
-
-    /**
-     * @brief InverseAdd computes the additive inverse Image:
-     * val - current Image.
-     * @param val is the maximum value for computing the inverse.
-     */
-    void InverseAdd(float val);
-
-    /**
-     * @brief InverseMul computes the multiplicative inverse Image:
-     * 1.0f / (current Image + val)
-     * @param val is the minimum value for computing the inverse.
-     */
-    void InverseMul(float val);
-
 
     /**
      * @brief ApplyFunction is an operator that applies
@@ -824,6 +743,89 @@ public:
      */
     bool Write(std::string nameFile, LDR_type typeWrite, int writerCounter);
 
+
+    /**
+     * @brief operator =
+     * @param a
+     */
+    void operator =(const float &a)
+    {
+        BufferAssign(data, size(), a);
+    }
+
+    /**
+     * @brief operator +=
+     * @param a
+     */
+    void operator +=(const float &a)
+    {
+        BufferAdd(data, size(), a);
+    }
+
+    /**
+     * @brief operator +=
+     * @param a
+     */
+    void operator +=(Image &a)
+    {
+        if(SimilarType(&a)) {
+            BufferAdd(data, a.data, size());
+        }
+    }
+
+    /**
+     * @brief operator *=
+     * @param a
+     */
+    void operator *=(const float &a)
+    {
+        BufferMul(data, size(), a);
+    }
+
+    /**
+     * @brief operator *=
+     * @param a
+     */
+    void operator *=(Image &a)
+    {
+        BufferMul(data, a.data, size());
+    }
+
+    /**
+     * @brief operator -=
+     * @param a
+     */
+    void operator -=(const float &a)
+    {
+        BufferSub(data, size(), a);
+    }
+
+    /**
+     * @brief operator -=
+     * @param a
+     */
+    void operator -=(Image &a)
+    {
+        BufferSub(data, a.data, size());
+    }
+
+    /**
+     * @brief operator /=
+     * @param a
+     */
+    void operator /=(const float &a)
+    {
+        BufferDiv(data, size(), a);
+    }
+
+    /**
+     * @brief operator /=
+     * @param a
+     */
+    void operator /=(Image &a)
+    {
+        BufferDiv(data, a.data, size());
+    }
 };
 
 PIC_INLINE void Image::SetNULL()
@@ -858,6 +860,22 @@ PIC_INLINE void Image::SetNULL()
 PIC_INLINE Image::Image()
 {
     SetNULL();
+}
+
+PIC_INLINE void Image::Assign(Image *imgIn)
+{
+    if(imgIn == NULL) {
+        return;
+    }
+
+    if(!SimilarType(imgIn)) {
+        Destroy();
+        Allocate(imgIn->width, imgIn->height, imgIn->channels, imgIn->frames);
+    }
+
+    flippedEXR = imgIn->flippedEXR;
+
+    memcpy(data, imgIn->data, frames * width * height * channels * sizeof(float));
 }
 
 PIC_INLINE Image::Image(int width, int height, int channels = 3)
@@ -1140,26 +1158,6 @@ PIC_INLINE void Image::ApplyFunction(float(*func)(float))
     }
 }
 
-PIC_INLINE void Image::InverseAdd(float val)
-{
-    int size = frames * width * height * channels;
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] = val - data[i];
-    }
-}
-
-PIC_INLINE void Image::InverseMul(float val)
-{
-    int size = frames * width * height * channels;
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] = (1.0f / (data[i] + val));
-    }
-}
-
 PIC_INLINE void Image::sort()
 {
     int size = frames * width * height * channels;
@@ -1266,122 +1264,6 @@ PIC_INLINE void Image::EvaluateSolid()
     }
 }
 
-PIC_INLINE void Image::Assign(Image *imgIn)
-{
-    if(imgIn == NULL) {
-        return;
-    }
-
-    if(!SimilarType(imgIn)) {
-        Destroy();
-        Allocate(imgIn->width, imgIn->height, imgIn->channels, imgIn->frames);
-    }
-
-    flippedEXR = imgIn->flippedEXR;
-
-    memcpy(data, imgIn->data, frames * width * height * channels * sizeof(float));
-}
-
-PIC_INLINE void Image::Assign(float value)
-{
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] = value;
-    }
-}
-
-PIC_INLINE void Image::Add(Image *img)
-{
-    if(img == NULL) {
-        return;
-    }
-
-    if(!SimilarType(img)) {
-        return;
-    }
-
-    int size = height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] += img->data[i];
-    }
-}
-
-PIC_INLINE void Image::Add(float val)
-{
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] += val;
-    }
-}
-
-PIC_INLINE void Image::Sub(Image *img)
-{
-    if(img == NULL) {
-        return;
-    }
-
-    if(!SimilarType(img)) {
-        return;
-    }
-
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] -= img->data[i];
-    }
-}
-
-PIC_INLINE void Image::Sub(float val)
-{
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] -= val;
-    }
-}
-
-PIC_INLINE void Image::Mul(Image *img)
-{
-    if(img == NULL) {
-        return;
-    }
-
-    if(!SimilarType(img)) {
-        return;
-    }
-
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] *= img->data[i];
-    }
-}
-
-PIC_INLINE void Image::Mul(float val)
-{
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] *= val;
-    }
-}
 
 PIC_INLINE void Image::MulS(Image *img)
 {
@@ -1462,32 +1344,6 @@ PIC_INLINE void Image::changeLum(Image *lumOld, Image *lumNew)
         for(int j = 0; j < channels; j++) {
             data[i + j] = data[i + j] * scale;
         }
-    }
-}
-
-PIC_INLINE void Image::Div(Image *img)
-{
-    if(!SimilarType(img)) {
-        return;
-    }
-
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] /= img->data[i];
-    }
-}
-
-PIC_INLINE void Image::Div(float val)
-{
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] /= val;
     }
 }
 
@@ -1786,7 +1642,7 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
                 float *tmp_data = (*this)(i, j, k);
 
                 for(int l = 0; l < channels; l++) {
-                    ret[l] += logf(tmp_data[l] + HARMONIC_MEAN_EPSILONf);
+                    ret[l] += logf(tmp_data[l] + 1e-6f);
                 }
             }
         }

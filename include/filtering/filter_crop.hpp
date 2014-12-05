@@ -139,7 +139,7 @@ public:
     static void test()
     {
         Image img(1, 512, 512, 3);
-        img.Assign(1.0f);
+        img = 1.0f;
 
         FilterCrop flt(Vec<2, int>(100, 100), Vec<2, int>(200, 200));
 

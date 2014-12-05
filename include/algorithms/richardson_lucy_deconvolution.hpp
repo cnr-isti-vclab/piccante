@@ -55,7 +55,7 @@ Image *RichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterations = 1
     Image *psf_hat = psf->Clone();
     psf_hat->FlipHV();
 
-    imgOut->Assign(0.5f);
+    *imgOut = 0.5f;
 
     Image *img_rel_blur = imgIn->AllocateSimilarOne();
 
@@ -71,11 +71,11 @@ Image *RichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterations = 1
         img_est_conv = FilterConv2D::Execute(imgOut, psf, img_est_conv);
 
         img_rel_blur->Assign(imgIn);
-        img_rel_blur->Div(img_est_conv);
+        *img_rel_blur /= *img_est_conv;
 
         img_err = FilterConv2D::Execute(img_rel_blur, psf_hat, img_err);
 
-        imgOut->Mul(img_err);
+        *imgOut *= *img_err;
     }
 
     delete img_est_conv;
