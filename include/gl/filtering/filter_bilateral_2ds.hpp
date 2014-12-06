@@ -9,16 +9,18 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
 
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+
+
+
+
+
+
+
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -175,13 +177,13 @@ FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma_r,
     if(BF_CLASSIC) {
         imageRand = new ImageGL(3, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
         imageRand->SetRand();
-        imageRand->Sub(0.5f);
+        *imageRand -= 0.5f;
         imageRand->loadFromMemory(false);
         nSamplers = 1;
     } else {
         imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
         imageRand->SetRand();
-        imageRand->Mul(float(nRand - 1));
+        *imageRand *= float(nRand - 1);
         imageRand->generateTexture2DU32GL();
         nSamplers = nRand;
     }

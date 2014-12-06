@@ -21,6 +21,10 @@ Francesco Banterle
 
 Luca Benedetti
 
+LICENSE:
+========
+Piccante is distributed under the MPL 2.0 license: https://www.mozilla.org/MPL/2.0/
+
 REFERENCE:
 ==========
 
