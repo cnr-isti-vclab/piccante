@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -138,6 +129,13 @@ public:
      * @brief the basic construct of an Image
      */
     Image();
+
+    /**
+     * @brief Image embeds an existing image in the new image.
+     * @param imgIn is the input image to embed.
+     * @param deepCopy enables a deep copy of img into this.
+     */
+    Image(Image *imgIn, bool deepCopy);
 
     /**
     * @brief Image loads an Image from a file on the disk.
@@ -834,6 +832,7 @@ PIC_INLINE void Image::SetNULL()
 {
     nameFile = "";
     notOwned = false;
+
     alpha = -1;
     tstride = -1;
     ystride = -1;
@@ -853,6 +852,7 @@ PIC_INLINE void Image::SetNULL()
 #ifdef PIC_ENABLE_OPEN_EXR
     dataEXR = NULL;
 #endif
+
     flippedEXR = false;
 
     readerCounter = 0;
@@ -864,20 +864,31 @@ PIC_INLINE Image::Image()
     SetNULL();
 }
 
-PIC_INLINE void Image::Assign(Image *imgIn)
+PIC_INLINE Image::Image(Image *imgIn, bool deepCopy = true)
 {
     if(imgIn == NULL) {
+        SetNULL();
         return;
     }
 
-    if(!SimilarType(imgIn)) {
-        Destroy();
-        Allocate(imgIn->width, imgIn->height, imgIn->channels, imgIn->frames);
+    if(deepCopy) {
+        Assign(imgIn);
+    } else {
+        width = imgIn->width;
+        height = imgIn->height;
+        channels = imgIn->channels;
+        frames = imgIn->frames;
+        data = imgIn->data;
+
+        notOwned = true;
+        exposure = imgIn->exposure;
+        nameFile = imgIn->nameFile;
+        flippedEXR = imgIn->flippedEXR;
+        typeLoad = imgIn->typeLoad;
+
+        AllocateAux();
     }
 
-    flippedEXR = imgIn->flippedEXR;
-
-    memcpy(data, imgIn->data, frames * width * height * channels * sizeof(float));
 }
 
 PIC_INLINE Image::Image(int width, int height, int channels = 3)
@@ -898,9 +909,10 @@ PIC_INLINE Image::Image(int frames, int width, int height, int channels,
         this->channels = channels;
         this->width    = width;
         this->height   = height;
+        this->notOwned = true;
+        this->data = data;
 
         AllocateAux();
-        this->data = data;
     }
 }
 
@@ -996,6 +1008,25 @@ PIC_INLINE void Image::AllocateAux()
     this->frames1f = float(frames -1);
 
     CalculateStrides();
+}
+
+PIC_INLINE void Image::Assign(Image *imgIn)
+{
+    if(imgIn == NULL) {
+        return;
+    }
+
+    if(!SimilarType(imgIn)) {
+        Destroy();
+        Allocate(imgIn->width, imgIn->height, imgIn->channels, imgIn->frames);
+    }
+
+    exposure = imgIn->exposure;
+    nameFile = imgIn->nameFile;
+    flippedEXR = imgIn->flippedEXR;
+    typeLoad = imgIn->typeLoad;
+
+    memcpy(data, imgIn->data, frames * width * height * channels * sizeof(float));
 }
 
 PIC_INLINE void Image::clamp(float a = 0.0f, float b = 1.0f)
@@ -1166,7 +1197,7 @@ PIC_INLINE void Image::sort()
 
     if(dataTMP == NULL) {
         dataTMP = new float[size];
-        memcpy(dataTMP, data, sizeof(float)*size);
+        memcpy(dataTMP, data, sizeof(float) * size);
     }
 
     std::sort(dataTMP, dataTMP + size);
@@ -1265,7 +1296,6 @@ PIC_INLINE void Image::EvaluateSolid()
         }
     }
 }
-
 
 PIC_INLINE void Image::MulS(Image *img)
 {

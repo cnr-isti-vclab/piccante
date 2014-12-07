@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -48,12 +39,12 @@ namespace pic {
 #ifndef PIC_DISABLE_EIGEN
 
 /**
- * @brief EstimateHomography estimates an homography matrix H between image 1 to image 2
+ * @brief estimateHomography estimates an homography matrix H between image 1 to image 2
  * @param points0 is an array of points computed from image 1.
  * @param points1 is an array of points computed from image 2.
  * @return It returns the homography matrix H.
  */
-Eigen::Matrix3d EstimateHomography(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1)
+Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1)
 {
     Eigen::Matrix3d  H;
 
@@ -131,18 +122,18 @@ Eigen::Matrix3d EstimateHomography(std::vector< Eigen::Vector2f > points0, std::
 }
 
 /**
- * @brief EstimateHomographyRansac
+ * @brief estimateHomographyRansac
  * @param points0
  * @param points1
  * @param inliers
  * @param maxIterations
  * @return
  */
-Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1,
+Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1,
                                          std::vector< unsigned int > &inliers, unsigned int maxIterations = 100, double threshold = 4.0)
 {
     if(points0.size() < 5) {
-        return EstimateHomography(points0, points1);
+        return estimateHomography(points0, points1);
     }
 
     Eigen::Matrix3d H;
@@ -168,7 +159,7 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0,
             sub_points1.push_back(points1[subSet[j]]);
         }
 
-        Eigen::Matrix3d tmpH = EstimateHomography(sub_points0, sub_points1);
+        Eigen::Matrix3d tmpH = estimateHomography(sub_points0, sub_points1);
 
         //is it a good one?
         std::vector< unsigned int > tmp_inliers;
@@ -210,19 +201,19 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0,
             sub_points1.push_back(points1[inliers[i]]);
         }
 
-        H = EstimateHomography(sub_points0, sub_points1);
+        H = estimateHomography(sub_points0, sub_points1);
     }
 
     return H;
 }
 
 /**
- * @brief EstimateFundamental estimates the foundamental matrix between image 1 to image 2
+ * @brief estimateFundamental estimates the foundamental matrix between image 1 to image 2
  * @param points0 is an array of points computed from image 1.
  * @param points1 is an array of points computed from image 2.
  * @return It returns the fundamental matrix, F_{1,2}.
  */
-Eigen::Matrix3d EstimateFundamental(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1)
+Eigen::Matrix3d estimateFundamental(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1)
 {
     Eigen::Matrix3d F;
 
@@ -300,18 +291,18 @@ Eigen::Matrix3d EstimateFundamental(std::vector< Eigen::Vector2f > points0, std:
 }
 
 /**
- * @brief EstimateFundamentalRansac
+ * @brief estimateFundamentalRansac
  * @param points0
  * @param points1
  * @param inliers
  * @param maxIterations
  * @return
  */
-Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1,
+Eigen::Matrix3d estimateFundamentalRansac(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1,
                                           std::vector< unsigned int > &inliers, unsigned int maxIterations = 100, double threshold = 0.01)
 {
     if(points0.size() < 9) {
-        return EstimateFundamental(points0, points1);
+        return estimateFundamental(points0, points1);
     }
 
     Eigen::Matrix3d F;
@@ -337,7 +328,7 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
             sub_points1.push_back(points1[k]);
         }
 
-        Eigen::Matrix3d tmpF = EstimateFundamental(sub_points0, sub_points1);
+        Eigen::Matrix3d tmpF = estimateFundamental(sub_points0, sub_points1);
 
         //is it a good one?
         std::vector< unsigned int > tmp_inliers;
@@ -382,7 +373,7 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
             sub_points1.push_back(points1[inliers[i]]);
         }
 
-        F = EstimateFundamental(sub_points0, sub_points1);
+        F = estimateFundamental(sub_points0, sub_points1);
     }
 
     return F;
@@ -408,14 +399,14 @@ Eigen::Matrix3d noramalizeFundamentalMatrix(Eigen::Matrix3d F)
 }
 
 /**
- * @brief ExtractFundamentalMatrix
+ * @brief extractFundamentalMatrix
  * @param M0
  * @param M1
  * @param e0
  * @param e1
  * @return
  */
-Eigen::Matrix3d ExtractFundamentalMatrix(Eigen::Matrix34d &M0, Eigen::Matrix34d &M1, Eigen::VectorXd &e0, Eigen::VectorXd &e1) {
+Eigen::Matrix3d extractFundamentalMatrix(Eigen::Matrix34d &M0, Eigen::Matrix34d &M1, Eigen::VectorXd &e0, Eigen::VectorXd &e1) {
 
     Eigen::Matrix3d M0_3 = getSquareMatrix(M0);
     Eigen::Matrix3d M1_3 = getSquareMatrix(M1);
@@ -474,11 +465,11 @@ void filterInliers(std::vector< T > &vec, std::vector< unsigned int > &inliers, 
 }
 
 /**
- * @brief ComputeEpipole computes the epipole of a fundamental matrix F.
+ * @brief computeEpipole computes the epipole of a fundamental matrix F.
  * @param F is a fundamental matrix.
  * @return It returns the epipole of F.
  */
-Eigen::Vector3d ComputeEpipole(Eigen::Matrix3d &F)
+Eigen::Vector3d computeEpipole(Eigen::Matrix3d &F)
 {
     Eigen::JacobiSVD< Eigen::Matrix3d > svdF(F, Eigen::ComputeFullV);
     Eigen::Matrix3d V = svdF.matrixV();
@@ -619,6 +610,49 @@ Eigen::Vector2d removeLensDistortion(Eigen::Vector2d &p, double k[5])
     ret = p * c + dx;
 
     return ret;
+}
+
+/**
+ * @brief getCameraMatrixFromHomography
+ * @param H is 3x3 homography matrix.
+ * @param K
+ * @return
+ */
+Eigen::Matrix34d getCameraMatrixFromHomography(Eigen::Matrix3d &H, Eigen::Matrix3d &K)
+{
+    Eigen::Matrix34d m;
+    m.setZero();
+
+    Eigen::Matrix3d K_inv = K.inverse();
+
+    Eigen::Matrix3d H_p = K_inv * H;
+
+    Eigen::Vector3d r_1(H_p(1, 1), H_p(2, 1), H_p(3, 1));
+    Eigen::Vector3d r_2(H_p(1, 2), H_p(2, 2), H_p(3, 2));
+
+    r_1.normalize();
+    r_2.normalize();
+    Eigen::Vector3d r_3 = r_1.cross(r_2);
+
+    Eigen::Vector3d t(H_p(1, 3), H_p(2, 3), H_p(3, 3));
+
+    m(0, 0) = r_1[0];
+    m(1, 0) = r_1[1];
+    m(2, 0) = r_1[2];
+
+    m(0, 1) = r_2[0];
+    m(1, 1) = r_2[1];
+    m(2, 1) = r_2[2];
+
+    m(0, 2) = r_3[0];
+    m(1, 2) = r_3[1];
+    m(2, 2) = r_3[2];
+
+    m(0 , 3) = t[0];
+    m(1 , 3) = t[1];
+    m(2 , 3) = t[2];
+
+    return K * m;
 }
 
 /**
@@ -827,7 +861,6 @@ Eigen::Vector4d triangulationHartleySturm(Eigen::Vector3d &point_0, Eigen::Vecto
 
     return x;
 }
-
 
 /**
  * @brief decomposeEssentialMatrixWithConfiguration decomposes an essential matrix E.
