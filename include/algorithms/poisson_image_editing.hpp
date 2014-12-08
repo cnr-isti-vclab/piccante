@@ -96,24 +96,33 @@ Image *PoissonImageEditing(Image *source, Image *target, bool *mask, Image *ret 
             if(mask[indI]) {
 
                 float n = 0.0f;
-                if(i < (width - 1) && mask[indI + 1]) {
-                    n += 1.0f;
-                    tL.push_back(Eigen::Triplet< double > (count, index[indI + 1], -1.0));
+
+                if((j + 1) < (width - 1)) {
+                    if(mask[indI + 1]) {
+                        n += 1.0f;
+                        tL.push_back(Eigen::Triplet< double > (count, index[indI + 1], -1.0));
+                    }
                 }
 
-                if(i > 0 && mask[indI - 1]) {
-                    n += 1.0f;
-                    tL.push_back(Eigen::Triplet< double > (count, index[indI - 1], -1.0));
+                if((j - 1) > -1) {
+                    if(mask[indI - 1]) {
+                        n += 1.0f;
+                        tL.push_back(Eigen::Triplet< double > (count, index[indI - 1], -1.0));
+                    }
                 }
 
-                if(j < (height - 1) && mask[indI + width]) {
-                    n += 1.0f;
-                    tL.push_back(Eigen::Triplet< double > (count, index[indI + width], -1.0));
+                if((i + 1) < (height - 1)) {
+                    if(mask[indI + width]) {
+                        n += 1.0f;
+                        tL.push_back(Eigen::Triplet< double > (count, index[indI + width], -1.0));
+                    }
                 }
 
-                if(j > 0 && mask[indI - width]) {
-                    n += 1.0f;
-                    tL.push_back(Eigen::Triplet< double > (count, index[indI - width], -1.0));
+                if((i - 1) > -1) {
+                    if(mask[indI - width]) {
+                        n += 1.0f;
+                        tL.push_back(Eigen::Triplet< double > (count, index[indI - width], -1.0));
+                    }
                 }
 
                 tL.push_back(Eigen::Triplet< double > (count, count , 4.0));
@@ -151,20 +160,28 @@ Image *PoissonImageEditing(Image *source, Image *target, bool *mask, Image *ret 
 
                     b[count] = -(*lap_source)(j, i)[k];
 
-                    if(i < (width - 1) && !mask[indI + 1]) {
-                        b[count] += (*target)(j + 1, i)[k];
+                    if((j + 1) < (width - 1)) {
+                        if(!mask[indI + 1]) {
+                            b[count] += (*target)(j + 1, i)[k];
+                        }
                     }
 
-                    if(i > 0 && !mask[indI - 1]) {
-                        b[count] += (*target)(j - 1, i)[k];
+                    if((j - 1) > -1) {
+                        if(!mask[indI - 1]) {
+                            b[count] += (*target)(j - 1, i)[k];
+                        }
+                    }                        
+
+                    if((i + 1) < (height - 1)) {
+                        if(!mask[indI + width]) {
+                            b[count] += (*target)(j, i + 1)[k];
+                        }
                     }
 
-                    if(i < (height - 1) && !mask[indI + width]) {
-                        b[count] += (*target)(j, i + 1)[k];
-                    }
-
-                    if(j > 0 && !mask[indI - width]) {
-                        b[count] += (*target)(j, i - 1)[k];
+                    if((i - 1) > -1) {
+                        if(!mask[indI - width]) {
+                           b[count] += (*target)(j, i - 1)[k];
+                        }
                     }
 
                     count++;
