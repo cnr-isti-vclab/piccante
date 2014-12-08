@@ -46,16 +46,14 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        int tmpChannel;
-        tmpChannel = MAX(channel, 0);
-        tmpChannel = MIN(channel, src[0]->channels);
+        int tmpChannel = CLAMPi(channel, 0, src[0]->channels);
 
         for(int p = box->z0; p < box->z1; p++) {
             for(int j = box->y0; j < box->y1; j++) {
                 for(int i = box->x0; i < box->x1; i++) {
 
                     float *dst_data =	(*dst)(i, j, p);
-                    float *data =	(*src[0])(i, j, p);
+                    float *data =	 (*src[0])(i, j, p);
 
                     dst_data[0] = data[tmpChannel];
                 }

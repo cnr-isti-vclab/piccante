@@ -285,15 +285,6 @@ public:
     void Assign(Image *imgIn);
 
     /**
-     * @brief MulS is the same function as Mul, where img has
-     * to have one color channel.
-     * @param img is an Image with one single color channel
-     * which is the multiplier while the current Image is the multiplicand.
-     * They need to have the same width and height.
-     */
-    void MulS(Image *img);
-
-    /**
      * @brief Blend
      * @param img
      * @param weight
@@ -676,7 +667,7 @@ public:
      * @brief Clone creates a deep copy of the calling instance.
      * @return This returns a deep copy of the calling instance.
      */
-    Image *Clone();
+    Image *Clone() const;
 
     //QImage interop
 #ifdef PIC_QT
@@ -763,6 +754,18 @@ public:
     }
 
     /**
+     * @brief operator +
+     * @param a
+     * @return it returns (this + a)
+     */
+    Image operator +(const float &a) const
+    {
+        Image *out = this->Clone();
+        *out += a;
+        return Image(out, false);
+    }
+
+    /**
      * @brief operator +=
      * @param a
      */
@@ -771,6 +774,18 @@ public:
         if(SimilarType(&a)) {
             BufferAdd(data, a.data, size());
         }
+    }
+
+    /**
+     * @brief operator +
+     * @param a
+     * @return it returns (this + a)
+     */
+    Image operator +(Image &a) const
+    {
+        Image *out = this->Clone();
+        *out += a;
+        return Image(out, false);
     }
 
     /**
@@ -783,12 +798,42 @@ public:
     }
 
     /**
+     * @brief operator *
+     * @param a
+     * @return it returns (this * a)
+     */
+    Image operator *(const float &a) const
+    {
+        Image *out = this->Clone();
+        *out *= a;
+        return Image(out, false);
+    }
+
+    /**
      * @brief operator *=
      * @param a
      */
     void operator *=(Image &a)
     {
-        BufferMul(data, a.data, size());
+        if(SimilarType(&a)) {
+            BufferMul(data, a.data, size());
+        } else {
+            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+                BufferMulS(data, a.data, nPixels(), channels);
+            }
+        }
+    }
+
+    /**
+     * @brief operator *
+     * @param a
+     * @return it returns (this * a)
+     */
+    Image operator *(Image &a) const
+    {
+        Image *out = this->Clone();
+        *out *= a;
+        return Image(out, false);
     }
 
     /**
@@ -801,12 +846,36 @@ public:
     }
 
     /**
+     * @brief operator -
+     * @param a
+     * @return it returns (this - a)
+     */
+    Image operator -(const float &a) const
+    {
+        Image *out = this->Clone();
+        *out -= a;
+        return Image(out, false);
+    }
+
+    /**
      * @brief operator -=
      * @param a
      */
     void operator -=(Image &a)
     {
         BufferSub(data, a.data, size());
+    }
+
+    /**
+     * @brief operator -
+     * @param a
+     * @return it returns (this - a)
+     */
+    Image operator -(Image &a) const
+    {
+        Image *out = this->Clone();
+        *out -= a;
+        return Image(out, false);
     }
 
     /**
@@ -819,12 +888,36 @@ public:
     }
 
     /**
+     * @brief operator /
+     * @param a
+     * @return it returns (this / a)
+     */
+    Image operator /(const float &a) const
+    {
+        Image *out = this->Clone();
+        *out /= a;
+        return Image(out, false);
+    }
+
+    /**
      * @brief operator /=
      * @param a
      */
     void operator /=(Image &a)
     {
         BufferDiv(data, a.data, size());
+    }
+
+    /**
+     * @brief operator /
+     * @param a
+     * @return it returns (this / a)
+     */
+    Image operator /(Image &a) const
+    {
+        Image *out = this->Clone();
+        *out /= a;
+        return Image(out, false);
     }
 };
 
@@ -1062,8 +1155,8 @@ PIC_INLINE bool Image::SimilarType(Image *img)
 
     bool ret =	(width		==	img->width) &&
                 (height		==	img->height) &&
-                (channels	==	img->channels) &&
                 (frames		==	img->frames) &&
+                (channels	==	img->channels) &&
                 (flippedEXR	==	img->flippedEXR);
 
 #ifdef PIC_DEBUG
@@ -1293,31 +1386,6 @@ PIC_INLINE void Image::EvaluateSolid()
             for(int k = 0; k < channels; k++) {
                 tmp_data[k] = val;
             }
-        }
-    }
-}
-
-PIC_INLINE void Image::MulS(Image *img)
-{
-    if(img == NULL) {
-        return;
-    }
-
-    if(img->channels != 1) {
-        return;
-    }
-
-    int size = frames * height * width;
-
-    #pragma omp parallel for
-
-    for(int ind = 0; ind < size; ind++) {
-        int i = ind * channels;
-
-        float val = img->data[ind];
-
-        for(int j = 0; j < channels; j++) {
-            data[i + j] *= val;
         }
     }
 }
@@ -2210,10 +2278,15 @@ PIC_INLINE Image *Image::AllocateSimilarOne()
     return ret;
 }
 
-PIC_INLINE Image *Image::Clone()
+PIC_INLINE Image *Image::Clone() const
 {
     Image *ret = new Image(frames, width, height, channels);
     ret->flippedEXR = flippedEXR;
+    ret->exposure = exposure;
+    ret->nameFile = nameFile;
+    ret->alpha = alpha;
+    ret->typeLoad = typeLoad;
+
     memcpy(ret->data, data, width * height * channels * sizeof(float));
     return ret;
 }

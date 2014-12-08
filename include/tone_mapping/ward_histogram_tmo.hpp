@@ -100,7 +100,7 @@ inline Image *WardHistogramTMO(Image *imgIn, Image *imgOut = NULL,
         L->data[i] = (Ld - LdMin) / ((LdMax - LdMin) * L_old);
     }
 
-    imgOut->MulS(L);
+    *imgOut *= *L;
     imgOut->removeSpecials();
 
     delete L;

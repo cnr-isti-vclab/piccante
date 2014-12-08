@@ -287,11 +287,7 @@ void Pyramid::Mul(const Pyramid *pyr)
     }
 
     for(unsigned int i = 0; i < stack.size(); i++) {
-        if(pyr->stack[i]->channels == 1) {
-            stack[i]->MulS(pyr->stack[i]);
-        } else {
-            *stack[i] *= *pyr->stack[i];
-        }
+        *stack[i] *= *pyr->stack[i];
     }
 }
 

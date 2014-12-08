@@ -125,6 +125,23 @@ PIC_INLINE T *BufferMul(T *bufferOut, T *bufferIn, int n)
     return bufferOut;
 }
 
+template<class T>
+PIC_INLINE T *BufferMulS(T *bufferOut, T *bufferIn, int n, int channels)
+{
+    #pragma omp parallel for
+    for(int ind = 0; ind < n; ind++) {
+        int i = ind * channels;
+
+        float val = bufferIn[ind];
+
+        for(int j = 0; j < channels; j++) {
+            bufferOut[i + j] *= val;
+        }
+    }
+
+    return bufferOut;
+}
+
 /**BufferSub subtracts a constant value*/
 template<class T>
 PIC_INLINE T *BufferSub(T *buffer, int n, T value)
