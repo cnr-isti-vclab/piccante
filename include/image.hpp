@@ -773,7 +773,12 @@ public:
     {
         if(SimilarType(&a)) {
             BufferAdd(data, a.data, size());
+        } else {
+            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+                BufferAddS(data, a.data, nPixels(), channels);
+            }
         }
+
     }
 
     /**
@@ -863,7 +868,13 @@ public:
      */
     void operator -=(Image &a)
     {
-        BufferSub(data, a.data, size());
+        if(SimilarType(&a)) {
+            BufferSub(data, a.data, size());
+        } else {
+            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+                BufferSubS(data, a.data, nPixels(), channels);
+            }
+        }
     }
 
     /**
@@ -905,7 +916,13 @@ public:
      */
     void operator /=(Image &a)
     {
-        BufferDiv(data, a.data, size());
+        if(SimilarType(&a)) {
+            BufferDiv(data, a.data, size());
+        } else {
+            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+                BufferDivS(data, a.data, nPixels(), channels);
+            }
+        }
     }
 
     /**

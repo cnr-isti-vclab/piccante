@@ -365,7 +365,7 @@ template <unsigned int N>  PIC_INLINE void RandomSampler<N>::Render2Int()
             coord = 0;//rounding
 
             for(unsigned int k = 0; k < N; k++) {
-                x = lround(samples[j + k] * window_f[k]);
+                x = int(lround(samples[j + k] * window_f[k]));
                 coord += x * powint(window[k], k);
             }
 
@@ -374,7 +374,7 @@ template <unsigned int N>  PIC_INLINE void RandomSampler<N>::Render2Int()
                 track.insert(coord);
 
                 for(unsigned int k = 0; k < N; k++) { //final rounding
-                    x = lround(samples[j + k] * window_f[k]);
+                    x = int(lround(samples[j + k] * window_f[k]));
                     samplesR.push_back(x);
                 }
             }

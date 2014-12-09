@@ -89,6 +89,23 @@ PIC_INLINE T *BufferAdd(T *bufferOut, T *bufferIn, int n)
     return bufferOut;
 }
 
+template<class T>
+PIC_INLINE T *BufferAddS(T *bufferOut, T *bufferIn, int n, int channels)
+{
+    #pragma omp parallel for
+    for(int ind = 0; ind < n; ind++) {
+        int i = ind * channels;
+
+        float val = bufferIn[ind];
+
+        for(int j = 0; j < channels; j++) {
+            bufferOut[i + j] += val;
+        }
+    }
+
+    return bufferOut;
+}
+
 /**BufferMul multiplies a constant value*/
 template<class T>
 PIC_INLINE T *BufferMul(T *buffer, int n, T value)
@@ -178,6 +195,23 @@ PIC_INLINE T *BufferSub(T *bufferOut, T *bufferIn, int n)
     return bufferOut;
 }
 
+template<class T>
+PIC_INLINE T *BufferSubS(T *bufferOut, T *bufferIn, int n, int channels)
+{
+    #pragma omp parallel for
+    for(int ind = 0; ind < n; ind++) {
+        int i = ind * channels;
+
+        float val = bufferIn[ind];
+
+        for(int j = 0; j < channels; j++) {
+            bufferOut[i + j] -= val;
+        }
+    }
+
+    return bufferOut;
+}
+
 /**BufferDiv divides by a constant value*/
 template<class T>
 PIC_INLINE T *BufferDiv(T *buffer, int n, T value)
@@ -209,6 +243,23 @@ PIC_INLINE T *BufferDiv(T *bufferOut, T *bufferIn, int n)
 
     for(int i = 0; i < n; i++) {
         bufferOut[i] /= bufferIn[i];
+    }
+
+    return bufferOut;
+}
+
+template<class T>
+PIC_INLINE T *BufferDivS(T *bufferOut, T *bufferIn, int n, int channels)
+{
+    #pragma omp parallel for
+    for(int ind = 0; ind < n; ind++) {
+        int i = ind * channels;
+
+        float val = bufferIn[ind];
+
+        for(int j = 0; j < channels; j++) {
+            bufferOut[i + j] /= val;
+        }
     }
 
     return bufferOut;
