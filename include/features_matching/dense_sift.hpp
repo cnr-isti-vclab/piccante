@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -28,6 +19,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FEATURES_MATCHING_DENSE_SIFT_HPP
 
 #include "util/array.hpp"
+
+#include "util/rasterizer.hpp"
 
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_gradient.hpp"
@@ -92,7 +85,7 @@ public:
         CONST_GRADIENT_SUPRESSIO_THRESHOLD = 0.2f;
 
         gauss = new Image(1, 5, 5, 1);
-        gauss->EvaluateGaussian(-1.0f, true);
+        EvaluateGaussian(gauss, -1.0f, true);
 
         SetNULL();
 

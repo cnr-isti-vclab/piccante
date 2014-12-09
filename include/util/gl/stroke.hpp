@@ -175,15 +175,19 @@ StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
 
     float halfBrushSizeXf = float(halfBrushSize) / float(width);
     float halfBrushSizeYf = float(halfBrushSize) / float(height);
-    printf("%f %f\n", halfBrushSizeXf, halfBrushSizeYf);
+
+    #ifdef PIC_DEBUG
+        printf("%f %f\n", halfBrushSizeXf, halfBrushSizeYf);
+    #endif
+
     this->quad = new QuadGL(true, halfBrushSizeXf, halfBrushSizeYf);
 
     size = 4.0f;
     rSize = size / float(max(width, height));
 
     shape = new ImageGL(1, this->brushSize, this->brushSize, 3, IMG_CPU, GL_TEXTURE_2D);
-//	shape->EvaluateGaussian(true);
-    shape->EvaluateSolid();
+//	EvaluateGaussian(shape, true);
+    EvaluateSolid(shape);
     shape->generateTextureGL(false, GL_TEXTURE_2D);
 
     if(color != NULL) {

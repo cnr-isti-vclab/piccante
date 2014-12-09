@@ -277,7 +277,6 @@ public:
      */
     bool SimilarType(Image *img);
 
-
     /**
      * @brief Assign
      * @param imgIn
@@ -368,7 +367,6 @@ public:
      */
     float *getMeanVal(BBox *box, float *ret);
 
-
     /**
      * @brief getMomentsVal computes the moments at pixel (x0, y0).
      * @param x0 is the horizontal coordinate.
@@ -420,14 +418,14 @@ public:
     /**
      * @brief sort sorts values in data and stores them into dataTMP.
      */
-    void  sort();
+    void sort();
 
     /**
      * @brief changeLum removes lumOld from Image and replaces lumNew.
      * @param lumOld is the old luminance channel.
      * @param lumNew is the new luminance channel.
      */
-    void  changeLum(Image *lumOld, Image *lumNew);
+    void changeLum(Image *lumOld, Image *lumNew);
 
     /**
      * @brief getdataUC
@@ -466,23 +464,9 @@ public:
      */
     bool checkCoordinates(int x, int y, int z = 0)
     {
-        return (x > -1) && (x < width) && (y > -1) && (y < height) && (z > -1) &&
-               (z < frames);
+        return (x > -1) && (x < width) && (y > -1) && (y < height) &&
+               (z > -1) && (z < frames);
     }
-
-    /**
-     * @brief EvaluateGaussian renders a Gaussian function which is centred
-     * in the image.
-     * @param sigma is the standard deviation of the Gaussian function.
-     * @param bNormTerm is a boolean value. If it is true the Gaussian function
-     * is normalized, false otherwise.
-     */
-    void EvaluateGaussian(float sigma, bool bNormTerm);
-
-    /**
-     * @brief EvaluateSolid renders a centred circle.
-     */
-    void EvaluateSolid();
 
     /**
      * @brief ConvertFromMask converts a boolean mask into an Image. true is mapped
@@ -1340,73 +1324,6 @@ PIC_INLINE float Image::getGT(float val)
     return -1.0f;
 }
 
-PIC_INLINE void Image::EvaluateGaussian(float sigma = -1.0f,
-                                        bool bNormTerm = false)
-{
-    if(sigma < 0.0f) {
-        sigma = float(MIN(width, height)) / 5.0f;
-    }
-
-    float sigma2 = (sigma * sigma * 2.0f);
-
-    int halfWidth  = width >> 1;
-    int halfHeight = height >> 1;
-
-    float normTerm = bNormTerm ? sigma * sqrtf(C_PI) : 1.0f ;
-
-    #pragma omp parallel for
-
-    for(int j = 0; j < height; j++) {
-        int j_squared = j - halfHeight;
-        j_squared = j_squared * j_squared;
-
-        for(int i = 0; i < width; i++) {
-            int i_squared = i - halfWidth;
-            i_squared = i_squared * i_squared;
-
-            float gaussVal = expf(-float(i_squared + j_squared) / sigma2) / normTerm;
-
-            float *tmp_data = (*this)(j, i);
-
-            for(int k = 0; k < channels; k++) {
-                tmp_data[k] = gaussVal;
-            }
-        }
-    }
-}
-
-PIC_INLINE void Image::EvaluateSolid()
-{
-    int halfWidth  = width  >> 1;
-    int halfHeight = height >> 1;
-
-    int radius_squared = (halfWidth * halfWidth + halfHeight * halfHeight) >> 1;
-
-    #pragma omp parallel for
-
-    for(int j = 0; j < height; j++) {
-        int j_squared = j - halfHeight;
-        j_squared = j_squared * j_squared;
-
-        for(int i = 0; i < width; i++) {
-            int i_squared = i - halfWidth;
-            i_squared = i_squared * i_squared;
-
-            float val = 0.0f;
-
-            if((i_squared + j_squared) < radius_squared) {
-                val = 1.0f;
-            }
-
-            float *tmp_data = (*this)(j, i);
-
-            for(int k = 0; k < channels; k++) {
-                tmp_data[k] = val;
-            }
-        }
-    }
-}
-
 PIC_INLINE void Image::Blend(Image *img, Image *weight)
 {
     if(img == NULL || weight == NULL) {
@@ -1497,7 +1414,7 @@ PIC_INLINE void Image::Maximum(Image *img)
 PIC_INLINE void Image::SetZero()
 {
     int size = frames * height * width * channels;
-//	memset(data, 0, size*sizeof(float));
+//	memset(data, 0, size * sizeof(float));
 
     #pragma omp parallel for
 
@@ -1509,7 +1426,7 @@ PIC_INLINE void Image::SetZero()
 PIC_INLINE void Image::SetRand()
 {
     std::mt19937 m(rand() % 10000);
-    int size = height * width * channels;
+    int size = frames * height * width * channels;
 
     for(int i = 0; i < size; i++) {
         data[i] = float(m()) / 4294967295.0f;
