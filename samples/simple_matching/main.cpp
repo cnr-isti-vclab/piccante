@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
         printf("\nFoundamental matrix: \n");
         pic::printfMat(F);
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No there is at least an invalid file!\n");
     }
 
     return 0;

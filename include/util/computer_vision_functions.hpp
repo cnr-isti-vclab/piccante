@@ -627,26 +627,26 @@ Eigen::Matrix34d getCameraMatrixFromHomography(Eigen::Matrix3d &H, Eigen::Matrix
 
     Eigen::Matrix3d H_p = K_inv * H;
 
-    Eigen::Vector3d r_1(H_p(1, 1), H_p(2, 1), H_p(3, 1));
-    Eigen::Vector3d r_2(H_p(1, 2), H_p(2, 2), H_p(3, 2));
+    Eigen::Vector3d r_0(H_p(0, 0), H_p(1, 0), H_p(2, 0));
+    Eigen::Vector3d r_1(H_p(0, 1), H_p(1, 1), H_p(2, 1));
 
+    r_0.normalize();
     r_1.normalize();
-    r_2.normalize();
-    Eigen::Vector3d r_3 = r_1.cross(r_2);
+    Eigen::Vector3d r_2 = r_0.cross(r_1);
 
-    Eigen::Vector3d t(H_p(1, 3), H_p(2, 3), H_p(3, 3));
+    Eigen::Vector3d t(H_p(0, 2), H_p(1, 2), H_p(2, 2));
 
-    m(0, 0) = r_1[0];
-    m(1, 0) = r_1[1];
-    m(2, 0) = r_1[2];
+    m(0, 0) = r_0[0];
+    m(1, 0) = r_0[1];
+    m(2, 0) = r_0[2];
 
-    m(0, 1) = r_2[0];
-    m(1, 1) = r_2[1];
-    m(2, 1) = r_2[2];
+    m(0, 1) = r_1[0];
+    m(1, 1) = r_1[1];
+    m(2, 1) = r_1[2];
 
-    m(0, 2) = r_3[0];
-    m(1, 2) = r_3[1];
-    m(2, 2) = r_3[2];
+    m(0, 2) = r_2[0];
+    m(1, 2) = r_2[1];
+    m(2, 2) = r_2[2];
 
     m(0 , 3) = t[0];
     m(1 , 3) = t[1];
@@ -711,9 +711,7 @@ Eigen::Matrix34d getCameraMatrix(Eigen::Matrix3d &K, Eigen::Matrix3d &R, Eigen::
  */
 Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector4d &p)
 {
-    Eigen::Vector3d proj;
-
-    proj = M * p;
+    Eigen::Vector3d proj = M * p;
     proj[0] /= proj[2];
     proj[1] /= proj[2];
 

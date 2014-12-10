@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
         imgOut0.Write("../data/output/simple_triangulation_reprojection_left.png");
         imgOut1.Write("../data/output/simple_triangulation_reprojection_right.png");
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No there is at least an invalid file!\n");
     }
 
     return 0;
