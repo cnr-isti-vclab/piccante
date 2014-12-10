@@ -703,6 +703,36 @@ Eigen::Matrix34d getCameraMatrix(Eigen::Matrix3d &K, Eigen::Matrix3d &R, Eigen::
 }
 
 /**
+ * @brief cameraMatrixProject projects a point, p, using the camera
+ * matrix, M.
+ * @param M
+ * @param p is a 3D point encoded in homogenous coordinate (4D vector)
+ * @return
+ */
+Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector4d &p)
+{
+    Eigen::Vector3d proj;
+
+    proj = M * p;
+    proj[0] /= proj[2];
+    proj[1] /= proj[2];
+
+    return Eigen::Vector2i(int(proj[0]), int(proj[1]));
+}
+
+/**
+ * @brief cameraMatrixProject projects a point, p, using the camera
+ * matrix, M.
+ * @param M
+ * @param p is a 3D point (3D vector)
+ * @return
+ */
+Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector3d &p)
+{
+    return cameraMatrixProject(M, Eigen::Vector4d(p[0], p[1], p[2], 1.0));
+}
+
+/**
  * @brief decomposeEssentialMatrix decomposes an essential matrix E.
  * @param E is the essential matrix. Input.
  * Note1: E = S * R

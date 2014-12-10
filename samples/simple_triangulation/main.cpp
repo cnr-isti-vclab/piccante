@@ -221,36 +221,31 @@ int main(int argc, char *argv[])
 
             fprintf(file, "%3.4f %3.4f %3.4f ", out[0],  out[1],  out[2]);
 
-            unsigned char r,g,b;
+            //writing color information
+            unsigned char r, g, b;
             float *color = (*img0)(int(m0f[i][0]), int(m0f[i][1]));
             r = int(color[0] * 255.0f);
             g = int(color[1] * 255.0f);
             b = int(color[2] * 255.0f);
-            fprintf(file, " %d %d %d 255\n",r,g,b);
+            fprintf(file, " %d %d %d 255\n",r, g, b);
 
-            Eigen::Vector3d proj;
-
-            proj = M0 * point;
-            proj[0] /= proj[2];
-            proj[1] /= proj[2];
+            //3d points projection
+            Eigen::Vector2i proj0 = pic::cameraMatrixProject(M0, point);
 
             float *tmp;
-
             tmp = imgOut0(int(m0f[i][0]), int(m0f[i][1]));
             tmp[1] = 1.0f;
 
-            tmp = imgOut0(int(proj[0]), int(proj[1]));
+            tmp = imgOut0(proj0[0], proj0[1]);
             tmp[0] = 1.0f;
 
             //second image
-            proj = M1 * point;
-            proj[0] /= proj[2];
-            proj[1] /= proj[2];
+            Eigen::Vector2i proj1 = pic::cameraMatrixProject(M0, point);
 
             tmp = imgOut1(int(m1f[i][0]), int(m1f[i][1]));
             tmp[1] = 1.0f;
 
-            tmp = imgOut1(int(proj[0]), int(proj[1]));
+            tmp = imgOut1(proj1[0], proj1[1]);
             tmp[0] = 1.0f;
         }
         fclose(file);
