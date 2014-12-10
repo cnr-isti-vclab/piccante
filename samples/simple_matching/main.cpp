@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
 
         printf("Estimating a homography matrix H from the matches...");
         std::vector< unsigned int > inliers;
-        Eigen::Matrix3d H = pic::EstimateHomographyRansac(m0, m1, inliers, 10000);
+        Eigen::Matrix3d H = pic::estimateHomographyRansac(m0, m1, inliers, 10000);
         printf("Ok.\n");
 
         pic::filterInliers(m0, inliers, m0f);
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
         printf("Ok.\n");
 
         printf("\nEstimating the fundamental matrix F from the matches...");
-        Eigen::Matrix3d F = pic::EstimateFundamentalRansac(m0, m1, inliers, 10000);
+        Eigen::Matrix3d F = pic::estimateFundamentalRansac(m0, m1, inliers, 10000);
         printf("Ok.\n");
 
         printf("\nFoundamental matrix: \n");

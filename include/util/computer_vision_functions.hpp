@@ -122,7 +122,7 @@ Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > points0, std::
 }
 
 /**
- * @brief estimateHomographyRansac
+ * @brief estimateHomographyRansac computes the homography such that: points1 = H * points0
  * @param points0
  * @param points1
  * @param inliers
