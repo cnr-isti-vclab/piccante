@@ -373,6 +373,25 @@ Eigen::MatrixXd getMatrixdFromLinearArray(float *array, int rows, int cols)
 }
 
 /**
+ * @brief getMatrix3dFromLinearArray
+ * @param array
+ * @return
+ */
+Eigen::Matrix3d getMatrix3dFromLinearArray(float *array)
+{
+    Eigen::Matrix3d ret;
+
+    int c = 0;
+    for(int i = 0; i < 3; i++) {
+        for(int j = 0; j < 3; j++) {
+            ret(i, j) = array[c];
+            c++;
+        }
+    }
+    return ret;
+}
+
+/**
  * @brief MatrixConvert
  * @param mat
  * @return
