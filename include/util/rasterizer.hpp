@@ -200,7 +200,7 @@ PIC_INLINE void EvaluateGaussian(Image *img, float sigma = -1.0f,
  */
 PIC_INLINE void EvaluateSolid(Image *img)
 {
-    if(img != NULL) {
+    if(img == NULL) {
         return;
     }
 
@@ -225,7 +225,7 @@ PIC_INLINE void EvaluateSolid(Image *img)
                 val = 1.0f;
             }
 
-            float *tmp_data = (*img)(j, i);
+            float *tmp_data = (*img)(i, j);
 
             for(int k = 0; k < img->channels; k++) {
                 tmp_data[k] = val;

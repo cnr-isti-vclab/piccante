@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -42,7 +33,7 @@ class StrokeGL
 {
 protected:
     int					width, height, brushSize;
-    ImageGL			*shape;
+    ImageGL			    *shape;
     float				size, rSize;
     float				color[4];
     float				tmpColor[3];
@@ -185,9 +176,10 @@ StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
     size = 4.0f;
     rSize = size / float(max(width, height));
 
-    shape = new ImageGL(1, this->brushSize, this->brushSize, 3, IMG_CPU, GL_TEXTURE_2D);
+    shape = new ImageGL(1, this->brushSize, this->brushSize, 1, IMG_CPU, GL_TEXTURE_2D);
 //	EvaluateGaussian(shape, true);
     EvaluateSolid(shape);
+    shape->Write("test.pfm");
     shape->generateTextureGL(false, GL_TEXTURE_2D);
 
     if(color != NULL) {
@@ -273,8 +265,7 @@ void StrokeGL::SetupShaders()
     annotationProgram.setup(glw::version("330"), vertex_source, fragment_source_annotation);
 
     printf("[StrokeGL log]\n%s\n", annotationProgram.log().c_str());
-
-
+    
     glw::bind_program(annotationProgram);
     annotationProgram.attribute_source("a_position", 0);
     annotationProgram.attribute_source("a_tex_coord", 1);
@@ -474,6 +465,7 @@ void StrokeGL::RenderAnnotationGL()
 #ifdef PIC_DEBUG
     printf("Annotation value: %f\n", annotation);
 #endif
+
     annotationProgram.uniform("annotation",  annotation);
 
     glEnable(GL_TEXTURE_2D);
