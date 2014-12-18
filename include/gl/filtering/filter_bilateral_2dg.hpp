@@ -90,11 +90,12 @@ public:
     static ImageGL *Execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r, int testing = 1)
     {
-        ImageGL imgIn(nameIn);
-        float maxVal = imgIn.getMaxVal()[0];
-        imgIn /= maxVal;
+        Image tmp_imgIn(nameIn);
+        float maxVal = tmp_imgIn.getMaxVal()[0];
+        tmp_imgIn /= maxVal;
         sigma_r = sigma_r / maxVal;
 
+        ImageGL imgIn(&tmp_imgIn, true);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLBilateral2DG *filter = new FilterGLBilateral2DG(sigma_s, sigma_r);//, imgIn.channels);
@@ -135,8 +136,8 @@ public:
         }*/
 
         //Read from the GPU
+        *imgOut /= maxVal;
         imgOut->loadToMemory();
-        *imgOut /= (maxVal);
         imgOut->Write(nameOut);
 
         return imgOut;

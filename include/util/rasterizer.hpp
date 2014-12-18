@@ -29,11 +29,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- * @brief DrawLine
- * @param img
- * @param v0
- * @param v1
- * @param color
+ * @brief DrawLine renders a line (v0, v1) with color into img.
+ * @param img is the image where to render the line (v0, v1).
+ * @param v0 is the first vertex of the line.
+ * @param v1 is the second vertex of the line.
+ * @param color is the color of the line (v0, v1).
  */
 PIC_INLINE void DrawLine(Image *img, Vec<2, int> v0, Vec<2, int> v1, float *color)
 {
@@ -168,7 +168,7 @@ PIC_INLINE void EvaluateGaussian(Image *img, float sigma = -1.0f,
 
     float sigma2 = (sigma * sigma * 2.0f);
 
-    int halfWidth  = img->width >> 1;
+    int halfWidth  = img->width  >> 1;
     int halfHeight = img->height >> 1;
 
     float normTerm = bNormTerm ? sigma * sqrtf(C_PI) : 1.0f ;
@@ -185,7 +185,7 @@ PIC_INLINE void EvaluateGaussian(Image *img, float sigma = -1.0f,
 
             float gaussVal = expf(-float(i_squared + j_squared) / sigma2) / normTerm;
 
-            float *tmp_data = (*img)(j, i);
+            float *tmp_data = (*img)(i, j);
 
             for(int k = 0; k < img->channels; k++) {
                 tmp_data[k] = gaussVal;

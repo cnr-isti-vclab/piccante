@@ -15,16 +15,27 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_GL_BUFFER_GL_HPP
-#define PIC_GL_BUFFER_GL_HPP
+#ifndef PIC_GL_BUFFER_OP_GL_HPP
+#define PIC_GL_BUFFER_OP_GL_HPP
 
 #include "util/string.hpp"
+#include "util/gl/quad.hpp"
 
 namespace pic {
 
-class BufferGL
-{
+class BufferOpGL{
 protected:
+
+    //FBO
+    Fbo *fbo;
+
+    //Quad
+    QuadGL *quad;
+
+    //Shaders
+    glw::program filteringProgram;
+    GLenum target;
+
     std::string op;
     float		c0[4], c1[4];
     bool		bTexelFetch;
@@ -33,14 +44,16 @@ protected:
 
 public:
 
+    std::string vertex_source, geometry_source, fragment_source;
+
     /**
-     * @brief FilterGLOp
+     * @brief BufferOpGL
      * @param op
      * @param bTexelFetch
      * @param c0
      * @param c1
      */
-    FilterGLOp(std::string op, bool bTexelFetch, float *c0, float *c1);
+    BufferOpGL(std::string op, bool bTexelFetch, float *c0, float *c1);
 
     /**
      * @brief Update
@@ -50,83 +63,37 @@ public:
     void Update(float *c0, float *c1);
 
     /**
+     * @brief Update
+     * @param c0
+     * @param c1
+     */
+    void Update(float c0, float c1);
+
+    /**
      * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
+     * @param tex0
+     * @param tex1
+     * @param texOut
+     * @param width
+     * @param height
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
+    void Process(GLuint tex0, GLuint tex1, GLuint texOut, int width, int height);
 
-    /**
-     * @brief CreateOpSetZero
-     * @return
-     */
-    static FilterGLOp *CreateOpSetZero()
-    {
-        float val[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-        FilterGLOp *filter = new FilterGLOp("C0", true, val, NULL);
-        return filter;
-    }
-
-    /**
-     * @brief CreateOpAdd
-     * @param bType
-     * @return
-     */
-    static FilterGLOp *CreateOpAdd(bool bType)
-    {
-        FilterGLOp *filter = new FilterGLOp("I0 + I1", bType, NULL, NULL);
-        return filter;
-    }
-
-     /**
-     * @brief CreateOpMul
-     * @param bType
-     * @return
-     */
-    static FilterGLOp *CreateOpMul(bool bType)
-    {
-        FilterGLOp *filter = new FilterGLOp("I0 * I1", bType, NULL, NULL);
-        return filter;
-    }
-
-    /**
-     * @brief CreateOpSub
-     * @param bType
-     * @return
-     */
-    static FilterGLOp *CreateOpSub(bool bType)
-    {
-        FilterGLOp *filter = new FilterGLOp("I0 - I1", bType, NULL, NULL);
-        return filter;
-    }
-
-    /**
-     * @brief CreateOpDiv
-     * @param bType
-     * @return
-     */
-    static FilterGLOp *CreateOpDiv(bool bType)
-    {
-        FilterGLOp *filter = new FilterGLOp("I0 / I1", bType, NULL, NULL);
-        return filter;
-    }
-
-    /**
-     * @brief CreateOpDivConst
-     * @param bType
-     * @return
-     */
-    static FilterGLOp *CreateOpDivConst(bool bType)
-    {
-        FilterGLOp *filter = new FilterGLOp("I0 / C0", bType, NULL, NULL);
-        return filter;
-    }
 };
 
-FilterGLOp::FilterGLOp(std::string op, bool bTexelFetch = false,
-                       float *c0 = NULL, float *c1 = NULL): FilterGL()
+BufferOpGL::BufferOpGL(std::string op, bool bTexelFetch = false, float *c0 = NULL, float *c1 = NULL)
 {
+    fbo = NULL;
+
+    quad = NULL;
+
+    quad = new QuadGL(false);
+
+    target = GL_TEXTURE_2D;
+
+    //getting a vertex program for screen aligned quad
+    vertex_source = QuadGL::getVertexProgramV3();
+
     if(c0 != NULL) {
         memcpy(this->c0, c0, 4 * sizeof(float));
     } else {
@@ -154,7 +121,7 @@ FilterGLOp::FilterGLOp(std::string op, bool bTexelFetch = false,
     InitShaders();
 }
 
-void FilterGLOp::InitShaders()
+void BufferOpGL::InitShaders()
 {
     std::string strOp = "ret = ";
     strOp.append(op);
@@ -272,7 +239,7 @@ void FilterGLOp::InitShaders()
     glw::bind_program(0);
 }
 
-void FilterGLOp::Update(float *c0, float *c1)
+void BufferOpGL::Update(float *c0, float *c1)
 {
     if(c0 != NULL) {
         for(int i = 0; i < 4; i++) {
@@ -294,37 +261,58 @@ void FilterGLOp::Update(float *c0, float *c1)
     glw::bind_program(0);
 }
 
-ImageGL *FilterGLOp::Process(ImageGLVec imgIn, ImageGL *imgOut)
+void BufferOpGL::Update(float c0 = 0.0f, float c1 = 0.0f)
 {
-    if(imgIn[0] == NULL) {
-        return imgOut;
+    for(int i = 0; i < 4; i++) {
+        this->c0[i] = c0;
     }
 
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
+    for(int i = 0; i < 4; i++) {
+        this->c1[i] = c1;
+    }
 
-    if(imgOut == NULL) {
-        //TO DO: it does not work for frames!
-        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+    glw::bind_program(filteringProgram);
+    filteringProgram.uniform("u_tex_0",  0);
+    filteringProgram.uniform("u_tex_1",  1);
+    filteringProgram.uniform4("u_val_0", this->c0);
+    filteringProgram.uniform4("u_val_1", this->c1);
+    glw::bind_program(0);
+}
+
+void BufferOpGL::Process(GLuint tex0, GLuint tex1, GLuint texOut, int width, int height)
+{
+    if(texOut == 0) {
+        #ifdef PIC_DEBUG
+            printf("BufferOpGL::Process: the output texture, texOut, is empty.\n");
+        #endif
+        return;
     }
 
     if(fbo == NULL) {
         fbo = new Fbo();
     }
 
-    fbo->create(w, h, 1, false, imgOut->getTexture());
+    fbo->create(width, height, 1, false, texOut);
 
     //Rendering
     fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+    glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 
     //Shaders
     glw::bind_program(filteringProgram);
 
     //Textures
-    for(unsigned int i = 0; i < imgIn.size(); i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, imgIn[i]->getTexture());
+    unsigned int counter = 0;
+    if(tex0 != 0) {
+        glActiveTexture(GL_TEXTURE0 + counter);
+        glBindTexture(GL_TEXTURE_2D, tex0);
+        counter++;
+    }
+
+    if(tex1 != 0) {
+        glActiveTexture(GL_TEXTURE0 + counter);
+        glBindTexture(GL_TEXTURE_2D, tex1);
+        counter++;
     }
 
     quad->Render();
@@ -336,14 +324,12 @@ ImageGL *FilterGLOp::Process(ImageGLVec imgIn, ImageGL *imgOut)
     glw::bind_program(0);
 
     //Textures
-    for(unsigned int i = 0; i < imgIn.size(); i++) {
+    for(unsigned int i = 0; i < counter; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-
-    return imgOut;
 }
 
 } // end namespace pic
 
-#endif /* PIC_GL_BUFFER_GL_HPP */
+#endif /* PIC_GL_BUFFER_OP_GL_HPP */

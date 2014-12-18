@@ -720,6 +720,15 @@ public:
 
 
     /**
+     * @brief ChangeOwnership
+     * @param notOwned
+     */
+    void ChangeOwnership(bool notOwned)
+    {
+        this->notOwned = notOwned;
+    }
+
+    /**
      * @brief operator =
      * @param a
      */
@@ -960,8 +969,9 @@ PIC_INLINE Image::Image()
 
 PIC_INLINE Image::Image(Image *imgIn, bool deepCopy = true)
 {
+    SetNULL();
+    
     if(imgIn == NULL) {
-        SetNULL();
         return;
     }
 

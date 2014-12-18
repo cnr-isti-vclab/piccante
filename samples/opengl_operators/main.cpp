@@ -34,7 +34,6 @@ class SimpleOperatorsWindow : public pic::OpenGLWindow
 protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
-    pic::FilterGLOp *op;
 
 public:
     pic::ImageGL img, *imgRand, *imgOut, *imgOutTMO;
@@ -68,8 +67,8 @@ public:
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        //allocating the add operator
-        op = pic::FilterGLOp::CreateOpAdd(false);
+        img *= *imgRand;
+
     }
 
     void render()
@@ -80,11 +79,9 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        //imgoOut = img + imgRand
-        imgOut = op->Process(DoubleGL(&img, imgRand), imgOut);
 
         //simple tone mapping: gamma + exposure correction
-        imgOutTMO = tmo->Process(SingleGL(imgOut), imgOutTMO);
+        imgOutTMO = tmo->Process(SingleGL(&img), imgOutTMO);
 
         //imgOut visualization
         glw::bind_program(program);

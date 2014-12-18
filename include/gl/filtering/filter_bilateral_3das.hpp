@@ -98,9 +98,12 @@ FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
     frame = 0;
 
     int nRand = 32;
-    imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
-    imageRand->SetRand();
-    *imageRand *= float(nRand - 1);
+
+    Image tmp_imageRand(1, 128, 128, 1);
+    tmp_imageRand.SetRand();
+    tmp_imageRand *= float(nRand - 1);
+
+    imageRand = new ImageGL(&tmp_imageRand, true);
     imageRand->generateTexture2DU32GL();
 
     //Precomputation of the Gaussian Kernel

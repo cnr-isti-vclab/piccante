@@ -35,6 +35,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterBilateral2DS class
+ */
 class FilterBilateral2DS: public Filter
 {
 protected:
@@ -45,46 +48,105 @@ protected:
     int						halfSizeKernel;
     PrecomputedGaussian		*pg;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     int nSamples;
 
-    //Basic constructors
+    /**
+     * @brief FilterBilateral2DS
+     */
     FilterBilateral2DS()
     {
         pg = NULL;
         ms = NULL;
     }
+
+    /**
+     * @brief FilterBilateral2DS
+     * @param nameFile
+     * @param sigma_r
+     */
     FilterBilateral2DS(std::string nameFile, float sigma_r);
 
-    //Constructors using Init
+    /**
+     * @brief FilterBilateral2DS
+     * @param type
+     * @param sigma_s
+     * @param sigma_r
+     * @param mult
+     */
     FilterBilateral2DS(SAMPLER_TYPE type, float sigma_s, float sigma_r, int mult);
+
+    /**
+     * @brief FilterBilateral2DS
+     * @param sigma_s
+     * @param sigma_r
+     * @param mult
+     */
     FilterBilateral2DS(float sigma_s, float sigma_r, int mult);
+
+    /**
+     * @brief FilterBilateral2DS
+     * @param sigma_s
+     * @param sigma_r
+     */
     FilterBilateral2DS(float sigma_s, float sigma_r);
 
-    //Init
+    /**
+     * @brief Init
+     * @param type
+     * @param sigma_s
+     * @param sigma_r
+     * @param mult
+     */
     void Init(SAMPLER_TYPE type, float sigma_s, float sigma_r, int mult);
 
+    /**
+     * @brief Signature
+     * @return
+     */
     std::string Signature()
     {
         return GenBilString("S", sigma_s, sigma_r);
     }
 
-    //Set sigma_r
+    /**
+     * @brief SetSigma_r
+     * @param sigma_r
+     */
     void SetSigma_r(float sigma_r)
     {
         this->sigma_r = sigma_r;
     }
 
-    //Write the kernel
+    /**
+     * @brief Write
+     * @param filename
+     * @return
+     */
     bool Write(std::string filename);
 
-    //Read the kernel
+    /**
+     * @brief Read
+     * @param filename
+     * @return
+     */
     bool Read(std::string filename);
 
-    //Filtering
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
     static Image *Execute(Image *imgIn,
                              float sigma_s, float sigma_r)
     {
@@ -97,7 +159,14 @@ public:
         return imgOut;
     }
 
-    //Filtering
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgEdge
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgEdge,
                              float sigma_s, float sigma_r)
     {
@@ -117,6 +186,16 @@ public:
         return imgOut;
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @param type
+     * @param mult
+     * @return
+     */
     static Image *Execute(std::string nameIn,
                              std::string nameOut,
                              float sigma_s, float sigma_r, SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
@@ -136,7 +215,17 @@ public:
         return imgOut;
     }
 
-    //Filtering
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameIn2
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @param type
+     * @param mult
+     * @return
+     */
     static Image *Execute(std::string nameIn,
                              std::string nameIn2,
                              std::string nameOut,
@@ -158,6 +247,11 @@ public:
         return imgOut;
     }
 
+    /**
+     * @brief BilateralStoK
+     * @param kernelSize
+     * @return
+     */
     static inline float BilateralStoK(int kernelSize)
     {
         //	float ret = 0.9577f/(0.6466f*float(kernelSize)-0.9175f)+0.4505;
@@ -170,6 +264,11 @@ public:
         }
     }
 
+    /**
+     * @brief BilateralStoK2
+     * @param kernelSize
+     * @return
+     */
     static inline float BilateralStoK2(int kernelSize)
     {
         float ret = 0.3233f / (0.5053f * float(kernelSize) - 0.8272f) + 0.7366f;
@@ -181,7 +280,9 @@ public:
         }
     }
 
-    /**Precomputing kernels*/
+    /**
+     * @brief PrecomputedKernels
+     */
     static void PrecomputedKernels()
     {
         char nameFile[512];
@@ -214,7 +315,6 @@ public:
     }
 };
 
-//Basic constructors
 PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(std::string nameFile,
         float sigma_r)
 {
@@ -222,7 +322,6 @@ PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(std::string nameFile,
     this->sigma_r = sigma_r;
 }
 
-//Init constructors
 PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(SAMPLER_TYPE type,
         float sigma_s, float sigma_r, int mult)
 {
@@ -240,7 +339,6 @@ PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(float sigma_s, float sigma_r)
     Init(ST_BRIDSON, sigma_s, sigma_r, 1);
 }
 
-//Init
 PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
         float sigma_r, int mult)
 {
@@ -265,7 +363,6 @@ PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
     ms = new MRSamplers<2>(type, pg->halfKernelSize, nSamples, 1, 64);
 }
 
-//Process in a box
 PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
@@ -410,14 +507,12 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
     }
 }
 
-//Write the kernel
 PIC_INLINE bool FilterBilateral2DS::Write(std::string nameFile)
 {
     //TODO: add the writing of (sigms_s, sigma_r)
     return ms->Write(nameFile);
 }
 
-//Read the kernel
 PIC_INLINE bool FilterBilateral2DS::Read(std::string filename)
 {
     //TODO: add the reading of (sigms_s, sigma_r)

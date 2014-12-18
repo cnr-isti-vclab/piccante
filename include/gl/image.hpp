@@ -33,6 +33,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/gl/fbo.hpp"
 #include "util/gl/formats.hpp"
 #include "util/gl/timings.hpp"
+#include "util/gl/buffer_ops.hpp"
 
 namespace pic {
 
@@ -71,6 +72,13 @@ public:
      * @param target
      */
     ImageGL(GLuint tex, GLenum target);
+
+    /**
+     * @brief ImageGL
+     * @param img
+     * @param transferOwnership
+     */
+    ImageGL(Image *img, bool transferOwnership);
 
     /**
      * @brief ImageGL
@@ -363,6 +371,108 @@ public:
 
         return tex;
     }
+
+
+    /**
+     * @brief operator +=
+     * @param a
+     */
+    void operator +=(ImageGL &a)
+    {
+        if(SimilarType(&a)) {
+            BufferOpsGL *ops = BufferOpsGL::getInstance();
+            ops->list[0]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
+        } else {
+            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+
+            }
+        }
+
+    }
+
+    /**
+     * @brief operator *=
+     * @param a
+     */
+    void operator *=(ImageGL &a)
+    {
+        if(SimilarType(&a)) {
+            BufferOpsGL *ops = BufferOpsGL::getInstance();
+            ops->list[1]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
+        } else {
+            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+
+            }
+        }
+    }
+
+    /**
+     * @brief operator *=
+     * @param a
+     */
+    void operator *=(const float &a)
+    {
+        BufferOpsGL *ops = BufferOpsGL::getInstance();
+
+        ops->list[5]->Update(a);
+        ops->list[5]->Process(getTexture(), 0, getTexture(), width, height);
+    }
+
+    /**
+     * @brief operator -=
+     * @param a
+     */
+    void operator -=(ImageGL &a)
+    {
+        if(SimilarType(&a)) {
+            BufferOpsGL *ops = BufferOpsGL::getInstance();
+            ops->list[2]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
+        } else {
+            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+
+            }
+        }
+    }
+
+    /**
+     * @brief operator /=
+     * @param a
+     */
+    void operator /=(ImageGL &a)
+    {
+        if(SimilarType(&a)) {
+            BufferOpsGL *ops = BufferOpsGL::getInstance();
+            ops->list[3]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
+        } else {
+            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+
+            }
+        }
+    }
+
+    /**
+     * @brief operator /=
+     * @param a
+     */
+    void operator /=(const float &a)
+    {
+        BufferOpsGL *ops = BufferOpsGL::getInstance();
+
+        ops->list[6]->Update(a);
+        ops->list[6]->Process(getTexture(), 0, getTexture(), width, height);
+    }
+
+    /**
+    * @brief operator -=
+    * @param a
+    */
+   void operator -=(const float &a)
+   {
+       BufferOpsGL *ops = BufferOpsGL::getInstance();
+
+       ops->list[7]->Update(a);
+       ops->list[7]->Process(getTexture(), 0, getTexture(), width, height);
+   }
 };
 
 ImageGL::ImageGL() : Image()
@@ -453,6 +563,7 @@ ImageGL::ImageGL(GLuint tex, GLuint target) : Image()
 ImageGL::ImageGL(Image *img, bool mipmap, GLenum target): Image()
 {
     notOwnedGL = false;
+    notOwned = true;
 
     tmpFbo = NULL;
 
@@ -469,6 +580,33 @@ ImageGL::ImageGL(Image *img, bool mipmap, GLenum target): Image()
     generateTextureGL(mipmap, target);
 
     mode = IMG_CPU_GPU;
+}
+
+ImageGL::ImageGL(Image *img, bool transferOwnership = false) : Image()
+{
+
+    if(transferOwnership) {
+        notOwned = false;
+        img->ChangeOwnership(true);
+    } else {
+        notOwned = true;
+    }
+
+    notOwnedGL = false;
+
+    tmpFbo = NULL;
+
+    width    = img->width;
+    height   = img->height;
+    frames   = img->frames;
+    channels = img->channels;
+    data     = img->data;
+
+    CalculateStrides();
+
+    texture = 0;
+
+    mode = IMG_CPU;
 }
 
 ImageGL::ImageGL(int frames, int width, int height, int channels,
@@ -684,6 +822,8 @@ GLuint ImageGL::generateTexture2DU32GL()
     if(width <1 || height < 1 || channels < 1) {
         return 0;
     }
+
+    updateModeGPU();
 
     target = GL_TEXTURE_2D;
 

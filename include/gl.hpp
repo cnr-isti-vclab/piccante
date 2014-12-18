@@ -45,6 +45,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "gl/algorithms/pyramid.hpp"
 
+#include "util/gl/buffer_op.hpp"
+#include "util/gl/buffer_ops.hpp"
+
 #include "gl/filtering/filter.hpp"
 #include "gl/filtering/filter_luminance.hpp"
 #include "gl/filtering/filter_channel.hpp"

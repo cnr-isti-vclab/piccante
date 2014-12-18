@@ -171,22 +171,24 @@ FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma_r,
     int halfKernelSize = kernelSize >> 1;
 
     //Random numbers
-    int nRand = 32;
     int nSamplers;
 
-    if(BF_CLASSIC) {
-        imageRand = new ImageGL(3, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
-        imageRand->SetRand();
-        *imageRand -= 0.5f;
-        imageRand->loadFromMemory(false);
-        nSamplers = 1;
-    } else {
+//    if(BF_CLASSIC) {
+
+    imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
+    imageRand->SetRand();
+    imageRand->loadFromMemory(false);
+    *imageRand -= 0.5f;
+    nSamplers = 1;
+
+ /*   } else {
+    int nRand = 32;
         imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
         imageRand->SetRand();
         *imageRand *= float(nRand - 1);
         imageRand->generateTexture2DU32GL();
         nSamplers = nRand;
-    }
+    }*/
 
     //Poisson samples
 #ifdef PIC_DEBUG
@@ -404,20 +406,20 @@ void FilterGLBilateral2DS::Update(float sigma_s, float sigma_r)
     float sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
 
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform("u_tex",      0);
-    filteringProgram.uniform("u_poisson",  1);
-    filteringProgram.uniform("u_rand",	 2);
-    filteringProgram.uniform("u_mask",	 3);
+    filteringProgram.uniform("u_tex",       0);
+    filteringProgram.uniform("u_poisson",   1);
+    filteringProgram.uniform("u_rand",      2);
+    filteringProgram.uniform("u_mask",      3);
 
     if(type == BF_CROSS) {
-        filteringProgram.uniform("u_edge",	 4);
+        filteringProgram.uniform("u_edge",  4);
     }
 
-    filteringProgram.uniform("sigmas2",		    sigmas2);
-    filteringProgram.uniform("sigmar2",		    sigmar2);
+    filteringProgram.uniform("sigmas2",         sigmas2);
+    filteringProgram.uniform("sigmar2",         sigmar2);
     filteringProgram.uniform("kernelSize",      kernelSize);
     filteringProgram.uniform("kernelSizef",     float(kernelSize));
-    filteringProgram.uniform("nSamples",    ms->nSamples / 2);
+    filteringProgram.uniform("nSamples",        ms->nSamples >> 1);
     glw::bind_program(0);
 }
 

@@ -185,9 +185,11 @@ FilterGLBilateral2DSE::FilterGLBilateral2DSE(float sigma_s, float sigma_p, float
     int nRand = 32;
     int nSamplers;
 
-    imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
-    imageRand->SetRand();
-    *imageRand *= float(nRand - 1);
+    Image tmp_imageRand(1, 128, 128, 1);
+    tmp_imageRand.SetRand();
+    tmp_imageRand *= float(nRand - 1);
+
+    imageRand = new ImageGL(&tmp_imageRand, true);
     imageRand->generateTexture2DU32GL();
     nSamplers = nRand;
 
@@ -221,7 +223,7 @@ void FilterGLBilateral2DSE::FragmentShader()
     uniform sampler2D	u_edge_alb;
     uniform isampler2D	u_poisson;
     uniform sampler2D	u_rand;
-    uniform int			TOKEN_BANANA;
+    uniform int			nSamples;
     uniform float		sigma_s2;
     uniform float		sigma_pos2;
     uniform float		sigma_nor2;
@@ -240,7 +242,7 @@ void FilterGLBilateral2DSE::FragmentShader()
         float weight = 0.0;
         float shifter = texture2D(u_rand, gl_FragCoord.xy, 0).x;
 
-        for(int i = 0; i < TOKEN_BANANA; i++) {
+        for(int i = 0; i < nSamples; i++) {
             //Coordinates
             ivec3 coords = texelFetch(u_poisson, ivec2(i, shifter), 0).xyz;
             //pos difference
@@ -343,7 +345,7 @@ void FilterGLBilateral2DSE::Update(float sigma_s, float sigma_p, float sigma_n, 
     filteringProgram.uniform("sigma_pos2",	    sigmap2);
     filteringProgram.uniform("sigma_nor2",	    sigman2);
     filteringProgram.uniform("sigma_alb2",	    sigmaa2);
-    filteringProgram.uniform("TOKEN_BANANA",    ms->nSamples / 2);
+    filteringProgram.uniform("nSamples",        ms->nSamples >> 1);
     glw::bind_program(0);
 }
 
