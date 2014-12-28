@@ -32,20 +32,45 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterSampler3D class
+ */
 class FilterSampler3D: public Filter
 {
 protected:
     ImageSampler *isb;
-    //Process in a box
+
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    //SetupAux
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterSampler3D
+     * @param scale
+     * @param isb
+     */
     FilterSampler3D(float scale, ImageSampler *isb);
 
+    /**
+     * @brief Execute
+     * @param in
+     * @param isb
+     * @param scale
+     * @return
+     */
     static Image *Execute(Image *in, ImageSampler *isb, float scale)
     {
         FilterSampler3D filterUp(scale, isb);
@@ -54,57 +79,43 @@ public:
     }
 };
 
-//Basic constructor
 FilterSampler3D::FilterSampler3D(float scale, ImageSampler *isb)
 {
     this->scale = scale;
     this->isb = isb;
 }
 
-//SetupAux
 Image *FilterSampler3D::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = new Image(  int(imgIn[0]->framesf * scale),
-                                int(imgIn[0]->widthf  * scale),
-                                int(imgIn[0]->heightf * scale),
-                                imgIn[0]->channels);
+        imgOut = new Image( int(imgIn[0]->framesf * scale),
+                            int(imgIn[0]->widthf  * scale),
+                            int(imgIn[0]->heightf * scale),
+                            imgIn[0]->channels);
     }
 
     return imgOut;
 }
 
-//Process in a box
 void FilterSampler3D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-    int channels = dst->channels;
-
     Image *source = src[0];
 
-    int i, j, k, p, c;
-    float x, y, t;
-    float *vOut = new float[channels];
+    for(int p = box->z0; p < box->z1; p++) {
+        float t = float(p) / float(box->frames - 1);
 
-    for(p = box->z0; p < box->z1; p++) {
-        t = float(p) / float(box->frames - 1);
-
-        for(j = box->y0; j < box->y1; j++) {
-            y = float(j) / float(box->height - 1);
+        for(int j = box->y0; j < box->y1; j++) {
+            float y = float(j) / float(box->height - 1);
 
             for(i = box->x0; i < box->x1; i++) {
-                x = float(i) / float(box->width - 1);
-                //Convolution kernel
-                c = p * source->tstride + j * source->ystride + i * source->xstride;
-                isb->SampleImage(source, x, y, t, vOut);
+                float x = float(i) / float(box->width - 1);
 
-                for(k = 0; k < channels; k++) {
-                    dst->data[c + k] = vOut[k];
-                }
+                int c = p * source->tstride + j * source->ystride + i * source->xstride;
+
+                isb->SampleImage(source, x, y, t, &dst->data[c]);
             }
         }
     }
-
-    delete[] vOut;
 }
 
 } // end namespace pic

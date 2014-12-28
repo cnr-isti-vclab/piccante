@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -32,18 +23,26 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterGaussian3D class
+ */
 class FilterGaussian3D: public FilterNPasses
 {
     FilterGaussian1D *gaussianFilter;
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterGaussian3D
+     */
     FilterGaussian3D()
     {
         gaussianFilter = NULL;
     }
 
-    //Standard constructor
+    /**
+     * @brief FilterGaussian3D
+     * @param sigma
+     */
     FilterGaussian3D(float sigma)
     {
         //Gaussian filter
@@ -61,6 +60,13 @@ public:
         }
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param sigma
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgOut, float sigma)
     {
         FilterGaussian3D filter(sigma);
@@ -68,6 +74,13 @@ public:
         return ret;
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma
+     * @return
+     */
     static Image *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
         Image imgIn(nameIn);

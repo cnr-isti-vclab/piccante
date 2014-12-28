@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -35,6 +26,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterSampler2D class
+ */
 class FilterSampler2D: public Filter
 {
 protected:
@@ -43,20 +37,54 @@ protected:
     int				width, height;
     bool			swh;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    //SetupAux
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterSampler2D
+     * @param scale
+     * @param isb
+     */
     FilterSampler2D(float scale, ImageSampler *isb);
+
+    /**
+     * @brief FilterSampler2D
+     * @param scaleX
+     * @param scaleY
+     * @param isb
+     */
     FilterSampler2D(float scaleX, float scaleY, ImageSampler *isb);
 
+    /**
+     * @brief FilterSampler2D
+     * @param width
+     * @param height
+     * @param isb
+     */
     FilterSampler2D(int width, int height, ImageSampler *isb);
 
-    /**Output size*/
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
     void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(swh) {
@@ -71,6 +99,14 @@ public:
         frames      = imgIn->frames;
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param scale
+     * @param isb
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgOut, float scale,
                              ImageSampler *isb)
     {
@@ -78,6 +114,15 @@ public:
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param scaleX
+     * @param scaleY
+     * @param isb
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgOut, float scaleX,
                              float scaleY, ImageSampler *isb)
     {
@@ -85,6 +130,15 @@ public:
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param width
+     * @param height
+     * @param isb
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgOut, int width,
                              int height, ImageSampler *isb)
     {
@@ -92,6 +146,13 @@ public:
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param scale
+     * @param isb
+     */
     static void Execute(std::string nameIn, std::string nameOut, float scale,
                         ImageSampler *isb)
     {

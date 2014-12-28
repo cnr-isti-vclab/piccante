@@ -33,6 +33,9 @@ namespace pic {
 
 enum SIGMOID_MODE {SIG_TMO, SIG_TMO_WP, SIG_SDM};
 
+/**
+ * @brief The FilterSigmoidTMO class
+ */
 class FilterSigmoidTMO: public Filter
 {
 protected:
@@ -40,25 +43,64 @@ protected:
     float			c, alpha, epsilon, wp, wp2;
     SIGMOID_MODE	type;
 
+    /**
+     * @brief CalculateEpsilon
+     * @param imgIn
+     * @return
+     */
     float CalculateEpsilon(ImageVec imgIn);
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
-    //SetupAux
+
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterSigmoidTMO
+     */
     FilterSigmoidTMO();
+
+    /**
+     * @brief FilterSigmoidTMO
+     * @param type
+     * @param alpha
+     * @param wp
+     * @param epsilon
+     * @param temporal
+     */
     FilterSigmoidTMO(SIGMOID_MODE type, float alpha, float wp, float epsilon,
                      bool temporal);
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgOut)
     {
         FilterSigmoidTMO filter;
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @return
+     */
     static Image *Execute(std::string nameIn, std::string nameOut)
     {
         Image imgIn(nameIn);
@@ -68,7 +110,6 @@ public:
     }
 };
 
-//Basic constructors
 FilterSigmoidTMO::FilterSigmoidTMO()
 {
     type = SIG_TMO;
@@ -131,7 +172,6 @@ Image *FilterSigmoidTMO::SetupAux(ImageVec imgIn, Image *imgOut)
         epsilon = CalculateEpsilon(imgIn);
     }
 
-    //printf("%f %f %f\n",epsilon,alpha,wp2);
     if(imgOut == NULL) {
         imgOut = imgIn[0]->AllocateSimilarOne();
     }
@@ -139,7 +179,6 @@ Image *FilterSigmoidTMO::SetupAux(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-//Process in a box
 void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
 
