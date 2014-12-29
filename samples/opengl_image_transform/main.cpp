@@ -50,7 +50,7 @@ public:
     {
         //reading an input image
         img.Read("../data/input/bottles.hdr");
-        img.generateTextureGL(false, GL_TEXTURE_2D);
+        img.generateTextureGL();
 
         //creating a screen aligned quad
         pic::QuadGL::getProgram(program,

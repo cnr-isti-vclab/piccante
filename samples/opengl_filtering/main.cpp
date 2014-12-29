@@ -56,7 +56,7 @@ public:
     {
         //reading an input image
         img.Read("../data/input/yellow_flowers.png");
-        img.generateTextureGL(false, GL_TEXTURE_2D);
+        img.generateTextureGL();
 
         //creating a screen aligned quad
         pic::QuadGL::getProgram(program,

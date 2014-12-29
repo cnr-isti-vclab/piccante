@@ -20,18 +20,26 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 #include <mutex>
+
 #include "util/gl/buffer_op.hpp"
 
 namespace pic {
 
 typedef std::vector<BufferOpGL*> BufferOperatorsGL;
 
+/**
+ * @brief The BufferOpsGL class
+ */
 class BufferOpsGL{
 public:
     std::lock_guard<std::mutex> lock(mutex);
 
     BufferOperatorsGL list;
 
+    /**
+     * @brief getInstance
+     * @return
+     */
     static BufferOpsGL* getInstance()
     {
         if(!flag) {
@@ -51,6 +59,9 @@ private:
     static bool flag;
     static BufferOpsGL *buffer_ops_gl;
 
+    /**
+     * @brief BufferOpsGL
+     */
     BufferOpsGL()
     {
         list.push_back(new BufferOpGL("I0 +  I1", true));

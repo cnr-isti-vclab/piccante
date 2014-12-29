@@ -732,6 +732,15 @@ public:
      * @brief operator =
      * @param a
      */
+    void operator =(Image &a)
+    {
+        this->Assign(&a);
+    }
+
+    /**
+     * @brief operator =
+     * @param a
+     */
     void operator =(const float &a)
     {
         BufferAssign(data, size(), a);

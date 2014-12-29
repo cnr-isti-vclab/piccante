@@ -104,7 +104,7 @@ FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
     tmp_imageRand *= float(nRand - 1);
 
     imageRand = new ImageGL(&tmp_imageRand, true);
-    imageRand->generateTexture2DU32GL();
+    imageRand->generateTextureGL(GL_TEXTURE_2D, GL_INT);
 
     //Precomputation of the Gaussian Kernel
     int kernelSize = PrecomputedGaussian::KernelSize(sigma_s);

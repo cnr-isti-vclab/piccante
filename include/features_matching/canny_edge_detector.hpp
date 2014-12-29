@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -37,15 +28,22 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The CannyEdgeDetector class
+ */
 class CannyEdgeDetector
 {
 protected:
-    bool     bLum;
+    bool  bLum;
     Image *lum;
 
     float    sigma, threshold_1, threshold_2;
 
-    void Destroy() {
+    /**
+     * @brief Destroy frees allocated memory for this class.
+     */
+    void Destroy()
+    {
         if(bLum && lum != NULL) {
             delete lum;
             lum = NULL;
@@ -55,6 +53,9 @@ protected:
     }
 
 public:
+    /**
+     * @brief CannyEdgeDetector
+     */
     CannyEdgeDetector()
     {
         lum = NULL;
@@ -68,8 +69,12 @@ public:
         Destroy();
     }
 
-
-
+    /**
+     * @brief Update
+     * @param sigma
+     * @param threshold_1
+     * @param threshold_2
+     */
     void Update(float sigma = 1.4f, float threshold_1 = 0.05f, float threshold_2 = 0.3f)
     {
         if(sigma > 0.0f) {
@@ -97,6 +102,12 @@ public:
         }
     }
 
+    /**
+     * @brief Compute computes Canny edge detector on img and ouputs imgEdges as results.
+     * @param img
+     * @param imgEdges
+     * @return
+     */
     Image *Compute(Image *img, Image *imgEdges)
     {
         if(img == NULL) {

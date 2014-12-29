@@ -41,6 +41,9 @@ namespace pic {
 
 #ifndef PIC_DISABLE_EIGEN
 
+/**
+ * @brief The SusanCornerDetector class
+ */
 class SusanCornerDetector: public GeneralCornerDetector
 {
 protected:
@@ -51,6 +54,9 @@ protected:
     int       radius, radius_maxima;
 
 public:
+    /**
+     * @brief SusanCornerDetector
+     */
     SusanCornerDetector() : GeneralCornerDetector()
     {
         lum_flt = NULL;
@@ -70,6 +76,13 @@ public:
         }
     }
 
+    /**
+     * @brief Update
+     * @param sigma
+     * @param radius_maxima
+     * @param radius
+     * @param threshold
+     */
     void Update(float sigma = 1.0f, int radius_maxima = 5, int radius = 3, float threshold = 0.001f)
     {
         if(sigma > 0.0f) {
@@ -97,6 +110,11 @@ public:
         }
     }
 
+    /**
+     * @brief Compute
+     * @param img
+     * @param corners
+     */
     void Compute(Image *img, std::vector< Eigen::Vector3f > *corners)
     {
         if(img == NULL) {

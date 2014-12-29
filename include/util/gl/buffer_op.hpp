@@ -23,7 +23,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-class BufferOpGL{
+/**
+ * @brief The BufferOpGL class
+ */
+class BufferOpGL
+{
 protected:
 
     //FBO
@@ -40,6 +44,9 @@ protected:
     float		c0[4], c1[4];
     bool		bTexelFetch;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
 
 public:

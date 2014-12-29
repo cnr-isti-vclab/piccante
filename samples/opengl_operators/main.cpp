@@ -51,7 +51,7 @@ public:
     {
         //reading an input image
         img.Read("../data/input/bottles.hdr");
-        img.generateTextureGL(false, GL_TEXTURE_2D);
+        img.generateTextureGL();
 
         //creating a random image
         imgRand = new pic::ImageGL(img.frames, img.width, img.height, img.channels, pic::IMG_CPU_GPU, GL_TEXTURE_2D);

@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -34,6 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/gl/formats.hpp"
 #include "util/gl/timings.hpp"
 #include "util/gl/buffer_ops.hpp"
+#include "util/gl/buffer_allocation.hpp"
 
 namespace pic {
 
@@ -68,10 +60,10 @@ public:
 
     /**
      * @brief ImageGL
-     * @param tex
+     * @param texture
      * @param target
      */
-    ImageGL(GLuint tex, GLenum target);
+    ImageGL(GLuint texture, GLenum target);
 
     /**
      * @brief ImageGL
@@ -83,10 +75,10 @@ public:
     /**
      * @brief ImageGL
      * @param img
-     * @param mipmap
      * @param target
+     * @param mipmap
      */
-    ImageGL(Image *img, bool mipmap, GLenum target);
+    ImageGL(Image *img, GLenum target, bool mipmap);
 
     /**
      * @brief ImageGL
@@ -150,42 +142,13 @@ public:
     void AssignGL(float r, float g, float b, float a);
 
     /**
-     * @brief generate
-     * @param mipmap
+     * @brief generateTextureGL
      * @param target
-     */
-    GLuint generateTextureGL(bool mipmap, GLenum target);
-
-    /**
-     * @brief generateTexture2DGL
+     * @param format_type
      * @param mipmap
      * @return
      */
-    GLuint generateTexture2DGL(bool mipmap);
-
-    /**
-     * @brief generateTexture2DU32GL
-     * @return
-     */
-    GLuint	generateTexture2DU32GL();
-
-    /**
-     * @brief generateTexture3DGL
-     * @return
-     */
-    GLuint generateTexture3DGL();
-
-    /**
-     * @brief generateTextureCubeMapGL
-     * @return
-     */
-    GLuint generateTextureCubeMapGL();
-
-    /**
-     * @brief generateTexture2DArrayGL
-     * @return
-     */
-    GLuint generateTexture2DArrayGL();
+    GLuint generateTextureGL(GLenum target, GLenum format_type, bool mipmap);
 
     /**
      * @brief loadSliceIntoTexture
@@ -194,15 +157,14 @@ public:
     void loadSliceIntoTexture(int i);
 
     /**
-     * @brief loadAllSlicesIntoTex
+     * @brief loadAllSlicesIntoTexture
      */
-    void loadAllSlicesIntoTex();
+    void loadAllSlicesIntoTexture();
 
     /**
      * @brief loadFromMemory
-     * @param mipmap
      */
-    void loadFromMemory(bool mipmap);
+    void loadFromMemory();
 
     /**
      * @brief loadToMemory
@@ -484,7 +446,7 @@ ImageGL::ImageGL() : Image()
     tmpFbo = NULL;
 }
 
-ImageGL::ImageGL(GLuint tex, GLuint target) : Image()
+ImageGL::ImageGL(GLuint texture, GLuint target) : Image()
 {
     notOwnedGL = true;
 
@@ -492,75 +454,16 @@ ImageGL::ImageGL(GLuint tex, GLuint target) : Image()
 
     mode = IMG_GPU;
 
+    this->texture = texture;
+
     this->target = target;
-    texture = tex;
 
-    GLint internalFormat;
-
-    switch(target) {
-    case GL_TEXTURE_2D: {
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
-        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
-        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT,
-                                 &internalFormat);
-
-        channels = getChannelsFromInternalFormatGL(internalFormat);
-
-        frames = 1;
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
-    break;
-
-    case GL_TEXTURE_CUBE_MAP: {
-        glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
-        glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP, 0, GL_TEXTURE_WIDTH, &width);
-        glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP, 0, GL_TEXTURE_HEIGHT, &height);
-        glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP, 0, GL_TEXTURE_INTERNAL_FORMAT,
-                                 &internalFormat);
-
-        channels = getChannelsFromInternalFormatGL(internalFormat);
-
-        frames = 6;
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
-    break;
-
-    case GL_TEXTURE_2D_ARRAY: {
-        glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
-        glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_WIDTH, &width);
-        glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_HEIGHT, &height);
-        glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_DEPTH, &frames);
-        glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_INTERNAL_FORMAT,
-                                 &internalFormat);
-
-        channels = getChannelsFromInternalFormatGL(internalFormat);
-        
-        glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-    }
-    break;
-
-    case GL_TEXTURE_3D: {
-        glBindTexture(GL_TEXTURE_3D, texture);
-        glGetTexLevelParameteriv(GL_TEXTURE_3D, 0, GL_TEXTURE_WIDTH, &width);
-        glGetTexLevelParameteriv(GL_TEXTURE_3D, 0, GL_TEXTURE_HEIGHT, &height);
-        glGetTexLevelParameteriv(GL_TEXTURE_3D, 0, GL_TEXTURE_DEPTH, &frames);
-        glGetTexLevelParameteriv(GL_TEXTURE_3D, 0, GL_TEXTURE_INTERNAL_FORMAT,
-                                 &internalFormat);
-
-        channels = getChannelsFromInternalFormatGL(internalFormat);
-
-        glBindTexture(GL_TEXTURE_3D, 0);
-    }
-    break;
-    }
+    getTextureInformationGL(texture, target, width, height, frames, channels);
 
     AllocateAux();
 }
 
-ImageGL::ImageGL(Image *img, bool mipmap, GLenum target): Image()
+ImageGL::ImageGL(Image *img, GLenum target, bool mipmap): Image()
 {
     notOwnedGL = false;
     notOwned = true;
@@ -577,7 +480,7 @@ ImageGL::ImageGL(Image *img, bool mipmap, GLenum target): Image()
 
     texture = 0;
 
-    generateTextureGL(mipmap, target);
+    generateTextureGL(target, GL_FLOAT, mipmap);
 
     mode = IMG_CPU_GPU;
 }
@@ -625,7 +528,7 @@ ImageGL::ImageGL(int frames, int width, int height, int channels,
     case IMG_CPU_GPU: {
         Allocate(width, height, channels, frames);
 
-        generateTextureGL(false, target);
+        generateTextureGL(target, GL_FLOAT, false);
     }
     break;
 
@@ -643,7 +546,7 @@ ImageGL::ImageGL(int frames, int width, int height, int channels,
 
         AllocateAux();
 
-        generateTextureGL(false, target);
+        generateTextureGL(target, GL_FLOAT, false);
     }
     break;
     }
@@ -654,39 +557,63 @@ ImageGL::~ImageGL()
     Destroy();
 }
 
-GLuint ImageGL::generateTextureGL(bool mipmap, GLenum target)
+/**
+ * @brief ImageGL::generateTextureGL
+ * @param target
+ * @param format_type
+ * @param mipmap
+ * @return
+ */
+GLuint ImageGL::generateTextureGL(GLenum target = GL_TEXTURE_2D, GLenum format_type = GL_FLOAT, bool mipmap = false)
 {
+    this->texture = 0;
     this->target  = target;
+
+    updateModeGPU();
+
+    if(format_type == GL_INT) {
+        int *buffer = new int[width * height * channels];
+
+        for(int i = 0; i < (width * height * channels); i++) {
+            buffer[i] = int(lround(data[i]));
+        }
+
+        texture = generateTexture2DU32GL(width, height, channels, buffer);
+
+        delete[] buffer;
+
+        return texture;
+    }
 
     switch(target) {
         case GL_TEXTURE_2D:
         {
-            generateTexture2DGL(mipmap);
+            texture = generateTexture2DGL(width, height, channels, data, mipmap);
         } break;
 
         case GL_TEXTURE_3D:
         {
             if(frames > 1) {
-                generateTexture3DGL();
+                texture = generateTexture3DGL(width, height, channels, frames, data);
             } else {
-                generateTexture2DGL(mipmap);
+                texture = generateTexture2DGL(width, height, channels, data, mipmap);
                 this->target = GL_TEXTURE_2D;
             }
         } break;
 
         case GL_TEXTURE_2D_ARRAY: {
-            generateTexture2DArrayGL();
+            texture = generateTexture2DArrayGL(width, height, channels, frames, data);
         } break;
 
         case GL_TEXTURE_CUBE_MAP: {
             if(frames > 5) {
-                generateTextureCubeMapGL();
+                texture = generateTextureCubeMapGL(width, height, channels, frames, data);
             } else {
                 if(frames > 1) {
-                    generateTexture2DArrayGL();
+                    texture = generateTexture2DArrayGL(width, height, channels, frames, data);
                     this->target = GL_TEXTURE_2D_ARRAY;
                 } else {
-                    generateTexture2DGL(mipmap);
+                    texture = generateTexture2DGL(width, height, channels, data, mipmap);
                     this->target = GL_TEXTURE_2D;
                 }
             }
@@ -745,177 +672,7 @@ void ImageGL::AssignGL(float r = 0.0f, float g = 0.0f, float b = 0.0f,
     tmpFbo->unbind();
 }
 
-GLuint ImageGL::generateTexture2DGL(bool mipmap = false)
-{
-    if(width <1 || height < 1 || channels < 1) {
-        return 0;
-    }
-
-    updateModeGPU();
-
-    target = GL_TEXTURE_2D;
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    if(mipmap) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    } else {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    }
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    int mode, modeInternalFormat;
-    getModesGL(channels, mode, modeInternalFormat);
-    glTexImage2D(GL_TEXTURE_2D, 0, modeInternalFormat, width, height, 0,
-                 mode, GL_FLOAT, data);
-
-    if(mipmap) {
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return texture;
-}
-
-GLuint	ImageGL::generateTextureCubeMapGL()
-{
-    if(width <1 || height < 1 || channels < 1 || frames < 6) {
-        return 0;
-    }
-
-    updateModeGPU();
-
-    target = GL_TEXTURE_CUBE_MAP;
-
-    int mode, modeInternalFormat;
-    getModesGL(channels, mode, modeInternalFormat);
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    //Order Pos,Neg X,Y,Z
-    for(int i = 0; i < 6; i++) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, modeInternalFormat, width,
-                     height, 0, mode, GL_FLOAT, &data[tstride * i]);
-    }
-
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
-    return texture;
-}
-
-GLuint ImageGL::generateTexture2DU32GL()
-{
-    if(width <1 || height < 1 || channels < 1) {
-        return 0;
-    }
-
-    updateModeGPU();
-
-    target = GL_TEXTURE_2D;
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    int *buffer = new int[width * height * channels];
-
-    for(int i = 0; i < (width * height * channels); i++) {
-        buffer[i] = int(lround(data[i]));
-    }
-
-    int mode, modeInternalFormat;
-    getModesIntegerGL(channels, mode, modeInternalFormat);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, modeInternalFormat, width, height, 0,
-                 mode, GL_INT, buffer);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    delete[] buffer;
-
-    return texture;
-}
-
-GLuint ImageGL::generateTexture3DGL()
-{
-    if(width <1 || height < 1 || channels < 1 || frames < 1) {
-        return 0;
-    }
-
-    updateModeGPU();
-
-    target = GL_TEXTURE_3D;
-
-    int mode, modeInternalFormat;
-    getModesGL(channels, mode, modeInternalFormat);
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_3D, texture);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    glTexImage3D(GL_TEXTURE_3D, 0, modeInternalFormat, width, height, frames, 0,
-                 mode, GL_FLOAT, data);
-
-    glBindTexture(GL_TEXTURE_3D, 0);
-
-//	for(int i=0;i<frames;i++)
-//		glTexSubImage3D(GL_TEXTURE_3D,0,0,0,i,width,height,1,mode,GL_FLOAT,&data[i*tstride]);
-
-    return texture;
-}
-
-GLuint ImageGL::generateTexture2DArrayGL()
-{
-    if(width <1 || height < 1 || channels < 1 || frames < 1) {
-        return 0;
-    }
-
-    updateModeGPU();
-
-    target = GL_TEXTURE_2D_ARRAY;
-
-    int mode, modeInternalFormat;
-    getModesGL(channels, mode, modeInternalFormat);
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, modeInternalFormat, width, height, frames,
-                 0, mode, GL_FLOAT, data);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-    return texture;
-}
-
-void ImageGL::loadFromMemory(bool mipmap = false)
+void ImageGL::loadFromMemory()
 {
     int mode, modeInternalFormat;
     getModesGL(channels, mode, modeInternalFormat);
@@ -979,8 +736,12 @@ void ImageGL::loadSliceIntoTexture(int i)
     glBindTexture(target, 0);
 }
 
-void ImageGL::loadAllSlicesIntoTex()
+void ImageGL::loadAllSlicesIntoTexture()
 {
+    if(target != GL_TEXTURE_3D && target != GL_TEXTURE_2D_ARRAY) {
+        return;
+    }
+
     for(int i = 0; i < frames; i++) {
         loadSliceIntoTexture(i);
     }

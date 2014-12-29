@@ -107,7 +107,7 @@ void FilterSampler3D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
         for(int j = box->y0; j < box->y1; j++) {
             float y = float(j) / float(box->height - 1);
 
-            for(i = box->x0; i < box->x1; i++) {
+            for(int i = box->x0; i < box->x1; i++) {
                 float x = float(i) / float(box->width - 1);
 
                 int c = p * source->tstride + j * source->ystride + i * source->xstride;

@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -33,6 +24,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterGuided class
+ */
 class FilterGuided: public Filter
 {
 protected:
@@ -40,24 +34,68 @@ protected:
     int		radius;
     float	e_regularization, nPixels;
 
-    //Process in a box
+    /**
+     * @brief Process1Channel
+     * @param I
+     * @param p
+     * @param q
+     * @param box
+     */
     void Process1Channel(Image *I, Image *p, Image *q, BBox *box);
+
+    /**
+     * @brief Process3Channel
+     * @param I
+     * @param p
+     * @param q
+     * @param box
+     */
     void Process3Channel(Image *I, Image *p, Image *q, BBox *box);
+
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
-    //Basic constructor
+
+    /**
+     * @brief FilterGuided
+     */
     FilterGuided()
     {
         Update(3, 0.1f);
     }
+
+    /**
+     * @brief FilterGuided
+     * @param radius
+     * @param e_regularization
+     */
     FilterGuided(int radius, float e_regularization)
     {
         Update(radius, e_regularization);
     }
 
+    /**
+     * @brief Update
+     * @param radius
+     * @param e_regularization
+     */
     void Update(int radius, float e_regularization);
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param guide
+     * @param imgOut
+     * @param radius
+     * @param e_regularization
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *guide, Image *imgOut,
                              int radius, float e_regularization)
     {
@@ -95,8 +133,8 @@ void FilterGuided::Process1Channel(Image *I, Image *p, Image *q,
                 float I_mean_p_mean = I_mean * p_mean[c];
                 float a = 0.0f;
 
-                for(int k = -radius; k < radius; k++) {
-                    for(int l = -radius; l < radius; l++) {
+                for(int k = -radius; k <= radius; k++) {
+                    for(int l = -radius; l <= radius; l++) {
                         float *I_i = (*I)(i + l, j + k);
                         float *p_i = (*p)(i + l, j + k);
                         a += I_i[0] * p_i[c] - I_mean_p_mean;
@@ -139,6 +177,7 @@ PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
 
             //regularization
             cov.Add(e_regularization);
+
             //invert matrix
             cov.Inverse(&inv);
 
@@ -150,8 +189,8 @@ PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
                     tmp_A[n] = 0.0f;
                 }
 
-                for(int k = -radius; k < radius; k++) {
-                    for(int l = -radius; l < radius; l++) {
+                for(int k = -radius; k <= radius; k++) {
+                    for(int l = -radius; l <= radius; l++) {
                         float *I_i = (*I)(i + l, j + k);
                         float *p_i = (*p)(i + l, j + k);
 
@@ -190,7 +229,6 @@ PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
     delete[] buf;
 }
 
-//Process in a box
 PIC_INLINE void FilterGuided::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {

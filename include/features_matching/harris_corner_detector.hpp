@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -44,6 +35,9 @@ namespace pic {
 
 #ifndef PIC_DISABLE_EIGEN
 
+/**
+ * @brief The HarrisCornerDetector class
+ */
 class HarrisCornerDetector: public GeneralCornerDetector
 {
 protected:
@@ -58,6 +52,9 @@ protected:
     //previous values
     int width, height;
 
+    /**
+     * @brief Destroy
+     */
     void Destroy()
     {
         if(lum != NULL) {
@@ -109,6 +106,9 @@ protected:
         ret = NULL;
     }
 
+    /**
+     * @brief SetNULL
+     */
     void SetNULL()
     {
         width = -1;
@@ -126,6 +126,12 @@ protected:
 
 public:
 
+    /**
+     * @brief HarrisCornerDetector
+     * @param sigma
+     * @param radius
+     * @param threshold
+     */
     HarrisCornerDetector(float sigma = 1.0f, int radius = 3, float threshold = 0.001f) : GeneralCornerDetector()
     {
         SetNULL();
@@ -137,6 +143,12 @@ public:
         Destroy();
     }
 
+    /**
+     * @brief Update
+     * @param sigma
+     * @param radius
+     * @param threshold
+     */
     void Update(float sigma = 1.0f, int radius = 3, float threshold = 0.001f)
     {
         if(sigma > 0.0f) {
@@ -154,6 +166,11 @@ public:
         this->threshold = threshold;
     }
 
+    /**
+     * @brief Compute
+     * @param img
+     * @param corners
+     */
     void Compute(Image *img, std::vector< Eigen::Vector3f > *corners)
     {
         if(img == NULL) {
@@ -196,7 +213,7 @@ public:
         if(Ixy == NULL) {
             Ixy = Ix->Clone();
         } else {
-            Ixy->Assign(Ix);
+            *Ixy = *Ix;
         }
 
         *Ixy *= *Iy;
@@ -218,7 +235,7 @@ public:
         if(ret == NULL) {
             ret = Ix2_flt->Clone();
         } else {
-            ret->Assign(Ix2_flt);
+            *ret = *Ix2_flt;
         }
 
         *ret *= *Iy2_flt; //Ix2.*Iy2

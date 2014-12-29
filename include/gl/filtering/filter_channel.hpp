@@ -106,7 +106,7 @@ public:
             imgIn.data[i + 2] = 0.25f;
         }
 
-        imgIn.generateTexture2DGL(false);
+        imgIn.generateTextureGL();
 
         FilterGLChannel filter(0);
         ImageGL *outR = filter.Process(SingleGL(&imgIn), NULL);

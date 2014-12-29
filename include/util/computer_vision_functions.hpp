@@ -727,7 +727,8 @@ Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector4d &p)
  */
 Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector3d &p)
 {
-    return cameraMatrixProject(M, Eigen::Vector4d(p[0], p[1], p[2], 1.0));
+    Eigen::Vector4d p4d(p[0], p[1], p[2], 1.0);
+    return cameraMatrixProject(M, p4d);
 }
 
 /**

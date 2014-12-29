@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,14 +22,26 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterIntegralImage class
+ */
 class FilterIntegralImage: public Filter
 {
 public:
 
+    /**
+     * @brief FilterIntegralImage
+     */
     FilterIntegralImage() : Filter()
     {
     }
 
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *Process(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() < 1){
@@ -102,6 +105,12 @@ public:
         return imgOut;
     }
 
+    /**
+     * @brief ProcessP
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *ProcessP(ImageVec imgIn, Image *imgOut)
     {
         return Process(imgIn, imgOut);

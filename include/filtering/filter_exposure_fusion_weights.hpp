@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -57,15 +48,13 @@ protected:
 
             for(int i = box->x0; i < box->x1; i++) {
                 int indOut = c + i;
+
                 int ind = indOut * channels;
 
-                float sum = 0.0f;
-                for(int k=0;k<transformChannels;k++)
-                {
-                    sum += data[ind + k] * weights[k];
+                dst->data[indOut] = 0.0f;
+                for(int k=0;k<transformChannels;k++) {
+                    dst->data[indOut] += data[ind + k] * weights[k];
                 }
-
-                dst->data[indOut] = sum;
             }
         }
     }
