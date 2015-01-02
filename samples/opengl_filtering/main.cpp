@@ -36,12 +36,11 @@ class SimpleFilteringWindow : public pic::OpenGLWindow
 protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
-    pic::FilterGLGaussian2D *fltGauss;
     pic::FilterGLBilateral2DG *fltBilG;
 
 public:
     pic::ImageGL img, *img_flt, *img_flt_tmo;
-    glw::program    program;
+    glw::program program;
 
     pic::ImageGLVec stack;
 

@@ -15,8 +15,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_GL_BUFFER_OP_GL_HPP
-#define PIC_GL_BUFFER_OP_GL_HPP
+#ifndef PIC_UTIL_GL_BUFFER_OP_HPP
+#define PIC_UTIL_GL_BUFFER_OP_HPP
 
 #include "util/string.hpp"
 #include "util/gl/quad.hpp"
@@ -339,4 +339,4 @@ void BufferOpGL::Process(GLuint tex0, GLuint tex1, GLuint texOut, int width, int
 
 } // end namespace pic
 
-#endif /* PIC_GL_BUFFER_OP_GL_HPP */
+#endif /* PIC_UTIL_GL_BUFFER_OP_HPP */

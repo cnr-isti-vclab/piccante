@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -29,7 +20,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**GLSL_SIMPLE_EXPOSURE_GAMMA: apply simple gamma correction and exposure*/
+/**
+ * @brief GLSL_SIMPLE_EXPOSURE_GAMMA applies a simple gamma correctiona and
+ * exposure in a shader.
+ * @return It returns a string which represents a part of a shader.
+ */
 std::string GLSL_SIMPLE_EXPOSURE_GAMMA()
 {
     std::string ret;
@@ -43,7 +38,10 @@ std::string GLSL_SIMPLE_EXPOSURE_GAMMA()
     return ret;
 }
 
-/**GLSL_DRAGO_TMO: Drago et al.'s TMO*/
+/**
+ * @brief GLSL_DRAGO_TMO returns Drago et al.'s tone mapping operator.
+ * @return It returns a string which represents a part of a shader.
+ */
 std::string GLSL_DRAGO_TMO()
 {
     std::string ret;

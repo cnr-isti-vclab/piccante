@@ -26,6 +26,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/gl/timings.hpp"
 #include "util/gl/buffer_ops.hpp"
 #include "util/gl/buffer_allocation.hpp"
+#include "util/gl/mask.hpp"
 
 namespace pic {
 
@@ -47,6 +48,32 @@ protected:
      * @brief Destroy
      */
     void	Destroy();
+
+    /**
+     * @brief AssignGL assigns an (r, g, b, a) value to an image using glClearColor.
+     * @param r is the value for the red channel.
+     * @param g is the value for the green channel.
+     * @param b is the value for the blue channel.
+     * @param a is the value for the alpha channel.
+     */
+    void AssignGL(float r = 0.0f, float g = 0.0f, float b = 0.0f,
+                  float a = 1.0f)
+    {
+        if(tmpFbo == NULL) {
+            tmpFbo = new Fbo();
+            tmpFbo->create(width, height, 1, false, texture);
+        }
+
+        glClearColor(r, g, b, a);
+
+        //Rendering
+        tmpFbo->bind();
+        glViewport(0, 0, (GLsizei)width, (GLsizei)height);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        //Fbo
+        tmpFbo->unbind();
+    }
 
 public:
     std::vector<ImageGL *> stack;
@@ -77,8 +104,9 @@ public:
      * @param img
      * @param target
      * @param mipmap
+     * @param transferOwnership
      */
-    ImageGL(Image *img, GLenum target, bool mipmap);
+    ImageGL(Image *img, GLenum target, bool mipmap, bool transferOwnership);
 
     /**
      * @brief ImageGL
@@ -133,15 +161,6 @@ public:
     ImageGL *CloneGL();
 
     /**
-     * @brief AssignGL
-     * @param r
-     * @param g
-     * @param b
-     * @param a
-     */
-    void AssignGL(float r, float g, float b, float a);
-
-    /**
      * @brief generateTextureGL
      * @param target
      * @param format_type
@@ -190,15 +209,6 @@ public:
     void readFromFBO(Fbo *fbo, GLenum format);
 
     /**
-     * @brief getTexture
-     * @return
-     */
-    GLuint getTexture()
-    {
-        return texture;
-    }
-
-    /**
      * @brief bindTexture
      */
     void bindTexture();
@@ -237,10 +247,19 @@ public:
     }
 
     /**
-     * @brief SetTexture
+     * @brief getTexture
+     * @return
+     */
+    GLuint getTexture()
+    {
+        return texture;
+    }
+
+    /**
+     * @brief setTexture
      * @param texture
      */
-    void SetTexture(GLuint texture)
+    void setTexture(GLuint texture)
     {
         //TODO: UNSAFE!
         this->texture = texture;
@@ -256,84 +275,13 @@ public:
     }
 
     /**
-     * @brief GenerateMask creates an opengl mask (a texture) from a buffer of bool values.
-     * @param width
-     * @param height
-     * @param buffer
-     * @param tex
-     * @param tmpBuffer
-     * @param mipmap
-     * @return
+     * @brief operator =
+     * @param a
      */
-    static GLuint GenerateMask(int width, int height, bool *buffer = NULL,
-                               GLuint tex = 0, unsigned char *tmpBuffer = NULL, bool mipmap = false)
+    void operator =(const float &a)
     {
-        bool bGen = (tex == 0);
-
-        if(bGen) {
-            glGenTextures(1, &tex);
-        }
-
-        glBindTexture(GL_TEXTURE_2D, tex);
-
-        if(bGen) {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        }
-
-        unsigned char *data = NULL;
-
-        if(buffer != NULL) {
-            int n = width * height;
-
-            if(tmpBuffer != NULL) {
-                data = tmpBuffer;
-            } else {
-                data = new unsigned char[n * 3];
-            }
-
-            #pragma omp parallel for
-
-            for(int i = 0; i < n; i++) {
-                data[i] = buffer[i] ? 255 : 0;
-            }
-        }
-
-        if(bGen) {
-            if(mipmap) {
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            } else {
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            }
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        }
-
-        //Note: GL_LUMINANCE is deprecated since OpenGL 3.1
-        #ifndef PIC_DISABLE_OPENGL_NON_CORE
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8 , width, height, 0, GL_LUMINANCE,
-                     GL_UNSIGNED_BYTE, data);
-        #endif
-
-        #ifdef PIC_DISABLE_OPENGL_NON_CORE
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED,
-                         GL_UNSIGNED_BYTE, data);
-        #endif
-
-        if(mipmap && bGen) {
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        if(data != NULL && tmpBuffer == NULL) {
-            delete[] data;
-        }
-
-        return tex;
+        AssignGL(a, a, a, a);
     }
-
 
     /**
      * @brief operator +=
@@ -343,7 +291,7 @@ public:
     {
         if(SimilarType(&a)) {
             BufferOpsGL *ops = BufferOpsGL::getInstance();
-            ops->list[0]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
+            ops->list[BOGL_ADD]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
         } else {
             if((nPixels() == a.nPixels()) && (a.channels == 1)) {
 
@@ -360,7 +308,8 @@ public:
     {
         if(SimilarType(&a)) {
             BufferOpsGL *ops = BufferOpsGL::getInstance();
-            ops->list[1]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
+
+            ops->list[BOGL_MUL]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
         } else {
             if((nPixels() == a.nPixels()) && (a.channels == 1)) {
 
@@ -376,8 +325,8 @@ public:
     {
         BufferOpsGL *ops = BufferOpsGL::getInstance();
 
-        ops->list[5]->Update(a);
-        ops->list[5]->Process(getTexture(), 0, getTexture(), width, height);
+        ops->list[BOGL_MUL_CONST]->Update(a);
+        ops->list[BOGL_MUL_CONST]->Process(getTexture(), 0, getTexture(), width, height);
     }
 
     /**
@@ -388,7 +337,7 @@ public:
     {
         if(SimilarType(&a)) {
             BufferOpsGL *ops = BufferOpsGL::getInstance();
-            ops->list[2]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
+            ops->list[BOGL_SUB]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
         } else {
             if((nPixels() == a.nPixels()) && (a.channels == 1)) {
 
@@ -404,7 +353,7 @@ public:
     {
         if(SimilarType(&a)) {
             BufferOpsGL *ops = BufferOpsGL::getInstance();
-            ops->list[3]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
+            ops->list[BOGL_DIV]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
         } else {
             if((nPixels() == a.nPixels()) && (a.channels == 1)) {
 
@@ -463,10 +412,16 @@ ImageGL::ImageGL(GLuint texture, GLuint target) : Image()
     AllocateAux();
 }
 
-ImageGL::ImageGL(Image *img, GLenum target, bool mipmap): Image()
+ImageGL::ImageGL(Image *img, GLenum target, bool mipmap, bool transferOwnership = false): Image()
 {
+    if(transferOwnership) {
+        notOwned = false;
+        img->ChangeOwnership(true);
+    } else {
+        notOwned = true;
+    }
+
     notOwnedGL = false;
-    notOwned = true;
 
     tmpFbo = NULL;
 
@@ -487,7 +442,6 @@ ImageGL::ImageGL(Image *img, GLenum target, bool mipmap): Image()
 
 ImageGL::ImageGL(Image *img, bool transferOwnership = false) : Image()
 {
-
     if(transferOwnership) {
         notOwned = false;
         img->ChangeOwnership(true);
@@ -525,6 +479,7 @@ ImageGL::ImageGL(int frames, int width, int height, int channels,
     }
 
     switch(this->mode) {
+
     case IMG_CPU_GPU: {
         Allocate(width, height, channels, frames);
 
@@ -625,9 +580,11 @@ GLuint ImageGL::generateTextureGL(GLenum target = GL_TEXTURE_2D, GLenum format_t
 
 ImageGL *ImageGL::CloneGL()
 {
-    //TODO: to improve CloneGL
+    //call Image clone function
     Image *tmp = this->Clone();
-    return new ImageGL(tmp, false, target);
+
+    //wrapping tmp into an ImageGL
+    return new ImageGL(tmp, target, false, true);
 }
 
 void ImageGL::Destroy()
@@ -651,25 +608,6 @@ ImageGL *ImageGL::AllocateSimilarOneGL()
 
     ImageGL *ret = new ImageGL(frames, width, height, channels, mode, target);
     return ret;
-}
-
-void ImageGL::AssignGL(float r = 0.0f, float g = 0.0f, float b = 0.0f,
-                          float a = 1.0f)
-{
-    if(tmpFbo == NULL) {
-        tmpFbo = new Fbo();
-        tmpFbo->create(width, height, 1, false, texture);
-    }
-
-    glClearColor(r, g, b, a);
-
-    //Rendering
-    tmpFbo->bind();
-    glViewport(0, 0, (GLsizei)width, (GLsizei)height);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    //Fbo
-    tmpFbo->unbind();
 }
 
 void ImageGL::loadFromMemory()

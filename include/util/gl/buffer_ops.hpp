@@ -15,15 +15,19 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_GL_BUFFER_OPS_GL_HPP
-#define PIC_GL_BUFFER_OPS_GL_HPP
+#ifndef PIC_UTIL_GL_BUFFER_OPS_HPP
+#define PIC_UTIL_GL_BUFFER_OPS_HPP
 
 #include <vector>
-#include <mutex>
+#include <map>
+#include <thread>
 
 #include "util/gl/buffer_op.hpp"
 
 namespace pic {
+
+enum BOGL{BOGL_ADD, BOGL_SUB, BOGL_MUL, BOGL_DIV,
+          BOGL_ADD_CONST, BOGL_SUB_CONST, BOGL_MUL_CONST, BOGL_DIV_CONST};
 
 typedef std::vector<BufferOpGL*> BufferOperatorsGL;
 
@@ -42,22 +46,27 @@ public:
      */
     static BufferOpsGL* getInstance()
     {
-        if(!flag) {
-            buffer_ops_gl = new BufferOpsGL();
-            flag = true;
+        std::thread::id this_id = std::this_thread::get_id();
+
+        if(!flag[this_id]) {
+            std::lock_guard<std::mutex> lock(mutex);
+
+            if(buffer_ops_gl[this_id] == NULL) {
+                buffer_ops_gl[this_id] = new BufferOpsGL();
+                flag[this_id] = true;
+            }
         }
 
-        return buffer_ops_gl;
+        return buffer_ops_gl[this_id];
     }
 
     ~BufferOpsGL()
     {
-        flag = false;
     }
 
 private:
-    static bool flag;
-    static BufferOpsGL *buffer_ops_gl;
+    static std::map<std::thread::id, bool> flag;
+    static std::map<std::thread::id, BufferOpsGL*> buffer_ops_gl;
 
     /**
      * @brief BufferOpsGL
@@ -65,21 +74,22 @@ private:
     BufferOpsGL()
     {
         list.push_back(new BufferOpGL("I0 +  I1", true));
+        list.push_back(new BufferOpGL("I0 -  I1", true));
         list.push_back(new BufferOpGL("I0 *  I1", true));
         list.push_back(new BufferOpGL("I0 /  I1", true));
-        list.push_back(new BufferOpGL("I0 -  I1", true));
 
         list.push_back(new BufferOpGL("I0 +  C0", true));
+        list.push_back(new BufferOpGL("I0 -  C0", true));
         list.push_back(new BufferOpGL("I0 *  C0", true));
         list.push_back(new BufferOpGL("I0 /  C0", true));
-        list.push_back(new BufferOpGL("I0 -  C0", true));
     }
 
 };
 
-bool BufferOpsGL::flag = false;
-BufferOpsGL* BufferOpsGL::buffer_ops_gl = NULL;
+std::map<std::thread::id, bool> BufferOpsGL::flag;
+
+std::map<std::thread::id, BufferOpsGL*> BufferOpsGL::buffer_ops_gl;
 
 } // end namespace pic
 
-#endif /* PIC_GL_BUFFER_OPS_GL_HPP */
+#endif /* PIC_UTIL_GL_BUFFER_OPS_HPP */

@@ -15,8 +15,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_GL_BUFFER_ALLOCATION_GL_HPP
-#define PIC_GL_BUFFER_ALLOCATION_GL_HPP
+#ifndef PIC_UTIL_GL_BUFFER_ALLOCATION_HPP
+#define PIC_UTIL_GL_BUFFER_ALLOCATION_HPP
 
 #include "util/string.hpp"
 #include "util/gl/quad.hpp"
@@ -224,4 +224,4 @@ GLuint generateTexture2DU32GL(int width, int height, int channels, int *data = N
 
 } // end namespace pic
 
-#endif /* PIC_GL_BUFFER_ALLOCATION_GL_HPP */
+#endif /* PIC_UTIL_GL_BUFFER_ALLOCATION_HPP */
