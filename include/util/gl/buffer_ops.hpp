@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <vector>
 #include <map>
 #include <thread>
+#include <mutex>
 
 #include "util/gl/buffer_op.hpp"
 
@@ -36,7 +37,6 @@ typedef std::vector<BufferOpGL*> BufferOperatorsGL;
  */
 class BufferOpsGL{
 public:
-    std::lock_guard<std::mutex> lock(mutex);
 
     BufferOperatorsGL list;
 
@@ -65,6 +65,7 @@ public:
     }
 
 private:
+    static std::mutex mutex;
     static std::map<std::thread::id, bool> flag;
     static std::map<std::thread::id, BufferOpsGL*> buffer_ops_gl;
 
@@ -85,6 +86,8 @@ private:
     }
 
 };
+
+std::mutex BufferOpsGL::mutex;
 
 std::map<std::thread::id, bool> BufferOpsGL::flag;
 

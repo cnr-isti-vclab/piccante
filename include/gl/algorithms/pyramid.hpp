@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -48,6 +39,11 @@ protected:
     FilterGLSampler2D		*fltS;
     FilterGLOp				*fltSub, *fltId, *fltMul, *fltAdd;
 
+    std::vector<ImageGL *> trackerRec, trackerUp;
+
+    /**
+     * @brief InitFilters
+     */
     void InitFilters()
     {
         fltG = new FilterGLGaussian2D(1.0f);
@@ -58,8 +54,12 @@ protected:
         fltId   = FilterGLOp::CreateOpIdentity(false);
     }
 
-    std::vector<ImageGL *> trackerRec, trackerUp;
-
+    /**
+     * @brief Create
+     * @param img
+     * @param lapGauss
+     * @param limitLevel
+     */
     void Create(ImageGL *img, bool lapGauss, int limitLevel);
 
 public:
