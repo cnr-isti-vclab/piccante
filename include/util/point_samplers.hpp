@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -28,8 +19,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_UTIL_POINT_SAMPLERS_HPP
 
 namespace pic {
-
-/**randU: random number in [0,1[*/
 
 /**
  * @brief randU computes a random number in [0, 1[ using the classic rand().

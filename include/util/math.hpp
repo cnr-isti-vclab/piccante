@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -29,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <math.h>
 #include <random>
+#include <stdlib.h>
 
 namespace pic {
 
@@ -111,6 +103,15 @@ template< typename T > inline bool isinf(T value)
 inline bool equalf(float a, float b)
 {
     return ( fabsf(a - b) < C_EPSILON);
+}
+
+/**
+ * @brief Randombase returns a number in [0, 1] based on rand().
+ * @return It returns a random number in [0, 1].
+ */
+float Randombase()
+{
+    return float(rand() % RAND_MAX) / float(RAND_MAX);
 }
 
 /**

@@ -35,9 +35,9 @@ typedef std::vector<BufferOpGL*> BufferOperatorsGL;
 /**
  * @brief The BufferOpsGL class
  */
-class BufferOpsGL{
+class BufferOpsGL
+{
 public:
-
     BufferOperatorsGL list;
 
     /**

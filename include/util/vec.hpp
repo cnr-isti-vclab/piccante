@@ -121,11 +121,6 @@ public:
     }
 };
 
-float Randomf()
-{
-    return float(rand() % RAND_MAX) / float(RAND_MAX);
-}
-
 template<unsigned int N>
 bool insideVecBBox(const Vec<N, float> &sample)
 {

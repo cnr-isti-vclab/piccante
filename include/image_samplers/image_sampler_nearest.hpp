@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,6 +22,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The ImageSamplerNearest class
+ */
 class ImageSamplerNearest: public ImageSampler
 {
 public:
@@ -88,7 +82,7 @@ PIC_INLINE void ImageSamplerNearest::SampleImage(Image *img, float x, float y,
     y = CLAMPi(y, 0.0f, 1.0f);
     t = CLAMPi(t, 0.0f, 1.0f);
 
-    //Coordiantes in [0,width-1]x[0,height-1]x[0,frames-1]
+    //Coordiantes in [0,width-1] x [0,height-1] x [0,frames-1]
     x = lround(x * img->width1f);
     y = lround(y * img->height1f);
     t = lround(t * img->frames1f);

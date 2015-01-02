@@ -29,7 +29,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-//Warp from a square to a circle
+/**
+ * @brief WarpSquareCircle warps from a square to a circle distribution.
+ * @param x
+ * @param y
+ * @param xo
+ * @param yo
+ */
 void WarpSquareCircle(float x, float y, float *xo, float *yo)
 {
     float phi, r;

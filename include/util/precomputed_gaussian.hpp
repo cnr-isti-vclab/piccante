@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -29,10 +20,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The PrecomputedGaussian class
+ */
 class  PrecomputedGaussian
 {
 protected:
-    /**PrecomputeCoefficients: precomputes a Gaussian Kernel*/
+    /**
+     * @brief PrecomputeCoefficients precomputes a Gaussian kernel.
+     */
     void PrecomputeCoefficients()
     {
         halfKernelSize = kernelSize >> 1;
@@ -62,12 +58,23 @@ public:
     int	  kernelSize, halfKernelSize;
     float *coeff;
 
-    //Constructor
+    /**
+     * @brief PrecomputedGaussian
+     */
     PrecomputedGaussian()
     {
         kernelSize = halfKernelSize = 0;
         sigma = 0.0f;
         coeff = NULL;
+    }
+
+    /**
+     * @brief PrecomputedGaussian
+     * @param sigma
+     */
+    PrecomputedGaussian(float sigma)
+    {
+        CalculateKernel(sigma);
     }
 
     ~PrecomputedGaussian()
@@ -79,13 +86,10 @@ public:
         coeff = NULL;
     }
 
-    //Constructor
-    PrecomputedGaussian(float sigma)
-    {
-        CalculateKernel(sigma);
-    }
-
-    //Computing a Gaussian kernel of size sigma1
+    /**
+     * @brief CalculateKernel computes a Gaussian kernel of size sigma
+     * @param sigma
+     */
     void CalculateKernel(float sigma)
     {
         this->sigma = sigma;
@@ -96,7 +100,11 @@ public:
         PrecomputeCoefficients();
     }
 
-    //Static kernel size
+    /**
+     * @brief KernelSize computes the size of a kernel in pixel give its sigma.
+     * @param sigma is the sigma value of a Gaussian kernel.
+     * @return It returns the size of the kernel in pixels.
+     */
     static int KernelSize(float sigma)
     {
         int kernelSize = int(ceilf(sigma * 5.0f));
