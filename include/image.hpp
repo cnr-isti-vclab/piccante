@@ -421,13 +421,6 @@ public:
     void sort();
 
     /**
-     * @brief changeLum removes lumOld from Image and replaces lumNew.
-     * @param lumOld is the old luminance channel.
-     * @param lumNew is the new luminance channel.
-     */
-    void changeLum(Image *lumOld, Image *lumNew);
-
-    /**
      * @brief getdataUC
      * @return
      */
@@ -488,15 +481,6 @@ public:
     bool *ConvertToMask(float *color, float threshold, bool cmp, bool *mask);
 
     /**
-     * @brief GradientMagnitude computes the magnitude of the gradient in (x, y)
-     * @param x is the horizontal coordinate where to compute the gradient.
-     * @param y is the vertical coordinate where to compute the gradient.
-     * @param shift is the distance for gradient computation.
-     * @return This function returns the magnitude of the gradient in (x, y).
-     */
-    float GradientMagnitude(int x, int y, int shift);
-
-    /**
      * @brief getFlippedEXR returns the flippedEXR flag.
      * @return This function returns the flippedEXR flag.
      */
@@ -510,22 +494,6 @@ public:
      * them to 0.0f.
      */
     void removeSpecials();
-
-    /**
-     * @brief copyC2C copies an input color channel into an output color channel.
-     * @param input is the index of the input color channel.
-     * @param output is the index of the output color channel.
-     */
-    void copyC2C(int input, int output);
-
-    /**
-     * @brief copyC2C is similar to copyC2C but the input channel comes
-     * from img.
-     * @param img is an Image from where copying the input channel.
-     * @param input is the index of the input color channel.
-     * @param output is the index of the output color channel.
-     */
-    void copyC2C(Image *img, int input, int output);
 
     /**
      * @brief clamp set data values in the range [a,b]
@@ -1196,26 +1164,6 @@ PIC_INLINE bool Image::isValid()
            (data != NULL);
 }
 
-PIC_INLINE float Image::GradientMagnitude(int x, int y, int shift)
-{
-    int c0, c1, c2, c3;
-    c0 = (((y + shift) % height) * width + x) * channels;
-    c1 = (y * width + (x + shift) % width) * channels;
-    c2 = MAX((((y - shift) % height) * width + x) * channels, 0);
-    c3 = MAX((y * width + (x - shift) % width) * channels, 0);
-
-    float grad = 0.0f;
-
-    for(int l = 0; l < channels; l++) {
-        float x = data[c1 + l] - data[c2 + l];
-        float y = data[c0 + l] - data[c3 + l];
-        grad += sqrtf(x * x + y * y);
-    }
-
-    grad /= float(channels);
-    return grad;
-}
-
 PIC_INLINE void Image::CopySubImage(Image *imgIn, int startX, int startY)
 {
     if(imgIn == NULL) {
@@ -1370,32 +1318,6 @@ PIC_INLINE void Image::Blend(Image *img, Image *weight)
             int indx = i + j;
 
             data[indx] = data[indx] * w0 + img->data[indx] * w1;
-        }
-    }
-}
-
-PIC_INLINE void Image::changeLum(Image *lumOld, Image *lumNew)
-{
-    if(lumOld == NULL || lumNew == NULL) {
-        return;
-    }
-
-    if(!lumOld->SimilarType(lumNew)) {
-        return;
-    }
-
-    int size = frames * height * width;
-
-    #pragma omp parallel for
-
-    for(int ind = 0; ind < size; ind++) {
-        int i = ind * channels;
-        float L_old = lumOld->data[ind];
-        float L_new = lumNew->data[ind];
-        float scale = L_new / L_old;
-
-        for(int j = 0; j < channels; j++) {
-            data[i + j] = data[i + j] * scale;
         }
     }
 }
@@ -1708,36 +1630,6 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
     }
 
     return ret;
-}
-
-PIC_INLINE void Image::copyC2C(int input, int output)
-{
-    if((input == output) || (input >= channels) || (output >= channels)) {
-        return;
-    }
-
-    int size = depth * width * height * channels;
-
-    int c = output;
-
-    for(int i = input; i < size; i += channels) {
-        data[c] = data[i];
-        c += channels;
-    }
-}
-
-PIC_INLINE void Image::copyC2C(Image *img, int input, int output)
-{
-    if((img->width != width) || (img->height != height)) {
-        return;
-    }
-
-    int c = output;
-
-    for(int i = input; i < img->size(); i += img->channels) {
-        data[c] = img->data[i];
-        c += channels;
-    }
 }
 
 PIC_INLINE void Image::ConvertFromMask(bool *mask, int width, int height)

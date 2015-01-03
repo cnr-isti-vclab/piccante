@@ -61,13 +61,18 @@ inline Image *HistogramTMO(Image *imgOut, Image *imgIn)
         lum->data[i] = powf(float(low - v.begin()) / 256.0f, 2.2f);
     }
 
-    imgOut->changeLum(lumOld, lum);
+    *imgOut /= *lumOld;
+    *imgOut *= *lum;
+
+    imgOut->removeSpecials();
 
     delete lum;
     delete lumOld;
 
     return imgOut;
 }
+
+
 
 } // end namespace pic
 

@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -60,7 +51,8 @@ public:
      * @param flt
      * @return
      */
-    float *getVal(ImageGL *imgIn, float *ret, FilterGLRedux *flt) {
+    float *getVal(ImageGL *imgIn, float *ret, FilterGLRedux *flt)
+    {
         if(imgIn == NULL) {
             return NULL;
         }
@@ -91,7 +83,8 @@ public:
      * @param ret
      * @return
      */
-    float *getMaxVal(ImageGL *imgIn, float *ret = NULL) {
+    float *getMaxVal(ImageGL *imgIn, float *ret = NULL)
+    {
         return getVal(imgIn, ret, flt_max);
     }
 
@@ -100,7 +93,8 @@ public:
      * @param imgIn
      * @return
      */
-    float *getMinVal(ImageGL *imgIn, float *ret = NULL) {
+    float *getMinVal(ImageGL *imgIn, float *ret = NULL)
+    {
         return getVal(imgIn, ret, flt_min);
     }
 
@@ -109,7 +103,8 @@ public:
      * @param imgIn
      * @return
      */
-    float *getMeanVal(ImageGL *imgIn, float *ret = NULL) {
+    float *getMeanVal(ImageGL *imgIn, float *ret = NULL)
+    {
         return getVal(imgIn, ret, flt_mean);
     }
 

@@ -114,7 +114,9 @@ Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
     Image *tonemapped = fSTMO.Process(Double(lum, filteredLum), NULL);
 
     //Removing HDR luminance and replacing it with LDR one
-    imgOut->changeLum(lum, tonemapped);
+    *imgOut /= *lum;
+    *imgOut *= *tonemapped;
+
     imgOut->removeSpecials();
 
     //Freeing memory
