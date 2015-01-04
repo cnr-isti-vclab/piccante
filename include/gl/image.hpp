@@ -27,6 +27,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/gl/buffer_ops.hpp"
 #include "util/gl/buffer_allocation.hpp"
 #include "util/gl/mask.hpp"
+#include "util/gl/redux.hpp"
+#include "util/gl/redux_ops.hpp"
 
 namespace pic {
 
@@ -76,7 +78,7 @@ protected:
     }
 
 public:
-    std::vector<ImageGL *> stack;
+    std::vector<GLuint> stack;
 
     /**
      * @brief ImageGL
@@ -369,8 +371,8 @@ public:
     {
         BufferOpsGL *ops = BufferOpsGL::getInstance();
 
-        ops->list[6]->Update(a);
-        ops->list[6]->Process(getTexture(), 0, getTexture(), width, height);
+        ops->list[BOGL_DIV_CONST]->Update(a);
+        ops->list[BOGL_DIV_CONST]->Process(getTexture(), 0, getTexture(), width, height);
     }
 
     /**
@@ -381,8 +383,72 @@ public:
    {
        BufferOpsGL *ops = BufferOpsGL::getInstance();
 
-       ops->list[7]->Update(a);
-       ops->list[7]->Process(getTexture(), 0, getTexture(), width, height);
+       ops->list[BOGL_SUB_CONST]->Update(a);
+       ops->list[BOGL_SUB_CONST]->Process(getTexture(), 0, getTexture(), width, height);
+   }
+
+
+   /**
+    * @brief getVal
+    * @param ret
+    * @param flt
+    * @return
+    */
+   float *getVal(float *ret, ReduxGL *flt)
+   {
+       if(ret == NULL) {
+           ret = new float [channels];
+       }
+
+       if(stack.empty()) {
+           ReduxGL::CreateData(width, height, channels, stack, 1);
+       }
+
+       GLuint output = flt->Redux(texture, width, height, channels, stack);
+
+       //copying data from GPU to main memory
+       int mode, modeInternalFormat;
+       getModesGL(channels, mode, modeInternalFormat);
+
+       glBindTexture(GL_TEXTURE_2D, output);
+       glGetTexImage(GL_TEXTURE_2D, 0, mode, GL_FLOAT, ret);
+       glBindTexture(GL_TEXTURE_2D, 0);
+
+       return ret;
+   }
+
+   /**
+    * @brief getMinVal
+    * @param imgIn
+    * @return
+    */
+   float *getMinVal(float *ret = NULL)
+   {
+       ReduxOpsGL *ops = ReduxOpsGL::getInstance();
+       return getVal(ret, ops->list[REDGL_MIN]);
+   }
+
+   /**
+    * @brief getMaxVal
+    * @param imgIn
+    * @param ret
+    * @return
+    */
+   float *getMaxVal(float *ret = NULL)
+   {
+       ReduxOpsGL *ops = ReduxOpsGL::getInstance();
+       return getVal(ret, ops->list[REDGL_MAX]);
+   }
+
+   /**
+    * @brief getMeanVal
+    * @param imgIn
+    * @return
+    */
+   float *getMeanVal(float *ret = NULL)
+   {
+       ReduxOpsGL *ops = ReduxOpsGL::getInstance();
+       return getVal(ret, ops->list[REDGL_MEAN]);
    }
 };
 

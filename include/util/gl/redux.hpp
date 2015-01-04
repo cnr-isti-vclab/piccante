@@ -15,19 +15,30 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_GL_FILTERING_FILTER_REDUX_HPP
-#define PIC_GL_FILTERING_FILTER_REDUX_HPP
+#ifndef PIC_UTIL_GL_REDUX_HPP
+#define PIC_UTIL_GL_REDUX_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "util/gl/fbo.hpp"
+#include "util/gl/quad.hpp"
 
 namespace pic {
 
 /**
- * @brief The FilterGLRedux class
+ * @brief The ReduxGL class
  */
-class FilterGLRedux: public FilterGL
+class ReduxGL
 {
 protected:
+    //FBO
+    Fbo *fbo;
+
+    //Quad
+    QuadGL *quad;
+
+    //Shaders
+    std::string vertex_source, geometry_source, fragment_source;
+    glw::program filteringProgram;
+
     std::string reduxOperation;
 
     /**
@@ -37,27 +48,30 @@ protected:
 
 public:
     /**
-     * @brief FilterGLRedux
+     * @brief ReduxGL
      * @param reduxOperation
      */
-    FilterGLRedux(std::string reduxOperation);
+    ReduxGL(std::string reduxOperation);
 
     /**
      * @brief Process
-     * @param imgIn
-     * @param imgOut
+     * @param texIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param texOut
      * @return
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
+    GLuint Process(GLuint texIn, int width, int height, int channels, GLuint texOut);
 
     /**
      * @brief CreateMean
      * @return
      */
-    static FilterGLRedux *CreateMean()
+    static ReduxGL *CreateMean()
     {
-        FilterGLRedux *filter = new
-        FilterGLRedux("color = (color00 + color10 + color01 + color11) / 4.0;");
+        ReduxGL *filter = new
+        ReduxGL("color = (color00 + color10 + color01 + color11) / 4.0;");
         return filter;
     }
 
@@ -65,10 +79,10 @@ public:
      * @brief CreateMax
      * @return
      */
-    static FilterGLRedux *CreateMax()
+    static ReduxGL *CreateMax()
     {
-        FilterGLRedux *filter = new
-        FilterGLRedux("color = max(color00, color10);\n color = max(color, color01);\n color = max(color, color11);\n");
+        ReduxGL *filter = new
+        ReduxGL("color = max(color00, color10);\n color = max(color, color01);\n color = max(color, color11);\n");
         return filter;
     }
 
@@ -76,10 +90,10 @@ public:
      * @brief CreateMin
      * @return
      */
-    static FilterGLRedux *CreateMin()
+    static ReduxGL *CreateMin()
     {
-        FilterGLRedux *filter = new
-        FilterGLRedux("color = min(color00, color10);\n color = min(color, color01);\n color = min(color, color11);\n");
+        ReduxGL *filter = new
+        ReduxGL("color = min(color00, color10);\n color = min(color, color01);\n color = min(color, color11);\n");
         return filter;
     }
 
@@ -87,10 +101,10 @@ public:
      * @brief CreateMinPos
      * @return
      */
-    static FilterGLRedux *CreateMinPos()
+    static ReduxGL *CreateMinPos()
     {
-        FilterGLRedux *filter = new
-        FilterGLRedux("vec4 maxVal = vec4(1e-6); if(color00.x>0.0f) color = color00; if(color01.x>0.0f) color = min(color,color01); if(color10.x>0.0f) color = min(color,color10); if(color11.x>0.0f) color = min(color,color11);\n");
+        ReduxGL *filter = new
+        ReduxGL("vec4 maxVal = vec4(1e-6); if(color00.x>0.0f) color = color00; if(color01.x>0.0f) color = min(color,color01); if(color10.x>0.0f) color = min(color,color10); if(color11.x>0.0f) color = min(color,color11);\n");
         return filter;
     }
 
@@ -98,10 +112,10 @@ public:
      * @brief CreateCheck
      * @return
      */
-    static FilterGLRedux *CreateCheck()
+    static ReduxGL *CreateCheck()
     {
-        FilterGLRedux *filter = new
-        FilterGLRedux("vec4 sum = color00 + color01 + color10 + color11; color = sum.x<0.5? vec4(0.0) : sum; color = ((sum.x>0.5)&&sum.x<3.5)? vec4(10.0) : color; color = ((sum.x>3.5)&&sum.x<4.5)? vec4(1.0) : color; color = sum.x>4.5 ? vec4(10.0) : color;\n");
+        ReduxGL *filter = new
+        ReduxGL("vec4 sum = color00 + color01 + color10 + color11; color = sum.x<0.5? vec4(0.0) : sum; color = ((sum.x>0.5)&&sum.x<3.5)? vec4(10.0) : color; color = ((sum.x>3.5)&&sum.x<4.5)? vec4(1.0) : color; color = sum.x>4.5 ? vec4(10.0) : color;\n");
         return filter;
     }
 
@@ -130,7 +144,7 @@ public:
      * @return
      */
     static void CreateData(int width, int height, int channels,
-                           ImageGLVec &stack, int minSize = 2)
+                           std::vector<GLuint> &stack, int minSize = 2)
     {
         int checkSize = EvenOdd(MIN(width, height));
 
@@ -140,8 +154,7 @@ public:
             width  = EvenOdd(width);
             height = EvenOdd(height);
 
-            ImageGL *tmpImg = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
-            stack.push_back(tmpImg);
+            stack.push_back(generateTexture2DGL(width, height, channels));
 
             checkSize = MIN(width, height);
         }
@@ -149,30 +162,45 @@ public:
 
     /**
      * @brief Redux
-     * @param imgIn
+     * @param texIn
+     * @param width
+     * @param height
+     * @param channels
      * @param stack
      * @return
      */
-    ImageGL *Redux(ImageGL *imgIn, ImageGLVec &stack)
+    GLuint Redux(GLuint texIn, int width, int height, int channels, std::vector<GLuint> &stack)
     {
-        ImageGL *imageFlt = imgIn;
+        GLuint texFlt = texIn;
 
         for(unsigned int i = 0; i < stack.size(); i++) {
-            Process(SingleGL(imageFlt), stack[i]);
-            imageFlt = stack[i];
+            width  = EvenOdd(width);
+            height = EvenOdd(height);
+
+            Process(texFlt, width, height, channels, stack[i]);
+            texFlt = stack[i];
         }
 
         return stack[stack.size() - 1];
     }
 };
 
-FilterGLRedux::FilterGLRedux(std::string reduxOperation): FilterGL()
+ReduxGL::ReduxGL(std::string reduxOperation)
 {
+    fbo = NULL;
+
+    quad = NULL;
+
+    quad = new QuadGL(false);
+
+    //getting a vertex program for screen aligned quad
+    vertex_source = QuadGL::getVertexProgramV3();
+
     this->reduxOperation = reduxOperation;
     InitShaders();
 }
 
-void FilterGLRedux::InitShaders()
+void ReduxGL::InitShaders()
 {
     fragment_source = GLW_STRINGFY
                       (
@@ -208,7 +236,7 @@ void FilterGLRedux::InitShaders()
     filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[FilterGLRedux log]\n%s\n", filteringProgram.log().c_str());
+    printf("[ReduxGL log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
@@ -219,26 +247,19 @@ void FilterGLRedux::InitShaders()
     glw::bind_program(0);
 }
 
-ImageGL *FilterGLRedux::Process(ImageGLVec imgIn, ImageGL *imgOut)
+GLuint ReduxGL::Process(GLuint texIn, int width, int height, int channels, GLuint texOut)
 {
-    if(imgIn[0] == NULL) {
-        return NULL;
+
+    if(texIn == 0) {
+        return texOut;
     }
 
-    if(imgIn.size() != 1) {
-        return imgOut;
+    if(texOut == 0) {
+        texOut = generateTexture2DGL(width, height, channels);
     }
 
-    int w = EvenOdd(imgIn[0]->width);
-    int h = EvenOdd(imgIn[0]->height);
-    int f = imgIn[0]->frames;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(imgOut->width < 1 || imgOut->height < 1) {
-        return imgOut;
+    if(width < 1 || height < 1) {
+        return texOut;
     }
 
     //Fbo
@@ -246,18 +267,18 @@ ImageGL *FilterGLRedux::Process(ImageGLVec imgIn, ImageGL *imgOut)
         fbo = new Fbo();
     }
 
-    fbo->create(w, h, f, false, imgOut->getTexture());
+    fbo->create(width, height, 1, false, texOut);
 
     //Rendering
     fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+    glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 
     //Shaders
     glw::bind_program(filteringProgram);
 
     //Textures
     glActiveTexture(GL_TEXTURE0);
-    imgIn[0]->bindTexture();
+    glBindTexture(GL_TEXTURE_2D, texIn);
 
     //Rendering aligned quad
     quad->Render();
@@ -270,12 +291,12 @@ ImageGL *FilterGLRedux::Process(ImageGLVec imgIn, ImageGL *imgOut)
 
     //Textures
     glActiveTexture(GL_TEXTURE0);
-    imgIn[0]->unBindTexture();
+    glBindTexture(GL_TEXTURE_2D, 0);
 
-    return imgOut;
+    return texOut;
 }
 
 } // end namespace pic
 
-#endif /* PIC_GL_FILTERING_FILTER_REDUX_HPP */
+#endif /* PIC_UTIL_GL_REDUX_HPP */
 

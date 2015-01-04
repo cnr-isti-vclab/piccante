@@ -29,7 +29,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "gl/filtering/filter_luminance.hpp"
 #include "gl/filtering/filter_drago_tmo.hpp"
-#include "gl/image_statistics.hpp"
 
 namespace pic {
 
@@ -40,27 +39,24 @@ namespace pic {
  * @param Ld_Max
  * @param b
  * @param imgOut
- * @param imgStat
  * @return
  */
 ImageGL *DragoTMOGL(ImageGL *imgIn, float Ld_Max = 100.0f, float b = 0.95f,
-                     ImageGL *imgOut = NULL, ImageStatisticsGL *imgStat = NULL)
+                     ImageGL *imgOut = NULL)
 {
     if(imgIn == NULL) {
         return imgOut;
     }
 
-    if(imgStat == NULL) {
-        imgStat = new ImageStatisticsGL();
-    }
-
     ImageGL *img_lum = FilterGLLuminance::Execute(imgIn, NULL);
 
     float LMax, Lwa;
-    imgStat->getMaxVal(img_lum, &LMax);
-    imgStat->getMeanVal(img_lum, &Lwa);
+    img_lum->getMaxVal(&LMax);
+    img_lum->getMeanVal(&Lwa);
 
-    printf("%f %f\n", LMax, Lwa);
+    #ifdef PIC_DEBUG
+        printf("%f %f\n", LMax, Lwa);
+    #endif
 
     FilterGLDragoTMO filter(Ld_Max, b, LMax, Lwa, false);
 

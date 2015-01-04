@@ -68,7 +68,6 @@ public:
         tmo = new pic::FilterGLSimpleTMO();
 
         img *= *imgRand;
-
     }
 
     void render()

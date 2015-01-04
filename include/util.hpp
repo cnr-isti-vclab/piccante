@@ -37,6 +37,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/gl/tone.hpp"
 #include "util/gl/buffer_ops.hpp"
 #include "util/gl/buffer_allocation.hpp"
+#include "util/gl/redux.hpp"
+#include "util/gl/redux_ops.hpp"
 #include "util/gl/mask.hpp"
 #endif
 
