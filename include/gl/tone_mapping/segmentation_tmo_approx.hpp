@@ -19,7 +19,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_GL_TONE_MAPPING_SEGMENTATION_TMO_APPROX_HPP
 
 #include "gl/filtering/filter_luminance.hpp"
-#include "gl/filtering/filter_redux.hpp"
 #include "gl/filtering/filter_remove_nuked.hpp"
 #include "gl/filtering/filter_iterative.hpp"
 #include "gl/filtering/filter_bilateral_2ds.hpp"
@@ -31,24 +30,21 @@ class SegmentationGL
 {
 protected:
     FilterGLLuminance		lum;
-    FilterGLRedux			*min, *max;
     FilterGLRemoveNuked		*fltNuked;
     FilterGLIterative		*fltIt;
     FilterGLBilateral2DS	*fltBil;
     FilterGLOp				*fltSeg;
-    ImageGL				*L, *imgIn_flt;
+    ImageGL                 *L, *imgIn_flt;
 
     float					perCent, nLayer;
     int						iterations;
 
 public:
-    ImageGLVec			stack;
+    ImageGLVec              stack;
     float					minVal, maxVal;
 
     SegmentationGL()
     {
-        min = FilterGLRedux::CreateMinPos();
-        max = FilterGLRedux::CreateMax();
         fltNuked = new FilterGLRemoveNuked(0.9f);
         fltBil = NULL;
         fltIt  = NULL;
@@ -76,8 +72,6 @@ public:
             delete L;
         }
 
-        delete min;
-        delete max;
         delete fltIt;
         delete fltBil;
         delete fltSeg;
@@ -111,22 +105,8 @@ public:
         //Compute luminance
         L = lum.Process(SingleGL(imgIn), L);
 
-        //Get min value
-        if(stack.empty()) {
-            FilterGLRedux::CreateData(L->width, L->height, L->channels, stack, 1);
-        }
-
-        ImageGL *min_val = min->Redux(L, stack);
-        min_val->loadToMemory();
-        minVal = min_val->data[0];
-
-        //Get max value
-        ImageGL *max_val = max->Redux(L, stack);
-        max_val->loadToMemory();
-        maxVal = max_val->data[0];
-
-        //Statistics
-        ComputeStatistics(imgIn);
+        L->getMinVal(&minVal);
+        L->getMaxVal(&maxVal);
 
         //Iterative bilateral filtering
         if(fltIt == NULL) {

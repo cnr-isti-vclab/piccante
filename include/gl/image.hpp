@@ -46,10 +46,13 @@ protected:
     bool		notOwnedGL;     //do we own the OpenGL texture??    
     Fbo			*tmpFbo;
 
+    //stack for statistics
+    std::vector<GLuint> stack;
+
     /**
-     * @brief Destroy
+     * @brief DestroyGL
      */
-    void	Destroy();
+    void	DestroyGL();
 
     /**
      * @brief AssignGL assigns an (r, g, b, a) value to an image using glClearColor.
@@ -78,7 +81,6 @@ protected:
     }
 
 public:
-    std::vector<GLuint> stack;
 
     /**
      * @brief ImageGL
@@ -653,7 +655,7 @@ ImageGL *ImageGL::CloneGL()
     return new ImageGL(tmp, target, false, true);
 }
 
-void ImageGL::Destroy()
+void ImageGL::DestroyGL()
 {
     if(notOwnedGL) {
         return;
@@ -663,6 +665,13 @@ void ImageGL::Destroy()
         glDeleteTextures(1, &texture);
         texture = 0;
         target = 0;
+    }
+
+    for(unsigned int i=0; i<stack.size(); i++) {
+        if(stack[i] != 0) {
+            glDeleteTextures(1, &stack[i]);
+            stack[i] = 0;
+        }
     }
 }
 

@@ -90,7 +90,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/filtering/filter_iterative.hpp"
 #include "gl/filtering/filter_npasses.hpp"
 #include "gl/filtering/filter_op.hpp"
-#include "gl/filtering/filter_redux.hpp"
 #include "gl/filtering/filter_remapping.hpp"
 #include "gl/filtering/filter_remove_nuked.hpp"
 #include "gl/filtering/filter_sampler_2d.hpp"

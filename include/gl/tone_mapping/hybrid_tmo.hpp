@@ -32,14 +32,14 @@ class HybridTMOGL
 protected:
     SegmentationGL		seg;
     FilterGLRemapping	remap;
-    FilterGLRedux		*check;
-    ImageGL			*seg_map;
+    ReduxGL     		*check;
+    ImageGL             *seg_map;
     FilterGLDragoTMO	*fltDragoTMO;
     FilterGLSigmoidTMO	*fltReinhardTMO;
     PyramidGL			*pyrA, *pyrB, *pyrWeight;
     float				Ld_Max, b;
     bool				bFirst;
-    ImageGL			*imgDrago, *imgReinhard, *remapped;
+    ImageGL             *imgDrago, *imgReinhard, *remapped;
 
 public:
     HybridTMOGL()
@@ -56,7 +56,8 @@ public:
         Ld_Max = 100.0f;
         b = 0.95f;
 
-        check = FilterGLRedux::CreateCheck();
+        check = ReduxGL::CreateCheck();
+
         fltDragoTMO    = new FilterGLDragoTMO(100.0f, 0.85f, 1e6, true);
         fltReinhardTMO = new FilterGLSigmoidTMO(0.18f, false, true);
     }
@@ -102,9 +103,10 @@ public:
 
         //Checking if we have different zones
         testTQ1 = glBeginTimeQuery();
-        ImageGL *check_value = check->Redux(remapped, seg.stack);
-        check_value->loadToMemory();
-        int value = int(check_value->data[0]);
+
+        float check_value;
+        remapped->getVal(&check_value, check);
+        int value = int(check_value);
         timeVal = glEndTimeQuery(testTQ1);
         ms = float(double(timeVal) / 1000000.0);
         tot_ms += ms;
