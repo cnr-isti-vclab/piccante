@@ -53,6 +53,8 @@ public:
      */
     ReduxGL(std::string reduxOperation);
 
+    ~ReduxGL();
+
     /**
      * @brief Process
      * @param texIn
@@ -63,6 +65,30 @@ public:
      * @return
      */
     GLuint Process(GLuint texIn, int width, int height, int channels, GLuint texOut);
+
+    /**
+     * @brief Redux
+     * @param texIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param stack
+     * @return
+     */
+    GLuint Redux(GLuint texIn, int width, int height, int channels, std::vector<GLuint> &stack)
+    {
+        GLuint texFlt = texIn;
+
+        for(unsigned int i = 0; i < stack.size(); i++) {
+            width  = divideByTwoWithEvenDividend(width);
+            height = divideByTwoWithEvenDividend(height);
+
+            Process(texFlt, width, height, channels, stack[i]);
+            texFlt = stack[i];
+        }
+
+        return stack[stack.size() - 1];
+    }
 
     /**
      * @brief CreateMean
@@ -120,39 +146,41 @@ public:
     }
 
     /**
-     * @brief EvenOdd
-     * @param val
-     * @return
+     * @brief divideByTwoWithEvenDividend if x is even it computes x/2 otherwise (x+1)/2.
+     * @param x is an input value.
+     * @return If x is even it returns x/2; otherwise it returns (x+1)/2.
      */
-    static int EvenOdd(int val)
+    static int divideByTwoWithEvenDividend(int x)
     {
-        if((val % 2) == 0) {
-            val = val >> 1;
-        } else {
-            val = (val >> 1) + 1;
+        if((x % 2) != 0) {
+            x++;
         }
 
-        return val;
+        return (x >> 1);
     }
 
     /**
-     * @brief CreateData
+     * @brief AllocateReduxData allocates a pyramid for computing the Redux operator.
      * @param width
      * @param height
      * @param channels
      * @param minSize
      * @return
      */
-    static void CreateData(int width, int height, int channels,
+    static void AllocateReduxData(int width, int height, int channels,
                            std::vector<GLuint> &stack, int minSize = 2)
     {
-        int checkSize = EvenOdd(MIN(width, height));
+        int checkSize = divideByTwoWithEvenDividend(MIN(width, height));
 
         stack.clear();
 
-        while(checkSize > minSize) {
-            width  = EvenOdd(width);
-            height = EvenOdd(height);
+        if(minSize < 2) {
+            minSize = 2;
+        }
+
+        while(checkSize >= minSize) {
+            width  = divideByTwoWithEvenDividend(width);
+            height = divideByTwoWithEvenDividend(height);
 
             stack.push_back(generateTexture2DGL(width, height, channels));
 
@@ -160,29 +188,6 @@ public:
         }
     }
 
-    /**
-     * @brief Redux
-     * @param texIn
-     * @param width
-     * @param height
-     * @param channels
-     * @param stack
-     * @return
-     */
-    GLuint Redux(GLuint texIn, int width, int height, int channels, std::vector<GLuint> &stack)
-    {
-        GLuint texFlt = texIn;
-
-        for(unsigned int i = 0; i < stack.size(); i++) {
-            width  = EvenOdd(width);
-            height = EvenOdd(height);
-
-            Process(texFlt, width, height, channels, stack[i]);
-            texFlt = stack[i];
-        }
-
-        return stack[stack.size() - 1];
-    }
 };
 
 ReduxGL::ReduxGL(std::string reduxOperation)
@@ -198,6 +203,19 @@ ReduxGL::ReduxGL(std::string reduxOperation)
 
     this->reduxOperation = reduxOperation;
     InitShaders();
+}
+
+RedguxGL::~ReduxGL()
+{
+    if(quad != NULL) {
+        delete quad;
+        quad = NULL;
+    }
+
+    if(fbo != NULL) {
+        delete fbo;
+        fbo = NULL;
+    }
 }
 
 void ReduxGL::InitShaders()

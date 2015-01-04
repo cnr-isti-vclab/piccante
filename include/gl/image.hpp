@@ -403,7 +403,7 @@ public:
        }
 
        if(stack.empty()) {
-           ReduxGL::CreateData(width, height, channels, stack, 1);
+           ReduxGL::AllocateReduxData(width, height, channels, stack, 1);
        }
 
        GLuint output = flt->Redux(texture, width, height, channels, stack);
