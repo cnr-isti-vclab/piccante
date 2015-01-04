@@ -205,7 +205,7 @@ ReduxGL::ReduxGL(std::string reduxOperation)
     InitShaders();
 }
 
-RedguxGL::~ReduxGL()
+ReduxGL::~ReduxGL()
 {
     if(quad != NULL) {
         delete quad;
