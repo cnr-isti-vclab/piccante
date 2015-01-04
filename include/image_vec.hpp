@@ -23,10 +23,16 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-//An dynamic array of Image*
+/**
+ * @brief ImageVec an std::vector of pic::Image
+ */
 typedef	std::vector<Image *> ImageVec;
 
-/**Single: creates a single for filters input*/
+/**
+ * @brief Single creates an std::vector which contains img; this is for filters input.
+ * @param img is a pointer to a pic::Image
+ * @return It returns an std::vector which contains img.
+ */
 PIC_INLINE ImageVec Single(Image *img)
 {
     ImageVec ret;
@@ -34,7 +40,12 @@ PIC_INLINE ImageVec Single(Image *img)
     return ret;
 }
 
-/**Double: creates a couple input for filters input*/
+/**
+ * @brief Double creates an std::vector which contains img1 and img2; this is for filters input.
+ * @param img1 is a pointer to a pic::Image
+ * @param img2 is a pointer to a pic::Image
+ * @return It returns an std::vector which contains img1 and img2.
+ */
 PIC_INLINE ImageVec Double(Image *img1, Image *img2)
 {
     ImageVec ret;
@@ -43,7 +54,13 @@ PIC_INLINE ImageVec Double(Image *img1, Image *img2)
     return ret;
 }
 
-/**Triple: creates a triple for filters input*/
+/**
+ * @brief Triple creates an std::vector which contains img1, img2, and img3; this is for filters input.
+ * @param img1 is a pointer to a pic::Image
+ * @param img2 is a pointer to a pic::Image
+ * @param img3 is a pointer to a pic::Image
+ * @return It returns an std::vector which contains img1, img2, and img3.
+ */
 PIC_INLINE ImageVec Triple(Image *img1, Image *img2, Image *img3)
 {
     ImageVec ret;
@@ -53,7 +70,14 @@ PIC_INLINE ImageVec Triple(Image *img1, Image *img2, Image *img3)
     return ret;
 }
 
-/**Quad: creates a quaduple for filters input*/
+/**
+ * @brief Triple creates an std::vector which contains img1, img2, img3, and img4; this is for filters input.
+ * @param img1 is a pointer to a pic::Image
+ * @param img2 is a pointer to a pic::Image
+ * @param img3 is a pointer to a pic::Image
+ * @param img4 is a pointer to a pic::Image
+ * @return It returns an std::vector which contains img1, img2, img3, and img4.
+ */
 PIC_INLINE ImageVec Quad(Image *img1, Image *img2, Image *img3,
                             Image *img4)
 {
