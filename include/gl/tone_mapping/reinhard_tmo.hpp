@@ -9,29 +9,19 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_TONE_MAPPING_DRAGO_TMO_GL_HPP
-#define PIC_TONE_MAPPING_DRAGO_TMO_GL_HPP
+#ifndef PIC_GL_TONE_MAPPING_REINHARD_TMO_HPP
+#define PIC_GL_TONE_MAPPING_REINHARD_TMO_HPP
 
-#include "filtering/gl/filter_luminance.hpp"
-#include "filtering/gl/filter_drago_tmo.hpp"
+#include "gl/filtering/filter_luminance.hpp"
+#include "gl/filtering/filter_drago_tmo.hpp"
 
 namespace pic {
-
 
 /**
  * @brief ReinhardLocal
@@ -40,12 +30,8 @@ namespace pic {
  * @param filter
  * @return
  */
-static ImageGL *ReinhardLocal(ImageGL imstd::string nameIn, std::string nameOut,
-                                        FilterGL *filter)
+static ImageGL *ReinhardLocal(ImageGL *imgIn, ImageGL *imgOut, FilterGL *filter)
 {
-    ImageGL imgIn(nameIn);
-    imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-
     FilterGLLuminance lum;
 
     ImageGL *L = lum.Process(SingleGL(&imgIn), NULL);
@@ -82,19 +68,22 @@ static ImageGL *ReinhardLocal(ImageGL imstd::string nameIn, std::string nameOut,
  * @param nameOut
  * @return
  */
-ImageGL *ReinhardGlobal(std::string nameIn, std::string nameOut)
+ImageGL *ReinhardGlobal(ImageGL *imgIn, ImageGL *imgOut)
 {
-    ImageGL imgIn(nameIn);
-    imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-
-    float Lav = imgIn.getLogMeanVal()[0];
+    float Lav = imgIn->getLogMeanVal()[0];
 
     FilterGLSigmoidTMO *filter = new FilterGLSigmoidTMO(0.18f / Lav, false, true);
 
-    GLuint testTQ1 = glBeginTimeQuery();
+    #ifdef PIC_DEBUG
+        GLuint testTQ1 = glBeginTimeQuery();
+    #endif
+
     ImageGL *imgOut = filter->Process(SingleGL(&imgIn), NULL);
-    GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-    printf("Sigmoid Filter on GPU time: %f ms\n", double(timeVal) / 1000000.0);
+
+    #ifdef PIC_DEBUG
+        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
+        printf("Sigmoid Filter on GPU time: %f ms\n", double(timeVal) / 1000000.0);
+    #endif
 
     imgOut->loadToMemory();
     imgOut->Write(nameOut);
@@ -103,5 +92,5 @@ ImageGL *ReinhardGlobal(std::string nameIn, std::string nameOut)
 
 } // end namespace pic
 
-#endif /* PIC_TONE_MAPPING_DRAGO_TMO_GL_HPP */
+#endif /* PIC_GL_TONE_MAPPING_REINHARD_TMO_HPP */
 

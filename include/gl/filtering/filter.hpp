@@ -150,33 +150,39 @@ public:
 
 ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
+    if(imgIn.empty()) {
+        return imgOut;
+    }
+
     if(imgIn[0] == NULL) {
         return imgOut;
     }
 
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
+    int width = imgIn[0]->width;
+    int height = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(imgIn[0]->frames, width, height, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {
         fbo = new Fbo();
     }
 
-    fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
+    fbo->create(width, height, imgIn[0]->frames, false, imgOut->getTexture());
 
     //Rendering
     fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+    glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 
     //Shaders
     glw::bind_program(filteringProgram);
 
     //Textures
-    glActiveTexture(GL_TEXTURE0);
-    imgIn[0]->bindTexture();
+    for(unsigned int i=0; i<imgIn.size(); i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        imgIn[i]->bindTexture();
+    }
 
     //Rendering aligned quad
     quad->Render();
@@ -188,7 +194,10 @@ ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
     glw::bind_program(0);
 
     //Textures
-    imgIn[0]->unBindTexture();
+    for(unsigned int i=0; i<imgIn.size(); i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        imgIn[i]->unBindTexture();
+    }
 
     return imgOut;
 }

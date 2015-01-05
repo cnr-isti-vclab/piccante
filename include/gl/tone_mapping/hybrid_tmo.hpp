@@ -119,7 +119,7 @@ public:
 
         switch(value) {
         case 0: {
-            fltDragoTMO->Update(Ld_Max, b, seg.maxVal);
+            fltDragoTMO->Update(Ld_Max, b, seg.maxVal, 1.0f);
             fltDragoTMO->Process(SingleGL(imgIn), imgOut);
         }
         break;
@@ -132,7 +132,7 @@ public:
 
         case 10: {
             //Drago TMO
-            fltDragoTMO->Update(Ld_Max, 100, seg.maxVal);
+            fltDragoTMO->Update(Ld_Max, 100, seg.maxVal, 1.0f);
             imgDrago = fltDragoTMO->Process(SingleGL(imgIn), imgDrago);
 
             if(pyrA == NULL) {

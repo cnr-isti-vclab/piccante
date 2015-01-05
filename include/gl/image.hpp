@@ -279,6 +279,69 @@ public:
     }
 
     /**
+     * @brief getVal
+     * @param ret
+     * @param flt
+     * @return
+     */
+    float *getVal(float *ret, ReduxGL *flt)
+    {
+        if(ret == NULL) {
+            ret = new float [channels];
+        }
+
+        if(stack.empty()) {
+            ReduxGL::AllocateReduxData(width, height, channels, stack, 1);
+        }
+
+        GLuint output = flt->Redux(texture, width, height, channels, stack);
+
+        //copying data from GPU to main memory
+        int mode, modeInternalFormat;
+        getModesGL(channels, mode, modeInternalFormat);
+
+        glBindTexture(GL_TEXTURE_2D, output);
+        glGetTexImage(GL_TEXTURE_2D, 0, mode, GL_FLOAT, ret);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        return ret;
+    }
+
+    /**
+     * @brief getMinVal
+     * @param imgIn
+     * @return
+     */
+    float *getMinVal(float *ret = NULL)
+    {
+        ReduxOpsGL *ops = ReduxOpsGL::getInstance();
+        return getVal(ret, ops->list[REDGL_MIN]);
+    }
+
+    /**
+     * @brief getMaxVal
+     * @param imgIn
+     * @param ret
+     * @return
+     */
+    float *getMaxVal(float *ret = NULL)
+    {
+        ReduxOpsGL *ops = ReduxOpsGL::getInstance();
+        return getVal(ret, ops->list[REDGL_MAX]);
+    }
+
+    /**
+     * @brief getMeanVal
+     * @param imgIn
+     * @return
+     */
+    float *getMeanVal(float *ret = NULL)
+    {
+        ReduxOpsGL *ops = ReduxOpsGL::getInstance();
+        return getVal(ret, ops->list[REDGL_MEAN]);
+    }
+
+    /**
      * @brief operator =
      * @param a
      */
@@ -301,7 +364,6 @@ public:
 
             }
         }
-
     }
 
     /**
@@ -387,70 +449,6 @@ public:
 
        ops->list[BOGL_SUB_CONST]->Update(a);
        ops->list[BOGL_SUB_CONST]->Process(getTexture(), 0, getTexture(), width, height);
-   }
-
-
-   /**
-    * @brief getVal
-    * @param ret
-    * @param flt
-    * @return
-    */
-   float *getVal(float *ret, ReduxGL *flt)
-   {
-       if(ret == NULL) {
-           ret = new float [channels];
-       }
-
-       if(stack.empty()) {
-           ReduxGL::AllocateReduxData(width, height, channels, stack, 1);
-       }
-
-       GLuint output = flt->Redux(texture, width, height, channels, stack);
-
-       //copying data from GPU to main memory
-       int mode, modeInternalFormat;
-       getModesGL(channels, mode, modeInternalFormat);
-
-       glBindTexture(GL_TEXTURE_2D, output);
-       glGetTexImage(GL_TEXTURE_2D, 0, mode, GL_FLOAT, ret);
-       glBindTexture(GL_TEXTURE_2D, 0);
-
-       return ret;
-   }
-
-   /**
-    * @brief getMinVal
-    * @param imgIn
-    * @return
-    */
-   float *getMinVal(float *ret = NULL)
-   {
-       ReduxOpsGL *ops = ReduxOpsGL::getInstance();
-       return getVal(ret, ops->list[REDGL_MIN]);
-   }
-
-   /**
-    * @brief getMaxVal
-    * @param imgIn
-    * @param ret
-    * @return
-    */
-   float *getMaxVal(float *ret = NULL)
-   {
-       ReduxOpsGL *ops = ReduxOpsGL::getInstance();
-       return getVal(ret, ops->list[REDGL_MAX]);
-   }
-
-   /**
-    * @brief getMeanVal
-    * @param imgIn
-    * @return
-    */
-   float *getMeanVal(float *ret = NULL)
-   {
-       ReduxOpsGL *ops = ReduxOpsGL::getInstance();
-       return getVal(ret, ops->list[REDGL_MEAN]);
    }
 };
 

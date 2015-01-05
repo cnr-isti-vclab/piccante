@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -74,16 +65,14 @@ public:
     FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
                      bool bGammaCorrection);
 
-    void Update(float Ld_Max, float b, float LMax);
-
     /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
+     * @brief Update
+     * @param Ld_Max
+     * @param b
+     * @param LMax
+     * @param Lwa
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
-
+    void Update(float Ld_Max, float b, float LMax, float Lwa);
 };
 
 FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()
@@ -184,10 +173,10 @@ void FilterGLDragoTMO::InitShaders()
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
 
-    Update(Ld_Max, b, LMax);
+    Update(Ld_Max, b, LMax, Lwa);
 }
 
-void FilterGLDragoTMO::Update(float Ld_Max, float b, float LMax)
+void FilterGLDragoTMO::Update(float Ld_Max, float b, float LMax, float Lwa)
 {
     if(Ld_Max > 0.0f) {
         this->Ld_Max = Ld_Max;
@@ -207,6 +196,12 @@ void FilterGLDragoTMO::Update(float Ld_Max, float b, float LMax)
         this->LMax = 1e6f;
     }
 
+    if(Lwa > 0.0f) {
+        this->Lwa = Lwa;
+    } else {
+        this->Lwa = 1.0f;
+    }
+
     ComputeConstants();
 
     glw::bind_program(filteringProgram);
@@ -217,60 +212,6 @@ void FilterGLDragoTMO::Update(float Ld_Max, float b, float LMax)
     filteringProgram.uniform("LMax",	    LMax_scaled);
     filteringProgram.uniform("Lwa",		    Lwa_scaled);
     glw::bind_program(0);   
-}
-
-ImageGL *FilterGLDragoTMO::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn.size()<2) {
-        return imgOut;
-    }
-
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    //Fbo
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, 1, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    glw::bind_program(filteringProgram);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, imgIn[1]->getTexture());
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    glw::bind_program(0);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

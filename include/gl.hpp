@@ -104,9 +104,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/point_samplers/sampler_random_m.hpp"
 
 //Tone mapping
-#include "gl/tone_mapping/hybrid_tmo.hpp"
 #include "gl/tone_mapping/segmentation_tmo_approx.hpp"
+#include "gl/tone_mapping/hybrid_tmo.hpp"
 #include "gl/tone_mapping/drago_tmo.hpp"
+//#include "gl/tone_mapping/reinhard_tmo.hpp"
 
 #endif /* PIC_DISABLE_OPENGL */
 

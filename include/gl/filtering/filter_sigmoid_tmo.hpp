@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -64,14 +55,6 @@ public:
      * @param bGammaCorrection
      */
     FilterGLSigmoidTMO(float alpha, bool bLocal, bool bGammaCorrection);
-
-    /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief Update
@@ -180,71 +163,6 @@ void FilterGLSigmoidTMO::Update(float alpha)
     filteringProgram.uniform("alpha", this->alpha);
     filteringProgram.uniform("epsilon", epsilon);
     glw::bind_program(0);
-}
-
-ImageGL *FilterGLSigmoidTMO::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn.empty()) {
-        return imgOut;
-    }
-
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, 1, false, imgOut->getTexture());
-
-    ImageGL *ori, *adapt;
-
-    if(imgIn.size() == 2) {
-        ori   = imgIn[0];
-        adapt = imgIn[1];
-    } else {
-        ori   = imgIn[0];
-        adapt = imgIn[0];
-    }
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    glw::bind_program(filteringProgram);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE1);
-    adapt->bindTexture();
-
-    glActiveTexture(GL_TEXTURE0);
-    ori->bindTexture();
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    glw::bind_program(0);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    ori->unBindTexture();
-
-    glActiveTexture(GL_TEXTURE1);
-    adapt->unBindTexture();
-    return imgOut;
 }
 
 } // end namespace pic
