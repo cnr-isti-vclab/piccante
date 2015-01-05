@@ -80,6 +80,37 @@ protected:
         tmpFbo->unbind();
     }
 
+    /**
+     * @brief thisOperatorConst
+     * @param a
+     * @param op
+     */
+    inline void thisOperatorConst(const float &a, BOGL op)
+    {
+        BufferOpsGL *ops = BufferOpsGL::getInstance();
+
+        ops->list[op]->Update(a);
+        ops->list[op]->Process(getTexture(), 0, getTexture(), width, height);
+    }
+
+    /**
+     * @brief thisOperatorImage
+     * @param a
+     * @param op
+     */
+    inline void thisOperatorImage(ImageGL &a, BOGL op)
+    {
+        if(SimilarType(&a)) {
+            BufferOpsGL *ops = BufferOpsGL::getInstance();
+
+            ops->list[op]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
+        } else {
+            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+
+            }
+        }
+    }
+
 public:
 
     /**
@@ -354,102 +385,43 @@ public:
      * @brief operator +=
      * @param a
      */
-    void operator +=(ImageGL &a)
-    {
-        if(SimilarType(&a)) {
-            BufferOpsGL *ops = BufferOpsGL::getInstance();
-            ops->list[BOGL_ADD]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
-        } else {
-            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
-
-            }
-        }
-    }
+    void operator +=(ImageGL &a);
 
     /**
      * @brief operator *=
      * @param a
      */
-    void operator *=(ImageGL &a)
-    {
-        if(SimilarType(&a)) {
-            BufferOpsGL *ops = BufferOpsGL::getInstance();
-
-            ops->list[BOGL_MUL]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
-        } else {
-            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
-
-            }
-        }
-    }
+    void operator *=(ImageGL &a);
 
     /**
      * @brief operator *=
      * @param a
      */
-    void operator *=(const float &a)
-    {
-        BufferOpsGL *ops = BufferOpsGL::getInstance();
-
-        ops->list[BOGL_MUL_CONST]->Update(a);
-        ops->list[BOGL_MUL_CONST]->Process(getTexture(), 0, getTexture(), width, height);
-    }
+    void operator *=(const float &a);
 
     /**
      * @brief operator -=
      * @param a
      */
-    void operator -=(ImageGL &a)
-    {
-        if(SimilarType(&a)) {
-            BufferOpsGL *ops = BufferOpsGL::getInstance();
-            ops->list[BOGL_SUB]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
-        } else {
-            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
-
-            }
-        }
-    }
+    void operator -=(ImageGL &a);
 
     /**
      * @brief operator /=
      * @param a
      */
-    void operator /=(ImageGL &a)
-    {
-        if(SimilarType(&a)) {
-            BufferOpsGL *ops = BufferOpsGL::getInstance();
-            ops->list[BOGL_DIV]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
-        } else {
-            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
-
-            }
-        }
-    }
+    void operator /=(ImageGL &a);
 
     /**
      * @brief operator /=
      * @param a
      */
-    void operator /=(const float &a)
-    {
-        BufferOpsGL *ops = BufferOpsGL::getInstance();
-
-        ops->list[BOGL_DIV_CONST]->Update(a);
-        ops->list[BOGL_DIV_CONST]->Process(getTexture(), 0, getTexture(), width, height);
-    }
+    void operator /=(const float &a);
 
     /**
     * @brief operator -=
     * @param a
     */
-   void operator -=(const float &a)
-   {
-       BufferOpsGL *ops = BufferOpsGL::getInstance();
-
-       ops->list[BOGL_SUB_CONST]->Update(a);
-       ops->list[BOGL_SUB_CONST]->Process(getTexture(), 0, getTexture(), width, height);
-   }
+   void operator -=(const float &a);
 };
 
 ImageGL::ImageGL() : Image()
@@ -814,6 +786,41 @@ void ImageGL::bindTexture()
 void ImageGL::unBindTexture()
 {
     glBindTexture(target, 0);
+}
+
+void ImageGL::operator +=(ImageGL &a)
+{
+    thisOperatorImage(a, BOGL_ADD);
+}
+
+void ImageGL::operator *=(ImageGL &a)
+{
+    thisOperatorImage(a, BOGL_MUL);
+}
+
+void ImageGL::operator *=(const float &a)
+{
+    thisOperatorConst(a, BOGL_MUL_CONST);
+}
+
+void ImageGL::operator -=(ImageGL &a)
+{
+    thisOperatorImage(a, BOGL_SUB);
+}
+
+void ImageGL::operator /=(ImageGL &a)
+{
+    thisOperatorImage(a, BOGL_DIV);
+}
+
+void ImageGL::operator /=(const float &a)
+{
+    thisOperatorConst(a, BOGL_DIV_CONST);
+}
+
+void ImageGL::operator -=(const float &a)
+{
+    thisOperatorConst(a, BOGL_SUB_CONST);
 }
 
 } // end namespace pic

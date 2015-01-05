@@ -700,212 +700,117 @@ public:
      * @brief operator =
      * @param a
      */
-    void operator =(Image &a)
-    {
-        this->Assign(&a);
-    }
+    void operator =(Image &a);
 
     /**
      * @brief operator =
      * @param a
      */
-    void operator =(const float &a)
-    {
-        BufferAssign(data, size(), a);
-    }
+    void operator =(const float &a);
 
     /**
      * @brief operator +=
      * @param a
      */
-    void operator +=(const float &a)
-    {
-        BufferAdd(data, size(), a);
-    }
+    void operator +=(const float &a);
 
     /**
      * @brief operator +
      * @param a
      * @return it returns (this + a)
      */
-    Image operator +(const float &a) const
-    {
-        Image *out = this->Clone();
-        *out += a;
-        return Image(out, false);
-    }
+    Image operator +(const float &a) const;
 
     /**
      * @brief operator +=
      * @param a
      */
-    void operator +=(Image &a)
-    {
-        if(SimilarType(&a)) {
-            BufferAdd(data, a.data, size());
-        } else {
-            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
-                BufferAddS(data, a.data, nPixels(), channels);
-            }
-        }
-
-    }
+    void operator +=(Image &a);
 
     /**
      * @brief operator +
      * @param a
      * @return it returns (this + a)
      */
-    Image operator +(Image &a) const
-    {
-        Image *out = this->Clone();
-        *out += a;
-        return Image(out, false);
-    }
+    Image operator +(Image &a) const;
 
     /**
      * @brief operator *=
      * @param a
      */
-    void operator *=(const float &a)
-    {
-        BufferMul(data, size(), a);
-    }
+    void operator *=(const float &a);
 
     /**
      * @brief operator *
      * @param a
      * @return it returns (this * a)
      */
-    Image operator *(const float &a) const
-    {
-        Image *out = this->Clone();
-        *out *= a;
-        return Image(out, false);
-    }
+    Image operator *(const float &a) const;
 
     /**
      * @brief operator *=
      * @param a
      */
-    void operator *=(Image &a)
-    {
-        if(SimilarType(&a)) {
-            BufferMul(data, a.data, size());
-        } else {
-            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
-                BufferMulS(data, a.data, nPixels(), channels);
-            }
-        }
-    }
+    void operator *=(Image &a);
 
     /**
      * @brief operator *
      * @param a
      * @return it returns (this * a)
      */
-    Image operator *(Image &a) const
-    {
-        Image *out = this->Clone();
-        *out *= a;
-        return Image(out, false);
-    }
+    Image operator *(Image &a) const;
 
     /**
      * @brief operator -=
      * @param a
      */
-    void operator -=(const float &a)
-    {
-        BufferSub(data, size(), a);
-    }
+    void operator -=(const float &a);
 
     /**
      * @brief operator -
      * @param a
      * @return it returns (this - a)
      */
-    Image operator -(const float &a) const
-    {
-        Image *out = this->Clone();
-        *out -= a;
-        return Image(out, false);
-    }
+    Image operator -(const float &a) const;
 
     /**
      * @brief operator -=
      * @param a
      */
-    void operator -=(Image &a)
-    {
-        if(SimilarType(&a)) {
-            BufferSub(data, a.data, size());
-        } else {
-            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
-                BufferSubS(data, a.data, nPixels(), channels);
-            }
-        }
-    }
+    void operator -=(Image &a);
 
     /**
      * @brief operator -
      * @param a
      * @return it returns (this - a)
      */
-    Image operator -(Image &a) const
-    {
-        Image *out = this->Clone();
-        *out -= a;
-        return Image(out, false);
-    }
+    Image operator -(Image &a) const;
 
     /**
      * @brief operator /=
      * @param a
      */
-    void operator /=(const float &a)
-    {
-        BufferDiv(data, size(), a);
-    }
+    void operator /=(const float &a);
 
     /**
      * @brief operator /
      * @param a
      * @return it returns (this / a)
      */
-    Image operator /(const float &a) const
-    {
-        Image *out = this->Clone();
-        *out /= a;
-        return Image(out, false);
-    }
+    Image operator /(const float &a) const;
 
     /**
      * @brief operator /=
      * @param a
      */
-    void operator /=(Image &a)
-    {
-        if(SimilarType(&a)) {
-            BufferDiv(data, a.data, size());
-        } else {
-            if((nPixels() == a.nPixels()) && (a.channels == 1)) {
-                BufferDivS(data, a.data, nPixels(), channels);
-            }
-        }
-    }
+    void operator /=(Image &a);
 
     /**
      * @brief operator /
      * @param a
      * @return it returns (this / a)
      */
-    Image operator /(Image &a) const
-    {
-        Image *out = this->Clone();
-        *out /= a;
-        return Image(out, false);
-    }
+    Image operator /(Image &a) const;
 };
 
 PIC_INLINE void Image::SetNULL()
@@ -2136,6 +2041,136 @@ PIC_INLINE Image *Image::Clone() const
     return ret;
 }
 
+PIC_INLINE void Image::operator =(Image &a)
+{
+    this->Assign(&a);
+}
+
+PIC_INLINE void Image::operator =(const float &a)
+{
+    BufferAssign(data, size(), a);
+}
+
+PIC_INLINE void Image::operator +=(const float &a)
+{
+    BufferAdd(data, size(), a);
+}
+
+PIC_INLINE Image Image::operator +(const float &a) const
+{
+    Image *out = this->Clone();
+    *out += a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator +=(Image &a)
+{
+    if(SimilarType(&a)) {
+        BufferAdd(data, a.data, size());
+    } else {
+        if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+            BufferAddS(data, a.data, nPixels(), channels);
+        }
+    }
+
+}
+
+PIC_INLINE Image Image::operator +(Image &a) const
+{
+    Image *out = this->Clone();
+    *out += a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator *=(const float &a)
+{
+    BufferMul(data, size(), a);
+}
+
+PIC_INLINE Image Image::operator *(const float &a) const
+{
+    Image *out = this->Clone();
+    *out *= a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator *=(Image &a)
+{
+    if(SimilarType(&a)) {
+        BufferMul(data, a.data, size());
+    } else {
+        if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+            BufferMulS(data, a.data, nPixels(), channels);
+        }
+    }
+}
+
+PIC_INLINE Image Image::operator *(Image &a) const
+{
+    Image *out = this->Clone();
+    *out *= a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator -=(const float &a)
+{
+    BufferSub(data, size(), a);
+}
+
+PIC_INLINE Image Image::operator -(const float &a) const
+{
+    Image *out = this->Clone();
+    *out -= a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator -=(Image &a)
+{
+    if(SimilarType(&a)) {
+        BufferSub(data, a.data, size());
+    } else {
+        if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+            BufferSubS(data, a.data, nPixels(), channels);
+        }
+    }
+}
+
+PIC_INLINE Image Image::operator -(Image &a) const
+{
+    Image *out = this->Clone();
+    *out -= a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator /=(const float &a)
+{
+    BufferDiv(data, size(), a);
+}
+
+PIC_INLINE Image Image::operator /(const float &a) const
+{
+    Image *out = this->Clone();
+    *out /= a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator /=(Image &a)
+{
+    if(SimilarType(&a)) {
+        BufferDiv(data, a.data, size());
+    } else {
+        if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+            BufferDivS(data, a.data, nPixels(), channels);
+        }
+    }
+}
+
+PIC_INLINE Image Image::operator /(Image &a) const
+{
+    Image *out = this->Clone();
+    *out /= a;
+    return Image(out, false);
+}
 } // end namespace pic
 
 #endif /* PIC_IMAGE_HPP */
