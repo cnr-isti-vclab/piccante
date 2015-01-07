@@ -30,10 +30,10 @@ class ReinhardTMOGL
 {
 protected:
     FilterGLLuminance  *flt_lum;
-    FilterGLSigmoidTMO *flt_tmo;
+    FilterGLSigmoidTMO *flt_tmo_global, *flt_tmo_local;
 
     FilterGL           *filter;
-    FilterGLOp         *simple_sigmoid;
+    FilterGLOp         *simple_sigmoid, *simple_sigmoid_inv;
     ImageGL            *img_lum, *img_lum_adapt;
 
 public:
@@ -43,9 +43,11 @@ public:
     ReinhardTMOGL()
     {
         flt_lum = new FilterGLLuminance();
-        flt_tmo = new FilterGLSigmoidTMO();
+        flt_tmo_global = new FilterGLSigmoidTMO(0.18f, false, false);
+        flt_tmo_local = new FilterGLSigmoidTMO(0.18f, true, false);
 
-        simple_sigmoid = new FilterGLOp("I0 / (I0 + 1.0)", true, NULL, NULL);
+        simple_sigmoid     = new FilterGLOp("I0 / (I0 + 1.0)", true, NULL, NULL);
+        simple_sigmoid_inv = new FilterGLOp("I0 / (1.0 - I0)", true, NULL, NULL);
 
         img_lum = NULL;
         img_lum_adapt = NULL;
@@ -60,27 +62,37 @@ public:
             flt_lum = NULL;
         }
 
+        /*
         if(flt_tmo != NULL) {
             delete flt_tmo;
             flt_tmo = NULL;
-        }
+        }*/
 
         if(img_lum != NULL) {
             delete img_lum;
             img_lum = NULL;
         }
 
+        if(img_lum_adapt != NULL) {
+            delete img_lum_adapt;
+            img_lum_adapt = NULL;
+        }
+
         if(filter != NULL) {
             delete filter;
             filter = NULL;
         }
+
+        if(simple_sigmoid != NULL) {
+            delete simple_sigmoid;
+            simple_sigmoid = NULL;
+        }
     }
 
     /**
-     * @brief Process
+     * @brief ProcessGlobal
      * @param imgIn
-     * @param Ld_Max
-     * @param bias
+     * @param alpha
      * @param imgOut
      * @return
      */
@@ -95,9 +107,8 @@ public:
         float Lwa;
         img_lum->getMeanVal(&Lwa);
 
-
-        flt_tmo->Update(alpha / Lwa);
-        imgOut = flt_tmo->Process(DoubleGL(imgIn, img_lum), imgOut);
+        flt_tmo_global->Update(alpha / Lwa);
+        imgOut = flt_tmo_global->Process(DoubleGL(imgIn, img_lum), imgOut);
 
         return imgOut;
     }
@@ -106,7 +117,8 @@ public:
      * @brief ProcessLocal
      * @param imgIn
      * @param alpha
-     * @param flt_local
+     * @param phi
+     * @param filter
      * @param imgOut
      * @return
      */
@@ -142,18 +154,13 @@ public:
         if(bDomainChange) {
             img_lum_adapt = simple_sigmoid->Process(SingleGL(img_lum), img_lum_adapt);
             img_lum = filter->Process(SingleGL(img_lum_adapt), img_lum);
-
-            ImageGL *tmp = img_lum;
-            img_lum = img_lum_adapt;
-            img_lum_adapt = tmp;
-
+            img_lum_adapt = simple_sigmoid_inv->Process(SingleGL(img_lum), img_lum_adapt);
         } else {
             img_lum_adapt = filter->Process(SingleGL(img_lum), img_lum_adapt);
         }
 
-
-        flt_tmo->Update(alpha / Lwa);
-        imgOut = flt_tmo->Process(DoubleGL(imgIn, img_lum_adapt), imgOut);
+        flt_tmo_local->Update(alpha / Lwa);
+        imgOut = flt_tmo_local->Process(DoubleGL(imgIn, img_lum_adapt), imgOut);
 
         return imgOut;
     }

@@ -29,6 +29,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #define PIC_DEBUG
 
+#include <QKeyEvent>
+
 #include "piccante.hpp"
 
 #include "../opengl_common_code/opengl_window.hpp"
@@ -45,11 +47,14 @@ public:
     pic::ImageGL    img, *imgOut, *imgOut_with_sRGB;
     glw::program    program;
 
+    unsigned int    method;
+
     SimpleIOWindow() : OpenGLWindow(NULL)
     {
         tmo = NULL;
         imgOut = NULL;
         imgOut_with_sRGB = NULL;
+        method = 0;
     }
 
     void init()
@@ -80,23 +85,33 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        //simple tone mapping: gamma + exposure correction
-        imgOut = reinhard_tmo->ProcessLocal(&img, 0.18f, 8.0f, NULL, imgOut);
+        switch(method) {
+        case 0:
+            imgOut = reinhard_tmo->ProcessLocal(&img, 0.18f, 8.0f, NULL, imgOut);
+            break;
+
+        case 1:
+            imgOut = reinhard_tmo->ProcessGlobal(&img, 0.18f, imgOut);
+            break;
+
+        case 2:
+            imgOut = drago_tmo->Process(&img, 100.0f, 0.95f, imgOut);
+            break;
+        }
+
         imgOut_with_sRGB = tmo->Process(SingleGL(imgOut), imgOut_with_sRGB);
 
         //imgOut visualization
-        glw::bind_program(program);
+        quad->Render(program, imgOut_with_sRGB->getTexture());
+    }
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, imgOut_with_sRGB->getTexture());
-
-        quad->Render();
-
-        glw::bind_program(0);
-
-        //Textures
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+    void keyPressEvent(QKeyEvent * ev)
+    {
+        if(ev->type() == QEvent::KeyPress) {
+            if(ev->key() == Qt::Key_Space) {
+                method = (method + 1) % 3;
+            }
+        }
     }
 };
 

@@ -132,6 +132,26 @@ public:
     }
 
     /**
+     * @brief Render
+     * @param program
+     * @param texture
+     */
+    void Render(glw::program &program, GLuint texture)
+    {
+        glw::bind_program(program);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        Render();
+
+        glw::bind_program(0);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    /**
      * @brief CreatePosCoord allocates memory for a position buffer.
      * @return
      */
