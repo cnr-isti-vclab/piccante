@@ -19,7 +19,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_GL_TONE_MAPPING_REINHARD_TMO_HPP
 
 #include "gl/filtering/filter_luminance.hpp"
-#include "gl/filtering/filter_drago_tmo.hpp"
+#include "gl/filtering/filter_sigmoid_tmo.hpp"
+#include "gl/filtering/filter_bilateral_2ds.hpp"
+#include "gl/filtering/filter_op.hpp"
 
 namespace pic {
 
@@ -31,8 +33,8 @@ protected:
     FilterGLSigmoidTMO *flt_tmo;
 
     FilterGL           *filter;
-
-    ImageGL            *img_lum;
+    FilterGLOp         *simple_sigmoid;
+    ImageGL            *img_lum, *img_lum_adapt;
 
 public:
     /**
@@ -43,7 +45,12 @@ public:
         flt_lum = new FilterGLLuminance();
         flt_tmo = new FilterGLSigmoidTMO();
 
+        simple_sigmoid = new FilterGLOp("I0 / (I0 + 1.0)", true, NULL, NULL);
+
         img_lum = NULL;
+        img_lum_adapt = NULL;
+
+        filter = NULL;
     }
 
     ~ReinhardTMOGL()
@@ -61,6 +68,11 @@ public:
         if(img_lum != NULL) {
             delete img_lum;
             img_lum = NULL;
+        }
+
+        if(filter != NULL) {
+            delete filter;
+            filter = NULL;
         }
     }
 
@@ -98,10 +110,28 @@ public:
      * @param imgOut
      * @return
      */
-    ImageGL *ProcessLocal(ImageGL *imgIn, float alpha = 0.18f, FilterGL *filter = NULL, ImageGL *imgOut = NULL)
+    ImageGL *ProcessLocal(ImageGL *imgIn, float alpha = 0.18f, float phi = 8.0f, FilterGL *filter = NULL, ImageGL *imgOut = NULL)
     {
         if(imgIn == NULL) {
             return imgOut;
+        }
+
+        bool bDomainChange = false;
+
+        if(filter == NULL) {
+            if(this->filter == NULL) {
+
+                float epsilon = 0.05f;
+                float s_max = 8.0f;
+                float sigma_s = 0.56f * powf(1.6f, s_max);
+
+                float sigma_r = (powf(2.0f, phi) * alpha / (s_max * s_max)) * epsilon;
+
+                this->filter = new FilterGLBilateral2DS(sigma_s, sigma_r);
+            }
+
+            bDomainChange = true;
+            filter = this->filter;
         }
 
         img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
@@ -109,7 +139,18 @@ public:
         float Lwa;
         img_lum->getMeanVal(&Lwa);
 
-        ImageGL *img_lum_adapt = filter->Process(SingleGL(img_lum), NULL);
+        if(bDomainChange) {
+            img_lum_adapt = simple_sigmoid->Process(SingleGL(img_lum), img_lum_adapt);
+            img_lum = filter->Process(SingleGL(img_lum_adapt), img_lum);
+
+            ImageGL *tmp = img_lum;
+            img_lum = img_lum_adapt;
+            img_lum_adapt = tmp;
+
+        } else {
+            img_lum_adapt = filter->Process(SingleGL(img_lum), img_lum_adapt);
+        }
+
 
         flt_tmo->Update(alpha / Lwa);
         imgOut = flt_tmo->Process(DoubleGL(imgIn, img_lum_adapt), imgOut);

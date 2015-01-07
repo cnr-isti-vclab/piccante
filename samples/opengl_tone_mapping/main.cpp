@@ -39,6 +39,7 @@ protected:
     pic::QuadGL *quad;
     pic::FilterGLColorConv *tmo;
     pic::DragoTMOGL        *drago_tmo;
+    pic::ReinhardTMOGL     *reinhard_tmo;
 
 public:
     pic::ImageGL    img, *imgOut, *imgOut_with_sRGB;
@@ -68,6 +69,7 @@ public:
         tmo = new pic::FilterGLColorConv(new pic::ColorConvGLRGBtosRGB());
 
         drago_tmo = new pic::DragoTMOGL();
+        reinhard_tmo = new pic::ReinhardTMOGL();
     }
 
     void render()
@@ -79,7 +81,7 @@ public:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //simple tone mapping: gamma + exposure correction
-        imgOut = drago_tmo->Process(&img, 100.0f, 0.95f, imgOut);
+        imgOut = reinhard_tmo->ProcessLocal(&img, 0.18f, 8.0f, NULL, imgOut);
         imgOut_with_sRGB = tmo->Process(SingleGL(imgOut), imgOut_with_sRGB);
 
         //imgOut visualization
