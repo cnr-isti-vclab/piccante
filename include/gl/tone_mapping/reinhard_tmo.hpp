@@ -30,13 +30,15 @@ protected:
     FilterGLLuminance  *flt_lum;
     FilterGLSigmoidTMO *flt_tmo;
 
+    FilterGL           *filter;
+
     ImageGL            *img_lum;
 
 public:
     /**
-     * @brief DragoTMOGL
+     * @brief ReinhardTMOGL
      */
-    DragoTMOGL()
+    ReinhardTMOGL()
     {
         flt_lum = new FilterGLLuminance();
         flt_tmo = new FilterGLSigmoidTMO();
@@ -44,7 +46,7 @@ public:
         img_lum = NULL;
     }
 
-    ~DragoTMOGL()
+    ~ReinhardTMOGL()
     {
         if(flt_lum != NULL) {
             delete flt_lum;
@@ -81,88 +83,40 @@ public:
         float Lwa;
         img_lum->getMeanVal(&Lwa);
 
-        FilterGLSigmoidTMO *filter = new FilterGLSigmoidTMO(0.18f / Lav, false, true);
 
-        #ifdef PIC_DEBUG
-            GLuint testTQ1 = glBeginTimeQuery();
-        #endif
-
-        ImageGL *imgOut = filter->Process(SingleGL(&imgIn), NULL);
-
-        flt_tmo->Update(alpha);
+        flt_tmo->Update(alpha / Lwa);
         imgOut = flt_tmo->Process(DoubleGL(imgIn, img_lum), imgOut);
 
         return imgOut;
     }
+
+    /**
+     * @brief ProcessLocal
+     * @param imgIn
+     * @param alpha
+     * @param flt_local
+     * @param imgOut
+     * @return
+     */
+    ImageGL *ProcessLocal(ImageGL *imgIn, float alpha = 0.18f, FilterGL *filter = NULL, ImageGL *imgOut = NULL)
+    {
+        if(imgIn == NULL) {
+            return imgOut;
+        }
+
+        img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
+
+        float Lwa;
+        img_lum->getMeanVal(&Lwa);
+
+        ImageGL *img_lum_adapt = filter->Process(SingleGL(img_lum), NULL);
+
+        flt_tmo->Update(alpha / Lwa);
+        imgOut = flt_tmo->Process(DoubleGL(imgIn, img_lum_adapt), imgOut);
+
+        return imgOut;
+    }
 };
-
-
-/**
- * @brief ReinhardLocal
- * @param nameIn
- * @param nameOut
- * @param filter
- * @return
- */
-static ImageGL *ReinhardLocal(ImageGL *imgIn, ImageGL *imgOut, FilterGL *filter)
-{
-    FilterGLLuminance lum;
-
-    ImageGL *L = lum.Process(SingleGL(&imgIn), NULL);
-    L->loadToMemory();
-    L->Write("lum.pfm");
-
-    GLuint testTQ1 = glBeginTimeQuery();
-    ImageGL *adapt = filter->Process(SingleGL(L), NULL);
-    GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-    printf("Bilateral 2DG Filter on GPU time: %f ms\n",
-           double(timeVal) / 1000000.0);
-
-    adapt->loadToMemory();
-    adapt->Write("adapt.pfm");
-
-    float Lav = imgIn.getLogMeanVal()[0];
-
-    FilterGLSigmoidTMO *tmo = new FilterGLSigmoidTMO(0.18f / Lav, true, true);
-
-    testTQ1 = glBeginTimeQuery();
-    ImageGL *imgOut = tmo->Process(DoubleGL(&imgIn, adapt), NULL);
-    timeVal = glEndTimeQuery(testTQ1);
-    printf("Sigmoid Local Filter on GPU time: %f ms\n",
-           double(timeVal) / 1000000.0);
-
-    imgOut->loadToMemory();
-    imgOut->Write(nameOut);
-    return imgOut;
-}
-
-/**
- * @brief ReinhardGlobal
- * @param nameIn
- * @param nameOut
- * @return
- */
-ImageGL *ReinhardGlobal(ImageGL *imgIn, ImageGL *imgOut)
-{
-    float Lav = imgIn->getLogMeanVal()[0];
-
-    FilterGLSigmoidTMO *filter = new FilterGLSigmoidTMO(0.18f / Lav, false, true);
-
-    #ifdef PIC_DEBUG
-        GLuint testTQ1 = glBeginTimeQuery();
-    #endif
-
-    ImageGL *imgOut = filter->Process(SingleGL(&imgIn), NULL);
-
-    #ifdef PIC_DEBUG
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        printf("Sigmoid Filter on GPU time: %f ms\n", double(timeVal) / 1000000.0);
-    #endif
-
-    imgOut->loadToMemory();
-    imgOut->Write(nameOut);
-    return imgOut;
-}
 
 } // end namespace pic
 

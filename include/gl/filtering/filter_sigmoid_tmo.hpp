@@ -121,13 +121,13 @@ void FilterGLSigmoidTMO::FragmentShader()
 
         size_t processing_found2 = fragment_source.find("__LOCAL__2__");
         fragment_source.replace(processing_found2, 12,
-                                " float Ld  = (Lw*alpha)/(Lwa*alpha+epsilon); ");
+                                " float Ld  = (Lw * alpha)/(Lwa * alpha + epsilon); ");
     } else {
         fragment_source.replace(processing_found1, 12, " ");
 
         size_t processing_found2 = fragment_source.find("__LOCAL__2__");
         fragment_source.replace(processing_found2, 12,
-                                " float Lscale = Lw*alpha;\n float Ld = Lscale/(Lscale+epsilon); ");
+                                " float Lscale = Lw * alpha;\n float Ld = Lscale / (Lscale + epsilon); ");
     }
 
     fragment_source = GammaCorrection(fragment_source, bGammaCorrection);

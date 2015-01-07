@@ -177,10 +177,8 @@ StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
     rSize = size / float(max(width, height));
 
     shape = new ImageGL(1, this->brushSize, this->brushSize, 1, IMG_CPU, GL_TEXTURE_2D);
-//	EvaluateGaussian(shape, true);
     EvaluateSolid(shape);
-    shape->Write("test.pfm");
-    shape->generateTextureGL(false, GL_TEXTURE_2D);
+    shape->generateTextureGL(GL_TEXTURE_2D, false);
 
     if(color != NULL) {
         for(int i = 0; i < 3; i++) {
