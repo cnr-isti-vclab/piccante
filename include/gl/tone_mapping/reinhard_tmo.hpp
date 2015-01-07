@@ -23,6 +23,80 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+
+class ReinhardTMOGL
+{
+protected:
+    FilterGLLuminance  *flt_lum;
+    FilterGLSigmoidTMO *flt_tmo;
+
+    ImageGL            *img_lum;
+
+public:
+    /**
+     * @brief DragoTMOGL
+     */
+    DragoTMOGL()
+    {
+        flt_lum = new FilterGLLuminance();
+        flt_tmo = new FilterGLSigmoidTMO();
+
+        img_lum = NULL;
+    }
+
+    ~DragoTMOGL()
+    {
+        if(flt_lum != NULL) {
+            delete flt_lum;
+            flt_lum = NULL;
+        }
+
+        if(flt_tmo != NULL) {
+            delete flt_tmo;
+            flt_tmo = NULL;
+        }
+
+        if(img_lum != NULL) {
+            delete img_lum;
+            img_lum = NULL;
+        }
+    }
+
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param Ld_Max
+     * @param bias
+     * @param imgOut
+     * @return
+     */
+    ImageGL *ProcessGlobal(ImageGL *imgIn, float alpha = 0.18f, ImageGL *imgOut = NULL)
+    {
+        if(imgIn == NULL) {
+            return imgOut;
+        }
+
+        img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
+
+        float Lwa;
+        img_lum->getMeanVal(&Lwa);
+
+        FilterGLSigmoidTMO *filter = new FilterGLSigmoidTMO(0.18f / Lav, false, true);
+
+        #ifdef PIC_DEBUG
+            GLuint testTQ1 = glBeginTimeQuery();
+        #endif
+
+        ImageGL *imgOut = filter->Process(SingleGL(&imgIn), NULL);
+
+        flt_tmo->Update(alpha);
+        imgOut = flt_tmo->Process(DoubleGL(imgIn, img_lum), imgOut);
+
+        return imgOut;
+    }
+};
+
+
 /**
  * @brief ReinhardLocal
  * @param nameIn
