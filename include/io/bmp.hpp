@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -40,6 +31,9 @@ namespace pic {
 
 #ifndef PIC_WIN32
 
+/**
+ * @brief The BITMAPFILEHEADER struct
+ */
 struct BITMAPFILEHEADER {
     unsigned short  bfType;
     unsigned int    bfSize;
@@ -48,6 +42,9 @@ struct BITMAPFILEHEADER {
     unsigned int    bfOffBits;
 };
 
+/**
+ * @brief The BITMAPINFOHEADER struct
+ */
 struct BITMAPINFOHEADER {
     unsigned int      biSize;
     int               biWidth;
@@ -66,7 +63,12 @@ struct BITMAPINFOHEADER {
 
 #endif
 
-//SYSTEM: X POS Y POS
+/**
+ * @brief BitmapPadding (SYSTEM: X POS Y POS).
+ * @param bpp
+ * @param width
+ * @return
+ */
 inline int BitmapPadding(int bpp, int width)
 {
     int padding;
@@ -80,7 +82,15 @@ inline int BitmapPadding(int bpp, int width)
     return padding;
 }
 
-//Writes the image as a BMP
+/**
+ * @brief ReadBMP reads an image as .bmp file.
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @return
+ */
 PIC_INLINE unsigned char *ReadBMP(std::string nameFile, unsigned char *data,
                                   int &width, int &height, int &channels)
 {
@@ -155,7 +165,15 @@ PIC_INLINE unsigned char *ReadBMP(std::string nameFile, unsigned char *data,
     return data;
 }
 
-//writes the image as a BMP
+/**
+ * @brief WriteBMP writes an image as a .bmp file.
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @return
+ */
 PIC_INLINE bool WriteBMP(std::string nameFile, const unsigned char *data,
                          int width, int height, int channels)
 {

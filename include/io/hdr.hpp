@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -36,7 +27,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**ReadHDR: reads a .hdr file*/
+/**
+ * @brief ReadHDR reads a .hdr/.pic file.
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @return
+ */
 PIC_INLINE float *ReadHDR(std::string nameFile, float *data, int &width,
                           int &height)
 {
@@ -199,7 +197,12 @@ PIC_INLINE float *ReadHDR(std::string nameFile, float *data, int &width,
     return data;
 }
 
-/**This function writes a scanline of an image using RLE and RGBE encoding*/
+/**
+ * @brief WriteLineHDR writes a scanline of an image using RLE and RGBE encoding.
+ * @param file
+ * @param buffer_line
+ * @param width
+ */
 PIC_INLINE void WriteLineHDR(FILE *file, unsigned char *buffer_line, int width)
 {
     int cur_pointer = 0;
@@ -271,7 +274,17 @@ PIC_INLINE void WriteLineHDR(FILE *file, unsigned char *buffer_line, int width)
     }
 }
 
-/**WriteHDR: writes a .hdr file*/
+/**
+ * @brief WriteHDR  writes a .hdr/.pic file
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @param appliedExposure
+ * @param bRLE
+ * @return
+ */
 PIC_INLINE bool WriteHDR(std::string nameFile, float *data, int width,
                          int height, int channels, float appliedExposure = 1.0f, bool bRLE = true)
 {
@@ -370,7 +383,17 @@ PIC_INLINE bool WriteHDR(std::string nameFile, float *data, int width,
     return true;
 }
 
-/**WriteHDR: writes a .hdr file*/
+/**
+ * @brief WriteHDRBlock writes a .hdr file.
+ * @param nameFile
+ * @param buffer_line
+ * @param width
+ * @param height
+ * @param channels
+ * @param blockID
+ * @param nBlocks
+ * @return
+ */
 PIC_INLINE bool WriteHDRBlock(std::string nameFile, float *buffer_line, int width,
                               int height, int channels, int blockID, int nBlocks)
 {

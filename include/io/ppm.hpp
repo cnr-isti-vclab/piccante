@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -34,7 +25,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**ReadPPM: reads an .ppm file*/
+/**
+ * @brief ReadPPM  reads an .ppm file
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @return
+ */
 PIC_INLINE unsigned char *ReadPPM(std::string nameFile, unsigned char *data,
                                   int &width, int &height, int &channels)
 {
@@ -115,7 +114,15 @@ PIC_INLINE unsigned char *ReadPPM(std::string nameFile, unsigned char *data,
     return data;
 }
 
-/**WritePPM: writes an .ppm file*/
+/**
+ * @brief WritePPM  writes an .ppm file.
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @return
+ */
 PIC_INLINE bool WritePPM(std::string nameFile, const unsigned char *data,
                          int width, int height, int channels)
 {

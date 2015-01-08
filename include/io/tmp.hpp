@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -34,12 +25,25 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**Header for a tmp image*/
+/**
+ * @brief The TMP_IMG_HEADER struct is a header for a tmp image
+ */
 struct TMP_IMG_HEADER {
     int frames, width, height, channels;
 };
 
-/**ReadTMP: reads a dump temp file*/
+
+/**
+ * @brief ReadTMP reads a dump temp file.
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @param frames
+ * @param bHeader
+ * @return
+ */
 PIC_INLINE float *ReadTMP(std::string nameFile, float *data, int &width,
                           int &height, int &channels, int &frames, bool bHeader = true)
 {
@@ -79,7 +83,17 @@ PIC_INLINE float *ReadTMP(std::string nameFile, float *data, int &width,
     return data;
 }
 
-/**WriteTMP: writes a dump temp file*/
+/**
+ * @brief WriteTMP writes a dump temp file.
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @param frames
+ * @param bHeader
+ * @return
+ */
 PIC_INLINE bool WriteTMP(std::string nameFile, const float *data, int &width,
                          int &height, int &channels, int &frames, bool bHeader = true)
 {

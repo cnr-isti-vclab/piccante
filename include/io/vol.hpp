@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -36,6 +27,16 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief ReadVOL
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param depth
+ * @param channels
+ * @return
+ */
 PIC_INLINE float *ReadVOL(std::string nameFile, float *data, int &width,
                           int &height, int &depth, int &channels)
 {
@@ -103,10 +104,20 @@ PIC_INLINE float *ReadVOL(std::string nameFile, float *data, int &width,
     fclose(file);
 
     return data;
-};
+}
 
-bool WriteVOL(std::string nameFile, const float *data, int width, int height,
-              int depth, int channels = 3)
+/**
+ * @brief WriteVOL
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param depth
+ * @param channels
+ * @return
+ */
+PIC_INLINE bool WriteVOL(std::string nameFile, const float *data, int width, int height,
+               int depth, int channels = 3)
 {
 
     FILE *file = fopen(nameFile.c_str(), "wb");
@@ -146,7 +157,7 @@ bool WriteVOL(std::string nameFile, const float *data, int width, int height,
     fclose(file);
 
     return true;
-};
+}
 
 } // end namespace pic
 

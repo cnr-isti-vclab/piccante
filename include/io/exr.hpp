@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -48,8 +39,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //SYSTEM: X POS Y NEG
 namespace pic {
 
-
-/**ReadEXR: reads EXR data from file*/
+/**
+ * @brief ReadEXR reads .exr data from file
+ * @param nameFile
+ * @param width
+ * @param height
+ * @param channels
+ * @param pixelBuffer
+ * @return
+ */
 PIC_INLINE Imf::Rgba *ReadEXR(std::string nameFile, int &width, int &height,
                               int &channels, Imf::Rgba *pixelBuffer = NULL)
 {
@@ -83,7 +81,16 @@ PIC_INLINE Imf::Rgba *ReadEXR(std::string nameFile, int &width, int &height,
     }  
 }
 
-/**ReadEXR: reads EXR data from file*/
+/**
+ * @brief ReadEXR reads .exr data from file.
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @param pixelBuffer
+ * @return
+ */
 PIC_INLINE float *ReadEXR(std::string nameFile, float *data, int &width,
                           int &height, int &channels, Imf::Rgba *pixelBuffer = NULL)
 {
@@ -137,7 +144,16 @@ PIC_INLINE float *ReadEXR(std::string nameFile, float *data, int &width,
     }
 }
 
-/**WriteEXR: writes an .exr file*/
+/**
+ * @brief WriteEXR writes an .exr file.
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @param pixelBuffer
+ * @return
+ */
 PIC_INLINE bool WriteEXR(std::string nameFile, const float *data, int width,
                          int height, int channels = 3, Imf::Rgba *pixelBuffer = NULL)
 {

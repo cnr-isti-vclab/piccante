@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -36,6 +27,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The TGA_HEADER struct
+ */
 struct TGA_HEADER{
     unsigned char id_length;
     unsigned char colormap_type;
@@ -56,7 +50,15 @@ struct TGA_HEADER{
     unsigned char descriptor;
 };
 
-/**ReadTGA: reads an image in the .tga format*/
+/**
+ * @brief ReadTGA reads an image in the .tga format.
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @return
+ */
 PIC_INLINE unsigned char *ReadTGA(std::string nameFile, unsigned char *data,
                                   int &width, int &height, int &channels)
 {
@@ -125,7 +127,15 @@ PIC_INLINE unsigned char *ReadTGA(std::string nameFile, unsigned char *data,
     return data;
 }
 
-/**WriteTGA: writes an image in the .tga format*/
+/**
+ * @brief WriteTGA writes an image in the .tga format.
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @return
+ */
 PIC_INLINE bool WriteTGA(std::string nameFile, const unsigned char *data,
                          int width, int height, int channels)
 {
