@@ -36,14 +36,13 @@ protected:
     pic::FilterGLSimpleTMO *tmo;
 
 public:
-    pic::ImageGL img, *imgRand, *imgOut, *imgOutTMO;
+    pic::ImageGL img, *imgRand, *img_flt_tmo;
     glw::program    program;
 
     SimpleOperatorsWindow() : OpenGLWindow(NULL)
     {
         tmo = NULL;
-        imgOut = NULL;
-        imgOutTMO = NULL;
+        img_flt_tmo = NULL;
 
     }
 
@@ -79,21 +78,10 @@ public:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //simple tone mapping: gamma + exposure correction
-        imgOutTMO = tmo->Process(SingleGL(&img), imgOutTMO);
+        img_flt_tmo = tmo->Process(SingleGL(&img), img_flt_tmo);
 
         //imgOut visualization
-        glw::bind_program(program);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, imgOutTMO->getTexture());
-
-        quad->Render();
-
-        glw::bind_program(0);
-
-        //Textures
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        quad->Render(program, img_flt_tmo->getTexture());
     }
 };
 

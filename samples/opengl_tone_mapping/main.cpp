@@ -44,7 +44,7 @@ protected:
     pic::ReinhardTMOGL     *reinhard_tmo;
 
 public:
-    pic::ImageGL    img, *imgOut, *imgOut_with_sRGB;
+    pic::ImageGL    img, *img_tmo, *img_tmo_with_sRGB;
     glw::program    program;
 
     unsigned int    method;
@@ -52,8 +52,8 @@ public:
     SimpleIOWindow() : OpenGLWindow(NULL)
     {
         tmo = NULL;
-        imgOut = NULL;
-        imgOut_with_sRGB = NULL;
+        img_tmo = NULL;
+        img_tmo_with_sRGB = NULL;
         method = 0;
     }
 
@@ -87,22 +87,22 @@ public:
 
         switch(method) {
         case 0:
-            imgOut = reinhard_tmo->ProcessLocal(&img, 0.18f, 8.0f, NULL, imgOut);
+            img_tmo = reinhard_tmo->ProcessLocal(&img, 0.18f, 8.0f, NULL, img_tmo);
             break;
 
         case 1:
-            imgOut = reinhard_tmo->ProcessGlobal(&img, 0.18f, imgOut);
+            img_tmo = reinhard_tmo->ProcessGlobal(&img, 0.18f, img_tmo);
             break;
 
         case 2:
-            imgOut = drago_tmo->Process(&img, 100.0f, 0.95f, imgOut);
+            img_tmo = drago_tmo->Process(&img, 100.0f, 0.95f, img_tmo);
             break;
         }
 
-        imgOut_with_sRGB = tmo->Process(SingleGL(imgOut), imgOut_with_sRGB);
+        img_tmo_with_sRGB = tmo->Process(SingleGL(imgOut), img_tmo_with_sRGB);
 
         //imgOut visualization
-        quad->Render(program, imgOut_with_sRGB->getTexture());
+        quad->Render(program, img_tmo_with_sRGB->getTexture());
     }
 
     void keyPressEvent(QKeyEvent * ev)

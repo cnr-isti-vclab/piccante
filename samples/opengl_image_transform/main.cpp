@@ -80,19 +80,8 @@ public:
         //simple tone mapping: gamma + exposure correction
         img_flt_tmo = flt_tmo->Process(SingleGL(img_flt), img_flt_tmo);
 
-        //visualization of the Gaussian filtering
-        glw::bind_program(program);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, img_flt_tmo->getTexture());
-
-        quad->Render();
-
-        glw::bind_program(0);
-
-        //Textures
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        //visualization of the image transformation
+        quad->Render(program, img_flt_tmo->getTexture());
     }
 };
 
