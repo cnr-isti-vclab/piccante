@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -34,6 +25,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The HybridTMO class
+ */
 class HybridTMO
 {
 protected:
@@ -43,9 +37,12 @@ protected:
     Pyramid				*pyrA, *pyrB, *pyrWeight;
     float				Ld_Max, b;
 
-    Image			*imgDrago, *imgReinhard, *seg_map;
+    Image               *imgDrago, *imgReinhard, *seg_map;
 
 public:
+    /**
+     * @brief HybridTMO
+     */
     HybridTMO()
     {
         imgDrago = NULL;
@@ -59,12 +56,23 @@ public:
         b = 0.95f;
     }
 
+    /**
+     * @brief ReinhardApprox
+     * @param alpha1
+     * @param alpha2
+     */
     void ReinhardApprox(float &alpha1, float &alpha2)
     {
         alpha2		= powf(1.6f, 9.0f);			//sigma_r
         alpha1		= 1.0f / (2.0f * sqrtf(2.0f));	//sigma_s
     }
 
+    /**
+     * @brief Compute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *Compute(Image *imgIn, Image *imgOut)
     {
         if(imgIn == NULL) {

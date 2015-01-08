@@ -28,7 +28,11 @@ namespace pic {
 const int CONST_DARTTHROWING = 5000;
 
 /**
- *
+ * @brief DartThrowingSampler
+ * @param m
+ * @param radius2
+ * @param nSamples
+ * @param samples
  */
 template<unsigned int N>
 void DartThrowingSampler(std::mt19937 *m, float radius2, int nSamples,

@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -34,11 +25,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**This function returns the best exposure value for an image, img,
-in f-stops values.*/
+/**
+ * @brief FindBestExposure computes the best exposure value for an image, img,
+ * @param img
+ * @return
+ */
 float FindBestExposure(Image *img)
 {
-    if(img==NULL) {
+    if(img == NULL) {
         return 0.0f;
     }
 
@@ -52,7 +46,11 @@ float FindBestExposure(Image *img)
     return fstop;
 }
 
-
+/**
+ * @brief FindBestExposureMain
+ * @param nameIn
+ * @param nameOut
+ */
 void FindBestExposureMain(std::string nameIn, std::string nameOut)
 {
     Image img(nameIn);

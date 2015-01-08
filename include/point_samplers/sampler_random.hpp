@@ -36,7 +36,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-template <unsigned int N> class RandomSampler
+/**
+ * @brief The RandomSampler class
+ */
+template <unsigned int N>
+class RandomSampler
 {
 protected:
     SAMPLER_TYPE		type;
@@ -96,6 +100,22 @@ public:
     void CutRescale(unsigned int cutDim);
 
     /**
+     * @brief getSamplesPerLevel
+     * @param level
+     * @return
+     */
+    int getSamplesPerLevel(int level);
+
+    /**
+     * @brief getSampleAt
+     * @param level
+     * @param i
+     * @param x
+     * @param y
+     */
+    void getSampleAt(int level, int i, int &x, int &y);
+
+    /**
      * @brief Write
      * @param name
      * @param level
@@ -145,50 +165,6 @@ public:
             p2Ds->Write(str, 0);
             c *= 2;
         }
-    }
-
-    /**
-     * @brief getSamplesPerLevel
-     * @param level
-     * @return
-     */
-    int getSamplesPerLevel(int level)
-    {
-        if(level<0) {
-            return -1;
-        }
-
-        if(level == 0) {
-            return (levelsR[level]/N);
-        } else {
-            return ( levelsR[level] - levelsR[level - 1]) / N;
-        }
-    }
-
-    /**
-     * @brief getSampleAt
-     * @param level
-     * @param i
-     * @param x
-     * @param y
-     */
-    void getSampleAt(int level, int i, int &x, int &y)
-    {
-        int start, end;
-
-        if(level == 0) {
-            start = 0;
-        } else {
-            start = levelsR[level - 1];
-        }
-
-        end = levelsR[level];
-
-        i *= int(N);
-        i = CLAMPi(i + start, start, end-1);
-
-        x = samplesR[i    ] + window[0];
-        y = samplesR[i + 1] + window[1];
     }
 };
 
@@ -379,7 +355,7 @@ template <unsigned int N>  PIC_INLINE void RandomSampler<N>::Render2Int()
 #endif
 }
 
-template <unsigned int N> PIC_INLINE void RandomSampler<N>::Write(
+template <unsigned int N>PIC_INLINE void RandomSampler<N>::Write(
     std::string name, int level)
 {
     Image img(1, window[0] * 2 + 1, window[1] * 2 + 1, 1);
@@ -404,6 +380,38 @@ template <unsigned int N> PIC_INLINE void RandomSampler<N>::Write(
     }
 
     img.Write(name);
+}
+
+template <unsigned int N> PIC_INLINE int RandomSampler<N>::getSamplesPerLevel(int level)
+{
+    if(level<0) {
+        return -1;
+    }
+
+    if(level == 0) {
+        return (levelsR[level] / N);
+    } else {
+        return ( levelsR[level] - levelsR[level - 1]) / N;
+    }
+}
+
+template <unsigned int N> PIC_INLINE void RandomSampler<N>::getSampleAt(int level, int i, int &x, int &y)
+{
+    int start, end;
+
+    if(level == 0) {
+        start = 0;
+    } else {
+        start = levelsR[level - 1];
+    }
+
+    end = levelsR[level];
+
+    i *= int(N);
+    i = CLAMPi(i + start, start, end-1);
+
+    x = samplesR[i    ] + window[0];
+    y = samplesR[i + 1] + window[1];
 }
 
 template <unsigned int N>
@@ -433,6 +441,8 @@ PIC_INLINE void ConvertVectorToPlus1(std::vector<RandomSampler<N> > &rsVec,
     window[N] = halfSize;
     rsOut.window = window;
 }
+
+
 
 } // end namespace pic
 

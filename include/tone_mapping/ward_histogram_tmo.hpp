@@ -34,6 +34,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief WardHistogramTMO
+ * @param imgIn
+ * @param imgOut
+ * @param nBin
+ * @param LdMax
+ * @param LdMin
+ * @return
+ */
 inline Image *WardHistogramTMO(Image *imgIn, Image *imgOut = NULL,
                                   int nBin = 256, float LdMax = 100.0f, float LdMin = 1.0f)
 {

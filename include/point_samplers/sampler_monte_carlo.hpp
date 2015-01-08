@@ -24,7 +24,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- *
+ * @brief MonteCarloSampler
+ * @param m
+ * @param nSamples
+ * @param samples
  */
 template <unsigned int N>
 void MonteCarloSampler(std::mt19937 *m, int nSamples, std::vector<float> &samples)
@@ -38,7 +41,10 @@ void MonteCarloSampler(std::mt19937 *m, int nSamples, std::vector<float> &sample
 }
 
 /**
- *
+ * @brief MonteCarloStratifiedSampler
+ * @param m
+ * @param nSamples
+ * @param samples
  */
 template <unsigned int N>
 void MonteCarloStratifiedSampler(std::mt19937 *m, int nSamples,
@@ -65,7 +71,9 @@ void MonteCarloStratifiedSampler(std::mt19937 *m, int nSamples,
 }
 
 /**
- *
+ * @brief PatternMethodSampler
+ * @param nSamples
+ * @param samples
  */
 template <unsigned int N>
 void PatternMethodSampler(int nSamples, std::vector<float> &samples)

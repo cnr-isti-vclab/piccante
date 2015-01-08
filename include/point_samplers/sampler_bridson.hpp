@@ -26,7 +26,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- *
+ * @brief checkNeighborsBruteForce
+ * @param samples
+ * @param x
+ * @param radius
+ * @return
  */
 template<unsigned int N>
 bool checkNeighborsBruteForce(std::vector< Vec<N, float> > &samples,
@@ -44,7 +48,11 @@ bool checkNeighborsBruteForce(std::vector< Vec<N, float> > &samples,
 }
 
 /**
- *
+ * @brief BridsonSampler
+ * @param m
+ * @param radius
+ * @param samples
+ * @param kSamples
  */
 template<unsigned int N>
 void BridsonSampler(std::mt19937 *m, float radius, std::vector<float> &samples,

@@ -33,12 +33,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The Segmentation class
+ */
 class Segmentation
 {
 protected:
     FilterIterative			*fltIt;
     FilterBilateral2DS		*fltBil;
-    Image				*L, *imgIn_flt;
+    Image                   *L, *imgIn_flt;
 
     int						iterations;
     float					perCent, nLayer;
@@ -46,6 +49,9 @@ protected:
 public:
     float					minVal, maxVal;
 
+    /**
+     * @brief Segmentation
+     */
     Segmentation()
     {
         nLayer = 0.0f;
@@ -82,6 +88,10 @@ public:
         }
     }
 
+    /**
+     * @brief ComputeStatistics
+     * @param imgIn
+     */
     void ComputeStatistics(Image *imgIn)
     {
         float nLevels, area;
@@ -92,6 +102,11 @@ public:
         iterations	= MAX(int(sqrtf(area)) / 2, 1);
     }
 
+    /**
+     * @brief SegmentationBilatearal
+     * @param imgIn
+     * @return
+     */
     Image *SegmentationBilatearal(Image *imgIn)
     {
         ComputeStatistics(imgIn);

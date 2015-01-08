@@ -26,9 +26,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- *
+ * @brief The MRSamplers class
  */
-template<unsigned int N> class MRSamplers
+template<unsigned int N>
+class MRSamplers
 {
 protected:
     RandomSampler<N>		**samplers;

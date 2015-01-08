@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -35,16 +26,33 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief Sigmoid
+ * @param x
+ * @return
+ */
 inline float Sigmoid(float x)
 {
     return x / (x + 1.0f);
 }
 
+/**
+ * @brief SigmoidInv
+ * @param x
+ * @return
+ */
 inline float SigmoidInv(float x)
 {
     return x / (1.0f - x);
 }
 
+/**
+ * @brief EstimateAlpha
+ * @param LMax
+ * @param LMin
+ * @param logAverage
+ * @return
+ */
 inline float EstimateAlpha(float LMax, float LMin, float logAverage)
 {
 
@@ -58,6 +66,12 @@ inline float EstimateAlpha(float LMax, float LMin, float logAverage)
     return 0.18f * powf(4.0f, tmp);
 }
 
+/**
+ * @brief EstimateWhitePoint
+ * @param LMax
+ * @param LMin
+ * @return
+ */
 inline float EstimateWhitePoint(float LMax, float LMin)
 {
 
@@ -68,6 +82,15 @@ inline float EstimateWhitePoint(float LMax, float LMin)
     return 1.5f * powf(2.0f, (log2Max - log2Min - 5.0f));
 }
 
+/**
+ * @brief ReinhardTMO
+ * @param imgIn
+ * @param imgOut
+ * @param alpha
+ * @param whitePoint
+ * @param phi
+ * @return
+ */
 Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
                       float whitePoint = -1.0f, float phi = 8.0f)
 {
