@@ -15,10 +15,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-
 #ifndef PIC_TONE_MAPPING_HPP
 #define PIC_TONE_MAPPING_HPP
-
 
 //#include "tone_mapping/bilateral_tmo.hpp"
 #include "tone_mapping/get_all_exposures.hpp"

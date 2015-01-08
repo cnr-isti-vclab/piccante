@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -29,6 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The TransformData class
+ */
 class TransformData
 {
 public:
@@ -36,16 +30,31 @@ public:
     float	angle, scale;
     float	gain, bias;
 
+    /**
+     * @brief TransformData
+     */
     TransformData()
     {
     }
 
+    /**
+     * @brief TransformData
+     * @param x
+     * @param y
+     */
     TransformData(int x, int y)
     {
         this->x = x;
         this->y = y;
     }
 
+    /**
+     * @brief TransformData
+     * @param x
+     * @param y
+     * @param angle
+     * @param scale
+     */
     TransformData(int x, int y, float angle, float scale)
     {
         this->x = x;
