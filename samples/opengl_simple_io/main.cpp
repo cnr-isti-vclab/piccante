@@ -40,7 +40,7 @@ protected:
     pic::FilterGLColorConv *tmo;
 
 public:
-    pic::ImageRAWGL img, *imgOut;
+    pic::ImageGL img, *imgOut;
     glw::program    program;
 
     SimpleIOWindow() : OpenGLWindow(NULL)
@@ -78,18 +78,7 @@ public:
         imgOut = tmo->Process(SingleGL(&img), imgOut);
 
         //imgOut visualization
-        glw::bind_program(program);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, imgOut->getTexture());
-
-        quad->Render();
-
-        glw::bind_program(0);
-
-        //Textures
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        quad->Render(program, imgOut->getTexture());
     }
 };
 

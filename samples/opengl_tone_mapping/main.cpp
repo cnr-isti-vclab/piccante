@@ -99,7 +99,7 @@ public:
             break;
         }
 
-        img_tmo_with_sRGB = tmo->Process(SingleGL(imgOut), img_tmo_with_sRGB);
+        img_tmo_with_sRGB = tmo->Process(SingleGL(img_tmo), img_tmo_with_sRGB);
 
         //imgOut visualization
         quad->Render(program, img_tmo_with_sRGB->getTexture());
