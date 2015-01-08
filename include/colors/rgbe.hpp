@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -39,6 +30,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief Float2RGBE
+ * @param colFloat
+ * @param colRGBE
+ */
 PIC_INLINE void Float2RGBE(float *colFloat, unsigned char *colRGBE)
 {
     float v;
@@ -70,6 +66,11 @@ PIC_INLINE void Float2RGBE(float *colFloat, unsigned char *colRGBE)
     *(colRGBE + 3) = (e + 128);
 }
 
+/**
+ * @brief SingleFloat2RGBE
+ * @param colFloat
+ * @param colRGBE
+ */
 PIC_INLINE void SingleFloat2RGBE(float *colFloat, unsigned char *colRGBE)
 {
     float v;
@@ -93,6 +94,11 @@ PIC_INLINE void SingleFloat2RGBE(float *colFloat, unsigned char *colRGBE)
     *(colRGBE + 3) = (e + 128);
 }
 
+/**
+ * @brief RGBE2Float
+ * @param colRGBE
+ * @param colFloat
+ */
 PIC_INLINE void RGBE2Float(unsigned char *colRGBE, float *colFloat)
 {
 

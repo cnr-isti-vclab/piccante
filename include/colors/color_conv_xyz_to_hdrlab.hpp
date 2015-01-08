@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -32,6 +23,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The ColorConvXYZtoHDRLAB class
+ */
 class ColorConvXYZtoHDRLAB: public ColorConv
 {
 protected:
@@ -41,6 +35,9 @@ protected:
 
 public:
 
+    /**
+     * @brief ColorConvXYZtoHDRLAB
+     */
     ColorConvXYZtoHDRLAB()
     {
         whitePoint[0] = 1.0f;
@@ -66,7 +63,11 @@ public:
         two_e = powf(2.0f, epsilon);
     }
 
-    //from XYZ to HDR-CIELAB
+    /**
+     * @brief direct from XYZ to HDR-CIELAB
+     * @param colIn
+     * @param colOut
+     */
     void direct(float *colIn, float *colOut)
     {
         //L_hdr
@@ -79,7 +80,11 @@ public:
         colOut[2] = 2.0f * (f(colIn[1] / whitePoint[1]) - f(colIn[2] / whitePoint[2]));
     }
 
-    //from HDR-CIELAB to XYZ
+    /**
+     * @brief inverse from HDR-CIELAB to XYZ
+     * @param colIn
+     * @param colOut
+     */
     void inverse(float *colIn, float *colOut)
     {
         colOut[1] = whitePoint[1] * f_inv( colIn[0] );
@@ -87,6 +92,11 @@ public:
         colOut[2] = whitePoint[2] * f_inv( colIn[0] - colIn[2]/2.0f );
     }
 
+    /**
+     * @brief WhitePointD65
+     * @param whitePoint
+     * @return
+     */
     float *WhitePointD65(float *whitePoint)
     {
         if(whitePoint == NULL) {
@@ -100,18 +110,34 @@ public:
         return whitePoint;
     }
 
+    /**
+     * @brief f
+     * @param omega
+     * @return
+     */
     float f(float omega)
     {
         float omega_e = powf(omega, epsilon);
         return (247.0f * omega_e) / (omega_e + two_e) + 0.02f;
     }
 
+    /**
+     * @brief f_inv
+     * @param x
+     * @return
+     */
     float f_inv(float x)
     {
         float omega_e = ( (x - 0.02f) * two_e ) / (247.0f + 0.02f - x);
         return powf(omega_e, 1.0f / epsilon);
     }
 
+    /**
+     * @brief computeEpsilon
+     * @param Ys
+     * @param Yabs
+     * @return
+     */
     static float computeEpsilon(float Ys, float Yabs)
     {
         if(Yabs <= 0.0f) {

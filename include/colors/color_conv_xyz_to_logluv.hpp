@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,6 +22,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The ColorConvXYZtoLogLuv class
+ */
 class ColorConvXYZtoLogLuv: public ColorConv
 {
 protected:
@@ -38,12 +32,19 @@ protected:
 
 public:
 
+    /**
+     * @brief ColorConvXYZtoLogLuv
+     */
     ColorConvXYZtoLogLuv()
     {
         epsilon = 1.0f;
     }
 
-    //from XYZ to CIE LUV
+    /**
+     * @brief direct from XYZ to CIE LUV
+     * @param colIn
+     * @param colOut
+     */
     void direct(float *colIn, float *colOut)
     {
 
@@ -61,7 +62,11 @@ public:
         colOut[2] = v_prime;
     }
 
-    //from CIE LUV to XYZ
+    /**
+     * @brief inverse from CIE LUV to XYZ
+     * @param colIn
+     * @param colOut
+     */
     void inverse(float *colIn, float *colOut)
     {
         float norm = 6.0f * colIn[1] - 16.0f * colIn[2] + 12.0f;
