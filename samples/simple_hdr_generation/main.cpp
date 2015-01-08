@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
     printf("Ok\n");
 
-    printf("Is it valid? ");
+    printf("Are these images valid? ");
     if(img[0].isValid() && img[1].isValid() && img[2].isValid()) {
         printf("Ok\n");
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 
 
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No, the files are not valid!\n");
     }
 
     return 0;

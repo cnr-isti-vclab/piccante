@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         printf("Computing the difference image...");
-        img.Sub(&out);
+        img -= out;
         img.ApplyFunction(fabsf);
         printf("Ok\n");
 
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
 
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No, the file is not valid!\n");
     }
 
     return 0;

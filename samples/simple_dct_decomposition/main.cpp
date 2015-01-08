@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No, the file is not valid!\n");
     }
 
     return 0;

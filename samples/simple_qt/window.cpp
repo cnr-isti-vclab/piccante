@@ -282,11 +282,11 @@ void Window::update_pixmap()
 {
     image_label->clear();
 
-    if(image==NULL){
+    if(image == NULL) {
         return;
     }
 
-    image->Div(image->getMeanVal()[0] * 4.0f);
+    *image /=(image->getMeanVal()[0] * 4.0f);
     QImage *qimage = image->ConvertToQImage();
 
     if(qimage->isNull()) {

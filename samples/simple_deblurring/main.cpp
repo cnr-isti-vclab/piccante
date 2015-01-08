@@ -15,8 +15,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#include <QCoreApplication>
-
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
@@ -24,9 +22,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
-
     printf("Reading an HDR file...");
 
     pic::Image img;
@@ -42,15 +37,14 @@ int main(int argc, char *argv[])
         pic::Image psf("../data/input/kernel_psf.png");
 
         //normalization of the PSF
-        float *norm = psf.getSumVal(NULL, NULL);
-        psf.Div(norm[0]);
+        psf /= psf.getSumVal(NULL, NULL)[0];
 
         pic::Image *conv = pic::FilterConv2D::Execute(&img, &psf, NULL);
         conv->Write("../data/output/bottles_conv_kernel_psf.hdr");
 
         printf("Ok!\n");
 
-        printf("Filtering the image with a PSF read from file...");
+        printf("Deconvolving the image with the PSF read from file...");
         pic::Image *deconv = pic::RichardsonLucyDeconvolution(conv, &psf, 1000, NULL);
 
         printf("Ok!\n");
@@ -64,7 +58,7 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No, the file is not valid!\n");
     }
 
     return 0;

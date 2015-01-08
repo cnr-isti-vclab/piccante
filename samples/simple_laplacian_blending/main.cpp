@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
     printf("Reading images...");
 
-    pic::Image imgA, imgB, maskA;
+    pic::Image img_source, img_target, mask_target;
     img_target.Read("../data/input/laplacian/target.png", pic::LT_NOR);
     img_source.Read("../data/input/laplacian/source.png", pic::LT_NOR);
     mask_target.Read("../data/input/laplacian/mask.png", pic::LT_NOR);
@@ -35,12 +35,12 @@ int main(int argc, char *argv[])
     printf("Ok\n");
 
     printf("Are images valid? ");
-    if( imgA.isValid() && imgB.isValid() && maskA.isValid()) {
+    if( img_source.isValid() && img_target.isValid() && mask_target.isValid()) {
         printf("OK\n");
 
         pic::Image mask_source(mask_target.width, mask_target.height, mask_target.channels);
-        mask_source.Assign(1.0f);
-        mask_source.Sub(&mask_target);
+        mask_source = 1.0f;
+        mask_source -= mask_target;
 
         //Creating Laplacian pyramids
         pic::Pyramid pyr_target(&img_target, true, 4);

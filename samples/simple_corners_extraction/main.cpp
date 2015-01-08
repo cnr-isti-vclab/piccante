@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
         pic::Image *imgCorners = fcd.getCornersImage(&corners);
 
-        bWritten = imgCorners->Write("../data/output/fast_corner_image.png");
+        bWritten = imgCorners->Write("../data/output/corner_fast_output.png");
 
 
         //Harris corners
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
         printf("\n");
 
         pic::Image *imgCorners_harris = fcd.getCornersImage(&corners_harris);
-        bWritten = imgCorners_harris->Write("../data/output/harris_corner_image.png");
+        bWritten = imgCorners_harris->Write("../data/output/corner_harris_output.png");
 
 
         //SUSAN corners
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 
         pic::Image *imgCorners_susan = scd.getCornersImage(&corners_susan);
 
-        bWritten = imgCorners_susan->Write("../data/output/susan_corner_image.png");
+        bWritten = imgCorners_susan->Write("../data/output/corner_susan_output.png");
 
         printf("\n");
 
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No, the file is not valid!\n");
     }
 
     return 0;

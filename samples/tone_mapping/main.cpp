@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
           this is quantized at 8-bit and gamma is applied.
           Note that pic::ReinhardTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bool bWritten = imgToneMapped_reinhard->Write("../data/output/reinhard_tmo.png", pic::LT_NOR_GAMMA);
+        bool bWritten = imgToneMapped_reinhard->Write("../data/output/tone_mapping_reinhard.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
           this is quantized at 8-bit and gamma is applied.
           Note that pic::DragoTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bWritten = imgToneMapped_drago->Write("../data/output/drago_tmo.png", pic::LT_NOR_GAMMA);
+        bWritten = imgToneMapped_drago->Write("../data/output/tone_mapping_drago.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
           this is quantized at 8-bit and gamma is applied.
           Note that pic::WardTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bWritten = imgToneMapped_ward->Write("../data/output/ward_tmo.png", pic::LT_NOR_GAMMA);
+        bWritten = imgToneMapped_ward->Write("../data/output/tone_mapping_ward.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
           this is quantized at 8-bit and gamma is applied.
           Note that pic::WardTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bWritten = imgToneMapped_lischinski->Write("../data/output/lischinski_tmo.png", pic::LT_NOR_GAMMA);
+        bWritten = imgToneMapped_lischinski->Write("../data/output/tone_mapping_lischinski.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
         }
 
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No, the file is not valid!\n");
     }
 
     return 0;

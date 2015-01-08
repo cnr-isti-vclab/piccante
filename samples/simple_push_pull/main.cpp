@@ -15,8 +15,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#include <QCoreApplication>
-
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
@@ -24,9 +22,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
-
     printf("Reading an HDR file...");
 
     pic::Image img;
@@ -44,7 +39,7 @@ int main(int argc, char *argv[])
         //Adding a hole in the image
         img.CopySubImage(&img_black, 292, 130);
 
-        img.Write("../data/output/bottles_black_pixels_pp.hdr");
+        img.Write("../data/output/pull_push_black_pixels.hdr");
 
         //Recovering black pixels with push-pull
         pic::PushPull pp;
@@ -53,7 +48,7 @@ int main(int argc, char *argv[])
 
         printf("Writing recovered result using Push-Pull... ");
 
-        bool bWritten = imgOut->Write("../data/output/bottles_rec_pp.hdr");
+        bool bWritten = imgOut->Write("../data/output/pull_push_reconstruction.hdr");
 
         if(bWritten) {
             printf("Ok\n");
@@ -61,7 +56,7 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No, the file is not valid!\n");
     }
 
     return 0;

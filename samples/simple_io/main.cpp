@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         for(unsigned int i=0; i<outputFormats.size(); i++) {
             std::string text = "Writing the file to disk as " + outputFormats[i] + " file... ";
             printf("%s", text.c_str());
-            bool bWritten = img.Write("../data/output/bottles."+outputFormats[i]);
+            bool bWritten = img.Write("../data/output/bottles." + outputFormats[i]);
 
             if(bWritten) {
                 printf("Ok\n");
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
             }
         }
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No, the file is not valid!\n");
     }
 
     return 0;

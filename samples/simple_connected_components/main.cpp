@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an LDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/connected_test.png", pic::LT_NOR);
 
     printf("Ok\n");
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         printf("Computing connected components...");
 
         std::vector<pic::LabelOutput> ret;
-        pic::ImageRAW *comp = pic::ConnectedComponents(&img, ret, NULL, 0.05f);
+        pic::Image *comp = pic::ConnectedComponents(&img, ret, NULL, 0.05f);
         printf("Ok!\n");
 
         unsigned int areaMin = img.nPixels();
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No, the file is not valid!\n");
     }
 
     return 0;

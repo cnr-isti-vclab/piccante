@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an HDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/bottles.hdr");
     printf("Ok\n");
 
@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("Ok\n");
 
-        pic::ImageRAWVec input = pic::Single(&img);
-        pic::ImageRAW *output = NULL;
+        pic::ImageVec input = pic::Single(&img);
+        pic::Image *output = NULL;
 
         //Filtering with the bilateral filter
         printf("Filtering the image with a Fast Bilateral filter;\n");
@@ -73,6 +73,14 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
+        //Filering with the Guided Filter
+        printf("Filtering the image with the Guided filter...");
+        pic::FilterGuided fltG;
+        output = fltG.ProcessP(input, output);//filtering the image
+
+        printf("Writing the file to disk...");
+        bWritten = output->Write("../data/output/filtered_guided.png");
+
         //Filtering with WLS
         printf("Filtering the image with the WLS filter...");
         pic::FilterWLS fltWLS;//creating the filter
@@ -101,14 +109,6 @@ int main(int argc, char *argv[])
         } else {
             printf("Writing had some issues!\n");
         }
-
-        //Filering with the Guided Filter
-        printf("Filtering the image with the Guided filter...");
-        pic::FilterGuided fltG;
-        output = fltG.ProcessP(input, output);//filtering the image
-
-        printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_guided.png");
 
         if(bWritten) {
             printf("Ok\n");

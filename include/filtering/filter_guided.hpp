@@ -133,8 +133,8 @@ void FilterGuided::Process1Channel(Image *I, Image *p, Image *q,
                 float I_mean_p_mean = I_mean * p_mean[c];
                 float a = 0.0f;
 
-                for(int k = -radius; k <= radius; k++) {
-                    for(int l = -radius; l <= radius; l++) {
+                for(int k = -radius; k < radius; k++) {
+                    for(int l = -radius; l < radius; l++) {
                         float *I_i = (*I)(i + l, j + k);
                         float *p_i = (*p)(i + l, j + k);
                         a += I_i[0] * p_i[c] - I_mean_p_mean;
@@ -177,7 +177,6 @@ PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
 
             //regularization
             cov.Add(e_regularization);
-
             //invert matrix
             cov.Inverse(&inv);
 
@@ -189,8 +188,8 @@ PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
                     tmp_A[n] = 0.0f;
                 }
 
-                for(int k = -radius; k <= radius; k++) {
-                    for(int l = -radius; l <= radius; l++) {
+                for(int k = -radius; k < radius; k++) {
+                    for(int l = -radius; l < radius; l++) {
                         float *I_i = (*I)(i + l, j + k);
                         float *p_i = (*p)(i + l, j + k);
 

@@ -91,7 +91,7 @@ inline float EstimateWhitePoint(float LMax, float LMin)
  * @param phi
  * @return
  */
-Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
+Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = 0.18f,
                       float whitePoint = -1.0f, float phi = 8.0f)
 {
     if(imgIn == NULL) {

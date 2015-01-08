@@ -89,7 +89,6 @@ inline Image *WardHistogramTMO(Image *imgIn, Image *imgOut = NULL,
     h.Ceiling();
 
     unsigned int *Pcum = NULL;
-
     Pcum = Array<unsigned int>::cumsum(h.bin, Pcum, nBin);
     float  maxPcumf = float(Pcum[nBin - 1]);
     float *PcumNorm = new float[nBin];
