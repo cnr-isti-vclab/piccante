@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,7 +22,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-//Border of a region
+/**
+ * @brief SetBorder
+ * @param img
+ * @param coordsBorder
+ * @return
+ */
 std::set<int> *SetBorder(Image *img, std::set<int> *coordsBorder)
 {
     //Second border
@@ -75,7 +71,13 @@ std::set<int> *SetBorder(Image *img, std::set<int> *coordsBorder)
     return ret;
 }
 
-//Large border of a region
+/**
+ * @brief SetBorderNth
+ * @param img
+ * @param coordsBorder
+ * @param widthBorder
+ * @return
+ */
 std::set<int> *SetBorderNth(Image *img, std::set<int> *coordsBorder,
                             int widthBorder)
 {

@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -34,6 +25,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The SuperPixelsOracle class
+ */
 class SuperPixelsOracle
 {
 protected:
@@ -44,6 +38,9 @@ protected:
 
     Quadtree			*root;
 
+    /**
+     * @brief Init
+     */
     void Init()
     {
         int size = width * height;
@@ -83,6 +80,12 @@ protected:
 
 public:
 
+    /**
+     * @brief SuperPixelsOracle
+     * @param buffer
+     * @param width
+     * @param height
+     */
     SuperPixelsOracle(int *buffer, int width, int height)
     {
         if((buffer == NULL) || (width < 1) || (height < 1)) {
@@ -100,6 +103,13 @@ public:
         delete root;
     }
 
+    /**
+     * @brief Query
+     * @param x
+     * @param y
+     * @param r
+     * @param out
+     */
     void Query(float x, float y, float r, std::set<int> &out)
     {
         root->Find(x, y, r, out);

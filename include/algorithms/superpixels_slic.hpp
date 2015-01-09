@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -32,11 +23,17 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The SlicoCenter struct
+ */
 struct SlicoCenter {
     float			*value;
     unsigned int	x, y;
 };
 
+/**
+ * @brief The Slic class
+ */
 class Slic
 {
 protected:
@@ -48,6 +45,13 @@ protected:
     float			*col_values, *mPixel;
     int				width, height, channels;
 
+    /**
+     * @brief distanceC
+     * @param a1
+     * @param a2
+     * @param channels
+     * @return
+     */
     inline float distanceC(float *a1, float *a2, int channels)
     {
         float acc = 0.0f;
@@ -60,6 +64,14 @@ protected:
         return acc;
     }
 
+    /**
+     * @brief distanceS
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @return
+     */
     inline int distanceS(int x1, int y1, int x2, int y2)
     {
         int tx = x1 - x2;
@@ -67,6 +79,12 @@ protected:
         return tx * tx + ty * ty;
     }
 
+    /**
+     * @brief Pass
+     * @param img
+     * @param S
+     * @return
+     */
     bool Pass(Image *img, int S)
     {
         float Sf = float(S);
@@ -175,6 +193,9 @@ protected:
         return (E > (0.0001f * float(nSuperPixels)));
     }
 
+    /**
+     * @brief Destroy
+     */
     void Destroy()
     {
         if(labels_distance != NULL) {
@@ -206,6 +227,11 @@ protected:
         }
     }
 
+    /**
+     * @brief Allocate
+     * @param nSuperPixels
+     * @param channels
+     */
     void Allocate(int nSuperPixels, int channels) 
     {
         if(this->nSuperPixels == nSuperPixels){
@@ -226,6 +252,9 @@ protected:
 
 public:
 
+    /**
+     * @brief Slic
+     */
     Slic()
     {
         labels_distance = NULL;
@@ -237,6 +266,11 @@ public:
         mPixel = NULL;
     }
 
+    /**
+     * @brief Slic
+     * @param img
+     * @param nSuperPixels
+     */
     Slic(Image *img, int nSuperPixels = 64)
     {
         labels_distance = NULL;
@@ -255,6 +289,11 @@ public:
         Destroy();
     }
     
+    /**
+     * @brief Process
+     * @param img
+     * @param nSuperPixels
+     */
     void Process(Image *img, int nSuperPixels = 64)
     {
         if(img == NULL) {
@@ -356,6 +395,11 @@ public:
         #endif
     }
 
+    /**
+     * @brief getLabelsBuffer
+     * @param out
+     * @return
+     */
     int *getLabelsBuffer(int *out = NULL)
     {
         if(labels_distance == NULL) {
@@ -379,6 +423,11 @@ public:
         return out;
     }
 
+    /**
+     * @brief getMeanImage
+     * @param imgOut
+     * @return
+     */
     Image *getMeanImage(Image *imgOut)
     {
         if(imgOut == NULL) {

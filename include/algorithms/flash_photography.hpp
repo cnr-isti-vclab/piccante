@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -33,7 +24,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**FlashPhotography: implements flash photography*/
+/**
+ * @brief FlashPhotography implements basic flash photography.
+ * @param nameFlash
+ * @param nameNoFlash
+ * @param nameOut
+ * @param filter
+ * @return
+ */
 Image *FlashPhotography(std::string nameFlash, std::string nameNoFlash,
                            std::string nameOut,
                            Filter *filter)
@@ -56,6 +54,15 @@ Image *FlashPhotography(std::string nameFlash, std::string nameNoFlash,
     return imgOut;
 }
 
+/**
+ * @brief FlashPhotography2DF
+ * @param nameFlash
+ * @param nameNoFlash
+ * @param nameOut
+ * @param sigma_s
+ * @param sigma_r
+ * @return
+ */
 Image *FlashPhotography2DF(std::string nameFlash, std::string nameNoFlash,
                               std::string nameOut,
                               float sigma_s, float sigma_r)
@@ -64,6 +71,15 @@ Image *FlashPhotography2DF(std::string nameFlash, std::string nameNoFlash,
     return FlashPhotography(nameFlash, nameNoFlash, nameOut, (Filter *)&filter);
 }
 
+/**
+ * @brief FlashPhotography2DS
+ * @param nameFlash
+ * @param nameNoFlash
+ * @param nameOut
+ * @param sigma_s
+ * @param sigma_r
+ * @return
+ */
 Image *FlashPhotography2DS(std::string nameFlash, std::string nameNoFlash,
                               std::string nameOut,
                               float sigma_s, float sigma_r)
