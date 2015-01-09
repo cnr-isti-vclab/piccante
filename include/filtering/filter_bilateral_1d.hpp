@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,40 +22,63 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterBilateral1D class
+ */
 class FilterBilateral1D: public Filter
 {
 protected:
     PrecomputedGaussian *pg;
     int					dirs[3];
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     float sigma_s, sigma_r;
 
-    //Standard constructor
+    /**
+     * @brief FilterBilateral1D
+     * @param sigma_s
+     * @param sigma_r
+     */
     FilterBilateral1D(float sigma_s, float sigma_r);
 
+    /**
+     * @brief Update
+     * @param sigma_s
+     * @param sigma_r
+     */
     void Update(float sigma_s, float sigma_r);
 
+    /**
+     * @brief Signature
+     * @return
+     */
     std::string Signature()
     {
         return GenBilString("1D", sigma_s, sigma_r);
     }
 
-    //Change data for this pass
+    /**
+     * @brief ChangePass
+     * @param pass
+     * @param tPass
+     */
     void ChangePass(int pass, int tPass);
 };
 
-//Basic constructor
 FilterBilateral1D::FilterBilateral1D(float sigma_s, float sigma_r)
 {
     pg = NULL;
     Update(sigma_s, sigma_r);
 }
 
-///Update:
 void FilterBilateral1D::Update(float sigma_s, float sigma_r)
 {
     //protected values are assigned/computed
@@ -80,7 +94,6 @@ void FilterBilateral1D::Update(float sigma_s, float sigma_r)
     pg = new PrecomputedGaussian(sigma_s);
 }
 
-//Change data for this pass
 void FilterBilateral1D::ChangePass(int pass, int tPass)
 {
     /*	tPass++;
@@ -112,7 +125,6 @@ void FilterBilateral1D::ChangePass(int pass, int tPass)
 #endif
 }
 
-//Process in a box
 void FilterBilateral1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;

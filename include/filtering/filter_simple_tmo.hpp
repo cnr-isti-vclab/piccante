@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,21 +22,45 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterSimpleTMO class
+ */
 class FilterSimpleTMO: public Filter
 {
 protected:
     float gamma, fstop, exposure;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterSimpleTMO
+     * @param gamma
+     * @param fstop
+     */
     FilterSimpleTMO(float gamma, float fstop);
 
-    //Update the filter
+    /**
+     * @brief Update
+     * @param gamma
+     * @param fstop
+     */
     void Update(float gamma, float fstop);
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param gamma
+     * @param fstop
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgOut, float gamma,
                              float fstop)
     {
@@ -53,6 +68,14 @@ public:
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param gamma
+     * @param fstop
+     * @return
+     */
     static Image *Execute(std::string nameIn, std::string nameOut, float gamma,
                              float fstop)
     {

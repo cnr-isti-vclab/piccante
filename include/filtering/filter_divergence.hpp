@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,24 +22,45 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterDivergence class
+ */
 class FilterDivergence: public Filter
 {
 protected:
-    int colorChannel;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterDivergence
+     */
     FilterDivergence() {}
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgOut)
     {
         FilterDivergence filter;
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @return
+     */
     static Image *Execute(std::string nameIn, std::string nameOut)
     {
         Image imgIn(nameIn);
@@ -58,7 +70,6 @@ public:
     }
 };
 
-//Process in a box
 void FilterDivergence::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
 

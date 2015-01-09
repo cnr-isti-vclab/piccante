@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,6 +22,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterIterative class
+ */
 class FilterIterative: public Filter
 {
 protected:
@@ -39,28 +33,59 @@ protected:
     bool		parallel;
     int			iterations;
 
-public:
-
-    //Basic constructor
-    FilterIterative();
-    FilterIterative(Filter *flt, int iterations);
-
-    //Basic
-    ~FilterIterative();
+    /**
+     * @brief Destroy
+     */
     void Destroy();
 
-    //Setup NPasses
+public:
+
+    /**
+     * @brief FilterIterative
+     */
+    FilterIterative();
+
+    /**
+     * @brief FilterIterative
+     * @param flt
+     * @param iterations
+     */
+    FilterIterative(Filter *flt, int iterations);
+
+    ~FilterIterative();
+
+    /**
+     * @brief SetupAuxN
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     virtual Image *SetupAuxN(ImageVec imgIn, Image *imgOut);
 
+    /**
+     * @brief Update
+     * @param flt
+     * @param iterations
+     */
     void Update(Filter *flt, int iterations);
 
-    //Process
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *Process(ImageVec imgIn, Image *imgOut);
-    //Process in parallel
+
+    /**
+     * @brief ProcessP
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *ProcessP(ImageVec imgIn, Image *imgOut);
 };
 
-//Basic constructor
 FilterIterative::FilterIterative()
 {
     parallel = false;
@@ -80,7 +105,6 @@ FilterIterative::FilterIterative(Filter *flt, int iterations)
     Update(flt, iterations);
 }
 
-//Basic
 FilterIterative::~FilterIterative()
 {
     Destroy();
@@ -120,7 +144,6 @@ void FilterIterative::Update(Filter *flt, int iterations)
     filters.push_back(flt);
 }
 
-//Setup NPasses
 Image *FilterIterative::SetupAuxN(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
@@ -142,9 +165,8 @@ Image *FilterIterative::SetupAuxN(ImageVec imgIn, Image *imgOut)
     }
 
     return imgOut;
-};
+}
 
-//Processing
 Image *FilterIterative::Process(ImageVec imgIn, Image *imgOut)
 {
     if(imgIn.size() < 1 || imgIn[0] == NULL) {
@@ -174,7 +196,6 @@ Image *FilterIterative::Process(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-//Processing in parallel
 Image *FilterIterative::ProcessP(ImageVec imgIn, Image *imgOut)
 {
     parallel = true;

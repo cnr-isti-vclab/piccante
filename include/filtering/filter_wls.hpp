@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -39,7 +30,12 @@ namespace pic {
 class FilterWLS: public Filter
 {
 protected:
-    /**WLSFilter: smoothing WLS filter for gray-scale images*/
+    /**
+     * @brief SingleChannel applies WLS smoothing filter for gray-scale images.
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *SingleChannel(ImageVec imgIn, Image *imgOut)
     {
         Image *L = imgIn[0];
@@ -137,7 +133,12 @@ protected:
         return imgOut;
     }
 
-    /**MultiChannel: smoothing WLS filter for color images*/
+    /**
+     * @brief MultiChannel applies WLS filter for color images.
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *MultiChannel(ImageVec imgIn, Image *imgOut)
     {
         Image *img = imgIn[0];
@@ -278,16 +279,29 @@ protected:
 
 public:
 
+    /**
+     * @brief FilterWLS
+     */
     FilterWLS()
     {
         Update(1.2f, 1.0f);
     }
 
+    /**
+     * @brief FilterWLS
+     * @param alpha
+     * @param lambda
+     */
     FilterWLS(float alpha, float lambda)
     {
         Update(alpha, lambda);
     }
 
+    /**
+     * @brief Update
+     * @param alpha
+     * @param lambda
+     */
     void Update(float alpha, float lambda)
     {
         epsilon = 0.0001f;
@@ -304,6 +318,12 @@ public:
         this->lambda = lambda;
     }
 
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *Process(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() < 1){
@@ -324,11 +344,23 @@ public:
         }
     }
 
+    /**
+     * @brief ProcessP
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *ProcessP(ImageVec imgIn, Image *imgOut)
     {
         return Process(imgIn, imgOut);
     }
 
+    /**
+     * @brief main
+     * @param argc
+     * @param argv
+     * @return
+     */
     static int main(int argc, char* argv[])
     {
         if(argc < 4) {

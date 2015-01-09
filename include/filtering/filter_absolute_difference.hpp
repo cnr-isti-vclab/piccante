@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,26 +22,67 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterAbsoluteDifference class
+ */
 class FilterAbsoluteDifference: public Filter
 {
 protected:
 
-    // Process in a box
-    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
+    {
+        if(src.size()!=2) {
+            return;
+        }
+
+        int channels = dst->channels;
+
+        for(int i = box->y0; i < box->y1; i++) {
+           for(int j = box->x0; j < box->x1; j++) {
+
+                float *tmp_src0 = (*src[0])(j, i);
+                float *tmp_src1 = (*src[1])(j, i);
+                float *tmp_dst  = (*dst   )(j, i);
+
+                for(int k = 0; k < channels; k++) {
+                    tmp_dst[k] = fabsf(tmp_src0[k] - tmp_src1[k]);
+                }
+            }
+        }
+    }
 
 public:
 
-    // Basic constructors
+    /**
+     * @brief FilterAbsoluteDifference
+     */
     FilterAbsoluteDifference() {}
 
-    //Execute
+    /**
+     * @brief Execute
+     * @param imgIn1
+     * @param imgIn2
+     * @return
+     */
     static Image *Execute(Image *imgIn1, Image *imgIn2)
     {
         FilterAbsoluteDifference filter;
         return filter.Process(Double(imgIn1, imgIn2), NULL);
     }
 
-    //Execute
+    /**
+     * @brief Execute
+     * @param name1
+     * @param name2
+     * @param nameOut
+     * @return
+     */
     static Image *Execute(std::string name1, std::string name2,
                              std::string nameOut)
     {
@@ -62,30 +94,6 @@ public:
         return out;
     }
 };
-
-// Process in a box
-void FilterAbsoluteDifference::ProcessBBox(Image *dst, ImageVec src,
-        BBox *box)
-{
-    if(src.size()!=2) {
-        return;
-    }
-
-    int channels = dst->channels;
-
-    for(int i = box->y0; i < box->y1; i++) {
-       for(int j = box->x0; j < box->x1; j++) {
-
-            float *tmp_src0 = (*src[0])(j, i);
-            float *tmp_src1 = (*src[1])(j, i);
-            float *tmp_dst  = (*dst   )(j, i);
-
-            for(int k = 0; k < channels; k++) {
-                tmp_dst[k] = fabsf(tmp_src0[k] - tmp_src1[k]);
-            }
-        }
-    }
-}
 
 } // end namespace pic
 

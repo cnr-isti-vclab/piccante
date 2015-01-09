@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -32,19 +23,41 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterAnsiotropicDiffusion class
+ */
 class FilterAnsiotropicDiffusion: public Filter
 {
 protected:
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     float			k, delta_t;
     unsigned int	mode;
 
 public:
-    //Basic constructor
+
+    /**
+     * @brief FilterAnsiotropicDiffusion
+     * @param k
+     * @param mode
+     */
     FilterAnsiotropicDiffusion(float k, unsigned int mode);
 
+    /**
+     * @brief AnisotropicDiffusion
+     * @param imgIn
+     * @param imgOut
+     * @param k
+     * @param mode
+     * @param iterations
+     * @return
+     */
     static Image *AnisotropicDiffusion(ImageVec imgIn, Image *imgOut,
                                           float k, unsigned int mode, unsigned int iterations)
     {
@@ -54,6 +67,14 @@ public:
         return imgOut;
     }
 
+    /**
+     * @brief AnisotropicDiffusion
+     * @param imgIn
+     * @param imgOut
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
     static Image *AnisotropicDiffusion(ImageVec imgIn, Image *imgOut,
                                           float sigma_s, float sigma_r)
     {
@@ -76,7 +97,6 @@ public:
 
 };
 
-//Basic constructor
 FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
         unsigned int mode)
 {
@@ -94,7 +114,6 @@ FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
     this->mode = mode;
 }
 
-//Process in a box
 void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {

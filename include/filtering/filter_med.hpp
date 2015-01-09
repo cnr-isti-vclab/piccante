@@ -30,7 +30,12 @@ class FilterMed: public Filter
 protected:
     int halfSize;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;

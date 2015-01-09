@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -33,6 +24,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterAssembleHDR class
+ */
 class FilterAssembleHDR: public Filter
 {
 protected:
@@ -40,7 +34,12 @@ protected:
     IMG_LIN                 linearization_type;
     std::vector<float *>    *icrf;
 
-    /**ProcessBBox: assembling an HDR image*/
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;

@@ -31,13 +31,21 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterColorDistance class
+ */
 class FilterColorDistance: public Filter
 {
 protected:
     float	*refColor;
     float	sigma;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;
@@ -76,13 +84,25 @@ protected:
 
 public:
 
-    //Basic constructors
+    /**
+     * @brief FilterColorDistance
+     * @param color
+     * @param sigma
+     */
     FilterColorDistance(float *color, float sigma)
     {
         refColor    = color;
         this->sigma = sigma;
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param color
+     * @param sigma
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgOut, float *color,
                              float sigma)
     {
@@ -90,7 +110,14 @@ public:
         return fltColDst.ProcessP(Single(imgIn), imgOut);
     }
 
-    //Filtering
+    /**
+     * @brief Execute
+     * @param fileInput
+     * @param fileOutput
+     * @param color
+     * @param sigma
+     * @return
+     */
     static Image *Execute(std::string fileInput, std::string fileOutput,
                              float *color, float sigma)
     {

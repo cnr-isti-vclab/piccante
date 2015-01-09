@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -32,13 +23,20 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterBilateral2DSP class
+ */
 class FilterBilateral2DSP: public FilterNPasses
 {
 protected:
     FilterBilateral1D *bilateralFilter;
 
 public:
-    //Standard constructor
+    /**
+     * @brief FilterBilateral2DSP
+     * @param sigma_s
+     * @param sigma_r
+     */
     FilterBilateral2DSP(float sigma_s, float sigma_r)
     {
         //Bilatearl 1D Filter
@@ -53,16 +51,33 @@ public:
         delete bilateralFilter;
     }
 
+    /**
+     * @brief Update
+     * @param sigma_s
+     * @param sigma_r
+     */
     void Update(float sigma_s, float sigma_r)
     {
         bilateralFilter->Update(sigma_s, sigma_r);
     }
     
+    /**
+     * @brief Signature
+     * @return
+     */
     std::string Signature()
     {
         return GenBilString("SP", bilateralFilter->sigma_s, bilateralFilter->sigma_r);
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgOut, float sigma_s,
                              float sigma_r)
     {
@@ -70,6 +85,14 @@ public:
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
     static Image *Execute(std::string nameIn, std::string nameOut, float sigma_s,
                              float sigma_r)
     {

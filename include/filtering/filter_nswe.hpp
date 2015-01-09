@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,10 +22,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterNSWE class
+ */
 class FilterNSWE: public Filter
 {
 protected:
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         //Filtering
@@ -75,10 +74,19 @@ protected:
     }
 
 public:
-    //Basic constructor
-    FilterNSWE() {};
+    /**
+     * @brief FilterNSWE
+     */
+    FilterNSWE() {}
 
-    /**Output size*/
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
     void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         width       = imgIn->width;
@@ -87,14 +95,24 @@ public:
         frames      = imgIn->frames;
     }
 
-    //Filtering
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgOut)
     {
         FilterNSWE filter;
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    //Filtering
+    /**
+     * @brief Execute
+     * @param fileInput
+     * @param fileOutput
+     * @return
+     */
     static Image *Execute(std::string fileInput, std::string fileOutput)
     {
         Image imgIn(fileInput);

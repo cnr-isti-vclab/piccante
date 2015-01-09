@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -34,16 +25,26 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The Vec class
+ */
 template<unsigned int N, class T>
 class Vec
 {
 public:
     T data[N];
 
+    /**
+     * @brief Vec<N, T>
+     */
     Vec<N, T>()
     {
     }
 
+    /**
+     * @brief Vec<N, T>
+     * @param data0
+     */
     Vec<N, T>(T data0)
     {
         assert(N >= 1);
@@ -53,6 +54,11 @@ public:
         }
     }
 
+    /**
+     * @brief Vec<N, T>
+     * @param data0
+     * @param data1
+     */
     Vec<N, T>(T data0, T data1)
     {
         assert(N >= 2);
@@ -60,6 +66,12 @@ public:
         data[1] = data1;
     }
 
+    /**
+     * @brief Vec<N, T>
+     * @param data0
+     * @param data1
+     * @param data2
+     */
     Vec<N, T>(T data0, T data1, T data2)
     {
         assert(N >= 3);
@@ -68,11 +80,19 @@ public:
         data[2] = data2;
     }
 
+    /**
+     * @brief operator []
+     * @param index
+     * @return
+     */
     T &operator[](int index)
     {
         return data[index];
     }
 
+    /**
+     * @brief setZero
+     */
     void setZero()
     {
         for(unsigned int i=0; i<N; i++) {
@@ -80,11 +100,21 @@ public:
         }
     }
 
+    /**
+     * @brief operator []
+     * @param index
+     * @return
+     */
     const T &operator[](int index) const
     {
         return data[index];
     }
 
+    /**
+     * @brief equal
+     * @param a
+     * @return
+     */
     bool equal(Vec<N, T> a)
     {
         for(unsigned int i = 0; i < N; i++) {
@@ -96,6 +126,11 @@ public:
         return true;
     }
 
+    /**
+     * @brief distanceSq
+     * @param x
+     * @return
+     */
     T distanceSq(Vec<N, T> &x)
     {
         T tmp = data[0] - x[0];
@@ -109,6 +144,10 @@ public:
         return d2;
     }
 
+    /**
+     * @brief lengthSq
+     * @return
+     */
     T lengthSq()
     {
         T l2 = data[0] * data[0];
@@ -121,6 +160,11 @@ public:
     }
 };
 
+/**
+ * @brief insideVecBBox
+ * @param sample
+ * @return
+ */
 template<unsigned int N>
 bool insideVecBBox(const Vec<N, float> &sample)
 {
@@ -148,6 +192,11 @@ Vec<N, float> normalize(Vec<N, float> x)
     return x;
 }
 
+/**
+ * @brief randomPoint
+ * @param m
+ * @return
+ */
 template<unsigned int N>
 Vec<N, float> randomPoint(std::mt19937 *m)
 {
@@ -160,6 +209,13 @@ Vec<N, float> randomPoint(std::mt19937 *m)
     return x;
 }
 
+/**
+ * @brief annulusSampling
+ * @param m
+ * @param center
+ * @param radius
+ * @return
+ */
 template<unsigned int N>
 Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, float radius)
 {
@@ -183,6 +239,26 @@ Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, float radiu
 
     return x;
 }
+
+/**
+ * @brief Vec2i
+ */
+typedef Vec<2, int> Vec2i;
+
+/**
+ * @brief Vec3i
+ */
+typedef Vec<3, int> Vec3i;
+
+/**
+ * @brief Vec4i
+ */
+typedef Vec<4, int> Vec4i;
+
+/**
+ * @brief Vec3f
+ */
+typedef Vec<3, float> Vec3f;
 
 } // end namespace pic
 

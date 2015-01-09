@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,12 +22,20 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterMax class
+ */
 class FilterMax: public Filter
 {
 protected:
     int halfSize;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;
@@ -71,18 +70,35 @@ protected:
     }
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterMax
+     * @param size
+     */
     FilterMax(int size)
     {
         this->halfSize = checkHalfSize(size);
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param size
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgOut, int size)
     {
         FilterMax filter(size);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param size
+     * @return
+     */
     static Image *Execute(std::string nameIn, std::string nameOut, int size)
     {
         Image imgIn(nameIn);

@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -33,6 +24,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterDiffGauss class
+ */
 class FilterDiffGauss: public FilterNPasses
 {
 protected:
@@ -40,7 +34,11 @@ protected:
     PrecomputedDifferenceOfGaussians    *pdg;
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterDiffGauss
+     * @param sigma_1
+     * @param sigma_2
+     */
     FilterDiffGauss(float sigma_1, float sigma_2)
     {
         //Difference of Gaussian filter
@@ -65,6 +63,14 @@ public:
         }
     }
 
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param sigma_1
+     * @param sigma_2
+     * @return
+     */
     static Image *Execute(Image *imgIn, Image *imgOut, float sigma_1,
                              float sigma_2)
     {
@@ -72,6 +78,14 @@ public:
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma_1
+     * @param sigma_2
+     * @return
+     */
     static Image *Execute(std::string nameIn, std::string nameOut, float sigma_1,
                              float sigma_2)
     {

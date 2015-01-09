@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -38,9 +29,9 @@ namespace pic {
 class FilterCrop: public Filter
 {
 protected:
-    bool			flag;
-    Vec<4, int>		maxi, mini;
-    Vec<3, float>	maxf, minf;
+    bool	flag;
+    Vec4i	maxi, mini;
+    Vec3f	maxf, minf;
 
     /**
      * @brief ProcessBBox
@@ -57,28 +48,28 @@ public:
      * @param min
      * @param max
      */
-    FilterCrop(Vec<2, int>   min, Vec<2, int>   max);
+    FilterCrop(Vec2i min, Vec2i max);
 
     /**
      * @brief FilterCrop
      * @param min
      * @param max
      */
-    FilterCrop(Vec<3, int>   min, Vec<3, int>   max);
+    FilterCrop(Vec3i min, Vec3i max);
 
     /**
      * @brief FilterCrop
      * @param min
      * @param max
      */
-    FilterCrop(Vec<4, int>   min, Vec<4, int>   max);
+    FilterCrop(Vec4i min, Vec4i max);
 
     /**
      * @brief FilterCrop
      * @param min
      * @param max
      */
-    FilterCrop(Vec<3, float> min, Vec<3, float> max);
+    FilterCrop(Vec3f min, Vec3f max);
 
     /**
      * @brief SetupAux
@@ -96,8 +87,8 @@ public:
      * @param max
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, Vec<4, int> min,
-                             Vec<4, int> max)
+    static Image *Execute(Image *imgIn, Image *imgOut, Vec4i min,
+                             Vec4i max)
     {
         FilterCrop fltCrop(min, max);
         return fltCrop.Process(Single(imgIn), imgOut);
@@ -111,8 +102,8 @@ public:
      * @param max
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, Vec<2, int> min,
-                             Vec<2, int> max)
+    static Image *Execute(Image *imgIn, Image *imgOut, Vec2i min,
+                             Vec2i max)
     {
         FilterCrop fltCrop(min, max);
         return fltCrop.Process(Single(imgIn), imgOut);
@@ -127,7 +118,7 @@ public:
      * @return
      */
     static Image *Execute(std::string fileInput, std::string fileOutput,
-                             Vec<2, int> min, Vec<2, int> max)
+                             Vec2i min, Vec2i max)
     {
         Image imgIn(fileInput);
         Image *out = FilterCrop::Execute(&imgIn, NULL, min, max);
@@ -143,7 +134,7 @@ public:
         Image img(1, 512, 512, 3);
         img = 1.0f;
 
-        FilterCrop flt(Vec<2, int>(100, 100), Vec<2, int>(200, 200));
+        FilterCrop flt(Vec2i(100, 100), Vec2i(200, 200));
 
         Image *out = flt.Process(Single(&img), NULL);
 
@@ -151,7 +142,7 @@ public:
     }
 };
 
-FilterCrop::FilterCrop(Vec<2, int> min, Vec<2, int> max)
+FilterCrop::FilterCrop(Vec2i min, Vec2i max)
 {
     maxi[0] = max[0];
     maxi[1] = max[1];
@@ -166,7 +157,7 @@ FilterCrop::FilterCrop(Vec<2, int> min, Vec<2, int> max)
     flag = false;
 }
 
-FilterCrop::FilterCrop(Vec<3, int> min, Vec<3, int> max)
+FilterCrop::FilterCrop(Vec3i min, Vec3i max)
 {
     for(int i = 0; i < 3; i++) {
         this->maxi[i] = max[i];
@@ -179,7 +170,7 @@ FilterCrop::FilterCrop(Vec<3, int> min, Vec<3, int> max)
     flag = false;
 }
 
-FilterCrop::FilterCrop(Vec<4, int> min, Vec<4, int> max)
+FilterCrop::FilterCrop(Vec4i min, Vec4i max)
 {
     this->maxi = max;
     this->mini = min;
@@ -187,7 +178,7 @@ FilterCrop::FilterCrop(Vec<4, int> min, Vec<4, int> max)
     flag = false;
 }
 
-FilterCrop::FilterCrop(Vec<3, float> min, Vec<3, float> max)
+FilterCrop::FilterCrop(Vec3f min, Vec3f max)
 {
     this->maxf = max;
     this->minf = min;
