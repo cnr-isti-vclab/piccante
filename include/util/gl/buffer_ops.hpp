@@ -28,7 +28,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 enum BOGL{BOGL_ADD, BOGL_SUB, BOGL_MUL, BOGL_DIV,
-          BOGL_ADD_CONST, BOGL_SUB_CONST, BOGL_MUL_CONST, BOGL_DIV_CONST};
+          BOGL_ADD_CONST, BOGL_SUB_CONST, BOGL_MUL_CONST, BOGL_DIV_CONST,
+          BOGL_ADD_S, BOGL_SUB_S, BOGL_MUL_S, BOGL_DIV_S};
 
 typedef std::vector<BufferOpGL*> BufferOperatorsGL;
 
@@ -74,15 +75,20 @@ private:
      */
     BufferOpsGL()
     {
-        list.push_back(new BufferOpGL("I0 +  I1", true));
-        list.push_back(new BufferOpGL("I0 -  I1", true));
-        list.push_back(new BufferOpGL("I0 *  I1", true));
-        list.push_back(new BufferOpGL("I0 /  I1", true));
+        list.push_back(new BufferOpGL("I0 + I1", true));
+        list.push_back(new BufferOpGL("I0 - I1", true));
+        list.push_back(new BufferOpGL("I0 * I1", true));
+        list.push_back(new BufferOpGL("I0 / I1", true));
 
-        list.push_back(new BufferOpGL("I0 +  C0", true));
-        list.push_back(new BufferOpGL("I0 -  C0", true));
-        list.push_back(new BufferOpGL("I0 *  C0", true));
-        list.push_back(new BufferOpGL("I0 /  C0", true));
+        list.push_back(new BufferOpGL("I0 + C0", true));
+        list.push_back(new BufferOpGL("I0 - C0", true));
+        list.push_back(new BufferOpGL("I0 * C0", true));
+        list.push_back(new BufferOpGL("I0 / C0", true));
+
+        list.push_back(new BufferOpGL("I0 + I1x", true));
+        list.push_back(new BufferOpGL("I0 - I1x", true));
+        list.push_back(new BufferOpGL("I0 * I1x", true));
+        list.push_back(new BufferOpGL("I0 / I1x", true));
     }
 
 };

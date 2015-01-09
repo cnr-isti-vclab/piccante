@@ -44,12 +44,16 @@ int main(int argc, char *argv[])
         printf("Filtering the image with a Fast Bilateral filter;\n");
         printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
 
-        pic::FilterBilateral2DS flt(4.0f, 0.05f);//creating the filter
-        output = flt.ProcessP(input, output);//filtering the image
+        //Creating the filter
+        pic::FilterBilateral2DS flt(4.0f, 0.05f);
+
+        //Filtering the image
+        output = flt.ProcessP(input, output);
 
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
+
         bool bWritten = output->Write("../data/output/filtered_bilateral.png");
 
         if(bWritten) {

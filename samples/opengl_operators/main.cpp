@@ -25,6 +25,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
+#define PIC_DEBUG
+
 #include "piccante.hpp"
 
 #include "../opengl_common_code/opengl_window.hpp"
@@ -53,7 +55,7 @@ public:
         img.generateTextureGL();
 
         //creating a random image
-        imgRand = new pic::ImageGL(img.frames, img.width, img.height, img.channels, pic::IMG_CPU_GPU, GL_TEXTURE_2D);
+        imgRand = new pic::ImageGL(img.frames, img.width, img.height, 1, pic::IMG_CPU_GPU, GL_TEXTURE_2D);
         imgRand->SetRand();
         imgRand->loadFromMemory();
 
@@ -66,7 +68,7 @@ public:
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        img *= *imgRand;
+        img += (*imgRand * 0.25f);
     }
 
     void render()
