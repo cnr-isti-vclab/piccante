@@ -134,9 +134,8 @@ public:
         tot_ms += ms;
 
         printf("GPU time Checking Different Zones: %f ms\n", ms);
-#endif
-
         testTQ1 = glBeginTimeQuery();
+#endif
 
         switch(value) {
         case 0: {
@@ -164,27 +163,22 @@ public:
             } else {
                 pyrA->Update(imgDrago);
             }
-            pyrA->Reconstruct(imgOut);
 
-
-            imgOut->loadToMemory();
-            imgOut->Write("tmp2.pfm");
-/*
             if(pyrB == NULL) {
                 pyrB = new PyramidGL(imgReinhard, true);
             } else {
                 pyrB->Update(imgReinhard);
             }
 
-            //Weights pyramid
             if(pyrWeight == NULL) {
                 pyrWeight = new PyramidGL(remapped, false);
             } else {
                 pyrWeight->Update(remapped);
-            }*/
+            }
 
             //Blending
-//            pyrA->Blend(pyrB, pyrWeight);
+            pyrA->Blend(pyrB, pyrWeight);
+            imgOut = pyrA->Reconstruct(imgOut);
         }
         break;
         }

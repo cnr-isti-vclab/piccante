@@ -260,18 +260,20 @@ void PyramidGL::Update(ImageGL *img)
         return;
     }
 
-    if(stack.size() < 1) {
+    if(stack.empty()) {
+        return;
+    }
+
+    if(!stack[0]->SimilarType(img)) {
         return;
     }
 
     ImageGL *tmpImg = img;
 
-    int levels = MAX(log2(MIN(tmpImg->width, tmpImg->height)) - limitLevel, 1);
+    for(int i = 0; i < (stack.size() - 2); i++) {
+        fltG->Process(SingleGL(tmpImg), stack[i]);
 
-    for(int i = 0; i < (levels - 1); i++) {
-        fltG->Process(SingleGL(tmpImg),		stack[i]);
-
-        fltS->Process(SingleGL(stack[i]),	trackerUp[i]);
+        fltS->Process(SingleGL(stack[i]), trackerUp[i]);
 
         if(lapGauss) {	//Laplacian Pyramid
             fltSub->Process(DoubleGL(tmpImg, trackerUp[i]), stack[i]);
@@ -282,9 +284,7 @@ void PyramidGL::Update(ImageGL *img)
         tmpImg = trackerUp[i];
     }
 
-    if(tmpImg != NULL) {
-        fltId->Process(SingleGL(tmpImg), stack[levels - 1]);
-    }
+    fltId->Process(SingleGL(tmpImg), stack[stack.size() - 1]);
 }
 
 } // end namespace pic

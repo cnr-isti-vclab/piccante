@@ -236,6 +236,10 @@ void Pyramid::Update(Image *img)
         return;
     }
 
+    if(stack.empty()) {
+        return;
+    }
+
     if(!stack[0]->SimilarType(img)) {
         return;
     }
