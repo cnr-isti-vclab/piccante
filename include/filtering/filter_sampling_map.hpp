@@ -36,6 +36,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterSamplingMap class
+ */
 class FilterSamplingMap: public FilterNPasses
 {
 protected:
@@ -48,22 +51,46 @@ protected:
     FilterSampler2D			*fltD;
     FilterGaussian2D		*fltG2D;
 
+    /**
+     * @brief Setup
+     * @param sigma
+     * @param scale
+     */
     void Setup(float sigma, float scale);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterSamplingMap
+     * @param sigma
+     */
     FilterSamplingMap(float sigma);
+
+    /**
+     * @brief FilterSamplingMap
+     * @param sigma
+     * @param scale
+     */
     FilterSamplingMap(float sigma, float scale);
 
     ~FilterSamplingMap();
 
-    //getScale
+    /**
+     * @brief getScale
+     * @return
+     */
     float getScale()
     {
         return scale;
     }
 
-    //Filtering
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma
+     * @param scale
+     * @return
+     */
     static Image *Execute(std::string nameIn, std::string nameOut, float sigma,
                              float scale)
     {
@@ -77,7 +104,6 @@ public:
     }
 };
 
-//Basic constructors
 FilterSamplingMap::FilterSamplingMap(float sigma) : FilterNPasses()
 {
     float rateScale = 2.0f;
@@ -121,7 +147,7 @@ void FilterSamplingMap::Setup(float sigma, float scale)
     fltL = new FilterLuminance(LT_CIE_LUMINANCE);
     fltD = new FilterSampler2D(scale, &isb);
     fltS = new FilterSigmoidTMO();
-    fltG = new FilterGradient(0);
+    fltG = new FilterGradient();
     fltG2D = new FilterGaussian2D(sigma);
 
     InsertFilter(fltL);     //Luminance

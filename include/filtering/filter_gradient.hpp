@@ -116,7 +116,7 @@ public:
     }
 };
 
-PIC_INLINE FilterGradient::FilterGradient(int colorChannel,
+PIC_INLINE FilterGradient::FilterGradient(int colorChannel = 0,
         GRADIENT_TYPE type = G_NORMAL)
 {
     this->colorChannel = colorChannel;
