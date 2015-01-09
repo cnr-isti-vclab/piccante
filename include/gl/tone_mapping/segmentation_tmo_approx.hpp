@@ -26,14 +26,17 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The SegmentationGL class
+ */
 class SegmentationGL
 {
 protected:
-    FilterGLLuminance		lum;
-    FilterGLRemoveNuked		*fltNuked;
-    FilterGLIterative		*fltIt;
-    FilterGLBilateral2DS	*fltBil;
-    FilterGLOp				*fltSeg;
+    FilterGLLuminance		*flt_lum;
+    FilterGLRemoveNuked		*flt_nuked;
+    FilterGLIterative		*flt_it;
+    FilterGLBilateral2DS	*flt_bil;
+    FilterGLOp				*flt_seg;
     ImageGL                 *L, *imgIn_flt;
 
     float					perCent, nLayer;
@@ -43,12 +46,16 @@ public:
     ImageGLVec              stack;
     float					minVal, maxVal;
 
+    /**
+     * @brief SegmentationGL
+     */
     SegmentationGL()
     {
-        fltNuked = new FilterGLRemoveNuked(0.9f);
-        fltBil = NULL;
-        fltIt  = NULL;
-        fltSeg = NULL;
+        flt_nuked = NULL;
+        flt_lum = NULL;
+        flt_bil = NULL;
+        flt_it  = NULL;
+        flt_seg = NULL;
 
         nLayer = 0.0f;
         iterations = 0;
@@ -66,18 +73,24 @@ public:
     {
         if(imgIn_flt != NULL) {
             delete imgIn_flt;
+            imgIn_flt = NULL;
         }
 
         if(L != NULL) {
             delete L;
+            L = NULL;
         }
 
-        delete fltIt;
-        delete fltBil;
-        delete fltSeg;
-        delete fltNuked;
+        delete flt_it;
+        delete flt_bil;
+        delete flt_seg;
+        delete flt_nuked;
     }
 
+    /**
+     * @brief ComputeStatistics
+     * @param imgIn
+     */
     void ComputeStatistics(Image *imgIn)
     {
         float nLevels, area;
@@ -88,14 +101,20 @@ public:
         iterations	= MAX(int(sqrtf(area)) / 8, 1);
     }
 
+    /**
+     * @brief Compute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageGL *Compute(ImageGL *imgIn, ImageGL *imgOut)
     {
         if(imgIn == NULL) {
-            return NULL;
+            return imgOut;
         }
 
         if(!imgIn->isValid()) {
-            return NULL;
+            return imgOut;
         }
 
         if(imgOut == NULL) {
@@ -103,29 +122,36 @@ public:
         }
 
         //Compute luminance
-        L = lum.Process(SingleGL(imgIn), L);
+        if(flt_lum == NULL) {
+            flt_lum = new FilterGLLuminance();
+        }
+
+        L = flt_lum->Process(SingleGL(imgIn), L);
 
         L->getMinVal(&minVal);
         L->getMaxVal(&maxVal);
 
         //Iterative bilateral filtering
-        if(fltIt == NULL) {
-            fltBil = new FilterGLBilateral2DS(1.0f, nLayer);
-            fltIt  = new FilterGLIterative(fltBil, iterations);
+        if(flt_it == NULL) {
+            flt_bil = new FilterGLBilateral2DS(1.0f, nLayer);
+            flt_it  = new FilterGLIterative(flt_bil, iterations);
         }
 
-        imgIn_flt = fltIt->Process(SingleGL(imgIn), imgIn_flt);
-        lum.Process(SingleGL(imgIn_flt), L);
+        imgIn_flt = flt_it->Process(SingleGL(imgIn), imgIn_flt);
+        L = flt_lum->Process(SingleGL(imgIn_flt), L);
 
         //Thresholding
-        if(fltSeg == NULL) {
-            fltSeg = FilterGLOp::CreateOpSegmentation(false, floor(log10f(minVal)));
+        if(flt_seg == NULL) {
+            flt_seg = FilterGLOp::CreateOpSegmentation(false, floor(log10f(minVal)));
         }
 
-        fltSeg->Process(SingleGL(L), L);
+        flt_seg->Process(SingleGL(L), L);
 
         //Removing nuked pixels
-        fltNuked->Process(SingleGL(L), imgOut);
+        if(flt_nuked == NULL) {
+            flt_nuked = new FilterGLRemoveNuked(0.9f);
+        }
+        flt_nuked->Process(SingleGL(L), imgOut);
 
         return imgOut;
     }

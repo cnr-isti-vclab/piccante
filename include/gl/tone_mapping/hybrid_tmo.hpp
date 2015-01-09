@@ -22,11 +22,16 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/algorithms/pyramid.hpp"
 
 #include "gl/filtering/filter_remapping.hpp"
-#include "gl/filtering/filter_drago_tmo.hpp"
-#include "gl/filtering/filter_sigmoid_tmo.hpp"
+
+#include "gl/tone_mapping/drago_tmo.hpp"
+
+#include "gl/tone_mapping/reinhard_tmo.hpp"
 
 namespace pic {
 
+/**
+ * @brief The HybridTMOGL class
+ */
 class HybridTMOGL
 {
 protected:
@@ -34,17 +39,22 @@ protected:
     FilterGLRemapping	remap;
     ReduxGL     		*check;
     ImageGL             *seg_map;
-    FilterGLDragoTMO	*fltDragoTMO;
-    FilterGLSigmoidTMO	*fltReinhardTMO;
+    ImageGL             *imgDrago, *imgReinhard, *remapped;
     PyramidGL			*pyrA, *pyrB, *pyrWeight;
     float				Ld_Max, b;
     bool				bFirst;
-    ImageGL             *imgDrago, *imgReinhard, *remapped;
+
+    DragoTMOGL          *tone_drago;
+    ReinhardTMOGL       *tone_reinhard;
 
 public:
+    /**
+     * @brief HybridTMOGL
+     */
     HybridTMOGL()
     {
         bFirst = true;
+
         imgDrago = NULL;
         imgReinhard = NULL;
         pyrA = NULL;
@@ -58,11 +68,17 @@ public:
 
         check = ReduxGL::CreateCheck();
 
-        fltDragoTMO    = new FilterGLDragoTMO(100.0f, 0.85f, 1e6, true);
-        fltReinhardTMO = new FilterGLSigmoidTMO(0.18f, false, true);
+        tone_drago    = new DragoTMOGL();
+        tone_reinhard = new ReinhardTMOGL();
     }
 
-    ImageGL *Compute(ImageGL *imgIn, ImageGL *imgOut)
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *Process(ImageGL *imgIn, ImageGL *imgOut)
     {
         if(imgIn == NULL) {
             return NULL;
@@ -77,15 +93,17 @@ public:
                                     IMG_GPU, GL_TEXTURE_2D);
         }
 
+#ifdef PIC_DEBUG
         float ms, tot_ms;
-        //Compute segmentation map
         GLuint testTQ1 = glBeginTimeQuery();
+#endif
+        //Compute segmentation map
         seg_map = seg.Compute(imgIn, seg_map);
+
+#ifdef PIC_DEBUG
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
         ms = float(double(timeVal) / 1000000.0);
         tot_ms = ms;
-
-#ifdef PIC_DEBUG
         printf("GPU time segmentation: %f ms\n", ms);
 #endif
 
@@ -102,16 +120,19 @@ public:
         	TMOForZone =  [ 0,  0, 1, 0, 1, 0, 0];	*/
 
         //Checking if we have different zones
+#ifdef PIC_DEBUG
         testTQ1 = glBeginTimeQuery();
+#endif
 
         float check_value;
         remapped->getVal(&check_value, check);
         int value = int(check_value);
+
+#ifdef PIC_DEBUG
         timeVal = glEndTimeQuery(testTQ1);
         ms = float(double(timeVal) / 1000000.0);
         tot_ms += ms;
 
-#ifdef PIC_DEBUG
         printf("GPU time Checking Different Zones: %f ms\n", ms);
 #endif
 
@@ -119,66 +140,68 @@ public:
 
         switch(value) {
         case 0: {
-            fltDragoTMO->Update(Ld_Max, b, seg.maxVal, 1.0f);
-            fltDragoTMO->Process(SingleGL(imgIn), imgOut);
+            imgOut = tone_drago->Process(imgIn, Ld_Max, b, imgOut);
         }
         break;
 
         case 1: {
-            fltReinhardTMO->Update(0.18f);
-            fltReinhardTMO->Process(SingleGL(imgIn), imgOut);
+            imgOut = tone_reinhard->ProcessLocal(imgIn, 0.18f, 8.0f, NULL, imgOut);
         }
         break;
 
         case 10: {
             //Drago TMO
-            fltDragoTMO->Update(Ld_Max, 100, seg.maxVal, 1.0f);
-            imgDrago = fltDragoTMO->Process(SingleGL(imgIn), imgDrago);
+            imgDrago = tone_drago->Process(imgIn, Ld_Max, b, imgDrago);
+            imgDrago->loadToMemory();
+            imgDrago->Write("tmp.pfm");
 
+            //Reinhard TMO
+            imgReinhard = tone_reinhard->ProcessLocal(imgIn, 0.18f, 8.0f, NULL, imgReinhard);
+
+            //Genarating/updating pryamids
             if(pyrA == NULL) {
                 pyrA = new PyramidGL(imgDrago, true);
             } else {
                 pyrA->Update(imgDrago);
             }
+            pyrA->Reconstruct(imgOut);
 
-            //Reinhard TMO
-            fltReinhardTMO->Update(0.18f);
-            imgReinhard = fltReinhardTMO->Process(SingleGL(imgIn), imgReinhard);
 
+            imgOut->loadToMemory();
+            imgOut->Write("tmp2.pfm");
+/*
             if(pyrB == NULL) {
                 pyrB = new PyramidGL(imgReinhard, true);
             } else {
                 pyrB->Update(imgReinhard);
             }
 
-            //Blending weight
+            //Weights pyramid
             if(pyrWeight == NULL) {
                 pyrWeight = new PyramidGL(remapped, false);
             } else {
                 pyrWeight->Update(remapped);
-            }
+            }*/
 
             //Blending
-            pyrA->Blend(pyrB, pyrWeight);
-            pyrA->Reconstruct(imgOut);
+//            pyrA->Blend(pyrB, pyrWeight);
         }
         break;
         }
 
+
+#ifdef PIC_DEBUG
         timeVal = glEndTimeQuery(testTQ1);
         ms = float(double(timeVal) / 1000000.0);
         tot_ms += ms;
-
-#ifdef PIC_DEBUG
         printf("GPU time Tone Mapping+Blending: %f ms\n", ms);
-#endif
 
         if(!bFirst) {
-            printf("%f\n",
-                   tot_ms);    //printf("Total time for Hybrid Tone Mapping: %f ms\n",tot_ms);
+            printf("Total time: %f\n", tot_ms);
         } else {
             bFirst = false;
         }
+#endif
 
         return imgOut;
     }

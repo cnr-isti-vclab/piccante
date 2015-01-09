@@ -220,9 +220,6 @@ void BufferOpGL::InitShaders()
     size_t processing_found = fragment_source.find("_PROCESSING_OPERATOR_");
     fragment_source.replace(processing_found, 21, strOp);
 
-    printf("%s\n", fragment_source.c_str());
-
-
     std::string prefix;
     prefix += glw::version("330");
 

@@ -205,10 +205,6 @@ Image *Pyramid::Reconstruct(Image *imgOut = NULL)
         return imgOut;
     }
 
-    if(imgOut == NULL) {
-        imgOut = stack[0]->AllocateSimilarOne();
-    }
-
     FilterSampler2DAdd fltAdd;
     int n = stack.size() - 1;
     Image *tmp = stack[n];
@@ -228,7 +224,7 @@ Image *Pyramid::Reconstruct(Image *imgOut = NULL)
         }
     }
 
-    fltAdd.ProcessP(Double(stack[0], tmp), imgOut);
+    imgOut = fltAdd.ProcessP(Double(stack[0], tmp), imgOut);
 
     return imgOut;
 }

@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "gl/filtering/filter_gaussian_2d.hpp"
 #include "gl/filtering/filter_sampler_2d.hpp"
+#include "gl/filtering/filter_blend.hpp"
 #include "gl/filtering/filter_op.hpp"
 
 namespace pic {
@@ -37,7 +38,8 @@ protected:
 
     FilterGLGaussian2D		*fltG;
     FilterGLSampler2D		*fltS;
-    FilterGLOp				*fltSub, *fltId, *fltMul, *fltAdd;
+    FilterGLOp				*fltAdd, *fltSub, *fltMul, *fltId;
+    FilterGLBlend           *fltBlend;
 
     std::vector<ImageGL *> trackerRec, trackerUp;
 
@@ -48,10 +50,11 @@ protected:
     {
         fltG = new FilterGLGaussian2D(1.0f);
         fltS = new FilterGLSampler2D(0.5f);
-        fltSub  = FilterGLOp::CreateOpSub(false);
-        fltMul  = FilterGLOp::CreateOpMul(false);
-        fltAdd  = FilterGLOp::CreateOpAdd(false);
         fltId   = FilterGLOp::CreateOpIdentity(false);
+        fltAdd  = FilterGLOp::CreateOpAdd(false);
+        fltMul  = FilterGLOp::CreateOpMul(false);
+        fltSub  = FilterGLOp::CreateOpSub(false);
+        fltBlend = new FilterGLBlend();
     }
 
     /**
@@ -132,6 +135,7 @@ PyramidGL::PyramidGL(ImageGL *img, bool lapGauss, int limitLevel = 0)
 PyramidGL::PyramidGL(int width, int height, int channels, bool lapGauss, int limitLevel = 0)
 {
     ImageGL *tmpImg = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
+    *tmpImg = 0.0f;
 
     Create(tmpImg, lapGauss, limitLevel);
 }
@@ -192,11 +196,6 @@ ImageGL *PyramidGL::Reconstruct(ImageGL *imgOut)
         return imgOut;
     }
 
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(1, stack[0]->width, stack[0]->height,
-                                stack[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
     int n = stack.size() - 1;
     ImageGL *tmp = stack[n];
 
@@ -215,7 +214,7 @@ ImageGL *PyramidGL::Reconstruct(ImageGL *imgOut)
         }
     }
 
-    fltAdd->Process(DoubleGL(stack[0], tmp), imgOut);
+    imgOut = fltAdd->Process(DoubleGL(stack[0], tmp), imgOut);
 
     return imgOut;
 }
@@ -237,6 +236,7 @@ void PyramidGL::Add(const PyramidGL *pyr)
         return;
     }
 
+
     for(unsigned int i = 0; i < stack.size(); i++) {
         fltAdd->Process(DoubleGL(stack[i], pyr->stack[i]), stack[i]);
     }
@@ -250,7 +250,7 @@ void PyramidGL::Blend(PyramidGL *pyr, PyramidGL *weight)
     }
 
     for(unsigned int i = 0; i < stack.size(); i++) {
-        //fltBlend->Process(Triple(stack[i], pyr->stack[i], weight->stack[i]), stack[i]);
+        fltBlend->Process(TripleGL(stack[i], pyr->stack[i], weight->stack[i]), stack[i]);
     }
 }
 

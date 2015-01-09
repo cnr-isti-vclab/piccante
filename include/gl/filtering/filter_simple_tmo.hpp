@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -159,9 +150,9 @@ void FilterGLSimpleTMO::InitShaders()
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
 
-    filteringProgram.uniform("tn_gamma",   invGamma);
+    filteringProgram.uniform("tn_gamma", invGamma);
     filteringProgram.uniform("tn_exposure", exposure);
-    filteringProgram.uniform("u_tex",      0);
+    filteringProgram.uniform("u_tex", 0);
     glw::bind_program(0);
 }
 
@@ -174,8 +165,8 @@ void FilterGLSimpleTMO::Update(float fstop, float gamma)
     float exposure = powf(2.0f, fstop);
 
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform("u_tex",      0);
-    filteringProgram.uniform("tn_gamma",		invGamma);
+    filteringProgram.uniform("u_tex", 0);
+    filteringProgram.uniform("tn_gamma", invGamma);
     filteringProgram.uniform("tn_exposure",	exposure);
     glw::bind_program(0);
 }
