@@ -27,8 +27,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
-#define PIC_DEBUG
-
 #include <QKeyEvent>
 
 #include "piccante.hpp"

@@ -106,12 +106,6 @@ public:
         tot_ms = ms;
         printf("GPU time segmentation: %f ms\n", ms);
 #endif
-
-#ifdef PIC_DEBUG
-        seg_map->loadToMemory();
-        seg_map->Write("segmentation_map.pfm");
-#endif
-
         remapped = remap.Process(SingleGL(seg_map), remapped);
 
         /*	0 ---> Drago et al. 2003
