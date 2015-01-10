@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "colors/saturation.hpp"
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_laplacian.hpp"
+#include "filtering/filter_exposure_fusion_weights.hpp"
 #include "algorithms/pyramid.hpp"
 
 namespace pic {
@@ -50,7 +51,6 @@ Image *ExposureFusion(ImageVec imgIn, Image *imgOut, float wC = 1.0f,
     int size = width * height;
 
     FilterLuminance fltL;
-    FilterLaplacian fltLap;
 
     Image *L       = new Image(1, width, height, 1);
     Image *weights = new Image(n, width, height, 1);
@@ -60,9 +60,7 @@ Image *ExposureFusion(ImageVec imgIn, Image *imgOut, float wC = 1.0f,
 
     ImageVec weights_list;
 
-    float mu = 0.5f;
-    float sigma = 0.2f;
-    float sigma2 = 2.0f * sigma * sigma;
+    FilterExposureFusionWeights fltWeights(wC, wE, wS);
 
     for(int j = 0; j < n; j++) {
         #ifdef PIC_DEBUG
@@ -72,32 +70,11 @@ Image *ExposureFusion(ImageVec imgIn, Image *imgOut, float wC = 1.0f,
         Image *curWeight = new Image(1, width, height, 1,
                                            &weights->data[size * j]);
 
+        L = fltL.ProcessP(Single(imgIn[j]), L);
+
+        curWeight = fltWeights.ProcessP(Double(imgIn[j], L), curWeight);
+
         weights_list.push_back(curWeight);
-
-        fltL.ProcessP(Single(imgIn[j]), L);
-
-        fltLap.ProcessP(Single(L), curWeight);
-
-        float *data = imgIn[j]->data;
-
-        for(int ind = 0; ind < size; ind++) {
-            int i = ind * channels;
-
-            //Contrast
-            float pCon = fabsf(curWeight->data[ind]);
-
-            //Saturation
-            float pSat = computeSaturation(&data[i], channels);
-
-            //Well-exposedness
-            float tmpL = L->data[ind] - mu;
-            float pWE = expf(-(tmpL * tmpL) / sigma2);
-
-            //Final weights
-            curWeight->data[ind] =  powf(pCon, wC) *
-                                    powf(pWE,  wE) *
-                                    powf(pSat, wS);
-        }
 
         *acc += *curWeight;
     }

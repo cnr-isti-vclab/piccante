@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "filtering/filter.hpp"
 
+#include "colors/saturation.hpp"
+
 namespace pic {
 
 /**
@@ -29,7 +31,7 @@ class FilterExposureFusionWeights: public Filter
 {
 protected:
     float wC, wE, wS;
-
+    float mu, sigma2;
 
     /**
      * @brief ProcessBBox
@@ -39,22 +41,45 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        int width    = src[0]->width;
         int channels = src[0]->channels;
-        float *data  = src[0]->data;
+        int width = src[0]->width;
+        int height = src[0]->height;
+        int tmp;
 
         for(int j = box->y0; j < box->y1; j++) {
             int c = j * width;
 
             for(int i = box->x0; i < box->x1; i++) {
-                int indOut = c + i;
+                int ind = c + i;
 
-                int ind = indOut * channels;
+                //Saturation
+                float pSat = computeSaturation(&src[0]->data[ind * channels], channels);
 
-                dst->data[indOut] = 0.0f;
-                for(int k=0;k<transformChannels;k++) {
-                    dst->data[indOut] += data[ind + k] * weights[k];
-                }
+                //Contrast
+                float pCon = -4.0f * src[1]->data[ind];
+
+                tmp   = CLAMP(i + 1, width);
+                pCon += src[1]->data[c + tmp];
+
+                tmp   = CLAMP(i - 1, width);
+                pCon += src[1]->data[c + tmp];
+
+                tmp   = CLAMP(j + 1, height);
+                pCon += src[1]->data[tmp * width + i];
+
+                tmp   = CLAMP(j - 1, height);
+                pCon += src[1]->data[tmp * width + i];
+
+                pCon = fabsf(pCon);
+
+                //Well-exposedness
+                float tmpL = src[1]->data[ind] - mu;
+                float pWE = expf(-(tmpL * tmpL) / sigma2);
+
+                //Final weights
+                dst->data[ind] =  powf(pCon, wC) *
+                                  powf(pWE,  wE) *
+                                  powf(pSat, wS);
             }
         }
     }
@@ -88,6 +113,11 @@ public:
      */
     FilterExposureFusionWeights(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
     {
+        float sigma = 0.2f;
+
+        mu = 0.5f;
+        sigma2 = 2.0f * sigma * sigma;
+
         this->wC = wC > 0.0f ? wC : 1.0f;
         this->wE = wE > 0.0f ? wE : 1.0f;
         this->wS = wS > 0.0f ? wS : 1.0f;

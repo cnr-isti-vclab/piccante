@@ -55,18 +55,22 @@ Image *RichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterations = 1
     Image *img_est_conv = NULL;
     Image *img_err = NULL;
 
+    FilterConv2D flt_conv;
+    ImageVec vec = Double(imgOut, psf);
+    ImageVec vec_err = Double(img_rel_blur, psf_hat);
+
     for(int i = 0; i < nIterations; i++) {
 
         #ifdef PIC_DEBUG
             printf("%d\n", i);
         #endif
 
-        img_est_conv = FilterConv2D::Execute(imgOut, psf, img_est_conv);
+        img_est_conv = flt_conv.Process(vec, img_est_conv);
 
         img_rel_blur->Assign(imgIn);
         *img_rel_blur /= *img_est_conv;
 
-        img_err = FilterConv2D::Execute(img_rel_blur, psf_hat, img_err);
+        img_err = flt_conv.Process(vec_err, img_err);
 
         *imgOut *= *img_err;
     }

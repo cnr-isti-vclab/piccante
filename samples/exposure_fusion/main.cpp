@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
+#define PIC_DEBUG
+
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -50,6 +52,7 @@ int main(int argc, char *argv[])
         pic::FilterSimpleTMO fltTMO(2.2f, 0.0f);
         std::vector< float > exposures = hst.ExposureCovering(8, 0.5f);
         pic::ImageVec stack;
+
         for(unsigned int i = 0; i < exposures.size(); i++) {
             fltTMO.Update(2.2f, exposures[i]);
             pic::Image *tmp = fltTMO.ProcessP(input, NULL);
@@ -63,6 +66,7 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         printf("Tone mapping using Exposure Fusion...");
+
         pic::Image *imgToneMapped = pic::ExposureFusion(stack, NULL, 0.2f, 1.0f, 0.2f);
         printf("Ok\n");
 
@@ -74,6 +78,7 @@ int main(int argc, char *argv[])
         } else {
             printf("Writing had some issues!\n");
         }
+
     } else {
         printf("No it is not a valid file!\n");
     }
