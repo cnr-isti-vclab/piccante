@@ -67,7 +67,7 @@ void FilterGLBlend::FragmentShader()
         ivec2 coords = ivec2(gl_FragCoord.xy);\n
         vec4  color0 = texelFetch(u_tex0, coords, 0);\n
         vec4  color1 = texelFetch(u_tex1, coords, 0);\n
-        vec4  weight = texelFetch(u_texMask, coords, 0).x;\n
+        float weight = texelFetch(u_texMask, coords, 0).x;\n
         f_color = mix(color0, color1, weight);
     }\n
                       );
