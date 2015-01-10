@@ -50,12 +50,12 @@ protected:
      */
     Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
-    /**
-     * @brief CreateMask
-     */
-    void CreateMask();
-
 public:
+    /**
+     * @brief FilterGradient
+     */
+    FilterGradient();
+
     /**
      * @brief FilterGradient
      * @param colorChannel
@@ -116,24 +116,23 @@ public:
     }
 };
 
-PIC_INLINE FilterGradient::FilterGradient(int colorChannel = 0,
+PIC_INLINE FilterGradient::FilterGradient()
+{
+    Setup(0, G_NORMAL);
+}
+
+PIC_INLINE FilterGradient::FilterGradient(int colorChannel,
         GRADIENT_TYPE type = G_NORMAL)
 {
-    this->colorChannel = colorChannel;
-    this->type = type;
-    CreateMask();
+    Setup(colorChannel, type);
 }
 
 PIC_INLINE void FilterGradient::Setup(int colorChannel,
-                                      GRADIENT_TYPE type = G_NORMAL)
+                                           GRADIENT_TYPE type = G_NORMAL)
 {
     this->colorChannel = colorChannel;
     this->type = type;
-    CreateMask();
-}
 
-PIC_INLINE void FilterGradient::CreateMask()
-{
     switch(type) {
     case G_SOBEL: {
         mask[0] = 1.0f;

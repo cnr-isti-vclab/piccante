@@ -15,17 +15,17 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_GL_FILTERING_FILTER_LAPLACIAN_HPP
-#define PIC_GL_FILTERING_FILTER_LAPLACIAN_HPP
+#ifndef PIC_GL_FILTERING_FILTER_BLEND_HPP
+#define PIC_GL_FILTERING_FILTER_BLEND_HPP
 
 #include "gl/filtering/filter.hpp"
 
 namespace pic {
 
 /**
- * @brief The FilterGLLaplacian class
+ * @brief The FilterGLBlend class
  */
-class FilterGLLaplacian: public FilterGL
+class FilterGLBlend: public FilterGL
 {
 protected:
     /**
@@ -41,39 +41,39 @@ protected:
 public:
 
     /**
-     * @brief FilterGLLaplacian
+     * @brief FilterGLBlend
      */
-    FilterGLLaplacian();
+    FilterGLBlend();
 };
 
-FilterGLLaplacian::FilterGLLaplacian(): FilterGL()
+FilterGLBlend::FilterGLBlend(): FilterGL()
 {
     //protected values are assigned/computed
     FragmentShader();
     InitShaders();
 }
 
-void FilterGLLaplacian::FragmentShader()
+void FilterGLBlend::FragmentShader()
 {
     fragment_source = GLW_STRINGFY
                       (
-                          uniform sampler2D u_tex; \n
+                          uniform sampler2D u_tex0; \n
+                          uniform sampler2D u_tex1; \n
+                          uniform sampler2D u_texMask; \n
                           out vec4      f_color;	\n
 
     void main(void) {
         \n
         ivec2 coords = ivec2(gl_FragCoord.xy);\n
-        vec3  color = -4.0 * texelFetch(u_tex, coords, 0).xyz;\n
-        color += texelFetch(u_tex, coords + ivec2(1, 0), 0).xyz;\n
-        color += texelFetch(u_tex, coords - ivec2(1, 0), 0).xyz;\n
-        color += texelFetch(u_tex, coords + ivec2(0, 1), 0).xyz;\n
-        color += texelFetch(u_tex, coords - ivec2(0, 1), 0).xyz;\n
-        f_color = vec4(color, 1.0); //Magnitude
+        vec4  color0 = texelFetch(u_tex0, coords, 0);\n
+        vec4  color1 = texelFetch(u_tex1, coords, 0);\n
+        vec4  weight = texelFetch(u_texMask, coords, 0).x;\n
+        f_color = mix(color0, color1, weight);
     }\n
                       );
 }
 
-void FilterGLLaplacian::InitShaders()
+void FilterGLBlend::InitShaders()
 {
     FragmentShader();
 
@@ -82,18 +82,20 @@ void FilterGLLaplacian::InitShaders()
     filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[FilterGLLaplacian log]\n%s\n", filteringProgram.log().c_str());
+    printf("[FilterGLBlend log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
-    filteringProgram.uniform("u_tex",      0);
+    filteringProgram.uniform("u_tex0", 0);
+    filteringProgram.uniform("u_tex1", 1);
+    filteringProgram.uniform("u_texMask", 2);
     glw::bind_program(0);
 }
 
 } // end namespace pic
 
-#endif /* PIC_GL_FILTERING_FILTER_LAPLACIAN_HPP */
+#endif /* PIC_GL_FILTERING_FILTER_BLEND_HPP */
 

@@ -33,15 +33,15 @@ namespace pic {
 class PyramidGL
 {
 protected:
-    bool					lapGauss;
-    int						limitLevel;
+    bool                lapGauss;
+    int                 limitLevel;
 
-    FilterGLGaussian2D		*fltG;
-    FilterGLSampler2D		*fltS;
-    FilterGLOp				*fltAdd, *fltSub, *fltMul, *fltId;
-    FilterGLBlend           *fltBlend;
+    FilterGLGaussian2D  *fltG;
+    FilterGLSampler2D   *fltS;
+    FilterGLOp			*fltAdd, *fltSub, *fltMul, *fltId;
+    FilterGLBlend       *fltBlend;
 
-    std::vector<ImageGL *> trackerRec, trackerUp;
+    ImageGLVec          trackerRec, trackerUp;
 
     /**
      * @brief InitFilters
@@ -190,6 +190,41 @@ void PyramidGL::Create(ImageGL *img, bool lapGauss, int limitLevel = 0)
 #endif
 }
 
+void PyramidGL::Update(ImageGL *img)
+{
+    if(img == NULL) {
+        return;
+    }
+
+    if(stack.empty()) {
+        return;
+    }
+
+    if(!stack[0]->SimilarType(img)) {
+        return;
+    }
+
+    ImageGL *tmpImg = img;
+
+    int levels = MAX(log2(MIN(tmpImg->width, tmpImg->height)) - limitLevel, 1);
+
+    for(int i = 0; i < levels; i++) {
+        stack[i] = fltG->Process(SingleGL(tmpImg), stack[i]);
+        trackerUp[i] = fltS->Process(SingleGL(stack[i]), trackerUp[i]);
+
+        if(lapGauss) {	//Laplacian Pyramid
+            stack[i] = fltSub->Process(DoubleGL(tmpImg, trackerUp[i]), stack[i]);
+        } else {		//Gaussian Pyramid
+            stack[i] = fltId->Process(SingleGL(tmpImg), stack[i]);
+        }
+
+        tmpImg = trackerUp[i];
+    }
+
+    fltId->Process(SingleGL(tmpImg), stack[stack.size() - 1]);
+
+}
+
 ImageGL *PyramidGL::Reconstruct(ImageGL *imgOut)
 {
     if(stack.size() < 2) {
@@ -252,39 +287,6 @@ void PyramidGL::Blend(PyramidGL *pyr, PyramidGL *weight)
     for(unsigned int i = 0; i < stack.size(); i++) {
         fltBlend->Process(TripleGL(stack[i], pyr->stack[i], weight->stack[i]), stack[i]);
     }
-}
-
-void PyramidGL::Update(ImageGL *img)
-{
-    if(img == NULL) {
-        return;
-    }
-
-    if(stack.empty()) {
-        return;
-    }
-
-    if(!stack[0]->SimilarType(img)) {
-        return;
-    }
-
-    ImageGL *tmpImg = img;
-
-    for(int i = 0; i < (stack.size() - 2); i++) {
-        fltG->Process(SingleGL(tmpImg), stack[i]);
-
-        fltS->Process(SingleGL(stack[i]), trackerUp[i]);
-
-        if(lapGauss) {	//Laplacian Pyramid
-            fltSub->Process(DoubleGL(tmpImg, trackerUp[i]), stack[i]);
-        } else {		//Gaussian Pyramid
-            fltId->Process(SingleGL(tmpImg), stack[i]);
-        }
-
-        tmpImg = trackerUp[i];
-    }
-
-    fltId->Process(SingleGL(tmpImg), stack[stack.size() - 1]);
 }
 
 } // end namespace pic

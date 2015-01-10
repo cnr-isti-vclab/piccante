@@ -35,7 +35,7 @@ protected:
     bool    lapGauss;
     int     limitLevel;
 
-    std::vector<Image *> trackerRec, trackerUp;
+    ImageVec trackerRec, trackerUp;
 
     void Create(Image *img, bool lapGauss, int limitLevel);
 
@@ -199,6 +199,48 @@ void Pyramid::Create(Image *img, bool lapGauss, int limitLevel = 0)
 #endif
 }
 
+void Pyramid::Update(Image *img)
+{
+    //TODO: check if the image and the pyramid are compatible
+    if(img == NULL) {
+        return;
+    }
+
+    if(stack.empty()) {
+        return;
+    }
+
+    if(!stack[0]->SimilarType(img)) {
+        return;
+    }
+
+    FilterGaussian2D	fltG(1.0f);
+    FilterSampler2D		fltS(0.5f);
+    FilterSampler2DSub	fSub;
+
+    Image *tmpImg = img;
+
+    unsigned int levels = MAX(log2(MIN(img->width, img->height)) - limitLevel, 1);
+
+    for(unsigned int i = 0; i < levels; i++) {
+        stack[i] = fltG.ProcessP(Single(tmpImg), stack[i]);
+
+        trackerUp[i] = fltS.ProcessP(Single(stack[i]), trackerUp[i]);
+
+        if(lapGauss) {	//Laplacian Pyramid
+            stack[i] = fSub.ProcessP(Double(tmpImg, trackerUp[i]), stack[i]);
+        } else {		//Gaussian Pyramid
+            stack[i]->Assign(tmpImg);
+        }
+
+        tmpImg = trackerUp[i];
+    }
+
+    if(tmpImg != NULL) {
+        stack[stack.size() - 1]->Assign(tmpImg);
+    }
+}
+
 Image *Pyramid::Reconstruct(Image *imgOut = NULL)
 {
     if(stack.size() < 2) {
@@ -227,48 +269,6 @@ Image *Pyramid::Reconstruct(Image *imgOut = NULL)
     imgOut = fltAdd.ProcessP(Double(stack[0], tmp), imgOut);
 
     return imgOut;
-}
-
-void Pyramid::Update(Image *img)
-{
-    //TODO: check if the image and the pyramid are compatible
-    if(img == NULL) {
-        return;
-    }
-
-    if(stack.empty()) {
-        return;
-    }
-
-    if(!stack[0]->SimilarType(img)) {
-        return;
-    }
-
-    FilterGaussian2D	fltG(1.0f);
-    FilterSampler2D		fltS(0.5f);
-    FilterSampler2DSub	fSub;
-
-    Image *tmpImg = img;
-
-    unsigned int levels = MAX(log2(MIN(img->width, img->height)) - limitLevel, 1);
-
-    for(unsigned int i = 0; i < (levels - 1); i++) {
-        fltG.ProcessP(Single(tmpImg), stack[i]);
-
-        fltS.ProcessP(Single(stack[i]), trackerUp[i]);
-
-        if(lapGauss) {	//Laplacian Pyramid
-            stack[i] = fSub.ProcessP(Double(tmpImg, trackerUp[i]), stack[i]);
-        } else {		//Gaussian Pyramid
-            stack[i]->Assign(tmpImg);
-        }
-
-        tmpImg = trackerUp[i];
-    }
-
-    if(tmpImg != NULL) {
-        stack[levels - 1]->Assign(tmpImg);
-    }
 }
 
 void Pyramid::Mul(const Pyramid *pyr)
