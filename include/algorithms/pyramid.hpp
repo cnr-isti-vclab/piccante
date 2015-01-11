@@ -183,7 +183,7 @@ void Pyramid::Create(Image *img, bool lapGauss, int limitLevel = 0)
             stack.push_back(tmpG);
         }
 
-        if(i < (levels - 1)) {
+        if(i < (levels -1)) {
             trackerUp.push_back(tmpD);
         }
 
@@ -223,12 +223,12 @@ void Pyramid::Update(Image *img)
     unsigned int levels = MAX(log2(MIN(img->width, img->height)) - limitLevel, 1);
 
     for(unsigned int i = 0; i < (levels - 1); i++) {
-        fltG.ProcessP(Single(tmpImg), stack[i]);
+        stack[i] = fltG.ProcessP(Single(tmpImg), stack[i]);
 
-        fltS.ProcessP(Single(stack[i]), trackerUp[i]);
+        trackerUp[i] = fltS.ProcessP(Single(stack[i]), trackerUp[i]);
 
         if(lapGauss) {	//Laplacian Pyramid
-            flt_sub.ProcessP(Double(tmpImg, trackerUp[i]), stack[i]);
+            stack[i] = flt_sub.ProcessP(Double(tmpImg, trackerUp[i]), stack[i]);
         } else {		//Gaussian Pyramid
             stack[i]->Assign(tmpImg);
         }
