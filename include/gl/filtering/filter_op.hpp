@@ -200,7 +200,7 @@ void FilterGLOp::InitShaders()
     strOp.append(";\n");
     int counter;
 
-    //I1
+    //I0
     counter = countSubString(strOp, "I0");
 
     if(counter == 1) {
@@ -225,7 +225,7 @@ void FilterGLOp::InitShaders()
         }
     }
 
-    //I2
+    //I1
     counter = countSubString(strOp, "I1");
 
     if(counter == 1) {

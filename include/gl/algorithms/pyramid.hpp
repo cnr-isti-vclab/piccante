@@ -144,6 +144,8 @@ PyramidGL::PyramidGL(int width, int height, int channels, bool lapGauss, int lim
     *tmpImg = 0.0f;
 
     Create(tmpImg, lapGauss, limitLevel);
+
+    delete tmpImg;
 }
 
 PyramidGL::~PyramidGL()
@@ -214,7 +216,7 @@ void PyramidGL::Update(ImageGL *img)
 
     int levels = MAX(log2(MIN(tmpImg->width, tmpImg->height)) - limitLevel, 1);
 
-    for(int i = 0; i < levels; i++) {
+    for(int i = 0; i < (levels - 1); i++) {
         stack[i] = fltG->Process(SingleGL(tmpImg), stack[i]);
         trackerUp[i] = fltS->Process(SingleGL(stack[i]), trackerUp[i]);
 
@@ -227,8 +229,7 @@ void PyramidGL::Update(ImageGL *img)
         tmpImg = trackerUp[i];
     }
 
-    fltId->Process(SingleGL(tmpImg), stack[stack.size() - 1]);
-
+    stack[levels - 1] = fltId->Process(SingleGL(tmpImg), stack[levels - 1]);
 }
 
 ImageGL *PyramidGL::Reconstruct(ImageGL *imgOut)
@@ -278,8 +279,8 @@ void PyramidGL::Mul(const PyramidGL *pyr)
     }
 
     for(unsigned int i = 0; i < stack.size(); i++) {
-        *stack[i] *= *pyr->stack[i];
-        //fltMul->Process(DoubleGL(stack[i], pyr->stack[i]), stack[i]);
+        //*stack[i] *= *pyr->stack[i];
+        fltMul->Process(DoubleGL(stack[i], pyr->stack[i]), stack[i]);
     }
 }
 
@@ -290,8 +291,8 @@ void PyramidGL::Add(const PyramidGL *pyr)
     }
 
     for(unsigned int i = 0; i < stack.size(); i++) {
-        *stack[i] += *pyr->stack[i];
-//        fltAdd->Process(DoubleGL(stack[i], pyr->stack[i]), stack[i]);
+        //*stack[i] += *pyr->stack[i];
+        fltAdd->Process(DoubleGL(stack[i], pyr->stack[i]), stack[i]);
     }
 }
 

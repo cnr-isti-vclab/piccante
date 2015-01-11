@@ -83,13 +83,6 @@ public:
         int width = imgIn[0]->width;
         int height = imgIn[0]->height;
 
-        if(lum == NULL) {
-            lum = new ImageGL(1, width, height, 1, IMG_GPU, GL_TEXTURE_2D);
-        }
-
-        if(weights == NULL) {
-            weights = new ImageGL(1, width, height, 1, IMG_GPU, GL_TEXTURE_2D);
-        }
 
         if(acc == NULL) {
             acc = new ImageGL(1, width, height, 1, IMG_GPU, GL_TEXTURE_2D);
@@ -108,7 +101,7 @@ public:
 
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
 
-            weights = flt_weights->Process(DoubleGL(imgIn[j], lum), weights);
+            weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 
             *acc += *weights;
         }
@@ -132,9 +125,9 @@ public:
 
         pOut->SetValue(0.0f);
 
-        for(int j = 0; j < n; j++) {
+        for(int j = 0; j < 3; j++) {
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
-            weights = flt_weights->Process(DoubleGL(imgIn[j], lum), weights);
+            weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 
             //normalization
             *weights /= *acc;
@@ -144,7 +137,7 @@ public:
             pI->Update(imgIn[j]);
 
             pI->Mul(pW);
-            pOut->Add(pI);
+//            pOut->Add(pI);
         }
 
         #ifdef PIC_DEBUG
@@ -152,7 +145,7 @@ public:
         #endif
 
         //final result
-        imgOut = pOut->Reconstruct(imgOut);
+        imgOut = pI->Reconstruct(imgOut);
       //  imgOut = remove_negative->Process(SingleGL(imgOut), imgOut);
 
         return imgOut;

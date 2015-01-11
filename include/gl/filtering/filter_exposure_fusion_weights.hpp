@@ -75,21 +75,30 @@ void FilterGLExposureFusionWeights::FragmentShader()
                           uniform float wC;   \n
                           uniform float wE;   \n
                           uniform float wS;   \n
+                          uniform float sigma2; \n
+                          uniform float mu; \n
                           out vec4      f_color;	\n
 
     void main(void) {
         \n
         ivec2 coords = ivec2(gl_FragCoord.xy);\n
 
-        float L = texelFetch(u_tex_lum, coords, 0).x; \n
+        float L = texelFetch(u_tex_lum, coords, 0).x;\n
 
-        //wC
+        //well-exposedness
+        float tmp = (L - mu);\n
+        float pExp = exp(-(tmp * tmp) / sigma2);\n
+        pExp = pow(pExp, wE);\n
+
+        //contrast
         float pCon = -4.0 * L;
         pCon += texelFetch(u_tex_lum, coords + ivec2(1, 0), 0).x;\n
         pCon += texelFetch(u_tex_lum, coords - ivec2(1, 0), 0).x;\n
         pCon += texelFetch(u_tex_lum, coords + ivec2(0, 1), 0).x;\n
         pCon += texelFetch(u_tex_lum, coords - ivec2(0, 1), 0).x;\n
-        f_color = vec4(pow(vec3(pCon), vec3(wC)), 1.0);
+        pCon = pow(pCon, wC);\n
+
+        f_color = vec4(vec3(pCon * pExp), 1.0);\n
     }\n
                       );
 }
@@ -110,11 +119,13 @@ void FilterGLExposureFusionWeights::InitShaders()
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
-    filteringProgram.uniform("u_tex", 0);
-    filteringProgram.uniform("u_tex_lum", 1);
+    filteringProgram.uniform("u_tex_lum", 0);
+    filteringProgram.uniform("u_tex", 1);
     filteringProgram.uniform("wC", wC);
     filteringProgram.uniform("wE", wE);
     filteringProgram.uniform("wS", wS);
+    filteringProgram.uniform("mu", mu);
+    filteringProgram.uniform("sigma2", sigma2);
     glw::bind_program(0);
 }
 
