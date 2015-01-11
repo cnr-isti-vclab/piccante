@@ -50,7 +50,7 @@ Image *ColorToGray(Image *imgIn, Image *imgOut)
         img_vec.push_back(flc.ProcessP(input, NULL));
     }
 
-    imgOut = ExposureFusion(img_vec, imgOut, 1.0f, 1.0f, 0.0f);
+    imgOut = ExposureFusion(img_vec, 1.0f, 1.0f, 0.0f, imgOut);
 
     for(int i=0; i<channels; i++) {
         delete img_vec[i];

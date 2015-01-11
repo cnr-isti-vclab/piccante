@@ -27,6 +27,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
+#define PIC_DEBUG
+
 #include <QKeyEvent>
 
 #include "piccante.hpp"
@@ -40,7 +42,6 @@ protected:
     pic::FilterGLColorConv *tmo;
     pic::DragoTMOGL        *drago_tmo;
     pic::ReinhardTMOGL     *reinhard_tmo;
-    pic::HybridTMOGL       *hybrid_tmo;
 
 public:
     pic::ImageGL    img, *img_tmo, *img_tmo_with_sRGB;
@@ -74,7 +75,6 @@ public:
 
         drago_tmo = new pic::DragoTMOGL();
         reinhard_tmo = new pic::ReinhardTMOGL();
-        hybrid_tmo = new pic::HybridTMOGL();
     }
 
     void render()
@@ -97,10 +97,6 @@ public:
         case 2:
             img_tmo = drago_tmo->Process(&img, 100.0f, 0.95f, img_tmo);
             break;
-
-        case 3:
-            img_tmo = hybrid_tmo->Process(&img, img_tmo);
-            break;
         }
 
         img_tmo_with_sRGB = tmo->Process(SingleGL(img_tmo), img_tmo_with_sRGB);
@@ -113,7 +109,7 @@ public:
     {
         if(ev->type() == QEvent::KeyPress) {
             if(ev->key() == Qt::Key_Space) {
-                method = (method + 1) % 4;
+                method = (method + 1) % 3;
             }
         }
     }

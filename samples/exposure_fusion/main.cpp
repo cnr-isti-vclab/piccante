@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 
         printf("Tone mapping using Exposure Fusion...");
 
-        pic::Image *imgToneMapped = pic::ExposureFusion(stack, NULL, 0.2f, 1.0f, 0.2f);
+        pic::Image *imgToneMapped = pic::ExposureFusion(stack, 0.2f, 1.0f, 0.2f, NULL);
         printf("Ok\n");
 
         printf("Writing the tone mapped image to disk...\n");

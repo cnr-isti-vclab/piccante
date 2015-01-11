@@ -29,44 +29,44 @@ namespace pic {
 /**
  * @brief ExposureFusion
  * @param imgIn
- * @param imgOut
  * @param wC
  * @param wE
  * @param wS
+ * @param imgOut
  * @return
  */
-Image *ExposureFusion(ImageVec imgIn, Image *imgOut, float wC = 1.0f,
-                         float wE = 1.0f, float wS = 1.0f)
+Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
+                      float wS = 1.0f, Image *imgOut = NULL)
 {
     int n = imgIn.size();
 
     if(n < 2) {
-        return NULL;
+        return imgOut;
     }
 
-    //Compute weights
+    //Computing weights values
     int channels = imgIn[0]->channels;
     int width = imgIn[0]->width;
     int height = imgIn[0]->height;
 
-    FilterLuminance fltL;
 
-    Image *L       = new Image(1, width, height, 1);
+    Image *lum     = new Image(1, width, height, 1);
     Image *weights = new Image(1, width, height, 1);
     Image *acc     = new Image(1, width, height, 1);
 
     acc->SetZero();
 
-    FilterExposureFusionWeights fltWeights(wC, wE, wS);
+    FilterLuminance flt_lum;
+    FilterExposureFusionWeights flt_weights(wC, wE, wS);
 
     for(int j = 0; j < n; j++) {
         #ifdef PIC_DEBUG
             printf("Processing image %d\n", j);
         #endif
 
-        L = fltL.ProcessP(Single(imgIn[j]), L);
+        lum = flt_lum.ProcessP(Single(imgIn[j]), lum);
 
-        weights = fltWeights.ProcessP(Double(imgIn[j], L), weights);
+        weights = flt_weights.ProcessP(Double(imgIn[j], lum), weights);
 
         *acc += *weights;
     }
@@ -87,8 +87,8 @@ Image *ExposureFusion(ImageVec imgIn, Image *imgOut, float wC = 1.0f,
     Pyramid *pOut = new Pyramid(width, height, channels, true, 0);
     
     for(int j = 0; j < n; j++) {
-        L = fltL.ProcessP(Single(imgIn[j]), L);
-        weights = fltWeights.ProcessP(Double(imgIn[j], L), weights);
+        lum = flt_lum.ProcessP(Single(imgIn[j]), lum);
+        weights = flt_weights.ProcessP(Double(imgIn[j], lum), weights);
 
         //normalization
         *weights /= *acc;
@@ -121,7 +121,7 @@ Image *ExposureFusion(ImageVec imgIn, Image *imgOut, float wC = 1.0f,
 
     delete acc;
     delete weights;
-    delete L;
+    delete lum;
 
     return imgOut;
 }
