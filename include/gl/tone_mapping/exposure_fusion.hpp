@@ -43,7 +43,7 @@ public:
         flt_lum = new FilterGLLuminance();
         flt_weights = NULL;
 
-        remove_negative = new FilterGLOp("MAX(I0, vec4(0.0))", true, NULL, NULL);
+        remove_negative = new FilterGLOp("max(I0, vec4(0.0))", true, NULL, NULL);
 
         lum = NULL;
         acc = NULL;
@@ -111,12 +111,6 @@ public:
             weights = flt_weights->Process(DoubleGL(imgIn[j], lum), weights);
 
             *acc += *weights;
-        }
-
-        for(int i=0; i<acc->size(); i++) {
-            if(acc->data[i] <= 0.0f) {
-                acc->data[i] = 1.0f;
-            }
         }
 
         //Accumulation Pyramid

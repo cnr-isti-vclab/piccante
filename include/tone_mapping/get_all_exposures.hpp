@@ -25,26 +25,41 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- * @brief getAllExposures converts an HDR image into a stack of LDR images
+ * @brief getAllExposures converts an HDR image into a stack of exposure values
  * @param imgIn
  * @return
  */
-ImageVec getAllExposures(Image *imgIn)
+std::vector<float> getAllExposures(Image *imgIn) {
+    std::vector<float> exposures;
+
+    if(imgIn == NULL) {
+        return exposures;
+    }
+
+    if(!imgIn->isValid()) {
+        return exposures;
+    }
+
+    Image *lum = FilterLuminance::Execute(imgIn, NULL);
+
+    Histogram m(lum, VS_LOG_2, 1024);
+    exposures = m.ExposureCovering();
+
+    delete lum;
+
+    return exposures;
+}
+
+/**
+ * @brief getAllExposuresImages converts an HDR image into a stack of LDR images
+ * @param imgIn
+ * @return
+ */
+ImageVec getAllExposuresImages(Image *imgIn)
 {
     ImageVec ret;
 
-    if(imgIn == NULL) {
-        return ret;
-    }
-
-    if(! imgIn->isValid()) {
-        return ret;
-    }
-        
-    Image *lum = FilterLuminance::Execute(imgIn, NULL);
-    Histogram m(lum, VS_LOG_2, 1024);
-
-    std::vector< float > exposures = m.ExposureCovering();
+    std::vector<float> exposures = getAllExposures(imgIn);
 
     FilterSimpleTMO flt(1.0f, 0.0f);
 
@@ -57,12 +72,10 @@ ImageVec getAllExposures(Image *imgIn)
         ret.push_back(expo);
     }
 
-    delete lum;
-
     return ret;
 }
 
 } // end namespace pic
 
-#endif /* PIC_TONE_MAPPING_WARD_HISTOGRAM_TMO_HPP */
+#endif /* PIC_GET_ALL_EXPOSURES_HPP */
 
