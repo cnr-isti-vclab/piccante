@@ -15,12 +15,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_GET_ALL_EXPOSURES_HPP
-#define PIC_GET_ALL_EXPOSURES_HPP
+#ifndef PIC_TONE_MAPPING_GET_ALL_EXPOSURES_HPP
+#define PIC_TONE_MAPPING_GET_ALL_EXPOSURES_HPP
 
 #include "image.hpp"
 #include "histogram.hpp"
 #include "filtering/filter_luminance.hpp"
+#include "filtering/filter_simple_tmo.hpp"
 
 namespace pic {
 
@@ -77,5 +78,5 @@ ImageVec getAllExposuresImages(Image *imgIn)
 
 } // end namespace pic
 
-#endif /* PIC_GET_ALL_EXPOSURES_HPP */
+#endif /* PIC_TONE_MAPPING_GET_ALL_EXPOSURES_HPP */
 

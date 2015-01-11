@@ -45,14 +45,14 @@ public:
      * @param fstop
      * @param gamma
      */
-    FilterGLSimpleTMO(float fstop, float gamma);
+    FilterGLSimpleTMO(float gamma, float fstop);
 
     /**
      * @brief Update
      * @param fstop
      * @param gamma
      */
-    void Update(float fstop, float gamma);
+    void Update(float gamma, float fstop);
 
     /**
      * @brief Execute
@@ -99,7 +99,7 @@ FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
     InitShaders();
 }
 
-FilterGLSimpleTMO::FilterGLSimpleTMO(float fstop, float gamma): FilterGL()
+FilterGLSimpleTMO::FilterGLSimpleTMO(float gamma, float fstop): FilterGL()
 {
     //protected values are assigned/computed
     if(gamma <= 0.0f) {
@@ -156,7 +156,7 @@ void FilterGLSimpleTMO::InitShaders()
     glw::bind_program(0);
 }
 
-void FilterGLSimpleTMO::Update(float fstop, float gamma)
+void FilterGLSimpleTMO::Update(float gamma, float fstop)
 {
     this->gamma = gamma;
     this->fstop = fstop;

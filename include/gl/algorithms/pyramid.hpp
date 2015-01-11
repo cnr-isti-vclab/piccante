@@ -95,6 +95,12 @@ public:
     void Update(ImageGL *img);
 
     /**
+     * @brief SetValue
+     * @param value
+     */
+    void SetValue(float value);
+
+    /**
      * @brief Mul
      * @param pyr
      */
@@ -252,6 +258,17 @@ ImageGL *PyramidGL::Reconstruct(ImageGL *imgOut)
     imgOut = fltAdd->Process(DoubleGL(stack[0], tmp), imgOut);
 
     return imgOut;
+}
+
+void PyramidGL::SetValue(float value)
+{
+    if(stack.empty()) {
+        return;
+    }
+
+    for(unsigned int i = 0; i < stack.size(); i++) {
+        *stack[i] = value;
+    }
 }
 
 void PyramidGL::Mul(const PyramidGL *pyr)

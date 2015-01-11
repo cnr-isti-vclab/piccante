@@ -41,6 +41,7 @@ protected:
 
 public:
     pic::ImageGL    img, *img_tmo;
+    pic::ImageGLVec img_vec;
     glw::program    program;
 
     unsigned int    method;
@@ -65,6 +66,8 @@ public:
         quad = new pic::QuadGL(true);
         
         ef = new pic::ExposureFusionGL();
+
+        img_vec = pic::getAllExposuresImagesGL(&img);
     }
 
     void render()
@@ -75,7 +78,6 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        pic::ImageGLVec img_vec;
         img_tmo = ef->Process(img_vec, 1.0f, 1.0f, 1.0f, img_tmo);
 
         //imgOut visualization

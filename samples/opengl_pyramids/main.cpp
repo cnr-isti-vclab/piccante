@@ -64,7 +64,6 @@ public:
 
         imgRec = NULL;
         pyr = new pic::PyramidGL(&img, true, 0);
-        imgRec = pyr->Reconstruct(imgRec);
     }
 
     void render()

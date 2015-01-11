@@ -123,12 +123,14 @@ public:
         }
 
         if(pI == NULL) {
-            pI = new PyramidGL(width, height, 1, false, 0);
+            pI = new PyramidGL(width, height, imgIn[0]->channels, false, 0);
         }
 
         if(pOut == NULL) {
-            pOut = new PyramidGL(width, height, 1, false, 0);
+            pOut = new PyramidGL(width, height, imgIn[0]->channels, false, 0);
         }
+
+        pOut->SetValue(0.0f);
 
         for(int j = 0; j < n; j++) {
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
@@ -151,7 +153,7 @@ public:
 
         //final result
         imgOut = pOut->Reconstruct(imgOut);
-        imgOut = remove_negative->Process(SingleGL(imgOut), imgOut);
+      //  imgOut = remove_negative->Process(SingleGL(imgOut), imgOut);
 
         return imgOut;
     }
