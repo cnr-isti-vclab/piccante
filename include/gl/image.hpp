@@ -107,6 +107,7 @@ protected:
         } else {
             if((nPixels() == a.nPixels()) && (a.channels == 1)) {
                 ops->list[op + 8]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
+                printf("%s\n",ops->list[op + 8]->fragment_source.c_str());
             }
         }
     }
@@ -414,6 +415,13 @@ public:
         ReduxOpsGL *ops = ReduxOpsGL::getInstance();
         return getVal(ret, ops->list[REDGL_MEAN]);
     }
+
+    /**
+     * @brief clamp
+     * @param a
+     * @param b
+     */
+    void clamp(float a, float b);
 
     /**
      * @brief operator =
@@ -891,6 +899,13 @@ void ImageGL::bindTexture()
 void ImageGL::unBindTexture()
 {
     glBindTexture(target, 0);
+}
+
+void ImageGL::clamp(float a, float b)
+{
+    BufferOpsGL *ops = BufferOpsGL::getInstance();
+    ops->list[BOGL_CLAMP]->Update(a, b);
+    ops->list[BOGL_CLAMP]->Process(getTexture(), 0, getTexture(), width, height);
 }
 
 void ImageGL::operator +=(ImageGL &a)

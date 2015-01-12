@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "util/string.hpp"
 #include "util/gl/quad.hpp"
+#include "util/gl/fbo.hpp"
 
 namespace pic {
 
@@ -130,7 +131,7 @@ BufferOpGL::BufferOpGL(std::string op, bool bTexelFetch = false, float *c0 = NUL
 
 void BufferOpGL::InitShaders()
 {
-    std::string strOp = "ret = ";
+    std::string strOp = "vec4 ret = ";
     strOp.append(op);
     strOp.append(";\n");
     int counter;
@@ -140,9 +141,9 @@ void BufferOpGL::InitShaders()
 
     if(counter > 0) {
         if(bTexelFetch) {
-            strOp = "vec4 tmp0x = texelFetch(u_tex_0, coords, 0).xxxx;\n" + strOp;
+            strOp = "vec4 tmp0x = texelFetch(u_tex_0, coords, 0).rrrr;\n" + strOp;
          } else {
-            strOp = "vec4 tmp0x = texture(u_tex_0, coords).xxxx;\n" + strOp;
+            strOp = "vec4 tmp0x = texture(u_tex_0, coords).rrrr;\n" + strOp;
          }
          strOp = stdStringRepAll(strOp, "I0x", "tmp0x");
     }
@@ -152,9 +153,9 @@ void BufferOpGL::InitShaders()
 
     if(counter > 0) {
         if(bTexelFetch) {
-            strOp = "vec4 tmp1x = texelFetch(u_tex_1, coords, 0).xxxx;\n" + strOp;
+            strOp = "texelFetch(u_tex_1, coords, 0).rrrr;\n" + strOp;
          } else {
-            strOp = "vec4 tmp1x = texture(u_tex_1, coords).xxxx;\n" + strOp;
+            strOp = "vec4 tmp1x = texture(u_tex_1, coords).rrrr;\n" + strOp;
          }
          strOp = stdStringRepAll(strOp, "I1x", "tmp1x");
     }
@@ -193,17 +194,13 @@ void BufferOpGL::InitShaders()
                           uniform sampler2D u_tex_1; \n
                           uniform vec4      u_val_0; \n
                           uniform vec4      u_val_1; \n
-                          out     vec4      f_color; \n
                           in      vec2      v_tex_coord; \n
+                          out     vec4      f_color; \n
                           \n
-    void main(void) {
-        \n
+    void main(void) { \n
         _COORDINATES_FOR_FETCHING_ \n
-        vec4 ret;
-        \n
         _PROCESSING_OPERATOR_ \n
-        f_color = ret;
-        \n
+        f_color = ret; \n
     }
                       );
 
@@ -224,9 +221,11 @@ void BufferOpGL::InitShaders()
     prefix += glw::version("330");
 
     filteringProgram.setup(prefix, vertex_source, fragment_source);
+
 #ifdef PIC_DEBUG
-    printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
+    printf("[BufferOp %s log]\n%s\n", strOp.c_str(), filteringProgram.log().c_str());
 #endif
+
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
 
@@ -236,6 +235,8 @@ void BufferOpGL::InitShaders()
 
     filteringProgram.fragment_target("f_color", 0);
     filteringProgram.relink();
+    glw::bind_program(0);
+
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex_0",  0);
     filteringProgram.uniform("u_tex_1",  1);
@@ -307,18 +308,11 @@ void BufferOpGL::Process(GLuint tex0, GLuint tex1, GLuint texOut, int width, int
     glw::bind_program(filteringProgram);
 
     //Textures
-    unsigned int counter = 0;
-    if(tex0 != 0) {
-        glActiveTexture(GL_TEXTURE0 + counter);
-        glBindTexture(GL_TEXTURE_2D, tex0);
-        counter++;
-    }
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex0);
 
-    if(tex1 != 0) {
-        glActiveTexture(GL_TEXTURE0 + counter);
-        glBindTexture(GL_TEXTURE_2D, tex1);
-        counter++;
-    }
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, tex1);
 
     quad->Render();
 
@@ -329,7 +323,7 @@ void BufferOpGL::Process(GLuint tex0, GLuint tex1, GLuint texOut, int width, int
     glw::bind_program(0);
 
     //Textures
-    for(unsigned int i = 0; i < counter; i++) {
+    for(unsigned int i = 0; i < 2; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, 0);
     }

@@ -71,7 +71,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageGL *Process(ImageGLVec &imgIn, float wC = 1.0f, float wE = 1.0f, float wS = 1.0f, ImageGL *imgOut = NULL)
+    ImageGL *Process(ImageGLVec imgIn, float wC = 1.0f, float wE = 1.0f, float wS = 1.0f, ImageGL *imgOut = NULL)
     {
         int n = imgIn.size();
 
@@ -116,16 +116,16 @@ public:
         }
 
         if(pI == NULL) {
-            pI = new PyramidGL(width, height, imgIn[0]->channels, false, 0);
+            pI = new PyramidGL(width, height, imgIn[0]->channels, true, 0);
         }
 
         if(pOut == NULL) {
-            pOut = new PyramidGL(width, height, imgIn[0]->channels, false, 0);
+            pOut = new PyramidGL(width, height, imgIn[0]->channels, true, 0);
         }
 
         pOut->SetValue(0.0f);
-
-        for(int j = 0; j < 3; j++) {
+    //    for(int j = 0; j < 1; j++) {
+        int j = 0;
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
             weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 
@@ -133,12 +133,11 @@ public:
             *weights /= *acc;
 
             pW->Update(weights);
-
             pI->Update(imgIn[j]);
 
             pI->Mul(pW);
 //            pOut->Add(pI);
-        }
+    //    }
 
         #ifdef PIC_DEBUG
             printf(" ok\n");

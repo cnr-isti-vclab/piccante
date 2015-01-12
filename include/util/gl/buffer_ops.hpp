@@ -29,7 +29,8 @@ namespace pic {
 
 enum BOGL{BOGL_ADD, BOGL_SUB, BOGL_MUL, BOGL_DIV,
           BOGL_ADD_CONST, BOGL_SUB_CONST, BOGL_MUL_CONST, BOGL_DIV_CONST,
-          BOGL_ADD_S, BOGL_SUB_S, BOGL_MUL_S, BOGL_DIV_S};
+          BOGL_ADD_S, BOGL_SUB_S, BOGL_MUL_S, BOGL_DIV_S,
+          BOGL_CLAMP};
 
 typedef std::vector<BufferOpGL*> BufferOperatorsGL;
 
@@ -89,6 +90,8 @@ private:
         list.push_back(new BufferOpGL("I0 - I1x", true));
         list.push_back(new BufferOpGL("I0 * I1x", true));
         list.push_back(new BufferOpGL("I0 / I1x", true));
+
+        list.push_back(new BufferOpGL("clamp(I0, C0, C1)", true));
     }
 
 };

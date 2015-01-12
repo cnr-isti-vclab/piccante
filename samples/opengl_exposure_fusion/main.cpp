@@ -68,6 +68,8 @@ public:
         ef = new pic::ExposureFusionGL();
 
         img_vec = pic::getAllExposuresImagesGL(&img);
+
+
     }
 
     void render()

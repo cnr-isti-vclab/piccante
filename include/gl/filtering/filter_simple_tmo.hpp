@@ -122,13 +122,11 @@ void FilterGLSimpleTMO::FragmentShader()
                           uniform float	  tn_exposure; \n
                           out     vec4      f_color;	\n
 
-    void main(void) {
-        \n
-        ivec2 coords = ivec2(gl_FragCoord.xy);
-        \n
-        vec3  color = texelFetch(u_tex, coords, 0).xyz;
-        \n
-        f_color = vec4(pow(color * tn_exposure, vec3(tn_gamma)), 1.0);
+    void main(void) { \n
+        ivec2 coords = ivec2(gl_FragCoord.xy); \n
+        vec3  color = texelFetch(u_tex, coords, 0).xyz; \n
+        color = pow(color * tn_exposure, vec3(tn_gamma));
+        f_color = vec4(color, 1.0);
         \n
     }\n
                       );
@@ -136,9 +134,6 @@ void FilterGLSimpleTMO::FragmentShader()
 
 void FilterGLSimpleTMO::InitShaders()
 {
-    float invGamma = 1.0f / gamma;
-    float exposure = powf(2.0f, fstop);
-
     filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
@@ -149,11 +144,9 @@ void FilterGLSimpleTMO::InitShaders()
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
-
-    filteringProgram.uniform("tn_gamma", invGamma);
-    filteringProgram.uniform("tn_exposure", exposure);
-    filteringProgram.uniform("u_tex", 0);
     glw::bind_program(0);
+
+    Update(gamma, fstop);
 }
 
 void FilterGLSimpleTMO::Update(float gamma, float fstop)

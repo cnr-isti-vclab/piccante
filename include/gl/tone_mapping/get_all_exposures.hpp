@@ -47,8 +47,13 @@ ImageGLVec getAllExposuresImagesGL(ImageGL *imgIn)
 
     for(unsigned int i = 0; i < exposures.size(); i++) {
         flt.Update(2.2f, exposures[i]);
-        ImageGL *expo = flt.Process(input, NULL);
 
+        #ifdef PIC_DEBUG
+            printf("Exposure: %f\n", exposures[i]);
+        #endif
+
+        ImageGL *expo = flt.Process(input, NULL);
+        expo->clamp(0.0f, 1.0f);
         ret.push_back(expo);
     }
 

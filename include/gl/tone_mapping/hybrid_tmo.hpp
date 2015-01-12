@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_GL_TONE_MAPPING_HYBRID_TMO_HPP
 
 #include "gl/tone_mapping/segmentation_tmo_approx.hpp"
+
 #include "gl/algorithms/pyramid.hpp"
 
 #include "gl/filtering/filter_remapping.hpp"
@@ -48,6 +49,7 @@ protected:
     ReinhardTMOGL       *tone_reinhard;
 
 public:
+
     /**
      * @brief HybridTMOGL
      */
