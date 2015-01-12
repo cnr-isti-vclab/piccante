@@ -66,7 +66,7 @@ public:
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        img += (*imgRand * 0.25f);
+        img *= (*imgRand * 0.25f);
     }
 
     void render()

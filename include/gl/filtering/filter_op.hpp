@@ -303,6 +303,8 @@ void FilterGLOp::InitShaders()
 
     filteringProgram.fragment_target("f_color", 0);
     filteringProgram.relink();
+    glw::bind_program(0);
+
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex_0",  0);
     filteringProgram.uniform("u_tex_1",  1);

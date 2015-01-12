@@ -66,7 +66,7 @@ protected:
     void Create(ImageGL *img, bool lapGauss, int limitLevel);
 
 public:
-    std::vector<ImageGL *>	stack;
+    ImageGLVec stack;
 
     /**
      * @brief PyramidGL
@@ -251,7 +251,8 @@ ImageGL *PyramidGL::Reconstruct(ImageGL *imgOut)
         int c = 0;
 
         for(int i = n; i >= 2; i--) {
-            tmp = fltAdd->Process(DoubleGL(stack[i - 1], tmp), trackerRec[c]);
+            trackerRec[c] = fltAdd->Process(DoubleGL(stack[i - 1], tmp), trackerRec[c]);
+            tmp = trackerRec[c];
             c++;
         }
     }

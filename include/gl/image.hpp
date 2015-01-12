@@ -107,8 +107,6 @@ protected:
         } else {
             if((nPixels() == a.nPixels()) && (a.channels == 1)) {
                 ops->list[op + 8]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
-
-                printf("%s\n",ops->list[op + 8]->fragment_source.c_str());
             }
         }
     }

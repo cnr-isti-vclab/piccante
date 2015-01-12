@@ -96,7 +96,7 @@ void FilterGLExposureFusionWeights::FragmentShader()
         pCon += texelFetch(u_tex_lum, coords - ivec2(1, 0), 0).x;\n
         pCon += texelFetch(u_tex_lum, coords + ivec2(0, 1), 0).x;\n
         pCon += texelFetch(u_tex_lum, coords - ivec2(0, 1), 0).x;\n
-        pCon = pow(pCon, wC);\n
+        pCon = pow(abs(pCon), wC);\n
 
         f_color = vec4(vec3(pCon * pExp), 1.0);\n
     }\n

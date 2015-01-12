@@ -144,7 +144,7 @@ ImageGL *FilterGLSampler2D::Process(ImageGLVec imgIn, ImageGL *imgOut)
     int f = imgIn[0]->frames;
 
     if(imgOut == NULL) {
-        imgOut = new ImageGL(f, w, h, 4, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     //Fbo

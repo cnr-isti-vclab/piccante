@@ -142,9 +142,9 @@ void BufferOpGL::InitShaders()
 
         if(I_found != std::string::npos) {
             if(bTexelFetch) {
-                strOp.replace(I_found, 2, "texelFetch(u_tex_0, coords, 0).xxxx");
+                strOp.replace(I_found, 3, "texelFetch(u_tex_0, coords, 0).xxxx");
             } else {
-                strOp.replace(I_found, 2, "texture(u_tex_0, coords).xxxx");
+                strOp.replace(I_found, 3, "texture(u_tex_0, coords).xxxx");
             }
         }
 
@@ -167,9 +167,9 @@ void BufferOpGL::InitShaders()
 
         if(I_found != std::string::npos) {
             if(bTexelFetch) {
-                strOp.replace(I_found, 2, "texelFetch(u_tex_1, coords, 0).x");
+                strOp.replace(I_found, 3, "texelFetch(u_tex_1, coords, 0).xxxx");
             } else {
-                strOp.replace(I_found, 2, "texture(u_tex_1, coords).x");
+                strOp.replace(I_found, 3, "texture(u_tex_1, coords).xxxx");
             }
         }
 
@@ -373,10 +373,11 @@ void BufferOpGL::Process(GLuint tex0, GLuint tex1, GLuint texOut, int width, int
     glw::bind_program(0);
 
     //Textures
-    for(unsigned int i = 0; i < 2; i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 } // end namespace pic

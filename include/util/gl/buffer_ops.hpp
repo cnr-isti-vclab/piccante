@@ -88,7 +88,7 @@ private:
 
         list.push_back(new BufferOpGL("I0 + I1x", true));
         list.push_back(new BufferOpGL("I0 - I1x", true));
-        list.push_back(new BufferOpGL("I0", false));
+        list.push_back(new BufferOpGL("I0 * I1x", true));
         list.push_back(new BufferOpGL("I0 / I1x", true));
 
         list.push_back(new BufferOpGL("clamp(I0, C0, C1)", true));

@@ -30,7 +30,7 @@ class ExposureFusionGL
 protected:
     FilterGLLuminance  *flt_lum;
     FilterGLExposureFusionWeights *flt_weights;
-    FilterGLOp         *remove_negative;
+    FilterGLOp         *remove_negative, *convert_zero_to_one;
     ImageGL            *lum, *acc, *weights;
     PyramidGL          *pW, *pI, *pOut;
 
@@ -44,6 +44,8 @@ public:
         flt_weights = NULL;
 
         remove_negative = new FilterGLOp("max(I0, vec4(0.0))", true, NULL, NULL);
+
+        convert_zero_to_one = new FilterGLOp("I0.x > 0.0 ? I0 : vec4(1.0)", true, NULL, NULL);
 
         lum = NULL;
         acc = NULL;
@@ -106,6 +108,8 @@ public:
             *acc += *weights;
         }
 
+        acc = convert_zero_to_one->Process(SingleGL(acc), acc);
+
         //Accumulation Pyramid
         #ifdef PIC_DEBUG
             printf("Blending...");
@@ -124,8 +128,8 @@ public:
         }
 
         pOut->SetValue(0.0f);
-    //    for(int j = 0; j < 1; j++) {
-        int j = 0;
+
+        for(int j = 0; j < n; j++) {
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
             weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 
@@ -136,16 +140,17 @@ public:
             pI->Update(imgIn[j]);
 
             pI->Mul(pW);
-//            pOut->Add(pI);
-    //    }
+
+            pOut->Add(pI);
+        }
 
         #ifdef PIC_DEBUG
             printf(" ok\n");
         #endif
 
         //final result
-        imgOut = pI->Reconstruct(imgOut);
-      //  imgOut = remove_negative->Process(SingleGL(imgOut), imgOut);
+        imgOut = pOut->Reconstruct(imgOut);
+        imgOut = remove_negative->Process(SingleGL(imgOut), imgOut);
 
         return imgOut;
     }
