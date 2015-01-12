@@ -93,12 +93,15 @@ public:
                                     IMG_GPU, GL_TEXTURE_2D);
         }
 
+        //Compute segmentation map
 #ifdef PIC_DEBUG
         float ms, tot_ms;
         GLuint testTQ1 = glBeginTimeQuery();
 #endif
+
         //Compute segmentation map
         seg_map = seg.Compute(imgIn, seg_map);
+
 
 #ifdef PIC_DEBUG
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
@@ -127,7 +130,7 @@ public:
         ms = float(double(timeVal) / 1000000.0);
         tot_ms += ms;
 
-        printf("GPU time Checking Different Zones: %f ms\n", ms);
+    printf("GPU time Checking Different Zones: %f ms\n", ms);
         testTQ1 = glBeginTimeQuery();
 #endif
 
