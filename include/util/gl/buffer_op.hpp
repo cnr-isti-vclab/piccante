@@ -95,12 +95,7 @@ BufferOpGL::BufferOpGL(std::string op, bool bTexelFetch = false, float *c0 = NUL
 
     quad = NULL;
 
-    quad = new QuadGL(false);
-
     target = GL_TEXTURE_2D;
-
-    //getting a vertex program for screen aligned quad
-    vertex_source = QuadGL::getVertexProgramV3();
 
     if(c0 != NULL) {
         memcpy(this->c0, c0, 4 * sizeof(float));
@@ -121,9 +116,12 @@ BufferOpGL::BufferOpGL(std::string op, bool bTexelFetch = false, float *c0 = NUL
     this->op = op;
     this->bTexelFetch = bTexelFetch;
 
-    if(!bTexelFetch) {
-        quad = new QuadGL(true);
+    if(bTexelFetch) {
+        vertex_source = QuadGL::getVertexProgramV3();
+        quad = new QuadGL(false);
+    } else {
         vertex_source = QuadGL::getVertexProgramWithTexCoordinates();
+        quad = new QuadGL(true);
     }
 
     InitShaders();
@@ -139,49 +137,101 @@ void BufferOpGL::InitShaders()
     //I0x
     counter = countSubString(strOp, "I0x");
 
-    if(counter > 0) {
-        if(bTexelFetch) {
-            strOp = "vec4 tmp0x = texelFetch(u_tex_0, coords, 0).rrrr;\n" + strOp;
-         } else {
-            strOp = "vec4 tmp0x = texture(u_tex_0, coords).rrrr;\n" + strOp;
-         }
-         strOp = stdStringRepAll(strOp, "I0x", "tmp0x");
+    if(counter == 1) {
+        size_t I_found = strOp.find("I0x");
+
+        if(I_found != std::string::npos) {
+            if(bTexelFetch) {
+                strOp.replace(I_found, 2, "texelFetch(u_tex_0, coords, 0).xxxx");
+            } else {
+                strOp.replace(I_found, 2, "texture(u_tex_0, coords).xxxx");
+            }
+        }
+
+    } else {
+        if(counter > 1) {
+            if(bTexelFetch) {
+                strOp = "vec4 tmp0x = texelFetch(u_tex_0, coords, 0);\n" + strOp;
+             } else {
+                strOp = "vec4 tmp0x = texture(u_tex_0, coords);\n" + strOp;
+             }
+             strOp = stdStringRepAll(strOp, "I0x", "tmp0x");
+        }
     }
 
     //I1x
     counter = countSubString(strOp, "I1x");
 
-    if(counter > 0) {
-        if(bTexelFetch) {
-            strOp = "texelFetch(u_tex_1, coords, 0).rrrr;\n" + strOp;
-         } else {
-            strOp = "vec4 tmp1x = texture(u_tex_1, coords).rrrr;\n" + strOp;
-         }
-         strOp = stdStringRepAll(strOp, "I1x", "tmp1x");
+    if(counter == 1) {
+        size_t I_found = strOp.find("I1x");
+
+        if(I_found != std::string::npos) {
+            if(bTexelFetch) {
+                strOp.replace(I_found, 2, "texelFetch(u_tex_1, coords, 0).x");
+            } else {
+                strOp.replace(I_found, 2, "texture(u_tex_1, coords).x");
+            }
+        }
+
+    } else {
+        if(counter > 1) {
+            if(bTexelFetch) {
+                strOp = "vec4 tmp1x = texelFetch(u_tex_1, coords, 0);\n" + strOp;
+             } else {
+                strOp = "vec4 tmp1x = texture(u_tex_1, coords);\n" + strOp;
+             }
+             strOp = stdStringRepAll(strOp, "I1x", "tmp1x");
+        }
     }
 
     //I0
     counter = countSubString(strOp, "I0");
 
-    if(counter > 0) {
-        if(bTexelFetch) {
-            strOp = "vec4 tmp0 = texelFetch(u_tex_0, coords, 0);\n" + strOp;
-         } else {
-            strOp = "vec4 tmp0 = texture(u_tex_0, coords);\n" + strOp;
-         }
-         strOp = stdStringRepAll(strOp, "I0", "tmp0");
+    if(counter == 1) {
+        size_t I_found = strOp.find("I0");
+
+        if(I_found != std::string::npos) {
+            if(bTexelFetch) {
+                strOp.replace(I_found, 2, "texelFetch(u_tex_0, coords, 0)");
+            } else {
+                strOp.replace(I_found, 2, "texture(u_tex_0, coords)");
+            }
+        }
+    } else {
+        if(counter > 1) {
+            if(bTexelFetch) {
+                strOp = "vec4 tmp0 = texelFetch(u_tex_0, coords, 0);\n" + strOp;
+            } else {
+                strOp = "vec4 tmp0 = texture(u_tex_0, coords);\n" + strOp;
+            }
+
+            strOp = stdStringRepAll(strOp, "I0", "tmp0");
+        }
     }
 
     //I1
     counter = countSubString(strOp, "I1");
 
-    if(counter > 0) {
-        if(bTexelFetch) {
-            strOp = "vec4 tmp1 = texelFetch(u_tex_1, coords, 0);\n" + strOp;
-         } else {
-            strOp = "vec4 tmp1 = texture(u_tex_1, coords);\n" + strOp;
-         }
-         strOp = stdStringRepAll(strOp, "I1", "tmp1");
+    if(counter == 1) {
+        size_t I_found = strOp.find("I1");
+
+        if(I_found != std::string::npos) {
+            if(bTexelFetch) {
+                strOp.replace(I_found, 2, "texelFetch(u_tex_1, coords, 0)");
+            } else {
+                strOp.replace(I_found, 2, "texture(u_tex_1, coords)");
+            }
+        }
+    } else {
+        if(counter > 1) {
+            if(bTexelFetch) {
+                strOp = "vec4 tmp1 = texelFetch(u_tex_1, coords, 0);\n" + strOp;
+            } else {
+                strOp = "vec4 tmp1 = texture(u_tex_1, coords);\n" + strOp;
+            }
+
+            strOp = stdStringRepAll(strOp, "I1", "tmp1");
+        }
     }
 
     //C1 and C2
@@ -218,12 +268,12 @@ void BufferOpGL::InitShaders()
     fragment_source.replace(processing_found, 21, strOp);
 
     std::string prefix;
-    prefix += glw::version("330");
+    prefix += glw::version("400");
 
     filteringProgram.setup(prefix, vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[BufferOp %s log]\n%s\n", strOp.c_str(), filteringProgram.log().c_str());
+    printf("[BufferOp log]\n%s\n", filteringProgram.log().c_str());
 #endif
 
     glw::bind_program(filteringProgram);

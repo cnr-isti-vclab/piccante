@@ -433,7 +433,7 @@ public:
      * @brief size computes the number of values.
      * @return This function returns the number of values.
      */
-    int size()
+    int size() const
     {
         return height * width * channels * frames;
     }
@@ -442,7 +442,7 @@ public:
      * @brief nPixels computes the number of pixels.
      * @return This function returns the number of pixels.
      */
-    int nPixels()
+    int nPixels() const
     {
         return height * width * frames;
     }

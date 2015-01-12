@@ -98,15 +98,16 @@ protected:
      * @param a
      * @param op
      */
-    inline void thisOperatorImage(ImageGL &a, BOGL op)
+    inline void thisOperatorImage(const ImageGL &a, BOGL op)
     {
         BufferOpsGL *ops = BufferOpsGL::getInstance();
 
-        if(SimilarType(&a)) {
+        if(channels == a.channels && width == a.width && height == a.height) {
             ops->list[op]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
         } else {
             if((nPixels() == a.nPixels()) && (a.channels == 1)) {
                 ops->list[op + 8]->Process(getTexture(), a.getTexture(), getTexture(), width, height);
+
                 printf("%s\n",ops->list[op + 8]->fragment_source.c_str());
             }
         }
@@ -134,13 +135,13 @@ protected:
      * @param a
      * @param op
      */
-    inline ImageGL newOperatorImage(ImageGL &a, BOGL op)
+    inline ImageGL newOperatorImage(const ImageGL &a, BOGL op)
     {
         ImageGL ret(frames, width, height, channels, IMG_GPU, target);
 
         BufferOpsGL *ops = BufferOpsGL::getInstance();
 
-        if(this->SimilarType(&a)) {
+        if(channels == a.channels && width == a.width && height == a.height) {
             ops->list[op]->Process(getTexture(), a.getTexture(), ret.getTexture(), width, height);
         } else {
             if((nPixels() == a.nPixels()) && ((a.channels == 1) || (channels == 1))) {
@@ -329,7 +330,7 @@ public:
      * @brief getTexture
      * @return
      */
-    GLuint getTexture()
+    GLuint getTexture() const
     {
         return texture;
     }
@@ -436,7 +437,7 @@ public:
      * @brief operator +=
      * @param a
      */
-    void operator +=(ImageGL &a);
+    void operator +=(const ImageGL &a);
 
     /**
      * @brief operator +=
@@ -449,7 +450,7 @@ public:
      * @param a
      * @return
      */
-    ImageGL operator +(ImageGL &a);
+    ImageGL operator +(const ImageGL &a);
 
     /**
      * @brief operator +
@@ -462,7 +463,7 @@ public:
      * @brief operator -=
      * @param a
      */
-    void operator -=(ImageGL &a);
+    void operator -=(const ImageGL &a);
 
     /**
      * @brief operator -=
@@ -475,7 +476,7 @@ public:
      * @param a
      * @return
      */
-    ImageGL operator -(ImageGL &a);
+    ImageGL operator -(const ImageGL &a);
 
     /**
      * @brief operator -
@@ -488,7 +489,7 @@ public:
      * @brief operator *=
      * @param a
      */
-    void operator *=(ImageGL &a);
+    void operator *=(const ImageGL &a);
 
     /**
      * @brief operator *=
@@ -501,7 +502,7 @@ public:
      * @param a
      * @return
      */
-    ImageGL operator *(ImageGL &a);
+    ImageGL operator *(const ImageGL &a);
 
     /**
      * @brief operator *
@@ -514,7 +515,7 @@ public:
      * @brief operator /=
      * @param a
      */
-    void operator /=(ImageGL &a);
+    void operator /=(const ImageGL &a);
 
     /**
      * @brief operator /=
@@ -527,7 +528,7 @@ public:
      * @param a
      * @return
      */
-    ImageGL operator /(ImageGL &a);
+    ImageGL operator /(const ImageGL &a);
 
     /**
      * @brief operator /
@@ -908,7 +909,7 @@ void ImageGL::clamp(float a, float b)
     ops->list[BOGL_CLAMP]->Process(getTexture(), 0, getTexture(), width, height);
 }
 
-void ImageGL::operator +=(ImageGL &a)
+void ImageGL::operator +=(const ImageGL &a)
 {
     thisOperatorImage(a, BOGL_ADD);
 }
@@ -918,7 +919,7 @@ void ImageGL::operator +=(const float &a)
     thisOperatorConst(a, BOGL_ADD_CONST);
 }
 
-ImageGL ImageGL::operator +(ImageGL &a)
+ImageGL ImageGL::operator +(const ImageGL &a)
 {
     return newOperatorImage(a, BOGL_ADD);
 }
@@ -928,7 +929,7 @@ ImageGL ImageGL::operator +(const float &a)
     return newOperatorConst(a, BOGL_ADD_CONST);
 }
 
-void ImageGL::operator -=(ImageGL &a)
+void ImageGL::operator -=(const ImageGL &a)
 {
     thisOperatorImage(a, BOGL_SUB);
 }
@@ -938,7 +939,7 @@ void ImageGL::operator -=(const float &a)
     thisOperatorConst(a, BOGL_SUB_CONST);
 }
 
-ImageGL ImageGL::operator -(ImageGL &a)
+ImageGL ImageGL::operator -(const ImageGL &a)
 {
     return newOperatorImage(a, BOGL_SUB);
 }
@@ -948,7 +949,7 @@ ImageGL ImageGL::operator -(const float &a)
     return newOperatorConst(a, BOGL_SUB_CONST);
 }
 
-void ImageGL::operator *=(ImageGL &a)
+void ImageGL::operator *=(const ImageGL &a)
 {
     thisOperatorImage(a, BOGL_MUL);
 }
@@ -958,7 +959,7 @@ void ImageGL::operator *=(const float &a)
     thisOperatorConst(a, BOGL_MUL_CONST);
 }
 
-ImageGL ImageGL::operator *(ImageGL &a)
+ImageGL ImageGL::operator *(const ImageGL &a)
 {
     return newOperatorImage(a, BOGL_MUL);
 }
@@ -968,7 +969,7 @@ ImageGL ImageGL::operator *(const float &a)
     return newOperatorConst(a, BOGL_MUL_CONST);
 }
 
-void ImageGL::operator /=(ImageGL &a)
+void ImageGL::operator /=(const ImageGL &a)
 {
     thisOperatorImage(a, BOGL_DIV);
 }
@@ -978,7 +979,7 @@ void ImageGL::operator /=(const float &a)
     thisOperatorConst(a, BOGL_DIV_CONST);
 }
 
-ImageGL ImageGL::operator /(ImageGL &a)
+ImageGL ImageGL::operator /(const ImageGL &a)
 {
     return newOperatorImage(a, BOGL_DIV);
 }
