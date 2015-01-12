@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -35,6 +26,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterGLSamplingMap class
+ */
 class FilterGLSamplingMap: public FilterGLNPasses
 {
 protected:
@@ -46,23 +40,62 @@ protected:
     FilterGLGaussian2D		*filterG2D;
 
     void InitShaders() {}
+
     void FragmentShader() {}
+
+    /**
+     * @brief Setup
+     * @param sigma
+     * @param scale
+     */
     void Setup(float sigma, float scale);
+
+    /**
+     * @brief SetupAuxN
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLSamplingMap
+     * @param sigma
+     */
     FilterGLSamplingMap(float sigma);
+
+    /**
+     * @brief FilterGLSamplingMap
+     * @param sigma
+     * @param scale
+     */
     FilterGLSamplingMap(float sigma, float scale);
+
     ~FilterGLSamplingMap();
 
+    /**
+     * @brief getScale
+     * @return
+     */
     float getScale()
     {
         return scale;
     }
 
+    /**
+     * @brief getFbo
+     * @return
+     */
     Fbo *getFbo();
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma
+     * @return
+     */
     static ImageGL *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
         ImageGL imgIn(nameIn);
@@ -83,7 +116,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLSamplingMap::FilterGLSamplingMap(float sigma): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
@@ -98,15 +130,6 @@ FilterGLSamplingMap::FilterGLSamplingMap(float sigma,
     Setup(sigma * scale, scale);
 }
 
-FilterGLSamplingMap::~FilterGLSamplingMap()
-{
-    delete filterG;
-    delete filterS;
-    delete filterD;
-    delete filterG2D;
-}
-
-//Basic constructor
 void FilterGLSamplingMap::Setup(float sigma, float scale)
 {
     this->sigma = sigma;
@@ -122,6 +145,14 @@ void FilterGLSamplingMap::Setup(float sigma, float scale)
     InsertFilter(filterS);
     InsertFilter(filterG);
     InsertFilter(filterG2D);
+}
+
+FilterGLSamplingMap::~FilterGLSamplingMap()
+{
+    delete filterG;
+    delete filterS;
+    delete filterD;
+    delete filterG2D;
 }
 
 Fbo *FilterGLSamplingMap::getFbo()

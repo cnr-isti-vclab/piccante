@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,6 +22,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief glGetPrintError
+ */
 void glGetPrintError()
 {
     GLenum err = glGetError();
@@ -40,7 +34,11 @@ void glGetPrintError()
     }
 }
 
-template <unsigned int N> class MRSamplersGL: public MRSamplers<N>
+/**
+ * @brief The MRSamplersGL class
+ */
+template <unsigned int N>
+class MRSamplersGL: public MRSamplers<N>
 {
 protected:
     GLuint	texture;
@@ -49,31 +47,55 @@ protected:
 public:
     int		nSamples;
 
+    /**
+     * @brief MRSamplersGL
+     * @param type
+     * @param window
+     * @param nSamples
+     * @param nLevels
+     * @param nSamplers
+     */
     MRSamplersGL(SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels,
                  int nSamplers): MRSamplers<N>(type, window, nSamples, nLevels, nSamplers)
     {
         texture = 0;
     }
 
-    //Update the window
+    /**
+     * @brief updateGL
+     * @param window
+     * @param nSamples
+     */
     void   updateGL(Vec<N, int> window, int nSamples);
 
-    //Get the texture
+    /**
+     * @brief getTexture
+     * @return
+     */
     GLuint getTexture()
     {
         return texture;
     }
 
-    //Generate the texture
+    /**
+     * @brief generateTexture
+     * @return
+     */
     GLuint generateTexture();
 
-    //Get the LevelsR texture
+    /**
+     * @brief getLevelsRTexture
+     * @return
+     */
     GLuint getLevelsRTexture()
     {
         return levelsRtexture;
     }
 
-    //Generate the LevelsR texture
+    /**
+     * @brief generateLevelsRTexture
+     * @return
+     */
     GLuint generateLevelsRTexture();
 };
 
@@ -167,7 +189,6 @@ template <unsigned int N> GLuint MRSamplersGL<N>::generateTexture()
     return texture;
 }
 
-//Generate the LevelsR texture
 template <unsigned int N> GLuint MRSamplersGL<N>::generateLevelsRTexture()
 {
     //Create the buffer in the main memory

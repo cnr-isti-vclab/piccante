@@ -48,14 +48,6 @@ public:
      * @param s_R
      */
     void Update(float s_S, float s_R);
-
-    /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
 FilterGLSlicer::FilterGLSlicer(float s_S, float s_R): FilterGL()
@@ -133,61 +125,6 @@ void FilterGLSlicer::Update(float s_S, float s_R)
     filteringProgram.uniform("s_S", s_S);
     filteringProgram.uniform("mul_E", mul_E);
     glw::bind_program(0);
-}
-
-ImageGL *FilterGLSlicer::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-        fbo->create(w, h, 1, false, imgOut->getTexture());
-    }
-
-    if(imgIn.size() < 2) {
-        return NULL;
-    }
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    glw::bind_program(filteringProgram);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    imgIn[0]->bindTexture();
-
-    glActiveTexture(GL_TEXTURE1);
-    imgIn[1]->bindTexture();
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    glw::bind_program(0);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE1);
-    imgIn[1]->unBindTexture();
-
-    glActiveTexture(GL_TEXTURE0);
-    imgIn[0]->unBindTexture();
-
-    return imgOut;
 }
 
 } // end namespace pic

@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -40,23 +31,37 @@ protected:
     void FragmentShader() {}
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLNPasses
+     */
     FilterGLNPasses();
 
     virtual ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
+    /**
+     * @brief InsertFilter
+     * @param flt
+     */
     void InsertFilter(FilterGL *flt);
 
+    /**
+     * @brief getFbo
+     * @return
+     */
     Fbo  *getFbo()
     {
         return filters.back()->getFbo();
     }
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-//Basic constructor
 FilterGLNPasses::FilterGLNPasses(): FilterGL()
 {
     imgTmp[0] = imgTmp[1] = NULL;
@@ -114,7 +119,6 @@ ImageGL *FilterGLNPasses::SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
     return imgOut;
 }
 
-//Processing
 ImageGL *FilterGLNPasses::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.size() < 1 || imgIn[0] == NULL) {

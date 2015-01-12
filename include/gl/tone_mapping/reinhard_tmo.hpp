@@ -25,7 +25,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-
+/**
+ * @brief The ReinhardTMOGL class
+ */
 class ReinhardTMOGL
 {
 protected:

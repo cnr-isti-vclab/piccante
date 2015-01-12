@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -35,6 +26,9 @@ namespace pic {
 
 enum BF_TYPE {BF_CLASSIC, BF_CROSS, BF_BRUSH};
 
+/**
+ * @brief The FilterGLBilateral2DS class
+ */
 class FilterGLBilateral2DS: public FilterGL
 {
 protected:

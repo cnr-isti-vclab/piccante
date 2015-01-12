@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -29,6 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterGLBilateral3DAS class
+ */
 class FilterGLBilateral3DAS: public FilterGL
 {
 protected:
@@ -49,20 +43,46 @@ protected:
     void FragmentShader();
 
 public:
-    //Basic constructors
+
+    /**
+     * @brief FilterGLBilateral3DAS
+     */
     FilterGLBilateral3DAS();
-    ~FilterGLBilateral3DAS();
-    //Init constructors
+
+    /**
+     * @brief FilterGLBilateral3DAS
+     * @param sigma_s
+     * @param sigma_r
+     * @param sigma_t
+     */
     FilterGLBilateral3DAS(float sigma_s, float sigma_r, float sigma_t);
 
-    //Change parameters
+    ~FilterGLBilateral3DAS();
+
+    /**
+     * @brief Update
+     * @param sigma_s
+     * @param sigma_r
+     * @param sigma_t
+     */
     void Update(float sigma_s, float sigma_r, float sigma_t);
+
+    /**
+     * @brief setFrame
+     * @param frame
+     */
     void setFrame(int frame)
     {
         this->frame = frame;
         Update(-1.0f, -1.0f, -1.0f);
     }
-    //Processing
+
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 

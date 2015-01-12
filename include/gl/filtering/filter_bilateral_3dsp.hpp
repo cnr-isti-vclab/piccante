@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,6 +22,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterGLBilateral3DSP class
+ */
 class FilterGLBilateral3DSP: public FilterGLNPasses
 {
 protected:
@@ -41,21 +35,48 @@ protected:
     void FragmentShader() {}
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLBilateral3DSP
+     */
     FilterGLBilateral3DSP();
-    ~FilterGLBilateral3DSP();
-    //Init constructors
+
+    /**
+     * @brief FilterGLBilateral3DSP
+     * @param sigma_s
+     * @param sigma_r
+     * @param sigma_t
+     */
     FilterGLBilateral3DSP(float sigma_s, float sigma_r, float sigma_t);
 
+    ~FilterGLBilateral3DSP();
+
+    /**
+     * @brief setFrame
+     * @param frame
+     */
     void setFrame(int frame)
     {
         filterS->setSlice(frame);
         filterT->setSlice(frame);
     }
 
-    //Update
+    /**
+     * @brief Update
+     * @param sigma_s
+     * @param sigma_r
+     * @param sigma_t
+     */
     void Update(float sigma_s,  float sigma_r, float sigma_t);
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @param sigma_t
+     * @return
+     */
     static ImageGL *Execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r, float sigma_t)
     {
@@ -63,7 +84,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLBilateral3DSP::FilterGLBilateral3DSP(): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D_ARRAY;
@@ -76,7 +96,6 @@ FilterGLBilateral3DSP::~FilterGLBilateral3DSP()
     delete filterT;
 }
 
-//Constructor
 FilterGLBilateral3DSP::FilterGLBilateral3DSP(float sigma_s, float sigma_r,
         float sigma_t): FilterGLNPasses()
 {

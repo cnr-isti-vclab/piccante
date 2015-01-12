@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -31,6 +22,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterGLBilateral3DS class
+ */
 class FilterGLBilateral3DS: public FilterGL
 {
 protected:
@@ -42,36 +36,74 @@ protected:
     //Random numbers tile
     ImageGL *imageRand;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
+
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
 public:
 
-    //Init constructors
+    /**
+     * @brief FilterGLBilateral3DS
+     * @param sigma_s
+     * @param sigma_r
+     * @param sigma_t
+     */
     FilterGLBilateral3DS(float sigma_s, float sigma_r, float sigma_t);
 
-    //Change parameters
+    /**
+     * @brief Update
+     * @param sigma_s
+     * @param sigma_r
+     * @param sigma_t
+     */
     void Update(float sigma_s, float sigma_r, float sigma_t);
+
+    /**
+     * @brief UpdateUniform
+     */
     void UpdateUniform();
 
+    /**
+     * @brief setFrame
+     * @param frame
+     */
     void setFrame(int frame)
     {
         this->frame = frame;
     }
+
+    /**
+     * @brief nextFrame
+     */
     void nextFrame()
     {
         frame++;
     }
+
+    /**
+     * @brief getFrame
+     * @return
+     */
     int  getFrame()
     {
         return frame;
     }
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-//Init constructors
 FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
         float sigma_t): FilterGL()
 {
@@ -182,7 +214,6 @@ void FilterGLBilateral3DS::InitShaders()
     UpdateUniform();
 }
 
-//Change parameters
 void FilterGLBilateral3DS::Update(float sigma_s, float sigma_r, float sigma_t)
 {
 
@@ -234,7 +265,6 @@ void FilterGLBilateral3DS::UpdateUniform()
     glw::bind_program(0);
 }
 
-//Processing
 ImageGL *FilterGLBilateral3DS::Process(ImageGLVec imgIn,
         ImageGL *imgOut)
 {

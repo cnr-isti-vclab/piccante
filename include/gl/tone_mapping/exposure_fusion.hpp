@@ -24,7 +24,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-
+/**
+ * @brief The ExposureFusionGL class
+ */
 class ExposureFusionGL
 {
 protected:
