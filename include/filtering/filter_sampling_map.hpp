@@ -97,6 +97,12 @@ public:
 
 FilterSamplingMap::FilterSamplingMap(float sigma) : FilterNPasses()
 {
+    fltL = NULL;
+    fltD = NULL;
+    fltS = NULL;
+    fltG = NULL;
+    fltG2D = NULL;
+
     float rateScale = 2.0f;
     Setup(rateScale, rateScale / sigma);
 }
