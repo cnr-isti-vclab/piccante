@@ -151,12 +151,12 @@ Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 0)
 
 Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, int limitLevel = 0)
 {
-    Image *img = new Image(1, width, height, channels);
-    *img = 0.0f;
+//    Image *img = new Image(1, width, height, channels);
+//    *img = 0.0f;
 
-    Create(img, width, height, channels, lapGauss, limitLevel);
+    Create(NULL, width, height, channels, lapGauss, limitLevel);
 
-    delete img;
+//    delete img;
 }
 
 Pyramid::~Pyramid()
@@ -181,24 +181,37 @@ void Pyramid::Create(Image *img, int width, int height, int channels, bool lapGa
 
     int levels = MAX(log2(MIN(width, height)) - limitLevel, 1);
 
+    if(img == NULL) {
+        int tmp_width  = width;
+        int tmp_height = height;
+        for(int i = 0; i < levels; i++) {
+            Image *tmp = new Image(1, tmp_width, tmp_height, channels);
+            tmp_width = tmp_width / 2 ;
+            tmp_height = tmp_height / 2;
+
+            *tmp = 0.0f;
+            stack.push_back(tmp);
+        }
+
+        tmp_width  = width / 2;
+        tmp_height = height / 2;
+        for(int i = 0; i < (levels - 1); i++) {
+            Image *tmp = new Image(1, tmp_width, tmp_height, channels);
+            tmp_width = tmp_width / 2;
+            tmp_height = tmp_height / 2;
+
+            *tmp = 0.0f;
+            trackerUp.push_back(tmp);
+        }
+        return;
+    }
+
     Image *tmpG = NULL;
     Image *tmpD = NULL;
 
-    bool bCreate = false;
-    if(img == NULL) {
-        bCreate = true;
-    }
-
     for(int i = 0; i < levels; i++) {
 
-        if(bCreate && (i == 0)) {
-            tmpG = new Image(1, width, height, channels);
-            *tmpG = 0.0f;
-            tmpImg = tmpG;
-            bCreate = false;
-        } else {
-            tmpG = flt_gauss.ProcessP(Single(tmpImg), NULL);
-        }
+        tmpG = flt_gauss.ProcessP(Single(tmpImg), NULL);
 
         tmpD = flt_sampler.ProcessP(Single(tmpG), NULL);
 

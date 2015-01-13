@@ -69,6 +69,7 @@ protected:
     void Create(ImageGL *img, int width, int height, int channels, bool lapGauss, int limitLevel);
 
 public:
+
     ImageGLVec stack;
 
     /**
@@ -145,12 +146,12 @@ PyramidGL::PyramidGL(ImageGL *img, bool lapGauss, int limitLevel = 0)
 
 PyramidGL::PyramidGL(int width, int height, int channels, bool lapGauss, int limitLevel = 0)
 {
-    ImageGL *img = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
-    *img = 0.0f;
+//    ImageGL *img = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
+//    *img = 0.0f;
 
-    Create(img, width, height, channels, lapGauss, limitLevel);
+    Create(NULL, width, height, channels, lapGauss, limitLevel);
 
-    delete img;
+//    delete img;
 }
 
 PyramidGL::~PyramidGL()
@@ -175,6 +176,33 @@ void PyramidGL::Create(ImageGL *img, int width, int height, int channels, bool l
 
     int levels = MAX(log2(MIN(width, height)) - limitLevel, 1);
 
+    //empty image case
+    if(img == NULL) {
+        int tmp_width  = width;
+        int tmp_height = height;
+        for(int i = 0; i < levels; i++) {
+            ImageGL *tmp = new ImageGL(1, tmp_width, tmp_height, channels, IMG_GPU, GL_TEXTURE_2D);
+            tmp_width = tmp_width / 2 ;
+            tmp_height = tmp_height / 2;
+
+            *tmp = 0.0f;
+            stack.push_back(tmp);
+        }
+
+        tmp_width  = width / 2;
+        tmp_height = height / 2;
+        for(int i = 0; i < (levels - 1); i++) {
+            ImageGL *tmp = new ImageGL(1, tmp_width, tmp_height, channels, IMG_GPU, GL_TEXTURE_2D);
+            tmp_width = tmp_width / 2;
+            tmp_height = tmp_height / 2;
+
+            *tmp = 0.0f;
+            trackerUp.push_back(tmp);
+        }
+        return;
+    }
+
+    //normal image case
     for(int i = 0; i < levels; i++) {
 
         tmpG = flt_gauss->Process(SingleGL(tmpImg), NULL);

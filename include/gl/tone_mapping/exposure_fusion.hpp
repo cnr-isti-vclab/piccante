@@ -86,7 +86,7 @@ public:
         //Computing weights values
         int width = imgIn[0]->width;
         int height = imgIn[0]->height;
-
+        int channels = imgIn[0]->channels;
 
         if(acc == NULL) {
             acc = new ImageGL(1, width, height, 1, IMG_GPU, GL_TEXTURE_2D);
@@ -118,17 +118,15 @@ public:
         #endif
 
         if(pW == NULL) {
-            pW = new PyramidGL(lum, false, 0);
-            pW->SetValue(0.0f);
+            pW = new PyramidGL(width, height, 1, false, 0);
         }
 
         if(pI == NULL) {
-            pI = new PyramidGL(imgIn[0], true, 0);
-            pW->SetValue(0.0f);
+            pI = new PyramidGL(width, height, channels, true, 0);
         }
 
         if(pOut == NULL) {
-            pOut = new PyramidGL(imgIn[0], true, 0);
+            pOut = new PyramidGL(width, height, channels, true, 0);
         }
 
         pOut->SetValue(0.0f);
