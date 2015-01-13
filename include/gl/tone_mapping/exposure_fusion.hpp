@@ -118,15 +118,17 @@ public:
         #endif
 
         if(pW == NULL) {
-            pW = new PyramidGL(width, height, 1, false, 0);
+            pW = new PyramidGL(lum, false, 0);
+            pW->SetValue(0.0f);
         }
 
         if(pI == NULL) {
-            pI = new PyramidGL(width, height, imgIn[0]->channels, true, 0);
+            pI = new PyramidGL(imgIn[0], true, 0);
+            pW->SetValue(0.0f);
         }
 
         if(pOut == NULL) {
-            pOut = new PyramidGL(width, height, imgIn[0]->channels, true, 0);
+            pOut = new PyramidGL(imgIn[0], true, 0);
         }
 
         pOut->SetValue(0.0f);

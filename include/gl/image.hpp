@@ -428,7 +428,7 @@ public:
      */
     void operator =(const float &a)
     {
-        AssignGL(a, a, a, a);
+        thisOperatorConst(a, BOGL_CONST);
     }
 
     /**

@@ -49,7 +49,6 @@ Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
     int width = imgIn[0]->width;
     int height = imgIn[0]->height;
 
-
     Image *lum     = new Image(1, width, height, 1);
     Image *weights = new Image(1, width, height, 1);
     Image *acc     = new Image(1, width, height, 1);
@@ -82,12 +81,14 @@ Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
         printf("Blending...");
     #endif
 
-    Pyramid *pW   = new Pyramid(width, height, 1, false, 0);
-    Pyramid *pI   = new Pyramid(width, height, channels, true, 0);
-    Pyramid *pOut = new Pyramid(width, height, channels, true, 0);
+    Pyramid *pW   = new Pyramid(lum, false, 0);
+    Pyramid *pI   = new Pyramid(imgIn[0], true, 0);
+    Pyramid *pOut = new Pyramid(imgIn[0], true, 0);
 
+    pW->SetValue(0.0f);
+    pI->SetValue(0.0f);
     pOut->SetValue(0.0f);
-    
+
     for(int j = 0; j < n; j++) {
         lum = flt_lum.ProcessP(Single(imgIn[j]), lum);
         weights = flt_weights.ProcessP(Double(lum, imgIn[j]), weights);

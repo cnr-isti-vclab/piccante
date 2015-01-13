@@ -60,10 +60,13 @@ protected:
     /**
      * @brief Create
      * @param img
+     * @param width
+     * @param height
+     * @param channels
      * @param lapGauss
      * @param limitLevel
      */
-    void Create(ImageGL *img, bool lapGauss, int limitLevel);
+    void Create(ImageGL *img, int width, int height, int channels, bool lapGauss, int limitLevel);
 
 public:
     ImageGLVec stack;
@@ -135,17 +138,19 @@ public:
 
 PyramidGL::PyramidGL(ImageGL *img, bool lapGauss, int limitLevel = 0)
 {
-    Create(img, lapGauss, limitLevel);
+    if(img != NULL) {
+        Create(img, img->width, img->height, img->channels, lapGauss, limitLevel);
+    }
 }
 
 PyramidGL::PyramidGL(int width, int height, int channels, bool lapGauss, int limitLevel = 0)
 {
-    ImageGL *tmpImg = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
-    *tmpImg = 0.0f;
+    ImageGL *img = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
+    *img = 0.0f;
 
-    Create(tmpImg, lapGauss, limitLevel);
+    Create(img, width, height, channels, lapGauss, limitLevel);
 
-    delete tmpImg;
+    delete img;
 }
 
 PyramidGL::~PyramidGL()
@@ -157,7 +162,7 @@ PyramidGL::~PyramidGL()
     }
 }
 
-void PyramidGL::Create(ImageGL *img, bool lapGauss, int limitLevel = 0)
+void PyramidGL::Create(ImageGL *img, int width, int height, int channels, bool lapGauss, int limitLevel = 0)
 {
     this->lapGauss = lapGauss;
     this->limitLevel  = limitLevel;
@@ -168,17 +173,21 @@ void PyramidGL::Create(ImageGL *img, bool lapGauss, int limitLevel = 0)
     ImageGL *tmpG   = NULL;
     ImageGL *tmpD   = NULL;
 
-    int levels = MAX(log2(MIN(tmpImg->width, tmpImg->height)) - limitLevel, 1);
+    int levels = MAX(log2(MIN(width, height)) - limitLevel, 1);
 
     for(int i = 0; i < levels; i++) {
+
         tmpG = flt_gauss->Process(SingleGL(tmpImg), NULL);
+
         tmpD = flt_sampler->Process(SingleGL(tmpG), NULL);
 
         if(lapGauss) {  //Laplacian Pyramid
-            flt_sub->Process(DoubleGL(tmpImg, tmpD), tmpG);
+            tmpG = flt_sub->Process(DoubleGL(tmpImg, tmpD), tmpG);
+
             stack.push_back(tmpG);
         } else {        //Gaussian Pyramid
-            flt_id->Process(SingleGL(tmpImg), tmpG);
+            tmpG = flt_id->Process(SingleGL(tmpImg), tmpG);
+
             stack.push_back(tmpG);
         }
 

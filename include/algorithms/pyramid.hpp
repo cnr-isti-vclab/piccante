@@ -37,7 +37,16 @@ protected:
 
     ImageVec trackerRec, trackerUp;
 
-    void Create(Image *img, bool lapGauss, int limitLevel);
+    /**
+     * @brief Create
+     * @param img
+     * @param width
+     * @param height
+     * @param channels
+     * @param lapGauss
+     * @param limitLevel
+     */
+    void Create(Image *img, int width, int height, int channels, bool lapGauss, int limitLevel);
 
 public:
     std::vector<Image *>  stack;
@@ -134,22 +143,20 @@ public:
 
 Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 0)
 {
-    Create(img, lapGauss, limitLevel);
+    if(img != NULL) {
+        Create(img, img->width, img->height, img->channels, lapGauss, limitLevel);
+    }
 }
 
 
 Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, int limitLevel = 0)
 {
-    Image *tmpImg = new Image(1, width, height, channels);
-    tmpImg->SetZero();
+    Image *img = new Image(1, width, height, channels);
+    *img = 0.0f;
 
-    Create(tmpImg, lapGauss, limitLevel);
+    Create(img, width, height, channels, lapGauss, limitLevel);
 
-    delete tmpImg;
-
-#ifdef PIC_DEBUG
-    printf("Pyramid size: %lu\n", stack.size());
-#endif
+    delete img;
 }
 
 Pyramid::~Pyramid()
@@ -161,7 +168,7 @@ Pyramid::~Pyramid()
     }
 }
 
-void Pyramid::Create(Image *img, bool lapGauss, int limitLevel = 0)
+void Pyramid::Create(Image *img, int width, int height, int channels, bool lapGauss, int limitLevel = 0)
 {
     this->lapGauss  = lapGauss;
     this->limitLevel = limitLevel;
@@ -172,18 +179,32 @@ void Pyramid::Create(Image *img, bool lapGauss, int limitLevel = 0)
 
     Image *tmpImg = img;
 
-    int levels = MAX(log2(MIN(img->width, img->height)) - limitLevel, 1);
+    int levels = MAX(log2(MIN(width, height)) - limitLevel, 1);
 
     Image *tmpG = NULL;
     Image *tmpD = NULL;
 
+    bool bCreate = false;
+    if(img == NULL) {
+        bCreate = true;
+    }
+
     for(int i = 0; i < levels; i++) {
-        tmpG = flt_gauss.ProcessP(Single(tmpImg), NULL);
+
+        if(bCreate && (i == 0)) {
+            tmpG = new Image(1, width, height, channels);
+            *tmpG = 0.0f;
+            tmpImg = tmpG;
+            bCreate = false;
+        } else {
+            tmpG = flt_gauss.ProcessP(Single(tmpImg), NULL);
+        }
+
         tmpD = flt_sampler.ProcessP(Single(tmpG), NULL);
 
         if(lapGauss) {	//Laplacian Pyramid
-            Image *tmpDiff = flt_sub.ProcessP(Double(tmpImg, tmpD), tmpG);
-            stack.push_back(tmpDiff);
+            tmpG = flt_sub.ProcessP(Double(tmpImg, tmpD), tmpG);
+            stack.push_back(tmpG);
         } else {			//Gaussian Pyramid
             tmpG->Assign(tmpImg);
             stack.push_back(tmpG);
