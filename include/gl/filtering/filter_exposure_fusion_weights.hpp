@@ -102,7 +102,8 @@ void FilterGLExposureFusionWeights::FragmentShader()
         pCon += texelFetch(u_tex_lum, coords - ivec2(1, 0), 0).x;\n
         pCon += texelFetch(u_tex_lum, coords + ivec2(0, 1), 0).x;\n
         pCon += texelFetch(u_tex_lum, coords - ivec2(0, 1), 0).x;\n
-        pCon = pow(abs(pCon), wC);\n
+        pCon = abs(pCon);\n
+        pCon = pow(pCon, wC);\n
 
         f_color = vec4(vec3(pCon * pExp * pSat), 1.0);\n
     }\n
@@ -112,8 +113,6 @@ void FilterGLExposureFusionWeights::FragmentShader()
 void FilterGLExposureFusionWeights::InitShaders()
 {
     FragmentShader();
-
-    std::string prefix;
 
     filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
@@ -125,6 +124,10 @@ void FilterGLExposureFusionWeights::InitShaders()
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
+
+    glw::bind_program(0);
+
+    glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex_lum", 0);
     filteringProgram.uniform("u_tex", 1);
     filteringProgram.uniform("wC", wC);
