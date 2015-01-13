@@ -52,16 +52,16 @@ public:
     FilterGLExposureFusionWeights(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f) : FilterGL()
     {
         float sigma = 0.2f;
-
         mu = 0.5f;
         sigma2 = 2.0f * sigma * sigma;
 
-        this->wC = wC > 0.0f ? wC : 1.0f;
-        this->wE = wE > 0.0f ? wE : 1.0f;
-        this->wS = wS > 0.0f ? wS : 1.0f;
+        this->wC = wC >= 0.0f ? wC : 1.0f;
+        this->wE = wE >= 0.0f ? wE : 1.0f;
+        this->wS = wS >= 0.0f ? wS : 1.0f;
 
         //protected values are assigned/computed
         FragmentShader();
+
         InitShaders();
     }
 };
@@ -83,14 +83,20 @@ void FilterGLExposureFusionWeights::FragmentShader()
         \n
         ivec2 coords = ivec2(gl_FragCoord.xy);\n
 
-        float L = texelFetch(u_tex_lum, coords, 0).x;\n
+        //saturation weight
+        vec3 color = texelFetch(u_tex, coords, 0).xyz;\n
+        float tmpMu = dot(color.xyz, vec3(1.0 / 3.0));\n
+        vec3 tmpVar = color - vec3(tmpMu);\n
+        float pSat = sqrt( dot(tmpVar, tmpVar) / 3.0);\n
+        pSat = pow(pSat, wS);\n
 
-        //well-exposedness
+        //well-exposedness weight
+        float L = texelFetch(u_tex_lum, coords, 0).x;\n
         float tmp = (L - mu);\n
         float pExp = exp(-(tmp * tmp) / sigma2);\n
         pExp = pow(pExp, wE);\n
 
-        //contrast
+        //contrast weight
         float pCon = -4.0 * L;
         pCon += texelFetch(u_tex_lum, coords + ivec2(1, 0), 0).x;\n
         pCon += texelFetch(u_tex_lum, coords - ivec2(1, 0), 0).x;\n
@@ -98,7 +104,7 @@ void FilterGLExposureFusionWeights::FragmentShader()
         pCon += texelFetch(u_tex_lum, coords - ivec2(0, 1), 0).x;\n
         pCon = pow(abs(pCon), wC);\n
 
-        f_color = vec4(vec3(pCon * pExp), 1.0);\n
+        f_color = vec4(vec3(pCon * pExp * pSat), 1.0);\n
     }\n
                       );
 }

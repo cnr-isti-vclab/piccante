@@ -36,29 +36,13 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("OK\n");
 
-        printf("Computing HDR Image histogram...");
-
-        pic::ImageVec input = Single(&img);
-        pic::FilterLuminance fLum;
-        pic::Image *lum = fLum.ProcessP(input, NULL);
-
-        pic::Histogram hst;
-        hst.Calculate(lum, pic::VS_LOG_2, 256, 0);
-        printf("Ok\n");
-
         printf("Extracting exposures from the HDR image...");
-        pic::FilterSimpleTMO fltTMO(2.2f, 0.0f);
-        std::vector< float > exposures = hst.ExposureCovering(8, 0.5f);
-        pic::ImageVec stack;
+        pic::ImageVec stack = pic::getAllExposuresImages(&img);
 
-        for(unsigned int i = 0; i < exposures.size(); i++) {
-            fltTMO.Update(2.2f, exposures[i]);
-            pic::Image *tmp = fltTMO.ProcessP(input, NULL);
-            tmp->clamp(0.0f, 1.0f);
-            stack.push_back(tmp);
-
+        for(unsigned int i = 0; i < stack.size(); i++) {
             //writing the extraced exposure image
-            tmp->Write("../data/output/exposure_" + pic::NumberToString(i) + ".png", pic::LT_NOR);
+            stack[i]->clamp(0.0f, 1.0f);
+            stack[i]->Write("../data/output/exposure_" + pic::NumberToString(i) + ".png", pic::LT_NOR);
         }
 
         printf("Ok\n");

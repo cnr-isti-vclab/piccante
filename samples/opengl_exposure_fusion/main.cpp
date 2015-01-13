@@ -79,7 +79,7 @@ public:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //computing exposure fusion for the stack (img_vec)
-        img_tmo = ef->Process(img_vec, 1.0f, 1.0f, 1.0f, img_tmo);
+        img_tmo = ef->Process(img_vec, 0.2f, 1.0f, 0.2f, img_tmo);
 
         //imgOut visualization
         quad->Render(program, img_tmo->getTexture());

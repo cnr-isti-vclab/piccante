@@ -85,6 +85,8 @@ Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
     Pyramid *pW   = new Pyramid(width, height, 1, false, 0);
     Pyramid *pI   = new Pyramid(width, height, channels, true, 0);
     Pyramid *pOut = new Pyramid(width, height, channels, true, 0);
+
+    pOut->SetValue(0.0f);
     
     for(int j = 0; j < n; j++) {
         lum = flt_lum.ProcessP(Single(imgIn[j]), lum);
@@ -111,7 +113,7 @@ Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
     #pragma omp parallel for
 
     for(int i = 0; i < imgOut->size(); i++) {
-        imgOut->data[i] = imgOut->data[i] > 0.0f ? imgOut->data[i] : 0.0f;
+        imgOut->data[i] = MAX(imgOut->data[i], 0.0f);
     }
 
     //free the memory
