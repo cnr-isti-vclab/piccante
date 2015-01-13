@@ -63,7 +63,8 @@ public:
         tmo = new pic::FilterGLSimpleTMO();
 
         imgRec = NULL;
-        pyr = new pic::PyramidGL(&img, true, 0);
+        pyr = new pic::PyramidGL(&img, true);
+
     }
 
     void render()
