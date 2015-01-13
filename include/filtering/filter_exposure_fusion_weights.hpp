@@ -74,11 +74,11 @@ protected:
 
                 //Well-exposedness
                 float tmpL = src[0]->data[ind] - mu;
-                float pWE = expf(-(tmpL * tmpL) / sigma2);
+                float pExp = expf(-(tmpL * tmpL) / sigma2);
 
                 //Final weights
                 dst->data[ind] =  powf(pCon, wC) *
-                                  powf(pWE,  wE) *
+                                  powf(pExp, wE) *
                                   powf(pSat, wS);
             }
         }

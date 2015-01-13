@@ -49,7 +49,7 @@ inline float computeSaturation(float *data, int channels = 3)
         var += tmp * tmp;
     }
 
-    var = sqrtf(var / float(channels));
+    var = sqrtf(MAX(var / float(channels), 0.0f));
 
     return var;
 }
