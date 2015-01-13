@@ -27,8 +27,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
-#define PIC_DEBUG
-
 #include <QKeyEvent>
 
 #include "piccante.hpp"
@@ -73,7 +71,10 @@ public:
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLColorConv(new pic::ColorConvGLRGBtosRGB());
 
+        //allocating Drago et al.'s TMO
         drago_tmo = new pic::DragoTMOGL();
+
+        //allocating Reinhard et al.'s TMO
         reinhard_tmo = new pic::ReinhardTMOGL();
     }
 
@@ -87,21 +88,25 @@ public:
 
         switch(method) {
         case 0:
+            //applying Reinhard et al.'s TMO (local version)
             img_tmo = reinhard_tmo->ProcessLocal(&img, 0.18f, 8.0f, NULL, img_tmo);
             break;
 
         case 1:
+            //applying Reinhard et al.'s TMO (global version)
             img_tmo = reinhard_tmo->ProcessGlobal(&img, 0.18f, img_tmo);
             break;
 
         case 2:
+            //applying Drago et al.'s TMO
             img_tmo = drago_tmo->Process(&img, 100.0f, 0.95f, img_tmo);
             break;
         }
 
+        //converting the image color space from linear RGB to sRGB
         img_tmo_with_sRGB = tmo->Process(SingleGL(img_tmo), img_tmo_with_sRGB);
 
-        //imgOut visualization
+        //img_tmo_with_sRGB visualization
         quad->Render(program, img_tmo_with_sRGB->getTexture());
     }
 
