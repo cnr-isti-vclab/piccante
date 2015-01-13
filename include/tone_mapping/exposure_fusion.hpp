@@ -66,7 +66,7 @@ Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
 
         lum = flt_lum.ProcessP(Single(imgIn[j]), lum);
 
-        weights = flt_weights.ProcessP(Double(imgIn[j], lum), weights);
+        weights = flt_weights.ProcessP(Double(lum, imgIn[j]), weights);
 
         *acc += *weights;
     }
@@ -90,7 +90,7 @@ Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
     
     for(int j = 0; j < n; j++) {
         lum = flt_lum.ProcessP(Single(imgIn[j]), lum);
-        weights = flt_weights.ProcessP(Double(imgIn[j], lum), weights);
+        weights = flt_weights.ProcessP(Double(lum, imgIn[j]), weights);
 
         //normalization
         *weights /= *acc;
