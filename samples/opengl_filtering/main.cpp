@@ -25,8 +25,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
-#define PIC_DEBUG
-
 #include "piccante.hpp"
 
 #include "../opengl_common_code/opengl_window.hpp"
@@ -79,13 +77,13 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        //Bilateral filtering...
+        //applying the bilateral filter
         img_flt = fltBilG->Process(SingleGL(&img), img_flt);
 
         //simple tone mapping: gamma + exposure correction
         img_flt_tmo = tmo->Process(SingleGL(img_flt), img_flt_tmo);
 
-        //visualization of the Gaussian filtering
+        //visualization of the filtered image
         quad->Render(program, img_flt_tmo->getTexture());
     }
 };

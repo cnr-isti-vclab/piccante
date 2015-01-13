@@ -63,11 +63,11 @@ public:
 
         quad = new pic::QuadGL(true);
         
+        //allocating an exposure fusion instance
         ef = new pic::ExposureFusionGL();
 
+        //computing a stack of LDR images from an HDR image
         img_vec = pic::getAllExposuresImagesGL(&img);
-
-
     }
 
     void render()
@@ -78,6 +78,7 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+        //computing exposure fusion for the stack (img_vec)
         img_tmo = ef->Process(img_vec, 1.0f, 1.0f, 1.0f, img_tmo);
 
         //imgOut visualization

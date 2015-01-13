@@ -66,6 +66,7 @@ public:
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
+        //using OpenGL operators
         img *= (*imgRand * 0.25f);
     }
 
@@ -80,7 +81,7 @@ public:
         //simple tone mapping: gamma + exposure correction
         img_flt_tmo = tmo->Process(SingleGL(&img), img_flt_tmo);
 
-        //imgOut visualization
+        //img_flt_tmo visualization
         quad->Render(program, img_flt_tmo->getTexture());
     }
 };

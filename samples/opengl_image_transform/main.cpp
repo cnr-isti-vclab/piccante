@@ -20,7 +20,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
-#define PIC_DEBUG
 #include "piccante.hpp"
 
 #include "../opengl_common_code/opengl_window.hpp"
@@ -59,9 +58,13 @@ public:
 
         quad = new pic::QuadGL(true);
 
+        //creating a rotation matrix
         pic::Matrix3x3 h;
         h.SetRotationMatrix(pic::Deg2Rad(45.0f));
+
+        //allocating the warping filter
         flt_warp = new pic::FilterGLWarp2D(h, true, true);
+
          //allocating a new filter for simple tone mapping
         flt_tmo = new pic::FilterGLSimpleTMO();
     }
@@ -74,13 +77,13 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        //warping...
+        //applying the warping filter
         img_flt = flt_warp->Process(SingleGL(&img), img_flt);
 
         //simple tone mapping: gamma + exposure correction
         img_flt_tmo = flt_tmo->Process(SingleGL(img_flt), img_flt_tmo);
 
-        //visualization of the image transformation
+        //visualization of the warped image
         quad->Render(program, img_flt_tmo->getTexture());
     }
 };
