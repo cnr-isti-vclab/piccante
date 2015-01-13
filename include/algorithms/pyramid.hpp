@@ -141,7 +141,7 @@ public:
     }
 };
 
-Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 1)
+Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 2)
 {
     if(img != NULL) {
         Create(img, img->width, img->height, img->channels, lapGauss, limitLevel);
@@ -149,7 +149,7 @@ Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 1)
 }
 
 
-Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, int limitLevel = 1)
+Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, int limitLevel = 2)
 {
 //    Image *img = new Image(1, width, height, channels);
 //    *img = 0.0f;
@@ -168,7 +168,7 @@ Pyramid::~Pyramid()
     }
 }
 
-void Pyramid::Create(Image *img, int width, int height, int channels, bool lapGauss, int limitLevel = 1)
+void Pyramid::Create(Image *img, int width, int height, int channels, bool lapGauss, int limitLevel = 2)
 {
     this->lapGauss  = lapGauss;
 
