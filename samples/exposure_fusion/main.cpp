@@ -30,8 +30,6 @@ int main(int argc, char *argv[])
     pic::Image img;
     img.Read("../data/input/bottles.hdr");
 
-    pic::Pyramid pyr(&img, true);
-    pyr.Reconstruct(NULL)->Write("../data/input/bottles2.hdr");
     printf("Ok\n");
 
     printf("Is it valid? ");
