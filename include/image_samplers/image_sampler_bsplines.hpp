@@ -40,15 +40,6 @@ public:
     void SampleImage(Image *img, float x, float y, float *vOut);
 
     /**
-     * @brief SampleImageUC
-     * @param img
-     * @param x
-     * @param y
-     * @param vOut
-     */
-    void SampleImageUC(Image *img, float x, float y, float *vOut);
-
-    /**
      * @brief SampleImage samples an image in uniform coordiantes.
      * @param img
      * @param x
