@@ -85,8 +85,6 @@ Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
     Pyramid *pI   = new Pyramid(width, height, channels, true);
     Pyramid *pOut = new Pyramid(width, height, channels, true);
 
-    pW->SetValue(0.0f);
-    pI->SetValue(0.0f);
     pOut->SetValue(0.0f);
 
     for(int j = 0; j < n; j++) {

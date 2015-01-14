@@ -129,19 +129,19 @@ void FilterSampler2DSub::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 
     float *vOut = new float[channels];
 
-    float height1f = float(box->height - 1);
-    float width1f  = float(box->width  - 1);
+    float scaleX = src1->widthf / src0->widthf;
+    float scaleY = src1->heightf / src0->heightf;
 
     for(int j = box->y0; j < box->y1; j++) {
-        float y = float(j) / height1f;
+        float y = float(j) * scaleY; // height1f;
 
         for(int i = box->x0; i < box->x1; i++) {
-            float x = float(i) / width1f;
-            
+            float x = float(i) * scaleX;
+
             float *tmp_dst  = (*dst )(i, j);
             float *tmp_src0 = (*src0)(i, j);
             
-            isb->SampleImage(src1, x, y, vOut);
+            isb->SampleImageUC(src1, x, y, vOut);
 
             for(int k = 0; k < channels; k++) {
                 tmp_dst[k] = tmp_src0[k] - vOut[k];

@@ -247,22 +247,22 @@ void Pyramid::Create(Image *img, int width, int height, int channels, bool lapGa
         int tmp_height = height;
         for(int i = 0; i < (levels + 1); i++) {
             Image *tmp = new Image(1, tmp_width, tmp_height, channels);
-            tmp_width = tmp_width >> 1 ;
-            tmp_height = tmp_height >> 1;
-
             *tmp = 0.0f;
             stack.push_back(tmp);
+
+            tmp_width = tmp_width >> 1 ;
+            tmp_height = tmp_height >> 1;
         }
 
         tmp_width  = width >> 1;
         tmp_height = height >> 1;
         for(int i = 0; i < (levels - 1); i++) {
             Image *tmp = new Image(1, tmp_width, tmp_height, channels);
-            tmp_width = tmp_width >> 1;
-            tmp_height = tmp_height >> 1;
-
             *tmp = 0.0f;
             trackerUp.push_back(tmp);
+
+            tmp_width = tmp_width >> 1;
+            tmp_height = tmp_height >> 1;
         }
         return;
     }

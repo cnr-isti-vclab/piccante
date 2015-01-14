@@ -108,7 +108,7 @@ FilterSampler2DAdd::~FilterSampler2DAdd()
 
 void FilterSampler2DAdd::Update(ImageSampler *isb)
 {
-    if((this->isb!=NULL) && (bIsb)) {
+    if((this->isb != NULL) && (bIsb)) {
         delete this->isb;
     }
 
@@ -127,30 +127,30 @@ void FilterSampler2DAdd::ProcessBBox(Image *dst, ImageVec src, BBox *box)
     Image *src0 = src[0];
     Image *src1 = src[1];
 
-    float *vOut1 = new float[channels];
+    float *vOut = new float[channels];
 
-    float height1f = float(box->height - 1);
-    float width1f  = float(box->width  - 1);
+    float scaleX = src1->widthf / src0->widthf;
+    float scaleY = src1->heightf / src0->heightf;
 
     for(int j = box->y0; j < box->y1; j++) {
-        float y = float(j) / height1f;
+        float y = float(j) * scaleY;
 
         for(int i = box->x0; i < box->x1; i++) {
-            float x = float(i) / width1f;
+            float x = float(i) * scaleX;
 
             float *tmp_dst = (*dst)(i, j);
+            float *tmp_src0 = (*src0)(i, j);
 
             //Convolution kernel
-            isb->SampleImage(src0, x, y, tmp_dst);
-            isb->SampleImage(src1, x, y, vOut1);
+            isb->SampleImageUC(src1, x, y, vOut);
 
             for(int k = 0; k < channels; k++) {
-                tmp_dst[k] += vOut1[k];
+                tmp_dst[k] = tmp_src0[k] + vOut[k];
             }
         }
     }
 
-    delete[] vOut1;
+    delete[] vOut;
 }
 
 } // end namespace pic
