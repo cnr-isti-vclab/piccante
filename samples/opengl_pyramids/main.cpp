@@ -64,11 +64,6 @@ public:
 
         imgRec = NULL;
         pyr = new pic::PyramidGL(&img, true);
-        //pyr->Update(&img);
-
-        pic::Pyramid *pyrCPU = new pic::Pyramid(&img, true);
-        //pyrCPU->Update(&img2);
-
    }
 
     void render()
