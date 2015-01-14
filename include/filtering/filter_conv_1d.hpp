@@ -208,7 +208,9 @@ void FilterConv1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
     int halfKernelSize = n >> 1;
 
     for(int m = box->z0; m < box->z1; m++) {
+
         for(int j = box->y0; j < box->y1; j++) {
+
             for(int i = box->x0; i < box->x1; i++) {
                 float *tmpDst = (*dst)(i, j, m);
 

@@ -522,8 +522,9 @@ public:
      */
     float *operator()(int x, int y, int t)
     {
-        return data + CLAMP(t, frames) * tstride + CLAMP(x, width) * xstride + CLAMP(y,
-                height) * ystride;
+        return data + CLAMP(t, frames) * tstride +
+                      CLAMP(x, width)  * xstride +
+                      CLAMP(y, height) * ystride;
     }
 
     /**
@@ -534,7 +535,8 @@ public:
      */
     float *operator()(int x, int y)
     {
-        return data + CLAMP(x, width) * xstride + CLAMP(y, height) * ystride;
+        return data + CLAMP(x, width)  * xstride +
+                      CLAMP(y, height) * ystride;
     }
 
     /**

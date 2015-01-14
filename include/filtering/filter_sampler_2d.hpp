@@ -214,9 +214,9 @@ PIC_INLINE Image *FilterSampler2D::SetupAux(ImageVec imgIn,
     if(imgOut == NULL) {
         if(swh) {
             imgOut = new Image(  imgIn[0]->frames, 
-                                    int(imgIn[0]->widthf  * scaleX),
-                                    int(imgIn[0]->heightf * scaleY),
-                                    imgIn[0]->channels);
+                                 int(imgIn[0]->widthf  * scaleX),
+                                 int(imgIn[0]->heightf * scaleY),
+                                 imgIn[0]->channels);
         } else {
             imgOut = new Image(imgIn[0]->frames, width, height, imgIn[0]->channels);
         }

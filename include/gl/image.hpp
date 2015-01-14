@@ -426,10 +426,13 @@ public:
      * @brief operator =
      * @param a
      */
-    void operator =(const float &a)
-    {
-        thisOperatorConst(a, BOGL_CONST);
-    }
+    void operator =(const ImageGL &a);
+
+    /**
+     * @brief operator =
+     * @param a
+     */
+    void operator =(const float &a);
 
     /**
      * @brief operator +=
@@ -905,6 +908,16 @@ void ImageGL::clamp(float a, float b)
     BufferOpsGL *ops = BufferOpsGL::getInstance();
     ops->list[BOGL_CLAMP]->Update(a, b);
     ops->list[BOGL_CLAMP]->Process(getTexture(), 0, getTexture(), width, height);
+}
+
+void ImageGL::operator =(const ImageGL &a)
+{
+    thisOperatorImage(a, BOGL_ID);
+}
+
+void ImageGL::operator =(const float &a)
+{
+    thisOperatorConst(a, BOGL_ID_CONST);
 }
 
 void ImageGL::operator +=(const ImageGL &a)

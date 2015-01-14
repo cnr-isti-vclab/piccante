@@ -118,7 +118,6 @@ void FilterSampler2DSub::Update(ImageSampler *isb)
 
 void FilterSampler2DSub::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-
     if(src.size() != 2) {
         return;
     }
@@ -130,11 +129,14 @@ void FilterSampler2DSub::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 
     float *vOut = new float[channels];
 
+    float height1f = float(box->height - 1);
+    float width1f  = float(box->width  - 1);
+
     for(int j = box->y0; j < box->y1; j++) {
-        float y = float(j) / float(box->height - 1);
+        float y = float(j) / height1f;
 
         for(int i = box->x0; i < box->x1; i++) {
-            float x = float(i) / float(box->width - 1);
+            float x = float(i) / width1f;
             
             float *tmp_dst  = (*dst )(i, j);
             float *tmp_src0 = (*src0)(i, j);

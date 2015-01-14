@@ -118,7 +118,6 @@ void FilterSampler2DAdd::Update(ImageSampler *isb)
 
 void FilterSampler2DAdd::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-
     if(src.size() != 2) {
         return;
     }
