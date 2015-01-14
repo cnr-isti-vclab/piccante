@@ -152,7 +152,7 @@ public:
     }
 };
 
-Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 2)
+Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 1)
 {
     flt_gauss = NULL;
     flt_sampler = NULL;
@@ -165,7 +165,7 @@ Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 2)
 }
 
 
-Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, int limitLevel = 2)
+Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, int limitLevel = 1)
 {
     flt_gauss = NULL;
     flt_sampler = NULL;
@@ -228,7 +228,7 @@ void Pyramid::InitFilters()
     }
 }
 
-void Pyramid::Create(Image *img, int width, int height, int channels, bool lapGauss, int limitLevel = 2)
+void Pyramid::Create(Image *img, int width, int height, int channels, bool lapGauss, int limitLevel = 1)
 {
     this->lapGauss  = lapGauss;
 

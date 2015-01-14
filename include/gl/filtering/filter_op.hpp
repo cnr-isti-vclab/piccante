@@ -282,9 +282,11 @@ void FilterGLOp::InitShaders()
     prefix += glw::version("330");
 
     filteringProgram.setup(prefix, vertex_source, fragment_source);
+
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
 #endif
+
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
 

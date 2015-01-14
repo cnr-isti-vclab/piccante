@@ -47,6 +47,15 @@ public:
     virtual void SampleImage(Image *img, float x, float y, float *vOut) {}
 
     /**
+     * @brief SampleImageUC samples an image in unnormalized coordinates [0,width-1]x[0,height-1].
+     * @param img
+     * @param x
+     * @param y
+     * @param vOut
+     */
+    virtual void SampleImageUC(Image *img, float x, float y, float *vOut) {}
+
+    /**
      * @brief SampleImage samples an image in uniform coordiantes.
      * @param img
      * @param x

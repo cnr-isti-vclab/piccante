@@ -69,16 +69,7 @@ public:
         pic::Pyramid *pyrCPU = new pic::Pyramid(&img, true);
         //pyrCPU->Update(&img2);
 
-        for(int i=0;i<pyrCPU->stack.size();i++){
-            pyrCPU->stack[i]->Write("cpu_"+pic::NumberToString(i)+".pfm");
-        }
-
-        for(int i=0;i<pyr->stack.size();i++){
-            pyr->stack[i]->loadToMemory();
-            pyr->stack[i]->Write("gpu_"+pic::NumberToString(i)+".pfm");
-        }
-
-    }
+   }
 
     void render()
     {

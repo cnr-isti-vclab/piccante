@@ -43,6 +43,15 @@ public:
     void SampleImage(Image *img, float x, float y, float *vOut);
 
     /**
+     * @brief SampleImageUC samples an image in unnormalized coordinates [0,width-1]x[0,height-1].
+     * @param img
+     * @param x
+     * @param y
+     * @param vOut
+     */
+    void SampleImageUC(Image *img, float x, float y, float *vOut);
+
+    /**
      * @brief SampleImage samples an image in uniform coordiantes.
      * @param img
      * @param x
@@ -67,6 +76,20 @@ PIC_INLINE void ImageSamplerNearest::SampleImage(Image *img, float x, float y,
     int ix = int(x);
     int iy = int(y);
     
+    //Bilinear interpolation indicies
+    int ind = (ix * img->xstride + iy * img->ystride);
+
+    for(int i = 0; i < img->channels; i++) {
+        vOut[i] = img->data[ind + i];
+    }
+}
+
+PIC_INLINE void ImageSamplerNearest::SampleImageUC(Image *img, float x, float y, float *vOut)
+{
+    //Integer coordinates
+    int ix = int(lround(x));
+    int iy = int(lround(y));
+
     //Bilinear interpolation indicies
     int ind = (ix * img->xstride + iy * img->ystride);
 
