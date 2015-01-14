@@ -164,6 +164,31 @@ PyramidGL::~PyramidGL()
             delete stack[i];
         }
     }
+
+    if(flt_gauss != NULL) {
+        delete flt_gauss;
+        flt_gauss = NULL;
+    }
+
+    if(flt_sampler != NULL) {
+        delete flt_sampler;
+        flt_sampler = NULL;
+    }
+
+    if(flt_add != NULL) {
+        delete flt_add;
+        flt_add = NULL;
+    }
+
+    if(flt_sub != NULL) {
+        delete flt_sub;
+        flt_sub = NULL;
+    }
+
+    if(flt_blend != NULL) {
+        delete flt_blend;
+        flt_blend = NULL;
+    }
 }
 
 void PyramidGL::InitFilters()
