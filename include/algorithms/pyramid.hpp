@@ -59,7 +59,8 @@ protected:
     void Create(Image *img, int width, int height, int channels, bool lapGauss, int limitLevel);
 
 public:
-    std::vector<Image *>  stack;
+
+    ImageVec stack;
 
     /**
      * @brief Pyramid
@@ -328,18 +329,18 @@ void Pyramid::Update(Image *img)
         tmpG = flt_gauss->ProcessP(Single(tmpImg), stack[i]);
 
         if(i == (levels - 1)) {
-            tmpD = flt_sampler->ProcessP(Single(stack[i]), stack[i + 1]);
+            tmpD = flt_sampler->ProcessP(Single(tmpG), stack[i + 1]);
         } else {
-            tmpD = flt_sampler->ProcessP(Single(stack[i]), trackerUp[i]);
+            tmpD = flt_sampler->ProcessP(Single(tmpG), trackerUp[i]);
         }
 
         if(lapGauss) {	//Laplacian Pyramid
-            tmpG = flt_sub->ProcessP(Double(tmpImg, tmpD), tmpG);
+            flt_sub->ProcessP(Double(tmpImg, tmpD), tmpG);
         } else {		//Gaussian Pyramid
             tmpG->Assign(tmpImg);
         }
 
-        tmpImg = trackerUp[i];
+        tmpImg = tmpD;
     }
 }
 

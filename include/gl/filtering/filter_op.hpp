@@ -326,7 +326,6 @@ void FilterGLOp::Update(float *c0, float *c1)
     glw::bind_program(0);
 }
 
-
 } // end namespace pic
 
 #endif /* PIC_GL_FILTERING_FILTER_OP_HPP */

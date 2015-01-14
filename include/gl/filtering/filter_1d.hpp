@@ -156,6 +156,7 @@ void FilterGL1D::SetUniform()
 {
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex", 0);
+    SetUniformAux();
     filteringProgram.uniform("iX", dirs[0]);
     filteringProgram.uniform("iY", dirs[1]);
 
@@ -163,8 +164,6 @@ void FilterGL1D::SetUniform()
         filteringProgram.uniform("iZ", dirs[2]);
         filteringProgram.uniform("slice", slice);
     }
-
-    SetUniformAux();
 
     glw::bind_program(0);
 }
@@ -196,7 +195,7 @@ ImageGL *FilterGL1D::Process(ImageGLVec imgIn, ImageGL *imgOut)
     int f = imgIn[0]->frames;
 
     if(imgOut == NULL) {
-        imgOut = new ImageGL(f, w, h, 4, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {

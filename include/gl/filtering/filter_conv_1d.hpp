@@ -62,10 +62,10 @@ public:
             kernelSize = weights->width;
             halfKernelSize = kernelSize >> 1;
         }
-        filteringProgram.uniform("halfKernelSize", halfKernelSize);
-        filteringProgram.uniform("kernelSize", kernelSize);
 
         filteringProgram.uniform("u_weights", 1);
+        filteringProgram.uniform("halfKernelSize", halfKernelSize);
+        filteringProgram.uniform("kernelSize", kernelSize);
     }
 };
 

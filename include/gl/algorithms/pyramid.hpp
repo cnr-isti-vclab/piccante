@@ -349,7 +349,8 @@ ImageGL *PyramidGL::Reconstruct(ImageGL *imgOut)
         int c = 0;
 
         for(int i = n; i >= 2; i--) {
-            tmp = flt_add->Process(DoubleGL(stack[i - 1], tmp), trackerRec[c]);
+            flt_add->Process(DoubleGL(stack[i - 1], tmp), trackerRec[c]);
+            tmp = trackerRec[c];
             c++;
         }
     }

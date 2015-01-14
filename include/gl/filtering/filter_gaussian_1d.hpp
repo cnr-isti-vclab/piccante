@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_GAUSSIAN_1D_HPP
 #define PIC_GL_FILTERING_FILTER_GAUSSIAN_1D_HPP
 
+#include "util/precomputed_gaussian.hpp"
+
 #include "gl/filtering/filter_conv_1d.hpp"
 
 namespace pic {
@@ -25,7 +27,8 @@ namespace pic {
 class FilterGLGaussian1D: public FilterGLConv1D
 {
 protected:
-    float		sigma;
+    float               sigma;
+    PrecomputedGaussian *pg;
 
 public:
 
@@ -55,7 +58,7 @@ public:
     static ImageGL *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
         ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
+        imgIn.generateTextureGL(GL_TEXTURE_2D, false);
 
         FilterGLGaussian1D filter(sigma, true, GL_TEXTURE_2D);
 
@@ -71,9 +74,11 @@ public:
     }
 };
 
-FilterGLGaussian1D::FilterGLGaussian1D(float sigma, int direction,
-                                       GLenum target): FilterGLConv1D(NULL, direction, target)
+FilterGLGaussian1D::FilterGLGaussian1D(float sigma, int direction = 0,
+                                       GLenum target = GL_TEXTURE_2D): FilterGLConv1D(NULL, direction, target)
 {
+    pg = NULL;
+
     this->sigma = -1.0f;
 
     Update(sigma);
@@ -96,22 +101,18 @@ void FilterGLGaussian1D::Update(float sigma)
         bChanges = true;
     }
 
-    //Precomputation of the Gaussian Kernel
-    int halfKernelSize = PrecomputedGaussian::KernelSize(sigma) >> 1;
-    int nSamples = halfKernelSize * 2 + 1;
-    float sigma2 = 2.0f * sigma * sigma;
+    if(pg != NULL) {
+        delete pg;
+    }
+
+    pg = new PrecomputedGaussian(this->sigma);
 
     if(bChanges || weights == NULL) {
         if(weights != NULL) {
             delete weights;
         }
 
-        weights = new ImageGL(1, nSamples, 1, 1, IMG_CPU, 0);
-
-        for(int i = -halfKernelSize; i <= halfKernelSize; i++) {
-            weights->data[i + halfKernelSize] = expf(-float(i * i) / sigma2);
-        }
-
+        weights = new ImageGL(1, pg->kernelSize, 1, 1, pg->coeff);
         weights->generateTextureGL();
     }
 

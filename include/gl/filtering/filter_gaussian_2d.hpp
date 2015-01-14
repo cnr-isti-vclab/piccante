@@ -62,7 +62,7 @@ public:
     static ImageGL *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
         ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
+        imgIn.generateTextureGL(GL_TEXTURE_2D, false);
 
         FilterGLGaussian2D *filter = new FilterGLGaussian2D(sigma);
 
@@ -89,7 +89,7 @@ FilterGLGaussian2D::FilterGLGaussian2D(): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
 
-    filter = new FilterGLGaussian1D(0.0f, 0, target);
+    filter = new FilterGLGaussian1D(1.0f, 0, target);
     InsertFilter(filter);
     InsertFilter(filter);
 }

@@ -60,13 +60,13 @@ public:
     static ImageGL *Execute(std::string nameIn, std::string nameOut, float scale)
     {
         ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
+        imgIn.generateTextureGL(GL_TEXTURE_2D, false);
 
         FilterGLSampler2D filter(scale);
-        ImageGL *imgOut = new ImageGL(    imgIn.frames,
-                                                int(imgIn.widthf  * scale),
-                                                int(imgIn.heightf * scale),
-                                                imgIn.channels, IMG_GPU_CPU, GL_TEXTURE_2D);
+        ImageGL *imgOut = new ImageGL( imgIn.frames,
+                                       int(imgIn.widthf  * scale),
+                                       int(imgIn.heightf * scale),
+                                       imgIn.channels, IMG_GPU_CPU, GL_TEXTURE_2D);
 
         GLuint testTQ1 = glBeginTimeQuery();
         filter.Process(SingleGL(&imgIn), imgOut);
@@ -113,6 +113,7 @@ void FilterGLSampler2D::InitShaders()
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color", 0);
     filteringProgram.relink();
+    glw::bind_program(0);
 
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex", 0);
