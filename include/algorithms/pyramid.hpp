@@ -278,9 +278,6 @@ void Pyramid::Create(Image *img, int width, int height, int channels, bool lapGa
 
         tmpD = flt_sampler->ProcessP(Single(tmpG), NULL);
 
-        if(i==0) {
-            tmpD->Write("cpu_downsampling.pfm");
-        }
         if(lapGauss) {	//Laplacian Pyramid
             flt_sub->ProcessP(Double(tmpImg, tmpD), tmpG);
             stack.push_back(tmpG);

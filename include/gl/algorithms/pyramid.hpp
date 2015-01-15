@@ -264,10 +264,6 @@ void PyramidGL::Create(ImageGL *img, int width, int height, int channels, bool l
         tmpG = flt_gauss->Process(SingleGL(tmpImg), NULL);
 
         tmpD = flt_sampler->Process(SingleGL(tmpG), NULL);
-        if(i==0) {
-            tmpD->loadToMemory();
-            tmpD->Write("gpu_downsampling.pfm");
-        }
 
         if(lapGauss) {  //Laplacian Pyramid
             flt_sub->Process(DoubleGL(tmpImg, tmpD), tmpG);
