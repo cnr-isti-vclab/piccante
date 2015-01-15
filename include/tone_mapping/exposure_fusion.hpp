@@ -95,10 +95,10 @@ Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
         *weights /= *acc;
 
         pW->Update(weights);
-
         pI->Update(imgIn[j]);
 
         pI->Mul(pW);
+
         pOut->Add(pI);
     }
 
