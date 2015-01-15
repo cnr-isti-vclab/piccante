@@ -110,11 +110,11 @@ Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
     imgOut = pOut->Reconstruct(imgOut);
 
     #pragma omp parallel for
-
+/*
     for(int i = 0; i < imgOut->size(); i++) {
         imgOut->data[i] = MAX(imgOut->data[i], 0.0f);
     }
-
+*/
     //free the memory
     delete pW;
     delete pOut;

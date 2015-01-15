@@ -86,13 +86,11 @@ public:
     }
 };
 
-//Basic constructor
 FilterSimpleTMO::FilterSimpleTMO(float gamma, float fstop)
 {
     Update(gamma, fstop);
 }
 
-//Update the filter
 void FilterSimpleTMO::Update(float gamma, float fstop)
 {
     this->gamma = 1.0f / gamma;
@@ -100,7 +98,6 @@ void FilterSimpleTMO::Update(float gamma, float fstop)
     exposure = powf(2.0f, fstop);
 }
 
-//Process in a box
 void FilterSimpleTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
 

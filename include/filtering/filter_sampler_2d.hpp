@@ -222,6 +222,11 @@ PIC_INLINE Image *FilterSampler2D::SetupAux(ImageVec imgIn,
         }
     }
 
+    if(!swh) {
+        scaleX = float(width)  / imgIn[0]->widthf;
+        scaleY = float(height) / imgIn[0]->heightf;
+    }
+
     return imgOut;
 }
 
@@ -231,13 +236,13 @@ PIC_INLINE void FilterSampler2D::ProcessBBox(Image *dst, ImageVec src,
     Image *source = src[0];
 
     for(int j = box->y0; j < box->y1; j++) {
-        float y = float(j);
+        float y = float(j) / scaleY;
 
         for(int i = box->x0; i < box->x1; i++) {
-            float x = float(i);
+            float x = float(i) / scaleX;
 
             float *tmp_dst = (*dst)(i, j);
-            isb->SampleImageUC(source, x / scaleX, y / scaleY, tmp_dst);
+            isb->SampleImageUC(source, x, y, tmp_dst);
         }
     }
 }

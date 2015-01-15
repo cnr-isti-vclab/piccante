@@ -69,8 +69,8 @@ PIC_INLINE void ImageSamplerNearest::SampleImage(Image *img, float x, float y,
     y = CLAMPi(y, 0.0f, 1.0f);
 
     //Coordiantes in [0,width-1]x[0,height-1]
-    x = lround(x * img->width1f);
-    y = lround(y * img->height1f);
+    x = x * img->width1f;
+    y = y * img->height1f;
     
     //Integer coordinates
     int ix = int(x);
@@ -87,8 +87,8 @@ PIC_INLINE void ImageSamplerNearest::SampleImage(Image *img, float x, float y,
 PIC_INLINE void ImageSamplerNearest::SampleImageUC(Image *img, float x, float y, float *vOut)
 {
     //Integer coordinates
-    int ix = int(lround(x));
-    int iy = int(lround(y));
+    int ix = int(x);
+    int iy = int(y);
 
     //Bilinear interpolation indicies
     int ind = (ix * img->xstride + iy * img->ystride);
@@ -106,9 +106,9 @@ PIC_INLINE void ImageSamplerNearest::SampleImage(Image *img, float x, float y,
     t = CLAMPi(t, 0.0f, 1.0f);
 
     //Coordiantes in [0,width-1] x [0,height-1] x [0,frames-1]
-    x = lround(x * img->width1f);
-    y = lround(y * img->height1f);
-    t = lround(t * img->frames1f);
+    x = x * img->width1f;
+    y = y * img->height1f;
+    t = t * img->frames1f;
     
     //Integer coordinates
     int ix = int(x);

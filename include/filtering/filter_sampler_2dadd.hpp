@@ -29,6 +29,7 @@ namespace pic {
 class FilterSampler2DAdd: public Filter
 {
 protected:
+    float           scaleX, scaleY;
     ImageSampler	*isb;
     bool            bIsb;
 
@@ -44,13 +45,13 @@ public:
     /**
      * @brief FilterSampler2DAdd
      */
-    FilterSampler2DAdd();
+    FilterSampler2DAdd(float scale);
 
     /**
      * @brief FilterSampler2DAdd
      * @param isb
      */
-    FilterSampler2DAdd(ImageSampler *isb);
+    FilterSampler2DAdd(float scale, ImageSampler *isb);
 
     ~FilterSampler2DAdd();
 
@@ -67,9 +68,9 @@ public:
      * @param isb
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, ImageSampler *isb)
+    static Image *Execute(Image *imgIn, Image *imgOut, float scale, ImageSampler *isb)
     {
-        FilterSampler2DAdd filter(isb);
+        FilterSampler2DAdd filter(scale, isb);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
@@ -79,22 +80,28 @@ public:
      * @param nameOut
      * @param isb
      */
-    static void Execute(std::string nameIn, std::string nameOut, ImageSampler *isb)
+    static void Execute(std::string nameIn, std::string nameOut, float scale, ImageSampler *isb)
     {
         Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, isb);
+        Image *imgOut = Execute(&imgIn, NULL, scale, isb);
         imgOut->Write(nameOut);
     }
 };
 
-FilterSampler2DAdd::FilterSampler2DAdd()
+FilterSampler2DAdd::FilterSampler2DAdd(float scale)
 {
+    this->scaleX = scale;
+    this->scaleY = scale;
+
     bIsb = true;
     this->isb = new ImageSamplerBilinear();
 }
 
-FilterSampler2DAdd::FilterSampler2DAdd(ImageSampler *isb)
+FilterSampler2DAdd::FilterSampler2DAdd(float scale, ImageSampler *isb)
 {
+    this->scaleX = scale;
+    this->scaleY = scale;
+
     bIsb = false;
     this->isb = isb;
 }
