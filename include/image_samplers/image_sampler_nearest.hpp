@@ -87,8 +87,8 @@ PIC_INLINE void ImageSamplerNearest::SampleImage(Image *img, float x, float y,
 PIC_INLINE void ImageSamplerNearest::SampleImageUC(Image *img, float x, float y, float *vOut)
 {
     //Integer coordinates
-    int ix = int(x);
-    int iy = int(y);
+    int ix = CLAMP(int(x), img->width);
+    int iy = CLAMP(int(y), img->height);
 
     //Bilinear interpolation indicies
     int ind = (ix * img->xstride + iy * img->ystride);

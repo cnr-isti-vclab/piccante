@@ -97,9 +97,8 @@ void FilterGLSampler2D::InitShaders()
                           out     vec4    f_color; \n
 
     void main(void) { \n
-        vec2 coords_mul = round(gl_FragCoord.xy / vec2(scale));
-        ivec2 coords = ivec2(coords_mul); \n
-        vec3  color = texelFetch(u_tex, coords, 0).xyz; \n
+        vec2 coords = gl_FragCoord.xy / vec2(scale);
+        vec3  color = texelFetch(u_tex, ivec2(coords), 0).xyz; \n
         f_color = vec4(color.xyz, 1.0); \n
     }
                       );
