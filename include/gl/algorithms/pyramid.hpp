@@ -379,7 +379,6 @@ void PyramidGL::Mul(const PyramidGL *pyr)
 
     for(unsigned int i = 0; i < stack.size(); i++) {
         *stack[i] *= *pyr->stack[i];
-        //stack[i] = flt_mul->Process(DoubleGL(stack[i], pyr->stack[i]), stack[i]);
     }
 }
 
@@ -391,7 +390,6 @@ void PyramidGL::Add(const PyramidGL *pyr)
 
     for(unsigned int i = 0; i < stack.size(); i++) {
         *stack[i] += *pyr->stack[i];
-        //stack[i] = flt_add->Process(DoubleGL(stack[i], pyr->stack[i]), stack[i]);
     }
 }
 

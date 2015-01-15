@@ -286,7 +286,7 @@ void Pyramid::Create(Image *img, int width, int height, int channels, bool lapGa
             stack.push_back(tmpG);
         }
 
-        if(i < (levels -1)) {
+        if(i < (levels - 1)) {
             trackerUp.push_back(tmpD);
         }
 

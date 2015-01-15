@@ -110,7 +110,7 @@ public:
             *acc += *weights;
         }
 
-        acc = convert_zero_to_one->Process(SingleGL(acc), acc);
+        convert_zero_to_one->Process(SingleGL(acc), acc);
 
         //Accumulation Pyramid
         #ifdef PIC_DEBUG
