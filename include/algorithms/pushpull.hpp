@@ -34,10 +34,8 @@ protected:
 
     FilterDownPP    *flt_down;
     FilterUpPP      *flt_up;
-
-    float           threshold;
-    float			*value;
-    ImageVec 	stack;
+    float           threshold, *value;
+    ImageVec        stack;
 
     /**
      * @brief Release
@@ -85,7 +83,7 @@ public:
         if(imgOut == NULL) {
             imgOut = imgIn->Clone();
         } else {
-            imgOut->Assign(imgIn);
+            *imgOut = *imgIn;
         }
 
         this->value = value;
@@ -102,16 +100,26 @@ public:
             flt_up->Update(value, threshold);
         }
 
-        //creating the pyramid: Pull
-        stack.push_back(imgOut);
-        Image *work = imgOut;
 
-        while(MIN(work->width, work->height) > 1) {
-            Image *tmp = flt_down->Process(Single(work), NULL);
+        if(stack.empty()) { //creating the pyramid: Pull
+            stack.push_back(imgOut);
+            Image *work = imgOut;
 
-            if(tmp != NULL) {
-                stack.push_back(tmp);
-                work = tmp;
+            while(MIN(work->width, work->height) > 1) {
+                Image *tmp = flt_down->Process(Single(work), NULL);
+
+                if(tmp != NULL) {
+                    stack.push_back(tmp);
+                    work = tmp;
+                }
+            }
+        } else { //updating previously created pyramid: Pull
+            Image *work = imgOut;
+
+            int c = 0;
+            while(MIN(work->width, work->height) > 1) {
+                flt_down->Process(Single(work), stack[c]);
+                work = stack[c];
             }
         }
 
@@ -135,12 +143,14 @@ public:
     {
         PushPull pp;
 
-        float *tmpValue = new float[img->channels];
+        float *tmp_value = new float[img->channels];
         for(int i = 0; i < img->channels; i++) {
-            tmpValue[i] = value;
+            tmp_value[i] = value;
         }
 
         return pp.Process(img, NULL, tmpValue);
+
+        delete tmp_value;
     }
 
     /**
