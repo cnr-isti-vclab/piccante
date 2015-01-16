@@ -65,12 +65,12 @@ Image *RichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterations = 1
             printf("%d\n", i);
         #endif
 
-        img_est_conv = flt_conv.Process(vec, img_est_conv);
+        img_est_conv = flt_conv.ProcessP(vec, img_est_conv);
 
         img_rel_blur->Assign(imgIn);
         *img_rel_blur /= *img_est_conv;
 
-        img_err = flt_conv.Process(vec_err, img_err);
+        img_err = flt_conv.ProcessP(vec_err, img_err);
 
         *imgOut *= *img_err;
     }

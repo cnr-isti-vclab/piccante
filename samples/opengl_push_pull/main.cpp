@@ -25,11 +25,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
+#include <QKeyEvent>
+
 #include "piccante.hpp"
 
 #include "../opengl_common_code/opengl_window.hpp"
 
-class SimpleOperatorsWindow : public pic::OpenGLWindow
+class SimplePushPull : public pic::OpenGLWindow
 {
 protected:
     pic::QuadGL *quad;
@@ -38,21 +40,30 @@ protected:
 public:
     pic::ImageGL img, *imgRec, *img_flt_tmo;
     glw::program    program;
-    pic::PyramidGL  *pyr;
+    int method;
+    pic::PushPullGL  *pp;
 
-    SimpleOperatorsWindow() : OpenGLWindow(NULL)
+    SimplePushPull() : OpenGLWindow(NULL)
     {
         tmo = NULL;
         img_flt_tmo = NULL;
-
+        method = 0;
     }
 
     void init()
     {
         //reading an input image
         img.Read("../data/input/bottles.hdr");
+
+        pic::Image img_black(1, 32, 32, 3);
+        img_black.SetZero();
+
+        //Adding a hole in the image
+        img.CopySubImage(&img_black, 292, 130);
+
         img.generateTextureGL();
 
+        img += 0.0f;
         //creating a screen aligned quad
         pic::QuadGL::getProgram(program,
                                 pic::QuadGL::getVertexProgramV3(),
@@ -62,9 +73,9 @@ public:
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        imgRec = NULL;
-        pyr = new pic::PyramidGL(&img, true);
-   }
+                imgRec = NULL;
+        pp = new pic::PushPullGL();
+    }
 
     void render()
     {
@@ -76,13 +87,24 @@ public:
 
         //simple tone mapping: gamma + exposure correction
 
-        pyr->Update(&img);
-        imgRec = pyr->Reconstruct(imgRec);
-
-        img_flt_tmo = tmo->Process(SingleGL(imgRec), img_flt_tmo);
+        if(method == 1) {
+            imgRec = pp->Process(&img, imgRec, NULL);
+            img_flt_tmo = tmo->Process(pic::SingleGL(imgRec), img_flt_tmo);
+        } else {
+            img_flt_tmo = tmo->Process(pic::SingleGL(&img), img_flt_tmo);
+        }
 
         //imgOut visualization
         quad->Render(program, img_flt_tmo->getTexture());
+    }
+
+    void keyPressEvent(QKeyEvent * ev)
+    {
+        if(ev->type() == QEvent::KeyPress) {
+            if(ev->key() == Qt::Key_Space) {
+                method = (method + 1) % 2;
+            }
+        }
     }
 };
 
@@ -96,7 +118,7 @@ int main(int argc, char **argv)
     format.setMinorVersion(0);
     format.setProfile(QSurfaceFormat::CoreProfile );
 
-    SimpleOperatorsWindow window;
+    SimplePushPull window;
     window.setFormat(format);
     window.resize(912, 684);
     window.show();

@@ -15,26 +15,26 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_ALGORITHMS_PUSHPULL_HPP
-#define PIC_ALGORITHMS_PUSHPULL_HPP
+#ifndef PIC_GL_ALGORITHMS_PUSHPULL_HPP
+#define PIC_GL_ALGORITHMS_PUSHPULL_HPP
 
-#include "image.hpp"
-#include "image_samplers/image_sampler_bsplines.hpp"
-#include "filtering/filter_down_pp.hpp"
-#include "filtering/filter_up_pp.hpp"
+#include "gl/Image.hpp"
+#include "gl/filtering/filter_down_pp.hpp"
+#include "gl/filtering/filter_up_pp.hpp"
 
 namespace pic {
 
 /**
- * @brief The PushPull class
+ * @brief The PushPullGL class
  */
-class PushPull
+class PushPullGL
 {
 protected:
 
-    FilterDownPP    *flt_down;
-    FilterUpPP      *flt_up;
-    ImageVec        stack;
+    FilterGLDownPP  *flt_down;
+    FilterGLUpPP    *flt_up;
+
+    ImageGLVec      stack;
 
     /**
      * @brief Release
@@ -52,15 +52,15 @@ protected:
 public:
 
     /**
-     * @brief PushPull
+     * @brief PushPullGL
      */
-    PushPull()
+    PushPullGL()
     {
         flt_down = NULL;
         flt_up = NULL;
     }
 
-    ~PushPull()
+    ~PushPullGL()
     {
         Release();
     }
@@ -71,38 +71,43 @@ public:
      * @param value
      * @return
      */
-    Image *Process(Image *imgIn, Image *imgOut, float *value = NULL, float threshold = 1e-6f)
+    ImageGL *Process(ImageGL *imgIn, ImageGL *imgOut, float *value, float threshold = 1e-6f)
     {
         if(imgIn == NULL) {
             return imgOut;
         }
 
         if(imgOut == NULL) {
-            imgOut = imgIn->Clone();
+            imgOut = imgIn->CloneGL();
         } else {
             *imgOut = *imgIn;
         }
 
         if(flt_down == NULL) {
-            flt_down = new FilterDownPP(value, threshold);
+            flt_down = new FilterGLDownPP(value, threshold);
         } else {
             flt_down->Update(value, threshold);
         }
 
         if(flt_up == NULL) {
-            flt_up = new FilterUpPP(value, threshold);
+            flt_up = new FilterGLUpPP(value, threshold);
         } else {
             flt_up->Update(value, threshold);
         }
 
-        Image *work = imgOut;
-
+        ImageGL *work = imgOut;
         if(stack.empty()) { //creating the pyramid: Pull
             stack.push_back(imgOut);
 
+            int c=0;
             while(MIN(work->width, work->height) > 1) {
-                Image *tmp = flt_down->Process(Single(work), NULL);
+                ImageGL *tmp = flt_down->Process(SingleGL(work), NULL);
 
+                if(c==3) {
+                    stack[c]->loadToMemory();
+                    stack[c]->Write("../test.pfm");
+                }
+                c++;
                 if(tmp != NULL) {
                     stack.push_back(tmp);
                     work = tmp;
@@ -111,7 +116,10 @@ public:
         } else { //updating previously created pyramid: Pull
             int c = 1;
             while(MIN(work->width, work->height) > 1) {
-                flt_down->Process(Single(work), stack[c]);
+                flt_down->Process(SingleGL(work), stack[c]);
+
+
+
                 work = stack[c];
                 c++;
             }
@@ -121,7 +129,7 @@ public:
         int n = (stack.size() - 2);
 
         for(int i = n; i >= 0; i--) {
-            flt_up->ProcessP(Single(stack[i + 1]), stack[i]);
+            flt_up->Process(DoubleGL(stack[i + 1], stack[i]), stack[i]);
         }
 
         return imgOut;
@@ -133,9 +141,9 @@ public:
      * @param value
      * @return
      */
-    static Image *Execute(Image *img, float value)
+    static ImageGL *Execute(ImageGL *img, float value)
     {
-        PushPull pp;
+        PushPullGL pp;
 
         float *tmp_value = new float[img->channels];
         for(int i = 0; i < img->channels; i++) {
@@ -153,10 +161,10 @@ public:
      * @param nameOut
      * @return
      */
-    static Image *Execute(std::string name, std::string nameOut)
+    static ImageGL *Execute(std::string name, std::string nameOut)
     {
-        Image img(name);
-        Image *imgOut = Execute(&img, 0.0f);
+        ImageGL img(name);
+        ImageGL *imgOut = Execute(&img, 0.0f);
         imgOut->Write(nameOut);
         return imgOut;
     }
@@ -164,5 +172,5 @@ public:
 
 } // end namespace pic
 
-#endif /* PIC_ALGORITHMS_PUSHPULL_HPP */
+#endif /* PIC_GL_ALGORITHMS_PUSHPULL_HPP */
 
