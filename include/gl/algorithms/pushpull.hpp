@@ -99,15 +99,9 @@ public:
         if(stack.empty()) { //creating the pyramid: Pull
             stack.push_back(imgOut);
 
-            int c=0;
             while(MIN(work->width, work->height) > 1) {
                 ImageGL *tmp = flt_down->Process(SingleGL(work), NULL);
 
-                if(c==3) {
-                    stack[c]->loadToMemory();
-                    stack[c]->Write("../test.pfm");
-                }
-                c++;
                 if(tmp != NULL) {
                     stack.push_back(tmp);
                     work = tmp;
@@ -117,8 +111,6 @@ public:
             int c = 1;
             while(MIN(work->width, work->height) > 1) {
                 flt_down->Process(SingleGL(work), stack[c]);
-
-
 
                 work = stack[c];
                 c++;
