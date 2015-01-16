@@ -148,7 +148,7 @@ public:
             tmp_value[i] = value;
         }
 
-        return pp.Process(img, NULL, tmpValue);
+        return pp.Process(img, NULL, tmp_value);
 
         delete tmp_value;
     }
