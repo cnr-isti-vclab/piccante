@@ -234,16 +234,22 @@ PIC_INLINE void FilterSampler2D::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
     Image *source = src[0];
-   float width1f = float(box->width - 1);
-   float height1f = float(box->height - 1);
-   for(int j = box->y0; j < box->y1; j++) {
-   float y = float(j) / height1f;
-   for(int i = box->x0; i < box->x1; i++) {
-   float x = float(i) / width1f;
-   float *tmp_dst = (*dst)(i, j);
-   isb->SampleImage(source, x, y, tmp_dst);
-   }
-   }
+
+    float inv_height1f = 1.0f / float(box->height - 1);
+    float inv_width1f = 1.0f / float(box->width - 1);
+
+    for(int j = box->y0; j < box->y1; j++) {
+        float y = float(j) * inv_height1f;
+
+        for(int i = box->x0; i < box->x1; i++) {
+
+            float x = float(i) * inv_width1f;
+
+            float *tmp_dst = (*dst)(i, j);
+
+            isb->SampleImage(source, x, y, tmp_dst);
+        }
+    }
 }
 
 } // end namespace pic

@@ -29,9 +29,8 @@ namespace pic {
 class FilterSampler2DAdd: public Filter
 {
 protected:
-    float           scaleX, scaleY;
-    ImageSampler	*isb;
     bool            bIsb;
+    ImageSampler	*isb;
 
     /**
      * @brief ProcessBBox
@@ -42,16 +41,12 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
-    /**
-     * @brief FilterSampler2DAdd
-     */
-    FilterSampler2DAdd(float scale);
 
     /**
      * @brief FilterSampler2DAdd
      * @param isb
      */
-    FilterSampler2DAdd(float scale, ImageSampler *isb);
+    FilterSampler2DAdd(ImageSampler *isb);
 
     ~FilterSampler2DAdd();
 
@@ -68,9 +63,9 @@ public:
      * @param isb
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float scale, ImageSampler *isb)
+    static Image *Execute(Image *imgIn, Image *imgOut, ImageSampler *isb)
     {
-        FilterSampler2DAdd filter(scale, isb);
+        FilterSampler2DAdd filter(isb);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
@@ -80,30 +75,23 @@ public:
      * @param nameOut
      * @param isb
      */
-    static void Execute(std::string nameIn, std::string nameOut, float scale, ImageSampler *isb)
+    static void Execute(std::string nameIn, std::string nameOut, ImageSampler *isb)
     {
         Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, scale, isb);
+        Image *imgOut = Execute(&imgIn, NULL, isb);
         imgOut->Write(nameOut);
     }
 };
 
-FilterSampler2DAdd::FilterSampler2DAdd(float scale)
+FilterSampler2DAdd::FilterSampler2DAdd(ImageSampler *isb = NULL)
 {
-    this->scaleX = scale;
-    this->scaleY = scale;
-
-    bIsb = true;
-    this->isb = new ImageSamplerBilinear();
-}
-
-FilterSampler2DAdd::FilterSampler2DAdd(float scale, ImageSampler *isb)
-{
-    this->scaleX = scale;
-    this->scaleY = scale;
-
-    bIsb = false;
-    this->isb = isb;
+    if(isb != NULL) {
+        bIsb = false;
+        this->isb = isb;
+    } else {
+        bIsb = true;
+        this->isb = new ImageSamplerBilinear();
+    }
 }
 
 FilterSampler2DAdd::~FilterSampler2DAdd()
@@ -119,8 +107,8 @@ void FilterSampler2DAdd::Update(ImageSampler *isb)
         delete this->isb;
     }
 
-    bIsb = false;
     this->isb = isb;
+    bIsb = false;
 }
 
 void FilterSampler2DAdd::ProcessBBox(Image *dst, ImageVec src, BBox *box)
@@ -134,23 +122,21 @@ void FilterSampler2DAdd::ProcessBBox(Image *dst, ImageVec src, BBox *box)
     Image *src0 = src[0];
     Image *src1 = src[1];
 
-    float *vOut = new float[channels];
-    float *vsrc0 = new float[channels];
+    float *tmp_mem = new float[channels * 2];
+    float *vOut  = &tmp_mem[0];
+    float *vsrc0 = &tmp_mem[channels];
 
-    float scaleX = src1->widthf / src0->widthf;
-    float scaleY = src1->heightf / src0->heightf;
+    float inv_height1f = 1.0f / float(box->height - 1);
+    float inv_width1f = 1.0f / float(box->width - 1);
 
-    float height1f = float(box->height - 1);
-   float width1f = float(box->width - 1);
     for(int j = box->y0; j < box->y1; j++) {
-        float y = float(j) /height1f;
+        float y = float(j) * inv_height1f;
 
         for(int i = box->x0; i < box->x1; i++) {
-            float x = float(i) /width1f;
+            float x = float(i) * inv_width1f;
 
-            float *tmp_dst = (*dst)(i, j);
+            float *tmp_dst  = (*dst )(i, j);
 
-            //Convolution kernel
             isb->SampleImage(src0, x, y, vsrc0);
             isb->SampleImage(src1, x, y, vOut);
 
@@ -160,8 +146,7 @@ void FilterSampler2DAdd::ProcessBBox(Image *dst, ImageVec src, BBox *box)
         }
     }
 
-    delete[] vOut;
-    delete[] vsrc0;
+    delete[] tmp_mem;
 }
 
 } // end namespace pic

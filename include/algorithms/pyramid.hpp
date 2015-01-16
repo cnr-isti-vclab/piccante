@@ -220,11 +220,11 @@ void Pyramid::InitFilters()
     }
 
     if(flt_sub == NULL) {
-        flt_sub = new FilterSampler2DSub(2.0f);
+        flt_sub = new FilterSampler2DSub();
     }
 
     if(flt_add == NULL) {
-        flt_add = new FilterSampler2DAdd(2.0f);
+        flt_add = new FilterSampler2DAdd();
     }
 }
 
