@@ -30,23 +30,23 @@ SCREENSHOT:
 Piccante can be used for generating HDR images starting from a stack of classic 8-bit
 images.
 
-->![HDR Generation](/screenshots/hdr_generation.png?raw=true "HDR Generation")<-
+![HDR Generation](/screenshots/hdr_generation.png?raw=true "HDR Generation")
 
 Piccante can manage different color spaces, and new ones can be added to its core with easy and simple steps!
 
-->![Color Spaces](/screenshots/color_spaces.png?raw=true "Color Spaces")<-
+![Color Spaces](/screenshots/color_spaces.png?raw=true "Color Spaces")
 
 Piccante has provides algorithms for tone mapping HDR images in order to be visualized on traditional displays.
 
-->![Tone Mapping](/screenshots/tone_mapping.png?raw=true "Tone Mapping")<-
+![Tone Mapping](/screenshots/tone_mapping.png?raw=true "Tone Mapping")
 
 Piccante can filter images using a high quality selection of linear and non linear filters.
 
-->![Filtering](/screenshots/filtering.png?raw=true "Filtering")<-
+![Filtering](/screenshots/filtering.png?raw=true "Filtering")
 
 Piccante can extract local features for different tasks such as image alignments, classification, 3D reconstruction, etc.
 
-->![Local Features](/screenshots/local_features.png?raw=true "Local Features")<-
+![Local Features](/screenshots/local_features.png?raw=true "Local Features")
 
 REFERENCE:
 ==========
