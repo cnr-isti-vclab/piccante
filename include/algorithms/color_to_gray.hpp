@@ -43,11 +43,11 @@ Image *ColorToGray(Image *imgIn, Image *imgOut)
     ImageVec img_vec;
     ImageVec input = Single(imgIn);
 
-    FilterChannel flc(0);
+    FilterChannel flt(0);
     int channels = imgIn->channels;
     for(int i = 0; i < channels; i++) {
-        flc.setChannel(i);
-        img_vec.push_back(flc.ProcessP(input, NULL));
+        img_vec.push_back(flt.ProcessP(input, NULL));
+        flt.setChannel(i + 1);
     }
 
     imgOut = ExposureFusion(img_vec, 1.0f, 1.0f, 0.0f, imgOut);

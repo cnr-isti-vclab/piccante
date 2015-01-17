@@ -83,7 +83,7 @@ public:
     }
 };
 
-FilterSampler2DAdd::FilterSampler2DAdd(ImageSampler *isb = NULL)
+FilterSampler2DAdd::FilterSampler2DAdd(ImageSampler *isb)
 {
     if(isb != NULL) {
         bIsb = false;

@@ -96,6 +96,7 @@ public:
 
         //imgOut visualization
         quad->Render(program, img_flt_tmo->getTexture());
+
     }
 
     void keyPressEvent(QKeyEvent * ev)

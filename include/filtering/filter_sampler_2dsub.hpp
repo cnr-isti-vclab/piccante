@@ -83,7 +83,7 @@ public:
     }
 };
 
-FilterSampler2DSub::FilterSampler2DSub(ImageSampler *isb = NULL)
+FilterSampler2DSub::FilterSampler2DSub(ImageSampler *isb)
 {
     if(isb != NULL) {
         bIsb = false;
