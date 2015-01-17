@@ -25,6 +25,16 @@ LICENSE:
 ========
 Piccante is distributed under the MPL 2.0 license: https://www.mozilla.org/MPL/2.0/
 
+SCREENSHOT:
+===========
+
+![Color Spaces](/screenshots/color_spaces.png?raw=true "Color Spaces")
+![Tone Mapping](/screenshots/tone_mapping.png?raw=true "Tone Mapping")
+![Local Features](/screenshots/local_features.png?raw=true "Local Features")
+![HDR Generation](/screenshots/hdr_generation.png?raw=true "HDR Generation")
+![Filtering](/screenshots/filtering.png?raw=true "Filtering")
+
+
 REFERENCE:
 ==========
 
