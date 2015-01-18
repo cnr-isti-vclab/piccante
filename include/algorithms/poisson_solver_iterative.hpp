@@ -23,14 +23,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- * @brief IterativePoissonSolver
+ * @brief PoissonSolverIterative
  * @param img
  * @param laplacian
  * @param coords
  * @param maxSteps
  * @return
  */
-Image *IterativePoissonSolver(Image *img, Image *laplacian,
+Image *PoissonSolverIterative(Image *img, Image *laplacian,
                               std::vector<int> coords,
                               int maxSteps = 100)
 {
