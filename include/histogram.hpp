@@ -264,7 +264,7 @@ public:
 
         if(bNormalized) {
             for(int i=0; i<nBin; i++) {
-                bin_c[i] /= bin_c[nBin-1];
+                bin_c[i] /= bin_c[nBin - 1];
             }
         }
 

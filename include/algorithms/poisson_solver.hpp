@@ -106,7 +106,7 @@ Image *PoissonSolver(Image *f, Image *ret = NULL)
                 printf("SOLVER FAILED!\n");
             #endif
 
-            return NULL;
+            return ret;
         }
 
         #ifdef PIC_DEBUG
