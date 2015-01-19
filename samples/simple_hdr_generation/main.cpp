@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     if(img[0].isValid() && img[1].isValid() && img[2].isValid()) {
         printf("Ok\n");
 
-        printf("We now align bright and dark exposure images to the well-exposed one...\n");
+        printf("We now align bright and dark exposure images to the well-exposed one... ");
         Eigen::Vector2i shift_dark;
         pic::Image *img_dark = pic::WardAlignment::Execute(&img[0], &img[1], shift_dark);
         img_dark->Write("../data/output/stack_aligned_dark.jpg", pic::LT_NOR);
@@ -51,22 +51,22 @@ int main(int argc, char *argv[])
         Eigen::Vector2i shift_bright;
         pic::Image *img_bright = pic::WardAlignment::Execute(&img[0], &img[2], shift_bright);
         img_bright->Write("../data/output/stack_aligned_bright.jpg", pic::LT_NOR);
-        printf("\nOk\n");
+        printf("Ok\n");
 
         //Estimating the camera response function
-        printf("Estimating the camera response function...\n");
+        printf("Estimating the camera response function... ");
         pic::ImageVec stack = Triple(&img[0], img_dark, img_bright);
 
         pic::CameraResponseFunction crf;
         crf.DebevecMalik(stack, exposureTime);
-        printf("\nOk.\n");
+        printf("Ok.\n");
 
         //Setting each exposure time to the related image
         for(int i=0; i<3; i++) {            
             stack[i]->exposure = exposureTime[i];
         }
 
-        printf("Assembling the different exposure images...");
+        printf("Assembling the different exposure images... ");
         pic::FilterAssembleHDR fltAHDR(pic::CRF_GAUSS, pic::LIN_ICFR, &crf.icrf);
         pic::Image *imgOut = fltAHDR.ProcessP(stack, NULL);
         printf("Ok\n");
