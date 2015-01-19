@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     printf("Reading an HDR file...");
 
     pic::Image img;
-    img.Read("../data/input/test_be.pfm");
+    img.Read("../data/input/bottles.hdr");
     printf("Ok\n");
 
     printf("Is it valid? ");

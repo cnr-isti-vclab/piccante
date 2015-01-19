@@ -45,7 +45,6 @@ protected:
     void GenerateSamples(unsigned int kernelSize)
     {
         rs = new RandomSampler<2>(ST_BRIDSON, kernelSize, kernelSize, 1);
-        rs->Write("../data/output/kernel.bmp", 0);
         nSamples = rs->samplesR.size() >> 1;
     }
 
