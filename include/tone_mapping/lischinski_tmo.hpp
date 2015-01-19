@@ -81,14 +81,11 @@ Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL,
 
     for(int i = 0; i < lum->height; i++) {
         for(int j = 0; j < lum->width; j++) {
+
             int indx = i * lum->width + j;
             float L_log = lum_log->data[indx];
 
-            int c = int(ceilf(L_log - minL_log));
-
-            if(c >= Z) {
-                c = Z - 1;
-            }
+            int c = CLAMP(int(ceilf(L_log - minL_log)), Z);
 
             Rz[c] += lum->data[indx];
             counter[c]++;
@@ -108,19 +105,23 @@ Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL,
         }
     }
 
-    //Create fstop maps
+    //creating the fstop maps
     Image *fstopMap = lum->AllocateSimilarOne();
 
     for(int i = 0; i < lum->height; i++) {
         for(int j = 0; j < lum->width; j++) {
+
             int indx = i * lum->width + j;
             float L_log = lum_log->data[indx];
-            int c = int(ceilf(L_log - minL_log));
+
+            int c = CLAMP(int(ceilf(L_log - minL_log)), Z);
 
             fstopMap->data[indx] = fstop[c];
 
         }
     }
+
+    fstopMap->Write("../fstop.pfm");
 
     //Lischinski minimization
     Image *tmp = lum->AllocateSimilarOne();
