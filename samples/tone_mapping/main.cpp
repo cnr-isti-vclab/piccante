@@ -38,8 +38,6 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("OK\n");
 
-        bool bWritten;
-
         printf("Tone mapping using Reinhard et al.'s TMO...");
         pic::Image *imgToneMapped_reinhard = pic::ReinhardTMO(&img);
 
@@ -47,7 +45,7 @@ int main(int argc, char *argv[])
           this is quantized at 8-bit and gamma is applied.
           Note that pic::ReinhardTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bWritten = imgToneMapped_reinhard->Write("../data/output/tone_mapping_reinhard.png", pic::LT_NOR_GAMMA);
+        bool bWritten = imgToneMapped_reinhard->Write("../data/output/tone_mapping_reinhard.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
