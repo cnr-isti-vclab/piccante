@@ -38,10 +38,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * in the case .exr images are used. Note that you need to manually install OpenEXR on your developing maching in order
  * to enable this flag.
  *
+ * Note that when using Eigen types and standard containters, if you do not align containters, a good practice is to enable the following #define:
+ * \li \c #define EIGEN_DONT_VECTORIZE
+ * \li \c #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
+ *
  * \section descr_sec Modules
  *
  * <a href="http://piccantelib.net">PICCANTE</a> is a modular library with different modules. The main classes are
- * pic::Image, pic::Image and pic::Histogram.
+ * pic::Image and pic::Histogram.
  * \li \c pic::Image is the base class for managing an image. Pixels are stored
  * in an array of interleaved channels float values; i.e. pic::Image::data.
  * Pixels are stored as float values, because the library is meant mostly for accurate and HDR
@@ -49,9 +53,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * image statistics (e.g. maximum value, minimum value, mean value, etc.), image operators
  * (e.g. add, sub, mul, div, etc.) and memory management functions (e.g. allocation, cloning, etc.).
  * Note that this class supports multi-channels (e.g. alpha channel) and temporal/volumetric images.
- * \li \c pic::Image inherits from pic::Image, and it provides an I/O interface for reading different
- * file formats (ppm, pgm, pbm, bmp, tga, hdr, pfm, etc.) natively in Piccante and through other optional
- * external libraries (e.g. OpenEXR and QT).
+ * It also provides an I/O interface for reading different file formats (ppm, pgm, pbm, bmp, tga, hdr, pfm, etc.)
+ * natively in Piccante and through other optional external libraries (e.g. OpenEXR and QT).
  * \li \c pic::Histogram is a class for creating, managing, and processing LDR/HDR image histograms.
  *
  * \subsection filters_module Filtering
