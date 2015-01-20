@@ -71,11 +71,7 @@ int main(int argc, char *argv[])
 
         printf("Computing ORB descriptors...\n");
 
-<<<<<<< HEAD
         pic::ORBDescriptor b_desc(31, 512);
-=======
-        pic::PoissonDescriptor b_desc(16);//(31, 512);
->>>>>>> develop
 
         std::vector< unsigned int *> descs0;
         for(unsigned int i=0; i<corners_from_img0.size(); i++) {
