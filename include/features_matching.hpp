@@ -32,7 +32,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //Feature descriptors
 #include "features_matching/lucid_descriptor.hpp"
 #include "features_matching/brief_descriptor.hpp"
-#include "features_matching/poisson_descriptor.hpp"
 #include "features_matching/orb_descriptor.hpp"
 
 #include "features_matching/dense_sift.hpp"
