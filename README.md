@@ -28,7 +28,7 @@ Piccante is distributed under the MPL 2.0 license: https://www.mozilla.org/MPL/2
 REFERENCE:
 ==========
 
-Please reference PICCANTE in your work using this reference:
+If you use PICCANTE in your work, please cite it using this reference:
 
 @misc{banterle:pic:2014,
 
