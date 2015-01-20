@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -27,7 +20,11 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
-/**GLSL_SIMPLE_EXPOSURE_GAMMA: apply simple gamma correction and exposure*/
+/**
+ * @brief GLSL_SIMPLE_EXPOSURE_GAMMA applies a simple gamma correctiona and
+ * exposure in a shader.
+ * @return It returns a string which represents a part of a shader.
+ */
 std::string GLSL_SIMPLE_EXPOSURE_GAMMA()
 {
     std::string ret;
@@ -41,7 +38,10 @@ std::string GLSL_SIMPLE_EXPOSURE_GAMMA()
     return ret;
 }
 
-/**GLSL_DRAGO_TMO: Drago et al.'s TMO*/
+/**
+ * @brief GLSL_DRAGO_TMO returns Drago et al.'s tone mapping operator.
+ * @return It returns a string which represents a part of a shader.
+ */
 std::string GLSL_DRAGO_TMO()
 {
     std::string ret;

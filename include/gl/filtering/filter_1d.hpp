@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -35,7 +28,7 @@ namespace pic {
 class FilterGL1D: public FilterGL
 {
 protected:
-    ImageRAWGL	*weights;
+    ImageGL	*weights;
 
     int			dirs[3];
     int			slice;
@@ -108,7 +101,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
 FilterGL1D::FilterGL1D(int direction, GLenum target): FilterGL()
@@ -163,6 +156,7 @@ void FilterGL1D::SetUniform()
 {
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex", 0);
+    SetUniformAux();
     filteringProgram.uniform("iX", dirs[0]);
     filteringProgram.uniform("iY", dirs[1]);
 
@@ -170,8 +164,6 @@ void FilterGL1D::SetUniform()
         filteringProgram.uniform("iZ", dirs[2]);
         filteringProgram.uniform("slice", slice);
     }
-
-    SetUniformAux();
 
     glw::bind_program(0);
 }
@@ -192,7 +184,7 @@ void FilterGL1D::InitShaders()
     SetUniform();
 }
 
-ImageRAWGL *FilterGL1D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGL1D::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn[0] == NULL || imgIn.size() > 1) {
         return imgOut;
@@ -203,7 +195,7 @@ ImageRAWGL *FilterGL1D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int f = imgIn[0]->frames;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(f, w, h, 4, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {
@@ -212,7 +204,7 @@ ImageRAWGL *FilterGL1D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
 
     fbo->create(w, h, f, false, imgOut->getTexture());
 
-    ImageRAWGL *base = imgIn[0];
+    ImageGL *base = imgIn[0];
 
     //Textures
     glActiveTexture(GL_TEXTURE0);

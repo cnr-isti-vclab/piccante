@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -42,14 +35,14 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         if(src.size() != 2) {
             return;
         }
 
-        ImageRAW *img  = src[0];
-        ImageRAW *conv = src[1];
+        Image *img  = src[0];
+        Image *conv = src[1];
 
         int channels = dst->channels;
 
@@ -67,8 +60,8 @@ protected:
                     dst_data[c] = 0.0f;
                 }
 
-                for(int k = -c_height_h; k < c_height_h; k++) {
-                    for(int l = -c_width_h; l < c_width_h; l++) {
+                for(int k = -c_height_h; k <= c_height_h; k++) {
+                    for(int l = -c_width_h; l <= c_width_h; l++) {
 
                         float *img_data  = (*img)(i + l, j + k);
                         float kernel_val = (*conv)(l + c_width_h, k + c_height_h)[0];
@@ -100,7 +93,7 @@ public:
      * @param imgOut
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *img, ImageRAW *conv, ImageRAW *imgOut)
+    static Image *Execute(Image *img, Image *conv, Image *imgOut)
     {
         FilterConv2D flt;
         return flt.ProcessP(Double(img, conv), imgOut);
@@ -115,13 +108,13 @@ public:
     static void Execute(std::string nameImg, std::string nameConv,
                         std::string nameOut)
     {
-        ImageRAW img(nameImg, LT_NOR_GAMMA);
-        ImageRAW conv(nameConv, LT_NOR_GAMMA);
+        Image img(nameImg, LT_NOR_GAMMA);
+        Image conv(nameConv, LT_NOR_GAMMA);
 
         float *sumVal = conv.getSumVal(NULL, NULL);
-        conv.Div(sumVal[0]);
+        conv /= sumVal[0];
 
-        ImageRAW *imgOut = Execute(&img, &conv, NULL);
+        Image *imgOut = Execute(&img, &conv, NULL);
 
         imgOut->Write(nameOut);
     }

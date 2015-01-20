@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -55,14 +48,6 @@ public:
      * @param s_R
      */
     void Update(float s_S, float s_R);
-
-    /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 };
 
 FilterGLSlicer::FilterGLSlicer(float s_S, float s_R): FilterGL()
@@ -140,61 +125,6 @@ void FilterGLSlicer::Update(float s_S, float s_R)
     filteringProgram.uniform("s_S", s_S);
     filteringProgram.uniform("mul_E", mul_E);
     glw::bind_program(0);
-}
-
-ImageRAWGL *FilterGLSlicer::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-        fbo->create(w, h, 1, false, imgOut->getTexture());
-    }
-
-    if(imgIn.size() < 2) {
-        return NULL;
-    }
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    glw::bind_program(filteringProgram);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    imgIn[0]->bindTexture();
-
-    glActiveTexture(GL_TEXTURE1);
-    imgIn[1]->bindTexture();
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    glw::bind_program(0);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE1);
-    imgIn[1]->unBindTexture();
-
-    glActiveTexture(GL_TEXTURE0);
-    imgIn[0]->unBindTexture();
-
-    return imgOut;
 }
 
 } // end namespace pic

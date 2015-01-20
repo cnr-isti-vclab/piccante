@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -44,12 +37,16 @@ protected:
     int                     width, height, range;
     float                   sigma_s, sigma_r;
 
-    ImageRAW	            *grid, *gridBlur;
+    Image	            *grid, *gridBlur;
     bool		            parallel;
 
 public:
     float s_S, s_R, mul_E;
 
+    /**
+     * @brief Signature
+     * @return
+     */
     std::string Signature()
     {
         return GenBilString("G", sigma_s, sigma_r);
@@ -62,7 +59,7 @@ public:
      * @param channel
      * @return
      */
-    ImageRAW *Splat(ImageRAW *base, ImageRAW *edge, int channel);
+    Image *Splat(Image *base, Image *edge, int channel);
 
     /**
      * @brief Slice slices the grid into the output image
@@ -71,7 +68,7 @@ public:
      * @param edge
      * @param channels
      */
-    void Slice(ImageRAW *out, ImageRAW *base, ImageRAW *edge, int channels);
+    void Slice(Image *out, Image *base, Image *edge, int channels);
 
     /**
      * @brief FilterBilateral2DG
@@ -83,10 +80,10 @@ public:
     ~FilterBilateral2DG();
 
     //Processing
-    ImageRAW *Process(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *Process(ImageVec imgIn, Image *imgOut);
 
     //Processing in parallel
-    ImageRAW *ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *ProcessP(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief Execute
@@ -96,7 +93,7 @@ public:
      * @param sigma_r
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float sigma_s,
+    static Image *Execute(Image *imgIn, Image *imgOut, float sigma_s,
                              float sigma_r)
     {
         FilterBilateral2DG filter(sigma_s, sigma_r);
@@ -117,15 +114,15 @@ public:
      * @param sigma_r
      * @return
      */
-    static ImageRAW *Execute(std::string nameIn,
+    static Image *Execute(std::string nameIn,
                              std::string nameOut,
                              float sigma_s, float sigma_r)
     {
         //Load the image
-        ImageRAW imgIn(nameIn, LT_NOR_GAMMA);
+        Image imgIn(nameIn, LT_NOR_GAMMA);
 
         //Filtering
-        ImageRAW *imgOut =  FilterBilateral2DG::Execute(&imgIn, NULL, sigma_s, sigma_r);
+        Image *imgOut =  FilterBilateral2DG::Execute(&imgIn, NULL, sigma_s, sigma_r);
 
         //Write image out
         imgOut->Write(nameOut);
@@ -134,19 +131,19 @@ public:
     }
 
     //Filtering
-    static ImageRAW *Execute(std::string nameBase,
+    static Image *Execute(std::string nameBase,
                              std::string nameEdge,
                              std::string nameOut,
                              float sigma_s, float sigma_r)
     {
         //Load the image
-        ImageRAW imgBase(nameBase, LT_NOR_GAMMA);
-        ImageRAW imgEdge(nameEdge, LT_NOR_GAMMA);
+        Image imgBase(nameBase, LT_NOR_GAMMA);
+        Image imgEdge(nameEdge, LT_NOR_GAMMA);
 
         //Filtering
         FilterBilateral2DG filter(sigma_s, sigma_r);
         long t0 = timeGetTime();
-        ImageRAW *imgOut = filter.Process(Double(&imgBase, &imgEdge), NULL);
+        Image *imgOut = filter.Process(Double(&imgBase, &imgEdge), NULL);
         long t1 = timeGetTime();
         printf("Bilateral Grid Filter time: %f\n", float(t1 - t0) / 1000.0f);
 
@@ -185,7 +182,7 @@ FilterBilateral2DG::~FilterBilateral2DG()
     }
 }
 
-ImageRAW *FilterBilateral2DG::Splat(ImageRAW *base, ImageRAW *edge, int channels)
+Image *FilterBilateral2DG::Splat(Image *base, Image *edge, int channels)
 {
     if(grid == NULL) {
         #ifdef PIC_DEBUG
@@ -204,14 +201,14 @@ ImageRAW *FilterBilateral2DG::Splat(ImageRAW *base, ImageRAW *edge, int channels
         printf("Grid - Memory Mb: %3.2f\n",
                float(width + 1)*float(height + 1)*float(range + 1) * 8.0f /
                (1024.0f * 1024.0f));
-        grid = new ImageRAW(range + 1, width + 1, height + 1, 2);
-        gridBlur = new ImageRAW(range + 1, width + 1, height + 1, 2);
+        grid = new Image(range + 1, width + 1, height + 1, 2);
+        gridBlur = new Image(range + 1, width + 1, height + 1, 2);
 #else
         printf("Grid - Memory Mb: %3.2f\n",
                float(width + 1)*float(height + 1)*float(range + 1) * 16.0f /
                (1024.0f * 1024.0f));
-        grid = new ImageRAW(range + 1, width + 1, height + 1, base->channels + 1);
-        gridBlur = new ImageRAW(range + 1, width + 1, height + 1, base->channels + 1);
+        grid = new Image(range + 1, width + 1, height + 1, base->channels + 1);
+        gridBlur = new Image(range + 1, width + 1, height + 1, base->channels + 1);
 #endif
     }
 
@@ -257,7 +254,7 @@ ImageRAW *FilterBilateral2DG::Splat(ImageRAW *base, ImageRAW *edge, int channels
     return grid;
 }
 
-void FilterBilateral2DG::Slice(ImageRAW *out, ImageRAW *base, ImageRAW *edge,
+void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge,
                                int channels)
 {
     float widthf = float(grid->width);
@@ -317,7 +314,7 @@ void FilterBilateral2DG::Slice(ImageRAW *out, ImageRAW *base, ImageRAW *edge,
     }
 }
 
-ImageRAW *FilterBilateral2DG::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
 {
     if(imgIn[0] == NULL) {
         return NULL;
@@ -327,7 +324,7 @@ ImageRAW *FilterBilateral2DG::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
         imgOut = imgIn[0]->AllocateSimilarOne();
     }
 
-    ImageRAW *base, *edge;
+    Image *base, *edge;
 
     float maxVal;
 
@@ -335,7 +332,7 @@ ImageRAW *FilterBilateral2DG::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
         base = imgIn[0];
         edge = imgIn[1];
         maxVal = MAX(base->getMaxVal()[0], edge->getMaxVal()[0]);
-        edge->Div(maxVal);
+        *edge /= maxVal;
     } else {
         base = imgIn[0];
         edge = imgIn[0];
@@ -343,7 +340,7 @@ ImageRAW *FilterBilateral2DG::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
     }
 
     //Range in [0,1]
-    base->Div(maxVal);
+    *base /= maxVal;
     float tmpSigma_r = sigma_r;
     sigma_r /= maxVal;
 
@@ -375,14 +372,14 @@ ImageRAW *FilterBilateral2DG::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
         Slice(imgOut, base, edge, i);
     }
 
-    imgOut->Mul(maxVal);
+    *imgOut *= maxVal;
     sigma_r = tmpSigma_r;
     parallel = false;
 
     return imgOut;
 }
 
-ImageRAW *FilterBilateral2DG::ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterBilateral2DG::ProcessP(ImageVec imgIn, Image *imgOut)
 {
     parallel = true;
     return Process(imgIn, imgOut);

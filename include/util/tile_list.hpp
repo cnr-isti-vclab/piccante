@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -32,6 +25,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The TileList class
+ */
 class TileList
 {
 protected:
@@ -97,7 +93,7 @@ public:
      * @brief Read loads a TileList from a file.
      * @param name is the file name.
      * @param flag is a boolean value. If it is true, this loads
-     * an ImageRAW from the tile name. Otherwise, an ImageRAW of the tile
+     * an Image from the tile name. Otherwise, an Image of the tile
      * size is allocated.
      * @return This function returns true if it is successfull.
      */
@@ -112,9 +108,9 @@ public:
 
     /**
      * @brief WriteIntoMemory copies tiles inside an output image.
-     * @param output is the ImageRAW where tiles will be copied to.
+     * @param output is the Image where tiles will be copied to.
      */
-    void WriteIntoMemory(ImageRAW *output);
+    void WriteIntoMemory(Image *output);
 };
 
 PIC_INLINE TileList::TileList()
@@ -244,7 +240,7 @@ PIC_INLINE void TileList::Create(int tileSize, int width, int height)
     }
 }
 
-PIC_INLINE void TileList::WriteIntoMemory(ImageRAW *output)
+PIC_INLINE void TileList::WriteIntoMemory(Image *output)
 {
     if(output == NULL) {
         return;
@@ -307,9 +303,9 @@ PIC_INLINE bool TileList::Read(std::string name, bool flag)
 
         tmpTile.name = tmp_name;
         if(flag) {
-            tmpTile.tile = new ImageRAW(tmpTile.name);
+            tmpTile.tile = new Image(tmpTile.name);
         } else {
-            tmpTile.tile = new ImageRAW(1, tmpTile.width, tmpTile.height, 3);
+            tmpTile.tile = new Image(1, tmpTile.width, tmpTile.height, 3);
         }
 
         tiles.push_back(tmpTile);

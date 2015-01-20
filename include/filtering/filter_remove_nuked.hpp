@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -43,7 +36,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         float maxVal;
         float values[9];
@@ -106,7 +99,7 @@ public:
      * @param threshold_nuked
      * @return
      */
-    static ImageRAW* Execute(ImageRAW *imgIn, ImageRAW *imgOut, float threshold_nuked = 1e4)
+    static Image* Execute(Image *imgIn, Image *imgOut, float threshold_nuked = 1e4)
     {
         FilterRemoveNuked filter(threshold_nuked);
         imgOut = filter.ProcessP(Single(imgIn), imgOut);
@@ -120,10 +113,10 @@ public:
      * @param threshold_nuked
      * @return
      */
-    static ImageRAW* Execute(std::string nameFileIn, std::string nameFileOut, float threshold_nuked = 1e4)
+    static Image* Execute(std::string nameFileIn, std::string nameFileOut, float threshold_nuked = 1e4)
     {
-        ImageRAW imgIn(nameFileIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, threshold_nuked);
+        Image imgIn(nameFileIn);
+        Image *imgOut = Execute(&imgIn, NULL, threshold_nuked);
         imgOut->Write(nameFileOut);
 
         return imgOut;

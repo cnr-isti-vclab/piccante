@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -29,6 +22,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterBilateral2DF class
+ */
 class FilterBilateral2DF: public Filter
 {
 protected:
@@ -36,43 +32,73 @@ protected:
 
     PrecomputedGaussian *pg;
 
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterBilateral2DF
+     */
     FilterBilateral2DF();
-    //Init constructors
+
+    /**
+     * @brief FilterBilateral2DF
+     * @param sigma_s
+     * @param sigma_r
+     */
     FilterBilateral2DF(float sigma_s, float sigma_r);
 
+    /**
+     * @brief Signature
+     * @return
+     */
     std::string Signature()
     {
         return GenBilString("F", sigma_s, sigma_r);
     }
 
-    //Filtering
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut,
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgOut,
                              float sigma_s, float sigma_r)
     {
         //Filtering
         FilterBilateral2DF filter(sigma_s, sigma_r);
         long t0 = timeGetTime();
-        ImageRAW *out = filter.ProcessP(Single(imgIn), imgOut);
+        Image *out = filter.ProcessP(Single(imgIn), imgOut);
         long t1 = timeGetTime();
         printf("Full Bilateral Filter time: %ld\n", t1 - t0);
         return out;
     }
 
-    //Filtering
-    static ImageRAW *Execute(std::string nameIn,
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
+    static Image *Execute(std::string nameIn,
                              std::string nameOut,
                              float sigma_s, float sigma_r)
     {
         //Load the image
-        ImageRAW imgIn(nameIn);
+        Image imgIn(nameIn);
 
         //Filter
-        ImageRAW *imgOut = FilterBilateral2DF::Execute(&imgIn, NULL, sigma_s, sigma_r);
+        Image *imgOut = FilterBilateral2DF::Execute(&imgIn, NULL, sigma_s, sigma_r);
 
         //Write image out
         imgOut->Write(nameOut);
@@ -80,13 +106,11 @@ public:
     }
 };
 
-//Basic constructor
 FilterBilateral2DF::FilterBilateral2DF()
 {
     pg = NULL;
 }
 
-//Init constructors
 FilterBilateral2DF::FilterBilateral2DF(float sigma_s, float sigma_r)
 {
     //protected values are assigned/computed
@@ -97,13 +121,12 @@ FilterBilateral2DF::FilterBilateral2DF(float sigma_s, float sigma_r)
     pg = new PrecomputedGaussian(sigma_s);
 }
 
-//Process in a box
-void FilterBilateral2DF::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterBilateral2DF::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 
     //Filtering
-    ImageRAW *edge, *base;
+    Image *edge, *base;
 
     if(src.size() == 2) {
         //Joint/Cross Bilateral Filtering

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -29,40 +22,63 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterBilateral1D class
+ */
 class FilterBilateral1D: public Filter
 {
 protected:
     PrecomputedGaussian *pg;
     int					dirs[3];
 
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     float sigma_s, sigma_r;
 
-    //Standard constructor
+    /**
+     * @brief FilterBilateral1D
+     * @param sigma_s
+     * @param sigma_r
+     */
     FilterBilateral1D(float sigma_s, float sigma_r);
 
+    /**
+     * @brief Update
+     * @param sigma_s
+     * @param sigma_r
+     */
     void Update(float sigma_s, float sigma_r);
 
+    /**
+     * @brief Signature
+     * @return
+     */
     std::string Signature()
     {
         return GenBilString("1D", sigma_s, sigma_r);
     }
 
-    //Change data for this pass
+    /**
+     * @brief ChangePass
+     * @param pass
+     * @param tPass
+     */
     void ChangePass(int pass, int tPass);
 };
 
-//Basic constructor
 FilterBilateral1D::FilterBilateral1D(float sigma_s, float sigma_r)
 {
     pg = NULL;
     Update(sigma_s, sigma_r);
 }
 
-///Update:
 void FilterBilateral1D::Update(float sigma_s, float sigma_r)
 {
     //protected values are assigned/computed
@@ -78,7 +94,6 @@ void FilterBilateral1D::Update(float sigma_s, float sigma_r)
     pg = new PrecomputedGaussian(sigma_s);
 }
 
-//Change data for this pass
 void FilterBilateral1D::ChangePass(int pass, int tPass)
 {
     /*	tPass++;
@@ -110,15 +125,14 @@ void FilterBilateral1D::ChangePass(int pass, int tPass)
 #endif
 }
 
-//Process in a box
-void FilterBilateral1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterBilateral1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 
     float inv_sigma_r2 = 1.0f / (2.0f * sigma_r * sigma_r);
 
     //Filtering
-    ImageRAW *edge, *base;
+    Image *edge, *base;
 
     if(src.size() == 2) {
         //Joint/Cross Bilateral Filtering

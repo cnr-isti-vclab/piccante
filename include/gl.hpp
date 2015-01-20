@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -51,6 +44,11 @@ See the GNU Lesser General Public License
 #include "externals/glw/utility.hpp"
 
 #include "gl/algorithms/pyramid.hpp"
+#include "gl/algorithms/pushpull.hpp"
+#include "gl/algorithms/color_to_gray.hpp"
+
+#include "util/gl/buffer_op.hpp"
+#include "util/gl/buffer_ops.hpp"
 
 #include "gl/filtering/filter.hpp"
 #include "gl/filtering/filter_luminance.hpp"
@@ -94,7 +92,6 @@ See the GNU Lesser General Public License
 #include "gl/filtering/filter_iterative.hpp"
 #include "gl/filtering/filter_npasses.hpp"
 #include "gl/filtering/filter_op.hpp"
-#include "gl/filtering/filter_redux.hpp"
 #include "gl/filtering/filter_remapping.hpp"
 #include "gl/filtering/filter_remove_nuked.hpp"
 #include "gl/filtering/filter_sampler_2d.hpp"
@@ -104,14 +101,17 @@ See the GNU Lesser General Public License
 #include "gl/filtering/filter_simple_tmo.hpp"
 #include "gl/filtering/filter_slicer.hpp"
 #include "gl/filtering/filter_thresholding.hpp"
-#include "gl/image_raw.hpp"
-#include "gl/image_raw_vec.hpp"
+#include "gl/image.hpp"
+#include "gl/image_vec.hpp"
 #include "gl/point_samplers/sampler_random_m.hpp"
 
 //Tone mapping
-#include "gl/tone_mapping/hybrid_tmo.hpp"
 #include "gl/tone_mapping/segmentation_tmo_approx.hpp"
 #include "gl/tone_mapping/drago_tmo.hpp"
+#include "gl/tone_mapping/reinhard_tmo.hpp"
+#include "gl/tone_mapping/hybrid_tmo.hpp"
+#include "gl/tone_mapping/get_all_exposures.hpp"
+#include "gl/tone_mapping/exposure_fusion.hpp"
 
 #endif /* PIC_DISABLE_OPENGL */
 

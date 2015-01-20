@@ -9,23 +9,16 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_ALGORITHMS_PUSHPULL_HPP
 #define PIC_ALGORITHMS_PUSHPULL_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "image_samplers/image_sampler_bsplines.hpp"
 #include "filtering/filter_down_pp.hpp"
 #include "filtering/filter_up_pp.hpp"
@@ -41,10 +34,7 @@ protected:
 
     FilterDownPP    *flt_down;
     FilterUpPP      *flt_up;
-
-    float           threshold;
-    float			*value;
-    ImageRAWVec 	stack;
+    ImageVec        stack;
 
     /**
      * @brief Release
@@ -68,8 +58,6 @@ public:
     {
         flt_down = NULL;
         flt_up = NULL;
-        threshold = 1e-6f;
-        value = NULL;
     }
 
     ~PushPull()
@@ -83,19 +71,17 @@ public:
      * @param value
      * @return
      */
-    ImageRAW *Process(ImageRAW *imgIn, ImageRAW *imgOut, float *value)
+    Image *Process(Image *imgIn, Image *imgOut, float *value = NULL, float threshold = 1e-6f)
     {
-        if(imgIn == NULL || value == NULL) {
-            return NULL;
+        if(imgIn == NULL) {
+            return imgOut;
         }
 
         if(imgOut == NULL) {
             imgOut = imgIn->Clone();
         } else {
-            imgOut->Assign(imgIn);
+            *imgOut = *imgIn;
         }
-
-        this->value = value;
 
         if(flt_down == NULL) {
             flt_down = new FilterDownPP(value, threshold);
@@ -109,16 +95,25 @@ public:
             flt_up->Update(value, threshold);
         }
 
-        //creating the pyramid: Pull
-        stack.push_back(imgOut);
-        ImageRAW *work = imgOut;
+        Image *work = imgOut;
 
-        while(MIN(work->width, work->height) > 1) {
-            ImageRAW *tmp = flt_down->Process(Single(work), NULL);
+        if(stack.empty()) { //creating the pyramid: Pull
+            stack.push_back(imgOut);
 
-            if(tmp != NULL) {
-                stack.push_back(tmp);
-                work = tmp;
+            while(MIN(work->width, work->height) > 1) {
+                Image *tmp = flt_down->Process(Single(work), NULL);
+
+                if(tmp != NULL) {
+                    stack.push_back(tmp);
+                    work = tmp;
+                }
+            }
+        } else { //updating previously created pyramid: Pull
+            int c = 1;
+            while(MIN(work->width, work->height) > 1) {
+                flt_down->Process(Single(work), stack[c]);
+                work = stack[c];
+                c++;
             }
         }
 
@@ -126,7 +121,7 @@ public:
         int n = (stack.size() - 2);
 
         for(int i = n; i >= 0; i--) {
-            stack[i] = flt_up->ProcessP(Single(stack[i + 1]), stack[i]);
+            flt_up->ProcessP(Single(stack[i + 1]), stack[i]);
         }
 
         return imgOut;
@@ -138,16 +133,18 @@ public:
      * @param value
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *img, float value)
+    static Image *Execute(Image *img, float value)
     {
         PushPull pp;
 
-        float *tmpValue = new float[img->channels];
+        float *tmp_value = new float[img->channels];
         for(int i = 0; i < img->channels; i++) {
-            tmpValue[i] = value;
+            tmp_value[i] = value;
         }
 
-        return pp.Process(img, NULL, tmpValue);
+        return pp.Process(img, NULL, tmp_value);
+
+        delete tmp_value;
     }
 
     /**
@@ -156,10 +153,10 @@ public:
      * @param nameOut
      * @return
      */
-    static ImageRAW *Execute(std::string name, std::string nameOut)
+    static Image *Execute(std::string name, std::string nameOut)
     {
-        ImageRAW img(name);
-        ImageRAW *imgOut = Execute(&img, 0.0f);
+        Image img(name);
+        Image *imgOut = Execute(&img, 0.0f);
         imgOut->Write(nameOut);
         return imgOut;
     }

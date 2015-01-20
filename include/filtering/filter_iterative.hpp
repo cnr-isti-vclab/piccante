@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -29,36 +22,70 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterIterative class
+ */
 class FilterIterative: public Filter
 {
 protected:
-    ImageRAW	*imgTmp[2];
+    Image	*imgTmp[2];
 
     bool		parallel;
     int			iterations;
 
-public:
-
-    //Basic constructor
-    FilterIterative();
-    FilterIterative(Filter *flt, int iterations);
-
-    //Basic
-    ~FilterIterative();
+    /**
+     * @brief Destroy
+     */
     void Destroy();
 
-    //Setup NPasses
-    virtual ImageRAW *SetupAuxN(ImageRAWVec imgIn, ImageRAW *imgOut);
+public:
 
+    /**
+     * @brief FilterIterative
+     */
+    FilterIterative();
+
+    /**
+     * @brief FilterIterative
+     * @param flt
+     * @param iterations
+     */
+    FilterIterative(Filter *flt, int iterations);
+
+    ~FilterIterative();
+
+    /**
+     * @brief SetupAuxN
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    virtual Image *SetupAuxN(ImageVec imgIn, Image *imgOut);
+
+    /**
+     * @brief Update
+     * @param flt
+     * @param iterations
+     */
     void Update(Filter *flt, int iterations);
 
-    //Process
-    ImageRAW *Process(ImageRAWVec imgIn, ImageRAW *imgOut);
-    //Process in parallel
-    ImageRAW *ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut);
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *Process(ImageVec imgIn, Image *imgOut);
+
+    /**
+     * @brief ProcessP
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *ProcessP(ImageVec imgIn, Image *imgOut);
 };
 
-//Basic constructor
 FilterIterative::FilterIterative()
 {
     parallel = false;
@@ -78,7 +105,6 @@ FilterIterative::FilterIterative(Filter *flt, int iterations)
     Update(flt, iterations);
 }
 
-//Basic
 FilterIterative::~FilterIterative()
 {
     Destroy();
@@ -118,8 +144,7 @@ void FilterIterative::Update(Filter *flt, int iterations)
     filters.push_back(flt);
 }
 
-//Setup NPasses
-ImageRAW *FilterIterative::SetupAuxN(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterIterative::SetupAuxN(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->AllocateSimilarOne();
@@ -140,10 +165,9 @@ ImageRAW *FilterIterative::SetupAuxN(ImageRAWVec imgIn, ImageRAW *imgOut)
     }
 
     return imgOut;
-};
+}
 
-//Processing
-ImageRAW *FilterIterative::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterIterative::Process(ImageVec imgIn, Image *imgOut)
 {
     if(imgIn.size() < 1 || imgIn[0] == NULL) {
         return imgOut;
@@ -172,8 +196,7 @@ ImageRAW *FilterIterative::Process(ImageRAWVec imgIn, ImageRAW *imgOut)
     return imgOut;
 }
 
-//Processing in parallel
-ImageRAW *FilterIterative::ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterIterative::ProcessP(ImageVec imgIn, Image *imgOut)
 {
     parallel = true;
     return Process(imgIn, imgOut);

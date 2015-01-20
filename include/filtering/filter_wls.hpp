@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -37,10 +30,15 @@ namespace pic {
 class FilterWLS: public Filter
 {
 protected:
-    /**WLSFilter: smoothing WLS filter for gray-scale images*/
-    ImageRAW *SingleChannel(ImageRAWVec imgIn, ImageRAW *imgOut)
+    /**
+     * @brief SingleChannel applies WLS smoothing filter for gray-scale images.
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *SingleChannel(ImageVec imgIn, Image *imgOut)
     {
-        ImageRAW *L = imgIn[0];
+        Image *L = imgIn[0];
 
         int width  = L->width;
         int height = L->height;
@@ -135,10 +133,15 @@ protected:
         return imgOut;
     }
 
-    /**MultiChannel: smoothing WLS filter for color images*/
-    ImageRAW *MultiChannel(ImageRAWVec imgIn, ImageRAW *imgOut)
+    /**
+     * @brief MultiChannel applies WLS filter for color images.
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *MultiChannel(ImageVec imgIn, Image *imgOut)
     {
-        ImageRAW *img = imgIn[0];
+        Image *img = imgIn[0];
 
         int width  = img->width;
         int height = img->height;
@@ -276,16 +279,29 @@ protected:
 
 public:
 
+    /**
+     * @brief FilterWLS
+     */
     FilterWLS()
     {
         Update(1.2f, 1.0f);
     }
 
+    /**
+     * @brief FilterWLS
+     * @param alpha
+     * @param lambda
+     */
     FilterWLS(float alpha, float lambda)
     {
         Update(alpha, lambda);
     }
 
+    /**
+     * @brief Update
+     * @param alpha
+     * @param lambda
+     */
     void Update(float alpha, float lambda)
     {
         epsilon = 0.0001f;
@@ -302,7 +318,13 @@ public:
         this->lambda = lambda;
     }
 
-    ImageRAW *Process(ImageRAWVec imgIn, ImageRAW *imgOut)
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *Process(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() < 1){
             return imgOut;
@@ -322,11 +344,23 @@ public:
         }
     }
 
-    ImageRAW *ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut)
+    /**
+     * @brief ProcessP
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *ProcessP(ImageVec imgIn, Image *imgOut)
     {
         return Process(imgIn, imgOut);
     }
 
+    /**
+     * @brief main
+     * @param argc
+     * @param argv
+     * @return
+     */
     static int main(int argc, char* argv[])
     {
         if(argc < 4) {
@@ -343,7 +377,7 @@ public:
 
         std::string nameOut = name + "_wls." + ext; 
 
-        ImageRAW img(nameIn);
+        Image img(nameIn);
 
         FilterWLS *filter = new FilterWLS(alpha, lambda);
 

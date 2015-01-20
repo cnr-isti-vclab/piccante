@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -33,6 +26,9 @@ namespace pic {
 
 enum BF_TYPE {BF_CLASSIC, BF_CROSS, BF_BRUSH};
 
+/**
+ * @brief The FilterGLBilateral2DS class
+ */
 class FilterGLBilateral2DS: public FilterGL
 {
 protected:
@@ -41,7 +37,7 @@ protected:
     BF_TYPE type;
 
     //Random numbers tile
-    ImageRAWGL *imageRand;
+    ImageGL *imageRand;
     //Fragment Brush
     std::vector<std::string> fragment_sources;
 
@@ -72,7 +68,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 \
     /**
      * @brief Execute
@@ -81,13 +77,13 @@ public:
      * @param sigma_r
      * @return
      */
-    static ImageRAWGL *Execute(ImageRAWGL *imgIn, float sigma_s, float sigma_r)
+    static ImageGL *Execute(ImageGL *imgIn, float sigma_s, float sigma_r)
     {
         FilterGLBilateral2DS *filter = new FilterGLBilateral2DS(sigma_s, sigma_r,
                 BF_CLASSIC);
 
         GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgOut = filter->Process(SingleGL(imgIn), NULL);
+        ImageGL *imgOut = filter->Process(SingleGL(imgIn), NULL);
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
 
         printf("Bilateral 2DS Filter on GPU time: %f ms\n",
@@ -106,16 +102,16 @@ public:
      * @param testing
      * @return
      */
-    static ImageRAWGL *Execute(std::string nameFile, std::string nameOut,
+    static ImageGL *Execute(std::string nameFile, std::string nameOut,
                                float sigma_s, float sigma_r, int testing = 1)
     {
-        ImageRAWGL imgIn(nameFile);
+        ImageGL imgIn(nameFile);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLBilateral2DS *filter = new FilterGLBilateral2DS(sigma_s, sigma_r,
                 BF_CLASSIC);
 
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, imgIn.channels,
+        ImageGL *imgOut = new ImageGL(1, imgIn.width, imgIn.height, imgIn.channels,
                                             IMG_GPU_CPU, GL_TEXTURE_2D);
 
         GLuint testTQ1;
@@ -169,22 +165,24 @@ FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma_r,
     int halfKernelSize = kernelSize >> 1;
 
     //Random numbers
-    int nRand = 32;
     int nSamplers;
 
-    if(BF_CLASSIC) {
-        imageRand = new ImageRAWGL(3, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
+//    if(BF_CLASSIC) {
+
+    imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
+    imageRand->SetRand();
+    imageRand->loadFromMemory();
+    *imageRand -= 0.5f;
+    nSamplers = 1;
+
+ /*   } else {
+    int nRand = 32;
+        imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
         imageRand->SetRand();
-        imageRand->Sub(0.5f);
-        imageRand->loadFromMemory(false);
-        nSamplers = 1;
-    } else {
-        imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
-        imageRand->SetRand();
-        imageRand->Mul(float(nRand - 1));
+        *imageRand *= float(nRand - 1);
         imageRand->generateTexture2DU32GL();
         nSamplers = nRand;
-    }
+    }*/
 
     //Poisson samples
 #ifdef PIC_DEBUG
@@ -402,26 +400,26 @@ void FilterGLBilateral2DS::Update(float sigma_s, float sigma_r)
     float sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
 
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform("u_tex",      0);
-    filteringProgram.uniform("u_poisson",  1);
-    filteringProgram.uniform("u_rand",	 2);
-    filteringProgram.uniform("u_mask",	 3);
+    filteringProgram.uniform("u_tex",       0);
+    filteringProgram.uniform("u_poisson",   1);
+    filteringProgram.uniform("u_rand",      2);
+    filteringProgram.uniform("u_mask",      3);
 
     if(type == BF_CROSS) {
-        filteringProgram.uniform("u_edge",	 4);
+        filteringProgram.uniform("u_edge",  4);
     }
 
-    filteringProgram.uniform("sigmas2",		    sigmas2);
-    filteringProgram.uniform("sigmar2",		    sigmar2);
+    filteringProgram.uniform("sigmas2",         sigmas2);
+    filteringProgram.uniform("sigmar2",         sigmar2);
     filteringProgram.uniform("kernelSize",      kernelSize);
     filteringProgram.uniform("kernelSizef",     float(kernelSize));
-    filteringProgram.uniform("nSamples",    ms->nSamples / 2);
+    filteringProgram.uniform("nSamples",        ms->nSamples >> 1);
     glw::bind_program(0);
 }
 
 //Processing
-ImageRAWGL *FilterGLBilateral2DS::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLBilateral2DS::Process(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -432,7 +430,7 @@ ImageRAWGL *FilterGLBilateral2DS::Process(ImageRAWGLVec imgIn,
 
     //TODO: check if other have height and frames swapped
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {
@@ -441,7 +439,7 @@ ImageRAWGL *FilterGLBilateral2DS::Process(ImageRAWGLVec imgIn,
 
     fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
 
-    ImageRAWGL *edge, *base, *mask;
+    ImageGL *edge, *base, *mask;
 
     if(imgIn.size() == 2) {
         //Joint/Cross Bilateral Filtering

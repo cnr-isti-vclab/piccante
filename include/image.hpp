@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -37,15 +30,24 @@ See the GNU Lesser General Public License
 #include "util/compability.hpp"
 #include "util/bbox.hpp"
 #include "util/buffer.hpp"
+#include "util/low_dynamic_range.hpp"
 
 #include "util/math.hpp"
 
+//IO formats
+#include "io/bmp.hpp"
 #include "io/exr.hpp"
+#include "io/hdr.hpp"
+#include "io/pfm.hpp"
+#include "io/ppm.hpp"
+#include "io/pgm.hpp"
+#include "io/tmp.hpp"
+#include "io/tga.hpp"
+#include "io/vol.hpp"
+#include "io/exr.hpp"
+#include "util/io.hpp"
 
 namespace pic {
-
-const double HARMONIC_MEAN_EPSILON = 1e-6;
-const float  HARMONIC_MEAN_EPSILONf = 1e-6f;
 
 /**
  * @brief The Image class stores an image as buffer of float.
@@ -86,6 +88,8 @@ protected:
 
     BBox fullBox;
 
+    LDR_type typeLoad;
+
 public:
     float exposure;
     int width, height, channels, frames, depth, alpha;
@@ -125,6 +129,42 @@ public:
      * @brief the basic construct of an Image
      */
     Image();
+
+    /**
+     * @brief Image embeds an existing image in the new image.
+     * @param imgIn is the input image to embed.
+     * @param deepCopy enables a deep copy of img into this.
+     */
+    Image(Image *imgIn, bool deepCopy);
+
+    /**
+    * @brief Image loads an Image from a file on the disk.
+    * @param nameFile is the file name.
+    * @param typeLoad is an option for LDR images only:
+    * LT_NOR means that the input image values will be normalized in [0,1].
+    * LT_NOR_GAMMA means that the input image values will be normalized in [0,1], and
+    * gamma correction 2.2 will be removed.
+    * LT_NONE means that image values are not modified during the loading.
+    *
+    * The default value is LT_NOR_GAMMA assuming that
+    * we are storing normalized and linearized values in Image.
+    */
+    Image(std::string nameFile, LDR_type typeLoad);
+
+    /**
+    * @brief Image creates an Image with a given size.
+    * @param width is the horizontal size in pixels.
+    * @param height is the vertical size in pixels.
+    * @param channels is the number of color channels.
+    */
+    Image(int width, int height, int channels);
+
+   /**
+   * @brief Image embeds an array of float inside an Image.
+   * @param color is the pointer to an array of float values.
+   * @param channels is the color's number of elements.
+   */
+    Image(float *color, int channels);
 
     /**
      * @brief Image is a constructor which initializes an image defined by
@@ -235,65 +275,13 @@ public:
      * @return This function returns true if the two images are similar,
      * otherwise false.
      */
-    bool SimilarType(Image *img);
+    bool SimilarType(const Image *img);
 
     /**
-     * @brief Assign is the assignment operator for Image.
-     * @param imgIn is the Image to be assigned to the current Image.
-     * They need to have the same width, height and color channels.
+     * @brief Assign
+     * @param imgIn
      */
-    void Assign(Image *imgIn);
-
-    /**
-     * @brief Assign is the assignment operator for Image.
-     * @param val is a single value to be assigned to the current Image.
-     */
-    void Assign(float val);
-
-    /**
-     * @brief Add is the addition operator for Image.
-     * @param img is an Image to be added to the current Image.
-     * They need to have the same width, height and color channels.
-     */
-    void Add(Image *img);
-
-    /**
-     * @brief Add is the addition operator for Image.
-     * @param val is a single value to be added to the current Image.
-     */
-    void Add(float val);
-
-    /**
-     * @brief Sub is the subtraction operator for Image.
-     * @param img is an Image and the subtrahend for the operator,
-     * while the current Image is the minuend.
-     * They need to have the same width, height and color channels.
-     */
-    void Sub(Image *img);
-
-    /**
-     * @brief Sub is the subtraction operator for Image.
-     * @param val is a single value, which is subtrahend while
-     * the current Image is the minuend.
-     */
-    void Sub(float val);
-
-    /**
-     * @brief Mul is the multiplication operator for Image.
-     * @param img is an Image and the multiplier while
-     * the current Image is the multiplicand.
-     * They need to have the same width, height and color channels.
-     */
-    void Mul(Image *img);
-
-    /**
-     * @brief MulS is the same function as Mul, where img has
-     * to have one color channel.
-     * @param img is an Image with one single color channel
-     * which is the multiplier while the current Image is the multiplicand.
-     * They need to have the same width and height.
-     */
-    void MulS(Image *img);
+    void Assign(const Image *imgIn);
 
     /**
      * @brief Blend
@@ -301,28 +289,6 @@ public:
      * @param weight
      */
     void Blend(Image *img, Image *weight);
-
-    /**
-     * @brief Mul is the multiplication operator for Image.
-     * @param val is a single value  and the multiplier while
-     * the current Image is the multiplicand.
-     */
-    void Mul(float val);
-
-    /**
-     * @brief Div is the division operator for Image.
-     * @param img is an Image and the divisor, while the
-     * current Image is the quotient. They need to have the
-     * same width, height and color channels.
-     */
-    void Div(Image *img);
-
-    /**
-     * @brief Div is the division operator for Image.
-     * @param val is a single value which is the divisor, while
-     * the current Image is the quotient.
-     */
-    void Div(float val);
 
     /**
      * @brief Minimum is the minimum operator for Image.
@@ -339,21 +305,6 @@ public:
      * height, and color channels.
      */
     void Maximum(Image *img);
-
-    /**
-     * @brief InverseAdd computes the additive inverse Image:
-     * val - current Image.
-     * @param val is the maximum value for computing the inverse.
-     */
-    void InverseAdd(float val);
-
-    /**
-     * @brief InverseMul computes the multiplicative inverse Image:
-     * 1.0f / (current Image + val)
-     * @param val is the minimum value for computing the inverse.
-     */
-    void InverseMul(float val);
-
 
     /**
      * @brief ApplyFunction is an operator that applies
@@ -416,7 +367,6 @@ public:
      */
     float *getMeanVal(BBox *box, float *ret);
 
-
     /**
      * @brief getMomentsVal computes the moments at pixel (x0, y0).
      * @param x0 is the horizontal coordinate.
@@ -468,14 +418,7 @@ public:
     /**
      * @brief sort sorts values in data and stores them into dataTMP.
      */
-    void  sort();
-
-    /**
-     * @brief changeLum removes lumOld from Image and replaces lumNew.
-     * @param lumOld is the old luminance channel.
-     * @param lumNew is the new luminance channel.
-     */
-    void  changeLum(Image *lumOld, Image *lumNew);
+    void sort();
 
     /**
      * @brief getdataUC
@@ -490,7 +433,7 @@ public:
      * @brief size computes the number of values.
      * @return This function returns the number of values.
      */
-    int size()
+    int size() const
     {
         return height * width * channels * frames;
     }
@@ -499,7 +442,7 @@ public:
      * @brief nPixels computes the number of pixels.
      * @return This function returns the number of pixels.
      */
-    int nPixels()
+    int nPixels() const
     {
         return height * width * frames;
     }
@@ -514,23 +457,9 @@ public:
      */
     bool checkCoordinates(int x, int y, int z = 0)
     {
-        return (x > -1) && (x < width) && (y > -1) && (y < height) && (z > -1) &&
-               (z < frames);
+        return (x > -1) && (x < width) && (y > -1) && (y < height) &&
+               (z > -1) && (z < frames);
     }
-
-    /**
-     * @brief EvaluateGaussian renders a Gaussian function which is centred
-     * in the image.
-     * @param sigma is the standard deviation of the Gaussian function.
-     * @param bNormTerm is a boolean value. If it is true the Gaussian function
-     * is normalized, false otherwise.
-     */
-    void EvaluateGaussian(float sigma, bool bNormTerm);
-
-    /**
-     * @brief EvaluateSolid renders a centred circle.
-     */
-    void EvaluateSolid();
 
     /**
      * @brief ConvertFromMask converts a boolean mask into an Image. true is mapped
@@ -552,15 +481,6 @@ public:
     bool *ConvertToMask(float *color, float threshold, bool cmp, bool *mask);
 
     /**
-     * @brief GradientMagnitude computes the magnitude of the gradient in (x, y)
-     * @param x is the horizontal coordinate where to compute the gradient.
-     * @param y is the vertical coordinate where to compute the gradient.
-     * @param shift is the distance for gradient computation.
-     * @return This function returns the magnitude of the gradient in (x, y).
-     */
-    float GradientMagnitude(int x, int y, int shift);
-
-    /**
      * @brief getFlippedEXR returns the flippedEXR flag.
      * @return This function returns the flippedEXR flag.
      */
@@ -574,22 +494,6 @@ public:
      * them to 0.0f.
      */
     void removeSpecials();
-
-    /**
-     * @brief copyC2C copies an input color channel into an output color channel.
-     * @param input is the index of the input color channel.
-     * @param output is the index of the output color channel.
-     */
-    void copyC2C(int input, int output);
-
-    /**
-     * @brief copyC2C is similar to copyC2C but the input channel comes
-     * from img.
-     * @param img is an Image from where copying the input channel.
-     * @param input is the index of the input color channel.
-     * @param output is the index of the output color channel.
-     */
-    void copyC2C(Image *img, int input, int output);
 
     /**
      * @brief clamp set data values in the range [a,b]
@@ -618,8 +522,9 @@ public:
      */
     float *operator()(int x, int y, int t)
     {
-        return data + CLAMP(t, frames) * tstride + CLAMP(x, width) * xstride + CLAMP(y,
-                height) * ystride;
+        return data + CLAMP(t, frames) * tstride +
+                      CLAMP(x, width)  * xstride +
+                      CLAMP(y, height) * ystride;
     }
 
     /**
@@ -630,7 +535,8 @@ public:
      */
     float *operator()(int x, int y)
     {
-        return data + CLAMP(x, width) * xstride + CLAMP(y, height) * ystride;
+        return data + CLAMP(x, width)  * xstride +
+                      CLAMP(y, height) * ystride;
     }
 
     /**
@@ -703,12 +609,217 @@ public:
         y   = ind / width;
         x   = ind - (y * width);
     }
+
+    /**
+     * @brief AllocateSimilarOne creates an Image with similar size
+     * of the calling instance.
+     * @return This returns an Image with the same size of the calling instance.
+     */
+    Image *AllocateSimilarOne();
+
+    /**
+     * @brief Clone creates a deep copy of the calling instance.
+     * @return This returns a deep copy of the calling instance.
+     */
+    Image *Clone() const;
+
+    //QImage interop
+#ifdef PIC_QT
+    /**
+     * @brief ConvertFromQImage converts a QImage into an Image.
+     * @param img is a QImage.
+     * @param typeLoad is a converting option for LDR images:
+     * LT_NOR means that the input image values will be normalized in [0,1].
+     * LT_NOR_GAMMA means that the input image values will be normalized in [0,1], and
+     * gamma correction 2.2 will be removed.
+     * LT_NONE means that image values are not modified.
+     * @param readerCounter.
+     */
+    void ConvertFromQImage(const QImage *img, LDR_type typeLoad, int readerCounter);
+
+    /**
+     * @brief ConvertToQImage
+     * @param image
+     * @param typeLoad is an option for LDR images only:
+     * LT_NOR means that the input image values will be normalized in [0,1].
+     * LT_NOR_GAMMA means that the input image values will be normalized in [0,1], and
+     * gamma correction 2.2 will be removed.
+     * LT_NONE means that image values are not modified.
+     * @param writerCounter.
+     * @param gamma.
+     * @return
+     */
+    QImage *ConvertToQImage(QImage *image, LDR_type type, int writerCounter,
+                            float gamma);
+#endif
+
+    /**
+     * @brief Read opens an Image from a file on the disk.
+     * @param nameFile is the file name.
+     * @param typeLoad is an option for LDR images only:
+     * LT_NOR means that the input image values will be normalized in [0,1].
+     * LT_NOR_GAMMA means that the input image values will be normalized in [0,1], and
+     * gamma correction 2.2 will be removed.
+     * LT_NONE means that image values are not modified.
+     *
+     * The default is LT_NOR_GAMMA assuming that
+     * we are storing normalized and linearized values in Image.
+     *
+     * @return This returns true if the reading succeeds, false otherwise.
+     */
+    bool Read (std::string nameFile, LDR_type typeLoad);
+
+    /**
+     * @brief Write saves an Image into a file on the disk.
+     * @param nameFile is the file name.
+     * @param typeWrite is an option for LDR images only:
+     * LT_NOR means that Image ha normalized values and the output image
+     * values will be multiplied by 255 to have values in [0,255].
+     * LT_NOR_GAMMA means that Image ha normalized and linearized values. The output image
+     * values will be gamma corrected (2.2) and multiplied by 255 to have values in [0,255].
+     * LT_NONE means that Image values are the same of the output.
+     *
+     * The default is LT_NOR_GAMMA assuming that
+     * we are storing normalized and linearized values in Image.
+     *
+     * @param writerCounter is the frame that we want to write on the disk in the case Image is a video.
+     * The default writerCounter value is 0.
+     * @return This returns true if the writing succeeds, false otherwise.
+     */
+    bool Write(std::string nameFile, LDR_type typeWrite, int writerCounter);
+
+
+    /**
+     * @brief ChangeOwnership
+     * @param notOwned
+     */
+    void ChangeOwnership(bool notOwned)
+    {
+        this->notOwned = notOwned;
+    }
+
+    /**
+     * @brief operator =
+     * @param a
+     */
+    void operator =(const Image &a);
+
+    /**
+     * @brief operator =
+     * @param a
+     */
+    void operator =(const float &a);
+
+    /**
+     * @brief operator +=
+     * @param a
+     */
+    void operator +=(const float &a);
+
+    /**
+     * @brief operator +
+     * @param a
+     * @return it returns (this + a)
+     */
+    Image operator +(const float &a) const;
+
+    /**
+     * @brief operator +=
+     * @param a
+     */
+    void operator +=(const Image &a);
+
+    /**
+     * @brief operator +
+     * @param a
+     * @return it returns (this + a)
+     */
+    Image operator +(const Image &a) const;
+
+    /**
+     * @brief operator *=
+     * @param a
+     */
+    void operator *=(const float &a);
+
+    /**
+     * @brief operator *
+     * @param a
+     * @return it returns (this * a)
+     */
+    Image operator *(const float &a) const;
+
+    /**
+     * @brief operator *=
+     * @param a
+     */
+    void operator *=(const Image &a);
+
+    /**
+     * @brief operator *
+     * @param a
+     * @return it returns (this * a)
+     */
+    Image operator *(const Image &a) const;
+
+    /**
+     * @brief operator -=
+     * @param a
+     */
+    void operator -=(const float &a);
+
+    /**
+     * @brief operator -
+     * @param a
+     * @return it returns (this - a)
+     */
+    Image operator -(const float &a) const;
+
+    /**
+     * @brief operator -=
+     * @param a
+     */
+    void operator -=(const Image &a);
+
+    /**
+     * @brief operator -
+     * @param a
+     * @return it returns (this - a)
+     */
+    Image operator -(const Image &a) const;
+
+    /**
+     * @brief operator /=
+     * @param a
+     */
+    void operator /=(const float &a);
+
+    /**
+     * @brief operator /
+     * @param a
+     * @return it returns (this / a)
+     */
+    Image operator /(const float &a) const;
+
+    /**
+     * @brief operator /=
+     * @param a
+     */
+    void operator /=(const Image &a);
+
+    /**
+     * @brief operator /
+     * @param a
+     * @return it returns (this / a)
+     */
+    Image operator /(const Image &a) const;
 };
 
 PIC_INLINE void Image::SetNULL()
 {
     nameFile = "";
     notOwned = false;
+
     alpha = -1;
     tstride = -1;
     ystride = -1;
@@ -723,8 +834,14 @@ PIC_INLINE void Image::SetNULL()
     data = NULL;
     dataUC = NULL;
     dataRGBE = NULL;
+    typeLoad = LT_NONE;
+
+#ifdef PIC_ENABLE_OPEN_EXR
+    dataEXR = NULL;
+#endif
 
     flippedEXR = false;
+
     readerCounter = 0;
     exposure = 1.0f;
 }
@@ -732,6 +849,40 @@ PIC_INLINE void Image::SetNULL()
 PIC_INLINE Image::Image()
 {
     SetNULL();
+}
+
+PIC_INLINE Image::Image(Image *imgIn, bool deepCopy = true)
+{
+    SetNULL();
+    
+    if(imgIn == NULL) {
+        return;
+    }
+
+    if(deepCopy) {
+        Assign(imgIn);
+    } else {
+        width = imgIn->width;
+        height = imgIn->height;
+        channels = imgIn->channels;
+        frames = imgIn->frames;
+        data = imgIn->data;
+
+        notOwned = true;
+        exposure = imgIn->exposure;
+        nameFile = imgIn->nameFile;
+        flippedEXR = imgIn->flippedEXR;
+        typeLoad = imgIn->typeLoad;
+
+        AllocateAux();
+    }
+
+}
+
+PIC_INLINE Image::Image(int width, int height, int channels = 3)
+{
+    SetNULL();
+    Allocate(width, height, channels, 1);
 }
 
 PIC_INLINE Image::Image(int frames, int width, int height, int channels,
@@ -746,9 +897,27 @@ PIC_INLINE Image::Image(int frames, int width, int height, int channels,
         this->channels = channels;
         this->width    = width;
         this->height   = height;
+        this->notOwned = true;
+        this->data = data;
 
         AllocateAux();
-        this->data = data;
+    }
+}
+
+PIC_INLINE Image::Image(std::string nameFile, LDR_type typeLoad = LT_NOR_GAMMA)
+{
+    SetNULL();
+    Read(nameFile, typeLoad);
+}
+
+PIC_INLINE Image::Image(float *color, int channels)
+{
+    typeLoad = LT_NONE;
+    SetNULL();
+
+    if(color != NULL) {
+        Allocate(1, 1, channels, 1);
+        memcpy(data, color, channels);
     }
 }
 
@@ -775,6 +944,12 @@ PIC_INLINE void Image::Destroy()
     if(dataRGBE != NULL) {
         delete[] dataRGBE;
     }
+
+    #ifdef PIC_ENABLE_OPEN_EXR
+        if(dataEXR != NULL) {
+            delete[] dataEXR;
+        }
+    #endif
 
     SetNULL();
 }
@@ -823,6 +998,25 @@ PIC_INLINE void Image::AllocateAux()
     CalculateStrides();
 }
 
+PIC_INLINE void Image::Assign(const Image *imgIn)
+{
+    if(imgIn == NULL) {
+        return;
+    }
+
+    if(!SimilarType(imgIn)) {
+        Destroy();
+        Allocate(imgIn->width, imgIn->height, imgIn->channels, imgIn->frames);
+    }
+
+    exposure = imgIn->exposure;
+    nameFile = imgIn->nameFile;
+    flippedEXR = imgIn->flippedEXR;
+    typeLoad = imgIn->typeLoad;
+
+    memcpy(data, imgIn->data, frames * width * height * channels * sizeof(float));
+}
+
 PIC_INLINE void Image::clamp(float a = 0.0f, float b = 1.0f)
 {
     int n = size();
@@ -848,7 +1042,7 @@ PIC_INLINE void Image::removeSpecials()
     }
 }
 
-PIC_INLINE bool Image::SimilarType(Image *img)
+PIC_INLINE bool Image::SimilarType(const Image *img)
 {
     if(img == NULL) {
         return false;
@@ -856,8 +1050,8 @@ PIC_INLINE bool Image::SimilarType(Image *img)
 
     bool ret =	(width		==	img->width) &&
                 (height		==	img->height) &&
-                (channels	==	img->channels) &&
                 (frames		==	img->frames) &&
+                (channels	==	img->channels) &&
                 (flippedEXR	==	img->flippedEXR);
 
 #ifdef PIC_DEBUG
@@ -875,26 +1069,6 @@ PIC_INLINE bool Image::isValid()
 {
     return (width > 0) && (height > 0) && (channels > 0) && (frames > 0) &&
            (data != NULL);
-}
-
-PIC_INLINE float Image::GradientMagnitude(int x, int y, int shift)
-{
-    int c0, c1, c2, c3;
-    c0 = (((y + shift) % height) * width + x) * channels;
-    c1 = (y * width + (x + shift) % width) * channels;
-    c2 = MAX((((y - shift) % height) * width + x) * channels, 0);
-    c3 = MAX((y * width + (x - shift) % width) * channels, 0);
-
-    float grad = 0.0f;
-
-    for(int l = 0; l < channels; l++) {
-        float x = data[c1 + l] - data[c2 + l];
-        float y = data[c0 + l] - data[c3 + l];
-        grad += sqrtf(x * x + y * y);
-    }
-
-    grad /= float(channels);
-    return grad;
 }
 
 PIC_INLINE void Image::CopySubImage(Image *imgIn, int startX, int startY)
@@ -985,33 +1159,13 @@ PIC_INLINE void Image::ApplyFunction(float(*func)(float))
     }
 }
 
-PIC_INLINE void Image::InverseAdd(float val)
-{
-    int size = frames * width * height * channels;
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] = val - data[i];
-    }
-}
-
-PIC_INLINE void Image::InverseMul(float val)
-{
-    int size = frames * width * height * channels;
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] = (1.0f / (data[i] + val));
-    }
-}
-
 PIC_INLINE void Image::sort()
 {
     int size = frames * width * height * channels;
 
     if(dataTMP == NULL) {
         dataTMP = new float[size];
-        memcpy(dataTMP, data, sizeof(float)*size);
+        memcpy(dataTMP, data, sizeof(float) * size);
     }
 
     std::sort(dataTMP, dataTMP + size);
@@ -1044,292 +1198,34 @@ PIC_INLINE float Image::getGT(float val)
     return -1.0f;
 }
 
-PIC_INLINE void Image::EvaluateGaussian(float sigma = -1.0f,
-                                        bool bNormTerm = false)
-{
-    if(sigma < 0.0f) {
-        sigma = float(MIN(width, height)) / 5.0f;
-    }
-
-    float sigma2 = (sigma * sigma * 2.0f);
-
-    int halfWidth  = width >> 1;
-    int halfHeight = height >> 1;
-
-    float normTerm = bNormTerm ? sigma * sqrtf(C_PI) : 1.0f ;
-
-    #pragma omp parallel for
-
-    for(int j = 0; j < height; j++) {
-        int j_squared = j - halfHeight;
-        j_squared = j_squared * j_squared;
-
-        for(int i = 0; i < width; i++) {
-            int i_squared = i - halfWidth;
-            i_squared = i_squared * i_squared;
-
-            float gaussVal = expf(-float(i_squared + j_squared) / sigma2) / normTerm;
-
-            float *tmp_data = (*this)(j, i);
-
-            for(int k = 0; k < channels; k++) {
-                tmp_data[k] = gaussVal;
-            }
-        }
-    }
-}
-
-PIC_INLINE void Image::EvaluateSolid()
-{
-    int halfWidth  = width  >> 1;
-    int halfHeight = height >> 1;
-
-    int radius_squared = (halfWidth * halfWidth + halfHeight * halfHeight) >> 1;
-
-    #pragma omp parallel for
-
-    for(int j = 0; j < height; j++) {
-        int j_squared = j - halfHeight;
-        j_squared = j_squared * j_squared;
-
-        for(int i = 0; i < width; i++) {
-            int i_squared = i - halfWidth;
-            i_squared = i_squared * i_squared;
-
-            float val = 0.0f;
-
-            if((i_squared + j_squared) < radius_squared) {
-                val = 1.0f;
-            }
-
-            float *tmp_data = (*this)(j, i);
-
-            for(int k = 0; k < channels; k++) {
-                tmp_data[k] = val;
-            }
-        }
-    }
-}
-
-PIC_INLINE void Image::Assign(Image *imgIn)
-{
-    if(imgIn == NULL) {
-        return;
-    }
-
-    if(!SimilarType(imgIn)) {
-        Destroy();
-        Allocate(imgIn->width, imgIn->height, imgIn->channels, imgIn->frames);
-    }
-
-    flippedEXR = imgIn->flippedEXR;
-
-    memcpy(data, imgIn->data, frames * width * height * channels * sizeof(float));
-}
-
-PIC_INLINE void Image::Assign(float value)
-{
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] = value;
-    }
-}
-
-PIC_INLINE void Image::Add(Image *img)
-{
-    if(img == NULL) {
-        return;
-    }
-
-    if(!SimilarType(img)) {
-        return;
-    }
-
-    int size = height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] += img->data[i];
-    }
-}
-
-PIC_INLINE void Image::Add(float val)
-{
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] += val;
-    }
-}
-
-PIC_INLINE void Image::Sub(Image *img)
-{
-    if(img == NULL) {
-        return;
-    }
-
-    if(!SimilarType(img)) {
-        return;
-    }
-
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] -= img->data[i];
-    }
-}
-
-PIC_INLINE void Image::Sub(float val)
-{
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] -= val;
-    }
-}
-
-PIC_INLINE void Image::Mul(Image *img)
-{
-    if(img == NULL) {
-        return;
-    }
-
-    if(!SimilarType(img)) {
-        return;
-    }
-
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] *= img->data[i];
-    }
-}
-
-PIC_INLINE void Image::Mul(float val)
-{
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] *= val;
-    }
-}
-
-PIC_INLINE void Image::MulS(Image *img)
-{
-    if(img == NULL) {
-        return;
-    }
-
-    if(img->channels != 1) {
-        return;
-    }
-
-    int size = frames * height * width;
-
-    #pragma omp parallel for
-
-    for(int ind = 0; ind < size; ind++) {
-        int i = ind * channels;
-
-        float val = img->data[ind];
-
-        for(int j = 0; j < channels; j++) {
-            data[i + j] *= val;
-        }
-    }
-}
-
 PIC_INLINE void Image::Blend(Image *img, Image *weight)
 {
-    if(img == NULL) {
+    if(img == NULL || weight == NULL) {
         return;
     }
 
-    if(weight->channels != 1) {
+    if( (weight->channels != 1) &&
+        (weight->channels != img->channels)) {
         return;
     }
 
-    int size = frames * height * width;
+    int size = height * width;
 
     #pragma omp parallel for
 
     for(int ind = 0; ind < size; ind++) {
         int i = ind * channels;
 
-        float w0 = weight->data[ind];
+        int indx_w = ind * weight->channels;
+        //int indx_w = i_w;// + (j % weight->channels);
+        float w0 = weight->data[indx_w];
         float w1 = 1.0f - w0;
 
         for(int j = 0; j < channels; j++) {
             int indx = i + j;
-            data[indx] *= w0;
-            data[indx] += img->data[indx] * w1;
+
+            data[indx] = data[indx] * w0 + img->data[indx] * w1;
         }
-    }
-}
-
-PIC_INLINE void Image::changeLum(Image *lumOld, Image *lumNew)
-{
-    if(lumOld == NULL || lumNew == NULL) {
-        return;
-    }
-
-    if(!lumOld->SimilarType(lumNew)) {
-        return;
-    }
-
-    int size = frames * height * width;
-
-    #pragma omp parallel for
-
-    for(int ind = 0; ind < size; ind++) {
-        int i = ind * channels;
-        float L_old = lumOld->data[ind];
-        float L_new = lumNew->data[ind];
-        float scale = L_new / L_old;
-
-        for(int j = 0; j < channels; j++) {
-            data[i + j] = data[i + j] * scale;
-        }
-    }
-}
-
-PIC_INLINE void Image::Div(Image *img)
-{
-    if(!SimilarType(img)) {
-        return;
-    }
-
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] /= img->data[i];
-    }
-}
-
-PIC_INLINE void Image::Div(float val)
-{
-    int size = frames * height * width * channels;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < size; i++) {
-        data[i] /= val;
     }
 }
 
@@ -1366,7 +1262,7 @@ PIC_INLINE void Image::Maximum(Image *img)
 PIC_INLINE void Image::SetZero()
 {
     int size = frames * height * width * channels;
-//	memset(data, 0, size*sizeof(float));
+//	memset(data, 0, size * sizeof(float));
 
     #pragma omp parallel for
 
@@ -1378,7 +1274,7 @@ PIC_INLINE void Image::SetZero()
 PIC_INLINE void Image::SetRand()
 {
     std::mt19937 m(rand() % 10000);
-    int size = height * width * channels;
+    int size = frames * height * width * channels;
 
     for(int i = 0; i < size; i++) {
         data[i] = float(m()) / 4294967295.0f;
@@ -1628,7 +1524,7 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
                 float *tmp_data = (*this)(i, j, k);
 
                 for(int l = 0; l < channels; l++) {
-                    ret[l] += logf(tmp_data[l] + HARMONIC_MEAN_EPSILONf);
+                    ret[l] += logf(tmp_data[l] + 1e-6f);
                 }
             }
         }
@@ -1641,36 +1537,6 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
     }
 
     return ret;
-}
-
-PIC_INLINE void Image::copyC2C(int input, int output)
-{
-    if((input == output) || (input >= channels) || (output >= channels)) {
-        return;
-    }
-
-    int size = depth * width * height * channels;
-
-    int c = output;
-
-    for(int i = input; i < size; i += channels) {
-        data[c] = data[i];
-        c += channels;
-    }
-}
-
-PIC_INLINE void Image::copyC2C(Image *img, int input, int output)
-{
-    if((img->width != width) || (img->height != height)) {
-        return;
-    }
-
-    int c = output;
-
-    for(int i = input; i < img->size(); i += img->channels) {
-        data[c] = img->data[i];
-        c += channels;
-    }
 }
 
 PIC_INLINE void Image::ConvertFromMask(bool *mask, int width, int height)
@@ -1690,16 +1556,16 @@ PIC_INLINE void Image::ConvertFromMask(bool *mask, int width, int height)
     }
 }
 
-PIC_INLINE bool *Image::ConvertToMask(float *color, float threshold,
+PIC_INLINE bool *Image::ConvertToMask(float *color = NULL, float threshold = 0.5f,
                                       bool cmp = true,  bool *mask = NULL)
 {
-    if(!isValid() || (color==NULL)) {
+    if(!isValid() || (color == NULL)) {
         return NULL;
     }
     
     bool bColorAllocated = false;
 
-    if(color==NULL) {
+    if(color == NULL) {
         bColorAllocated = true;
         color = new float[channels];
 
@@ -1710,7 +1576,7 @@ PIC_INLINE bool *Image::ConvertToMask(float *color, float threshold,
 
     int n = width * height;
 
-    if(mask==NULL) {
+    if(mask == NULL) {
         mask = new bool[n];
     }
 
@@ -1741,6 +1607,572 @@ PIC_INLINE bool *Image::ConvertToMask(float *color, float threshold,
     return mask;
 }
 
+
+#ifdef PIC_QT
+PIC_INLINE void Image::ConvertFromQImage(const QImage *img,
+        LDR_type typeLoad = LT_NONE, int readerCounter = 0)
+{
+    bool bAlpha = img->hasAlphaChannel();
+
+    if(img->depth() == 1) {
+        channels = 1;
+    } else {
+        channels = img->depth() / 8;
+    }
+
+    if(bAlpha) { //check for alpha
+        Allocate(img->width(), img->height(), channels, 1);
+        alpha = channels;
+    } else {
+        if(img->depth() == 32 ) {
+            Allocate(img->width(), img->height(), 3, 1);
+        } else {
+            Allocate(img->width(), img->height(), channels, 1);
+        }
+    }
+
+    int tmpInd = tstride * (readerCounter % frames);
+
+    if(dataUC != NULL) {
+        delete[] dataUC;
+    }
+
+    unsigned int n = width * height * channels;
+    dataUC = new unsigned char[n];
+
+    //NOTE: this code works but it is slow!
+    int shiftG = 0;
+    int shiftB = 0;
+    int shiftA = 1;
+
+    if(channels == 3 || channels == 4) {
+        shiftG = 1;
+        shiftB = 2;
+        shiftA = 3;
+    }
+
+    for(int i = 0; i < height; i++) {
+        for(int j = 0; j < width; j++) {
+            QRgb col = img->pixel(j, i);
+
+            int A = (col & 0xFF000000) >> 24;
+            int R = (col & 0x00FF0000) >> 16;
+            int G = (col & 0x0000FF00) >> 8;
+            int B = (col & 0x000000FF);
+            int ind = tmpInd + i * ystride + j * xstride;
+
+            dataUC[ind         ] = R;
+            dataUC[ind + shiftG] = G;
+            dataUC[ind + shiftB] = B;
+
+            if(bAlpha) {
+                dataUC[ind + shiftA] = A;
+            }
+        }
+     }
+
+
+    /*
+    const unsigned char *tmp = img->bits();
+    for(int i=0; i<n; i+=channels) {
+        int j = (i * 4) / channels;
+
+        dataUC[i    ] = tmp[j + 2];
+        dataUC[i + 1] = tmp[j + 1];
+        dataUC[i + 2] = tmp[j    ];
+
+        if(bAlpha) {
+            dataUC[i + 3] = tmp[j + 3];
+        }
+    }*/
+
+    ConvertLDR2HDR(dataUC, &data[tmpInd], width * height * channels, typeLoad);
+}
+
+PIC_INLINE QImage *Image::ConvertToQImage(QImage *image = NULL,
+        LDR_type type = LT_NOR_GAMMA, int writerCoutner = 0, float gamma = 2.2f)
+{
+
+    QImage *ret = NULL;
+    bool bAllocate = false;
+
+    if(image != NULL) {
+        bAllocate = (image->width() != width || image->height() != height);
+    } else {
+        bAllocate = true;
+    }
+
+    if(bAllocate) {
+        ret = new QImage(width, height, QImage::Format_ARGB32);
+    } else {
+        ret = image;
+    }
+
+    float *tmpData = &data[writerCoutner % frames];
+
+    dataUC = ConvertHDR2LDR(tmpData, dataUC, width * height * channels, type, gamma);
+
+    int shifter[2];
+    shifter[0] = 1;
+    shifter[1] = 2;
+
+    switch(channels) {
+    case 1: {
+        shifter[0] = 0;
+        shifter[1] = 0;
+    }
+    break;
+
+    case 2: {
+        shifter[0] = 1;
+        shifter[1] = 1;
+    }
+    break;
+    }
+
+    #pragma omp parallel for
+
+    for(int i = 0; i < height; i++) {
+        int ind = i * width;
+
+        for(int j = 0; j < width; j++) {
+            int c = (ind + j) * channels;
+            ret->setPixel(j, i, qRgb(dataUC[c], dataUC[c + shifter[0]],
+                                     dataUC[c + shifter[1]]));
+        }
+    }
+
+    return ret;
+}
+#endif
+
+PIC_INLINE bool Image::Read(std::string nameFile,
+                               LDR_type typeLoad = LT_NOR_GAMMA)
+{
+    this->nameFile = nameFile;
+
+    this->typeLoad = typeLoad;
+
+    LABEL_IO_EXTENSION label;
+
+    bool bReturn = false;
+
+    //Reading an HDR format
+    label = getLabelHDRExtension(nameFile);
+
+    if(label != IO_NULL) {
+        float *dataReader = NULL;
+        float *tmp = NULL;
+
+        if(data != NULL) {
+            dataReader = &data[tstride * readerCounter];
+#ifdef PIC_ENABLE_OPEN_EXR
+            dataEXR = new Imf::Rgba[width * height];
+#endif
+        } else {
+            channels = 3;
+        }
+
+        switch(label) {
+        case IO_TMP:
+            tmp = ReadTMP(nameFile, dataReader, width, height, channels, frames);
+            break;
+
+        case IO_HDR:
+            tmp = ReadHDR(nameFile, dataReader, width, height);
+            break;
+
+        case IO_PFM:
+            tmp = ReadPFM(nameFile, dataReader, width, height, channels);
+            break;
+
+        case IO_EXR:
+#ifdef PIC_ENABLE_OPEN_EXR
+            tmp = ReadEXR(nameFile, dataReader, width, height, channels, dataEXR);
+#endif
+            break;
+
+        case IO_VOL:
+            tmp = ReadVOL(nameFile, dataReader, width, height, frames, channels);
+            depth = frames;
+            break;
+
+        default:
+            tmp = NULL;
+        }
+
+        if(tmp != NULL) {
+            if(data == NULL) {
+                data = tmp;
+
+                if(frames <= 0) {
+                    frames = 1;
+                }
+            }
+
+            AllocateAux();
+            bReturn = true;
+        } else {
+            bReturn = false;
+        }
+    } else {
+        //Reading an LDR format
+        label = getLabelLDRExtension(nameFile);
+        unsigned char *dataReader = NULL;
+        unsigned char *tmp = NULL;
+        bool bExt = false;
+
+        if(dataUC != NULL) {
+            dataReader = dataUC;
+        }
+
+        switch(label) {
+        case IO_BMP:
+            tmp = ReadBMP(nameFile, dataReader, width, height, channels);
+            break;
+
+        case IO_PPM:
+            tmp = ReadPPM(nameFile, dataReader, width, height, channels);
+            break;
+
+        case IO_PGM:
+            tmp = ReadPGM(nameFile, dataUC, width, height, channels);
+            break;
+
+        case IO_TGA:
+            tmp = ReadTGA(nameFile.c_str(), dataReader, width, height, channels);
+            break;
+
+        case IO_JPG:
+            bExt = true;
+            break;
+
+        case IO_PNG:
+            bExt = true;
+            break;
+
+        default:
+            tmp = NULL;
+        }
+
+        if(bExt) { //External reader
+#ifdef PIC_QT
+            QImage tmpImg;
+            bool ret = tmpImg.load(nameFile.c_str());
+
+            if(!ret) {
+                bReturn = false;
+            } else {
+                ConvertFromQImage(&tmpImg, typeLoad);
+                bReturn = true;
+            }
+#else
+            bReturn = false;
+#endif
+        } else {
+            if(tmp != NULL) { //move the handle where it's trackable
+                if(dataUC == NULL) {
+                    dataUC = tmp;
+                }
+            }
+
+            float *tmpFloat = NULL;
+
+            if(data != NULL) {
+                tmpFloat = &data[tstride * readerCounter];
+            }
+
+            float *tmpConv = ConvertLDR2HDR(tmp, tmpFloat, width * height * channels,
+                                            typeLoad);
+
+            if(tmpConv != NULL) {
+                if(data == NULL) {
+                    data = tmpConv;
+
+                    if(frames <= 0) {
+                        frames = 1;
+                    }
+
+                    AllocateAux();
+                }
+
+                bReturn = true;
+            } else {
+                bReturn = false;
+            }
+        }
+    }
+
+    readerCounter = (readerCounter + 1) % frames;
+    return bReturn;
+}
+
+PIC_INLINE bool Image::Write(std::string nameFile, LDR_type typeWrite = LT_NOR_GAMMA,
+                                int writerCounter = 0)
+{
+    if(!isValid()) {
+        return false;
+    }
+
+    LABEL_IO_EXTENSION label;
+
+    //Reading an HDR format
+    label = getLabelHDRExtension(nameFile);
+
+    if(label != IO_NULL) {
+        float *dataWriter = NULL;
+
+        if((writerCounter > 0) && (writerCounter < frames)) {
+            dataWriter = &data[tstride * writerCounter];
+        } else {
+            dataWriter = data;
+        }
+
+        bool ret = false;
+
+        switch(label) {
+        case IO_TMP:
+            ret = WriteTMP(nameFile, dataWriter, width, height, channels, frames);
+            break;
+
+        case IO_HDR:
+            ret = WriteHDR(nameFile, dataWriter, width, height, channels);
+            break;
+
+        case IO_PFM:
+            ret = WritePFM(nameFile, dataWriter, width, height, channels);
+            break;
+
+        case IO_EXR:
+#ifdef PIC_ENABLE_OPEN_EXR
+            ret = WriteEXR(nameFile, dataWriter, width, height, channels);
+#endif
+            break;
+
+        case IO_VOL:
+            ret = WriteVOL(nameFile, dataWriter, width, height, frames, channels);
+            break;
+
+        default:
+            ret = false;
+        }
+
+        return ret;
+    } else {
+        //Writing an LDR format
+        label = getLabelLDRExtension(nameFile);
+
+        bool bExt = (label == IO_JPG) || (label == IO_PNG);
+
+        if(bExt) {
+#ifdef PIC_QT
+            QImage *tmpImg = ConvertToQImage(NULL, typeWrite);
+            tmpImg->save(nameFile.c_str());
+
+            if(tmpImg != NULL) {
+                delete tmpImg;
+            }
+
+            return true;
+#else
+            return false;
+#endif
+        } else {
+            float *dataWriter = NULL;
+
+            if((writerCounter > 0) && (writerCounter < frames)) {
+                dataWriter = &data[tstride * writerCounter];
+            } else {
+                dataWriter = data;
+            }
+
+            unsigned char *tmp = ConvertHDR2LDR(dataWriter, dataUC,
+                                                width * height * channels, typeWrite);
+
+            if(dataUC == NULL) {
+                dataUC = tmp;
+            }
+
+            switch(label) {
+            case IO_BMP:
+                return WriteBMP(nameFile, dataUC, width, height, channels);
+                break;
+
+            case IO_TGA:
+                //values are stored with a vertical flip
+                BufferFlipV(dataUC, width, height, channels, 1);
+
+                //values needs to be stored as BGR
+                BufferBGRtoRGB(dataUC, width, height, channels, 1);
+
+                return WriteTGA(nameFile, dataUC, width, height, channels);
+                break;
+
+            case IO_PPM:
+                return WritePPM(nameFile, dataUC, width, height, channels);
+                break;
+
+            case IO_PGM:
+                return WritePGM(nameFile, dataUC, width, height, channels);
+                break;
+
+            default:
+                return false;
+            }
+        }
+    }
+}
+
+PIC_INLINE Image *Image::AllocateSimilarOne()
+{
+    Image *ret = new Image(frames, width, height, channels);
+    ret->flippedEXR = flippedEXR;
+    return ret;
+}
+
+PIC_INLINE Image *Image::Clone() const
+{
+    Image *ret = new Image(frames, width, height, channels);
+    ret->flippedEXR = flippedEXR;
+    ret->exposure = exposure;
+    ret->nameFile = nameFile;
+    ret->alpha = alpha;
+    ret->typeLoad = typeLoad;
+
+    memcpy(ret->data, data, width * height * channels * sizeof(float));
+    return ret;
+}
+
+PIC_INLINE void Image::operator =(const Image &a)
+{
+    this->Assign(&a);
+}
+
+PIC_INLINE void Image::operator =(const float &a)
+{
+    BufferAssign(data, size(), a);
+}
+
+PIC_INLINE void Image::operator +=(const float &a)
+{
+    BufferAdd(data, size(), a);
+}
+
+PIC_INLINE Image Image::operator +(const float &a) const
+{
+    Image *out = this->Clone();
+    *out += a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator +=(const Image &a)
+{
+    if(SimilarType(&a)) {
+        BufferAdd(data, a.data, size());
+    } else {
+        if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+            BufferAddS(data, a.data, nPixels(), channels);
+        }
+    }
+
+}
+
+PIC_INLINE Image Image::operator +(const Image &a) const
+{
+    Image *out = this->Clone();
+    *out += a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator *=(const float &a)
+{
+    BufferMul(data, size(), a);
+}
+
+PIC_INLINE Image Image::operator *(const float &a) const
+{
+    Image *out = this->Clone();
+    *out *= a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator *=(const Image &a)
+{
+    if(SimilarType(&a)) {
+        BufferMul(data, a.data, size());
+    } else {
+        if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+            BufferMulS(data, a.data, nPixels(), channels);
+        }
+    }
+}
+
+PIC_INLINE Image Image::operator *(const Image &a) const
+{
+    Image *out = this->Clone();
+    *out *= a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator -=(const float &a)
+{
+    BufferSub(data, size(), a);
+}
+
+PIC_INLINE Image Image::operator -(const float &a) const
+{
+    Image *out = this->Clone();
+    *out -= a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator -=(const Image &a)
+{
+    if(SimilarType(&a)) {
+        BufferSub(data, a.data, size());
+    } else {
+        if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+            BufferSubS(data, a.data, nPixels(), channels);
+        }
+    }
+}
+
+PIC_INLINE Image Image::operator -(const Image &a) const
+{
+    Image *out = this->Clone();
+    *out -= a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator /=(const float &a)
+{
+    BufferDiv(data, size(), a);
+}
+
+PIC_INLINE Image Image::operator /(const float &a) const
+{
+    Image *out = this->Clone();
+    *out /= a;
+    return Image(out, false);
+}
+
+PIC_INLINE void Image::operator /=(const Image &a)
+{
+    if(SimilarType(&a)) {
+        BufferDiv(data, a.data, size());
+    } else {
+        if((nPixels() == a.nPixels()) && (a.channels == 1)) {
+            BufferDivS(data, a.data, nPixels(), channels);
+        }
+    }
+}
+
+PIC_INLINE Image Image::operator /(const Image &a) const
+{
+    Image *out = this->Clone();
+    *out /= a;
+    return Image(out, false);
+}
 } // end namespace pic
 
 #endif /* PIC_IMAGE_HPP */

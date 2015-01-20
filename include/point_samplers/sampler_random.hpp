@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -33,7 +26,7 @@ See the GNU Lesser General Public License
 #include <random>
 
 #include "base.hpp"
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "util/math.hpp"
 #include "util/point_samplers.hpp"
 
@@ -43,7 +36,11 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
-template <unsigned int N> class RandomSampler
+/**
+ * @brief The RandomSampler class
+ */
+template <unsigned int N>
+class RandomSampler
 {
 protected:
     SAMPLER_TYPE		type;
@@ -103,6 +100,22 @@ public:
     void CutRescale(unsigned int cutDim);
 
     /**
+     * @brief getSamplesPerLevel
+     * @param level
+     * @return
+     */
+    int getSamplesPerLevel(int level);
+
+    /**
+     * @brief getSampleAt
+     * @param level
+     * @param i
+     * @param x
+     * @param y
+     */
+    void getSampleAt(int level, int i, int &x, int &y);
+
+    /**
      * @brief Write
      * @param name
      * @param level
@@ -153,50 +166,6 @@ public:
             c *= 2;
         }
     }
-
-    /**
-     * @brief getSamplesPerLevel
-     * @param level
-     * @return
-     */
-    int getSamplesPerLevel(int level)
-    {
-        if(level<0) {
-            return -1;
-        }
-
-        if(level == 0) {
-            return (levelsR[level]/N);
-        } else {
-            return ( levelsR[level] - levelsR[level - 1]) / N;
-        }
-    }
-
-    /**
-     * @brief getSampleAt
-     * @param level
-     * @param i
-     * @param x
-     * @param y
-     */
-    void getSampleAt(int level, int i, int &x, int &y)
-    {
-        int start, end;
-
-        if(level == 0) {
-            start = 0;
-        } else {
-            start = levelsR[level - 1];
-        }
-
-        end = levelsR[level];
-
-        i *= int(N);
-        i = CLAMPi(i + start, start, end-1);
-
-        x = samplesR[i    ] + window[0];
-        y = samplesR[i + 1] + window[1];
-    }
 };
 
 template <unsigned int N> PIC_INLINE RandomSampler<N>::RandomSampler(
@@ -206,7 +175,6 @@ template <unsigned int N> PIC_INLINE RandomSampler<N>::RandomSampler(
     Update(type, window, nSamples, nLevels);
 }
 
-//Samples cut and rescale
 template <unsigned int N> PIC_INLINE void RandomSampler<N>::CutRescale(
     unsigned int cutDim)
 {
@@ -363,7 +331,7 @@ template <unsigned int N>  PIC_INLINE void RandomSampler<N>::Render2Int()
             coord = 0;//rounding
 
             for(unsigned int k = 0; k < N; k++) {
-                x = lround(samples[j + k] * window_f[k]);
+                x = int(lround(samples[j + k] * window_f[k]));
                 coord += x * powint(window[k], k);
             }
 
@@ -372,7 +340,7 @@ template <unsigned int N>  PIC_INLINE void RandomSampler<N>::Render2Int()
                 track.insert(coord);
 
                 for(unsigned int k = 0; k < N; k++) { //final rounding
-                    x = lround(samples[j + k] * window_f[k]);
+                    x = int(lround(samples[j + k] * window_f[k]));
                     samplesR.push_back(x);
                 }
             }
@@ -387,10 +355,10 @@ template <unsigned int N>  PIC_INLINE void RandomSampler<N>::Render2Int()
 #endif
 }
 
-template <unsigned int N> PIC_INLINE void RandomSampler<N>::Write(
+template <unsigned int N>PIC_INLINE void RandomSampler<N>::Write(
     std::string name, int level)
 {
-    ImageRAW img(1, window[0] * 2 + 1, window[1] * 2 + 1, 1);
+    Image img(1, window[0] * 2 + 1, window[1] * 2 + 1, 1);
     img.SetZero();
 
     int start, end;
@@ -412,6 +380,38 @@ template <unsigned int N> PIC_INLINE void RandomSampler<N>::Write(
     }
 
     img.Write(name);
+}
+
+template <unsigned int N> PIC_INLINE int RandomSampler<N>::getSamplesPerLevel(int level)
+{
+    if(level<0) {
+        return -1;
+    }
+
+    if(level == 0) {
+        return (levelsR[level] / N);
+    } else {
+        return ( levelsR[level] - levelsR[level - 1]) / N;
+    }
+}
+
+template <unsigned int N> PIC_INLINE void RandomSampler<N>::getSampleAt(int level, int i, int &x, int &y)
+{
+    int start, end;
+
+    if(level == 0) {
+        start = 0;
+    } else {
+        start = levelsR[level - 1];
+    }
+
+    end = levelsR[level];
+
+    i *= int(N);
+    i = CLAMPi(i + start, start, end-1);
+
+    x = samplesR[i    ] + window[0];
+    y = samplesR[i + 1] + window[1];
 }
 
 template <unsigned int N>
@@ -441,6 +441,8 @@ PIC_INLINE void ConvertVectorToPlus1(std::vector<RandomSampler<N> > &rsVec,
     window[N] = halfSize;
     rsOut.window = window;
 }
+
+
 
 } // end namespace pic
 

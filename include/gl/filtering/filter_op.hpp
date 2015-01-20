@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -56,14 +49,6 @@ public:
      * @param c1
      */
     void Update(float *c0, float *c1);
-
-    /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
     /**
      * @brief CreateOpSetZero
@@ -206,7 +191,7 @@ void FilterGLOp::InitShaders()
     strOp.append(";\n");
     int counter;
 
-    //I1
+    //I0
     counter = countSubString(strOp, "I0");
 
     if(counter == 1) {
@@ -231,7 +216,7 @@ void FilterGLOp::InitShaders()
         }
     }
 
-    //I2
+    //I1
     counter = countSubString(strOp, "I1");
 
     if(counter == 1) {
@@ -297,9 +282,11 @@ void FilterGLOp::InitShaders()
     prefix += glw::version("330");
 
     filteringProgram.setup(prefix, vertex_source, fragment_source);
+
 #ifdef PIC_DEBUG
     printf("[filteringProgram log]\n%s\n", filteringProgram.log().c_str());
 #endif
+
     glw::bind_program(filteringProgram);
     filteringProgram.attribute_source("a_position", 0);
 
@@ -309,6 +296,8 @@ void FilterGLOp::InitShaders()
 
     filteringProgram.fragment_target("f_color", 0);
     filteringProgram.relink();
+    glw::bind_program(0);
+
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex_0",  0);
     filteringProgram.uniform("u_tex_1",  1);
@@ -337,56 +326,6 @@ void FilterGLOp::Update(float *c0, float *c1)
     filteringProgram.uniform4("u_val_0", this->c0);
     filteringProgram.uniform4("u_val_1", this->c1);
     glw::bind_program(0);
-}
-
-ImageRAWGL *FilterGLOp::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        //TO DO: it does not work for frames!
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, 1, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    glw::bind_program(filteringProgram);
-
-    //Textures
-    for(unsigned int i = 0; i < imgIn.size(); i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, imgIn[i]->getTexture());
-    }
-
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    glw::bind_program(0);
-
-    //Textures
-    for(unsigned int i = 0; i < imgIn.size(); i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
-
-    return imgOut;
 }
 
 } // end namespace pic

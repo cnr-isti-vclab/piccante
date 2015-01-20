@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -73,7 +66,7 @@ public:
      * @param imgIn
      * @param imgOut
      */
-    void PreProcess(ImageRAWVec imgIn, ImageRAW *imgOut);
+    void PreProcess(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief Execute
@@ -83,7 +76,7 @@ public:
      * @param height
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, int width,
+    static Image *Execute(Image *imgIn, Image *imgOut, int width,
                              int height)
     {
         FilterDownSampler2D flt(width, height);
@@ -98,7 +91,7 @@ public:
      * @param scaleY
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float scaleX,
+    static Image *Execute(Image *imgIn, Image *imgOut, float scaleX,
                              float scaleY)
     {
         FilterDownSampler2D flt(scaleX, scaleY);
@@ -112,7 +105,7 @@ public:
      * @param scaleXY
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float scaleXY)
+    static Image *Execute(Image *imgIn, Image *imgOut, float scaleXY)
     {
         FilterDownSampler2D flt(scaleXY, scaleXY);
         return flt.ProcessP(Single(imgIn), imgOut);
@@ -168,8 +161,8 @@ PIC_INLINE FilterDownSampler2D::~FilterDownSampler2D()
     }
 }
 
-PIC_INLINE void FilterDownSampler2D::PreProcess(ImageRAWVec imgIn,
-        ImageRAW *imgOut)
+PIC_INLINE void FilterDownSampler2D::PreProcess(ImageVec imgIn,
+        Image *imgOut)
 {
     if(!swh) {
         scaleX = float(width)  / imgIn[0]->widthf;

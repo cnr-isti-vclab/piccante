@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -31,6 +24,9 @@ namespace pic {
 
 enum SIGMOID_MODE {SIG_TMO, SIG_TMO_WP, SIG_SDM};
 
+/**
+ * @brief The FilterSigmoidTMO class
+ */
 class FilterSigmoidTMO: public Filter
 {
 protected:
@@ -38,35 +34,73 @@ protected:
     float			c, alpha, epsilon, wp, wp2;
     SIGMOID_MODE	type;
 
-    float CalculateEpsilon(ImageRAWVec imgIn);
+    /**
+     * @brief CalculateEpsilon
+     * @param imgIn
+     * @return
+     */
+    float CalculateEpsilon(ImageVec imgIn);
 
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
-    //SetupAux
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
+
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterSigmoidTMO
+     */
     FilterSigmoidTMO();
+
+    /**
+     * @brief FilterSigmoidTMO
+     * @param type
+     * @param alpha
+     * @param wp
+     * @param epsilon
+     * @param temporal
+     */
     FilterSigmoidTMO(SIGMOID_MODE type, float alpha, float wp, float epsilon,
                      bool temporal);
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut)
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgOut)
     {
         FilterSigmoidTMO filter;
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut)
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @return
+     */
+    static Image *Execute(std::string nameIn, std::string nameOut)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL);
         imgOut->Write(nameOut);
         return imgOut;
     }
 };
 
-//Basic constructors
 FilterSigmoidTMO::FilterSigmoidTMO()
 {
     type = SIG_TMO;
@@ -89,7 +123,7 @@ FilterSigmoidTMO::FilterSigmoidTMO(SIGMOID_MODE type, float alpha,
     this->temporal = temporal;
 }
 
-float FilterSigmoidTMO::CalculateEpsilon(ImageRAWVec imgIn)
+float FilterSigmoidTMO::CalculateEpsilon(ImageVec imgIn)
 {
     float tmpEpsilon, retEpsilon;
 
@@ -123,13 +157,12 @@ float FilterSigmoidTMO::CalculateEpsilon(ImageRAWVec imgIn)
     return retEpsilon;
 }
 
-ImageRAW *FilterSigmoidTMO::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterSigmoidTMO::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(epsilon <= 0.0f || temporal) {
         epsilon = CalculateEpsilon(imgIn);
     }
 
-    //printf("%f %f %f\n",epsilon,alpha,wp2);
     if(imgOut == NULL) {
         imgOut = imgIn[0]->AllocateSimilarOne();
     }
@@ -137,8 +170,7 @@ ImageRAW *FilterSigmoidTMO::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
     return imgOut;
 }
 
-//Process in a box
-void FilterSigmoidTMO::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
 
     float *data, *dataFlt;

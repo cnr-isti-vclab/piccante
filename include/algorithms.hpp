@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -28,13 +21,13 @@ See the GNU Lesser General Public License
 #include "algorithms/calculate_divergence.hpp"
 #include "algorithms/camera_response_function.hpp"
 #include "algorithms/connected_components.hpp"
-#include "algorithms/demosaic.hpp"
 #include "algorithms/discrete_cosine_transform.hpp"
 #include "algorithms/edge_enhancement.hpp"
 #include "algorithms/flash_photography.hpp"
-#include "algorithms/iterative_poisson_solver.hpp"
+#include "algorithms/poisson_solver_iterative.hpp"
 #include "algorithms/poisson_filling.hpp"
 #include "algorithms/poisson_solver.hpp"
+#include "algorithms/poisson_image_editing.hpp"
 #include "algorithms/pushpull.hpp"
 #include "algorithms/pyramid.hpp"
 #include "algorithms/quadtree.hpp"
@@ -42,6 +35,7 @@ See the GNU Lesser General Public License
 #include "algorithms/superpixels_oracle.hpp"
 #include "algorithms/superpixels_slic.hpp"
 #include "algorithms/color_to_gray.hpp"
+#include "algorithms/richardson_lucy_deconvolution.hpp"
 
 #endif /* PIC_ALGORITHMS_HPP */
 

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -30,49 +23,75 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterSampler2DSub class
+ */
 class FilterSampler2DSub: public Filter
 {
 protected:
     bool            bIsb;
     ImageSampler	*isb;
 
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
-    //Basic constructors
-    FilterSampler2DSub();
+
+    /**
+     * @brief FilterSampler2DSub
+     * @param isb
+     */
     FilterSampler2DSub(ImageSampler *isb);
 
     ~FilterSampler2DSub();
 
+    /**
+     * @brief Update
+     * @param isb
+     */
     void Update(ImageSampler *isb);
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, ImageSampler *isb)
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param isb
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgOut, ImageSampler *isb)
     {
         FilterSampler2DSub filter(isb);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param isb
+     */
     static void Execute(std::string nameIn, std::string nameOut, ImageSampler *isb)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, isb);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL, isb);
         imgOut->Write(nameOut);
     }
 };
 
-//Basic constructor
-FilterSampler2DSub::FilterSampler2DSub()
-{
-    bIsb = true; 
-    this->isb = new ImageSamplerBilinear();
-}
-
 FilterSampler2DSub::FilterSampler2DSub(ImageSampler *isb)
 {
-    bIsb = false;
-    this->isb = isb;
+    if(isb != NULL) {
+        bIsb = false;
+        this->isb = isb;
+    } else {
+        bIsb = true;
+        this->isb = new ImageSamplerBilinear();
+    }
 }
 
 FilterSampler2DSub::~FilterSampler2DSub()
@@ -84,7 +103,7 @@ FilterSampler2DSub::~FilterSampler2DSub()
 
 void FilterSampler2DSub::Update(ImageSampler *isb)
 {
-    if((this->isb!=NULL) && (bIsb)) {
+    if((this->isb != NULL) && (bIsb)) {
         delete this->isb;
     }
 
@@ -92,39 +111,42 @@ void FilterSampler2DSub::Update(ImageSampler *isb)
     bIsb = false;
 }
 
-//Process in a box
-void FilterSampler2DSub::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterSampler2DSub::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-
     if(src.size() != 2) {
         return;
     }
 
     int channels = dst->channels;
 
-    ImageRAW *src0 = src[0];
-    ImageRAW *src1 = src[1];
+    Image *src0 = src[0];
+    Image *src1 = src[1];
 
-    float *vOut = new float[channels];
+    float *tmp_mem = new float[channels * 2];
+    float *vOut  = &tmp_mem[0];
+    float *vsrc0 = &tmp_mem[channels];
+
+    float inv_height1f = 1.0f / float(box->height - 1);
+    float inv_width1f = 1.0f / float(box->width - 1);
 
     for(int j = box->y0; j < box->y1; j++) {
-        float y = float(j) / float(box->height - 1);
+        float y = float(j) * inv_height1f;
 
         for(int i = box->x0; i < box->x1; i++) {
-            float x = float(i) / float(box->width - 1);
-            
+            float x = float(i) * inv_width1f;
+
             float *tmp_dst  = (*dst )(i, j);
-            float *tmp_src0 = (*src0)(i, j);
-            
+
+            isb->SampleImage(src0, x, y, vsrc0);
             isb->SampleImage(src1, x, y, vOut);
 
             for(int k = 0; k < channels; k++) {
-                tmp_dst[k] = tmp_src0[k] - vOut[k];
+                tmp_dst[k] = vsrc0[k] - vOut[k];
             }
         }
     }
 
-    delete[] vOut;
+    delete[] tmp_mem;
 }
 
 } // end namespace pic

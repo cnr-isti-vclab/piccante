@@ -2,23 +2,16 @@
 
 PICCANTE
 The hottest HDR imaging library!
-http://vcg.isti.cnr.it/piccante
+http://piccantelib.net
 
 Copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -26,6 +19,10 @@ See the GNU Lesser General Public License
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
+
+#define EIGEN_DONT_VECTORIZE
+
+#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 
 #include "piccante.hpp"
 
@@ -41,10 +38,10 @@ int main(int argc, char *argv[])
     double fy = pic::getFocalLengthPixels(18.0, 14.9, 1728.0);
     Eigen::Matrix3d K = pic::getIntrinsicsMatrix(fx, fy, 2592.0 / 2.0, 1728.0 / 2.0);
 
-    pic::ImageRAW *img0 = new pic::ImageRAW();
+    pic::Image *img0 = new pic::Image();
     img0->Read("../data/input/triangulation/venice_campo_s_polo_left.jpg", pic::LT_NOR);
 
-    pic::ImageRAW *img1 = new pic::ImageRAW();
+    pic::Image *img1 = new pic::Image();
     img1->Read("../data/input/triangulation/venice_campo_s_polo_right.jpg", pic::LT_NOR);
 
     printf("Ok\n");
@@ -58,8 +55,8 @@ int main(int argc, char *argv[])
         std::vector< Eigen::Vector3f > corners_from_img1;
 
         //computing the luminance images
-        pic::ImageRAW *L0 = pic::FilterLuminance::Execute(img0, NULL, pic::LT_CIE_LUMINANCE);
-        pic::ImageRAW *L1 = pic::FilterLuminance::Execute(img1, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *L0 = pic::FilterLuminance::Execute(img0, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *L1 = pic::FilterLuminance::Execute(img1, NULL, pic::LT_CIE_LUMINANCE);
 
         //getting corners
         printf("Extracting corners...\n");
@@ -69,12 +66,16 @@ int main(int argc, char *argv[])
 
         //computing ORB descriptors for each corner and image
         //Computing luminance images
-        pic::ImageRAW *L0_flt = pic::FilterGaussian2D::Execute(L0, NULL, 2.5f);
-        pic::ImageRAW *L1_flt = pic::FilterGaussian2D::Execute(L1, NULL, 2.5f);
+        pic::Image *L0_flt = pic::FilterGaussian2D::Execute(L0, NULL, 2.5f);
+        pic::Image *L1_flt = pic::FilterGaussian2D::Execute(L1, NULL, 2.5f);
 
         printf("Computing ORB descriptors...\n");
 
+<<<<<<< HEAD
         pic::ORBDescriptor b_desc(31, 512);
+=======
+        pic::PoissonDescriptor b_desc(16);//(31, 512);
+>>>>>>> develop
 
         std::vector< unsigned int *> descs0;
         for(unsigned int i=0; i<corners_from_img0.size(); i++) {
@@ -148,9 +149,11 @@ int main(int argc, char *argv[])
             printf("I1: %d (%d %d) -- I2: %d (%d %d) -- Score: %d\n", I0, int(x[0]), int(x[1]), I1, int(y[0]), int(y[1]), matches[i][2]);
         }
 
-        printf("Estimating the fundamental matrix F from the matches...");
+        printf("\n Total matches: (%d | %d)\n", m0.size(), m1.size());
+
+        printf("\nEstimating the fundamental matrix F from the matches...");
         std::vector< unsigned int > inliers;
-        Eigen::Matrix3d F = pic::EstimateFundamentalRansac(m0, m1, inliers, 10000);
+        Eigen::Matrix3d F = pic::estimateFundamentalRansac(m0, m1, inliers, 1000000, 0.5);
 
         //non-linear refinement using Nelder-Mead        
         pic::NelderMeadOptFundamental nmf(m0, m1, inliers);
@@ -178,10 +181,10 @@ int main(int argc, char *argv[])
         pic::decomposeEssentialMatrixWithConfiguration(E, K, K, m0f, m1f, R, t);
 
         //Triangulation
-        pic::ImageRAW imgOut0(1, img0->width, img0->height, 3);
+        pic::Image imgOut0(1, img0->width, img0->height, 3);
         imgOut0.SetZero();
 
-        pic::ImageRAW imgOut1(1, img1->width, img1->height, 3);
+        pic::Image imgOut1(1, img1->width, img1->height, 3);
         imgOut1.SetZero();
 
         FILE *file = fopen("../data/output/simple_triangulation_mesh.ply","w");
@@ -222,36 +225,31 @@ int main(int argc, char *argv[])
 
             fprintf(file, "%3.4f %3.4f %3.4f ", out[0],  out[1],  out[2]);
 
-            unsigned char r,g,b;
+            //writing color information
+            unsigned char r, g, b;
             float *color = (*img0)(int(m0f[i][0]), int(m0f[i][1]));
             r = int(color[0] * 255.0f);
             g = int(color[1] * 255.0f);
             b = int(color[2] * 255.0f);
-            fprintf(file, " %d %d %d 255\n",r,g,b);
+            fprintf(file, " %d %d %d 255\n",r, g, b);
 
-            Eigen::Vector3d proj;
-
-            proj = M0 * point;
-            proj[0] /= proj[2];
-            proj[1] /= proj[2];
+            //3d points projection
+            Eigen::Vector2i proj0 = pic::cameraMatrixProject(M0, point);
 
             float *tmp;
-
             tmp = imgOut0(int(m0f[i][0]), int(m0f[i][1]));
             tmp[1] = 1.0f;
 
-            tmp = imgOut0(int(proj[0]), int(proj[1]));
+            tmp = imgOut0(proj0[0], proj0[1]);
             tmp[0] = 1.0f;
 
             //second image
-            proj = M1 * point;
-            proj[0] /= proj[2];
-            proj[1] /= proj[2];
+            Eigen::Vector2i proj1 = pic::cameraMatrixProject(M0, point);
 
             tmp = imgOut1(int(m1f[i][0]), int(m1f[i][1]));
             tmp[1] = 1.0f;
 
-            tmp = imgOut1(int(proj[0]), int(proj[1]));
+            tmp = imgOut1(proj1[0], proj1[1]);
             tmp[0] = 1.0f;
         }
         fclose(file);
@@ -259,7 +257,7 @@ int main(int argc, char *argv[])
         imgOut0.Write("../data/output/simple_triangulation_reprojection_left.png");
         imgOut1.Write("../data/output/simple_triangulation_reprojection_right.png");
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No there is at least an invalid file!\n");
     }
 
     return 0;

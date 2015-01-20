@@ -9,23 +9,16 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_UTIL_GL_STROKE_HPP
 #define PIC_UTIL_GL_STROKE_HPP
 
-#include "gl/image_raw.hpp"
+#include "gl/image.hpp"
 #include "util/gl/quad.hpp"
 #include "externals/glw/program.hpp"
 
@@ -40,7 +33,7 @@ class StrokeGL
 {
 protected:
     int					width, height, brushSize;
-    ImageRAWGL			*shape;
+    ImageGL			    *shape;
     float				size, rSize;
     float				color[4];
     float				tmpColor[3];
@@ -173,16 +166,19 @@ StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
 
     float halfBrushSizeXf = float(halfBrushSize) / float(width);
     float halfBrushSizeYf = float(halfBrushSize) / float(height);
-    printf("%f %f\n", halfBrushSizeXf, halfBrushSizeYf);
+
+    #ifdef PIC_DEBUG
+        printf("%f %f\n", halfBrushSizeXf, halfBrushSizeYf);
+    #endif
+
     this->quad = new QuadGL(true, halfBrushSizeXf, halfBrushSizeYf);
 
     size = 4.0f;
     rSize = size / float(max(width, height));
 
-    shape = new ImageRAWGL(1, this->brushSize, this->brushSize, 3, IMG_CPU, GL_TEXTURE_2D);
-//	shape->EvaluateGaussian(true);
-    shape->EvaluateSolid();
-    shape->generateTextureGL(false, GL_TEXTURE_2D);
+    shape = new ImageGL(1, this->brushSize, this->brushSize, 1, IMG_CPU, GL_TEXTURE_2D);
+    EvaluateSolid(shape);
+    shape->generateTextureGL(GL_TEXTURE_2D, false);
 
     if(color != NULL) {
         for(int i = 0; i < 3; i++) {
@@ -267,8 +263,7 @@ void StrokeGL::SetupShaders()
     annotationProgram.setup(glw::version("330"), vertex_source, fragment_source_annotation);
 
     printf("[StrokeGL log]\n%s\n", annotationProgram.log().c_str());
-
-
+    
     glw::bind_program(annotationProgram);
     annotationProgram.attribute_source("a_position", 0);
     annotationProgram.attribute_source("a_tex_coord", 1);
@@ -449,7 +444,6 @@ void StrokeGL::RenderGL()
         brushProgram.uniform("shift_position", positions[i], positions[i + 1]);
         quad->Render();
     }
-    glEnd();
 
     glw::bind_program(0);
 
@@ -469,6 +463,7 @@ void StrokeGL::RenderAnnotationGL()
 #ifdef PIC_DEBUG
     printf("Annotation value: %f\n", annotation);
 #endif
+
     annotationProgram.uniform("annotation",  annotation);
 
     glEnable(GL_TEXTURE_2D);
@@ -481,8 +476,6 @@ void StrokeGL::RenderAnnotationGL()
         annotationProgram.uniform("shift_position", positions[i], positions[i + 1]);
         quad->Render();
     }
-
-    glEnd();
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);

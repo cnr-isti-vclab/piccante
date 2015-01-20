@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -34,6 +27,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterSamplingMap class
+ */
 class FilterSamplingMap: public FilterNPasses
 {
 protected:
@@ -46,38 +42,67 @@ protected:
     FilterSampler2D			*fltD;
     FilterGaussian2D		*fltG2D;
 
+    /**
+     * @brief Setup
+     * @param sigma
+     * @param scale
+     */
     void Setup(float sigma, float scale);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterSamplingMap
+     * @param sigma
+     */
     FilterSamplingMap(float sigma);
+
+    /**
+     * @brief FilterSamplingMap
+     * @param sigma
+     * @param scale
+     */
     FilterSamplingMap(float sigma, float scale);
 
     ~FilterSamplingMap();
 
-    //getScale
+    /**
+     * @brief getScale
+     * @return
+     */
     float getScale()
     {
         return scale;
     }
 
-    //Filtering
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, float sigma,
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma
+     * @param scale
+     * @return
+     */
+    static Image *Execute(std::string nameIn, std::string nameOut, float sigma,
                              float scale)
     {
-        ImageRAW imgIn(nameIn);
+        Image imgIn(nameIn);
 
         FilterSamplingMap filter(sigma, scale);
-        ImageRAW *imgOut = filter.Process(Single(&imgIn), NULL);
+        Image *imgOut = filter.Process(Single(&imgIn), NULL);
 
         imgOut->Write(nameOut);
         return imgOut;
     }
 };
 
-//Basic constructors
 FilterSamplingMap::FilterSamplingMap(float sigma) : FilterNPasses()
 {
+    fltL = NULL;
+    fltD = NULL;
+    fltS = NULL;
+    fltG = NULL;
+    fltG2D = NULL;
+
     float rateScale = 2.0f;
     Setup(rateScale, rateScale / sigma);
 }
@@ -119,7 +144,7 @@ void FilterSamplingMap::Setup(float sigma, float scale)
     fltL = new FilterLuminance(LT_CIE_LUMINANCE);
     fltD = new FilterSampler2D(scale, &isb);
     fltS = new FilterSigmoidTMO();
-    fltG = new FilterGradient(0);
+    fltG = new FilterGradient();
     fltG2D = new FilterGaussian2D(sigma);
 
     InsertFilter(fltL);     //Luminance

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -27,7 +20,7 @@ See the GNU Lesser General Public License
 
 #include "util/vec.hpp"
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_gaussian_2d.hpp"
 #include "filtering/filter_conv_1d.hpp"
@@ -42,12 +35,15 @@ namespace pic {
 
 #ifndef PIC_DISABLE_EIGEN
 
+/**
+ * @brief The HarrisCornerDetector class
+ */
 class HarrisCornerDetector: public GeneralCornerDetector
 {
 protected:
-    ImageRAW *Ix, *Iy, *Ixy, *ret;
-    ImageRAW *Ix2_flt, *Iy2_flt, *Ixy_flt;
-    ImageRAW *filtered;
+    Image *Ix, *Iy, *Ixy, *ret;
+    Image *Ix2_flt, *Iy2_flt, *Ixy_flt;
+    Image *filtered;
 
     //Harris Corners detector parameters
     float sigma, threshold;
@@ -56,6 +52,9 @@ protected:
     //previous values
     int width, height;
 
+    /**
+     * @brief Destroy
+     */
     void Destroy()
     {
         if(lum != NULL) {
@@ -107,6 +106,9 @@ protected:
         ret = NULL;
     }
 
+    /**
+     * @brief SetNULL
+     */
     void SetNULL()
     {
         width = -1;
@@ -124,6 +126,12 @@ protected:
 
 public:
 
+    /**
+     * @brief HarrisCornerDetector
+     * @param sigma
+     * @param radius
+     * @param threshold
+     */
     HarrisCornerDetector(float sigma = 1.0f, int radius = 3, float threshold = 0.001f) : GeneralCornerDetector()
     {
         SetNULL();
@@ -135,6 +143,12 @@ public:
         Destroy();
     }
 
+    /**
+     * @brief Update
+     * @param sigma
+     * @param radius
+     * @param threshold
+     */
     void Update(float sigma = 1.0f, int radius = 3, float threshold = 0.001f)
     {
         if(sigma > 0.0f) {
@@ -152,7 +166,12 @@ public:
         this->threshold = threshold;
     }
 
-    void Compute(ImageRAW *img, std::vector< Eigen::Vector3f > *corners)
+    /**
+     * @brief Compute
+     * @param img
+     * @param corners
+     */
+    void Compute(Image *img, std::vector< Eigen::Vector3f > *corners)
     {
         if(img == NULL) {
             return;
@@ -176,8 +195,8 @@ public:
 
         float delta = maxL - minL;
 
-        lum->Sub(minL);
-        lum->Mul(delta);
+        *lum -= minL;
+        *lum *= delta;
 
         if(corners == NULL) {
             corners = new std::vector< Eigen::Vector3f >;
@@ -194,13 +213,13 @@ public:
         if(Ixy == NULL) {
             Ixy = Ix->Clone();
         } else {
-            Ixy->Assign(Ix);
+            *Ixy = *Ix;
         }
 
-        Ixy->Mul(Iy);
+        *Ixy *= *Iy;
 
-        Ix->Mul(Ix);
-        Iy->Mul(Iy);
+        *Ix *= *Ix;
+        *Iy *= *Iy;
 
         float eps = 2.2204e-16f;
 
@@ -211,21 +230,21 @@ public:
         Ixy_flt = flt.ProcessP(Single(Ixy), Ixy_flt);
 
         //ret = (Ix2.*Iy2 - Ixy.^2)./(Ix2 + Iy2 + eps);
-        Ixy_flt->Mul(Ixy_flt);//Ixy.^2
+        *Ixy_flt *= *Ixy_flt; //Ixy.^2
 
         if(ret == NULL) {
             ret = Ix2_flt->Clone();
         } else {
-            ret->Assign(Ix2_flt);
+            *ret = *Ix2_flt;
         }
 
-        ret->Mul(Iy2_flt);//Ix2.*Iy2
-        ret->Sub(Ixy_flt);
+        *ret *= *Iy2_flt; //Ix2.*Iy2
+        *ret -= *Ixy_flt;
 
-        Ix2_flt->Add(Iy2_flt);
-        Ix2_flt->Add(eps);
+        *Ix2_flt += *Iy2_flt;
+        *Ix2_flt += eps;
 
-        ret->Div(Ix2_flt);
+        *ret /= *Ix2_flt;
 
         //Maximal supression
         filtered = FilterMax::Execute(ret, filtered, radius * 2 + 1);

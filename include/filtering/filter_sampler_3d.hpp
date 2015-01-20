@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -30,79 +23,90 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterSampler3D class
+ */
 class FilterSampler3D: public Filter
 {
 protected:
     ImageSampler *isb;
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
 
-    //SetupAux
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
+
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterSampler3D
+     * @param scale
+     * @param isb
+     */
     FilterSampler3D(float scale, ImageSampler *isb);
 
-    static ImageRAW *Execute(ImageRAW *in, ImageSampler *isb, float scale)
+    /**
+     * @brief Execute
+     * @param in
+     * @param isb
+     * @param scale
+     * @return
+     */
+    static Image *Execute(Image *in, ImageSampler *isb, float scale)
     {
         FilterSampler3D filterUp(scale, isb);
-        ImageRAW *out = filterUp.Process(Single(in), NULL);
+        Image *out = filterUp.Process(Single(in), NULL);
         return out;
     }
 };
 
-//Basic constructor
 FilterSampler3D::FilterSampler3D(float scale, ImageSampler *isb)
 {
     this->scale = scale;
     this->isb = isb;
 }
 
-//SetupAux
-ImageRAW *FilterSampler3D::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterSampler3D::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = new ImageRAW(  int(imgIn[0]->framesf * scale),
-                                int(imgIn[0]->widthf  * scale),
-                                int(imgIn[0]->heightf * scale),
-                                imgIn[0]->channels);
+        imgOut = new Image( int(imgIn[0]->framesf * scale),
+                            int(imgIn[0]->widthf  * scale),
+                            int(imgIn[0]->heightf * scale),
+                            imgIn[0]->channels);
     }
 
     return imgOut;
 }
 
-//Process in a box
-void FilterSampler3D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterSampler3D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-    int channels = dst->channels;
+    Image *source = src[0];
 
-    ImageRAW *source = src[0];
+    for(int p = box->z0; p < box->z1; p++) {
+        float t = float(p) / float(box->frames - 1);
 
-    int i, j, k, p, c;
-    float x, y, t;
-    float *vOut = new float[channels];
+        for(int j = box->y0; j < box->y1; j++) {
+            float y = float(j) / float(box->height - 1);
 
-    for(p = box->z0; p < box->z1; p++) {
-        t = float(p) / float(box->frames - 1);
+            for(int i = box->x0; i < box->x1; i++) {
+                float x = float(i) / float(box->width - 1);
 
-        for(j = box->y0; j < box->y1; j++) {
-            y = float(j) / float(box->height - 1);
+                int c = p * source->tstride + j * source->ystride + i * source->xstride;
 
-            for(i = box->x0; i < box->x1; i++) {
-                x = float(i) / float(box->width - 1);
-                //Convolution kernel
-                c = p * source->tstride + j * source->ystride + i * source->xstride;
-                isb->SampleImage(source, x, y, t, vOut);
-
-                for(k = 0; k < channels; k++) {
-                    dst->data[c + k] = vOut[k];
-                }
+                isb->SampleImage(source, x, y, t, &dst->data[c]);
             }
         }
     }
-
-    delete[] vOut;
 }
 
 } // end namespace pic

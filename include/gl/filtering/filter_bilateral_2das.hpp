@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -38,12 +31,12 @@ protected:
     MRSamplersGL<2> *ms;
 
     //Random numbers tile
-    ImageRAWGL *imageRand;
+    ImageGL *imageRand;
 
     //Sampling map
     FilterGLSamplingMap *fGLsm;
 
-    ImageRAWGL			*imgTmp;
+    ImageGL			*imgTmp;
 
     void InitShaders();
     void FragmentShader();
@@ -59,16 +52,16 @@ public:
     void Update(float sigma_s, float sigma_r);
 
     //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     //Execute
     //Execute
-    static ImageRAWGL *Execute(ImageRAWGL *imgIn, float sigma_s, float sigma_r)
+    static ImageGL *Execute(ImageGL *imgIn, float sigma_s, float sigma_r)
     {
         FilterGLBilateral2DAS *filter = new FilterGLBilateral2DAS(sigma_s, sigma_r);
 
         GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgOut = filter->Process(SingleGL(imgIn), NULL);
+        ImageGL *imgOut = filter->Process(SingleGL(imgIn), NULL);
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
 
         printf("Bilateral 2DS Filter on GPU time: %f ms\n",
@@ -78,15 +71,15 @@ public:
         return imgOut;
     }
 
-    static ImageRAWGL *Execute(std::string nameFile, std::string nameOut,
+    static ImageGL *Execute(std::string nameFile, std::string nameOut,
                                float sigma_s, float sigma_r, int testing)
     {
-        ImageRAWGL imgIn(nameFile);
+        ImageGL imgIn(nameFile);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLBilateral2DAS filter(sigma_s, sigma_r);
 
-        ImageRAWGL *imgRet = new ImageRAWGL(1, imgIn.width, imgIn.height, 3, IMG_GPU, GL_TEXTURE_2D);
+        ImageGL *imgRet = new ImageGL(1, imgIn.width, imgIn.height, 3, IMG_GPU, GL_TEXTURE_2D);
         GLuint testTQ1;
 
         if(testing > 1) {
@@ -102,10 +95,11 @@ public:
             filter.Process(SingleGL(&imgIn), imgRet);
         }
 
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        double ms = double(timeVal) / (double(testing) * 1000000.0);
-        printf("Adaptive Stochastic Bilateral Filter on GPU time: %f ms\n", ms);
+     //   GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
+   //     double ms = double(timeVal) / (double(testing) * 1000000.0);
+     //   printf("Adaptive Stochastic Bilateral Filter on GPU time: %f ms\n", ms);
 
+        /*
         std::string nameTime = FileLister::FileNumber(GenBilString("AS", sigma_s,
                                sigma_r), "txt");
 
@@ -114,7 +108,7 @@ public:
         if(file != NULL) {
             fprintf(file, "%f", ms);
             fclose(file);
-        }
+        }*/
 
         //Read from the GPU
         imgRet->loadToMemory();
@@ -152,10 +146,13 @@ FilterGLBilateral2DAS::FilterGLBilateral2DAS(float sigma_s,
     imgTmp = NULL;
 
     int nRand = 32;
-    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
-    imageRand->SetRand();
-    imageRand->Mul(float(nRand - 1));
-    imageRand->generateTexture2DU32GL();
+
+    Image tmp_image_rand(1, 128, 128, 1);
+    tmp_image_rand.SetRand();
+    tmp_image_rand *= float(nRand - 1);
+
+    imageRand = new ImageGL(&tmp_image_rand, true);
+    imageRand->generateTextureGL(GL_TEXTURE_2D, GL_INT);
 
     //Precomputation of the Gaussian Kernel
     int kernelSize = PrecomputedGaussian::KernelSize(sigma_s);
@@ -311,8 +308,8 @@ void FilterGLBilateral2DAS::Update(float sigma_s, float sigma_r)
 }
 
 //Processing
-ImageRAWGL *FilterGLBilateral2DAS::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLBilateral2DAS::Process(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -322,7 +319,7 @@ ImageRAWGL *FilterGLBilateral2DAS::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {
@@ -332,13 +329,13 @@ ImageRAWGL *FilterGLBilateral2DAS::Process(ImageRAWGLVec imgIn,
 
     if(imgTmp == NULL) {
         float scale = fGLsm->getScale();
-        imgTmp = new ImageRAWGL(    1, 
+        imgTmp = new ImageGL(    1, 
                                     int(imgIn[0]->widthf  * scale),
                                     int(imgIn[0]->heightf * scale),
                                     1, IMG_GPU, GL_TEXTURE_2D);
     }
 
-    ImageRAWGL *edge, *base;
+    ImageGL *edge, *base;
 
     if(imgIn.size() == 2) {
         //Joint/Cross Bilateral Filtering

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -36,9 +29,9 @@ namespace pic {
 class FilterCrop: public Filter
 {
 protected:
-    bool			flag;
-    Vec<4, int>		maxi, mini;
-    Vec<3, float>	maxf, minf;
+    bool	flag;
+    Vec4i	maxi, mini;
+    Vec3f	maxf, minf;
 
     /**
      * @brief ProcessBBox
@@ -46,7 +39,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
 
@@ -55,28 +48,28 @@ public:
      * @param min
      * @param max
      */
-    FilterCrop(Vec<2, int>   min, Vec<2, int>   max);
+    FilterCrop(Vec2i min, Vec2i max);
 
     /**
      * @brief FilterCrop
      * @param min
      * @param max
      */
-    FilterCrop(Vec<3, int>   min, Vec<3, int>   max);
+    FilterCrop(Vec3i min, Vec3i max);
 
     /**
      * @brief FilterCrop
      * @param min
      * @param max
      */
-    FilterCrop(Vec<4, int>   min, Vec<4, int>   max);
+    FilterCrop(Vec4i min, Vec4i max);
 
     /**
      * @brief FilterCrop
      * @param min
      * @param max
      */
-    FilterCrop(Vec<3, float> min, Vec<3, float> max);
+    FilterCrop(Vec3f min, Vec3f max);
 
     /**
      * @brief SetupAux
@@ -84,7 +77,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief Execute
@@ -94,8 +87,8 @@ public:
      * @param max
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, Vec<4, int> min,
-                             Vec<4, int> max)
+    static Image *Execute(Image *imgIn, Image *imgOut, Vec4i min,
+                             Vec4i max)
     {
         FilterCrop fltCrop(min, max);
         return fltCrop.Process(Single(imgIn), imgOut);
@@ -109,8 +102,8 @@ public:
      * @param max
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, Vec<2, int> min,
-                             Vec<2, int> max)
+    static Image *Execute(Image *imgIn, Image *imgOut, Vec2i min,
+                             Vec2i max)
     {
         FilterCrop fltCrop(min, max);
         return fltCrop.Process(Single(imgIn), imgOut);
@@ -124,32 +117,32 @@ public:
      * @param max
      * @return
      */
-    static ImageRAW *Execute(std::string fileInput, std::string fileOutput,
-                             Vec<2, int> min, Vec<2, int> max)
+    static Image *Execute(std::string fileInput, std::string fileOutput,
+                             Vec2i min, Vec2i max)
     {
-        ImageRAW imgIn(fileInput);
-        ImageRAW *out = FilterCrop::Execute(&imgIn, NULL, min, max);
+        Image imgIn(fileInput);
+        Image *out = FilterCrop::Execute(&imgIn, NULL, min, max);
         out->Write(fileOutput);
         return out;
     }
 
     /**
-     * @brief TestCrop2D
+     * @brief test
      */
-    static void TestCrop2D()
+    static void test()
     {
-        ImageRAW img(1, 512, 512, 3);
-        img.Assign(1.0f);
+        Image img(1, 512, 512, 3);
+        img = 1.0f;
 
-        FilterCrop flt(Vec<2, int>(100, 100), Vec<2, int>(200, 200));
+        FilterCrop flt(Vec2i(100, 100), Vec2i(200, 200));
 
-        ImageRAW *out = flt.Process(Single(&img), NULL);
+        Image *out = flt.Process(Single(&img), NULL);
 
         out->Write("test_crop_2d_output.pfm");
     }
 };
 
-FilterCrop::FilterCrop(Vec<2, int> min, Vec<2, int> max)
+FilterCrop::FilterCrop(Vec2i min, Vec2i max)
 {
     maxi[0] = max[0];
     maxi[1] = max[1];
@@ -164,7 +157,7 @@ FilterCrop::FilterCrop(Vec<2, int> min, Vec<2, int> max)
     flag = false;
 }
 
-FilterCrop::FilterCrop(Vec<3, int> min, Vec<3, int> max)
+FilterCrop::FilterCrop(Vec3i min, Vec3i max)
 {
     for(int i = 0; i < 3; i++) {
         this->maxi[i] = max[i];
@@ -177,7 +170,7 @@ FilterCrop::FilterCrop(Vec<3, int> min, Vec<3, int> max)
     flag = false;
 }
 
-FilterCrop::FilterCrop(Vec<4, int> min, Vec<4, int> max)
+FilterCrop::FilterCrop(Vec4i min, Vec4i max)
 {
     this->maxi = max;
     this->mini = min;
@@ -185,7 +178,7 @@ FilterCrop::FilterCrop(Vec<4, int> min, Vec<4, int> max)
     flag = false;
 }
 
-FilterCrop::FilterCrop(Vec<3, float> min, Vec<3, float> max)
+FilterCrop::FilterCrop(Vec3f min, Vec3f max)
 {
     this->maxf = max;
     this->minf = min;
@@ -193,7 +186,7 @@ FilterCrop::FilterCrop(Vec<3, float> min, Vec<3, float> max)
     flag = true;
 }
 
-ImageRAW *FilterCrop::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterCrop::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(flag) {
         maxi[0] = int(maxf[0] * imgIn[0]->widthf);
@@ -236,15 +229,14 @@ ImageRAW *FilterCrop::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
             mini[2]  = 0;
         }
 
-        imgOut = new ImageRAW(delta[2], delta[0], delta[1], channels);
+        imgOut = new Image(delta[2], delta[0], delta[1], channels);
     }
 
     return imgOut;
 }
 
-void FilterCrop::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterCrop::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-
     maxi[3] = MIN(maxi[3], src[0]->channels);
 
     for(int p = box->z0; p < box->z1; p++) {

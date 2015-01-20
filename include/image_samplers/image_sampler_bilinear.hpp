@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -29,6 +22,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The ImageSamplerBilinear class
+ */
 class ImageSamplerBilinear: public ImageSampler
 {
 public:
@@ -66,8 +62,8 @@ public:
 PIC_INLINE void ImageSamplerBilinear::SampleImage(Image *img, float x, float y,
         float *vOut)
 {
-//	x=CLAMPi(x,0.0f,1.0f);
-//	y=CLAMPi(y,0.0f,1.0f);
+//	x = CLAMPi(x,0.0f,1.0f);
+//	y = CLAMPi(y,0.0f,1.0f);
 
     float xx, yy, dx, dy;
     int ind0, ind1, ind2, ind3;
@@ -99,12 +95,13 @@ PIC_INLINE void ImageSamplerBilinear::SampleImage(Image *img, float x, float y,
     ind2 = (ix  + t1) * img->channels;
     ind3 = (ix1 + t1) * img->channels;
 
-    for(int i = 0; i < img->channels; i++)
+    for(int i = 0; i < img->channels; i++) {
         vOut[i] = Bilinear<float>(img->data[ind0 + i],
                                   img->data[ind1 + i],
                                   img->data[ind2 + i],
                                   img->data[ind3 + i],
                                   dx, dy);
+    }
 }
 
 PIC_INLINE void ImageSamplerBilinear::SampleImageUC(Image *img, float x,
@@ -136,12 +133,13 @@ PIC_INLINE void ImageSamplerBilinear::SampleImageUC(Image *img, float x,
     ind2 = (ix  + t1) * img->channels;
     ind3 = (ix1 + t1) * img->channels;
 
-    for(int i = 0; i < img->channels; i++)
+    for(int i = 0; i < img->channels; i++) {
         vOut[i] = Bilinear<float>(img->data[ind0 + i],
                                   img->data[ind1 + i],
                                   img->data[ind2 + i],
                                   img->data[ind3 + i],
                                   dx, dy);
+    }
 }
 
 PIC_INLINE void ImageSamplerBilinear::SampleImage(Image *img, float x, float y,
@@ -180,17 +178,17 @@ PIC_INLINE void ImageSamplerBilinear::SampleImage(Image *img, float x, float y,
 
     for(int i = 0; i < img->channels; i++) {
         val[0] = Bilinear<float>(
-                     *((*img)(ix,	iy,	iz) + i),
-                     *((*img)(ix1,	iy,	iz) + i),
+                     *((*img)(ix,	iy,	iz)  + i),
+                     *((*img)(ix1,	iy,	iz)  + i),
                      *((*img)(ix,	iy,	iz1) + i),
                      *((*img)(ix1,	iy,	iz1) + i),
                      deltax, deltaz);
 
         val[1] = Bilinear<float>(
-                     *((*img)(ix,	iy1,	iz) + i),
-                     *((*img)(ix1,	iy1,	iz) + i),
-                     *((*img)(ix,	iy1,	iz1) + i),
-                     *((*img)(ix1,	iy1,	iz1) + i),
+                     *((*img)(ix,	iy1,    iz)  + i),
+                     *((*img)(ix1,	iy1,    iz)  + i),
+                     *((*img)(ix,	iy1,    iz1) + i),
+                     *((*img)(ix1,	iy1,    iz1) + i),
                      deltax, deltaz);
 
         vOut[i] = val[0] + deltay * (val[1] - val[0]);

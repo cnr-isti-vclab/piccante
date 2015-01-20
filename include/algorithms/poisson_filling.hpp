@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -27,10 +20,13 @@ See the GNU Lesser General Public License
 
 #include "util/buffer.hpp"
 #include "util/mask.hpp"
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
+/**
+ * @brief The PoissonFilling class
+ */
 class PoissonFilling
 {
 protected:
@@ -39,10 +35,13 @@ protected:
 
     bool		*mask;
     bool		*maskPoisson;
-    ImageRAW	*imgTmp;
+    Image       *imgTmp;
 
 public:
 
+    /**
+     * @brief PoissonFilling
+     */
     PoissonFilling()
     {
         imgTmp = NULL;
@@ -60,6 +59,9 @@ public:
         CleanUp();
     }
 
+    /**
+     * @brief CleanUp
+     */
     void CleanUp()
     {
         if(mask != NULL) {
@@ -78,7 +80,12 @@ public:
         }
     }
 
-    void Update(ImageRAW *imgOut, ImageRAW *imgIn)
+    /**
+     * @brief Update
+     * @param imgOut
+     * @param imgIn
+     */
+    void Update(Image *imgOut, Image *imgIn)
     {
         imgOut->Assign(imgIn);
 
@@ -160,7 +167,14 @@ public:
         }
     }
 
-    ImageRAW *Compute(ImageRAW *imgIn, ImageRAW *imgOut, float value)
+    /**
+     * @brief Compute
+     * @param imgIn
+     * @param imgOut
+     * @param value
+     * @return
+     */
+    Image *Compute(Image *imgIn, Image *imgOut, float value)
     {
         if(imgIn == NULL) {
             return NULL;
@@ -197,7 +211,7 @@ public:
 
         maskPoisson = MaskClone(mask, maskPoisson, imgIn->width, imgIn->height);
 
-        ImageRAW *work[2];
+        Image *work[2];
         work[0] = imgTmp;
         work[1] = imgOut;
 

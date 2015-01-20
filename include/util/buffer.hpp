@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -30,14 +23,10 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
-/**BufferSetValue: assigns a constant value to the mask*/
+/**BufferAssign assigns a constant value*/
 template<class T>
-PIC_INLINE T *BufferSetValue(T *buffer, int n, T value)
+PIC_INLINE T *BufferAssign(T *buffer, int n, T value)
 {
-    if(buffer == NULL) {
-        buffer = new T[n];
-    }
-
     #pragma omp parallel for
 
     for(int i = 0; i < n; i++) {
@@ -45,6 +34,226 @@ PIC_INLINE T *BufferSetValue(T *buffer, int n, T value)
     }
 
     return buffer;
+}
+
+template<class T>
+PIC_INLINE T *BufferAssign(T *bufferOut, T *bufferIn, int n)
+{
+    memcpy(bufferOut, bufferIn, n * sizeof(T));
+    return bufferOut;
+}
+
+/**BufferAdd adds a constant value*/
+template<class T>
+PIC_INLINE T *BufferAdd(T *buffer, int n, T value)
+{
+    #pragma omp parallel for
+
+    for(int i = 0; i < n; i++) {
+        buffer[i] += value;
+    }
+
+    return buffer;
+}
+
+template<class T>
+PIC_INLINE T *BufferAdd(T *bufferOut, T *bufferIn0, T *bufferIn1, int n)
+{
+    #pragma omp parallel for
+
+    for(int i = 0; i < n; i++) {
+        bufferOut[i] = bufferIn0[i] + bufferIn1[i];
+    }
+
+    return bufferOut;
+}
+
+template<class T>
+PIC_INLINE T *BufferAdd(T *bufferOut, T *bufferIn, int n)
+{
+    #pragma omp parallel for
+
+    for(int i = 0; i < n; i++) {
+        bufferOut[i] += bufferIn[i];
+    }
+
+    return bufferOut;
+}
+
+template<class T>
+PIC_INLINE T *BufferAddS(T *bufferOut, T *bufferIn, int n, int channels)
+{
+    #pragma omp parallel for
+    for(int ind = 0; ind < n; ind++) {
+        int i = ind * channels;
+
+        float val = bufferIn[ind];
+
+        for(int j = 0; j < channels; j++) {
+            bufferOut[i + j] += val;
+        }
+    }
+
+    return bufferOut;
+}
+
+/**BufferMul multiplies a constant value*/
+template<class T>
+PIC_INLINE T *BufferMul(T *buffer, int n, T value)
+{
+    #pragma omp parallel for
+    for(int i = 0; i < n; i++) {
+        buffer[i] *= value;
+    }
+
+    return buffer;
+}
+
+template<class T>
+PIC_INLINE T *BufferMul(T *bufferOut, T *bufferIn0, T *bufferIn1, int n)
+{
+    #pragma omp parallel for
+
+    for(int i = 0; i < n; i++) {
+        bufferOut[i] = bufferIn0[i] * bufferIn1[i];
+    }
+
+    return bufferOut;
+}
+
+template<class T>
+PIC_INLINE T *BufferMul(T *bufferOut, T *bufferIn, int n)
+{
+    #pragma omp parallel for
+
+    for(int i = 0; i < n; i++) {
+        bufferOut[i] *= bufferIn[i];
+    }
+
+    return bufferOut;
+}
+
+template<class T>
+PIC_INLINE T *BufferMulS(T *bufferOut, T *bufferIn, int n, int channels)
+{
+    #pragma omp parallel for
+    for(int ind = 0; ind < n; ind++) {
+        int i = ind * channels;
+
+        float val = bufferIn[ind];
+
+        for(int j = 0; j < channels; j++) {
+            bufferOut[i + j] *= val;
+        }
+    }
+
+    return bufferOut;
+}
+
+/**BufferSub subtracts a constant value*/
+template<class T>
+PIC_INLINE T *BufferSub(T *buffer, int n, T value)
+{
+    #pragma omp parallel for
+    for(int i = 0; i < n; i++) {
+        buffer[i] -= value;
+    }
+
+    return buffer;
+}
+
+template<class T>
+PIC_INLINE T *BufferSub(T *bufferOut, T *bufferIn0, T *bufferIn1, int n)
+{
+    #pragma omp parallel for
+
+    for(int i = 0; i < n; i++) {
+        bufferOut[i] = bufferIn0[i] - bufferIn1[i];
+    }
+
+    return bufferOut;
+}
+
+template<class T>
+PIC_INLINE T *BufferSub(T *bufferOut, T *bufferIn, int n)
+{
+    #pragma omp parallel for
+
+    for(int i = 0; i < n; i++) {
+        bufferOut[i] -= bufferIn[i];
+    }
+
+    return bufferOut;
+}
+
+template<class T>
+PIC_INLINE T *BufferSubS(T *bufferOut, T *bufferIn, int n, int channels)
+{
+    #pragma omp parallel for
+    for(int ind = 0; ind < n; ind++) {
+        int i = ind * channels;
+
+        float val = bufferIn[ind];
+
+        for(int j = 0; j < channels; j++) {
+            bufferOut[i + j] -= val;
+        }
+    }
+
+    return bufferOut;
+}
+
+/**BufferDiv divides by a constant value*/
+template<class T>
+PIC_INLINE T *BufferDiv(T *buffer, int n, T value)
+{
+    #pragma omp parallel for
+    for(int i = 0; i < n; i++) {
+        buffer[i] /= value;
+    }
+
+    return buffer;
+}
+
+template<class T>
+PIC_INLINE T *BufferDiv(T *bufferOut, T *bufferIn0, T *bufferIn1, int n)
+{
+    #pragma omp parallel for
+
+    for(int i = 0; i < n; i++) {
+        bufferOut[i] = bufferIn0[i] / bufferIn1[i];
+    }
+
+    return bufferOut;
+}
+
+template<class T>
+PIC_INLINE T *BufferDiv(T *bufferOut, T *bufferIn, int n)
+{
+    #pragma omp parallel for
+
+    for(int i = 0; i < n; i++) {
+        bufferOut[i] /= bufferIn[i];
+    }
+
+    return bufferOut;
+}
+
+template<class T>
+PIC_INLINE T *BufferDivS(T *bufferOut, T *bufferIn, int n, int channels)
+{
+    #pragma omp parallel for
+    for(int ind = 0; ind < n; ind++) {
+        int i = ind * channels;
+
+        float val = bufferIn[ind];
+
+        for(int j = 0; j < channels; j++) {
+            bufferOut[i + j] /= val;
+        }
+    }
+
+    return bufferOut;
 }
 
 /**FlipH: flips a buffer horizontally*/
@@ -116,7 +325,7 @@ PIC_INLINE void BufferRotate90CW(T *buffer, int &width, int &height, int channel
 
             for(int j = i; j < (n - i - 1); j++) {
                 int j_n = n - j  - 1 ;
- 
+
                 int i0 = (i   * n + j  ) * channels;
                 int i1 = (j_n * n + i  ) * channels;
                 int i2 = (i_n * n + j_n) * channels;
@@ -124,7 +333,7 @@ PIC_INLINE void BufferRotate90CW(T *buffer, int &width, int &height, int channel
 
 
                 for(int k = 0; k < channels; k++) { //swap
-                    T tmp          = buffer[i0 + k];                  
+                    T tmp          = buffer[i0 + k];
                     buffer[i0 + k] = buffer[i1 + k];
                     buffer[i1 + k] = buffer[i2 + k];
                     buffer[i2 + k] = buffer[i3 + k];
@@ -153,7 +362,7 @@ PIC_INLINE void BufferRotate90CW(T *buffer, int &width, int &height, int channel
         int tmp = width;
         width   = height;
         height  = tmp;
-    }    
+    }
 }
 
 /**BufferRotate90CCW: rotates an image 90 CCW*/
@@ -257,7 +466,7 @@ PIC_INLINE T *BufferShift(T *bufferOut, T *bufferIn, int dx, int dy, int width,
 /**This function transposes a buffer*/
 template<class T>
 PIC_INLINE T *BufferTranspose(T *bufferOut, T *bufferIn, int width, int height,
-                          int channels, int frames) 
+                          int channels, int frames)
 {
     if(bufferIn == NULL) {
         return bufferOut;
@@ -296,127 +505,6 @@ PIC_INLINE T *BufferBGRtoRGB(T *buffer, int width, int height,
 
     return buffer;
 }
-
-/**CheckNormalized: checks if data is in [0,1]*/
-PIC_INLINE bool CheckNormalized(const float *data, int size, float delta = 1e-6f)
-{
-    float thr = 1.0f + delta;
-
-    for(int i = 0; i < size; i++) {
-        if(data[i] > thr) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-//LDR type
-enum LDR_type { LT_NOR, LT_NOR_GAMMA, LT_NONE};
-
-/**ConvertLDR2HDR: converts a buffer of unsigned char into float*/
-PIC_INLINE float *ConvertLDR2HDR(unsigned char *dataIn, float *dataOut,
-                                 int size, LDR_type type, float gamma = 2.2f)
-{
-    if(dataIn == NULL) {
-        return NULL;
-    }
-
-    if(dataOut == NULL) {
-        dataOut = new float[size];
-    }
-
-    switch(type) {
-    //Simple cast
-    case LT_NONE: {
-        #pragma omp parallel for
-
-        for(int i = 0; i < size; i++) {
-            dataOut[i] = float(dataIn[i]);
-        }
-    }
-    break;
-
-    //Normalization in [0,1]
-    case LT_NOR: {
-        float inv_255 = 1.0f / 255.0f;
-        #pragma omp parallel for
-
-        for(int i = 0; i < size; i++) {
-            dataOut[i] = float(dataIn[i]) * inv_255;
-        }
-    }
-    break;
-
-    //Normalization in [0,1] + GAMMA removal
-    case LT_NOR_GAMMA: {
-        float inv_255 = 1.0f / 255.0f;
-        #pragma omp parallel for
-
-        for(int i = 0; i < size; i++) {
-            dataOut[i] = powf(float(dataIn[i]) * inv_255, gamma);
-        }
-    }
-    break;
-    }
-
-    return dataOut;
-}
-
-/**ConvertHDR2LDR: converts a buffer of unsigned char into float*/ 
-PIC_INLINE unsigned char *ConvertHDR2LDR(const float *dataIn, unsigned char *dataOut,
-        int size, LDR_type type, float gamma = 2.2f)
-{
-    if(dataIn == NULL) {
-        return NULL;
-    }
-
-    if(dataOut == NULL) {
-        dataOut = new unsigned char[size];
-    }
-
-    if(gamma <= 0.0f) {
-        gamma = 2.2f;
-    }
-
-    float invGamma = 1.0f / gamma;
-
-    switch(type) {
-    //Simple cast
-    case LT_NONE: {
-        #pragma omp parallel for
-
-        for(int i = 0; i < size; i++) {
-            dataOut[i] = CLAMPi(int(lround(dataIn[i])), 0, 255);
-        }
-    }
-    break;
-
-    //Converting into 8-bit
-    case LT_NOR: {
-        #pragma omp parallel for
-
-        for(int i = 0; i < size; i++) {
-            dataOut[i] = CLAMPi(int(lround(dataIn[i] * 255.0f)), 0, 255);
-        }
-    }
-    break;
-
-    //Normalization in [0,1] + GAMMA removal
-    case LT_NOR_GAMMA: {
-        #pragma omp parallel for
-
-        for(int i = 0; i < size; i++) {
-            float tmp = powf(dataIn[i], invGamma);
-            dataOut[i] = CLAMPi(int(lround(tmp * 255.0f)), 0, 255);
-        }
-    }
-    break;
-    }
-
-    return dataOut;
-}
-
 
 } // end namespace pic
 

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -33,6 +26,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLSamplingMap class
+ */
 class FilterGLSamplingMap: public FilterGLNPasses
 {
 protected:
@@ -44,32 +40,71 @@ protected:
     FilterGLGaussian2D		*filterG2D;
 
     void InitShaders() {}
+
     void FragmentShader() {}
+
+    /**
+     * @brief Setup
+     * @param sigma
+     * @param scale
+     */
     void Setup(float sigma, float scale);
-    ImageRAWGL *SetupAuxN(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+
+    /**
+     * @brief SetupAuxN
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLSamplingMap
+     * @param sigma
+     */
     FilterGLSamplingMap(float sigma);
+
+    /**
+     * @brief FilterGLSamplingMap
+     * @param sigma
+     * @param scale
+     */
     FilterGLSamplingMap(float sigma, float scale);
+
     ~FilterGLSamplingMap();
 
+    /**
+     * @brief getScale
+     * @return
+     */
     float getScale()
     {
         return scale;
     }
 
+    /**
+     * @brief getFbo
+     * @return
+     */
     Fbo *getFbo();
 
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float sigma)
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma
+     * @return
+     */
+    static ImageGL *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLSamplingMap filter(sigma);
 
         GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgRet = filter.Process(SingleGL(&imgIn), NULL);
+        ImageGL *imgRet = filter.Process(SingleGL(&imgIn), NULL);
 
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
         printf("Sampling Map Filter on GPU time: %f ms\n", (timeVal) / 100000000.0f);
@@ -81,7 +116,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterGLSamplingMap::FilterGLSamplingMap(float sigma): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
@@ -96,15 +130,6 @@ FilterGLSamplingMap::FilterGLSamplingMap(float sigma,
     Setup(sigma * scale, scale);
 }
 
-FilterGLSamplingMap::~FilterGLSamplingMap()
-{
-    delete filterG;
-    delete filterS;
-    delete filterD;
-    delete filterG2D;
-}
-
-//Basic constructor
 void FilterGLSamplingMap::Setup(float sigma, float scale)
 {
     this->sigma = sigma;
@@ -122,6 +147,14 @@ void FilterGLSamplingMap::Setup(float sigma, float scale)
     InsertFilter(filterG2D);
 }
 
+FilterGLSamplingMap::~FilterGLSamplingMap()
+{
+    delete filterG;
+    delete filterS;
+    delete filterD;
+    delete filterG2D;
+}
+
 Fbo *FilterGLSamplingMap::getFbo()
 {
     if(filters.size() <= 0) {
@@ -131,11 +164,11 @@ Fbo *FilterGLSamplingMap::getFbo()
     return filters[filters.size() - 1]->getFbo();
 }
 
-ImageRAWGL *FilterGLSamplingMap::SetupAuxN(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLSamplingMap::SetupAuxN(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(    imgIn[0]->frames,
+        imgOut = new ImageGL(    imgIn[0]->frames,
                                     int(imgIn[0]->widthf  * scale),
                                     int(imgIn[0]->heightf * scale),
                                     imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);

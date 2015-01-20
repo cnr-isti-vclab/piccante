@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -29,15 +22,27 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterIntegralImage class
+ */
 class FilterIntegralImage: public Filter
 {
 public:
 
+    /**
+     * @brief FilterIntegralImage
+     */
     FilterIntegralImage() : Filter()
     {
     }
 
-    ImageRAW *Process(ImageRAWVec imgIn, ImageRAW *imgOut)
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *Process(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() < 1){
             return imgOut;
@@ -100,7 +105,13 @@ public:
         return imgOut;
     }
 
-    ImageRAW *ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut)
+    /**
+     * @brief ProcessP
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *ProcessP(ImageVec imgIn, Image *imgOut)
     {
         return Process(imgIn, imgOut);
     }

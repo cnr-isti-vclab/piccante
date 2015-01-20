@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -46,12 +39,12 @@ namespace pic {
 #ifndef PIC_DISABLE_EIGEN
 
 /**
- * @brief EstimateHomography estimates an homography matrix H between image 1 to image 2
+ * @brief estimateHomography estimates an homography matrix H between image 1 to image 2
  * @param points0 is an array of points computed from image 1.
  * @param points1 is an array of points computed from image 2.
  * @return It returns the homography matrix H.
  */
-Eigen::Matrix3d EstimateHomography(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1)
+Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1)
 {
     Eigen::Matrix3d  H;
 
@@ -60,44 +53,49 @@ Eigen::Matrix3d EstimateHomography(std::vector< Eigen::Vector2f > points0, std::
         return H;
     }
 
-    //shifting and scaling points for numerical stability
-    std::vector< Eigen::Vector2f > tmp_points0, tmp_points1;
-    tmp_points0.assign(points0.begin(), points0.end());
-    tmp_points1.assign(points1.begin(), points1.end());
+    Eigen::Vector3f transform_0 = ComputeNormalizationTransform(points0);
+    Eigen::Vector3f transform_1 = ComputeNormalizationTransform(points1);
 
-    Eigen::Vector3f tmp_points0_info = GeneralCornerDetector::NormalizePoints(tmp_points0);
-    Eigen::Vector3f tmp_points1_info = GeneralCornerDetector::NormalizePoints(tmp_points1);
+    Eigen::Matrix3d mat_0 = getShiftScaleMatrix(transform_0);
+    Eigen::Matrix3d mat_1 = getShiftScaleMatrix(transform_1);
 
-    Eigen::Matrix3d mat_0 = getShiftScaleMatrix(tmp_points0_info);
-    Eigen::Matrix3d mat_1 = getShiftScaleMatrix(tmp_points1_info);
-
-    unsigned int n = tmp_points0.size();
+    unsigned int n = points0.size();
     Eigen::MatrixXd A(n * 2, 9);
 
     //setting up the linear system
-    for(unsigned int j = 0; j < n; j++) {
-        int i = j * 2;
-        A(i, 0) = 0.0;
-        A(i, 1) = 0.0;
-        A(i, 2) = 0.0;
-        A(i, 3) = tmp_points0[j][0];
-        A(i, 4) = tmp_points0[j][1];
-        A(i, 5) = 1.0;
-        A(i, 6) = -tmp_points1[j][1] * tmp_points0[j][0];
-        A(i, 7) = -tmp_points1[j][1] * tmp_points0[j][1];
-        A(i, 8) = -tmp_points1[j][1];
+    for(unsigned int i = 0; i < n; i++) {
+        //transforming coordinates for increasing stability of the system
+        Eigen::Vector2f p0 = points0[i];
+        Eigen::Vector2f p1 = points1[i];
 
-        i++;
+        p0[0] = (p0[0] - transform_0[0]) / transform_0[2];
+        p0[1] = (p0[1] - transform_0[1]) / transform_0[2];
 
-        A(i, 0) = tmp_points0[j][0];
-        A(i, 1) = tmp_points0[j][1];
-        A(i, 2) = 1.0;
-        A(i, 3) = 0.0;
-        A(i, 4) = 0.0;
-        A(i, 5) = 0.0;
-        A(i, 6) = -tmp_points1[j][0] * tmp_points0[j][0];
-        A(i, 7) = -tmp_points1[j][0] * tmp_points0[j][1];
-        A(i, 8) = -tmp_points1[j][0];
+        p1[0] = (p1[0] - transform_1[0]) / transform_1[2];
+        p1[1] = (p1[1] - transform_1[1]) / transform_1[2];
+
+        int j = i * 2;
+        A(j, 0) = 0.0;
+        A(j, 1) = 0.0;
+        A(j, 2) = 0.0;
+        A(j, 3) = p0[0];
+        A(j, 4) = p0[1];
+        A(j, 5) = 1.0;
+        A(j, 6) = -p1[1] * p0[0];
+        A(j, 7) = -p1[1] * p0[1];
+        A(j, 8) = -p1[1];
+
+        j++;
+
+        A(j, 0) = p0[0];
+        A(j, 1) = p0[1];
+        A(j, 2) = 1.0;
+        A(j, 3) = 0.0;
+        A(j, 4) = 0.0;
+        A(j, 5) = 0.0;
+        A(j, 6) = -p1[0] * p0[0];
+        A(j, 7) = -p1[0] * p0[1];
+        A(j, 8) = -p1[0];
     }
 
     //Solving the linear system
@@ -124,27 +122,22 @@ Eigen::Matrix3d EstimateHomography(std::vector< Eigen::Vector2f > points0, std::
 }
 
 /**
- * @brief EstimateHomographyRansac
+ * @brief estimateHomographyRansac computes the homography such that: points1 = H * points0
  * @param points0
  * @param points1
  * @param inliers
  * @param maxIterations
  * @return
  */
-Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1,
+Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1,
                                          std::vector< unsigned int > &inliers, unsigned int maxIterations = 100, double threshold = 4.0)
 {
     if(points0.size() < 5) {
-        return EstimateHomography(points0, points1);
+        return estimateHomography(points0, points1);
     }
 
     Eigen::Matrix3d H;
-    std::vector< Eigen::Vector2f > sub_points0;
-    std::vector< Eigen::Vector2f > sub_points1;
-
     int nSubSet = 4;
-    sub_points0.reserve(nSubSet);
-    sub_points1.reserve(nSubSet);
 
     std::mt19937 m(rand() % 10000);
 
@@ -155,17 +148,18 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0,
     inliers.clear();
 
     for(unsigned int i = 0; i < maxIterations; i++) {       
+
         getPermutation(m, subSet, nSubSet, n);
 
-        sub_points0.clear();
-        sub_points1.clear();
+        std::vector< Eigen::Vector2f > sub_points0;
+        std::vector< Eigen::Vector2f > sub_points1;
 
         for(int j = 0; j < nSubSet; j++) {
             sub_points0.push_back(points0[subSet[j]]);
             sub_points1.push_back(points1[subSet[j]]);
         }
 
-        Eigen::Matrix3d tmpH = EstimateHomography(sub_points0, sub_points1);
+        Eigen::Matrix3d tmpH = estimateHomography(sub_points0, sub_points1);
 
         //is it a good one?
         std::vector< unsigned int > tmp_inliers;
@@ -199,27 +193,27 @@ Eigen::Matrix3d EstimateHomographyRansac(std::vector< Eigen::Vector2f > points0,
             printf("Better estimate using inliers only.\n");
         #endif
 
-        sub_points0.clear();
-        sub_points1.clear();
+        std::vector< Eigen::Vector2f > sub_points0;
+        std::vector< Eigen::Vector2f > sub_points1;
 
         for(unsigned int i = 0; i < inliers.size(); i++) {
             sub_points0.push_back(points0[inliers[i]]);
             sub_points1.push_back(points1[inliers[i]]);
         }
 
-        H = EstimateHomography(sub_points0, sub_points1);
+        H = estimateHomography(sub_points0, sub_points1);
     }
 
     return H;
 }
 
 /**
- * @brief EstimateFundamental estimates the foundamental matrix between image 1 to image 2
+ * @brief estimateFundamental estimates the foundamental matrix between image 1 to image 2
  * @param points0 is an array of points computed from image 1.
  * @param points1 is an array of points computed from image 2.
  * @return It returns the fundamental matrix, F_{1,2}.
  */
-Eigen::Matrix3d EstimateFundamental(std::vector< Eigen::Vector2f > &points0, std::vector< Eigen::Vector2f > &points1)
+Eigen::Matrix3d estimateFundamental(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1)
 {
     Eigen::Matrix3d F;
 
@@ -229,29 +223,35 @@ Eigen::Matrix3d EstimateFundamental(std::vector< Eigen::Vector2f > &points0, std
     }
 
     //shifting and scaling points for numerical stability
-    std::vector< Eigen::Vector2f > tmp_points0, tmp_points1;
-    tmp_points0.assign(points0.begin(), points0.end());
-    tmp_points1.assign(points1.begin(), points1.end());
+    Eigen::Vector3f transform_0 = ComputeNormalizationTransform(points0);
+    Eigen::Vector3f transform_1 = ComputeNormalizationTransform(points1);
 
-    Eigen::Vector3f tmp_points0_info = GeneralCornerDetector::NormalizePoints(tmp_points0);
-    Eigen::Vector3f tmp_points1_info = GeneralCornerDetector::NormalizePoints(tmp_points1);
+    Eigen::Matrix3d mat_0 = getShiftScaleMatrix(transform_0);
+    Eigen::Matrix3d mat_1 = getShiftScaleMatrix(transform_1);
 
-    Eigen::Matrix3d mat_0 = getShiftScaleMatrix(tmp_points0_info);
-    Eigen::Matrix3d mat_1 = getShiftScaleMatrix(tmp_points1_info);
-
-    Eigen::MatrixXd A(tmp_points0.size(), 9);
+    Eigen::MatrixXd A(points0.size(), 9);
 
     //setting up the linear system
-    for(unsigned int i = 0; i < tmp_points0.size(); i++) {
+    for(unsigned int i = 0; i < points0.size(); i++) {
 
-        A(i, 0) = tmp_points0[i][0] * tmp_points1[i][0];
-        A(i, 1) = tmp_points0[i][0] * tmp_points1[i][1];
-        A(i, 2) = tmp_points0[i][0];
-        A(i, 3) = tmp_points0[i][1] * tmp_points1[i][0];
-        A(i, 4) = tmp_points0[i][1] * tmp_points1[i][1];
-        A(i, 5) = tmp_points0[i][1];
-        A(i, 6) = tmp_points1[i][0];
-        A(i, 7) = tmp_points1[i][1];
+        //transforming coordinates for increasing stability of the system
+        Eigen::Vector2f p0 = points0[i];
+        Eigen::Vector2f p1 = points1[i];
+
+        p0[0] = (p0[0] - transform_0[0]) / transform_0[2];
+        p0[1] = (p0[1] - transform_0[1]) / transform_0[2];
+
+        p1[0] = (p1[0] - transform_1[0]) / transform_1[2];
+        p1[1] = (p1[1] - transform_1[1]) / transform_1[2];
+
+        A(i, 0) = p0[0] * p1[0];
+        A(i, 1) = p0[0] * p1[1];
+        A(i, 2) = p0[0];
+        A(i, 3) = p0[1] * p1[0];
+        A(i, 4) = p0[1] * p1[1];
+        A(i, 5) = p0[1];
+        A(i, 6) = p1[0];
+        A(i, 7) = p1[1];
         A(i, 8) = 1.0;
     }
 
@@ -291,27 +291,22 @@ Eigen::Matrix3d EstimateFundamental(std::vector< Eigen::Vector2f > &points0, std
 }
 
 /**
- * @brief EstimateFundamentalRansac
+ * @brief estimateFundamentalRansac
  * @param points0
  * @param points1
  * @param inliers
  * @param maxIterations
  * @return
  */
-Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1,
+Eigen::Matrix3d estimateFundamentalRansac(std::vector< Eigen::Vector2f > points0, std::vector< Eigen::Vector2f > points1,
                                           std::vector< unsigned int > &inliers, unsigned int maxIterations = 100, double threshold = 0.01)
 {
     if(points0.size() < 9) {
-        return EstimateFundamental(points0, points1);
+        return estimateFundamental(points0, points1);
     }
 
     Eigen::Matrix3d F;
-    std::vector< Eigen::Vector2f > sub_points0;
-    std::vector< Eigen::Vector2f > sub_points1;
-
     int nSubSet = 8;
-    sub_points0.reserve(nSubSet);
-    sub_points1.reserve(nSubSet);
 
     std::mt19937 m(rand() % 10000);
 
@@ -324,22 +319,23 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
     for(unsigned int i = 0; i < maxIterations; i++) {
         getPermutation(m, subSet, nSubSet, n);
 
-        sub_points0.clear();
-        sub_points1.clear();
+        std::vector< Eigen::Vector2f > sub_points0;
+        std::vector< Eigen::Vector2f > sub_points1;
 
         for(int j = 0; j < nSubSet; j++) {
-            sub_points0.push_back(points0[subSet[j]]);
-            sub_points1.push_back(points1[subSet[j]]);
+            unsigned int k = subSet[j];
+            sub_points0.push_back(points0[k]);
+            sub_points1.push_back(points1[k]);
         }
 
-        Eigen::Matrix3d tmpF = EstimateFundamental(sub_points0, sub_points1);
+        Eigen::Matrix3d tmpF = estimateFundamental(sub_points0, sub_points1);
 
         //is it a good one?
         std::vector< unsigned int > tmp_inliers;
 
         for(unsigned int j = 0; j < n; j++) {
-            Eigen::Vector3d p0 = Eigen::Vector3d(points0[j][0], points0[j][1], 1.0f);
-            Eigen::Vector3d p1 = Eigen::Vector3d(points1[j][0], points1[j][1], 1.0f);
+            Eigen::Vector3d p0 = Eigen::Vector3d(points0[j][0], points0[j][1], 1.0);
+            Eigen::Vector3d p1 = Eigen::Vector3d(points1[j][0], points1[j][1], 1.0);
 
             Eigen::Vector3d tmpF_p0 = tmpF * p0;
             double n0 = sqrt(tmpF_p0[0] * tmpF_p0[0] + tmpF_p0[1] * tmpF_p0[1]);
@@ -347,7 +343,7 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
                 tmpF_p0 /= n0;
             }
 
-            double err = abs(tmpF_p0.dot(p1));
+            double err = fabs(tmpF_p0.dot(p1));
 
             if(err < threshold){
                 tmp_inliers.push_back(j);
@@ -369,15 +365,15 @@ Eigen::Matrix3d EstimateFundamentalRansac(std::vector< Eigen::Vector2f > points0
             printf("Better estimate using inliers only.\n");
         #endif
 
-        sub_points0.clear();
-        sub_points1.clear();
+        std::vector< Eigen::Vector2f > sub_points0;
+        std::vector< Eigen::Vector2f > sub_points1;
 
         for(unsigned int i = 0; i < inliers.size(); i++) {
             sub_points0.push_back(points0[inliers[i]]);
             sub_points1.push_back(points1[inliers[i]]);
         }
 
-        F = EstimateFundamental(sub_points0, sub_points1);
+        F = estimateFundamental(sub_points0, sub_points1);
     }
 
     return F;
@@ -403,14 +399,14 @@ Eigen::Matrix3d noramalizeFundamentalMatrix(Eigen::Matrix3d F)
 }
 
 /**
- * @brief ExtractFundamentalMatrix
+ * @brief extractFundamentalMatrix
  * @param M0
  * @param M1
  * @param e0
  * @param e1
  * @return
  */
-Eigen::Matrix3d ExtractFundamentalMatrix(Eigen::Matrix34d &M0, Eigen::Matrix34d &M1, Eigen::VectorXd &e0, Eigen::VectorXd &e1) {
+Eigen::Matrix3d extractFundamentalMatrix(Eigen::Matrix34d &M0, Eigen::Matrix34d &M1, Eigen::VectorXd &e0, Eigen::VectorXd &e1) {
 
     Eigen::Matrix3d M0_3 = getSquareMatrix(M0);
     Eigen::Matrix3d M1_3 = getSquareMatrix(M1);
@@ -469,11 +465,11 @@ void filterInliers(std::vector< T > &vec, std::vector< unsigned int > &inliers, 
 }
 
 /**
- * @brief ComputeEpipole computes the epipole of a fundamental matrix F.
+ * @brief computeEpipole computes the epipole of a fundamental matrix F.
  * @param F is a fundamental matrix.
  * @return It returns the epipole of F.
  */
-Eigen::Vector3d ComputeEpipole(Eigen::Matrix3d &F)
+Eigen::Vector3d computeEpipole(Eigen::Matrix3d &F)
 {
     Eigen::JacobiSVD< Eigen::Matrix3d > svdF(F, Eigen::ComputeFullV);
     Eigen::Matrix3d V = svdF.matrixV();
@@ -617,6 +613,49 @@ Eigen::Vector2d removeLensDistortion(Eigen::Vector2d &p, double k[5])
 }
 
 /**
+ * @brief getCameraMatrixFromHomography
+ * @param H is 3x3 homography matrix.
+ * @param K
+ * @return
+ */
+Eigen::Matrix34d getCameraMatrixFromHomography(Eigen::Matrix3d &H, Eigen::Matrix3d &K)
+{
+    Eigen::Matrix34d m;
+    m.setZero();
+
+    Eigen::Matrix3d K_inv = K.inverse();
+
+    Eigen::Matrix3d H_p = K_inv * H;
+
+    Eigen::Vector3d r_0(H_p(0, 0), H_p(1, 0), H_p(2, 0));
+    Eigen::Vector3d r_1(H_p(0, 1), H_p(1, 1), H_p(2, 1));
+
+    r_0.normalize();
+    r_1.normalize();
+    Eigen::Vector3d r_2 = r_0.cross(r_1);
+
+    Eigen::Vector3d t(H_p(0, 2), H_p(1, 2), H_p(2, 2));
+
+    m(0, 0) = r_0[0];
+    m(1, 0) = r_0[1];
+    m(2, 0) = r_0[2];
+
+    m(0, 1) = r_1[0];
+    m(1, 1) = r_1[1];
+    m(2, 1) = r_1[2];
+
+    m(0, 2) = r_2[0];
+    m(1, 2) = r_2[1];
+    m(2, 2) = r_2[2];
+
+    m(0 , 3) = t[0];
+    m(1 , 3) = t[1];
+    m(2 , 3) = t[2];
+
+    return K * m;
+}
+
+/**
  * @brief getCameraMatrixIdentity
  * @param K
  * @return
@@ -661,6 +700,35 @@ Eigen::Matrix34d getCameraMatrix(Eigen::Matrix3d &K, Eigen::Matrix3d &R, Eigen::
     m(2, 3) = t[2];
 
     return K * m;
+}
+
+/**
+ * @brief cameraMatrixProject projects a point, p, using the camera
+ * matrix, M.
+ * @param M
+ * @param p is a 3D point encoded in homogenous coordinate (4D vector)
+ * @return
+ */
+Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector4d &p)
+{
+    Eigen::Vector3d proj = M * p;
+    proj[0] /= proj[2];
+    proj[1] /= proj[2];
+
+    return Eigen::Vector2i(int(proj[0]), int(proj[1]));
+}
+
+/**
+ * @brief cameraMatrixProject projects a point, p, using the camera
+ * matrix, M.
+ * @param M
+ * @param p is a 3D point (3D vector)
+ * @return
+ */
+Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector3d &p)
+{
+    Eigen::Vector4d p4d(p[0], p[1], p[2], 1.0);
+    return cameraMatrixProject(M, p4d);
 }
 
 /**
@@ -822,7 +890,6 @@ Eigen::Vector4d triangulationHartleySturm(Eigen::Vector3d &point_0, Eigen::Vecto
 
     return x;
 }
-
 
 /**
  * @brief decomposeEssentialMatrixWithConfiguration decomposes an essential matrix E.

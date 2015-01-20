@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -46,28 +39,20 @@ public:
     FilterGLThresholding();
 
     /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
-
-    /**
      * @brief Execute
      * @param nameIn
      * @param nameOut
      * @return
      */
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut)
+    static ImageGL *Execute(std::string nameIn, std::string nameOut)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLThresholding filter;
 
         GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgOut = filter.Process(SingleGL(&imgIn), NULL);
+        ImageGL *imgOut = filter.Process(SingleGL(&imgIn), NULL);
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
         printf("Gradient Filter on GPU time: %g ms\n", double(timeVal) / 100000000.0);
 
@@ -127,52 +112,6 @@ void FilterGLThresholding::InitShaders()
     filteringProgram.relink();
     filteringProgram.uniform("u_tex",      0);
     glw::bind_program(0);
-}
-
-ImageRAWGL *FilterGLThresholding::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    glw::bind_program(filteringProgram);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    glw::bind_program(0);
-
-    //Textures
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

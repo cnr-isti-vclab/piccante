@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -45,10 +38,14 @@ See the GNU Lesser General Public License
  * in the case .exr images are used. Note that you need to manually install OpenEXR on your developing maching in order
  * to enable this flag.
  *
+ * Note that when using Eigen types and standard containters, if you do not align containters, a good practice is to enable the following #define:
+ * \li \c #define EIGEN_DONT_VECTORIZE
+ * \li \c #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
+ *
  * \section descr_sec Modules
  *
  * <a href="http://piccantelib.net">PICCANTE</a> is a modular library with different modules. The main classes are
- * pic::Image, pic::ImageRAW and pic::Histogram.
+ * pic::Image and pic::Histogram.
  * \li \c pic::Image is the base class for managing an image. Pixels are stored
  * in an array of interleaved channels float values; i.e. pic::Image::data.
  * Pixels are stored as float values, because the library is meant mostly for accurate and HDR
@@ -56,16 +53,15 @@ See the GNU Lesser General Public License
  * image statistics (e.g. maximum value, minimum value, mean value, etc.), image operators
  * (e.g. add, sub, mul, div, etc.) and memory management functions (e.g. allocation, cloning, etc.).
  * Note that this class supports multi-channels (e.g. alpha channel) and temporal/volumetric images.
- * \li \c pic::ImageRAW inherits from pic::Image, and it provides an I/O interface for reading different
- * file formats (ppm, pgm, pbm, bmp, tga, hdr, pfm, etc.) natively in Piccante and through other optional
- * external libraries (e.g. OpenEXR and QT).
+ * It also provides an I/O interface for reading different file formats (ppm, pgm, pbm, bmp, tga, hdr, pfm, etc.)
+ * natively in Piccante and through other optional external libraries (e.g. OpenEXR and QT).
  * \li \c pic::Histogram is a class for creating, managing, and processing LDR/HDR image histograms.
  *
  * \subsection filters_module Filtering
  *
  * The main class of this module is pic::Filter. This is a base class for managing
  * a filter; it provides mechanisms for multi-threading, memory allocation, and so on.
- * Typically, a filter in <a href="http://piccantelib.net">PICCANTE</a> can have multiple pic::ImageRAW images as input, imgIn,
+ * Typically, a filter in <a href="http://piccantelib.net">PICCANTE</a> can have multiple pic::Image images as input, imgIn,
  * and a single output, imgOut.
  * Many image filters are implemented in <a href="http://piccantelib.net">PICCANTE</a> susch as: linear filters
  * (e.g. Gaussian, gradient based, DCT, etc.), non-linear filters
@@ -214,8 +210,7 @@ See the GNU Lesser General Public License
 // base stuff
 #include "base.hpp"
 #include "image.hpp"
-#include "image_raw.hpp"
-#include "image_raw_vec.hpp"
+#include "image_vec.hpp"
 #include "histogram.hpp"
 
 // sub dirs

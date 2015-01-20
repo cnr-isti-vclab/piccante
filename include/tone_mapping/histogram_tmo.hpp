@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -26,19 +19,25 @@ See the GNU Lesser General Public License
 #define PIC_TONE_MAPPING_HISTOGRAM_TMO_HPP
 
 #include <vector>
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_luminance.hpp"
 
 namespace pic {
 
-inline ImageRAW *HistogramTMO(ImageRAW *imgOut, ImageRAW *imgIn)
+/**
+ * @brief HistogramTMO
+ * @param imgOut
+ * @param imgIn
+ * @return
+ */
+inline Image *HistogramTMO(Image *imgOut, Image *imgIn)
 {
     if(imgOut == NULL) {
         imgOut = imgIn->Clone();
     }
 
-    ImageRAW *lum    = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
-    ImageRAW *lumOld = lum->Clone();
+    Image *lum    = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
+    Image *lumOld = lum->Clone();
     lum->sort();
 
     int size = lum->width * lum->height * lum->frames;
@@ -59,7 +58,10 @@ inline ImageRAW *HistogramTMO(ImageRAW *imgOut, ImageRAW *imgIn)
         lum->data[i] = powf(float(low - v.begin()) / 256.0f, 2.2f);
     }
 
-    imgOut->changeLum(lumOld, lum);
+    *imgOut /= *lumOld;
+    *imgOut *= *lum;
+
+    imgOut->removeSpecials();
 
     delete lum;
     delete lumOld;

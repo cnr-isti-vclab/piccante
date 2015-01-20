@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -33,6 +26,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterBilateral2DS class
+ */
 class FilterBilateral2DS: public Filter
 {
 protected:
@@ -43,66 +39,132 @@ protected:
     int						halfSizeKernel;
     PrecomputedGaussian		*pg;
 
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     int nSamples;
 
-    //Basic constructors
+    /**
+     * @brief FilterBilateral2DS
+     */
     FilterBilateral2DS()
     {
         pg = NULL;
         ms = NULL;
     }
+
+    /**
+     * @brief FilterBilateral2DS
+     * @param nameFile
+     * @param sigma_r
+     */
     FilterBilateral2DS(std::string nameFile, float sigma_r);
 
-    //Constructors using Init
+    /**
+     * @brief FilterBilateral2DS
+     * @param type
+     * @param sigma_s
+     * @param sigma_r
+     * @param mult
+     */
     FilterBilateral2DS(SAMPLER_TYPE type, float sigma_s, float sigma_r, int mult);
+
+    /**
+     * @brief FilterBilateral2DS
+     * @param sigma_s
+     * @param sigma_r
+     * @param mult
+     */
     FilterBilateral2DS(float sigma_s, float sigma_r, int mult);
+
+    /**
+     * @brief FilterBilateral2DS
+     * @param sigma_s
+     * @param sigma_r
+     */
     FilterBilateral2DS(float sigma_s, float sigma_r);
 
-    //Init
+    /**
+     * @brief Init
+     * @param type
+     * @param sigma_s
+     * @param sigma_r
+     * @param mult
+     */
     void Init(SAMPLER_TYPE type, float sigma_s, float sigma_r, int mult);
 
+    /**
+     * @brief Signature
+     * @return
+     */
     std::string Signature()
     {
         return GenBilString("S", sigma_s, sigma_r);
     }
 
-    //Set sigma_r
+    /**
+     * @brief SetSigma_r
+     * @param sigma_r
+     */
     void SetSigma_r(float sigma_r)
     {
         this->sigma_r = sigma_r;
     }
 
-    //Write the kernel
+    /**
+     * @brief Write
+     * @param filename
+     * @return
+     */
     bool Write(std::string filename);
 
-    //Read the kernel
+    /**
+     * @brief Read
+     * @param filename
+     * @return
+     */
     bool Read(std::string filename);
 
-    //Filtering
-    static ImageRAW *Execute(ImageRAW *imgIn,
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
+    static Image *Execute(Image *imgIn,
                              float sigma_s, float sigma_r)
     {
         //Filtering
         FilterBilateral2DS filter(sigma_s, sigma_r, 1);
         //long t0 = timeGetTime();
-        ImageRAW *imgOut = filter.ProcessP(Single(imgIn), NULL);
+        Image *imgOut = filter.ProcessP(Single(imgIn), NULL);
         //long t1 = timeGetTime();
         //printf("Stochastic Bilateral Filter time: %ld\n",t1-t0);
         return imgOut;
     }
 
-    //Filtering
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgEdge,
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgEdge
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgEdge,
                              float sigma_s, float sigma_r)
     {
         //Filtering
         FilterBilateral2DS filter(sigma_s, sigma_r, 1);
         //long t0 = timeGetTime();
-        ImageRAW *imgOut;
+        Image *imgOut;
 
         if(imgEdge == NULL) {
             imgOut = filter.ProcessP(Single(imgIn), NULL);
@@ -115,17 +177,27 @@ public:
         return imgOut;
     }
 
-    static ImageRAW *Execute(std::string nameIn,
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @param type
+     * @param mult
+     * @return
+     */
+    static Image *Execute(std::string nameIn,
                              std::string nameOut,
                              float sigma_s, float sigma_r, SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
     {
         //Load the image
-        ImageRAW imgIn(nameIn);
+        Image imgIn(nameIn);
 
         //Filtering
         FilterBilateral2DS filter(type, sigma_s, sigma_r, mult);
         //long t0 = timeGetTime();
-        ImageRAW *imgOut = filter.ProcessP(Single(&imgIn), NULL);
+        Image *imgOut = filter.ProcessP(Single(&imgIn), NULL);
         //long t1 = timeGetTime();
         //printf("Stochastic Bilateral Filter time: %ld\n",t1-t0);
 
@@ -134,20 +206,30 @@ public:
         return imgOut;
     }
 
-    //Filtering
-    static ImageRAW *Execute(std::string nameIn,
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameIn2
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @param type
+     * @param mult
+     * @return
+     */
+    static Image *Execute(std::string nameIn,
                              std::string nameIn2,
                              std::string nameOut,
                              float sigma_s, float sigma_r, SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
     {
         //Load the image
-        ImageRAW imgIn(nameIn);
-        ImageRAW imgIn2(nameIn2);
+        Image imgIn(nameIn);
+        Image imgIn2(nameIn2);
 
         //Filtering
         FilterBilateral2DS filter(type, sigma_s, sigma_r, mult);
         //long t0 = timeGetTime();
-        ImageRAW *imgOut = filter.ProcessP(Double(&imgIn, &imgIn2), NULL);
+        Image *imgOut = filter.ProcessP(Double(&imgIn, &imgIn2), NULL);
         //long t1 = timeGetTime();
         //printf("Stochastic Bilateral Filter time: %ld\n",t1-t0);
 
@@ -156,6 +238,11 @@ public:
         return imgOut;
     }
 
+    /**
+     * @brief BilateralStoK
+     * @param kernelSize
+     * @return
+     */
     static inline float BilateralStoK(int kernelSize)
     {
         //	float ret = 0.9577f/(0.6466f*float(kernelSize)-0.9175f)+0.4505;
@@ -168,6 +255,11 @@ public:
         }
     }
 
+    /**
+     * @brief BilateralStoK2
+     * @param kernelSize
+     * @return
+     */
     static inline float BilateralStoK2(int kernelSize)
     {
         float ret = 0.3233f / (0.5053f * float(kernelSize) - 0.8272f) + 0.7366f;
@@ -179,7 +271,9 @@ public:
         }
     }
 
-    /**Precomputing kernels*/
+    /**
+     * @brief PrecomputedKernels
+     */
     static void PrecomputedKernels()
     {
         char nameFile[512];
@@ -212,7 +306,6 @@ public:
     }
 };
 
-//Basic constructors
 PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(std::string nameFile,
         float sigma_r)
 {
@@ -220,7 +313,6 @@ PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(std::string nameFile,
     this->sigma_r = sigma_r;
 }
 
-//Init constructors
 PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(SAMPLER_TYPE type,
         float sigma_s, float sigma_r, int mult)
 {
@@ -238,7 +330,6 @@ PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(float sigma_s, float sigma_r)
     Init(ST_BRIDSON, sigma_s, sigma_r, 1);
 }
 
-//Init
 PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
         float sigma_r, int mult)
 {
@@ -263,8 +354,7 @@ PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
     ms = new MRSamplers<2>(type, pg->halfKernelSize, nSamples, 1, 64);
 }
 
-//Process in a box
-PIC_INLINE void FilterBilateral2DS::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
+PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
     //Filtering
@@ -272,7 +362,7 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
     double I_val[4], tmpC[4];
     double  tmp, tmp2, tmp3, sum;
 
-    ImageRAW *edge, *base, *selector;
+    Image *edge, *base, *selector;
     selector = NULL;
 
     int nImg = src.size();
@@ -408,14 +498,12 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
     }
 }
 
-//Write the kernel
 PIC_INLINE bool FilterBilateral2DS::Write(std::string nameFile)
 {
     //TODO: add the writing of (sigms_s, sigma_r)
     return ms->Write(nameFile);
 }
 
-//Read the kernel
 PIC_INLINE bool FilterBilateral2DS::Read(std::string filename)
 {
     //TODO: add the reading of (sigms_s, sigma_r)

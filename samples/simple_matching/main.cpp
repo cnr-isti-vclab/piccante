@@ -2,27 +2,18 @@
 
 PICCANTE
 The hottest HDR imaging library!
-http://vcg.isti.cnr.it/piccante
+http://piccantelib.net
 
 Copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
-
-#include <QCoreApplication>
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
@@ -36,10 +27,10 @@ int main(int argc, char *argv[])
 
     printf("Reading an LDR images...");
 
-    pic::ImageRAW *img0 = new pic::ImageRAW();
+    pic::Image *img0 = new pic::Image();
     img0->Read("../data/input/features/balcony_0.png", pic::LT_NOR);
 
-    pic::ImageRAW *img1 = new pic::ImageRAW();
+    pic::Image *img1 = new pic::Image();
     img1->Read("../data/input/features/balcony_1.png", pic::LT_NOR);
 
     img0->Write("../data/output/simple_matching_img_0.png", pic::LT_NOR);
@@ -56,8 +47,8 @@ int main(int argc, char *argv[])
         std::vector< Eigen::Vector3f > corners_from_img1;
 
         //computing the luminance images
-        pic::ImageRAW *L0 = pic::FilterLuminance::Execute(img0, NULL, pic::LT_CIE_LUMINANCE);
-        pic::ImageRAW *L1 = pic::FilterLuminance::Execute(img1, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *L0 = pic::FilterLuminance::Execute(img0, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *L1 = pic::FilterLuminance::Execute(img1, NULL, pic::LT_CIE_LUMINANCE);
 
         //getting corners
         printf("Extracting corners...\n");
@@ -67,8 +58,8 @@ int main(int argc, char *argv[])
 
         //computing ORB descriptors for each corner and image
         //Computing luminance images
-        pic::ImageRAW *L0_flt = pic::FilterGaussian2D::Execute(L0, NULL, 2.5f);
-        pic::ImageRAW *L1_flt = pic::FilterGaussian2D::Execute(L1, NULL, 2.5f);
+        pic::Image *L0_flt = pic::FilterGaussian2D::Execute(L0, NULL, 2.5f);
+        pic::Image *L1_flt = pic::FilterGaussian2D::Execute(L1, NULL, 2.5f);
 
         printf("Computing ORB descriptors...\n");
 
@@ -150,7 +141,7 @@ int main(int argc, char *argv[])
 
         printf("Estimating a homography matrix H from the matches...");
         std::vector< unsigned int > inliers;
-        Eigen::Matrix3d H = pic::EstimateHomographyRansac(m0, m1, inliers, 10000);
+        Eigen::Matrix3d H = pic::estimateHomographyRansac(m0, m1, inliers, 10000);
         printf("Ok.\n");
 
         pic::filterInliers(m0, inliers, m0f);
@@ -174,18 +165,18 @@ int main(int argc, char *argv[])
         mtxH.print();
 
         printf("Applying H to the first image..");
-        pic::ImageRAW *img0_H = pic::FilterWarp2D::Execute(img0, NULL, mtxH, true, false);
+        pic::Image *img0_H = pic::FilterWarp2D::Execute(img0, NULL, mtxH, true, false);
         img0_H->Write("../data/output/simple_matching_img_0_H_applied.png", pic::LT_NOR);
         printf("Ok.\n");
 
         printf("\nEstimating the fundamental matrix F from the matches...");
-        Eigen::Matrix3d F = pic::EstimateFundamentalRansac(m0, m1, inliers, 10000);
+        Eigen::Matrix3d F = pic::estimateFundamentalRansac(m0, m1, inliers, 10000);
         printf("Ok.\n");
 
         printf("\nFoundamental matrix: \n");
         pic::printfMat(F);
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No there is at least an invalid file!\n");
     }
 
     return 0;

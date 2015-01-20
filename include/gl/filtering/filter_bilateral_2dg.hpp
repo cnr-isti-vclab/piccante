@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -43,7 +36,7 @@ protected:
     FilterGLScatter		*scatter;
     FilterGLGaussian3D	*gauss3D;
 
-    ImageRAWGL			*gridGL, *gridBlurGL;
+    ImageGL             *gridGL, *gridBlurGL;
 
 public:
     FilterGLSlicer		*slicer;
@@ -63,7 +56,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief Execute
@@ -72,11 +65,11 @@ public:
      * @param sigma_r
      * @return
      */
-    static ImageRAWGL *Execute(ImageRAWGL *imgIn, float sigma_s, float sigma_r)
+    static ImageGL *Execute(ImageGL *imgIn, float sigma_s, float sigma_r)
     {
         FilterGLBilateral2DG *filter = new FilterGLBilateral2DG(sigma_s, sigma_r);
         GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgOut = filter->Process(SingleGL(imgIn), NULL);
+        ImageGL *imgOut = filter->Process(SingleGL(imgIn), NULL);
         GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
 
         printf("Bilateral 2DG Filter on GPU time: %f ms\n",
@@ -85,19 +78,20 @@ public:
         return imgOut;
     }
 
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut,
+    static ImageGL *Execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r, int testing = 1)
     {
-        ImageRAWGL imgIn(nameIn);
-        float maxVal = imgIn.getMaxVal()[0];
-        imgIn.Div(maxVal);
+        Image tmp_imgIn(nameIn);
+        float maxVal = tmp_imgIn.getMaxVal()[0];
+        tmp_imgIn /= maxVal;
         sigma_r = sigma_r / maxVal;
 
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
+        ImageGL imgIn(&tmp_imgIn, true);
+        imgIn.generateTextureGL();
 
         FilterGLBilateral2DG *filter = new FilterGLBilateral2DG(sigma_s, sigma_r);//, imgIn.channels);
 
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 4,
+        ImageGL *imgOut = new ImageGL(1, imgIn.width, imgIn.height, 4,
                                             IMG_GPU_CPU, GL_TEXTURE_2D);
 
         GLuint testTQ1;
@@ -115,13 +109,14 @@ public:
             filter->Process(SingleGL(&imgIn), imgOut);
         }
 
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
+       // GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
 
-        double ms = double(timeVal) / (double(testing) * 1000000.0);
-        printf("Bilateral Grid on the GPU time: %g ms\n", ms);
+      //  double ms = double(timeVal) / (double(testing) * 1000000.0);
+      //  printf("Bilateral Grid on the GPU time: %g ms\n", ms);
 
         std::string sign = GenBilString("G", sigma_s, sigma_r);
 
+        /*
         std::string nameTime = FileLister::FileNumber(sign, "txt");
 
         FILE *file = fopen(nameTime.c_str(), "w");
@@ -129,11 +124,11 @@ public:
         if(file != NULL) {
             fprintf(file, "%f", ms);
             fclose(file);
-        }
+        }*/
 
         //Read from the GPU
+        *imgOut /= maxVal;
         imgOut->loadToMemory();
-        imgOut->Mul(maxVal);
         imgOut->Write(nameOut);
 
         return imgOut;
@@ -156,8 +151,8 @@ FilterGLBilateral2DG::FilterGLBilateral2DG(float sigma_s, float sigma_r): Filter
     slicer  = new FilterGLSlicer(s_S, s_R);
 }
 
-ImageRAWGL *FilterGLBilateral2DG::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLBilateral2DG::Process(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgIn[0] == NULL || imgIn.size() > 1) {
         return imgOut;

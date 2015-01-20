@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -26,7 +19,7 @@ See the GNU Lesser General Public License
 #define PIC_UTIL_CONVERT_RAW_TO_IMAGES_HPP
 
 #include "util/string.hpp"
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
@@ -43,7 +36,7 @@ void ConvertRAWtoImages(std::string nameDirectory, std::string format,
     StringVec vec;
     FileLister::List(nameDirectory, "raw", &vec);
 
-    ImageRAW img;
+    Image img;
 
     for(unsigned int i = 0; i < vec.size(); i++) {
         img.ReadRAW(vec[i], "NULL", RAW_U16_RGGB, width, height);
@@ -74,7 +67,7 @@ void ConvertDetect(std::string nameDirectory, std::string format, int width,
     FileLister::List(nameDirectory, "raw", &vec);
 
     RAW<unsigned short> tmp;
-    ImageRAW img;
+    Image img;
 
     for(unsigned int i = 0; i < vec.size(); i++) {
         tmp.Read(vec[i], width * height);

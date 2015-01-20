@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -26,14 +19,14 @@ See the GNU Lesser General Public License
 #define PIC_METRICS_PSNR_HPP
 
 #include <math.h>
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "metrics/base.hpp"
 #include "metrics/mse.hpp"
 
 namespace pic {
 
 /**PSNR: Peak Signal to Noise Ratio for images in [0, 1]*/
-double PSNR(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
+double PSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -53,7 +46,7 @@ double PSNR(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
 }
 
 /**PSNR: relative Peak Signal to Noise Ratio*/
-double rPSNR(ImageRAW *ori, ImageRAW *cmp, bool bLargeDifferences = false)
+double rPSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;

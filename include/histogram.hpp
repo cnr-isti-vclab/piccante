@@ -9,23 +9,16 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_HISTOGRAM_HPP
 #define PIC_HISTOGRAM_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "util/array.hpp"
 
 namespace pic {
@@ -34,7 +27,7 @@ enum VALUE_SPACE {VS_LDR, VS_LIN, VS_LOG_2, VS_LOG_E, VS_LOG_10};
 
 /**
  * @brief The Histogram class is a class for creating,
- * managing, loading, and saving histogram for an ImageRAW.
+ * managing, loading, and saving histogram for an Image.
  */
 class Histogram
 {
@@ -271,7 +264,7 @@ public:
 
         if(bNormalized) {
             for(int i=0; i<nBin; i++) {
-                bin_c[i] /= bin_c[nBin-1];
+                bin_c[i] /= bin_c[nBin - 1];
             }
         }
 
@@ -310,13 +303,13 @@ public:
     }
 
     /**
-     * @brief Write saves the Histogram as an ImageRAW into a file.
+     * @brief Write saves the Histogram as an Image into a file.
      * @param name is the filename where to save the Histogram.
      * @param bNor is a boolean value for normalizing or not the Histogram.
      */
     void Write(std::string name, bool bNor)
     {
-        ImageRAW img(1, nBin, 1, 1);
+        Image img(1, nBin, 1, 1);
 
         if(bNor) {
             getNormalized();

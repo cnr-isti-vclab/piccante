@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -29,6 +22,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLBilateral3DS class
+ */
 class FilterGLBilateral3DS: public FilterGL
 {
 protected:
@@ -38,38 +34,76 @@ protected:
     MRSamplersGL<3> *ms;
 
     //Random numbers tile
-    ImageRAWGL *imageRand;
+    ImageGL *imageRand;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
+
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
 public:
 
-    //Init constructors
+    /**
+     * @brief FilterGLBilateral3DS
+     * @param sigma_s
+     * @param sigma_r
+     * @param sigma_t
+     */
     FilterGLBilateral3DS(float sigma_s, float sigma_r, float sigma_t);
 
-    //Change parameters
+    /**
+     * @brief Update
+     * @param sigma_s
+     * @param sigma_r
+     * @param sigma_t
+     */
     void Update(float sigma_s, float sigma_r, float sigma_t);
+
+    /**
+     * @brief UpdateUniform
+     */
     void UpdateUniform();
 
+    /**
+     * @brief setFrame
+     * @param frame
+     */
     void setFrame(int frame)
     {
         this->frame = frame;
     }
+
+    /**
+     * @brief nextFrame
+     */
     void nextFrame()
     {
         frame++;
     }
+
+    /**
+     * @brief getFrame
+     * @return
+     */
     int  getFrame()
     {
         return frame;
     }
 
-    //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-//Init constructors
 FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
         float sigma_t): FilterGL()
 {
@@ -79,10 +113,10 @@ FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
     this->sigma_t = sigma_t;
 
     int nRand = 32;
-    imageRand = new ImageRAWGL(1, 256, 256, 1, IMG_CPU, GL_TEXTURE_2D);
+    imageRand = new ImageGL(1, 256, 256, 1, IMG_CPU, GL_TEXTURE_2D);
     imageRand->SetRand();
-    imageRand->Mul(float(nRand - 1));
     imageRand->generateTextureGL(false, GL_TEXTURE_2D);
+    *imageRand *= float(nRand - 1);
 
     //Precomputation of the Gaussian Kernel
     int kernelSizeSpace = PrecomputedGaussian::KernelSize(sigma_s);
@@ -175,12 +209,11 @@ void FilterGLBilateral3DS::InitShaders()
     filteringProgram.relink();
 
     sigmas2 = 2.0f * sigma_s * sigma_s;
-    sigmat2 = 2.0f * sigma_t *sigma_t;
+    sigmat2 = 2.0f * sigma_t * sigma_t;
     sigmar2 = 2.0f * sigma_r * sigma_r;
     UpdateUniform();
 }
 
-//Change parameters
 void FilterGLBilateral3DS::Update(float sigma_s, float sigma_r, float sigma_t)
 {
 
@@ -232,9 +265,8 @@ void FilterGLBilateral3DS::UpdateUniform()
     glw::bind_program(0);
 }
 
-//Processing
-ImageRAWGL *FilterGLBilateral3DS::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLBilateral3DS::Process(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -244,7 +276,7 @@ ImageRAWGL *FilterGLBilateral3DS::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(w, h, 1, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(w, h, 1, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {
@@ -252,7 +284,7 @@ ImageRAWGL *FilterGLBilateral3DS::Process(ImageRAWGLVec imgIn,
         fbo->create(w, h, 1, false, imgOut->getTexture());
     }
 
-    ImageRAWGL *base = imgIn[0];
+    ImageGL *base = imgIn[0];
 
     //Rendering
     fbo->bind();

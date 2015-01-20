@@ -9,63 +9,74 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_GET_ALL_EXPOSURES_HPP
-#define PIC_GET_ALL_EXPOSURES_HPP
+#ifndef PIC_TONE_MAPPING_GET_ALL_EXPOSURES_HPP
+#define PIC_TONE_MAPPING_GET_ALL_EXPOSURES_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "histogram.hpp"
 #include "filtering/filter_luminance.hpp"
+#include "filtering/filter_simple_tmo.hpp"
 
 namespace pic {
 
-//This function converts an HDR image into a stack of LDR images
-ImageRAWVec getAllExposures(ImageRAW *imgIn)
-{
-    ImageRAWVec ret;
+/**
+ * @brief getAllExposures converts an HDR image into a stack of exposure values
+ * @param imgIn
+ * @return
+ */
+std::vector<float> getAllExposures(Image *imgIn) {
+    std::vector<float> exposures;
 
     if(imgIn == NULL) {
-        return ret;
+        return exposures;
     }
 
-    if(! imgIn->isValid()) {
-        return ret;
+    if(!imgIn->isValid()) {
+        return exposures;
     }
-        
-    ImageRAW *lum = FilterLuminance::Execute(imgIn, NULL);
+
+    Image *lum = FilterLuminance::Execute(imgIn, NULL);
+
     Histogram m(lum, VS_LOG_2, 1024);
+    exposures = m.ExposureCovering();
 
-    std::vector< float > exposures = m.ExposureCovering();
+    delete lum;
+
+    return exposures;
+}
+
+/**
+ * @brief getAllExposuresImages converts an HDR image into a stack of LDR images
+ * @param imgIn
+ * @return
+ */
+ImageVec getAllExposuresImages(Image *imgIn)
+{
+    ImageVec ret;
+
+    std::vector<float> exposures = getAllExposures(imgIn);
 
     FilterSimpleTMO flt(1.0f, 0.0f);
 
-    ImageRAWVec input = Single(imgIn);
+    ImageVec input = Single(imgIn);
 
     for(unsigned int i = 0; i < exposures.size(); i++) {
         flt.Update(2.2f, exposures[i]);
-        ImageRAW *expo = flt.ProcessP(input, NULL);
+        Image *expo = flt.ProcessP(input, NULL);
 
         ret.push_back(expo);
     }
-
-    delete lum;
 
     return ret;
 }
 
 } // end namespace pic
 
-#endif /* PIC_TONE_MAPPING_WARD_HISTOGRAM_TMO_HPP */
+#endif /* PIC_TONE_MAPPING_GET_ALL_EXPOSURES_HPP */
 

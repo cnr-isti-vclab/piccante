@@ -9,23 +9,19 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
+
+#include <vector>
 
 #include "util/matrix_3_x_3.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/LU"
+    #include "externals/Eigen/LU"
+    #include "externals/Eigen/Geometry"
 #endif
 
 #ifndef PIC_EIGEN_UTIL
@@ -368,6 +364,25 @@ Eigen::MatrixXd getMatrixdFromLinearArray(float *array, int rows, int cols)
 }
 
 /**
+ * @brief getMatrix3dFromLinearArray
+ * @param array
+ * @return
+ */
+Eigen::Matrix3d getMatrix3dFromLinearArray(float *array)
+{
+    Eigen::Matrix3d ret;
+
+    int c = 0;
+    for(int i = 0; i < 3; i++) {
+        for(int j = 0; j < 3; j++) {
+            ret(i, j) = array[c];
+            c++;
+        }
+    }
+    return ret;
+}
+
+/**
  * @brief MatrixConvert
  * @param mat
  * @return
@@ -390,7 +405,44 @@ Eigen::Matrix3f MatrixConvert(Matrix3x3 &mat)
     return mtx;
 }
 
+/**
+ * @brief ComputeNormalizationTransform
+ * @param points
+ * @return
+ */
+Eigen::Vector3f ComputeNormalizationTransform(std::vector< Eigen::Vector2f > &points)
+{
+    Eigen::Vector3f ret;
 
+    if(points.size() < 2) {
+        return ret;
+    }
+
+    ret[0] = 0.0f;
+    ret[1] = 0.0f;
+
+    for(unsigned int i = 0; i < points.size(); i++) {
+        ret[0] += points[i][0];
+        ret[1] += points[i][1];
+    }
+
+    float n = float(points.size());
+    ret[0] /= n;
+    ret[1] /= n;
+
+    ret[2] = 0.0;
+    for(unsigned int i = 0; i < points.size(); i++) {
+
+        float dx = points[i][0] - ret[0];
+        float dy = points[i][1] - ret[1];
+
+        ret[2] += sqrtf(dx * dx + dy * dy);
+    }
+
+    ret[2] = ret[2] / n / sqrtf(2.0f);
+
+    return ret;
+}
 
 #endif
 

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -62,14 +55,6 @@ public:
      * @param bGammaCorrection
      */
     FilterGLSigmoidTMO(float alpha, bool bLocal, bool bGammaCorrection);
-
-    /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
 
     /**
      * @brief Update
@@ -136,13 +121,13 @@ void FilterGLSigmoidTMO::FragmentShader()
 
         size_t processing_found2 = fragment_source.find("__LOCAL__2__");
         fragment_source.replace(processing_found2, 12,
-                                " float Ld  = (Lw*alpha)/(Lwa*alpha+epsilon); ");
+                                " float Ld  = (Lw * alpha)/(Lwa * alpha + epsilon); ");
     } else {
         fragment_source.replace(processing_found1, 12, " ");
 
         size_t processing_found2 = fragment_source.find("__LOCAL__2__");
         fragment_source.replace(processing_found2, 12,
-                                " float Lscale = Lw*alpha;\n float Ld = Lscale/(Lscale+epsilon); ");
+                                " float Lscale = Lw * alpha;\n float Ld = Lscale / (Lscale + epsilon); ");
     }
 
     fragment_source = GammaCorrection(fragment_source, bGammaCorrection);
@@ -178,71 +163,6 @@ void FilterGLSigmoidTMO::Update(float alpha)
     filteringProgram.uniform("alpha", this->alpha);
     filteringProgram.uniform("epsilon", epsilon);
     glw::bind_program(0);
-}
-
-ImageRAWGL *FilterGLSigmoidTMO::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
-{
-    if(imgIn.empty()) {
-        return imgOut;
-    }
-
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, 1, false, imgOut->getTexture());
-
-    ImageRAWGL *ori, *adapt;
-
-    if(imgIn.size() == 2) {
-        ori   = imgIn[0];
-        adapt = imgIn[1];
-    } else {
-        ori   = imgIn[0];
-        adapt = imgIn[0];
-    }
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    glw::bind_program(filteringProgram);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE1);
-    adapt->bindTexture();
-
-    glActiveTexture(GL_TEXTURE0);
-    ori->bindTexture();
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    glw::bind_program(0);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    ori->unBindTexture();
-
-    glActiveTexture(GL_TEXTURE1);
-    adapt->unBindTexture();
-    return imgOut;
 }
 
 } // end namespace pic

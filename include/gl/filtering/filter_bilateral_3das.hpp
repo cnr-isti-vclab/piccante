@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -27,6 +20,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLBilateral3DAS class
+ */
 class FilterGLBilateral3DAS: public FilterGL
 {
 protected:
@@ -35,33 +31,59 @@ protected:
     MRSamplersGL<3> *ms;
 
     //Random numbers tile
-    ImageRAWGL *imageRand;
+    ImageGL *imageRand;
 
     //Sampling map
     FilterGLSamplingMap *fGLsm;
 
-    ImageRAWGL			*imgFrame;
-    ImageRAWGL			*imgTmp;
+    ImageGL			*imgFrame;
+    ImageGL			*imgTmp;
 
     void InitShaders();
     void FragmentShader();
 
 public:
-    //Basic constructors
+
+    /**
+     * @brief FilterGLBilateral3DAS
+     */
     FilterGLBilateral3DAS();
-    ~FilterGLBilateral3DAS();
-    //Init constructors
+
+    /**
+     * @brief FilterGLBilateral3DAS
+     * @param sigma_s
+     * @param sigma_r
+     * @param sigma_t
+     */
     FilterGLBilateral3DAS(float sigma_s, float sigma_r, float sigma_t);
 
-    //Change parameters
+    ~FilterGLBilateral3DAS();
+
+    /**
+     * @brief Update
+     * @param sigma_s
+     * @param sigma_r
+     * @param sigma_t
+     */
     void Update(float sigma_s, float sigma_r, float sigma_t);
+
+    /**
+     * @brief setFrame
+     * @param frame
+     */
     void setFrame(int frame)
     {
         this->frame = frame;
         Update(-1.0f, -1.0f, -1.0f);
     }
-    //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
 //Basic constructor
@@ -96,10 +118,13 @@ FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
     frame = 0;
 
     int nRand = 32;
-    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
-    imageRand->SetRand();
-    imageRand->Mul(float(nRand - 1));
-    imageRand->generateTexture2DU32GL();
+
+    Image tmp_imageRand(1, 128, 128, 1);
+    tmp_imageRand.SetRand();
+    tmp_imageRand *= float(nRand - 1);
+
+    imageRand = new ImageGL(&tmp_imageRand, true);
+    imageRand->generateTextureGL(GL_TEXTURE_2D, GL_INT);
 
     //Precomputation of the Gaussian Kernel
     int kernelSize = PrecomputedGaussian::KernelSize(sigma_s);
@@ -270,8 +295,8 @@ void FilterGLBilateral3DAS::Update(float sigma_s, float sigma_r, float sigma_t)
 }
 
 //Processing
-ImageRAWGL *FilterGLBilateral3DAS::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLBilateral3DAS::Process(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -281,7 +306,7 @@ ImageRAWGL *FilterGLBilateral3DAS::Process(ImageRAWGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {
@@ -293,13 +318,13 @@ ImageRAWGL *FilterGLBilateral3DAS::Process(ImageRAWGLVec imgIn,
         float scale = fGLsm->getScale();
         imgFrame->generateTextureGL(false, GL_TEXTURE_2D);
 
-        imgTmp = new ImageRAWGL(    1,
+        imgTmp = new ImageGL(    1,
                                     int(imgIn[0]->widthf  * scale),
                                     int(imgIn[0]->heightf * scale),
                                     1, IMG_GPU, GL_TEXTURE_2D);
     }
 
-    ImageRAWGL *edge, *base;
+    ImageGL *edge, *base;
 
     if(imgIn.size() == 2) {
         //Joint/Cross Bilateral Filtering

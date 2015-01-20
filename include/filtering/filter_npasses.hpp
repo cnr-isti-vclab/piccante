@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -35,12 +28,12 @@ namespace pic {
 class FilterNPasses: public Filter
 {
 protected:
-    ImageRAW	*imgTmpSame[2];
-    ImageRAWVec imgTmp;
+    Image	*imgTmpSame[2];
+    ImageVec imgTmp;
 
     bool        bSame;
 
-    void CheckSame(ImageRAWVec imgIn);
+    void CheckSame(ImageVec imgIn);
 
 public:
 
@@ -61,7 +54,7 @@ public:
      * @param imgIn
      * @param imgOut
      */
-    virtual void PreProcess(ImageRAWVec imgIn, ImageRAW *imgOut){}
+    virtual void PreProcess(ImageVec imgIn, Image *imgOut){}
 
     /**
      * @brief SetupAuxNGen
@@ -69,7 +62,7 @@ public:
      * @param imgOut
      * @return
      */
-    virtual ImageRAW *SetupAuxNGen(ImageRAWVec imgIn, ImageRAW *imgOut);
+    virtual Image *SetupAuxNGen(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief SetupAuxNSame
@@ -77,7 +70,7 @@ public:
      * @param imgOut
      * @return
      */
-    virtual ImageRAW *SetupAuxNSame(ImageRAWVec imgIn, ImageRAW *imgOut);
+    virtual Image *SetupAuxNSame(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief ProcessGen
@@ -86,7 +79,7 @@ public:
      * @param parallel
      * @return
      */
-    ImageRAW *ProcessGen(ImageRAWVec imgIn, ImageRAW *imgOut, bool parallel);
+    Image *ProcessGen(ImageVec imgIn, Image *imgOut, bool parallel);
 
     /**
      * @brief ProcessSame
@@ -95,7 +88,7 @@ public:
      * @param parallel
      * @return
      */
-    ImageRAW *ProcessSame(ImageRAWVec imgIn, ImageRAW *imgOut, bool parallel);
+    Image *ProcessSame(ImageVec imgIn, Image *imgOut, bool parallel);
 
     /**
      * @brief InsertFilter
@@ -110,7 +103,7 @@ public:
      * @param parallel
      * @return
      */
-    ImageRAW *Process(ImageRAWVec imgIn, ImageRAW *imgOut, bool parallel);
+    Image *Process(ImageVec imgIn, Image *imgOut, bool parallel);
 
     /**
      * @brief ProcessP
@@ -118,7 +111,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAW *ProcessP(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *ProcessP(ImageVec imgIn, Image *imgOut);
 };
 
 PIC_INLINE FilterNPasses::FilterNPasses()
@@ -157,11 +150,11 @@ PIC_INLINE void FilterNPasses::Destroy()
     imgTmp.clear();
 }
 
-PIC_INLINE void FilterNPasses::CheckSame(ImageRAWVec imgIn)
+PIC_INLINE void FilterNPasses::CheckSame(ImageVec imgIn)
 {
     bSame = true;
 
-    ImageRAW *tmp = imgIn[0];
+    Image *tmp = imgIn[0];
 
     for(unsigned int i = 0; i < filters.size(); i++) {
         int width, height, channels, frames; 
@@ -191,8 +184,8 @@ PIC_INLINE void FilterNPasses::InsertFilter(Filter *flt)
     }
 }
 
-PIC_INLINE ImageRAW *FilterNPasses::SetupAuxNGen(ImageRAWVec imgIn,
-        ImageRAW *imgOut)
+PIC_INLINE Image *FilterNPasses::SetupAuxNGen(ImageVec imgIn,
+        Image *imgOut)
 {   
     if(imgTmp.size() == 0 ) {
         for( unsigned int i=0; i<filters.size(); i++) {
@@ -203,8 +196,8 @@ PIC_INLINE ImageRAW *FilterNPasses::SetupAuxNGen(ImageRAWVec imgIn,
     return imgOut;
 }
 
-PIC_INLINE ImageRAW *FilterNPasses::SetupAuxNSame(ImageRAWVec imgIn,
-        ImageRAW *imgOut)
+PIC_INLINE Image *FilterNPasses::SetupAuxNSame(ImageVec imgIn,
+        Image *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->AllocateSimilarOne();
@@ -238,7 +231,7 @@ PIC_INLINE ImageRAW *FilterNPasses::SetupAuxNSame(ImageRAWVec imgIn,
     return imgOut;
 }
 
-PIC_INLINE ImageRAW *FilterNPasses::ProcessGen(ImageRAWVec imgIn, ImageRAW *imgOut,
+PIC_INLINE Image *FilterNPasses::ProcessGen(ImageVec imgIn, Image *imgOut,
         bool parallel = false)
 {
     if((imgIn.size() <= 0) || (filters.size() < 1)) {
@@ -267,7 +260,7 @@ PIC_INLINE ImageRAW *FilterNPasses::ProcessGen(ImageRAWVec imgIn, ImageRAW *imgO
     return imgOut;
 }
 
-PIC_INLINE ImageRAW *FilterNPasses::ProcessSame(ImageRAWVec imgIn, ImageRAW *imgOut,
+PIC_INLINE Image *FilterNPasses::ProcessSame(ImageVec imgIn, Image *imgOut,
         bool parallel = false)
 {
     if((imgIn.size() <= 0) || (filters.size() < 1)) {
@@ -301,8 +294,8 @@ PIC_INLINE ImageRAW *FilterNPasses::ProcessSame(ImageRAWVec imgIn, ImageRAW *img
     return imgOut;
 }
 
-PIC_INLINE ImageRAW *FilterNPasses::Process(ImageRAWVec imgIn, 
-        ImageRAW *imgOut, bool parallel = false)
+PIC_INLINE Image *FilterNPasses::Process(ImageVec imgIn, 
+        Image *imgOut, bool parallel = false)
 {
     PreProcess(imgIn, imgOut);
 
@@ -315,8 +308,8 @@ PIC_INLINE ImageRAW *FilterNPasses::Process(ImageRAWVec imgIn,
     }
 }
  
-PIC_INLINE ImageRAW *FilterNPasses::ProcessP(ImageRAWVec imgIn,
-        ImageRAW *imgOut)
+PIC_INLINE Image *FilterNPasses::ProcessP(ImageVec imgIn,
+        Image *imgOut)
 {
     return Process(imgIn, imgOut, true);
 }

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -28,6 +21,7 @@ See the GNU Lesser General Public License
 #include "colors/saturation.hpp"
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_laplacian.hpp"
+#include "filtering/filter_exposure_fusion_weights.hpp"
 #include "algorithms/pyramid.hpp"
 
 namespace pic {
@@ -35,84 +29,49 @@ namespace pic {
 /**
  * @brief ExposureFusion
  * @param imgIn
- * @param imgOut
  * @param wC
  * @param wE
  * @param wS
+ * @param imgOut
  * @return
  */
-ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
-                         float wE = 1.0f, float wS = 1.0f)
+Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
+                      float wS = 1.0f, Image *imgOut = NULL)
 {
     int n = imgIn.size();
 
     if(n < 2) {
-        return NULL;
+        return imgOut;
     }
 
-    //Compute weights
+    //Computing weights values
     int channels = imgIn[0]->channels;
     int width = imgIn[0]->width;
     int height = imgIn[0]->height;
-    int size = width * height;
 
-    FilterLuminance fltL;
-    FilterLaplacian fltLap;
-
-    ImageRAW *L       = new ImageRAW(1, width, height, 1);
-    ImageRAW *weights = new ImageRAW(n, width, height, 1);
-    ImageRAW *acc     = new ImageRAW(1, width, height, 1);
+    Image *lum     = new Image(1, width, height, 1);
+    Image *weights = new Image(1, width, height, 1);
+    Image *acc     = new Image(1, width, height, 1);
 
     acc->SetZero();
 
-    ImageRAWVec weights_list;
-
-    float mu = 0.5f;
-    float sigma = 0.2f;
-    float sigma2 = 2.0f * sigma * sigma;
+    FilterLuminance flt_lum;
+    FilterExposureFusionWeights flt_weights(wC, wE, wS);
 
     for(int j = 0; j < n; j++) {
         #ifdef PIC_DEBUG
             printf("Processing image %d\n", j);
         #endif
 
-        ImageRAW *curWeight = new ImageRAW(1, width, height, 1,
-                                           &weights->data[size * j]);
+        lum = flt_lum.ProcessP(Single(imgIn[j]), lum);
 
-        weights_list.push_back(curWeight);
+        weights = flt_weights.ProcessP(Double(lum, imgIn[j]), weights);
 
-        fltL.ProcessP(Single(imgIn[j]), L);
-
-        fltLap.ProcessP(Single(L), curWeight);
-
-        float *data = imgIn[j]->data;
-
-        for(int ind = 0; ind < size; ind++) {
-            int i = ind * channels;
-
-            //Contrast
-            float pCon = fabsf(curWeight->data[ind]);
-
-            //Saturation
-            float pSat = computeSaturation(&data[i], channels);
-
-            //Well-exposedness
-            float tmpL = L->data[ind] - mu;
-            float pWE = expf(-(tmpL * tmpL) / sigma2);
-
-            //Final weights
-            curWeight->data[ind] =  powf(pCon, wC) *
-                                    powf(pWE,  wE) *
-                                    powf(pSat, wS);
-        }
-
-        acc->Add(curWeight);
+        *acc += *weights;
     }
 
     for(int i=0; i<acc->size(); i++) {
-        if(acc->data[i] <= 0.0f) {
-            acc->data[i] = 1.0f;
-        }
+        acc->data[i] = acc->data[i] > 0.0f ? acc->data[i] : 1.0f;
     }
 
     //Accumulation Pyramid
@@ -120,19 +79,24 @@ ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
         printf("Blending...");
     #endif
 
-    Pyramid *pW   = new Pyramid(width, height, 1, false, 0);
-    Pyramid *pI   = new Pyramid(width, height, channels, true, 0);
-    Pyramid *pOut = new Pyramid(width, height, channels, true, 0);
-    
+    Pyramid *pW   = new Pyramid(width, height, 1, false);
+    Pyramid *pI   = new Pyramid(width, height, channels, true);
+    Pyramid *pOut = new Pyramid(width, height, channels, true);
+
+    pOut->SetValue(0.0f);
+
     for(int j = 0; j < n; j++) {
+        lum = flt_lum.ProcessP(Single(imgIn[j]), lum);
+        weights = flt_weights.ProcessP(Double(lum, imgIn[j]), weights);
+
         //normalization
-        weights_list[j]->Div(acc);
+        *weights /= *acc;
 
-        pW->Update(weights_list[j]);
-
+        pW->Update(weights);
         pI->Update(imgIn[j]);
 
         pI->Mul(pW);
+
         pOut->Add(pI);
     }
 
@@ -144,19 +108,18 @@ ImageRAW *ExposureFusion(ImageRAWVec imgIn, ImageRAW *imgOut, float wC = 1.0f,
     imgOut = pOut->Reconstruct(imgOut);
 
     #pragma omp parallel for
-
     for(int i = 0; i < imgOut->size(); i++) {
-        if(imgOut->data[i])
-        imgOut->data[i] = imgOut->data[i] > 0.0f ? imgOut->data[i] : 0.0f;
+        imgOut->data[i] = MAX(imgOut->data[i], 0.0f);
     }
 
     //free the memory
     delete pW;
     delete pOut;
     delete pI;
+
     delete acc;
     delete weights;
-    delete L;
+    delete lum;
 
     return imgOut;
 }

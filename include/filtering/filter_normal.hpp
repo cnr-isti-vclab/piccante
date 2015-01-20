@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -43,7 +36,7 @@ protected:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief ProcessBBox
@@ -51,7 +44,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
     /**
@@ -79,7 +72,7 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         width       = imgIn->width;
         height      = imgIn->height;
@@ -107,16 +100,16 @@ void FilterNormal::Update(int colorChannel)
     this->colorChannel = colorChannel;
 }
 
-ImageRAW *FilterNormal::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterNormal::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, 3);
+        imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
     }
 
     return imgOut;
 }
 
-void FilterNormal::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterNormal::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int width    = dst->width;
     int height   = dst->height;

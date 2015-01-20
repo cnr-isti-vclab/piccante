@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -39,7 +32,7 @@ protected:
 
 protected:
     FilterGLConv1D  *filter;
-    ImageRAWGL      *weights;
+    ImageGL      *weights;
     float           *data;
     int             kernelSize;
 
@@ -102,7 +95,7 @@ public:
             delete weights;
         }
 
-        weights = new ImageRAWGL(1, kernelSize, 1, 1, data);
+        weights = new ImageGL(1, kernelSize, 1, 1, data);
         weights->generateTextureGL(false, GL_TEXTURE_2D);
     }
 
@@ -113,7 +106,7 @@ public:
      * @param kernelSize
      * @return
      */
-    static ImageRAWGL *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgOut, int kernelSize)
+    static ImageGL *Execute(ImageGL *imgIn, ImageGL *imgOut, int kernelSize)
     {
         FilterGLMean filter(kernelSize);
         return filter.Process(SingleGL(imgIn), imgOut);
@@ -126,11 +119,11 @@ public:
      * @param kernelSize
      * @return
      */
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, int kernelSize)
+    static Image *Execute(std::string nameIn, std::string nameOut, int kernelSize)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-        ImageRAWGL *imgOut = Execute(&imgIn, NULL, kernelSize);
+        ImageGL *imgOut = Execute(&imgIn, NULL, kernelSize);
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
         return imgOut;

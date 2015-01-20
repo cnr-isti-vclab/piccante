@@ -9,16 +9,18 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
 
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+
+
+
+
+
+
+
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -29,14 +31,22 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterColorDistance class
+ */
 class FilterColorDistance: public Filter
 {
 protected:
     float	*refColor;
     float	sigma;
 
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;
         int channels = src[0]->channels;
@@ -63,10 +73,10 @@ protected:
         }
     }
 
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut == NULL) {
-            imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, 1);
+            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
         }
 
         return imgOut;
@@ -74,26 +84,45 @@ protected:
 
 public:
 
-    //Basic constructors
+    /**
+     * @brief FilterColorDistance
+     * @param color
+     * @param sigma
+     */
     FilterColorDistance(float *color, float sigma)
     {
         refColor    = color;
         this->sigma = sigma;
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float *color,
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param color
+     * @param sigma
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgOut, float *color,
                              float sigma)
     {
         FilterColorDistance fltColDst(color, sigma);
         return fltColDst.ProcessP(Single(imgIn), imgOut);
     }
 
-    //Filtering
-    static ImageRAW *Execute(std::string fileInput, std::string fileOutput,
+    /**
+     * @brief Execute
+     * @param fileInput
+     * @param fileOutput
+     * @param color
+     * @param sigma
+     * @return
+     */
+    static Image *Execute(std::string fileInput, std::string fileOutput,
                              float *color, float sigma)
     {
-        ImageRAW imgIn(fileInput);
-        ImageRAW *out = FilterColorDistance::Execute(&imgIn, NULL, color, sigma);
+        Image imgIn(fileInput);
+        Image *out = FilterColorDistance::Execute(&imgIn, NULL, color, sigma);
         out->Write(fileOutput);
         return out;
     }

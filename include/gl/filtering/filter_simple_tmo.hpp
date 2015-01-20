@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -52,14 +45,14 @@ public:
      * @param fstop
      * @param gamma
      */
-    FilterGLSimpleTMO(float fstop, float gamma);
+    FilterGLSimpleTMO(float gamma, float fstop);
 
     /**
      * @brief Update
      * @param fstop
      * @param gamma
      */
-    void Update(float fstop, float gamma);
+    void Update(float gamma, float fstop);
 
     /**
      * @brief Execute
@@ -69,16 +62,16 @@ public:
      * @param fstop
      * @return
      */
-    ImageRAWGL *Execute(std::string nameIn, std::string nameOut, float gamma,
+    ImageGL *Execute(std::string nameIn, std::string nameOut, float gamma,
                         float fstop)
     {
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLSimpleTMO filter(gamma, fstop);
 
         GLuint testTQ1 = glBeginTimeQuery();
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, 4,
+        ImageGL *imgOut = new ImageGL(1, imgIn.width, imgIn.height, 4,
                                             IMG_GPU_CPU, GL_TEXTURE_2D);
 
         int n = 100;
@@ -106,7 +99,7 @@ FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
     InitShaders();
 }
 
-FilterGLSimpleTMO::FilterGLSimpleTMO(float fstop, float gamma): FilterGL()
+FilterGLSimpleTMO::FilterGLSimpleTMO(float gamma, float fstop): FilterGL()
 {
     //protected values are assigned/computed
     if(gamma <= 0.0f) {
@@ -129,13 +122,11 @@ void FilterGLSimpleTMO::FragmentShader()
                           uniform float	  tn_exposure; \n
                           out     vec4      f_color;	\n
 
-    void main(void) {
-        \n
-        ivec2 coords = ivec2(gl_FragCoord.xy);
-        \n
-        vec3  color = texelFetch(u_tex, coords, 0).xyz;
-        \n
-        f_color = vec4(pow(color * tn_exposure, vec3(tn_gamma)), 1.0);
+    void main(void) { \n
+        ivec2 coords = ivec2(gl_FragCoord.xy); \n
+        vec3  color = texelFetch(u_tex, coords, 0).xyz; \n
+        color = pow(color * tn_exposure, vec3(tn_gamma));
+        f_color = vec4(color, 1.0);
         \n
     }\n
                       );
@@ -143,9 +134,6 @@ void FilterGLSimpleTMO::FragmentShader()
 
 void FilterGLSimpleTMO::InitShaders()
 {
-    float invGamma = 1.0f / gamma;
-    float exposure = powf(2.0f, fstop);
-
     filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
@@ -156,14 +144,12 @@ void FilterGLSimpleTMO::InitShaders()
     filteringProgram.attribute_source("a_position", 0);
     filteringProgram.fragment_target("f_color",    0);
     filteringProgram.relink();
-
-    filteringProgram.uniform("tn_gamma",   invGamma);
-    filteringProgram.uniform("tn_exposure", exposure);
-    filteringProgram.uniform("u_tex",      0);
     glw::bind_program(0);
+
+    Update(gamma, fstop);
 }
 
-void FilterGLSimpleTMO::Update(float fstop, float gamma)
+void FilterGLSimpleTMO::Update(float gamma, float fstop)
 {
     this->gamma = gamma;
     this->fstop = fstop;
@@ -172,8 +158,8 @@ void FilterGLSimpleTMO::Update(float fstop, float gamma)
     float exposure = powf(2.0f, fstop);
 
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform("u_tex",      0);
-    filteringProgram.uniform("tn_gamma",		invGamma);
+    filteringProgram.uniform("u_tex", 0);
+    filteringProgram.uniform("tn_gamma", invGamma);
     filteringProgram.uniform("tn_exposure",	exposure);
     glw::bind_program(0);
 }

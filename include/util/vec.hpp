@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -32,16 +25,26 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The Vec class
+ */
 template<unsigned int N, class T>
 class Vec
 {
 public:
     T data[N];
 
+    /**
+     * @brief Vec<N, T>
+     */
     Vec<N, T>()
     {
     }
 
+    /**
+     * @brief Vec<N, T>
+     * @param data0
+     */
     Vec<N, T>(T data0)
     {
         assert(N >= 1);
@@ -51,6 +54,11 @@ public:
         }
     }
 
+    /**
+     * @brief Vec<N, T>
+     * @param data0
+     * @param data1
+     */
     Vec<N, T>(T data0, T data1)
     {
         assert(N >= 2);
@@ -58,6 +66,12 @@ public:
         data[1] = data1;
     }
 
+    /**
+     * @brief Vec<N, T>
+     * @param data0
+     * @param data1
+     * @param data2
+     */
     Vec<N, T>(T data0, T data1, T data2)
     {
         assert(N >= 3);
@@ -66,11 +80,19 @@ public:
         data[2] = data2;
     }
 
+    /**
+     * @brief operator []
+     * @param index
+     * @return
+     */
     T &operator[](int index)
     {
         return data[index];
     }
 
+    /**
+     * @brief setZero
+     */
     void setZero()
     {
         for(unsigned int i=0; i<N; i++) {
@@ -78,11 +100,21 @@ public:
         }
     }
 
+    /**
+     * @brief operator []
+     * @param index
+     * @return
+     */
     const T &operator[](int index) const
     {
         return data[index];
     }
 
+    /**
+     * @brief equal
+     * @param a
+     * @return
+     */
     bool equal(Vec<N, T> a)
     {
         for(unsigned int i = 0; i < N; i++) {
@@ -94,6 +126,11 @@ public:
         return true;
     }
 
+    /**
+     * @brief distanceSq
+     * @param x
+     * @return
+     */
     T distanceSq(Vec<N, T> &x)
     {
         T tmp = data[0] - x[0];
@@ -107,6 +144,10 @@ public:
         return d2;
     }
 
+    /**
+     * @brief lengthSq
+     * @return
+     */
     T lengthSq()
     {
         T l2 = data[0] * data[0];
@@ -119,11 +160,11 @@ public:
     }
 };
 
-float Randomf()
-{
-    return float(rand() % RAND_MAX) / float(RAND_MAX);
-}
-
+/**
+ * @brief insideVecBBox
+ * @param sample
+ * @return
+ */
 template<unsigned int N>
 bool insideVecBBox(const Vec<N, float> &sample)
 {
@@ -151,6 +192,11 @@ Vec<N, float> normalize(Vec<N, float> x)
     return x;
 }
 
+/**
+ * @brief randomPoint
+ * @param m
+ * @return
+ */
 template<unsigned int N>
 Vec<N, float> randomPoint(std::mt19937 *m)
 {
@@ -163,6 +209,13 @@ Vec<N, float> randomPoint(std::mt19937 *m)
     return x;
 }
 
+/**
+ * @brief annulusSampling
+ * @param m
+ * @param center
+ * @param radius
+ * @return
+ */
 template<unsigned int N>
 Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, float radius)
 {
@@ -186,6 +239,26 @@ Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, float radiu
 
     return x;
 }
+
+/**
+ * @brief Vec2i
+ */
+typedef Vec<2, int> Vec2i;
+
+/**
+ * @brief Vec3i
+ */
+typedef Vec<3, int> Vec3i;
+
+/**
+ * @brief Vec4i
+ */
+typedef Vec<4, int> Vec4i;
+
+/**
+ * @brief Vec3f
+ */
+typedef Vec<3, float> Vec3f;
 
 } // end namespace pic
 

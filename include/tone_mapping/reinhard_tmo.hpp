@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -33,16 +26,33 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief Sigmoid
+ * @param x
+ * @return
+ */
 inline float Sigmoid(float x)
 {
     return x / (x + 1.0f);
 }
 
+/**
+ * @brief SigmoidInv
+ * @param x
+ * @return
+ */
 inline float SigmoidInv(float x)
 {
     return x / (1.0f - x);
 }
 
+/**
+ * @brief EstimateAlpha
+ * @param LMax
+ * @param LMin
+ * @param logAverage
+ * @return
+ */
 inline float EstimateAlpha(float LMax, float LMin, float logAverage)
 {
 
@@ -56,6 +66,12 @@ inline float EstimateAlpha(float LMax, float LMin, float logAverage)
     return 0.18f * powf(4.0f, tmp);
 }
 
+/**
+ * @brief EstimateWhitePoint
+ * @param LMax
+ * @param LMin
+ * @return
+ */
 inline float EstimateWhitePoint(float LMax, float LMin)
 {
 
@@ -66,7 +82,16 @@ inline float EstimateWhitePoint(float LMax, float LMin)
     return 1.5f * powf(2.0f, (log2Max - log2Min - 5.0f));
 }
 
-ImageRAW *ReinhardTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL, float alpha = -1.0f,
+/**
+ * @brief ReinhardTMO
+ * @param imgIn
+ * @param imgOut
+ * @param alpha
+ * @param whitePoint
+ * @param phi
+ * @return
+ */
+Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = 0.18f,
                       float whitePoint = -1.0f, float phi = 8.0f)
 {
     if(imgIn == NULL) {
@@ -78,7 +103,7 @@ ImageRAW *ReinhardTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL, float alpha = -1
     }
 
     //luminance image
-    ImageRAW *lum = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);
+    Image *lum = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);
 
     float LMax = lum->getMaxVal()[0];
     float LMin = lum->getMinVal()[0];
@@ -100,7 +125,7 @@ ImageRAW *ReinhardTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL, float alpha = -1
 
     float sigma_r = powf(2.0f, phi) * alpha / (s_max * s_max);
 
-    ImageRAW *filteredLum = FilterBilateral2DS::Execute(lum, NULL, sigma_s,
+    Image *filteredLum = FilterBilateral2DS::Execute(lum, NULL, sigma_s,
                             sigma_r);
 
     lum->ApplyFunction(&SigmoidInv);
@@ -109,10 +134,12 @@ ImageRAW *ReinhardTMO(ImageRAW *imgIn, ImageRAW *imgOut = NULL, float alpha = -1
 
     //Applying a sigmoid filter
     FilterSigmoidTMO fSTMO(SIG_TMO, alpha, whitePoint, LogAverage);
-    ImageRAW *tonemapped = fSTMO.Process(Double(lum, filteredLum), NULL);
+    Image *tonemapped = fSTMO.Process(Double(lum, filteredLum), NULL);
 
     //Removing HDR luminance and replacing it with LDR one
-    imgOut->changeLum(lum, tonemapped);
+    *imgOut /= *lum;
+    *imgOut *= *tonemapped;
+
     imgOut->removeSpecials();
 
     //Freeing memory

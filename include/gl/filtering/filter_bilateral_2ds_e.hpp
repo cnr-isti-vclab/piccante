@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -32,6 +25,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGLBilateral2DSE class
+ */
 class FilterGLBilateral2DSE: public FilterGL
 {
 protected:
@@ -39,9 +35,16 @@ protected:
     MRSamplersGL<2> *ms;
 
     //Random numbers tile
-    ImageRAWGL *imageRand;
+    ImageGL *imageRand;
 
+    /**
+     * @brief InitShaders
+     */
     void InitShaders();
+
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
 public:
@@ -71,7 +74,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief main
@@ -101,7 +104,7 @@ public:
      * @param testing
      * @return
      */
-    static ImageRAWGL *Execute( std::string nameIn, 
+    static ImageGL *Execute( std::string nameIn, 
                                 float sigma_s, float sigma_p, float sigma_n, float sigma_a, int testing = 1)
     {
 
@@ -115,19 +118,19 @@ public:
         std::string nameAlb = name +"_alb." + ext;
 
 
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
-        ImageRAWGL imgPos(namePos);
+        ImageGL imgPos(namePos);
         imgPos.generateTextureGL(false, GL_TEXTURE_2D);
 
-        ImageRAWGL imgNor(nameNor);
+        ImageGL imgNor(nameNor);
         imgNor.generateTextureGL(false, GL_TEXTURE_2D);
 
-        ImageRAWGL imgAlb(nameAlb);
+        ImageGL imgAlb(nameAlb);
         imgAlb.generateTextureGL(false, GL_TEXTURE_2D);
 
-        ImageRAWGLVec vec;
+        ImageGLVec vec;
         vec.push_back(&imgIn);
         vec.push_back(&imgPos);
         vec.push_back(&imgNor);
@@ -136,7 +139,7 @@ public:
         FilterGLBilateral2DSE *filter = new FilterGLBilateral2DSE(sigma_s, sigma_p,
                     sigma_n, sigma_a);
 
-        ImageRAWGL *imgOut = new ImageRAWGL(1, imgIn.width, imgIn.height, imgIn.channels,
+        ImageGL *imgOut = new ImageGL(1, imgIn.width, imgIn.height, imgIn.channels,
                                             IMG_GPU_CPU, GL_TEXTURE_2D);
 
         GLuint testTQ1;
@@ -183,10 +186,13 @@ FilterGLBilateral2DSE::FilterGLBilateral2DSE(float sigma_s, float sigma_p, float
     int nRand = 32;
     int nSamplers;
 
-    imageRand = new ImageRAWGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
-    imageRand->SetRand();
-    imageRand->Mul(float(nRand - 1));
-    imageRand->generateTexture2DU32GL();
+    Image tmp_imageRand(1, 128, 128, 1);
+    tmp_imageRand.SetRand();
+    tmp_imageRand *= float(nRand - 1);
+
+    imageRand = new ImageGL(&tmp_imageRand, true);
+    imageRand->generateTextureGL(GL_TEXTURE_2D, GL_INT);
+
     nSamplers = nRand;
 
     //Poisson samples
@@ -219,7 +225,7 @@ void FilterGLBilateral2DSE::FragmentShader()
     uniform sampler2D	u_edge_alb;
     uniform isampler2D	u_poisson;
     uniform sampler2D	u_rand;
-    uniform int			TOKEN_BANANA;
+    uniform int			nSamples;
     uniform float		sigma_s2;
     uniform float		sigma_pos2;
     uniform float		sigma_nor2;
@@ -238,7 +244,7 @@ void FilterGLBilateral2DSE::FragmentShader()
         float weight = 0.0;
         float shifter = texture2D(u_rand, gl_FragCoord.xy, 0).x;
 
-        for(int i = 0; i < TOKEN_BANANA; i++) {
+        for(int i = 0; i < nSamples; i++) {
             //Coordinates
             ivec3 coords = texelFetch(u_poisson, ivec2(i, shifter), 0).xyz;
             //pos difference
@@ -341,13 +347,13 @@ void FilterGLBilateral2DSE::Update(float sigma_s, float sigma_p, float sigma_n, 
     filteringProgram.uniform("sigma_pos2",	    sigmap2);
     filteringProgram.uniform("sigma_nor2",	    sigman2);
     filteringProgram.uniform("sigma_alb2",	    sigmaa2);
-    filteringProgram.uniform("TOKEN_BANANA",    ms->nSamples / 2);
+    filteringProgram.uniform("nSamples",        ms->nSamples >> 1);
     glw::bind_program(0);
 }
 
 //Processing
-ImageRAWGL *FilterGLBilateral2DSE::Process(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLBilateral2DSE::Process(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return imgOut;
@@ -358,7 +364,7 @@ ImageRAWGL *FilterGLBilateral2DSE::Process(ImageRAWGLVec imgIn,
 
     //TODO: check if other have height and frames swapped
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {
@@ -367,10 +373,10 @@ ImageRAWGL *FilterGLBilateral2DSE::Process(ImageRAWGLVec imgIn,
 
     fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
 
-    ImageRAWGL *base     = imgIn[0];
-    ImageRAWGL *edge_pos = imgIn[1];
-    ImageRAWGL *edge_nor = imgIn[2];
-    ImageRAWGL *edge_alb = imgIn[3];
+    ImageGL *base     = imgIn[0];
+    ImageGL *edge_pos = imgIn[1];
+    ImageGL *edge_nor = imgIn[2];
+    ImageGL *edge_alb = imgIn[3];
 
     //Rendering
     fbo->bind();

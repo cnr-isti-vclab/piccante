@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -54,7 +47,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     /**
      * @brief SetupAux
@@ -62,7 +55,7 @@ protected:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief SetDirection
@@ -117,7 +110,7 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(swh) {
             float scaleX = (dirs[X_DIRECTION] == 1) ? scale : 1.0f;
@@ -143,7 +136,7 @@ public:
      * @param isb
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float scale,
+    static Image *Execute(Image *imgIn, Image *imgOut, float scale,
                              int direction, ImageSampler *isb)
     {
         FilterSampler1D filter(scale, direction, isb);
@@ -203,15 +196,15 @@ PIC_INLINE void FilterSampler1D::SetImageSampler(ImageSampler *isb)
     }
 }
 
-PIC_INLINE ImageRAW *FilterSampler1D::SetupAux(ImageRAWVec imgIn,
-        ImageRAW *imgOut)
+PIC_INLINE Image *FilterSampler1D::SetupAux(ImageVec imgIn,
+        Image *imgOut)
 {
     if(imgOut == NULL) {
         if(swh) {
             float scaleX = (dirs[X_DIRECTION] == 1) ? scale : 1.0f;
             float scaleY = (dirs[Y_DIRECTION] == 1) ? scale : 1.0f;
 
-            imgOut = new ImageRAW(  imgIn[0]->frames,
+            imgOut = new Image(  imgIn[0]->frames,
                                     int(imgIn[0]->widthf  * scaleX),
                                     int(imgIn[0]->heightf * scaleY),
                                     imgIn[0]->channels);
@@ -219,17 +212,17 @@ PIC_INLINE ImageRAW *FilterSampler1D::SetupAux(ImageRAWVec imgIn,
             int nWidth  = (dirs[X_DIRECTION] == 1) ? size : imgIn[0]->width;
             int nHeight = (dirs[Y_DIRECTION] == 1) ? size : imgIn[0]->height;
 
-            imgOut = new ImageRAW(imgIn[0]->frames, nWidth, nHeight, imgIn[0]->channels);
+            imgOut = new Image(imgIn[0]->frames, nWidth, nHeight, imgIn[0]->channels);
         }
     }
 
     return imgOut;
 }
 
-PIC_INLINE void FilterSampler1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
+PIC_INLINE void FilterSampler1D::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
-    ImageRAW *source = src[0];
+    Image *source = src[0];
 
     float width1f  = float(box->width  - 1);
     float height1f = float(box->height - 1);

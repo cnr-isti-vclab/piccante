@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -48,23 +41,38 @@ protected:
     void InitShaders();
 
 public:
-    //Basic constructor
+
+    /**
+     * @brief FilterGLDisp
+     */
     FilterGLDisp();
 
-    //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
-
-    //Update
+    /**
+     * @brief Update
+     * @param sigma
+     * @param sigma_s
+     * @param sigma_r
+     * @param bUse
+     * @param bLeft
+     */
     void Update(float sigma, float sigma_s, float sigma_r, bool bUse, bool bLeft);
 
-    static ImageRAWGL *Execute(std::string nameLeft,
+    /**
+     * @brief Execute
+     * @param nameLeft
+     * @param nameRight
+     * @param nameDisp
+     * @param nameOut
+     * @return
+     */
+    static ImageGL *Execute(std::string nameLeft,
                                std::string nameRight,
                                std::string nameDisp,
                                std::string nameOut)
     {
-        ImageRAWGL imgL(nameLeft);
-        ImageRAWGL imgR(nameRight);
-        ImageRAWGL imgD(nameDisp);
+        ImageGL imgL(nameLeft);
+        ImageGL imgR(nameRight);
+        ImageGL imgD(nameDisp);
 
         imgL.generateTextureGL(false, GL_TEXTURE_2D);
         imgR.generateTextureGL(false, GL_TEXTURE_2D);
@@ -72,7 +80,7 @@ public:
 
         FilterGLDisp filter;
 
-        ImageRAWGL *imgOut = filter.Process(TripleGL(&imgL, &imgR, &imgD), NULL);
+        ImageGL *imgOut = filter.Process(TripleGL(&imgL, &imgR, &imgD), NULL);
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
         return imgOut;
@@ -205,7 +213,6 @@ void FilterGLDisp::InitShaders()
     glw::bind_program(0);
 }
 
-//Update
 void FilterGLDisp::Update(float sigma, float sigma_s, float sigma_r, bool bUse,
                           bool bLeft)
 {
@@ -240,69 +247,6 @@ void FilterGLDisp::Update(float sigma, float sigma_s, float sigma_r, bool bUse,
     filteringProgram.uniform("sigma",		sigma * sigma * 2.0f);
     filteringProgram.uniform("halfKernelSize", halfKernelSize);
     glw::bind_program(0);
-}
-
-//Processing
-ImageRAWGL *FilterGLDisp::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    if(imgIn[0]->channels != 3) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, 1, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    glw::bind_program(filteringProgram);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, imgIn[2]->getTexture());
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, imgIn[1]->getTexture());
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    glw::bind_program(0);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

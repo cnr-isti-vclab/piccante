@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -49,7 +42,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int channels = src[0]->channels;
 
@@ -96,7 +89,7 @@ protected:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+    Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut != NULL) {
             return imgOut;
@@ -104,7 +97,7 @@ protected:
 
         if(!bSameSize) {
             ComputingBoundingBox(h, imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax, bCentroid);
-            imgOut = new ImageRAW(1, bmax[0] - bmin[0], bmax[1] - bmin[1], imgIn[0]->channels);
+            imgOut = new Image(1, bmax[0] - bmin[0], bmax[1] - bmin[1], imgIn[0]->channels);
         } else {
             bmin[0] = 0;
             bmin[1] = 0;
@@ -112,7 +105,7 @@ protected:
             bmax[0] = imgIn[0]->width;
             bmax[1] = imgIn[0]->height;
 
-            imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, imgIn[0]->channels);
+            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, imgIn[0]->channels);
         }
 
         return imgOut;
@@ -241,7 +234,7 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(!bSameSize) {
             ComputingBoundingBox(h, imgIn->widthf, imgIn->heightf, bmin, bmax, bCentroid);
@@ -257,7 +250,7 @@ public:
         channels = imgIn->channels;
     }
 
-    static ImageRAW *Execute(ImageRAW *img, ImageRAW *imgOut, Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
+    static Image *Execute(Image *img, Image *imgOut, Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
     {
         FilterWarp2D flt(h, bSameSize, bCentroid);
         imgOut = flt.ProcessP(Single(img), imgOut);

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -27,7 +20,7 @@ See the GNU Lesser General Public License
 
 #include "util/vec.hpp"
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_luminance.hpp"
 
 #include "features_matching/general_corner_detector.hpp"
@@ -39,16 +32,22 @@ namespace pic {
 
 #ifndef PIC_DISABLE_EIGEN
 
+/**
+ * @brief The SusanCornerDetector class
+ */
 class SusanCornerDetector: public GeneralCornerDetector
 {
 protected:
-    ImageRAW *lum_flt;
+    Image *lum_flt;
     bool      bComputeThreshold;
 
     float     sigma, threshold;
     int       radius, radius_maxima;
 
 public:
+    /**
+     * @brief SusanCornerDetector
+     */
     SusanCornerDetector() : GeneralCornerDetector()
     {
         lum_flt = NULL;
@@ -68,6 +67,13 @@ public:
         }
     }
 
+    /**
+     * @brief Update
+     * @param sigma
+     * @param radius_maxima
+     * @param radius
+     * @param threshold
+     */
     void Update(float sigma = 1.0f, int radius_maxima = 5, int radius = 3, float threshold = 0.001f)
     {
         if(sigma > 0.0f) {
@@ -95,7 +101,12 @@ public:
         }
     }
 
-    void Compute(ImageRAW *img, std::vector< Eigen::Vector3f > *corners)
+    /**
+     * @brief Compute
+     * @param img
+     * @param corners
+     */
+    void Compute(Image *img, std::vector< Eigen::Vector3f > *corners)
     {
         if(img == NULL) {
             return;
@@ -147,7 +158,7 @@ public:
 
         float g = C * 0.5f; //Geometric constant for determing corners
 
-        ImageRAW R(1,width, height, 1);
+        Image R(1,width, height, 1);
         R.SetZero();
         for(int i=radius; i<(height - radius - 1); i++) {
             for(int j=radius; j<(width - radius - 1); j++) {

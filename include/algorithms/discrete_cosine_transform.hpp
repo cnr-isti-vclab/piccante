@@ -9,23 +9,16 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_ALGORITHMS_DISCRETE_COSINE_TRANSFORM_HPP
 #define PIC_ALGORITHMS_DISCRETE_COSINE_TRANSFORM_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "util/tile_list.hpp"
 
 namespace pic {
@@ -46,13 +39,13 @@ public:
     }
 
     /**
-     * @brief Transform
-     * @param imgIn
-     * @param imgOut
-     * @param size
+     * @brief Transform computes the forward DCT transformation.
+     * @param imgIn is an input image.
+     * @param imgOut is an output image; i.e. imgIn in the DCT domain.
+     * @param size is the size of blocks (size * size) for computing the DCT.
      * @return
      */
-    static ImageRAW *Transform(ImageRAW *imgIn, ImageRAW *imgOut, int size = 8)
+    static Image *Transform(Image *imgIn, Image *imgOut, int size = 8)
     {
         if(imgIn == NULL) {
             return imgOut;
@@ -132,13 +125,13 @@ public:
     }
 
     /**
-     * @brief Inverse
-     * @param imgIn
-     * @param imgOut
-     * @param size
+     * @brief Inverse computes the inverse DCT transformation.
+     * @param imgIn is an input image in the DCT domain.
+     * @param imgOut is an output image; i.e. imgIn in spatial domain.
+     * @param size is the size of blocks (size * size) for computing the DCT.
      * @return
      */
-    static ImageRAW *Inverse(ImageRAW *imgIn, ImageRAW *imgOut, int size = 8)
+    static Image *Inverse(Image *imgIn, Image *imgOut, int size = 8)
     {
         if(imgIn == NULL) {
             return imgOut;

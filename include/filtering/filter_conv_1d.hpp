@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -30,6 +23,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterConv1D class
+ */
 class FilterConv1D: public Filter
 {
 protected:
@@ -43,7 +39,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
 
@@ -94,7 +90,7 @@ public:
      * @param XorY
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float *data, int n,
+    static Image *Execute(Image *imgIn, Image *imgOut, float *data, int n,
                              bool XorY = true)
     {
         FilterConv1D filter(data, n, 0);
@@ -203,16 +199,18 @@ void FilterConv1D::ChangePass(int x, int y, int z)
     dirs[2] = z;
 }
 
-void FilterConv1D::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterConv1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 
-    ImageRAW *source = src[0];
+    Image *source = src[0];
 
     int halfKernelSize = n >> 1;
 
     for(int m = box->z0; m < box->z1; m++) {
+
         for(int j = box->y0; j < box->y1; j++) {
+
             for(int i = box->x0; i < box->x1; i++) {
                 float *tmpDst = (*dst)(i, j, m);
 

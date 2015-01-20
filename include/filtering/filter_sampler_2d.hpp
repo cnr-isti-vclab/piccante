@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -33,6 +26,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterSampler2D class
+ */
 class FilterSampler2D: public Filter
 {
 protected:
@@ -41,21 +37,55 @@ protected:
     int				width, height;
     bool			swh;
 
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    //SetupAux
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterSampler2D
+     * @param scale
+     * @param isb
+     */
     FilterSampler2D(float scale, ImageSampler *isb);
+
+    /**
+     * @brief FilterSampler2D
+     * @param scaleX
+     * @param scaleY
+     * @param isb
+     */
     FilterSampler2D(float scaleX, float scaleY, ImageSampler *isb);
 
+    /**
+     * @brief FilterSampler2D
+     * @param width
+     * @param height
+     * @param isb
+     */
     FilterSampler2D(int width, int height, ImageSampler *isb);
 
-    /**Output size*/
-    void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(swh) {
             width       = int(imgIn->widthf  * scaleX);
@@ -69,32 +99,65 @@ public:
         frames      = imgIn->frames;
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float scale,
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param scale
+     * @param isb
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgOut, float scale,
                              ImageSampler *isb)
     {
         FilterSampler2D filter(scale, isb);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float scaleX,
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param scaleX
+     * @param scaleY
+     * @param isb
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgOut, float scaleX,
                              float scaleY, ImageSampler *isb)
     {
         FilterSampler2D filter(scaleX, scaleY, isb);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, int width,
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param width
+     * @param height
+     * @param isb
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgOut, int width,
                              int height, ImageSampler *isb)
     {
         FilterSampler2D filter(width, height, isb);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param scale
+     * @param isb
+     */
     static void Execute(std::string nameIn, std::string nameOut, float scale,
                         ImageSampler *isb)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, scale, isb);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL, scale, isb);
         imgOut->Write(nameOut);
     }
 };
@@ -145,38 +208,45 @@ PIC_INLINE FilterSampler2D::FilterSampler2D(int width, int height,
     }
 }
 
-PIC_INLINE ImageRAW *FilterSampler2D::SetupAux(ImageRAWVec imgIn,
-        ImageRAW *imgOut)
+PIC_INLINE Image *FilterSampler2D::SetupAux(ImageVec imgIn,
+        Image *imgOut)
 {
     if(imgOut == NULL) {
         if(swh) {
-            imgOut = new ImageRAW(  imgIn[0]->frames, 
-                                    int(imgIn[0]->widthf  * scaleX),
-                                    int(imgIn[0]->heightf * scaleY),
-                                    imgIn[0]->channels);
+            imgOut = new Image(  imgIn[0]->frames, 
+                                 int(imgIn[0]->widthf  * scaleX),
+                                 int(imgIn[0]->heightf * scaleY),
+                                 imgIn[0]->channels);
         } else {
-            imgOut = new ImageRAW(imgIn[0]->frames, width, height, imgIn[0]->channels);
+            imgOut = new Image(imgIn[0]->frames, width, height, imgIn[0]->channels);
         }
+    }
+
+    if(!swh) {
+        scaleX = float(width)  / imgIn[0]->widthf;
+        scaleY = float(height) / imgIn[0]->heightf;
     }
 
     return imgOut;
 }
 
-PIC_INLINE void FilterSampler2D::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
+PIC_INLINE void FilterSampler2D::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
-    ImageRAW *source = src[0];
+    Image *source = src[0];
 
-    float width1f  = float(box->width  - 1);
-    float height1f = float(box->height - 1);
+    float inv_height1f = 1.0f / float(box->height - 1);
+    float inv_width1f = 1.0f / float(box->width - 1);
 
     for(int j = box->y0; j < box->y1; j++) {
-        float y = float(j) / height1f;
+        float y = float(j) * inv_height1f;
 
         for(int i = box->x0; i < box->x1; i++) {
-            float x = float(i) / width1f;
+
+            float x = float(i) * inv_width1f;
 
             float *tmp_dst = (*dst)(i, j);
+
             isb->SampleImage(source, x, y, tmp_dst);
         }
     }

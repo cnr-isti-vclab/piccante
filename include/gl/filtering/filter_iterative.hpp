@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -35,7 +28,7 @@ namespace pic {
 class FilterGLIterative: public FilterGL
 {
 protected:
-    ImageRAWGL *imgTmp[2];
+    ImageGL *imgTmp[2];
     int			iterations;
 
     void InitShaders() {}
@@ -61,7 +54,7 @@ public:
      * @param imgOut
      * @return
      */
-    virtual ImageRAWGL *SetupAuxN(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    virtual ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief Update
@@ -79,7 +72,13 @@ public:
         return filters.back()->getFbo();
     }
 
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
 FilterGLIterative::FilterGLIterative(): FilterGL()
@@ -114,8 +113,8 @@ void FilterGLIterative::Update(FilterGL *flt, int iterations)
     filters.push_back(flt);
 }
 
-ImageRAWGL *FilterGLIterative::SetupAuxN(ImageRAWGLVec imgIn,
-        ImageRAWGL *imgOut)
+ImageGL *FilterGLIterative::SetupAuxN(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->AllocateSimilarOneGL();
@@ -145,7 +144,7 @@ ImageRAWGL *FilterGLIterative::SetupAuxN(ImageRAWGLVec imgIn,
     return imgOut;
 }
 
-ImageRAWGL *FilterGLIterative::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLIterative::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.size() < 1 || imgIn[0] == NULL) {
         return imgOut;

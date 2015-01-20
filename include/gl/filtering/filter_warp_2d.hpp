@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -72,7 +65,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
 FilterGLWarp2D::FilterGLWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false) : FilterGL()
@@ -135,7 +128,7 @@ void FilterGLWarp2D::InitShaders()
     glw::bind_program(0);
 }
 
-ImageRAWGL *FilterGLWarp2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLWarp2D::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.empty()) {
         return imgOut;
@@ -152,7 +145,7 @@ ImageRAWGL *FilterGLWarp2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     if(imgOut == NULL) {
         if(!bSameSize) {
             FilterWarp2D::ComputingBoundingBox(h, imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax, bCentroid);
-            imgOut = new ImageRAWGL(1, bmax[0] - bmin[0], bmax[1] - bmin[1], channels, IMG_GPU, GL_TEXTURE_2D);
+            imgOut = new ImageGL(1, bmax[0] - bmin[0], bmax[1] - bmin[1], channels, IMG_GPU, GL_TEXTURE_2D);
         } else {
             bmin[0] = 0;
             bmin[1] = 0;
@@ -160,7 +153,7 @@ ImageRAWGL *FilterGLWarp2D::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
             bmax[0] = imgIn[0]->width;
             bmax[1] = imgIn[0]->height;
 
-            imgOut = new ImageRAWGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
+            imgOut = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
         }
     }
 

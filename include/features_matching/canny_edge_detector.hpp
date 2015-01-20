@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -27,7 +20,7 @@ See the GNU Lesser General Public License
 
 #include "util/vec.hpp"
 
-#include "image_raw.hpp"
+#include "image.hpp"
 
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_gaussian_2d.hpp"
@@ -35,15 +28,22 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The CannyEdgeDetector class
+ */
 class CannyEdgeDetector
 {
 protected:
-    bool     bLum;
-    ImageRAW *lum;
+    bool  bLum;
+    Image *lum;
 
     float    sigma, threshold_1, threshold_2;
 
-    void Destroy() {
+    /**
+     * @brief Destroy frees allocated memory for this class.
+     */
+    void Destroy()
+    {
         if(bLum && lum != NULL) {
             delete lum;
             lum = NULL;
@@ -53,6 +53,9 @@ protected:
     }
 
 public:
+    /**
+     * @brief CannyEdgeDetector
+     */
     CannyEdgeDetector()
     {
         lum = NULL;
@@ -66,8 +69,12 @@ public:
         Destroy();
     }
 
-
-
+    /**
+     * @brief Update
+     * @param sigma
+     * @param threshold_1
+     * @param threshold_2
+     */
     void Update(float sigma = 1.4f, float threshold_1 = 0.05f, float threshold_2 = 0.3f)
     {
         if(sigma > 0.0f) {
@@ -95,7 +102,13 @@ public:
         }
     }
 
-    ImageRAW *Compute(ImageRAW *img, ImageRAW *imgEdges)
+    /**
+     * @brief Compute computes Canny edge detector on img and ouputs imgEdges as results.
+     * @param img
+     * @param imgEdges
+     * @return
+     */
+    Image *Compute(Image *img, Image *imgEdges)
     {
         if(img == NULL) {
             return imgEdges;
@@ -111,10 +124,10 @@ public:
 
         //Filtering the image
         FilterGaussian2D flt(sigma);
-        ImageRAW *lum_flt = flt.ProcessP(Single(lum), NULL);
+        Image *lum_flt = flt.ProcessP(Single(lum), NULL);
 
         FilterGradient fltGrad(0, G_SOBEL);
-        ImageRAW *grad = fltGrad.ProcessP(Single(lum_flt), NULL);
+        Image *grad = fltGrad.ProcessP(Single(lum_flt), NULL);
 
         //non-maximum suppression
         if(imgEdges == NULL) {

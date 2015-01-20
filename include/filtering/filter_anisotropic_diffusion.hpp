@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -30,20 +23,42 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterAnsiotropicDiffusion class
+ */
 class FilterAnsiotropicDiffusion: public Filter
 {
 protected:
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     float			k, delta_t;
     unsigned int	mode;
 
 public:
-    //Basic constructor
+
+    /**
+     * @brief FilterAnsiotropicDiffusion
+     * @param k
+     * @param mode
+     */
     FilterAnsiotropicDiffusion(float k, unsigned int mode);
 
-    static ImageRAW *AnisotropicDiffusion(ImageRAWVec imgIn, ImageRAW *imgOut,
+    /**
+     * @brief AnisotropicDiffusion
+     * @param imgIn
+     * @param imgOut
+     * @param k
+     * @param mode
+     * @param iterations
+     * @return
+     */
+    static Image *AnisotropicDiffusion(ImageVec imgIn, Image *imgOut,
                                           float k, unsigned int mode, unsigned int iterations)
     {
         FilterAnsiotropicDiffusion ansio_flt(k, mode);
@@ -52,7 +67,15 @@ public:
         return imgOut;
     }
 
-    static ImageRAW *AnisotropicDiffusion(ImageRAWVec imgIn, ImageRAW *imgOut,
+    /**
+     * @brief AnisotropicDiffusion
+     * @param imgIn
+     * @param imgOut
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
+    static Image *AnisotropicDiffusion(ImageVec imgIn, Image *imgOut,
                                           float sigma_s, float sigma_r)
     {
 
@@ -74,7 +97,6 @@ public:
 
 };
 
-//Basic constructor
 FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
         unsigned int mode)
 {
@@ -92,12 +114,11 @@ FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
     this->mode = mode;
 }
 
-//Process in a box
-void FilterAnsiotropicDiffusion::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
+void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
     //Filtering
-    ImageRAW *img = src[0];
+    Image *img = src[0];
     int channels = img->channels;
 
     float *gN = new float [channels];

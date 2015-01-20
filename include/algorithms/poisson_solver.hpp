@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -30,7 +23,7 @@ See the GNU Lesser General Public License
 #include "externals/Eigen/Sparse"
 #include "externals/Eigen/src/SparseCore/SparseMatrix.h"
 
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
@@ -40,18 +33,20 @@ namespace pic {
  * @param ret
  * @return
  */
-ImageRAW *PoissonSolver(ImageRAW *f, ImageRAW *ret)
+Image *PoissonSolver(Image *f, Image *ret = NULL)
 {
     if(f == NULL) {
         return NULL;
     }
 
+    //Allocating the output
+    if(ret == NULL) {
+        ret = f->AllocateSimilarOne();
+    }
+
     int width = f->width;
     int height = f->height;
     int tot = height * width;
-
-    Eigen::VectorXd b, x;
-    b = Eigen::VectorXd::Zero(tot);
 
     #ifdef PIC_DEBUG
         printf("Init matrix...");
@@ -64,7 +59,6 @@ ImageRAW *PoissonSolver(ImageRAW *f, ImageRAW *ret)
 
         for(int j = 0; j < width; j++) {
             int indI = tmpI + j;
-            b[indI] = -f->data[indI];
 
             tL.push_back(Eigen::Triplet< double > (indI, indI, 4.0f));
 
@@ -86,34 +80,45 @@ ImageRAW *PoissonSolver(ImageRAW *f, ImageRAW *ret)
         printf("Ok\n");
     #endif
 
-    //Solving the linear system
+    //Solving the system for each color channel
     Eigen::SparseMatrix<double> A = Eigen::SparseMatrix<double>(tot, tot);
     A.setFromTriplets(tL.begin(), tL.end());
-
     Eigen::SimplicialCholesky<Eigen::SparseMatrix<double> > solver(A);
-    x = solver.solve(b);
 
-    if(solver.info() != Eigen::Success) {
+    for(int k=0; k< f->channels; k++) {
+
+        Eigen::VectorXd b, x;
+        b = Eigen::VectorXd::Zero(tot);
+
+        //copying values from f to b
+        for(int i = 0; i < height; i++) {
+            int tmpI = i * width;
+            for(int j = 0; j < width; j++) {
+                int indI = (tmpI + j);
+                b[indI] = - f->data[indI * f->channels + k];
+            }
+        }
+
+        x = solver.solve(b);
+
+        if(solver.info() != Eigen::Success) {
+            #ifdef PIC_DEBUG
+                printf("SOLVER FAILED!\n");
+            #endif
+
+            return ret;
+        }
+
         #ifdef PIC_DEBUG
-            printf("SOLVER FAILED!\n");
+            printf("SOLVER SUCCESS!\n");
         #endif
-        return NULL;
-    }
 
-    #ifdef PIC_DEBUG
-        printf("SOLVER SUCCESS!\n");
-    #endif
+        for(int i = 0; i < height; i++) {
+            int tmpI = i * width;
 
-    //Copy from x to ret
-    if(ret == NULL) {
-        ret = f->AllocateSimilarOne();
-    }
-
-    for(int i = 0; i < height; i++) {
-        int tmpI = i * width;
-
-        for(int j = 0; j < width; j++) {
-            (*ret)(j, i)[0] = float(x(tmpI + j));
+            for(int j = 0; j < width; j++) {
+                (*ret)(j, i)[k] = float(x(tmpI + j));
+            }
         }
     }
 

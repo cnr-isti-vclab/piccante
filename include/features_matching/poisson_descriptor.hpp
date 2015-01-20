@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -27,7 +20,7 @@ See the GNU Lesser General Public License
 
 #include <random>
 #include "util/math.hpp"
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "point_samplers/sampler_random.hpp"
 
 namespace pic {
@@ -52,7 +45,6 @@ protected:
     void GenerateSamples(unsigned int kernelSize)
     {
         rs = new RandomSampler<2>(ST_BRIDSON, kernelSize, kernelSize, 1);
-        rs->Write("../data/output/kernel.bmp", 0);
         nSamples = rs->samplesR.size() >> 1;
     }
 
@@ -64,7 +56,7 @@ protected:
      * @param desc
      * @return
      */
-    unsigned int *getAux(ImageRAW *img, int x0, int y0, unsigned int *desc = NULL)
+    unsigned int *getAux(Image *img, int x0, int y0, unsigned int *desc = NULL)
     {
         unsigned int bits = sizeof(unsigned int) * 8;
         subBlock = (nSamples * (nSamples - 1)) / bits;
@@ -152,7 +144,7 @@ public:
      * @param desc
      * @return
      */
-    unsigned int *get(ImageRAW *img, int x0, int y0, unsigned int *desc = NULL)
+    unsigned int *get(Image *img, int x0, int y0, unsigned int *desc = NULL)
     {
         if(img == NULL) {
             return NULL;

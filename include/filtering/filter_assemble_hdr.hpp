@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -31,6 +24,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterAssembleHDR class
+ */
 class FilterAssembleHDR: public Filter
 {
 protected:
@@ -38,8 +34,13 @@ protected:
     IMG_LIN                 linearization_type;
     std::vector<float *>    *icrf;
 
-    /**ProcessBBox: assembling an HDR image*/
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;
         int channels = dst->channels;
@@ -68,7 +69,7 @@ protected:
                         float weight = WeightFunction(x, weight_type);
 
                         float x_lin;
-                        if((icrf != NULL) || (linearization_type != LIN_ICFR)) {
+                        if((icrf != NULL) && (linearization_type == LIN_ICFR)) {
                             x_lin = Linearize(x, linearization_type, icrf->at(k));
                         } else {
                             x_lin = x;
@@ -98,58 +99,20 @@ protected:
     }
 
 public:
-    //Basic constructors
+
+    /**
+     * @brief FilterAssembleHDR
+     * @param weight_type
+     * @param linearization_type
+     * @param icrf
+     */
     FilterAssembleHDR(CRF_WEIGHT weight_type = CRF_GAUSS, IMG_LIN linearization_type = LIN_LIN, std::vector<float *> *icrf = NULL)
     {
         this->weight_type = weight_type;
 
         this->linearization_type = linearization_type;
+
         this->icrf = icrf;
-    }
-
-    //Assemble an HDR image from RAW images
-    static void FromRAWs(std::string nameFileIn, std::string nameFileOut)
-    {
-        FILE *file = fopen(nameFileIn.c_str(), "r");
-
-        if(file == NULL) {
-            return;
-        }
-
-        //Read header
-        int width, height, bits;
-        char tmp[64];
-        fscanf(file, "%s", tmp);
-        fscanf(file, "%d", &width);
-        fscanf(file, "%s", tmp);
-        fscanf(file, "%d", &height);
-        fscanf(file, "%s", tmp);
-        fscanf(file, "%d", &bits);
-
-        ImageRAWVec stack;
-        int i = 0;
-
-        while(!feof(file)) {
-            char name[1024];
-            float exposure;
-            fscanf(file, "%f", &exposure);
-            fscanf(file, "%s", name);
-
-            printf("Processing image: %s\n", name);
-
-            ImageRAW *img = new ImageRAW();
-
-            img->ReadRAW(name, "NULL", RAW_U16_RGGB, width, height);
-            img->exposure = exposure;
-            stack.push_back(img);
-            i++;
-        }
-
-        fclose(file);
-
-        FilterAssembleHDR fAHDR;
-        ImageRAW *imgOut = fAHDR.ProcessP(stack, NULL);
-        imgOut->Write(nameFileOut);
     }
 };
 

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -35,6 +28,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterBilateral2DAS class
+ */
 class FilterBilateral2DAS: public Filter
 {
 protected:
@@ -46,27 +42,47 @@ protected:
     PrecomputedGaussian		*pg;
 
     //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterBilateral2DAS
+     */
     FilterBilateral2DAS();
 
-    //Init constructors
+    /**
+     * @brief FilterBilateral2DAS
+     * @param type
+     * @param sigma_s
+     * @param sigma_r
+     * @param mult
+     */
     FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s, float sigma_r, int mult);
 
     ~FilterBilateral2DAS();
 
+    /**
+     * @brief Signature
+     * @return
+     */
     std::string Signature()
     {
         return GenBilString("AS", sigma_s, sigma_r);
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float sigma_s, float sigma_r)
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgOut, float sigma_s, float sigma_r)
     {
         FilterSamplingMap fsm(sigma_s);
-        ImageRAW *samplingMap = fsm.ProcessP(Single(imgIn), NULL);
-        samplingMap->Div(samplingMap->getMaxVal(NULL, NULL)[0]);
+        Image *samplingMap = fsm.ProcessP(Single(imgIn), NULL);
+        *samplingMap /= samplingMap->getMaxVal(NULL, NULL)[0];
 
         FilterBilateral2DAS fltBil2DAS(ST_DARTTHROWING, sigma_s, sigma_r, 1);
         imgOut = fltBil2DAS.Process(Double(imgIn, samplingMap), imgOut);
@@ -76,13 +92,21 @@ public:
         return imgOut;
     }
 
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, float sigma_s,
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
+    static Image *Execute(std::string nameIn, std::string nameOut, float sigma_s,
                              float sigma_r)
     {
-        ImageRAW imgIn(nameIn);
+        Image imgIn(nameIn);
         
         long t0 = timeGetTime();
-        ImageRAW *imgOut = Execute(&imgIn, NULL, sigma_s, sigma_r);
+        Image *imgOut = Execute(&imgIn, NULL, sigma_s, sigma_r);
         long t1 = timeGetTime();
         printf("Stochastic Adaptive Bilateral Filter time: %ld\n", t1 - t0);
 
@@ -91,7 +115,6 @@ public:
     }
 };
 
-//Basic constructor
 FilterBilateral2DAS::FilterBilateral2DAS()
 {
     pg = NULL;
@@ -109,7 +132,6 @@ FilterBilateral2DAS::~FilterBilateral2DAS()
     }
 }
 
-//Init constructors
 FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s,
         float sigma_r, int mult = 1)
 {
@@ -131,8 +153,7 @@ FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s,
     }
 }
 
-//Process in a box
-void FilterBilateral2DAS::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int width = dst->width;
     int height = dst->height;
@@ -143,7 +164,7 @@ void FilterBilateral2DAS::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
     float  tmp, tmp2, tmp3, sum;
     int c2, ci, cj;
 
-    ImageRAW *edge, *base, *samplingMap;
+    Image *edge, *base, *samplingMap;
 
     if(src.size() == 3) {//Joint/Cross Bilateral Filtering
         base = src[0];

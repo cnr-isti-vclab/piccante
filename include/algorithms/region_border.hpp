@@ -9,28 +9,26 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_ALGORITHMS_REGION_BORDER_HPP
 #define PIC_ALGORITHMS_REGION_BORDER_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
-//Border of a region
-std::set<int> *SetBorder(ImageRAW *img, std::set<int> *coordsBorder)
+/**
+ * @brief SetBorder
+ * @param img
+ * @param coordsBorder
+ * @return
+ */
+std::set<int> *SetBorder(Image *img, std::set<int> *coordsBorder)
 {
     //Second border
     int ind, c, x, y;
@@ -73,8 +71,14 @@ std::set<int> *SetBorder(ImageRAW *img, std::set<int> *coordsBorder)
     return ret;
 }
 
-//Large border of a region
-std::set<int> *SetBorderNth(ImageRAW *img, std::set<int> *coordsBorder,
+/**
+ * @brief SetBorderNth
+ * @param img
+ * @param coordsBorder
+ * @param widthBorder
+ * @return
+ */
+std::set<int> *SetBorderNth(Image *img, std::set<int> *coordsBorder,
                             int widthBorder)
 {
     std::set<int> *ret = new std::set<int>;

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -30,13 +23,19 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGaussian2D class
+ */
 class FilterGaussian2D: public FilterNPasses
 {
 protected:
     FilterGaussian1D *gaussianFilter;
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterGaussian2D
+     * @param sigma
+     */
     FilterGaussian2D(float sigma)
     {
         //Gaussian filter
@@ -55,16 +54,30 @@ public:
         }
     }
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float sigma)
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param sigma
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgOut, float sigma)
     {
         FilterGaussian2D filter(sigma);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, float sigma)
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param sigma
+     * @return
+     */
+    static Image *Execute(std::string nameIn, std::string nameOut, float sigma)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, sigma);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL, sigma);
         imgOut->Write(nameOut);
         return imgOut;
     }

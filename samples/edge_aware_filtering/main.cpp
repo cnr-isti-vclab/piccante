@@ -2,23 +2,16 @@
 
 PICCANTE
 The hottest HDR imaging library!
-http://vcg.isti.cnr.it/piccante
+http://piccantelib.net
 
 Copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -36,7 +29,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an HDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/bottles.hdr");
     printf("Ok\n");
 
@@ -44,19 +37,23 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("Ok\n");
 
-        pic::ImageRAWVec input = pic::Single(&img);
-        pic::ImageRAW *output = NULL;
+        pic::ImageVec input = pic::Single(&img);
+        pic::Image *output = NULL;
 
         //Filtering with the bilateral filter
         printf("Filtering the image with a Fast Bilateral filter;\n");
         printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
 
-        pic::FilterBilateral2DS flt(4.0f, 0.05f);//creating the filter
-        output = flt.ProcessP(input, output);//filtering the image
+        //Creating the filter
+        pic::FilterBilateral2DS flt(4.0f, 0.05f);
+
+        //Filtering the image
+        output = flt.ProcessP(input, output);
 
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
+
         bool bWritten = output->Write("../data/output/filtered_bilateral.png");
 
         if(bWritten) {
@@ -79,6 +76,14 @@ int main(int argc, char *argv[])
         } else {
             printf("Writing had some issues!\n");
         }
+
+        //Filering with the Guided Filter
+        printf("Filtering the image with the Guided filter...");
+        pic::FilterGuided fltG;
+        output = fltG.ProcessP(input, output);//filtering the image
+
+        printf("Writing the file to disk...");
+        bWritten = output->Write("../data/output/filtered_guided.png");
 
         //Filtering with WLS
         printf("Filtering the image with the WLS filter...");
@@ -108,14 +113,6 @@ int main(int argc, char *argv[])
         } else {
             printf("Writing had some issues!\n");
         }
-
-        //Filering with the Guided Filter
-        printf("Filtering the image with the Guided filter...");
-        pic::FilterGuided fltG;
-        output = fltG.ProcessP(input, output);//filtering the image
-
-        printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_guided.png");
 
         if(bWritten) {
             printf("Ok\n");

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -31,6 +24,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterGuided class
+ */
 class FilterGuided: public Filter
 {
 protected:
@@ -38,25 +34,69 @@ protected:
     int		radius;
     float	e_regularization, nPixels;
 
-    //Process in a box
-    void Process1Channel(ImageRAW *I, ImageRAW *p, ImageRAW *q, BBox *box);
-    void Process3Channel(ImageRAW *I, ImageRAW *p, ImageRAW *q, BBox *box);
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    /**
+     * @brief Process1Channel
+     * @param I
+     * @param p
+     * @param q
+     * @param box
+     */
+    void Process1Channel(Image *I, Image *p, Image *q, BBox *box);
+
+    /**
+     * @brief Process3Channel
+     * @param I
+     * @param p
+     * @param q
+     * @param box
+     */
+    void Process3Channel(Image *I, Image *p, Image *q, BBox *box);
+
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
-    //Basic constructor
+
+    /**
+     * @brief FilterGuided
+     */
     FilterGuided()
     {
         Update(3, 0.1f);
     }
+
+    /**
+     * @brief FilterGuided
+     * @param radius
+     * @param e_regularization
+     */
     FilterGuided(int radius, float e_regularization)
     {
         Update(radius, e_regularization);
     }
 
+    /**
+     * @brief Update
+     * @param radius
+     * @param e_regularization
+     */
     void Update(int radius, float e_regularization);
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *guide, ImageRAW *imgOut,
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param guide
+     * @param imgOut
+     * @param radius
+     * @param e_regularization
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *guide, Image *imgOut,
                              int radius, float e_regularization)
     {
         FilterGuided filter(radius, e_regularization);
@@ -71,7 +111,7 @@ void FilterGuided::Update(int radius, float e_regularization)
     nPixels = float(radius * radius * 4);
 }
 
-void FilterGuided::Process1Channel(ImageRAW *I, ImageRAW *p, ImageRAW *q,
+void FilterGuided::Process1Channel(Image *I, Image *p, Image *q,
                                    BBox *box)
 {
     float I_mean, I_var;
@@ -111,8 +151,8 @@ void FilterGuided::Process1Channel(ImageRAW *I, ImageRAW *p, ImageRAW *q,
     delete p_mean;
 }
 
-PIC_INLINE void FilterGuided::Process3Channel(ImageRAW *I, ImageRAW *p,
-        ImageRAW *q, BBox *box)
+PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
+        Image *q, BBox *box)
 {
     int channels = p->channels;
 
@@ -188,11 +228,10 @@ PIC_INLINE void FilterGuided::Process3Channel(ImageRAW *I, ImageRAW *p,
     delete[] buf;
 }
 
-//Process in a box
-PIC_INLINE void FilterGuided::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
+PIC_INLINE void FilterGuided::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
-    ImageRAW *I, *p;
+    Image *I, *p;
 
     if(src.size() == 2) {
         p = src[0];

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -26,13 +19,18 @@ See the GNU Lesser General Public License
 #define PIC_UTIL_IO_HPP
 
 #include <string>
+
 #include "base.hpp"
 
 namespace pic {
 
 enum LABEL_IO_EXTENSION {IO_TMP, IO_PFM, IO_HDR, IO_EXR, IO_VOL, IO_BMP, IO_PPM, IO_TGA, IO_JPG, IO_PNG, IO_PGM, IO_NULL};
 
-//HDR
+/**
+ * @brief getLabelHDRExtension returns the file label given its file name (for HDR images).
+ * @param nameFile is a file name.
+ * @return It returns a file label.
+ */
 PIC_INLINE LABEL_IO_EXTENSION getLabelHDRExtension(std::string nameFile)
 {
     size_t posTMP = nameFile.find(".tmp");
@@ -74,7 +72,11 @@ PIC_INLINE LABEL_IO_EXTENSION getLabelHDRExtension(std::string nameFile)
     return IO_NULL;
 }
 
-//LDR
+/**
+ * @brief getLabelHDRExtension returns the file label given its file name (for LDR images).
+ * @param nameFile is a file name.
+ * @return It returns a file label.
+ */
 PIC_INLINE LABEL_IO_EXTENSION getLabelLDRExtension(std::string nameFile)
 {
     size_t posBMP = nameFile.find(".bmp");

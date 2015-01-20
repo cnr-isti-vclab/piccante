@@ -9,38 +9,34 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_TONE_MAPPING_FIND_BEST_EXPOSURE_HPP
 #define PIC_TONE_MAPPING_FIND_BEST_EXPOSURE_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_simple_tmo.hpp"
 #include "histogram.hpp"
 
 namespace pic {
 
-/**This function returns the best exposure value for an image, img,
-in f-stops values.*/
-float FindBestExposure(ImageRAW *img)
+/**
+ * @brief FindBestExposure computes the best exposure value for an image, img,
+ * @param img
+ * @return
+ */
+float FindBestExposure(Image *img)
 {
-    if(img==NULL) {
+    if(img == NULL) {
         return 0.0f;
     }
 
-    ImageRAW *lum = FilterLuminance::Execute(img, NULL, LT_CIE_LUMINANCE);
+    Image *lum = FilterLuminance::Execute(img, NULL, LT_CIE_LUMINANCE);
     Histogram hist(lum, VS_LOG_2, 1024, 0);
 
     float fstop = hist.FindBestExposure(8.0f);
@@ -50,15 +46,19 @@ float FindBestExposure(ImageRAW *img)
     return fstop;
 }
 
-
+/**
+ * @brief FindBestExposureMain
+ * @param nameIn
+ * @param nameOut
+ */
 void FindBestExposureMain(std::string nameIn, std::string nameOut)
 {
-    ImageRAW img(nameIn);
+    Image img(nameIn);
 
     float fstop = FindBestExposure(&img);
     printf("Exposure for image %s is %f\n", nameIn.c_str(), fstop);
 
-    ImageRAW *imgOut = FilterSimpleTMO::Execute(&img, NULL, 1.0f / 2.2f, fstop);
+    Image *imgOut = FilterSimpleTMO::Execute(&img, NULL, 1.0f / 2.2f, fstop);
     imgOut->Write(nameOut);
 }
 
@@ -67,7 +67,7 @@ void FindBestExposureMain(std::string nameIn, std::string nameOut)
 #endif /* PIC_TONE_MAPPING_FIND_BEST_EXPOSURE_HPP */
 
 /*
-	ImageRAW *lum = FilterLuminance::Execute(img,NULL);
+	Image *lum = FilterLuminance::Execute(img,NULL);
 
 	float minValue = lum->getMinVal();
 	float fstop;
@@ -81,7 +81,7 @@ void FindBestExposureMain(std::string nameIn, std::string nameOut)
 
 	FilterSimpleTMO flt(2.2f,fstop);
 
-	ImageRAW *tmpTMO = lum->Clone();
+	Image *tmpTMO = lum->Clone();
 	float *data = tmpTMO->data;
 
 	int size = tmpTMO->width*tmpTMO->height*tmpTMO->channels;

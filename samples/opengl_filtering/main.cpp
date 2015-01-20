@@ -2,23 +2,16 @@
 
 PICCANTE
 The hottest HDR imaging library!
-http://vcg.isti.cnr.it/piccante
+http://piccantelib.net
 
 Copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -32,8 +25,6 @@ See the GNU Lesser General Public License
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
-#define PIC_DEBUG
-
 #include "piccante.hpp"
 
 #include "../opengl_common_code/opengl_window.hpp"
@@ -43,14 +34,13 @@ class SimpleFilteringWindow : public pic::OpenGLWindow
 protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
-    pic::FilterGLGaussian2D *fltGauss;
     pic::FilterGLBilateral2DG *fltBilG;
 
 public:
-    pic::ImageRAWGL img, *img_flt, *img_flt_tmo;
-    glw::program    program;
+    pic::ImageGL img, *img_flt, *img_flt_tmo;
+    glw::program program;
 
-    pic::ImageRAWGLVec stack;
+    pic::ImageGLVec stack;
 
     SimpleFilteringWindow() : OpenGLWindow(NULL)
     {
@@ -63,7 +53,7 @@ public:
     {
         //reading an input image
         img.Read("../data/input/yellow_flowers.png");
-        img.generateTextureGL(false, GL_TEXTURE_2D);
+        img.generateTextureGL();
 
         //creating a screen aligned quad
         pic::QuadGL::getProgram(program,
@@ -87,25 +77,14 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        //Bilateral filtering...
+        //applying the bilateral filter
         img_flt = fltBilG->Process(SingleGL(&img), img_flt);
 
         //simple tone mapping: gamma + exposure correction
         img_flt_tmo = tmo->Process(SingleGL(img_flt), img_flt_tmo);
 
-        //visualization of the Gaussian filtering
-        glw::bind_program(program);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, img_flt_tmo->getTexture());
-
-        quad->Render();
-
-        glw::bind_program(0);
-
-        //Textures
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        //visualization of the filtered image
+        quad->Render(program, img_flt_tmo->getTexture());
     }
 };
 

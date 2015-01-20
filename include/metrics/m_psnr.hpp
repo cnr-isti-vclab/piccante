@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -26,7 +19,7 @@ See the GNU Lesser General Public License
 #define PIC_METRICS_M_PSNR_HPP
 
 #include <math.h>
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "metrics/base.hpp"
 #include "util/indexed_array.hpp"
 #include "metrics/mse.hpp"
@@ -34,7 +27,7 @@ See the GNU Lesser General Public License
 namespace pic {
 
 /**mPSNR: multiple-exposure peak signal-to-noise ratio*/
-double mPSNR(ImageRAW *ori, ImageRAW *cmp, int minFstop, int maxFstop)
+double mPSNR(Image *ori, Image *cmp, int minFstop, int maxFstop)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -46,8 +39,8 @@ double mPSNR(ImageRAW *ori, ImageRAW *cmp, int minFstop, int maxFstop)
 
     //TO DO: Calculate fstop
     if(minFstop == maxFstop) {
-        ImageRAW *oriLum = FilterLuminance::Execute(ori, NULL, LT_CIE_LUMINANCE);
-        ImageRAW *cmpLum = FilterLuminance::Execute(cmp, NULL, LT_CIE_LUMINANCE);
+        Image *oriLum = FilterLuminance::Execute(ori, NULL, LT_CIE_LUMINANCE);
+        Image *cmpLum = FilterLuminance::Execute(cmp, NULL, LT_CIE_LUMINANCE);
 
         int nData = oriLum->width * oriLum->height;
 

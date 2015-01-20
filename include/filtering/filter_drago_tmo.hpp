@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -45,7 +38,7 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     /**
      * @brief SetupAux
@@ -53,7 +46,7 @@ protected:
      * @param imgOut
      * @return
      */
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     /**
@@ -128,7 +121,7 @@ void FilterDragoTMO::Update(float Ld_Max, float b, float Lw_Max,
     constant2 = (Ld_Max / 100.0f) / (log10f(1.0f + Lw_Max_scaled));
 }
 
-ImageRAW *FilterDragoTMO::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
+Image *FilterDragoTMO::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgIn.size() < 2) {
         #ifdef PIC_DEBUG
@@ -144,7 +137,7 @@ ImageRAW *FilterDragoTMO::SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut)
     return imgOut;
 }
 
-void FilterDragoTMO::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterDragoTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = src[0]->channels;
 

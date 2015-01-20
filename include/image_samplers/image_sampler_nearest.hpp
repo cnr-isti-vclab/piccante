@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -29,6 +22,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The ImageSamplerNearest class
+ */
 class ImageSamplerNearest: public ImageSampler
 {
 public:
@@ -45,6 +41,15 @@ public:
      * @param vOut
      */
     void SampleImage(Image *img, float x, float y, float *vOut);
+
+    /**
+     * @brief SampleImageUC samples an image in unnormalized coordinates [0,width-1]x[0,height-1].
+     * @param img
+     * @param x
+     * @param y
+     * @param vOut
+     */
+    void SampleImageUC(Image *img, float x, float y, float *vOut);
 
     /**
      * @brief SampleImage samples an image in uniform coordiantes.
@@ -64,13 +69,27 @@ PIC_INLINE void ImageSamplerNearest::SampleImage(Image *img, float x, float y,
     y = CLAMPi(y, 0.0f, 1.0f);
 
     //Coordiantes in [0,width-1]x[0,height-1]
-    x = lround(x * img->width1f);
-    y = lround(y * img->height1f);
+    x = x * img->width1f;
+    y = y * img->height1f;
     
     //Integer coordinates
     int ix = int(x);
     int iy = int(y);
     
+    //Bilinear interpolation indicies
+    int ind = (ix * img->xstride + iy * img->ystride);
+
+    for(int i = 0; i < img->channels; i++) {
+        vOut[i] = img->data[ind + i];
+    }
+}
+
+PIC_INLINE void ImageSamplerNearest::SampleImageUC(Image *img, float x, float y, float *vOut)
+{
+    //Integer coordinates
+    int ix = CLAMP(int(x), img->width);
+    int iy = CLAMP(int(y), img->height);
+
     //Bilinear interpolation indicies
     int ind = (ix * img->xstride + iy * img->ystride);
 
@@ -86,10 +105,10 @@ PIC_INLINE void ImageSamplerNearest::SampleImage(Image *img, float x, float y,
     y = CLAMPi(y, 0.0f, 1.0f);
     t = CLAMPi(t, 0.0f, 1.0f);
 
-    //Coordiantes in [0,width-1]x[0,height-1]x[0,frames-1]
-    x = lround(x * img->width1f);
-    y = lround(y * img->height1f);
-    t = lround(t * img->frames1f);
+    //Coordiantes in [0,width-1] x [0,height-1] x [0,frames-1]
+    x = x * img->width1f;
+    y = y * img->height1f;
+    t = t * img->frames1f;
     
     //Integer coordinates
     int ix = int(x);

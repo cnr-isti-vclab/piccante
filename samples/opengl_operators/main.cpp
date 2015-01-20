@@ -2,23 +2,16 @@
 
 PICCANTE
 The hottest HDR imaging library!
-http://vcg.isti.cnr.it/piccante
+http://piccantelib.net
 
 Copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -41,17 +34,15 @@ class SimpleOperatorsWindow : public pic::OpenGLWindow
 protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
-    pic::FilterGLOp *op;
 
 public:
-    pic::ImageRAWGL img, *imgRand, *imgOut, *imgOutTMO;
+    pic::ImageGL img, *imgRand, *img_flt_tmo;
     glw::program    program;
 
     SimpleOperatorsWindow() : OpenGLWindow(NULL)
     {
         tmo = NULL;
-        imgOut = NULL;
-        imgOutTMO = NULL;
+        img_flt_tmo = NULL;
 
     }
 
@@ -59,10 +50,10 @@ public:
     {
         //reading an input image
         img.Read("../data/input/bottles.hdr");
-        img.generateTextureGL(false, GL_TEXTURE_2D);
+        img.generateTextureGL();
 
         //creating a random image
-        imgRand = new pic::ImageRAWGL(img.frames, img.width, img.height, img.channels, pic::IMG_CPU_GPU, GL_TEXTURE_2D);
+        imgRand = new pic::ImageGL(img.frames, img.width, img.height, 1, pic::IMG_CPU_GPU, GL_TEXTURE_2D);
         imgRand->SetRand();
         imgRand->loadFromMemory();
 
@@ -75,8 +66,8 @@ public:
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        //allocating the add operator
-        op = pic::FilterGLOp::CreateOpAdd(false);
+        //using OpenGL operators
+        img *= (*imgRand * 0.25f);
     }
 
     void render()
@@ -87,25 +78,11 @@ public:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        //imgoOut = img + imgRand
-        imgOut = op->Process(DoubleGL(&img, imgRand), imgOut);
-
         //simple tone mapping: gamma + exposure correction
-        imgOutTMO = tmo->Process(SingleGL(imgOut), imgOutTMO);
+        img_flt_tmo = tmo->Process(SingleGL(&img), img_flt_tmo);
 
-        //imgOut visualization
-        glw::bind_program(program);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, imgOutTMO->getTexture());
-
-        quad->Render();
-
-        glw::bind_program(0);
-
-        //Textures
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        //img_flt_tmo visualization
+        quad->Render(program, img_flt_tmo->getTexture());
     }
 };
 

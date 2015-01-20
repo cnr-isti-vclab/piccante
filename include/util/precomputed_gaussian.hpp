@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -27,10 +20,15 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The PrecomputedGaussian class
+ */
 class  PrecomputedGaussian
 {
 protected:
-    /**PrecomputeCoefficients: precomputes a Gaussian Kernel*/
+    /**
+     * @brief PrecomputeCoefficients precomputes a Gaussian kernel.
+     */
     void PrecomputeCoefficients()
     {
         halfKernelSize = kernelSize >> 1;
@@ -47,7 +45,7 @@ protected:
             sum += coeff[i];
         }
 
-        //Kernel's normalization
+        //kernel's normalization
         if(sum > 0.0f) {
             for(int i = 0; i < kernelSize; i++) {
                 coeff[i] /= sum;
@@ -60,12 +58,23 @@ public:
     int	  kernelSize, halfKernelSize;
     float *coeff;
 
-    //Constructor
+    /**
+     * @brief PrecomputedGaussian
+     */
     PrecomputedGaussian()
     {
         kernelSize = halfKernelSize = 0;
         sigma = 0.0f;
         coeff = NULL;
+    }
+
+    /**
+     * @brief PrecomputedGaussian
+     * @param sigma
+     */
+    PrecomputedGaussian(float sigma)
+    {
+        CalculateKernel(sigma);
     }
 
     ~PrecomputedGaussian()
@@ -77,13 +86,10 @@ public:
         coeff = NULL;
     }
 
-    //Constructor
-    PrecomputedGaussian(float sigma)
-    {
-        CalculateKernel(sigma);
-    }
-
-    //Computing a Gaussian kernel of size sigma1
+    /**
+     * @brief CalculateKernel computes a Gaussian kernel of size sigma
+     * @param sigma
+     */
     void CalculateKernel(float sigma)
     {
         this->sigma = sigma;
@@ -94,7 +100,11 @@ public:
         PrecomputeCoefficients();
     }
 
-    //Static kernel size
+    /**
+     * @brief KernelSize computes the size of a kernel in pixel give its sigma.
+     * @param sigma is the sigma value of a Gaussian kernel.
+     * @return It returns the size of the kernel in pixels.
+     */
     static int KernelSize(float sigma)
     {
         int kernelSize = int(ceilf(sigma * 5.0f));

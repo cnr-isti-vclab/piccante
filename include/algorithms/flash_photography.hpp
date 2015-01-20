@@ -9,44 +9,44 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_ALGORITHMS_FLASH_PHOTOGRAPHY_HPP
 #define PIC_ALGORITHMS_FLASH_PHOTOGRAPHY_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter.hpp"
 #include "filtering/filter_bilateral_2df.hpp"
 
 namespace pic {
 
-/**FlashPhotography: implements flash photography*/
-ImageRAW *FlashPhotography(std::string nameFlash, std::string nameNoFlash,
+/**
+ * @brief FlashPhotography implements basic flash photography.
+ * @param nameFlash
+ * @param nameNoFlash
+ * @param nameOut
+ * @param filter
+ * @return
+ */
+Image *FlashPhotography(std::string nameFlash, std::string nameNoFlash,
                            std::string nameOut,
                            Filter *filter)
 {
 
     //Loading Images
     printf("Read flash image...");
-    ImageRAW imgFlash(nameFlash);
+    Image imgFlash(nameFlash);
     printf("ok\n");
     printf("Read no-flash image...");
-    ImageRAW imgNoFlash(nameNoFlash);
+    Image imgNoFlash(nameNoFlash);
     printf("ok\n");
 
     //Filter
-    ImageRAW *imgOut = filter->ProcessP(Double(&imgNoFlash, &imgFlash), NULL);
+    Image *imgOut = filter->ProcessP(Double(&imgNoFlash, &imgFlash), NULL);
 
     //Write image
     imgOut->Write(nameOut);
@@ -54,7 +54,16 @@ ImageRAW *FlashPhotography(std::string nameFlash, std::string nameNoFlash,
     return imgOut;
 }
 
-ImageRAW *FlashPhotography2DF(std::string nameFlash, std::string nameNoFlash,
+/**
+ * @brief FlashPhotography2DF
+ * @param nameFlash
+ * @param nameNoFlash
+ * @param nameOut
+ * @param sigma_s
+ * @param sigma_r
+ * @return
+ */
+Image *FlashPhotography2DF(std::string nameFlash, std::string nameNoFlash,
                               std::string nameOut,
                               float sigma_s, float sigma_r)
 {
@@ -62,7 +71,16 @@ ImageRAW *FlashPhotography2DF(std::string nameFlash, std::string nameNoFlash,
     return FlashPhotography(nameFlash, nameNoFlash, nameOut, (Filter *)&filter);
 }
 
-ImageRAW *FlashPhotography2DS(std::string nameFlash, std::string nameNoFlash,
+/**
+ * @brief FlashPhotography2DS
+ * @param nameFlash
+ * @param nameNoFlash
+ * @param nameOut
+ * @param sigma_s
+ * @param sigma_r
+ * @return
+ */
+Image *FlashPhotography2DS(std::string nameFlash, std::string nameNoFlash,
                               std::string nameOut,
                               float sigma_s, float sigma_r)
 {

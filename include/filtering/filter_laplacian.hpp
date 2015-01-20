@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -29,12 +22,20 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterLaplacian class
+ */
 class FilterLaplacian: public Filter
 {
 protected:
 
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;
         int height = dst->height;
@@ -77,19 +78,35 @@ protected:
     }
 
 public:
-    //Basic constructor
-    FilterLaplacian() {}
+    /**
+     * @brief FilterLaplacian
+     */
+    FilterLaplacian()
+    {
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut)
+    }
+
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgOut)
     {
         FilterLaplacian filter;
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     */
     static void Execute(std::string nameIn, std::string nameOut)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL);
         imgOut->Write(nameOut);
     }
 };

@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -76,7 +69,7 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief Execute
@@ -85,7 +78,7 @@ public:
      * @param channel
      * @return
      */
-    static ImageRAW *Execute(ImageRAWGL *imgIn, ImageRAWGL *imgOut, int channel = 0)
+    static Image *Execute(ImageGL *imgIn, ImageGL *imgOut, int channel = 0)
     {
         FilterGLChannel flt(channel);
         return flt.Process(SingleGL(imgIn), imgOut);
@@ -96,7 +89,7 @@ public:
      */
     static void Test()
     {
-        ImageRAWGL imgIn(1, 512, 512, 3, IMG_GPU_CPU, GL_TEXTURE_2D);
+        ImageGL imgIn(1, 512, 512, 3, IMG_GPU_CPU, GL_TEXTURE_2D);
 
         for(int i=0;i<imgIn.size();i+=3) {
             imgIn.data[i    ] = 1.0f;
@@ -104,16 +97,16 @@ public:
             imgIn.data[i + 2] = 0.25f;
         }
 
-        imgIn.generateTexture2DGL(false);
+        imgIn.generateTextureGL();
 
         FilterGLChannel filter(0);
-        ImageRAWGL *outR = filter.Process(SingleGL(&imgIn), NULL);
+        ImageGL *outR = filter.Process(SingleGL(&imgIn), NULL);
 
         filter.Update(1);
-        ImageRAWGL *outG = filter.Process(SingleGL(&imgIn), NULL);
+        ImageGL *outG = filter.Process(SingleGL(&imgIn), NULL);
 
         filter.Update(2);
-        ImageRAWGL *outB = filter.Process(SingleGL(&imgIn), NULL);
+        ImageGL *outB = filter.Process(SingleGL(&imgIn), NULL);
 
         outR->loadToMemory();
         outR->Write("channel_R.pfm");
@@ -173,7 +166,7 @@ void FilterGLChannel::Update(int channel)
     glw::bind_program(0);
 }
 
-ImageRAWGL *FilterGLChannel::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLChannel::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.empty()) {
         return imgOut;
@@ -191,7 +184,7 @@ ImageRAWGL *FilterGLChannel::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, w, h, 1, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(1, w, h, 1, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {

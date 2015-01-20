@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -30,38 +23,38 @@ See the GNU Lesser General Public License
 namespace pic {
 
 /**
- * @brief CalculateDivergence calculates divergence of an image
- * @param f
- * @param div
+ * @brief CalculateDivergence calculates divergence of the gradient of an image.
+ * @param img is an input image.
+ * @param div is the output divergence of the gradient of img; i.e. Laplacian.
  * @return
  */
-ImageRAW *CalculateDivergence(ImageRAW *f, ImageRAW *div)
+Image *CalculateDivergence(Image *img, Image *div = NULL)
 {
-    if(f == NULL) {
+    if(img == NULL) {
         return div;
     }
 
     if(div == NULL) {
-        div = f->AllocateSimilarOne();
+        div = img->AllocateSimilarOne();
     }
 
-    ImageRAW *f_dx2, *f_dy2;
+    Image *img_dx2, *img_dy2;
 
     float kernelGrad[] = { -0.5f, 0.0f, 0.5f};
     float kernelDiv[] = { -1.0f, 1.0f, 0.0f};
 
-    //Calculate first order gradient
-    ImageRAW *f_dx = FilterConv1D::Execute(f, NULL, kernelGrad, 3, true);
-    ImageRAW *f_dy = FilterConv1D::Execute(f, NULL, kernelGrad, 3, false);
+    //calculating the gradient of img
+    Image *img_dx = FilterConv1D::Execute(img, NULL, kernelGrad, 3, true);
+    Image *img_dy = FilterConv1D::Execute(img, NULL, kernelGrad, 3, false);
 
-    //Calculate divergence using backward differences
-    f_dx2 = FilterConv1D::Execute(f_dx, div , kernelDiv, 3, true);
-    f_dy2 = FilterConv1D::Execute(f_dy, f_dx, kernelDiv, 3, false);
+    //calculating the divergence using backward differences
+    img_dx2 = FilterConv1D::Execute(img_dx, div ,   kernelDiv, 3, true);
+    img_dy2 = FilterConv1D::Execute(img_dy, img_dx, kernelDiv, 3, false);
 
-    div->Add(f_dy2);
+    *div += *img_dy2;
 
-    delete f_dx;
-    delete f_dy;
+    delete img_dx;
+    delete img_dy;
 
     return div;
 }

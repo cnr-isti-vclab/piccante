@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -27,6 +20,7 @@ See the GNU Lesser General Public License
 
 #include <math.h>
 #include <random>
+#include <stdlib.h>
 
 namespace pic {
 
@@ -81,22 +75,36 @@ const float C_PI_OVER_ONE_80    = 0.017453292519943295769236907685f;
     #define CLAMPi(x, a, b)     (x <  a ? a       : (x > b ? b : x))
 #endif
 
-/**isnan: is it a NaN?*/
+
 #ifndef isnan
+
+/**
+ * @brief isnan is it a NaN?
+ * @param value
+ * @return
+ */
 template< typename T > inline bool isnan(T value)
 {
     return value != value ;
 }
+
 #endif
 
-/**isnan: is it a Inf value?*/
+
 #ifndef isnan
+
+/**
+ * @brief isinf is it a Inf value?
+ * @param value
+ * @return
+ */
 template< typename T > inline bool isinf(T value)
 {
     return std::numeric_limits<T>::has_infinity &&
            (value == std::numeric_limits<T>::infinity() ||
             value == -std::numeric_limits<T>::infinity());
 }
+
 #endif
 
 /**
@@ -112,32 +120,71 @@ inline bool equalf(float a, float b)
 }
 
 /**
- * @brief Random returns a number in [0, 2^32 - 1] to a float in [0, 1]
- * @param n
- * @return
+ * @brief Randombase returns a number in [0, 1] based on rand().
+ * @return It returns a random number in [0, 1].
+ */
+float Randombase()
+{
+    return float(rand() % RAND_MAX) / float(RAND_MAX);
+}
+
+/**
+ * @brief Random returns a number in [0, 2^32 - 1] to a float in [0, 1].
+ * @param n is a 32-bit unsigned integer number.
+ * @return It returns n as a normalized float in [0, 1].
  */
 inline float Random(unsigned int n)
 {
     return float(n) / 4294967295.0f;
 }
 
-/**SFunction: a cubic s-function*/
+/**
+ * @brief RandomInt
+ * @param n
+ * @param a
+ * @param b
+ * @return
+ */
+inline int RandomInt(unsigned int n, int a, int b)
+{
+    if(a < b) {
+        return n % (b - a);
+    } else {
+        return 0;
+    }
+}
+
+/**
+ * @brief SFunction evaluates a cubic s-function.
+ * @param x is a value in [0.0, 1.0]
+ * @return it returns 3 x^2 - 2 x^3
+ */
 inline float SFunction(float x)
 {
     float x2 = x * x;
     return 3.0f * x2 - 2.0f * x2 * x;
 }
 
-/**SCurve5: a quintic S-Shape: 6x^5-15x^4+10x^3*/
-float SCurve5(float t)
+/**
+ * @brief SCurve5 evaluates a quintic S-Shape: 6x^5-15x^4+10x^3
+ * @param x is a value in [0.0, 1.0]
+ * @return
+ */
+float SCurve5(float x)
 {
-    float t2 = t * t;
-    float t4 = t2 * t2;
+    float x2 = x * x;
+    float x4 = x2 * x2;
 
-    return (6.0f * t - 15.0f) * t4 + 10.0f * t2 * t;
+    return (6.0f * x - 15.0f) * x4 + 10.0f * x2 * x;
 }
 
-//Clamp a value, x, in the bound [a,b]
+/**
+ * @brief Clamp clamps a value, x, in the bound [a,b].
+ * @param x
+ * @param a
+ * @param b
+ * @return
+ */
 template< class T >
 inline T Clamp(T x, T a, T b)
 {
@@ -152,17 +199,25 @@ inline T Clamp(T x, T a, T b)
     return x;
 }
 
-/**lround: double rounding*/
+/**
+ * @brief lround rounds double numbers properly.
+ * @param x is a scalar.
+ * @return
+ */
 inline long lround(double x)
 {
     if(x > 0.0) {
-        return (x - floor(x) < 0.5) ? (long)floor(x) : (long)ceil(x);
+        return (x - floor(x) <  0.5) ? (long)floor(x) : (long)ceil(x);
     } else {
         return (x - floor(x) <= 0.5) ? (long)floor(x) : (long)ceil(x);
     }
 }
 
-/**lround: float rounding*/
+/**
+ * @brief lround rounds float numbers properly.
+ * @param x is a scalar.
+ * @return
+ */
 inline float lround(float x)
 {
     if(x > 0.0f) {
@@ -172,33 +227,56 @@ inline float lround(float x)
     }
 }
 
-
-/**lerp: Linear interpolation*/
+/**
+ * @brief lerp evaluates linear interpolation
+ * @param t is a value in [0.0, 1.0].
+ * @param x0 is the min value.
+ * @param x1 is the max value.
+ * @return it returns x0 + t * (x1 - x0)
+ */
 inline float lerp(float t, float x0, float x1)
 {
     return x0 + t * (x1 - x0);
 }
 
-/**SmoothStep: smoothes a value from a to b using a cube S-Shape: -2x^3+3x^2*/
+/**
+ * @brief SmoothStep smoothes a value from a to b using a cube S-Shape.
+ * @param a is the min value.
+ * @param b is the max value.
+ * @param value is a value in [0.0, 1.0].
+ * @return It returns - 2 x^3 + 3 x^2.
+ */
 inline float SmoothStep(float a, float b, float value)
 {
     float x = Clamp<float>((value - a) / (b - a), 0.0f, 1.0f);
     return  x * x * (-2.0f * x + 3.0f);
 }
 
-/**Deg2Rad: from degrees to radiants*/
+/**
+ * @brief Deg2Rad converts angles expressed in degrees into angles expressed in radians.
+ * @param deg is a value of an angle expressed in degrees.
+ * @return It returns an ang expressed in radians.
+ */
 inline float Deg2Rad(float deg)
 {
     return deg * C_PI_OVER_ONE_80;
 }
 
-/**Rad2Deg: from radiants to degrees*/
+/**
+ * @brief Rad2Deg converts angles expressed in radians into angles expressed in degrees.
+ * @param rad is a value of an angle expressed in radians.
+ * @return It returns an ang expressed in degrees.
+ */
 inline float Rad2Deg(float rad)
 {
     return rad * C_ONE_80_OVER_PI;
 }
 
-/**log2: logarithm in base 2 for integers*/
+/**
+ * @brief log2 computes logarithm in base 2 for integers.
+ * @param n is an integer value.
+ * @return It returns log2 of n.
+ */
 inline int log2(int n)
 {
     int val = 1;
@@ -216,50 +294,73 @@ inline int log2(int n)
     return lg;
 }
 
-/**pow2: power of two for integers*/
+/**
+ * @brief pow2 computes 2^n.
+ * @param n is a positive exponent.
+ * @return It returns 2^n.
+ */
 inline int pow2(int n)
 {
     return 1 << n;
 }
 
-/**logPlus: log10f adding an 1.0*/
-float logPlus(float x)
+/**
+ * @brief log10Plus computes log10 of a value plus 1.
+ * @param x is a value for which the log10 needs to be computed.
+ * @return It returns log10(x + 1).
+ */
+float log10Plus(float x)
 {
     return log10f(x + 1.0f);
 }
 
-/**expMinus: pow10f removing an 1.0*/
+/**
+ * @brief expMinus
+ * @param x
+ * @return
+ */
 inline float expMinus(float x)
 {
     float tmp = powf(10.0f, x) - 1.0f;
     return MAX(tmp, 0.0f);
 }
 
-/**logPlusEpsilon: log10f plus a small epsilon*/
-float logPlusEpsilon(float x)
+/**
+ * @brief log10PlusEpsilon
+ * @param x
+ * @return
+ */
+float log10PlusEpsilon(float x)
 {
     return log10f(x + 1e-5f);
 }
 
-/**log2f: logarithm in base 2 for floating point*/
+/**
+ * @brief log2f logarithm in base 2 for floating point
+ * @param x
+ * @return
+ */
 inline float log2f(float x)
 {
     return logf(x) * C_INV_LOG_NAT_2;
 }
 
-/**pow2f: power of two for floating point*/
+/**
+ * @brief pow2f
+ * @param x
+ * @return
+ */
 inline float pow2f(float x)
 {
     return powf(2.0f, x);
 }
 
-/**NegZero: a small value is set to zero*/
-inline float NegZero(float val)
-{
-    return (fabsf(val) < 1e-6f) ? 0.0f : val;
-}
-
-/*powint: x^b for integers*/
+/**
+ * @brief powint computes power function for integer values.
+ * @param x is the base.
+ * @param b is the exponent.
+ * @return it returns x^b.
+ */
 static int powint(int x, int b)
 {
     int ret = 1;

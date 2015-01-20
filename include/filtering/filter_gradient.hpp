@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -31,6 +24,9 @@ namespace pic {
 
 enum GRADIENT_TYPE {G_SOBEL, G_PREWITT, G_NORMAL};
 
+/**
+ * @brief The FilterGradient class
+ */
 class FilterGradient: public Filter
 {
 protected:
@@ -38,21 +34,51 @@ protected:
     GRADIENT_TYPE	type;
     float			mask[3];
 
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    ImageRAW *SetupAux(ImageRAWVec imgIn, ImageRAW *imgOut);
-
-    void CreateMask();
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGradient
+     */
+    FilterGradient();
+
+    /**
+     * @brief FilterGradient
+     * @param colorChannel
+     * @param type
+     */
     FilterGradient(int colorChannel, GRADIENT_TYPE type);
 
+    /**
+     * @brief Setup
+     * @param colorChannel
+     * @param type
+     */
     void Setup(int colorChannel, GRADIENT_TYPE type);
-    
-    /**Output size*/
-    void OutputSize(ImageRAW *imgIn, int &width, int &height, int &channels, int &frames)
+
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         width       = imgIn->width;
         height      = imgIn->height;
@@ -60,43 +86,53 @@ public:
         frames      = imgIn->frames;
     }
 
-    //Filtering
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut = NULL,
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param type
+     * @param colorChannel
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgOut = NULL,
                              GRADIENT_TYPE type = G_SOBEL, int colorChannel = 0)
     {
         FilterGradient filter(colorChannel, type);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    //Filtering
-    static ImageRAW *Execute(std::string fileInput, std::string fileOutput)
+    /**
+     * @brief Execute
+     * @param fileInput
+     * @param fileOutput
+     * @return
+     */
+    static Image *Execute(std::string fileInput, std::string fileOutput)
     {
-        ImageRAW imgIn(fileInput);
-        ImageRAW *out = FilterGradient::Execute(&imgIn, NULL);
+        Image imgIn(fileInput);
+        Image *out = FilterGradient::Execute(&imgIn, NULL);
         out->Write(fileOutput);
         return out;
     }
 };
 
-//Basic constructor
+PIC_INLINE FilterGradient::FilterGradient()
+{
+    Setup(0, G_NORMAL);
+}
+
 PIC_INLINE FilterGradient::FilterGradient(int colorChannel,
         GRADIENT_TYPE type = G_NORMAL)
 {
-    this->colorChannel = colorChannel;
-    this->type = type;
-    CreateMask();
+    Setup(colorChannel, type);
 }
 
 PIC_INLINE void FilterGradient::Setup(int colorChannel,
-                                      GRADIENT_TYPE type = G_NORMAL)
+                                           GRADIENT_TYPE type = G_NORMAL)
 {
     this->colorChannel = colorChannel;
     this->type = type;
-    CreateMask();
-}
 
-PIC_INLINE void FilterGradient::CreateMask()
-{
     switch(type) {
     case G_SOBEL: {
         mask[0] = 1.0f;
@@ -122,23 +158,21 @@ PIC_INLINE void FilterGradient::CreateMask()
     }
 }
 
-//Processing
-PIC_INLINE ImageRAW *FilterGradient::SetupAux(ImageRAWVec imgIn,
-        ImageRAW *imgOut)
+PIC_INLINE Image *FilterGradient::SetupAux(ImageVec imgIn,
+        Image *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = new ImageRAW(1, imgIn[0]->width, imgIn[0]->height, 3);
+        imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
     }
 
     return imgOut;
 }
 
-//Process in a box
-PIC_INLINE void FilterGradient::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
+PIC_INLINE void FilterGradient::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
     //Filtering
-    ImageRAW *img = src[0];
+    Image *img = src[0];
 
     int channels = img->channels;
 
@@ -171,27 +205,3 @@ PIC_INLINE void FilterGradient::ProcessBBox(ImageRAW *dst, ImageRAWVec src,
 } // end namespace pic
 
 #endif /* PIC_FILTERING_FILTER_GRADIENT_HPP */
-
-/*			//Convolution kernel
-			c = ind + i*dst->xstride;
-			//Positions
-			ci	=	CLAMP(i+1,width);
-			cj	=	CLAMP(j+1,height);
-			ci1	=	CLAMP(i-1,width);
-			cj1	=	CLAMP(j-1,height);
-
-			//Grad X
-			tmpc   = j*src[0]->ystride + ci*src[0]->xstride;
-			gradX  = data[tmpc+colorChannel];
-
-			tmpc   = j*src[0]->ystride + ci*src[0]->xstride;
-			gradX -= data[tmpc+colorChannel];
-
-			//Grad Y
-			tmpc   = cj*src[0]->ystride + i*src[0]->xstride;
-			gradY  = data[tmpc+colorChannel];
-
-			tmpc   = cj1*src[0]->ystride + i*src[0]->xstride;
-			gradY -= data[tmpc+colorChannel];
-			*/
-

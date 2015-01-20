@@ -2,23 +2,16 @@
 
 PICCANTE
 The hottest HDR imaging library!
-http://vcg.isti.cnr.it/piccante
+http://piccantelib.net
 
 Copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -36,7 +29,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an LDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/features/balcony_1.png", pic::LT_NOR);
 
     printf("Ok\n");
@@ -60,9 +53,9 @@ int main(int argc, char *argv[])
 
         printf("\n");
 
-        pic::ImageRAW *imgCorners = fcd.getCornersImage(&corners);
+        pic::Image *imgCorners = fcd.getCornersImage(&corners);
 
-        bWritten = imgCorners->Write("../data/output/fast_corner_image.png");
+        bWritten = imgCorners->Write("../data/output/corner_fast_output.png");
 
 
         //Harris corners
@@ -77,8 +70,8 @@ int main(int argc, char *argv[])
         }
         printf("\n");
 
-        pic::ImageRAW *imgCorners_harris = fcd.getCornersImage(&corners_harris);
-        bWritten = imgCorners_harris->Write("../data/output/harris_corner_image.png");
+        pic::Image *imgCorners_harris = fcd.getCornersImage(&corners_harris);
+        bWritten = imgCorners_harris->Write("../data/output/corner_harris_output.png");
 
 
         //SUSAN corners
@@ -92,9 +85,9 @@ int main(int argc, char *argv[])
         }
         printf("\n");
 
-        pic::ImageRAW *imgCorners_susan = scd.getCornersImage(&corners_susan);
+        pic::Image *imgCorners_susan = scd.getCornersImage(&corners_susan);
 
-        bWritten = imgCorners_susan->Write("../data/output/susan_corner_image.png");
+        bWritten = imgCorners_susan->Write("../data/output/corner_susan_output.png");
 
         printf("\n");
 
@@ -104,7 +97,7 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No, the file is not valid!\n");
     }
 
     return 0;

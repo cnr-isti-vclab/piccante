@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -32,29 +25,43 @@ namespace pic {
 class FilterGLNPasses: public FilterGL
 {
 protected:
-    ImageRAWGL *imgTmp[2];
+    ImageGL *imgTmp[2];
 
     void InitShaders() {}
     void FragmentShader() {}
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLNPasses
+     */
     FilterGLNPasses();
 
-    virtual ImageRAWGL *SetupAuxN(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    virtual ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
+    /**
+     * @brief InsertFilter
+     * @param flt
+     */
     void InsertFilter(FilterGL *flt);
 
+    /**
+     * @brief getFbo
+     * @return
+     */
     Fbo  *getFbo()
     {
         return filters.back()->getFbo();
     }
 
-    //Processing
-    ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-//Basic constructor
 FilterGLNPasses::FilterGLNPasses(): FilterGL()
 {
     imgTmp[0] = imgTmp[1] = NULL;
@@ -80,7 +87,7 @@ void FilterGLNPasses::InsertFilter(FilterGL *flt)
     }
 }
 
-ImageRAWGL *FilterGLNPasses::SetupAuxN(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLNPasses::SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->AllocateSimilarOneGL();
@@ -112,8 +119,7 @@ ImageRAWGL *FilterGLNPasses::SetupAuxN(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     return imgOut;
 }
 
-//Processing
-ImageRAWGL *FilterGLNPasses::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGLNPasses::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.size() < 1 || imgIn[0] == NULL) {
         return imgOut;

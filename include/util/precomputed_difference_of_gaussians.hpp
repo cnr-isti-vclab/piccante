@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -30,10 +23,15 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The PrecomputedDifferenceOfGaussians class
+ */
 class PrecomputedDifferenceOfGaussians
 {
 protected:
-    /**PrecomputeCoefficients: precomputes a Gaussian Kernel*/
+    /**
+     * @brief PrecomputeCoefficients
+     */
     void PrecomputeCoefficients()
     {
         halfKernelSize = kernelSize >> 1;
@@ -63,13 +61,25 @@ public:
     int	  kernelSize, halfKernelSize;
     float *coeff;
 
-    //Constructor
+    /**
+     * @brief PrecomputedDifferenceOfGaussians
+     */
     PrecomputedDifferenceOfGaussians()
     {
         kernelSize = halfKernelSize = 0;
         sigma_1 = 0.0f;
         sigma_2 = 0.0f;
         coeff = NULL;
+    }
+
+    /**
+     * @brief PrecomputedDifferenceOfGaussians
+     * @param sigma_1
+     * @param sigma_2
+     */
+    PrecomputedDifferenceOfGaussians(float sigma_1, float sigma_2)
+    {
+        CalculateKernel(sigma_1, sigma_2);
     }
 
     ~PrecomputedDifferenceOfGaussians()
@@ -81,13 +91,11 @@ public:
         coeff = NULL;
     }
 
-    //Constructor
-    PrecomputedDifferenceOfGaussians(float sigma_1, float sigma_2)
-    {
-        CalculateKernel(sigma_1, sigma_2);
-    }
-
-    //Computing a Gaussian kernel of size sigma1
+    /**
+     * @brief CalculateKernel
+     * @param sigma_1
+     * @param sigma_2
+     */
     void CalculateKernel(float sigma_1, float sigma_2)
     {
         this->sigma_1 = sigma_1;

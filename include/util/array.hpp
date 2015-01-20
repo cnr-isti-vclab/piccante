@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -30,6 +23,9 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The Array class
+ */
 template<class T>
 class Array
 {
@@ -43,6 +39,13 @@ public:
 
     }
 
+    /**
+     * @brief genRange
+     * @param minVal
+     * @param step
+     * @param maxVal
+     * @return
+     */
     static std::vector<T> *genRange(T minVal, T step, T maxVal)
     {
         int n = int((maxVal - minVal) / step) + 1;
@@ -59,12 +62,25 @@ public:
         return ret;
     }
 
+    /**
+     * @brief linspace
+     * @param minVal
+     * @param maxVal
+     * @param n
+     * @return
+     */
     static std::vector<T> *linspace(T minVal, T maxVal, int n)
     {
         T step = (maxVal - minVal) / (n - 1);
         return genRangeArray(minVal, step, maxVal);
     }
 
+    /**
+     * @brief norm
+     * @param data
+     * @param n
+     * @return
+     */
     static inline float norm(float *data, int n)
     {
         float norm = 0.0f;
@@ -77,6 +93,13 @@ public:
         return sqrtf(norm);
     }
 
+    /**
+     * @brief distanceSq
+     * @param a0
+     * @param a1
+     * @param n
+     * @return
+     */
     static inline float distanceSq(float *a0, float *a1, int n)
     {
         float distSq = 0.0f;
@@ -90,7 +113,7 @@ public:
     }
 
     /**
-     * @brief normalizeArray
+     * @brief normalize
      * @param data
      * @param n
      * @param norm
@@ -114,6 +137,12 @@ public:
         return norm;
     }
 
+    /**
+     * @brief sum
+     * @param vec
+     * @param size
+     * @return
+     */
     static inline T sum(T *vec, int size)
     {
         if(vec == NULL) {
@@ -133,6 +162,13 @@ public:
         return ret;
     }
 
+    /**
+     * @brief cumsum
+     * @param vec
+     * @param ret
+     * @param size
+     * @return
+     */
     static inline T *cumsum(T *vec, T *ret, int size)
     {
         if(vec == NULL) {
@@ -156,6 +192,13 @@ public:
         return ret;
     }
 
+    /**
+     * @brief max
+     * @param vec
+     * @param size
+     * @param ind
+     * @return
+     */
     static inline T max(T *vec, int size, int &ind)
     {
         if(vec == NULL) {
@@ -179,6 +222,13 @@ public:
         return ret;
     }
 
+    /**
+     * @brief min
+     * @param vec
+     * @param size
+     * @param ind
+     * @return
+     */
     static inline T min(T *vec, int size, int &ind)
     {
         if(vec == NULL) {
@@ -202,6 +252,14 @@ public:
         return ret;
     }
 
+    /**
+     * @brief interp
+     * @param x
+     * @param y
+     * @param size
+     * @param xval
+     * @return
+     */
     static inline T interp(T *x, T *y, int size, T xval)
     {
         int offset, offset2;

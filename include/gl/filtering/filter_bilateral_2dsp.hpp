@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -85,17 +78,17 @@ public:
      * @param testing
      * @return
      */
-    static ImageRAWGL *Execute(std::string nameIn, std::string nameOut,
+    static ImageGL *Execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r, int testing)
     {
         GLuint testTQ = glBeginTimeQuery();
         glEndTimeQuery(testTQ);
 
-        ImageRAWGL imgIn(nameIn);
+        ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
         FilterGLBilateral2DSP filter(sigma_s, sigma_r);
-        ImageRAWGL *imgRet = new ImageRAWGL(1, imgIn.width, imgIn.height, 3, IMG_GPU, GL_TEXTURE_2D);
+        ImageGL *imgRet = new ImageGL(1, imgIn.width, imgIn.height, 3, IMG_GPU, GL_TEXTURE_2D);
 
         GLuint testTQ1;
 
@@ -126,7 +119,7 @@ public:
             fclose(file);
         }
 
-        ImageRAWGL *imgWrite = new ImageRAWGL(1, imgIn.width, imgIn.height, 4, IMG_CPU, GL_TEXTURE_2D);
+        ImageGL *imgWrite = new ImageGL(1, imgIn.width, imgIn.height, 4, IMG_CPU, GL_TEXTURE_2D);
         imgWrite->readFromFBO(filter.getFbo());
         imgWrite->Write(nameOut);
         return imgRet;

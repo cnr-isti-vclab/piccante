@@ -9,40 +9,41 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_ALGORITHMS_ITERATIVE_POISSON_SOLVER_HPP
 #define PIC_ALGORITHMS_ITERATIVE_POISSON_SOLVER_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 
 namespace pic {
 
-ImageRAW *IterativePoissonSolver(ImageRAW *img,
-                                 ImageRAW *laplacian,
-                                 std::vector<int> coords,
-                                 int maxSteps = 100)
+/**
+ * @brief PoissonSolverIterative
+ * @param img
+ * @param laplacian
+ * @param coords
+ * @param maxSteps
+ * @return
+ */
+Image *PoissonSolverIterative(Image *img, Image *laplacian,
+                              std::vector<int> coords,
+                              int maxSteps = 100)
 {
-    //Iterative Poisson solver
-    printf("Iterative Poisson solver... ");
+    #ifdef PIC_DEBUG
+        printf("Iterative Poisson solver... ");
+    #endif
 
     if(maxSteps < 1) {
         maxSteps = 20000;
     }
 
-    ImageRAW *tmpImg = img->Clone();
-    ImageRAW *tmpSwap = NULL;
+    Image *tmpImg = img->Clone();
+    Image *tmpSwap = NULL;
 
     int c, coord, x, y;
     float workValue;
@@ -53,12 +54,16 @@ ImageRAW *IterativePoissonSolver(ImageRAW *img,
             img->ReverseAddress(coord, x, y);
 
             workValue = -laplacian->data[coord];
+
             c = img->Address(x + 1, y);
             workValue += img->data[c];
+
             c = img->Address(x - 1, y);
             workValue += img->data[c];
+
             c = img->Address(x, y + 1);
             workValue += img->data[c];
+
             c = img->Address(x, y - 1);
             workValue += img->data[c];
 
@@ -70,7 +75,10 @@ ImageRAW *IterativePoissonSolver(ImageRAW *img,
         tmpImg  = tmpSwap;
     }
 
-    printf("done.\n");
+    #ifdef PIC_DEBUG
+        printf("done.\n");
+    #endif
+
     return img;
 }
 

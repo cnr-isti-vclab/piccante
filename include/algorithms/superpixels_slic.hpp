@@ -9,43 +9,49 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_ALGORITHMS_SUPERPIXELS_SLIC_HPP
 #define PIC_ALGORITHMS_SUPERPIXELS_SLIC_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_laplacian.hpp"
 
 namespace pic {
 
+/**
+ * @brief The SlicoCenter struct
+ */
 struct SlicoCenter {
     float			*value;
     unsigned int	x, y;
 };
 
+/**
+ * @brief The Slic class
+ */
 class Slic
 {
 protected:
 
     int				nSuperPixels;
-    ImageRAW		*labels_distance;
+    Image		*labels_distance;
     SlicoCenter		*centers;
     unsigned int	*prevX, *prevY, *counter;
     float			*col_values, *mPixel;
     int				width, height, channels;
 
+    /**
+     * @brief distanceC
+     * @param a1
+     * @param a2
+     * @param channels
+     * @return
+     */
     inline float distanceC(float *a1, float *a2, int channels)
     {
         float acc = 0.0f;
@@ -58,6 +64,14 @@ protected:
         return acc;
     }
 
+    /**
+     * @brief distanceS
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @return
+     */
     inline int distanceS(int x1, int y1, int x2, int y2)
     {
         int tx = x1 - x2;
@@ -65,7 +79,13 @@ protected:
         return tx * tx + ty * ty;
     }
 
-    bool Pass(ImageRAW *img, int S)
+    /**
+     * @brief Pass
+     * @param img
+     * @param S
+     * @return
+     */
+    bool Pass(Image *img, int S)
     {
         float Sf = float(S);
         float Sf2 = Sf * Sf;
@@ -173,6 +193,9 @@ protected:
         return (E > (0.0001f * float(nSuperPixels)));
     }
 
+    /**
+     * @brief Destroy
+     */
     void Destroy()
     {
         if(labels_distance != NULL) {
@@ -204,6 +227,11 @@ protected:
         }
     }
 
+    /**
+     * @brief Allocate
+     * @param nSuperPixels
+     * @param channels
+     */
     void Allocate(int nSuperPixels, int channels) 
     {
         if(this->nSuperPixels == nSuperPixels){
@@ -224,6 +252,9 @@ protected:
 
 public:
 
+    /**
+     * @brief Slic
+     */
     Slic()
     {
         labels_distance = NULL;
@@ -235,7 +266,12 @@ public:
         mPixel = NULL;
     }
 
-    Slic(ImageRAW *img, int nSuperPixels = 64)
+    /**
+     * @brief Slic
+     * @param img
+     * @param nSuperPixels
+     */
+    Slic(Image *img, int nSuperPixels = 64)
     {
         labels_distance = NULL;
         centers = NULL;
@@ -253,7 +289,12 @@ public:
         Destroy();
     }
     
-    void Process(ImageRAW *img, int nSuperPixels = 64)
+    /**
+     * @brief Process
+     * @param img
+     * @param nSuperPixels
+     */
+    void Process(Image *img, int nSuperPixels = 64)
     {
         if(img == NULL) {
             return;
@@ -266,7 +307,7 @@ public:
             return;
         }
 
-        labels_distance = new ImageRAW(1, img->width, img->height, 3);
+        labels_distance = new Image(1, img->width, img->height, 3);
 
         for(int i = 0; i < labels_distance->size(); i += labels_distance->channels) {
             labels_distance->data[i    ] = -1.0f;
@@ -279,7 +320,7 @@ public:
         channels = img->channels;
 
         FilterLaplacian lap;
-        ImageRAW *lap_img = lap.ProcessP(Single(img), NULL);
+        Image *lap_img = lap.ProcessP(Single(img), NULL);
 
         nSuperPixels = (img->width / S) * (img->height / S);
 
@@ -354,6 +395,11 @@ public:
         #endif
     }
 
+    /**
+     * @brief getLabelsBuffer
+     * @param out
+     * @return
+     */
     int *getLabelsBuffer(int *out = NULL)
     {
         if(labels_distance == NULL) {
@@ -377,10 +423,15 @@ public:
         return out;
     }
 
-    ImageRAW *getMeanImage(ImageRAW *imgOut)
+    /**
+     * @brief getMeanImage
+     * @param imgOut
+     * @return
+     */
+    Image *getMeanImage(Image *imgOut)
     {
         if(imgOut == NULL) {
-            imgOut = new ImageRAW(1, width, height, channels);
+            imgOut = new Image(1, width, height, channels);
         }
 
         for(int i = 0; i < height; i++) {

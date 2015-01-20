@@ -9,23 +9,16 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_FEATURES_MATCHING_MOTION_ESTIMATION_HPP
 #define PIC_FEATURES_MATCHING_MOTION_ESTIMATION_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 
 #include "features_matching/patch_comp.hpp"
 
@@ -42,7 +35,7 @@ protected:
      * @param tiles
      * @param imgOut
      */
-    void ProcessAux(TileList *tiles, ImageRAW *imgOut) {
+    void ProcessAux(TileList *tiles, Image *imgOut) {
         bool state = true;
 
         while(state) {
@@ -105,7 +98,7 @@ public:
      * @param blockSize
      * @param maxRadius
      */
-    MotionEstimation(ImageRAW *img0, ImageRAW *img1, int blockSize, int maxRadius) {
+    MotionEstimation(Image *img0, Image *img1, int blockSize, int maxRadius) {
         pmc = NULL;
 
         Setup(img0, img1, blockSize, maxRadius);
@@ -124,7 +117,7 @@ public:
      * @param blockSize
      * @param maxRadius
      */
-    void Setup(ImageRAW *img0, ImageRAW *img1, int blockSize, int maxRadius) {
+    void Setup(Image *img0, Image *img1, int blockSize, int maxRadius) {
         if(img0 == NULL || img1 == NULL) {
             return;
         }
@@ -159,9 +152,9 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAW *Process(ImageRAW *imgOut) {
+    Image *Process(Image *imgOut) {
         if(imgOut == NULL) {
-            imgOut = new ImageRAW(1, width, height, 3);
+            imgOut = new Image(1, width, height, 3);
         }
 
         TileList lst(blockSize, width, height);
@@ -193,7 +186,7 @@ public:
      * @param imgOut
      * @return
      */
-    static ImageRAW *Execute(ImageRAW *img0, ImageRAW *img1, int blockSize, int maxRadius, ImageRAW *imgOut) {
+    static Image *Execute(Image *img0, Image *img1, int blockSize, int maxRadius, Image *imgOut) {
         MotionEstimation me(img0, img1, blockSize, maxRadius);
 
         return me.Process(imgOut);

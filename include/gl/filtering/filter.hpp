@@ -9,23 +9,25 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
 
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+
+
+
+
+
+
+
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_GL_FILTERING_FILTER_HPP
 #define PIC_GL_FILTERING_FILTER_HPP
 
-#include "gl/image_raw_vec.hpp"
+#include "gl/image_vec.hpp"
 #include "util/gl/quad.hpp"
 
 #include "externals/glw/program.hpp"
@@ -120,7 +122,7 @@ public:
      * @param imgOut
      * @return
      */
-    virtual ImageRAWGL *Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut);
+    virtual ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief GammaCorrection
@@ -146,35 +148,41 @@ public:
     }
 };
 
-ImageRAWGL *FilterGL::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
+ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
+    if(imgIn.empty()) {
+        return imgOut;
+    }
+
     if(imgIn[0] == NULL) {
         return imgOut;
     }
 
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
+    int width = imgIn[0]->width;
+    int height = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(imgIn[0]->frames, width, height, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {
         fbo = new Fbo();
     }
 
-    fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
+    fbo->create(width, height, imgIn[0]->frames, false, imgOut->getTexture());
 
     //Rendering
     fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+    glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 
     //Shaders
     glw::bind_program(filteringProgram);
 
     //Textures
-    glActiveTexture(GL_TEXTURE0);
-    imgIn[0]->bindTexture();
+    for(unsigned int i=0; i<imgIn.size(); i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        imgIn[i]->bindTexture();
+    }
 
     //Rendering aligned quad
     quad->Render();
@@ -186,7 +194,10 @@ ImageRAWGL *FilterGL::Process(ImageRAWGLVec imgIn, ImageRAWGL *imgOut)
     glw::bind_program(0);
 
     //Textures
-    imgIn[0]->unBindTexture();
+    for(unsigned int i=0; i<imgIn.size(); i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        imgIn[i]->unBindTexture();
+    }
 
     return imgOut;
 }

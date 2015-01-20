@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -26,7 +19,6 @@ See the GNU Lesser General Public License
 #define PIC_GL_TONE_MAPPING_SEGMENTATION_TMO_APPROX_HPP
 
 #include "gl/filtering/filter_luminance.hpp"
-#include "gl/filtering/filter_redux.hpp"
 #include "gl/filtering/filter_remove_nuked.hpp"
 #include "gl/filtering/filter_iterative.hpp"
 #include "gl/filtering/filter_bilateral_2ds.hpp"
@@ -34,32 +26,36 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The SegmentationGL class
+ */
 class SegmentationGL
 {
 protected:
-    FilterGLLuminance		lum;
-    FilterGLRedux			*min, *max;
-    FilterGLRemoveNuked		*fltNuked;
-    FilterGLIterative		*fltIt;
-    FilterGLBilateral2DS	*fltBil;
-    FilterGLOp				*fltSeg;
-    ImageRAWGL				*L, *imgIn_flt;
+    FilterGLLuminance		*flt_lum;
+    FilterGLRemoveNuked		*flt_nuked;
+    FilterGLIterative		*flt_it;
+    FilterGLBilateral2DS	*flt_bil;
+    FilterGLOp				*flt_seg;
+    ImageGL                 *L, *imgIn_flt;
 
     float					perCent, nLayer;
     int						iterations;
 
 public:
-    ImageRAWGLVec			stack;
+    ImageGLVec              stack;
     float					minVal, maxVal;
 
+    /**
+     * @brief SegmentationGL
+     */
     SegmentationGL()
     {
-        min = FilterGLRedux::CreateMinPos();
-        max = FilterGLRedux::CreateMax();
-        fltNuked = new FilterGLRemoveNuked(0.9f);
-        fltBil = NULL;
-        fltIt  = NULL;
-        fltSeg = NULL;
+        flt_nuked = NULL;
+        flt_lum = NULL;
+        flt_bil = NULL;
+        flt_it  = NULL;
+        flt_seg = NULL;
 
         nLayer = 0.0f;
         iterations = 0;
@@ -77,21 +73,25 @@ public:
     {
         if(imgIn_flt != NULL) {
             delete imgIn_flt;
+            imgIn_flt = NULL;
         }
 
         if(L != NULL) {
             delete L;
+            L = NULL;
         }
 
-        delete min;
-        delete max;
-        delete fltIt;
-        delete fltBil;
-        delete fltSeg;
-        delete fltNuked;
+        delete flt_it;
+        delete flt_bil;
+        delete flt_seg;
+        delete flt_nuked;
     }
 
-    void ComputeStatistics(ImageRAW *imgIn)
+    /**
+     * @brief ComputeStatistics
+     * @param imgIn
+     */
+    void ComputeStatistics(Image *imgIn)
     {
         float nLevels, area;
 
@@ -101,58 +101,57 @@ public:
         iterations	= MAX(int(sqrtf(area)) / 8, 1);
     }
 
-    ImageRAWGL *Compute(ImageRAWGL *imgIn, ImageRAWGL *imgOut)
+    /**
+     * @brief Compute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *Compute(ImageGL *imgIn, ImageGL *imgOut)
     {
         if(imgIn == NULL) {
-            return NULL;
+            return imgOut;
         }
 
         if(!imgIn->isValid()) {
-            return NULL;
+            return imgOut;
         }
 
         if(imgOut == NULL) {
-            imgOut = new ImageRAWGL(1, imgIn->width, imgIn->height, 1, IMG_GPU, GL_TEXTURE_2D);
+            imgOut = new ImageGL(1, imgIn->width, imgIn->height, 1, IMG_GPU, GL_TEXTURE_2D);
         }
 
         //Compute luminance
-        L = lum.Process(SingleGL(imgIn), L);
-
-        //Get min value
-        if(stack.empty()) {
-            FilterGLRedux::CreateData(L->width, L->height, L->channels, stack, 1);
+        if(flt_lum == NULL) {
+            flt_lum = new FilterGLLuminance();
         }
 
-        ImageRAWGL *min_val = min->Redux(L, stack);
-        min_val->loadToMemory();
-        minVal = min_val->data[0];
+        L = flt_lum->Process(SingleGL(imgIn), L);
 
-        //Get max value
-        ImageRAWGL *max_val = max->Redux(L, stack);
-        max_val->loadToMemory();
-        maxVal = max_val->data[0];
-
-        //Statistics
-        ComputeStatistics(imgIn);
+        L->getMinVal(&minVal);
+        L->getMaxVal(&maxVal);
 
         //Iterative bilateral filtering
-        if(fltIt == NULL) {
-            fltBil = new FilterGLBilateral2DS(1.0f, nLayer);
-            fltIt  = new FilterGLIterative(fltBil, iterations);
+        if(flt_it == NULL) {
+            flt_bil = new FilterGLBilateral2DS(1.0f, nLayer);
+            flt_it  = new FilterGLIterative(flt_bil, iterations);
         }
 
-        imgIn_flt = fltIt->Process(SingleGL(imgIn), imgIn_flt);
-        lum.Process(SingleGL(imgIn_flt), L);
+        imgIn_flt = flt_it->Process(SingleGL(imgIn), imgIn_flt);
+        L = flt_lum->Process(SingleGL(imgIn_flt), L);
 
         //Thresholding
-        if(fltSeg == NULL) {
-            fltSeg = FilterGLOp::CreateOpSegmentation(false, floor(log10f(minVal)));
+        if(flt_seg == NULL) {
+            flt_seg = FilterGLOp::CreateOpSegmentation(false, floor(log10f(minVal)));
         }
 
-        fltSeg->Process(SingleGL(L), L);
+        flt_seg->Process(SingleGL(L), L);
 
         //Removing nuked pixels
-        fltNuked->Process(SingleGL(L), imgOut);
+        if(flt_nuked == NULL) {
+            flt_nuked = new FilterGLRemoveNuked(0.9f);
+        }
+        flt_nuked->Process(SingleGL(L), imgOut);
 
         return imgOut;
     }

@@ -9,26 +9,20 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_GL_ALGORITHMS_PYRAMID_HPP
 #define PIC_GL_ALGORITHMS_PYRAMID_HPP
 
-#include "gl/image_raw.hpp"
+#include "gl/image.hpp"
 
 #include "gl/filtering/filter_gaussian_2d.hpp"
 #include "gl/filtering/filter_sampler_2d.hpp"
+#include "gl/filtering/filter_blend.hpp"
 #include "gl/filtering/filter_op.hpp"
 
 namespace pic {
@@ -39,29 +33,35 @@ namespace pic {
 class PyramidGL
 {
 protected:
-    bool					lapGauss;
-    int						limitLevel;
+    bool                lapGauss;
+    int                 limitLevel;
 
-    FilterGLGaussian2D		*fltG;
-    FilterGLSampler2D		*fltS;
-    FilterGLOp				*fltSub, *fltId, *fltMul, *fltAdd;
+    FilterGLGaussian2D  *flt_gauss;
+    FilterGLSampler2D   *flt_sampler;
+    FilterGLOp			*flt_add, *flt_sub;
+    FilterGLBlend       *flt_blend;
 
-    void InitFilters()
-    {
-        fltG = new FilterGLGaussian2D(1.0f);
-        fltS = new FilterGLSampler2D(0.5f);
-        fltSub  = FilterGLOp::CreateOpSub(false);
-        fltMul  = FilterGLOp::CreateOpMul(false);
-        fltAdd  = FilterGLOp::CreateOpAdd(false);
-        fltId   = FilterGLOp::CreateOpIdentity(false);
-    }
+    ImageGLVec          trackerRec, trackerUp;
 
-    std::vector<ImageRAWGL *> trackerRec, trackerUp;
+    /**
+     * @brief InitFilters
+     */
+    void InitFilters();
 
-    void Create(ImageRAWGL *img, bool lapGauss, int limitLevel);
+    /**
+     * @brief Create
+     * @param img
+     * @param width
+     * @param height
+     * @param channels
+     * @param lapGauss
+     * @param limitLevel
+     */
+    void Create(ImageGL *img, int width, int height, int channels, bool lapGauss, int limitLevel);
 
 public:
-    std::vector<ImageRAWGL *>	stack;
+
+    ImageGLVec stack;
 
     /**
      * @brief PyramidGL
@@ -69,7 +69,7 @@ public:
      * @param lapGauss
      * @param limitLevel
      */
-    PyramidGL(ImageRAWGL *img, bool lapGauss, int limitLevel);
+    PyramidGL(ImageGL *img, bool lapGauss, int limitLevel);
 
     /**
      * @brief PyramidGL
@@ -87,7 +87,13 @@ public:
      * @brief Update
      * @param img
      */
-    void Update(ImageRAWGL *img);
+    void Update(ImageGL *img);
+
+    /**
+     * @brief SetValue
+     * @param value
+     */
+    void SetValue(float value);
 
     /**
      * @brief Mul
@@ -119,19 +125,36 @@ public:
      * @param imgOut
      * @return
      */
-    ImageRAWGL *Reconstruct(ImageRAWGL *imgOut);
+    ImageGL *Reconstruct(ImageGL *imgOut);
 };
 
-PyramidGL::PyramidGL(ImageRAWGL *img, bool lapGauss, int limitLevel = 0)
+PyramidGL::PyramidGL(ImageGL *img, bool lapGauss, int limitLevel = 1)
 {
-    Create(img, lapGauss, limitLevel);
+    flt_gauss = NULL;
+    flt_sampler = NULL;
+    flt_add = NULL;
+    flt_sub = NULL;
+    flt_blend = NULL;
+
+    if(img != NULL) {
+        Create(img, img->width, img->height, img->channels, lapGauss, limitLevel);
+    }
 }
 
-PyramidGL::PyramidGL(int width, int height, int channels, bool lapGauss, int limitLevel = 0)
+PyramidGL::PyramidGL(int width, int height, int channels, bool lapGauss, int limitLevel = 1)
 {
-    ImageRAWGL *tmpImg = new ImageRAWGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
+    flt_gauss = NULL;
+    flt_sampler = NULL;
+    flt_add = NULL;
+    flt_sub = NULL;
+    flt_blend = NULL;
 
-    Create(tmpImg, lapGauss, limitLevel);
+//    ImageGL *img = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
+//    *img = 0.0f;
+
+    Create(NULL, width, height, channels, lapGauss, limitLevel);
+
+//    delete img;
 }
 
 PyramidGL::~PyramidGL()
@@ -141,30 +164,114 @@ PyramidGL::~PyramidGL()
             delete stack[i];
         }
     }
+
+    if(flt_gauss != NULL) {
+        delete flt_gauss;
+        flt_gauss = NULL;
+    }
+
+    if(flt_sampler != NULL) {
+        delete flt_sampler;
+        flt_sampler = NULL;
+    }
+
+    if(flt_add != NULL) {
+        delete flt_add;
+        flt_add = NULL;
+    }
+
+    if(flt_sub != NULL) {
+        delete flt_sub;
+        flt_sub = NULL;
+    }
+
+    if(flt_blend != NULL) {
+        delete flt_blend;
+        flt_blend = NULL;
+    }
 }
 
-void PyramidGL::Create(ImageRAWGL *img, bool lapGauss, int limitLevel = 0)
+void PyramidGL::InitFilters()
+{
+    if(flt_gauss == NULL) {
+        flt_gauss = new FilterGLGaussian2D(1.0f);
+    }
+
+    if(flt_sampler == NULL) {
+        flt_sampler = new FilterGLSampler2D(0.5f);
+    }
+
+    if(flt_add == NULL) {
+        flt_add  = FilterGLOp::CreateOpAdd(false);
+    }
+
+    if(flt_sub == NULL) {
+        flt_sub  = FilterGLOp::CreateOpSub(false);
+    }
+
+    if(flt_blend == NULL) {
+        flt_blend = new FilterGLBlend();
+    }
+}
+
+void PyramidGL::Create(ImageGL *img, int width, int height, int channels, bool lapGauss, int limitLevel = 1)
 {
     this->lapGauss = lapGauss;
+
+    if(limitLevel < 1) {
+        limitLevel = 1;
+    }
+
     this->limitLevel  = limitLevel;
 
     InitFilters();
 
-    ImageRAWGL *tmpImg = img;
-    ImageRAWGL *tmpG   = NULL;
-    ImageRAWGL *tmpD   = NULL;
+    int levels = MAX(log2(MIN(width, height)) - limitLevel, 1);
 
-    int levels = MAX(log2(MIN(tmpImg->width, tmpImg->height)) - limitLevel, 1);
+    //empty image case
+    if(img == NULL) {
+        int tmp_width  = width;
+        int tmp_height = height;
+        for(int i = 0; i < (levels + 1); i++) {
+            ImageGL *tmp = new ImageGL(1, tmp_width, tmp_height, channels, IMG_GPU, GL_TEXTURE_2D);
+            *tmp = 0.0f;
+            stack.push_back(tmp);
 
+            tmp_width = tmp_width >> 1;
+            tmp_height = tmp_height >> 1;
+        }
+
+        tmp_width  = width >> 1;
+        tmp_height = height >> 1;
+        for(int i = 0; i < (levels - 1); i++) {
+            ImageGL *tmp = new ImageGL(1, tmp_width, tmp_height, channels, IMG_GPU, GL_TEXTURE_2D);
+            *tmp = 0.0f;
+            trackerUp.push_back(tmp);
+
+            tmp_width = tmp_width >> 1;
+            tmp_height = tmp_height >> 1;
+        }
+        return;
+    }
+
+    ImageGL *tmpImg = img;
+    ImageGL *tmpG   = NULL;
+    ImageGL *tmpD   = NULL;
+
+    //normal image case
     for(int i = 0; i < levels; i++) {
-        tmpG = fltG->Process(SingleGL(tmpImg), NULL);
-        tmpD = fltS->Process(SingleGL(tmpG), NULL);
+
+        tmpG = flt_gauss->Process(SingleGL(tmpImg), NULL);
+
+        tmpD = flt_sampler->Process(SingleGL(tmpG), NULL);
 
         if(lapGauss) {  //Laplacian Pyramid
-            fltSub->Process(DoubleGL(tmpImg, tmpD), tmpG);
+            flt_sub->Process(DoubleGL(tmpImg, tmpD), tmpG);
+
             stack.push_back(tmpG);
         } else {        //Gaussian Pyramid
-            fltId->Process(SingleGL(tmpImg), tmpG);
+            *tmpG = *tmpImg;
+
             stack.push_back(tmpG);
         }
 
@@ -184,23 +291,57 @@ void PyramidGL::Create(ImageRAWGL *img, bool lapGauss, int limitLevel = 0)
 #endif
 }
 
-ImageRAWGL *PyramidGL::Reconstruct(ImageRAWGL *imgOut)
+void PyramidGL::Update(ImageGL *img)
+{
+    if(img == NULL) {
+        return;
+    }
+
+    if(stack.empty()) {
+        return;
+    }
+
+    if(!stack[0]->SimilarType(img)) {
+        return;
+    }
+
+    ImageGL *tmpG = NULL;
+    ImageGL *tmpD = NULL;
+    ImageGL *tmpImg = img;
+
+    int levels = MAX(log2(MIN(tmpImg->width, tmpImg->height)) - limitLevel, 1);
+
+    for(int i = 0; i < levels; i++) {
+        tmpG = flt_gauss->Process(SingleGL(tmpImg), stack[i]);
+
+        if(i == (levels - 1) ) {
+            tmpD = flt_sampler->Process(SingleGL(tmpG), stack[i + 1]);
+        } else {
+            tmpD = flt_sampler->Process(SingleGL(tmpG), trackerUp[i]);
+        }
+
+        if(lapGauss) {	//Laplacian Pyramid
+            flt_sub->Process(DoubleGL(tmpImg, tmpD), tmpG);
+        } else {		//Gaussian Pyramid
+            *tmpG = *tmpImg;
+        }
+
+        tmpImg = tmpD;
+    }
+}
+
+ImageGL *PyramidGL::Reconstruct(ImageGL *imgOut)
 {
     if(stack.size() < 2) {
         return imgOut;
     }
 
-    if(imgOut == NULL) {
-        imgOut = new ImageRAWGL(1, stack[0]->width, stack[0]->height,
-                                stack[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
     int n = stack.size() - 1;
-    ImageRAWGL *tmp = stack[n];
+    ImageGL *tmp = stack[n];
 
     if(trackerRec.empty()) {
         for(int i = n; i >= 2; i--) {
-            ImageRAWGL *tmp2 = fltAdd->Process(DoubleGL(stack[i - 1], tmp), NULL);
+            ImageGL *tmp2 = flt_add->Process(DoubleGL(stack[i - 1], tmp), NULL);
             trackerRec.push_back(tmp2);
             tmp = tmp2;
         }
@@ -208,14 +349,26 @@ ImageRAWGL *PyramidGL::Reconstruct(ImageRAWGL *imgOut)
         int c = 0;
 
         for(int i = n; i >= 2; i--) {
-            tmp = fltAdd->Process(DoubleGL(stack[i - 1], tmp), trackerRec[c]);
+            flt_add->Process(DoubleGL(stack[i - 1], tmp), trackerRec[c]);
+            tmp = trackerRec[c];
             c++;
         }
     }
 
-    fltAdd->Process(DoubleGL(stack[0], tmp), imgOut);
+    imgOut = flt_add->Process(DoubleGL(stack[0], tmp), imgOut);
 
     return imgOut;
+}
+
+void PyramidGL::SetValue(float value)
+{
+    if(stack.empty()) {
+        return;
+    }
+
+    for(unsigned int i = 0; i < stack.size(); i++) {
+        *stack[i] = value;
+    }
 }
 
 void PyramidGL::Mul(const PyramidGL *pyr)
@@ -225,7 +378,7 @@ void PyramidGL::Mul(const PyramidGL *pyr)
     }
 
     for(unsigned int i = 0; i < stack.size(); i++) {
-        fltMul->Process(DoubleGL(stack[i], pyr->stack[i]), stack[i]);
+        *stack[i] *= *pyr->stack[i];
     }
 }
 
@@ -236,7 +389,7 @@ void PyramidGL::Add(const PyramidGL *pyr)
     }
 
     for(unsigned int i = 0; i < stack.size(); i++) {
-        fltAdd->Process(DoubleGL(stack[i], pyr->stack[i]), stack[i]);
+        *stack[i] += *pyr->stack[i];
     }
 }
 
@@ -248,40 +401,7 @@ void PyramidGL::Blend(PyramidGL *pyr, PyramidGL *weight)
     }
 
     for(unsigned int i = 0; i < stack.size(); i++) {
-        //fltBlend->Process(Triple(stack[i], pyr->stack[i], weight->stack[i]), stack[i]);
-    }
-}
-
-void PyramidGL::Update(ImageRAWGL *img)
-{
-    if(img == NULL) {
-        return;
-    }
-
-    if(stack.size() < 1) {
-        return;
-    }
-
-    ImageRAWGL *tmpImg = img;
-
-    int levels = MAX(log2(MIN(tmpImg->width, tmpImg->height)) - limitLevel, 1);
-
-    for(int i = 0; i < (levels - 1); i++) {
-        fltG->Process(SingleGL(tmpImg),		stack[i]);
-
-        fltS->Process(SingleGL(stack[i]),	trackerUp[i]);
-
-        if(lapGauss) {	//Laplacian Pyramid
-            fltSub->Process(DoubleGL(tmpImg, trackerUp[i]), stack[i]);
-        } else {		//Gaussian Pyramid
-            fltId->Process(SingleGL(tmpImg), stack[i]);
-        }
-
-        tmpImg = trackerUp[i];
-    }
-
-    if(tmpImg != NULL) {
-        fltId->Process(SingleGL(tmpImg), stack[levels - 1]);
+        flt_blend->Process(TripleGL(stack[i], pyr->stack[i], weight->stack[i]), stack[i]);
     }
 }
 

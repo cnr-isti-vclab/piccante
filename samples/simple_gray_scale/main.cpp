@@ -2,23 +2,16 @@
 
 PICCANTE
 The hottest HDR imaging library!
-http://vcg.isti.cnr.it/piccante
+http://piccantelib.net
 
 Copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -27,6 +20,7 @@ See the GNU Lesser General Public License
 //This means that we disable Eigen; some functionalities cannot be used.
 //For example, estimating the camera response function
 #define PIC_DISABLE_EIGEN
+
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
@@ -37,10 +31,9 @@ int main(int argc, char *argv[])
     Q_UNUSED(argc);
     Q_UNUSED(argv);
 
-
     printf("Reading an LDR file...");
 
-    pic::ImageRAW img;
+    pic::Image img;
     img.Read("../data/input/singapore.png");
 
     printf("Ok\n");
@@ -53,7 +46,7 @@ int main(int argc, char *argv[])
 
         //Computing grey scale by computing the mean of color channels
         printf("Computing a gray scale image by computing the mean of color channels...");
-        pic::ImageRAW *img_mean = pic::FilterLuminance::Execute(&img, NULL, pic::LT_MEAN);
+        pic::Image *img_mean = pic::FilterLuminance::Execute(&img, NULL, pic::LT_MEAN);
 
         bWritten = img_mean->Write("../data/output/singapore_mean.png");
 
@@ -65,7 +58,7 @@ int main(int argc, char *argv[])
 
         //Computing grey scale by computing the weighted average following CIE weights for Y
         printf("Computing a gray scale image by computing the weighted mean of color channels using CIE weights for Y...");
-        pic::ImageRAW *img_cie_y = pic::FilterLuminance::Execute(&img, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *img_cie_y = pic::FilterLuminance::Execute(&img, NULL, pic::LT_CIE_LUMINANCE);
 
         bWritten = img_cie_y->Write("../data/output/singapore_cie_y.png");
 
@@ -78,7 +71,7 @@ int main(int argc, char *argv[])
 
         //Computing grey scale by using Exposure Fusion
         printf("Computing a gray scale image by using Exposure Fusion...");
-        pic::ImageRAW *img_cg_ef = pic::ColorToGray(&img, NULL);
+        pic::Image *img_cg_ef = pic::ColorToGray(&img, NULL);
 
         bWritten = img_cg_ef->Write("../data/output/singapore_cg_ef.png");
 
@@ -89,7 +82,7 @@ int main(int argc, char *argv[])
         }
 
     } else {
-        printf("No it is not a valid file!\n");
+        printf("No, the file is not valid!\n");
     }
 
     return 0;

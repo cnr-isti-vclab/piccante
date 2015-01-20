@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -29,45 +22,75 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterSimpleTMO class
+ */
 class FilterSimpleTMO: public Filter
 {
 protected:
     float gamma, fstop, exposure;
 
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box);
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterSimpleTMO
+     * @param gamma
+     * @param fstop
+     */
     FilterSimpleTMO(float gamma, float fstop);
 
-    //Update the filter
+    /**
+     * @brief Update
+     * @param gamma
+     * @param fstop
+     */
     void Update(float gamma, float fstop);
 
-    static ImageRAW *Execute(ImageRAW *imgIn, ImageRAW *imgOut, float gamma,
+    /**
+     * @brief Execute
+     * @param imgIn
+     * @param imgOut
+     * @param gamma
+     * @param fstop
+     * @return
+     */
+    static Image *Execute(Image *imgIn, Image *imgOut, float gamma,
                              float fstop)
     {
         FilterSimpleTMO filter(gamma, fstop);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute(std::string nameIn, std::string nameOut, float gamma,
+    /**
+     * @brief Execute
+     * @param nameIn
+     * @param nameOut
+     * @param gamma
+     * @param fstop
+     * @return
+     */
+    static Image *Execute(std::string nameIn, std::string nameOut, float gamma,
                              float fstop)
     {
-        ImageRAW imgIn(nameIn);
-        ImageRAW *imgOut = Execute(&imgIn, NULL, gamma, fstop);
+        Image imgIn(nameIn);
+        Image *imgOut = Execute(&imgIn, NULL, gamma, fstop);
         imgOut->Write(nameOut);
         return imgOut;
     }
 };
 
-//Basic constructor
 FilterSimpleTMO::FilterSimpleTMO(float gamma, float fstop)
 {
     Update(gamma, fstop);
 }
 
-//Update the filter
 void FilterSimpleTMO::Update(float gamma, float fstop)
 {
     this->gamma = 1.0f / gamma;
@@ -75,8 +98,7 @@ void FilterSimpleTMO::Update(float gamma, float fstop)
     exposure = powf(2.0f, fstop);
 }
 
-//Process in a box
-void FilterSimpleTMO::ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+void FilterSimpleTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
 
     int width = dst->width;

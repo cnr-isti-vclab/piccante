@@ -9,16 +9,9 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
@@ -29,14 +22,22 @@ See the GNU Lesser General Public License
 
 namespace pic {
 
+/**
+ * @brief The FilterLinearColorSpace class
+ */
 class FilterLinearColorSpace: public Filter
 {
 protected:
     float		*matrix;
     int			nMatrix;
 
-    //Process in a box
-    void ProcessBBox(ImageRAW *dst, ImageRAWVec src, BBox *box)
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         if(src[0]->channels != nMatrix) {
             return;
@@ -67,7 +68,9 @@ protected:
     }
 
 public:
-    //Basic constructor
+    /**
+     * @brief FilterLinearColorSpace
+     */
     FilterLinearColorSpace()
     {
         matrix  = NULL;
@@ -81,6 +84,10 @@ public:
         }
     }
 
+    /**
+     * @brief getRGB2XYZMatrix
+     * @return
+     */
     float *getRGB2XYZMatrix()
     {
         if(matrix == NULL) {
@@ -102,6 +109,10 @@ public:
         return matrix;
     }
 
+    /**
+     * @brief getXYZ2RGBMatrix
+     * @return
+     */
     float *getXYZ2RGBMatrix()
     {
         if(matrix == NULL) {
@@ -123,7 +134,13 @@ public:
         return matrix;
     }
 
-    static ImageRAW *Execute_RGB_to_XYZ(ImageRAW *imgIn, ImageRAW *imgOut)
+    /**
+     * @brief Execute_RGB_to_XYZ
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image *Execute_RGB_to_XYZ(Image *imgIn, Image *imgOut)
     {
         FilterLinearColorSpace flt;
 
@@ -132,7 +149,13 @@ public:
         return flt.ProcessP(Single(imgIn), imgOut);
     }
 
-    static ImageRAW *Execute_XYZ_to_RGB(ImageRAW *imgIn, ImageRAW *imgOut)
+    /**
+     * @brief Execute_XYZ_to_RGB
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image *Execute_XYZ_to_RGB(Image *imgIn, Image *imgOut)
     {
         FilterLinearColorSpace flt;
 

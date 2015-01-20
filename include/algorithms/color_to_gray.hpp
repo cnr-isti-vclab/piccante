@@ -9,23 +9,16 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-PICCANTE is free software; you can redistribute it and/or modify
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 3.0 of
-the License, or (at your option) any later version.
-
-PICCANTE is distributed in the hope that it will be useful, but
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License
-( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
 #ifndef PIC_ALGORITHMS_COLOR_TO_GRAY_HPP
 #define PIC_ALGORITHMS_COLOR_TO_GRAY_HPP
 
-#include "image_raw.hpp"
+#include "image.hpp"
 #include "filtering/filter_channel.hpp"
 #include "tone_mapping/exposure_fusion.hpp"
 
@@ -37,27 +30,27 @@ namespace pic {
  * @param imgOut
  * @return
  */
-ImageRAW *ColorToGray(ImageRAW *imgIn, ImageRAW *imgOut)
+Image *ColorToGray(Image *imgIn, Image *imgOut)
 {
     if(imgIn == NULL){
         return imgOut;
     }
 
     if(imgOut == NULL){
-        imgOut = new ImageRAW(1, imgIn->width, imgIn->height, 1);
+        imgOut = new Image(1, imgIn->width, imgIn->height, 1);
     }
 
-    ImageRAWVec img_vec;
-    ImageRAWVec input = Single(imgIn);
+    ImageVec img_vec;
+    ImageVec input = Single(imgIn);
 
-    FilterChannel flc(0);
+    FilterChannel flt(0);
     int channels = imgIn->channels;
     for(int i = 0; i < channels; i++) {
-        flc.setChannel(i);
-        img_vec.push_back(flc.ProcessP(input, NULL));
+        img_vec.push_back(flt.ProcessP(input, NULL));
+        flt.setChannel(i + 1);
     }
 
-    imgOut = ExposureFusion(img_vec, imgOut, 1.0f, 1.0f, 0.0f);
+    imgOut = ExposureFusion(img_vec, 1.0f, 1.0f, 0.0f, imgOut);
 
     for(int i=0; i<channels; i++) {
         delete img_vec[i];
