@@ -75,22 +75,36 @@ const float C_PI_OVER_ONE_80    = 0.017453292519943295769236907685f;
     #define CLAMPi(x, a, b)     (x <  a ? a       : (x > b ? b : x))
 #endif
 
-/**isnan: is it a NaN?*/
+
 #ifndef isnan
+
+/**
+ * @brief isnan is it a NaN?
+ * @param value
+ * @return
+ */
 template< typename T > inline bool isnan(T value)
 {
     return value != value ;
 }
+
 #endif
 
-/**isnan: is it a Inf value?*/
+
 #ifndef isnan
+
+/**
+ * @brief isinf is it a Inf value?
+ * @param value
+ * @return
+ */
 template< typename T > inline bool isinf(T value)
 {
     return std::numeric_limits<T>::has_infinity &&
            (value == std::numeric_limits<T>::infinity() ||
             value == -std::numeric_limits<T>::infinity());
 }
+
 #endif
 
 /**
@@ -115,9 +129,9 @@ float Randombase()
 }
 
 /**
- * @brief Random returns a number in [0, 2^32 - 1] to a float in [0, 1]
- * @param n
- * @return
+ * @brief Random returns a number in [0, 2^32 - 1] to a float in [0, 1].
+ * @param n is a 32-bit unsigned integer number.
+ * @return It returns n as a normalized float in [0, 1].
  */
 inline float Random(unsigned int n)
 {
@@ -133,7 +147,7 @@ inline float Random(unsigned int n)
  */
 inline int RandomInt(unsigned int n, int a, int b)
 {
-    if(a != b) {
+    if(a < b) {
         return n % (b - a);
     } else {
         return 0;
@@ -164,7 +178,13 @@ float SCurve5(float x)
     return (6.0f * x - 15.0f) * x4 + 10.0f * x2 * x;
 }
 
-//Clamp a value, x, in the bound [a,b]
+/**
+ * @brief Clamp clamps a value, x, in the bound [a,b].
+ * @param x
+ * @param a
+ * @param b
+ * @return
+ */
 template< class T >
 inline T Clamp(T x, T a, T b)
 {
@@ -219,14 +239,12 @@ inline float lerp(float t, float x0, float x1)
     return x0 + t * (x1 - x0);
 }
 
-/**SmoothStep: */
-
 /**
  * @brief SmoothStep smoothes a value from a to b using a cube S-Shape.
  * @param a is the min value.
  * @param b is the max value.
  * @param value is a value in [0.0, 1.0].
- * @return it returns - 2 x^3 + 3 x^2
+ * @return It returns - 2 x^3 + 3 x^2.
  */
 inline float SmoothStep(float a, float b, float value)
 {
@@ -237,29 +255,27 @@ inline float SmoothStep(float a, float b, float value)
 /**
  * @brief Deg2Rad converts angles expressed in degrees into angles expressed in radians.
  * @param deg is a value of an angle expressed in degrees.
- * @return it returns an ang expressed in radians.
+ * @return It returns an ang expressed in radians.
  */
 inline float Deg2Rad(float deg)
 {
     return deg * C_PI_OVER_ONE_80;
 }
 
-/**Rad2Deg: from radiants to degrees*/
 /**
- * @brief Rad2Deg
- * @param rad
- * @return
+ * @brief Rad2Deg converts angles expressed in radians into angles expressed in degrees.
+ * @param rad is a value of an angle expressed in radians.
+ * @return It returns an ang expressed in degrees.
  */
 inline float Rad2Deg(float rad)
 {
     return rad * C_ONE_80_OVER_PI;
 }
 
-/**log2: logarithm in base 2 for integers*/
 /**
- * @brief log2
- * @param n
- * @return
+ * @brief log2 computes logarithm in base 2 for integers.
+ * @param n is an integer value.
+ * @return It returns log2 of n.
  */
 inline int log2(int n)
 {
@@ -278,29 +294,26 @@ inline int log2(int n)
     return lg;
 }
 
-/**pow2: power of two for integers*/
 /**
- * @brief pow2
- * @param n
- * @return
+ * @brief pow2 computes 2^n.
+ * @param n is a positive exponent.
+ * @return It returns 2^n.
  */
 inline int pow2(int n)
 {
     return 1 << n;
 }
 
-/**logPlus: log10f adding an 1.0*/
 /**
- * @brief logPlus
- * @param x
- * @return
+ * @brief log10Plus computes log10 of a value plus 1.
+ * @param x is a value for which the log10 needs to be computed.
+ * @return It returns log10(x + 1).
  */
-float logPlus(float x)
+float log10Plus(float x)
 {
     return log10f(x + 1.0f);
 }
 
-/**expMinus: pow10f removing an 1.0*/
 /**
  * @brief expMinus
  * @param x
@@ -312,13 +325,12 @@ inline float expMinus(float x)
     return MAX(tmp, 0.0f);
 }
 
-/**logPlusEpsilon: log10f plus a small epsilon*/
 /**
- * @brief logPlusEpsilon
+ * @brief log10PlusEpsilon
  * @param x
  * @return
  */
-float logPlusEpsilon(float x)
+float log10PlusEpsilon(float x)
 {
     return log10f(x + 1e-5f);
 }
@@ -341,16 +353,6 @@ inline float log2f(float x)
 inline float pow2f(float x)
 {
     return powf(2.0f, x);
-}
-
-/**
- * @brief NegZero
- * @param val
- * @return
- */
-inline float NegZero(float val)
-{
-    return (fabsf(val) < 1e-6f) ? 0.0f : val;
 }
 
 /**

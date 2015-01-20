@@ -275,13 +275,13 @@ public:
      * @return This function returns true if the two images are similar,
      * otherwise false.
      */
-    bool SimilarType(Image *img);
+    bool SimilarType(const Image *img);
 
     /**
      * @brief Assign
      * @param imgIn
      */
-    void Assign(Image *imgIn);
+    void Assign(const Image *imgIn);
 
     /**
      * @brief Blend
@@ -702,7 +702,7 @@ public:
      * @brief operator =
      * @param a
      */
-    void operator =(Image &a);
+    void operator =(const Image &a);
 
     /**
      * @brief operator =
@@ -727,14 +727,14 @@ public:
      * @brief operator +=
      * @param a
      */
-    void operator +=(Image &a);
+    void operator +=(const Image &a);
 
     /**
      * @brief operator +
      * @param a
      * @return it returns (this + a)
      */
-    Image operator +(Image &a) const;
+    Image operator +(const Image &a) const;
 
     /**
      * @brief operator *=
@@ -753,14 +753,14 @@ public:
      * @brief operator *=
      * @param a
      */
-    void operator *=(Image &a);
+    void operator *=(const Image &a);
 
     /**
      * @brief operator *
      * @param a
      * @return it returns (this * a)
      */
-    Image operator *(Image &a) const;
+    Image operator *(const Image &a) const;
 
     /**
      * @brief operator -=
@@ -779,14 +779,14 @@ public:
      * @brief operator -=
      * @param a
      */
-    void operator -=(Image &a);
+    void operator -=(const Image &a);
 
     /**
      * @brief operator -
      * @param a
      * @return it returns (this - a)
      */
-    Image operator -(Image &a) const;
+    Image operator -(const Image &a) const;
 
     /**
      * @brief operator /=
@@ -805,14 +805,14 @@ public:
      * @brief operator /=
      * @param a
      */
-    void operator /=(Image &a);
+    void operator /=(const Image &a);
 
     /**
      * @brief operator /
      * @param a
      * @return it returns (this / a)
      */
-    Image operator /(Image &a) const;
+    Image operator /(const Image &a) const;
 };
 
 PIC_INLINE void Image::SetNULL()
@@ -998,7 +998,7 @@ PIC_INLINE void Image::AllocateAux()
     CalculateStrides();
 }
 
-PIC_INLINE void Image::Assign(Image *imgIn)
+PIC_INLINE void Image::Assign(const Image *imgIn)
 {
     if(imgIn == NULL) {
         return;
@@ -1042,7 +1042,7 @@ PIC_INLINE void Image::removeSpecials()
     }
 }
 
-PIC_INLINE bool Image::SimilarType(Image *img)
+PIC_INLINE bool Image::SimilarType(const Image *img)
 {
     if(img == NULL) {
         return false;
@@ -2043,7 +2043,7 @@ PIC_INLINE Image *Image::Clone() const
     return ret;
 }
 
-PIC_INLINE void Image::operator =(Image &a)
+PIC_INLINE void Image::operator =(const Image &a)
 {
     this->Assign(&a);
 }
@@ -2065,7 +2065,7 @@ PIC_INLINE Image Image::operator +(const float &a) const
     return Image(out, false);
 }
 
-PIC_INLINE void Image::operator +=(Image &a)
+PIC_INLINE void Image::operator +=(const Image &a)
 {
     if(SimilarType(&a)) {
         BufferAdd(data, a.data, size());
@@ -2077,7 +2077,7 @@ PIC_INLINE void Image::operator +=(Image &a)
 
 }
 
-PIC_INLINE Image Image::operator +(Image &a) const
+PIC_INLINE Image Image::operator +(const Image &a) const
 {
     Image *out = this->Clone();
     *out += a;
@@ -2096,7 +2096,7 @@ PIC_INLINE Image Image::operator *(const float &a) const
     return Image(out, false);
 }
 
-PIC_INLINE void Image::operator *=(Image &a)
+PIC_INLINE void Image::operator *=(const Image &a)
 {
     if(SimilarType(&a)) {
         BufferMul(data, a.data, size());
@@ -2107,7 +2107,7 @@ PIC_INLINE void Image::operator *=(Image &a)
     }
 }
 
-PIC_INLINE Image Image::operator *(Image &a) const
+PIC_INLINE Image Image::operator *(const Image &a) const
 {
     Image *out = this->Clone();
     *out *= a;
@@ -2126,7 +2126,7 @@ PIC_INLINE Image Image::operator -(const float &a) const
     return Image(out, false);
 }
 
-PIC_INLINE void Image::operator -=(Image &a)
+PIC_INLINE void Image::operator -=(const Image &a)
 {
     if(SimilarType(&a)) {
         BufferSub(data, a.data, size());
@@ -2137,7 +2137,7 @@ PIC_INLINE void Image::operator -=(Image &a)
     }
 }
 
-PIC_INLINE Image Image::operator -(Image &a) const
+PIC_INLINE Image Image::operator -(const Image &a) const
 {
     Image *out = this->Clone();
     *out -= a;
@@ -2156,7 +2156,7 @@ PIC_INLINE Image Image::operator /(const float &a) const
     return Image(out, false);
 }
 
-PIC_INLINE void Image::operator /=(Image &a)
+PIC_INLINE void Image::operator /=(const Image &a)
 {
     if(SimilarType(&a)) {
         BufferDiv(data, a.data, size());
@@ -2167,7 +2167,7 @@ PIC_INLINE void Image::operator /=(Image &a)
     }
 }
 
-PIC_INLINE Image Image::operator /(Image &a) const
+PIC_INLINE Image Image::operator /(const Image &a) const
 {
     Image *out = this->Clone();
     *out /= a;

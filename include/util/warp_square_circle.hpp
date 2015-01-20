@@ -42,6 +42,7 @@ void WarpSquareCircle(float x, float y, float *xo, float *yo)
 
 //	float a = 2*O.x - 1;
 //	float b = 2*O.y - 1;
+
     if(x * x > y * y) {
         r = x;
         phi = (C_PI / 4.0f) * (y / x);

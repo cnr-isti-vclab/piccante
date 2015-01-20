@@ -903,7 +903,7 @@ void ImageGL::unBindTexture()
     glBindTexture(target, 0);
 }
 
-void ImageGL::clamp(float a, float b)
+void ImageGL::clamp(float a = 0.0f, float b = 1.0f)
 {
     BufferOpsGL *ops = BufferOpsGL::getInstance();
     ops->list[BOGL_CLAMP]->Update(a, b);
