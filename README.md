@@ -53,7 +53,7 @@ Piccante can manage different color spaces, and new ones can be added to its cor
 
 ![Color Spaces](/screenshots/color_spaces.png?raw=true "Color Spaces")
 
-Piccante has provides algorithms for tone mapping HDR images in order to be visualized on traditional displays.
+Piccante provides algorithms for tone mapping HDR images in order to be visualized on traditional displays.
 
 ![Tone Mapping](/screenshots/tone_mapping.png?raw=true "Tone Mapping")
 
