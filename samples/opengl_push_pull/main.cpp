@@ -45,16 +45,16 @@ protected:
     pic::ImageGL img, *imgRec, *img_flt_tmo;
     glw::program program;
     int method;
-    pic::PushPullGL  *pp;
+    pic::PushPullGL *pp;
+
+    QWidget *parent;
 
     /**
      * @brief initializeGL sets variables up.
      */
     void initializeGL(){
 
-          initializeOpenGLFunctions();
-
-        glClearColor( 1.0f, 0.4f, 0.4f, 1.0f );
+        initializeOpenGLFunctions();
 
         #ifdef PIC_WIN32
             if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
@@ -62,6 +62,7 @@ protected:
             }
         #endif
 
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
         //reading an input image
         img.Read("../data/input/bottles.hdr");
@@ -83,10 +84,9 @@ protected:
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-            imgRec = NULL;
+        imgRec = NULL;
+
         pp = new pic::PushPullGL();
-
-
     }
 
     /**
@@ -96,13 +96,18 @@ protected:
      */
     void resizeGL( int w, int h ){
         const qreal retinaScale = devicePixelRatio();
-        glViewport(0, 0, width() * retinaScale, height() * retinaScale);
+        glViewport(0, 0, w * retinaScale, h * retinaScale);
     }
 
     /**
      * @brief paintGL
      */
     void paintGL(){
+        if(parentWidget() != NULL) {
+            if(!parentWidget()->isVisible()) {
+                return;
+            }
+        }
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -115,7 +120,7 @@ protected:
             img_flt_tmo = tmo->Process(pic::SingleGL(&img), img_flt_tmo);
         }
 
-        //imgOut visualization
+        //visualization
         quad->Render(program, img_flt_tmo->getTexture());
     }
 
@@ -126,7 +131,7 @@ public:
      * @param format
      * @param parent
      */
-    GLWidget( const QGLFormat& format, QWidget* parent = 0 ): QGLWidget(format, parent)
+    GLWidget( const QGLFormat& format, QWidget* parent = 0 ): QGLWidget(format, parent, 0)
     {
         setFixedWidth(912);
         setFixedHeight(684);
@@ -161,9 +166,9 @@ public:
      */
     Window(const QGLFormat &format)
     {
-  //      resize(912, 900);
+        resize(912, 684 + 64);
 
-        window_gl = new GLWidget(format,this);
+        window_gl = new GLWidget(format, this);
 
         layout = new QVBoxLayout();
 
