@@ -1,12 +1,11 @@
 TARGET = opengl_tone_mapping
 
-QT       += core
-TEMPLATE = app
-CONFIG   += console
-CONFIG   -= app_bundle
+QT += core
+QT += gui
+QT += opengl
+QT += widgets
 
 SOURCES += main.cpp
-
 
 CONFIG   += C++11
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7

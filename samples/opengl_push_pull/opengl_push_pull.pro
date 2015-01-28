@@ -4,6 +4,7 @@ QT += core
 QT += gui
 QT += opengl
 QT += widgets
+
 TEMPLATE = app
 CONFIG   += console
 CONFIG   -= app_bundle

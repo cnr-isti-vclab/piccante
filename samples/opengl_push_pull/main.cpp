@@ -21,14 +21,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * a suggestion for running examples.
 */
 
-#include <QKeyEvent>
-
 #ifdef _MSC_VER
     #define PIC_DISABLE_OPENGL_NON_CORE
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
 #include "piccante.hpp"
+
+#include <QKeyEvent>
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
 #include <QApplication>
@@ -39,15 +39,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
 {  
 protected:
-
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
     pic::ImageGL img, *imgRec, *img_flt_tmo;
     glw::program program;
     int method;
     pic::PushPullGL *pp;
-
-    QWidget *parent;
 
     /**
      * @brief initializeGL sets variables up.
@@ -84,8 +81,6 @@ protected:
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        imgRec = NULL;
-
         pp = new pic::PushPullGL();
     }
 
@@ -109,7 +104,6 @@ protected:
             }
         }
 
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //simple tone mapping: gamma + exposure correction
@@ -136,6 +130,9 @@ public:
         setFixedWidth(912);
         setFixedHeight(684);
 
+        method = 0;
+
+        imgRec = NULL;
         img_flt_tmo = NULL;
         imgRec = NULL;
         quad = NULL;
@@ -216,7 +213,7 @@ int main(int argc, char **argv)
     glFormat.setProfile( QGLFormat::CoreProfile );
     glFormat.setSampleBuffers( true );
 
-    // Create a GLWidget requesting our format
+    //Creating a window with OpenGL 4.0 Core profile
     Window w( glFormat );
     w.show();
 

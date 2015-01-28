@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * please change it with your favorite one. This is just
  * a suggestion for running examples.
 */
+
 #ifdef _MSC_VER
     #define PIC_DISABLE_OPENGL_NON_CORE
     #include "../opengl_common_code/gl_core_4_0.h"
@@ -27,27 +28,40 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "piccante.hpp"
 
-#include "../opengl_common_code/opengl_window.hpp"
+#include <QKeyEvent>
+#include <QtCore/QCoreApplication>
+#include <QtOpenGL/QGLWidget>
+#include <QApplication>
+#include <QOpenGLFunctions>
+#include <QVBoxLayout>
+#include <QLabel>
 
-class SimpleOperatorsWindow : public pic::OpenGLWindow
+class GLWidget : public QGLWidget, protected QOpenGLFunctions
 {
 protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
 
-public:
     pic::ImageGL img, *imgRand, *img_flt_tmo;
     glw::program    program;
 
-    SimpleOperatorsWindow() : OpenGLWindow(NULL)
-    {
-        tmo = NULL;
-        img_flt_tmo = NULL;
+    int method;
 
-    }
+    /**
+     * @brief initializeGL sets variables up.
+     */
+    void initializeGL(){
 
-    void init()
-    {
+        initializeOpenGLFunctions();
+
+        #ifdef PIC_WIN32
+            if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+                printf("OpenGL functions are not loaded!\n");
+            }
+        #endif
+
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
+
         //reading an input image
         img.Read("../data/input/bottles.hdr");
         img.generateTextureGL();
@@ -56,6 +70,7 @@ public:
         imgRand = new pic::ImageGL(img.frames, img.width, img.height, 1, pic::IMG_CPU_GPU, GL_TEXTURE_2D);
         imgRand->SetRand();
         imgRand->loadFromMemory();
+        *imgRand *= 0.1f;
 
         //creating a screen aligned quad
         pic::QuadGL::getProgram(program,
@@ -65,17 +80,28 @@ public:
 
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
-
-        //using OpenGL operators
-        img *= (*imgRand * 0.25f);
     }
 
-    void render()
-    {
+    /**
+     * @brief resizeGL
+     * @param w
+     * @param h
+     */
+    void resizeGL( int w, int h ){
         const qreal retinaScale = devicePixelRatio();
-        glViewport(0, 0, width() * retinaScale, height() * retinaScale);
+        glViewport(0, 0, w * retinaScale, h * retinaScale);
+    }
 
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    /**
+     * @brief paintGL
+     */
+    void paintGL(){
+        if(parentWidget() != NULL) {
+            if(!parentWidget()->isVisible()) {
+                return;
+            }
+        }
+
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //simple tone mapping: gamma + exposure correction
@@ -84,24 +110,106 @@ public:
         //img_flt_tmo visualization
         quad->Render(program, img_flt_tmo->getTexture());
     }
+
+public:
+
+    /**
+     * @brief GLWidget
+     * @param format
+     * @param parent
+     */
+    GLWidget( const QGLFormat& format, QWidget* parent = 0 ): QGLWidget(format, parent, 0)
+    {
+        setFixedWidth(912);
+        setFixedHeight(684);
+
+        tmo = NULL;
+        img_flt_tmo = NULL;
+        method = 0;
+    }
+
+    /**
+     * @brief update
+     */
+    void update()
+    {
+        method = (method + 1) % 2;
+
+        img += *imgRand;
+    }
+};
+
+class Window : public QWidget
+{
+protected:
+    GLWidget *window_gl;
+    QVBoxLayout *layout;
+    QLabel *label;
+
+public:
+
+    /**
+     * @brief Window
+     * @param format
+     */
+    Window(const QGLFormat &format)
+    {
+        resize(912, 684 + 64);
+
+        window_gl = new GLWidget(format, this);
+
+        layout = new QVBoxLayout();
+
+        layout->addWidget(window_gl);
+
+        label = new QLabel(
+        "Pease hit the space bar in order to add random grey noise to the original image.", this);
+        label->setAlignment(Qt::AlignHCenter);
+        label->setFixedWidth(912);
+        label->setFixedHeight(64);
+
+        layout->addWidget(label);
+
+        setLayout(layout);
+
+        setWindowTitle(tr("Operators Example"));
+    }
+
+    ~Window()
+    {
+        delete window_gl;
+        delete layout;
+        delete label;
+    }
+
+    /**
+     * @brief keyPressEvent
+     * @param e
+     */
+    void keyPressEvent( QKeyEvent* e ){
+        if(e->type() == QEvent::KeyPress) {
+            if(e->key() == Qt::Key_Space) {
+                window_gl->update();
+                window_gl->updateGL();
+            }
+        }
+    }
 };
 
 int main(int argc, char **argv)
 {
-    QGuiApplication app(argc, argv);
+    QApplication app( argc, argv );
 
-    QSurfaceFormat format;
-    format.setSamples(4);
-    format.setMajorVersion(4);
-    format.setMinorVersion(0);
-    format.setProfile(QSurfaceFormat::CoreProfile );
+    QGLFormat glFormat;
+    glFormat.setVersion( 4, 0 );
+    glFormat.setProfile( QGLFormat::CoreProfile );
+    glFormat.setSampleBuffers( true );
 
-    SimpleOperatorsWindow window;
-    window.setFormat(format);
-    window.resize(912, 684);
-    window.show();
+    //Creating a window with OpenGL 4.0 Core profile
+    Window w( glFormat );
+    w.show();
 
-    window.setAnimating(true);
+    app.installEventFilter(&w);
 
     return app.exec();
 }
