@@ -104,7 +104,6 @@ protected:
             }
         }
 
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //applying the warping filter
@@ -116,7 +115,7 @@ protected:
         //simple tone mapping: gamma + exposure correction
         img_flt_tmo = flt_tmo->Process(SingleGL(img_flt), img_flt_tmo);
 
-        //visualization of the warped image
+        //visualization
         quad->Render(program, img_flt_tmo->getTexture());
     }
 

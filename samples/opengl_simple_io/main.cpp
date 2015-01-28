@@ -99,7 +99,7 @@ protected:
         //simple tone mapping: gamma + exposure correction
         imgOut = tmo->Process(SingleGL(&img), imgOut);
 
-        //imgOut visualization
+        //visualization
         quad->Render(program, imgOut->getTexture());
     }
 

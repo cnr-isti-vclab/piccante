@@ -114,7 +114,7 @@ protected:
             img_flt_tmo = tmo->Process(SingleGL(&img), img_flt_tmo);
         }
 
-        //visualization of the filtered image
+        //visualization
         quad->Render(program, img_flt_tmo->getTexture());
     }
 
