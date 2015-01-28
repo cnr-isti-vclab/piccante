@@ -20,38 +20,49 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * please change it with your favorite one. This is just
  * a suggestion for running examples.
 */
+
+#include <QKeyEvent>
+
 #ifdef _MSC_VER
     #define PIC_DISABLE_OPENGL_NON_CORE
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
-#include <QKeyEvent>
-
 #include "piccante.hpp"
+#include <QtCore/QCoreApplication>
+#include <QtOpenGL/QGLWidget>
+#include <QApplication>
+#include <QOpenGLFunctions>
+#include <QVBoxLayout>
+#include <QLabel>
 
-#include "../opengl_common_code/opengl_window.hpp"
-
-class SimplePushPull : public pic::OpenGLWindow
-{
+class GLWidget : public QGLWidget, protected QOpenGLFunctions
+{  
 protected:
+
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
-
-public:
     pic::ImageGL img, *imgRec, *img_flt_tmo;
-    glw::program    program;
+    glw::program program;
     int method;
     pic::PushPullGL  *pp;
 
-    SimplePushPull() : OpenGLWindow(NULL)
-    {
-        tmo = NULL;
-        img_flt_tmo = NULL;
-        method = 0;
-    }
+    /**
+     * @brief initializeGL sets variables up.
+     */
+    void initializeGL(){
 
-    void init()
-    {
+          initializeOpenGLFunctions();
+
+        glClearColor( 1.0f, 0.4f, 0.4f, 1.0f );
+
+        #ifdef PIC_WIN32
+            if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+                printf("OpenGL functions are not loaded!\n");
+            }
+        #endif
+
+
         //reading an input image
         img.Read("../data/input/bottles.hdr");
 
@@ -63,30 +74,40 @@ public:
 
         img.generateTextureGL();
 
-        img += 0.0f;
         //creating a screen aligned quad
         pic::QuadGL::getProgram(program,
-                                pic::QuadGL::getVertexProgramV3(),
-                                pic::QuadGL::getFragmentProgramForView());
+                            pic::QuadGL::getVertexProgramV3(),
+                            pic::QuadGL::getFragmentProgramForView());
         quad = new pic::QuadGL(true);
 
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-                imgRec = NULL;
+            imgRec = NULL;
         pp = new pic::PushPullGL();
+
+
     }
 
-    void render()
-    {
+    /**
+     * @brief resizeGL
+     * @param w
+     * @param h
+     */
+    void resizeGL( int w, int h ){
         const qreal retinaScale = devicePixelRatio();
         glViewport(0, 0, width() * retinaScale, height() * retinaScale);
+    }
+
+    /**
+     * @brief paintGL
+     */
+    void paintGL(){
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //simple tone mapping: gamma + exposure correction
-
         if(method == 1) {
             imgRec = pp->Process(&img, imgRec, NULL);
             img_flt_tmo = tmo->Process(pic::SingleGL(imgRec), img_flt_tmo);
@@ -96,14 +117,86 @@ public:
 
         //imgOut visualization
         quad->Render(program, img_flt_tmo->getTexture());
-
     }
 
-    void keyPressEvent(QKeyEvent * ev)
+public:
+
+    /**
+     * @brief GLWidget
+     * @param format
+     * @param parent
+     */
+    GLWidget( const QGLFormat& format, QWidget* parent = 0 ): QGLWidget(format, parent)
     {
-        if(ev->type() == QEvent::KeyPress) {
-            if(ev->key() == Qt::Key_Space) {
-                method = (method + 1) % 2;
+        setFixedWidth(912);
+        setFixedHeight(684);
+
+        img_flt_tmo = NULL;
+        imgRec = NULL;
+        quad = NULL;
+    }
+
+    /**
+     * @brief update
+     */
+    void update()
+    {
+        method = (method + 1) % 2;
+    }
+};
+
+class Window : public QWidget
+{
+protected:
+
+    GLWidget *window_gl;
+    QVBoxLayout *layout;
+    QLabel *label;
+
+public:
+
+    /**
+     * @brief Window
+     * @param format
+     */
+    Window(const QGLFormat &format)
+    {
+  //      resize(912, 900);
+
+        window_gl = new GLWidget(format,this);
+
+        layout = new QVBoxLayout();
+
+        layout->addWidget(window_gl);
+
+        label = new QLabel(
+        "Pease hit the space bar in order to switch from the original image (with a black hole) to the reconstructed one using Push-Pull.", this);
+        label->setFixedWidth(912);
+        label->setFixedHeight(64);
+
+        layout->addWidget(label);
+
+        setLayout(layout);
+
+        setWindowTitle(tr("Push-Pull Example"));
+    }
+
+    ~Window()
+    {
+        delete window_gl;
+        delete layout;
+        delete label;
+    }
+
+    /**
+     * @brief keyPressEvent
+     * @param e
+     */
+    void keyPressEvent( QKeyEvent* e ){
+        if(e->type() == QEvent::KeyPress) {
+            if(e->key() == Qt::Key_Space) {
+                window_gl->update();
+                window_gl->updateGL();
             }
         }
     }
@@ -111,20 +204,18 @@ public:
 
 int main(int argc, char **argv)
 {
-    QGuiApplication app(argc, argv);
+    QApplication app( argc, argv );
 
-    QSurfaceFormat format;
-    format.setSamples(4);
-    format.setMajorVersion(4);
-    format.setMinorVersion(0);
-    format.setProfile(QSurfaceFormat::CoreProfile );
+    QGLFormat glFormat;
+    glFormat.setVersion( 4, 0 );
+    glFormat.setProfile( QGLFormat::CoreProfile );
+    glFormat.setSampleBuffers( true );
 
-    SimplePushPull window;
-    window.setFormat(format);
-    window.resize(912, 684);
-    window.show();
+    // Create a GLWidget requesting our format
+    Window w( glFormat );
+    w.show();
 
-    window.setAnimating(true);
+    app.installEventFilter(&w);
 
     return app.exec();
 }
