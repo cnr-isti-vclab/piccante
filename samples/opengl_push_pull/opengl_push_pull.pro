@@ -1,12 +1,15 @@
 TARGET = opengl_push_pull
 
-QT       += core
+QT += core
+QT += gui
+QT += opengl
+QT += widgets
+
 TEMPLATE = app
 CONFIG   += console
 CONFIG   -= app_bundle
 
 SOURCES += main.cpp
-
 
 CONFIG   += C++11
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
