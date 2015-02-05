@@ -20,24 +20,27 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-enum CRF_WEIGHT {CRF_ALL, CRF_HAT, CRF_HAT_2, CRF_TRIANGLE, CRF_DEB97, CRF_AKYUZ, CRF_GAUSS};
+/**
+ * @brief The CRF_WEIGHT enum
+ */
+enum CRF_WEIGHT {CRF_ALL, CRF_HAT, CRF_HAT_2, CRF_TRIANGLE, CRF_DEB97, CRF_GAUSS};
 
-/**WeightFunction: computes weight functions for x in [0,1]*/
+/**
+ * @brief WeightFunction computes weight functions for x in [0,1].
+ * @param x is an input value in [0, 1].
+ * @param type is the type of the function.
+ * @return It returns a weight for x.
+ */
 inline float WeightFunction(float x, CRF_WEIGHT type)
 {
     switch(type) {
 
     case CRF_GAUSS: {
-        float sigma = 0.3f;
+        float sigma = 0.5f;
         float mu = 0.5f;
         float sigma_2 = 2.0f * (sigma * sigma);
         float tmp = (x - mu);
-        return expf(-tmp * tmp / sigma_2);
-    }
-    break;
-
-    case CRF_AKYUZ: {
-        return 1.0f - powf(2.0f * x - 1.0f, 12.0f);
+        return expf(-4.0f * (tmp * tmp) / sigma_2);
     }
     break;
 
@@ -425,13 +428,13 @@ public:
 
                 }
 
-                if(coords.size()>0) {//getting the median value
+                if(!coords.empty()) {//getting the median value
                     std::sort (coords.begin(), coords.end());  
                     ret_c[j] = float(coords[coords.size() >> 1]) / 255.0f;
                 }
             }
             
-            if(filteringSize>0) {
+            if(filteringSize > 0) {
                 Image toBeFiltered(1, 256, 1, 1, ret_c);
 
                 Image *filtered = FilterMean::Execute(&toBeFiltered, NULL, filteringSize);
