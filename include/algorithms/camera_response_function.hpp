@@ -23,7 +23,7 @@ namespace pic {
 /**
  * @brief The CRF_WEIGHT enum
  */
-enum CRF_WEIGHT {CRF_ALL, CRF_HAT, CRF_HAT_2, CRF_TRIANGLE, CRF_DEB97, CRF_GAUSS};
+enum CRF_WEIGHT {CW_ALL, CW_HAT, CW_HAT_2, CW_DEB97, CW_GAUSSS};
 
 /**
  * @brief WeightFunction computes weight functions for x in [0,1].
@@ -35,7 +35,7 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
 {
     switch(type) {
 
-    case CRF_GAUSS: {
+    case CW_GAUSSS: {
         float sigma = 0.5f;
         float mu = 0.5f;
         float sigma_2 = 2.0f * (sigma * sigma);
@@ -44,29 +44,19 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
     }
     break;
 
-    case CRF_HAT: {
+    case CW_HAT: {
         return 1.0f - powf(2.0f * x - 1.0f, 12.0f);
     }
     break;
 
-    case CRF_HAT_2: {
+    case CW_HAT_2: {
         float val = (2.0f * x - 1.0f);
         float val_squared = val * val;
         float val_quartic = val_squared * val_squared;
         return (1.0f - val_quartic * val_quartic * val_quartic);
     }
 
-    case CRF_TRIANGLE: {
-        if(x > 0.5f) {
-            float tmp = 1.0f - x;
-            return tmp > 0.0f ? tmp : 0.0f;
-        } else {
-            return x;
-        }
-    }
-    break;
-
-    case CRF_DEB97: {
+    case CW_DEB97: {
         float Zmin = 0.0f;
         float Zmax = 1.0f;
         float tr = (Zmin + Zmax) / 2.0f;
@@ -86,11 +76,12 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
 enum IMG_LIN {LIN_LIN, LIN_2_2, LIN_ICFR};
 
 /**
- * @brief Linearize
- * @param x
- * @param type
- * @param icrf
- * @return
+ * @brief Linearize removes a camera resposnse function to a value.
+ * @param x is an intensity value in [0,1].
+ * @param type describes how x values are encoded.
+ * @param icrf is the inverse camera response function stored as
+ * an array of values of 256 elements.
+ * @return It returns x in the linear domain.
  */
 inline float Linearize(float x, IMG_LIN type, float *icrf = NULL)
 {
@@ -352,7 +343,7 @@ public:
      * @param nSamples
      * @param lambda
      */
-    CameraResponseFunction(ImageVec stack, float *exposure, CRF_WEIGHT type = CRF_DEB97, int nSamples = 100, float lambda = 10.0f)
+    CameraResponseFunction(ImageVec stack, float *exposure, CRF_WEIGHT type = CW_DEB97, int nSamples = 100, float lambda = 10.0f)
     {
         DebevecMalik(stack, exposure, type, nSamples, lambda);
     }
@@ -378,7 +369,7 @@ public:
         
         icrf.clear();
 
-        this->type = CRF_ALL;
+        this->type = CW_ALL;
 
         int width    = img_raw->width;
         int height   = img_raw->height;
@@ -456,7 +447,7 @@ public:
      * @param nSamples
      * @param lambda
      */
-    void DebevecMalik(ImageVec stack, float *exposure, CRF_WEIGHT type = CRF_DEB97, int nSamples = 100, float lambda = 10.0f)
+    void DebevecMalik(ImageVec stack, float *exposure, CRF_WEIGHT type = CW_DEB97, int nSamples = 100, float lambda = 10.0f)
     {
         if( stack.empty() || (exposure == NULL) ) {
             return;

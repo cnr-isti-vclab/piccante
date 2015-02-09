@@ -47,6 +47,14 @@ protected:
 
         unsigned int n = src.size();
 
+        bool bFunction = (icrf != NULL) && (linearization_type == LIN_ICFR);
+
+        float maxVal = FLT_MAX;
+        for(int j = 0; j < n; j++) {
+            maxVal = MIN(maxVal, src[j]->exposure);
+        }
+        maxVal = 1.0f / maxVal;
+
         for(int j = box->y0; j < box->y1; j++) {
             int ind = j * width;
 
@@ -56,8 +64,6 @@ protected:
                 int c = (ind + i) * channels;
 
                 bool flag = false;
-
-                float maxVal = -1.0f;
 
                 for(int k = 0; k < channels; k++) {
                     float weight_norm = 0.0f;
@@ -69,7 +75,7 @@ protected:
                         float weight = WeightFunction(x, weight_type);
 
                         float x_lin;
-                        if((icrf != NULL) && (linearization_type == LIN_ICFR)) {
+                        if(bFunction) {
                             x_lin = Linearize(x, linearization_type, icrf->at(k));
                         } else {
                             x_lin = x;
@@ -82,17 +88,8 @@ protected:
 
                     flag = flag || (weight_norm <= 0.0f);
 
-                    float final_value = weight_norm > 0.0f ? (acc / weight_norm) : -1.0f;
+                    float final_value = weight_norm > 0.0f ? (acc / weight_norm) : maxVal;
                     dst->data[c + k] = final_value;
-
-                    maxVal = final_value > maxVal ? final_value : maxVal;
-                }
-
-                //we had a saturated pixel...
-                for(int k = 0; k < channels; k++) {
-                    if(dst->data[c + k] < 0.0f) {
-                        dst->data[c + k] = maxVal;
-                    }
                 }
             }
         }
@@ -106,7 +103,7 @@ public:
      * @param linearization_type
      * @param icrf
      */
-    FilterAssembleHDR(CRF_WEIGHT weight_type = CRF_GAUSS, IMG_LIN linearization_type = LIN_LIN, std::vector<float *> *icrf = NULL)
+    FilterAssembleHDR(CRF_WEIGHT weight_type = CW_GAUSS, IMG_LIN linearization_type = LIN_LIN, std::vector<float *> *icrf = NULL)
     {
         this->weight_type = weight_type;
 
