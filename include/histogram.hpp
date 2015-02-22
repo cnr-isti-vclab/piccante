@@ -211,12 +211,12 @@ public:
             int indx = int(((val - fMin) * nBinf) / deltaMaxMin);
 
             #ifdef PIC_DEBUG
-            if((indx >= nBin) || (indx<0)) {
+            if((indx >= nBin) || (indx < 0)) {
                 printf("Error in Calculate %d.\n",indx);
             }
             #endif
 
-            bin[ CLAMP(indx, nBin) ]++;
+            bin[CLAMP(indx, nBin)]++;
         }
     }
 

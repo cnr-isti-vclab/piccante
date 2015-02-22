@@ -23,7 +23,7 @@ namespace pic {
 /**
  * @brief The CRF_WEIGHT enum
  */
-enum CRF_WEIGHT {CW_ALL, CW_HAT, CW_HAT_2, CW_DEB97, CW_GAUSSS};
+enum CRF_WEIGHT {CW_ALL, CW_HAT, CW_DEB97, CW_GAUSS};
 
 /**
  * @brief WeightFunction computes weight functions for x in [0,1].
@@ -35,7 +35,7 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
 {
     switch(type) {
 
-    case CW_GAUSSS: {
+    case CW_GAUSS: {
         float sigma = 0.5f;
         float mu = 0.5f;
         float sigma_2 = 2.0f * (sigma * sigma);
@@ -45,11 +45,6 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
     break;
 
     case CW_HAT: {
-        return 1.0f - powf(2.0f * x - 1.0f, 12.0f);
-    }
-    break;
-
-    case CW_HAT_2: {
         float val = (2.0f * x - 1.0f);
         float val_squared = val * val;
         float val_quartic = val_squared * val_squared;
