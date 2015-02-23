@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "image.hpp"
 #include "util/array.hpp"
+#include "util/math.hpp"
 
 namespace pic {
 
@@ -37,6 +38,62 @@ protected:
     int				nBin;
     VALUE_SPACE		type;
     float			fMin, fMax;
+    float           deltaMaxMin, nBinf;
+    float           epsilon;
+
+    /**
+     * @brief projectDomain applies the histogram domain to x.
+     * @param x is an input value.
+     * @return x is converted into the histogram domain.
+     */
+    inline float projectDomain(float x)
+    {
+        switch(type) {
+            case VS_LOG_2: {
+                return logf(x + epsilon) * C_INV_LOG_NAT_2;
+            }
+            break;
+
+            case VS_LOG_E: {
+                return logf(x + epsilon);
+            }
+            break;
+
+            case VS_LOG_10: {
+                return log10f(x + epsilon);
+            }
+            break;
+        }
+
+        return x;
+    }
+
+    /**
+     * @brief unprojectDomain removes the histogram domain to x.
+     * @param x is an input value.
+     * @return x is converted back to its original domain.
+     */
+    inline float unprojectDomain(float x)
+    {
+        switch(type) {
+            case VS_LOG_2: {
+                return powf(2.0f, x) - epsilon;
+            }
+            break;
+
+            case VS_LOG_E: {
+                return expf(x) - epsilon;
+            }
+            break;
+
+            case VS_LOG_10: {
+                return powf(10.0f, x) - epsilon;
+            }
+            break;
+        }
+
+        return x;
+    }
 
 public:
     unsigned int	*bin, *bin_work;
@@ -55,6 +112,8 @@ public:
         type =  VS_LIN;
         fMin = -FLT_MAX;
         fMax =  FLT_MAX;
+
+        epsilon = 1e-6f;
     }
 
     /**
@@ -74,6 +133,8 @@ public:
 
         fMin = -FLT_MAX;
         fMax =  FLT_MAX;
+
+        epsilon = 1e-6f;
 
         Calculate(imgIn, type, nBin, channel);
     }
@@ -107,7 +168,7 @@ public:
         type =  VS_LIN;
         fMin = -FLT_MAX;
         fMax =  FLT_MAX;
-    }
+    }   
 
     /**
      * @brief Calculate computes the histogram of an input image. In the case
@@ -151,62 +212,24 @@ public:
         int channels = imgIn->channels;
 
         //Statistics
-        float epsilon = 1e-6f;
         fMin =  FLT_MAX;
         fMax = -FLT_MAX;
-        float log2f = logf(2.0f);
 
         for(int i = channel; i < size; i += channels) {
             float val = imgIn->data[i];
-
-            switch(type) {
-                case VS_LOG_2: {
-                    val = logf(imgIn->data[i] + epsilon) / log2f;
-                }
-                break;
-
-                case VS_LOG_E: {
-                    val = logf(imgIn->data[i] + epsilon);
-                }
-                break;
-
-                case VS_LOG_10: {
-                    val = log10f(imgIn->data[i] + epsilon);
-                }
-                break;
-            }
-
             fMin = MIN(fMin, val);
             fMax = MAX(fMax, val);
         }
 
-        if(type == VS_LDR) {
-            fMin = 0.0f;
-            fMax = 1.0f;
-        }
-    
-        float deltaMaxMin = (fMax - fMin);
-        float nBinf = float(nBin - 1);
+        fMin = projectDomain(fMin);
+        fMax = projectDomain(fMax);
 
-        //Histogram calculation
-        for(int i = channel; i < size; i += channels) {
-            float val = imgIn->data[i];
-            switch(type) {
-                case VS_LOG_2: {
-                    val = logf(imgIn->data[i] + epsilon) / log2f;
-                }
-                break;
+        deltaMaxMin = (fMax - fMin);
+        nBinf = float(nBin - 1);
 
-                case VS_LOG_E: {
-                    val = logf(imgIn->data[i] + epsilon);
-                }
-                break;
-
-                case VS_LOG_10: {
-                    val = log10f(imgIn->data[i] + epsilon);
-                }
-                break;
-            }
+        //histogram calculation
+        for(int i = channel; i < size; i += channels) {           
+            float val = projectDomain(imgIn->data[i]);
 
             int indx = int(((val - fMin) * nBinf) / deltaMaxMin);
 
@@ -218,6 +241,29 @@ public:
 
             bin[CLAMP(indx, nBin)]++;
         }
+    }
+
+    /**
+     * @brief project converts an input value in the histogram domain.
+     * @param x is an input value.
+     * @return x is projected in the histogram domain.
+     */
+    int project(float x)
+    {
+        float y = projectDomain(x);
+        return int(((y - fMin) * nBinf) / deltaMaxMin);
+    }
+
+    /**
+     * @brief unproject converts a histogram value back to its original domain.
+     * @param ind is a histogram value.
+     * @return ind is converted back to its original domain.
+     */
+    float unproject(int ind)
+    {
+        float indf = float(ind);
+        float y = ((indf * deltaMaxMin) / nBinf) + fMin;
+        return unprojectDomain(y);
     }
 
     /**

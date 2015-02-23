@@ -50,9 +50,10 @@ protected:
         bool bFunction = (icrf != NULL) && (linearization_type == LIN_ICFR);
 
         float maxVal = FLT_MAX;
-        for(int j = 0; j < n; j++) {
+        for(unsigned int j = 0; j < n; j++) {
             maxVal = MIN(maxVal, src[j]->exposure);
         }
+
         maxVal = 1.0f / maxVal;
 
         for(int j = box->y0; j < box->y1; j++) {

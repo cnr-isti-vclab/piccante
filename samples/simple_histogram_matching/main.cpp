@@ -22,26 +22,25 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-//This means we do not use QT for I/O
-#define PIC_DISABLE_QT
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    printf("Reading an HDR file...");
+    printf("Reading source and target images...");
 
-    pic::Image img;
-    img.Read("../data/input/bottles.hdr");
+    pic::Image img_source("../data/input/histogram_matching/source.jpg");
+    pic::Image img_target("../data/input/histogram_matching/target.jpg");
 
     printf("Ok\n");
 
-    printf("Is it valid? ");
-    if(img.isValid()) {
+    printf("Are these valid? ");
+    if(img_source.isValid() && img_target.isValid()) {
 
+        pic::Image *out = pic::HistogramMatching(&img_source, &img_target);
 
+        out->Write("../data/output/histogram_matching.png");
     } else {
-        printf("No, the file is not valid!\n");
+        printf("No, the files are not valid!\n");
     }
 
     return 0;

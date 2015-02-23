@@ -24,13 +24,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- * @brief histogramMatching
+ * @brief HistogramMatching
  * @param img_source is the input image
  * @param img_target is the image with target colors
  * @param out is
  * @return It returns out.
  */
-Image *histogramMatching(Image* img_source, Image* img_target, Image* out = NULL)
+Image *HistogramMatching(Image* img_source, Image* img_target, int nBin = 256, Image* out = NULL)
 {
     if(img_source == NULL || img_target == NULL) {
         return out;
@@ -40,14 +40,51 @@ Image *histogramMatching(Image* img_source, Image* img_target, Image* out = NULL
         return out;
     }
 
+    if(nBin < 1) {
+        nBin = 256;
+    }
+
     int channels = img_source->channels;
 
     Histogram *h_source = new Histogram[channels];
     Histogram *h_target = new Histogram[channels];
 
-    for(int i=0;i <channels; i++) {
-        h_source[i].Calculate(img_source, VS_LIN, 256, i);
-        h_target[i].Calculate(img_target, VS_LIN, 256, i);
+    std::vector<int *> lut;
+
+    for(int i=0; i<channels; i++) {
+        h_source[i].Calculate(img_source, VS_LIN, nBin, i);
+        h_target[i].Calculate(img_target, VS_LIN, nBin, i);
+
+        h_source[i].cumulativef(true);
+        h_target[i].cumulativef(true);
+
+        float *c_source = h_source[i].getCumulativef();
+        float *c_target = h_target[i].getCumulativef();
+
+        int *tmp_lut = new int[nBin];
+
+        for(int j=0; j<nBin; j++) {
+            float x = c_source[j];
+            float *ptr = std::upper_bound(c_target, c_target + nBin, x);
+            tmp_lut[j] = MAX((int)(ptr - c_target), 0);
+        }
+
+        lut.push_back(tmp_lut);
+    }
+
+    if(out == NULL) {
+        out = img_source->Clone();
+    }
+
+    for(int i=0; i<out->size(); i+=channels) {
+
+        for(int j=0; j<channels; j++) {
+            int ind_source = h_source[j].project(img_source->data[i + j]);
+
+            int ind_target = lut[j][ind_source];
+
+            out->data[i + j] = h_target[j].unproject(ind_target);
+        }
     }
 
     return out;
