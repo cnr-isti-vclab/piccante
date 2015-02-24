@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
 {
     printf("Reading source and target images...");
 
-    pic::Image img_source("../data/input/histogram_matching/source.jpg");
-    pic::Image img_target("../data/input/histogram_matching/target.jpg");
+    pic::Image img_source("../data/input/histogram_matching/source.png");
+    pic::Image img_target("../data/input/histogram_matching/target.png");
 
     printf("Ok\n");
 
