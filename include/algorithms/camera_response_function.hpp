@@ -192,7 +192,7 @@ protected:
             return NULL;
         }
      
-        if(nSamples<1) {
+        if(nSamples < 1) {
             nSamples = 100;
         }
 
@@ -204,7 +204,7 @@ protected:
         int c = 0;
         
         #ifdef PIC_DEBUG
-        printf("Computing histograms...");
+            printf("Computing histograms...");
         #endif
         
         for(int j = 0; j < channels; j++) {
@@ -215,13 +215,13 @@ protected:
             }
         }
         #ifdef PIC_DEBUG
-        printf("Ok\n");
+            printf("Ok\n");
         #endif        
         
         unsigned char *samples = new unsigned char[nSamples * channels * exposures];
         
         #ifdef PIC_DEBUG
-        printf("Sampling...");
+            printf("Sampling...");
         #endif
         
         c = 0;
@@ -246,7 +246,7 @@ protected:
         }
 
         #ifdef PIC_DEBUG
-        printf("Ok\n");
+            printf("Ok\n");
         #endif
 
         return samples;
@@ -350,8 +350,8 @@ public:
 
     /**
      * @brief FromRAWJPEG computes the CRF by exploiting the couple RAW/JPEG from cameras.
-     * @param img_raw
-     * @param img_jpg
+     * @param img_raw is a RAW image.
+     * @param img_jpg is a JPEG compressed image.
      * @param filteringSize
      */
     void FromRAWJPEG(Image *img_raw, Image *img_jpg, int filteringSize = 11)
@@ -499,6 +499,18 @@ public:
         
         delete[] log_exposure;
         delete[] samples;
+    }
+
+    /**
+     * @brief MitsunagaNayar
+     * @param stack
+     * @param exposure
+     * @param polynomial_degree
+     * @param nSamples
+     */
+    void MitsunagaNayar(ImageVec stack, float *exposure, int polynomial_degree = 3, int nSamples = 100)
+    {
+
     }
 
     /**
