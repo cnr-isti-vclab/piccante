@@ -30,6 +30,9 @@ const float C_CIELAB_C1                     = 7.787037037037037037037037037037f;
 const float C_CIELAB_C1_INV                 = 0.12841854934601664684898929845422f;
 const float C_FOUR_OVER_TWENTY_NINE         = 0.13793103448275862068965517241379f;
 
+/**
+ * @brief The ColorConvXYZtoCIELAB class
+ */
 class ColorConvXYZtoCIELAB: public ColorConv
 {
 protected:
@@ -38,6 +41,9 @@ protected:
 
 public:
 
+    /**
+     * @brief ColorConvXYZtoCIELAB
+     */
     ColorConvXYZtoCIELAB()
     {
         white_point[0] = 1.0f;
@@ -45,7 +51,11 @@ public:
         white_point[2] = 1.0f;
     }
 
-    ///from XYZ to CIE LAB
+    /**
+     * @brief direct
+     * @param colIn
+     * @param colOut
+     */
     void direct(float *colIn, float *colOut)
     {
         float fY_Yn = f(colIn[1] / white_point[1]);
@@ -55,7 +65,11 @@ public:
         colOut[2] = 200.0f * (fY_Yn - f(colIn[2] / white_point[2]));
     }
 
-    ///from CIE LAB to XYZ
+    /**
+     * @brief inverse
+     * @param colIn
+     * @param colOut
+     */
     void inverse(float *colIn, float *colOut)
     {
         float tmp = (colIn[0] + 16.0f) / 116.0f;
@@ -65,6 +79,11 @@ public:
         colOut[2] = white_point[2] * f_inv(tmp - colIn[2] / 200.0f);
     }
 
+    /**
+     * @brief f
+     * @param t
+     * @return
+     */
     static float f(float t)
     {
         if(t > C_SIX_OVER_TWENTY_NINE_CUBIC) {
@@ -75,6 +94,11 @@ public:
         }
     }
 
+    /**
+     * @brief f_inv
+     * @param t
+     * @return
+     */
     static float f_inv(float t)
     {
         if(t > C_SIX_OVER_TWENTY_NINE ) {

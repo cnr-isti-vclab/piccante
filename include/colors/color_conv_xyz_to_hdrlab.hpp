@@ -50,6 +50,11 @@ public:
         two_e = powf(2.0f, computeEpsilon(Ys, Yabs));
     }
 
+    /**
+     * @brief ColorConvXYZtoHDRLAB
+     * @param Yabs
+     * @param whitePoint
+     */
     ColorConvXYZtoHDRLAB(float Yabs, float *whitePoint)
     {
         this->Yabs = Yabs;
