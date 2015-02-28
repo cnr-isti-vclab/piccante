@@ -47,7 +47,7 @@ protected:
 
         unsigned int n = src.size();
 
-        bool bFunction = (icrf != NULL) && (linearization_type == LIN_ICFR);
+        bool bFunction = (icrf != NULL) && (linearization_type == IL_LUT_8_BIT);
 
         float maxVal = FLT_MAX;
         for(unsigned int j = 0; j < n; j++) {
@@ -104,7 +104,7 @@ public:
      * @param linearization_type
      * @param icrf
      */
-    FilterAssembleHDR(CRF_WEIGHT weight_type = CW_GAUSS, IMG_LIN linearization_type = LIN_LIN, std::vector<float *> *icrf = NULL)
+    FilterAssembleHDR(CRF_WEIGHT weight_type = CW_GAUSS, IMG_LIN linearization_type = IL_LIN, std::vector<float *> *icrf = NULL)
     {
         this->weight_type = weight_type;
 

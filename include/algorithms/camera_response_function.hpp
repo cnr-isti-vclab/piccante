@@ -52,8 +52,8 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
     }
 
     case CW_DEB97: {
-        float Zmin = 0.0f;
-        float Zmax = 1.0f;
+        float Zmin = 0.01f;
+        float Zmax = 0.99f;
         float tr = (Zmin + Zmax) / 2.0f;
 
         if(x <= tr) {
@@ -68,7 +68,7 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
     return 1.0f;
 }
 
-enum IMG_LIN {LIN_LIN, LIN_2_2, LIN_ICFR};
+enum IMG_LIN {IL_LIN, IL_2_2, IL_LUT_8_BIT};
 
 /**
  * @brief Linearize removes a camera resposnse function to a value.
@@ -82,18 +82,18 @@ inline float Linearize(float x, IMG_LIN type, float *icrf = NULL)
 {
     switch(type) {
 
-    case LIN_LIN:{
+    case IL_LIN:{
         return x;
     }
     break;
 
-    case LIN_ICFR:{
+    case IL_LUT_8_BIT:{
         int index =  CLAMP(int(lround(x * 255.0f)), 256);
         return icrf[index];
     }
     break;
 
-    case LIN_2_2: {
+    case IL_2_2: {
         return powf(x, 2.2f);
     }
     break;
@@ -116,6 +116,9 @@ inline float Linearize(float x, IMG_LIN type, float *icrf = NULL)
 
 namespace pic {
 
+/**
+ * @brief The CameraResponseFunction class
+ */
 class CameraResponseFunction
 {
 protected:
@@ -447,22 +450,22 @@ public:
         if( stack.empty() || (exposure == NULL) ) {
             return;
         }
-            
+
+        if(nSamples < 1) {
+            nSamples = 100;
+        }
+
         icrf.clear();
 
         this->type = type;
 
+        //Subsampling the image stack
 //      unsigned char *samples = subSample(stack, nSamples);
         unsigned char *samples = subSampleGrossberg(stack, nSamples);
         
         //Computing CRF using Debevec and Malik
         int channels = stack[0]->channels;
-                
-        //Subsampling the image stack
-        if(nSamples < 1) {
-            nSamples = 100;
-        }
-    
+                    
         //precomputing the weight function
         for(int i = 0; i < 256; i++) {
             w[i] = WeightFunction(float(i) / 255.0f, type);

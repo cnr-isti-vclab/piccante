@@ -79,9 +79,9 @@ Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
         printf("Blending...");
     #endif
 
-    Pyramid *pW   = new Pyramid(width, height, 1, false);
-    Pyramid *pI   = new Pyramid(width, height, channels, true);
-    Pyramid *pOut = new Pyramid(width, height, channels, true);
+    Pyramid *pW   = new Pyramid(width, height, 1, false, 2);
+    Pyramid *pI   = new Pyramid(width, height, channels, true, 2);
+    Pyramid *pOut = new Pyramid(width, height, channels, true, 2);
 
     pOut->SetValue(0.0f);
 
