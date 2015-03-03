@@ -326,13 +326,13 @@ inline float expMinus(float x)
 }
 
 /**
- * @brief log10PlusEpsilon
+ * @brief log10fPlusEpsilon
  * @param x
  * @return
  */
-float log10PlusEpsilon(float x)
+float log10fPlusEpsilon(float x)
 {
-    return log10f(x + 1e-5f);
+    return log10f(x + 1e-6f);
 }
 
 /**

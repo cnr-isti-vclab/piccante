@@ -53,6 +53,22 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
+        printf("Tone mapping using Durand and Dorsey's TMO...");
+        pic::Image *imgToneMapped_durand = pic::DurandTMO(&img);
+
+        /*pic::LT_NOR_GAMMA implies that when we save the image,
+          this is quantized at 8-bit and gamma is applied.
+          Note that pic::DurandTMO tone maps an HDR image
+          but it does not apply gamma.*/
+        bWritten = imgToneMapped_durand->Write("../data/output/tone_mapping_durand.png", pic::LT_NOR_GAMMA);
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+
+
         printf("Tone mapping using Drago et al.'s TMO...");
         pic::Image *imgToneMapped_drago = pic::DragoTMO(&img);
 
