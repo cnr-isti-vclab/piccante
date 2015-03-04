@@ -84,7 +84,7 @@ public:
 
         float LMax, Lwa;
         img_lum->getMaxVal(&LMax);
-        img_lum->getMeanVal(&Lwa);
+        img_lum->getLogMeanVal(&Lwa);
 
         flt_tmo->Update(Ld_Max, bias, LMax, Lwa);
         imgOut = flt_tmo->Process(DoubleGL(imgIn, img_lum), imgOut);

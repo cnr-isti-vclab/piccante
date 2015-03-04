@@ -107,7 +107,7 @@ public:
         img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
 
         float Lwa;
-        img_lum->getMeanVal(&Lwa);
+        img_lum->getLogMeanVal(&Lwa);
 
         flt_tmo_global->Update(alpha / Lwa);
         imgOut = flt_tmo_global->Process(DoubleGL(imgIn, img_lum), imgOut);
@@ -150,8 +150,10 @@ public:
 
         img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
 
+        img_lum->loadToMemory();
+
         float Lwa;
-        img_lum->getMeanVal(&Lwa);
+        img_lum->getLogMeanVal(&Lwa);
 
         if(bDomainChange) {
             img_lum_adapt = simple_sigmoid->Process(SingleGL(img_lum), img_lum_adapt);

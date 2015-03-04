@@ -190,10 +190,6 @@ ImageGL *FilterGLLuminance::Process(ImageGLVec imgIn, ImageGL *imgOut)
         return imgOut;
     }
 
-    if(imgIn[0]->channels != 3) {
-        return imgOut;
-    }
-
     int w = imgIn[0]->width;
     int h = imgIn[0]->height;
 

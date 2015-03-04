@@ -80,6 +80,10 @@ public:
      */
     GLuint Redux(GLuint texIn, int width, int height, int channels, std::vector<GLuint> &stack)
     {
+        if(stack.empty()) {
+            return 0;
+        }
+
         GLuint texFlt = texIn;
 
         for(unsigned int i = 0; i < stack.size(); i++) {
@@ -302,7 +306,6 @@ void ReduxGL::InitShaders()
         filteringProgram[1].relink();
         filteringProgram[1].uniform("u_tex", 0);
         glw::bind_program(0);
-
     }
 }
 
@@ -333,7 +336,7 @@ GLuint ReduxGL::Process(GLuint texIn, int width, int height, int channels, GLuin
     glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 
     //Shaders
-    glw::bind_program(filteringProgram[0]);
+    glw::bind_program(filteringProgram[counter]);
 
     //Textures
     glActiveTexture(GL_TEXTURE0);
