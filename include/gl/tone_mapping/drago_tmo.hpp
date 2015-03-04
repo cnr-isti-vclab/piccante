@@ -30,6 +30,7 @@ class DragoTMOGL
 {
 protected:
     FilterGLLuminance *flt_lum;
+    FilterGLOp        *flt_log;
     FilterGLDragoTMO  *flt_tmo;
 
     ImageGL           *img_lum;

@@ -127,7 +127,7 @@ void FilterGLDragoTMO::FragmentShader()
     fragment_source = GLW_STRINGFY
                       (
     uniform sampler2D u_tex;	\n
-    uniform sampler2D u_lum;	\n
+    //uniform sampler2D u_lum;	\n
     uniform float	  constant1;\n
     uniform float	  constant2;\n
     uniform float     LMax;		\n
@@ -138,7 +138,8 @@ void FilterGLDragoTMO::FragmentShader()
         \n
         ivec2 coords   = ivec2(gl_FragCoord.xy);\n
         vec3  color    = texelFetch(u_tex, coords, 0).xyz;\n
-        float L        = texelFetch(u_lum, coords, 0).x;\n
+        //float L        = texelFetch(u_lum, coords, 0).x;\n
+        float L        = dot(vec3(0.213, 0.715, 0.072), color);
         float L_scaled = L / Lwa;\n
         float tmp      = pow((L_scaled / LMax), constant1);\n
         float Ld       = constant2 * log(1.0 + L_scaled) / log(2.0 + 8.0 * tmp);\n
@@ -205,12 +206,12 @@ void FilterGLDragoTMO::Update(float Ld_Max, float b, float LMax, float Lwa)
     ComputeConstants();
 
     glw::bind_program(filteringProgram);
-    filteringProgram.uniform("u_tex",       0);
-    filteringProgram.uniform("u_lum",       1);
-    filteringProgram.uniform("constant1",	constant1);
-    filteringProgram.uniform("constant2",	constant2);
-    filteringProgram.uniform("LMax",	    LMax_scaled);
-    filteringProgram.uniform("Lwa",		    Lwa_scaled);
+    filteringProgram.uniform("u_tex", 0);
+    //filteringProgram.uniform("u_lum", 1);
+    filteringProgram.uniform("constant1", constant1);
+    filteringProgram.uniform("constant2", constant2);
+    filteringProgram.uniform("LMax", LMax_scaled);
+    filteringProgram.uniform("Lwa",	Lwa_scaled);
     glw::bind_program(0);   
 }
 

@@ -416,6 +416,24 @@ public:
     }
 
     /**
+     * @brief getLogMeanVal
+     * @param imgIn
+     * @return
+     */
+    float *getLogMeanVal(float *ret = NULL)
+    {
+        ReduxOpsGL *ops = ReduxOpsGL::getInstance();
+
+        ret = getVal(ret, ops->list[REDGL_LOG_MEAN]);
+
+        for(int i=0; i<channels; i++) {
+            ret[i] = expf(ret[i]);
+        }
+
+        return ret;
+    }
+
+    /**
      * @brief clamp
      * @param a
      * @param b

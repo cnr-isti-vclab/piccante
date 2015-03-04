@@ -35,9 +35,12 @@ protected:
     //Quad
     QuadGL *quad;
 
+    bool bDomainTransform;
+    int  counter;
+
     //Shaders
-    std::string vertex_source, geometry_source, fragment_source;
-    glw::program filteringProgram;
+    std::string vertex_source, geometry_source, fragment_source, fragment_source_domain_transform;
+    glw::program filteringProgram[2];
 
     std::string reduxOperation;
 
@@ -51,7 +54,7 @@ public:
      * @brief ReduxGL
      * @param reduxOperation
      */
-    ReduxGL(std::string reduxOperation);
+    ReduxGL(std::string reduxOperation, bool bDomainTransform);
 
     ~ReduxGL();
 
@@ -80,6 +83,8 @@ public:
         GLuint texFlt = texIn;
 
         for(unsigned int i = 0; i < stack.size(); i++) {
+            counter = (bDomainTransform && (i == 0)) ? 1 : 0;
+
             width  = divideByTwoWithEvenDividend(width);
             height = divideByTwoWithEvenDividend(height);
 
@@ -97,7 +102,18 @@ public:
     static ReduxGL *CreateMean()
     {
         ReduxGL *filter = new
-        ReduxGL("color = (color00 + color10 + color01 + color11) / 4.0;");
+        ReduxGL("color = (color00 + color10 + color01 + color11) / 4.0;", false);
+        return filter;
+    }
+
+    /**
+     * @brief CreateLogMean
+     * @return
+     */
+    static ReduxGL *CreateLogMean()
+    {
+        ReduxGL *filter = new
+        ReduxGL("color = (color00 + color10 + color01 + color11) / 4.0;", true);
         return filter;
     }
 
@@ -108,7 +124,7 @@ public:
     static ReduxGL *CreateMax()
     {
         ReduxGL *filter = new
-        ReduxGL("color = max(color00, color10);\n color = max(color, color01);\n color = max(color, color11);\n");
+        ReduxGL("color = max(color00, color10);\n color = max(color, color01);\n color = max(color, color11);\n", false);
         return filter;
     }
 
@@ -119,7 +135,7 @@ public:
     static ReduxGL *CreateMin()
     {
         ReduxGL *filter = new
-        ReduxGL("color = min(color00, color10);\n color = min(color, color01);\n color = min(color, color11);\n");
+        ReduxGL("color = min(color00, color10);\n color = min(color, color01);\n color = min(color, color11);\n", false);
         return filter;
     }
 
@@ -130,7 +146,7 @@ public:
     static ReduxGL *CreateMinPos()
     {
         ReduxGL *filter = new
-        ReduxGL("vec4 maxVal = vec4(1e-6); if(color00.x>0.0f) color = color00; if(color01.x>0.0f) color = min(color,color01); if(color10.x>0.0f) color = min(color,color10); if(color11.x>0.0f) color = min(color,color11);\n");
+        ReduxGL("vec4 maxVal = vec4(1e-6); if(color00.x>0.0f) color = color00; if(color01.x>0.0f) color = min(color,color01); if(color10.x>0.0f) color = min(color,color10); if(color11.x>0.0f) color = min(color,color11);\n", false);
         return filter;
     }
 
@@ -141,7 +157,7 @@ public:
     static ReduxGL *CreateCheck()
     {
         ReduxGL *filter = new
-        ReduxGL("vec4 sum = color00 + color01 + color10 + color11; color = sum.x<0.5? vec4(0.0) : sum; color = ((sum.x>0.5)&&sum.x<3.5)? vec4(10.0) : color; color = ((sum.x>3.5)&&sum.x<4.5)? vec4(1.0) : color; color = sum.x>4.5 ? vec4(10.0) : color;\n");
+        ReduxGL("vec4 sum = color00 + color01 + color10 + color11; color = sum.x<0.5? vec4(0.0) : sum; color = ((sum.x>0.5)&&sum.x<3.5)? vec4(10.0) : color; color = ((sum.x>3.5)&&sum.x<4.5)? vec4(1.0) : color; color = sum.x>4.5 ? vec4(10.0) : color;\n", false);
         return filter;
     }
 
@@ -190,11 +206,14 @@ public:
 
 };
 
-ReduxGL::ReduxGL(std::string reduxOperation)
+ReduxGL::ReduxGL(std::string reduxOperation, bool bDomainTransform)
 {
     fbo = NULL;
 
     quad = NULL;
+
+    this->counter = 0;
+    this->bDomainTransform = bDomainTransform;
 
     quad = new QuadGL(false);
 
@@ -222,7 +241,6 @@ void ReduxGL::InitShaders()
 {
     fragment_source = GLW_STRINGFY
                       (
-
                           uniform sampler2D u_tex; \n
                           out     vec4      f_color; \n
 
@@ -248,21 +266,44 @@ void ReduxGL::InitShaders()
     }
                       );
 
+    fragment_source_domain_transform = fragment_source;
+
     size_t processing_found = fragment_source.find("___REDUX_OPERATION___");
     fragment_source.replace(processing_found, 21, reduxOperation);
 
-    filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
+    filteringProgram[0].setup(glw::version("330"), vertex_source, fragment_source);
 
 #ifdef PIC_DEBUG
-    printf("[ReduxGL log]\n%s\n", filteringProgram.log().c_str());
+    printf("[ReduxGL log]\n%s\n", filteringProgram[0].log().c_str());
 #endif
 
-    glw::bind_program(filteringProgram);
-    filteringProgram.attribute_source("a_position", 0);
-    filteringProgram.fragment_target("f_color", 0);
-    filteringProgram.relink();
-    filteringProgram.uniform("u_tex", 0);
+    glw::bind_program(filteringProgram[0]);
+    filteringProgram[0].attribute_source("a_position", 0);
+    filteringProgram[0].fragment_target("f_color", 0);
+    filteringProgram[0].relink();
+    filteringProgram[0].uniform("u_tex", 0);
     glw::bind_program(0);
+
+    if(bDomainTransform) {
+        size_t processing_found = fragment_source_domain_transform.find("___REDUX_OPERATION___");
+        std::string domain_transform = "float eps = 1e-6; color00 = log(color00 + eps); color01 = log(color01 + eps); color10 = log(color10 + eps) ; color11 = log(color11 + eps);";
+        domain_transform += reduxOperation;
+        fragment_source_domain_transform.replace(processing_found, 21, domain_transform);
+
+        filteringProgram[1].setup(glw::version("330"), vertex_source, fragment_source_domain_transform);
+
+        #ifdef PIC_DEBUG
+            printf("[ReduxGL log]\n%s\n", filteringProgram[1].log().c_str());
+        #endif
+
+        glw::bind_program(filteringProgram[1]);
+        filteringProgram[1].attribute_source("a_position", 0);
+        filteringProgram[1].fragment_target("f_color", 0);
+        filteringProgram[1].relink();
+        filteringProgram[1].uniform("u_tex", 0);
+        glw::bind_program(0);
+
+    }
 }
 
 GLuint ReduxGL::Process(GLuint texIn, int width, int height, int channels, GLuint texOut)
@@ -292,7 +333,7 @@ GLuint ReduxGL::Process(GLuint texIn, int width, int height, int channels, GLuin
     glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 
     //Shaders
-    glw::bind_program(filteringProgram);
+    glw::bind_program(filteringProgram[0]);
 
     //Textures
     glActiveTexture(GL_TEXTURE0);
