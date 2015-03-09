@@ -43,6 +43,7 @@ protected:
     pic::FilterGLColorConv *tmo;
     pic::DragoTMOGL        *drago_tmo;
     pic::ReinhardTMOGL     *reinhard_tmo;
+    pic::DurandTMOGL       *durand_tmo;
 
     pic::ImageGL    img, *img_tmo, *img_tmo_with_sRGB;
     glw::program    program;
@@ -84,6 +85,9 @@ protected:
 
         //allocating Reinhard et al.'s TMO
         reinhard_tmo = new pic::ReinhardTMOGL();
+
+        //allocating Durand et al.'s TMO
+        durand_tmo = new pic::DurandTMOGL();
     }
 
     /**
@@ -111,17 +115,22 @@ protected:
         switch(method) {
         case 0:
             //applying Reinhard et al.'s TMO (local version)
-            img_tmo = reinhard_tmo->ProcessLocal(&img, 0.18f, 8.0f, NULL, img_tmo);
+            img_tmo = reinhard_tmo->ProcessLocal(&img, img_tmo, 0.18f, 8.0f, NULL);
             break;
 
         case 1:
             //applying Reinhard et al.'s TMO (global version)
-            img_tmo = reinhard_tmo->ProcessGlobal(&img, 0.18f, img_tmo);
+            img_tmo = reinhard_tmo->ProcessGlobal(&img, img_tmo, 0.18f);
             break;
 
         case 2:
             //applying Drago et al.'s TMO
-            img_tmo = drago_tmo->Process(&img, 100.0f, 0.95f, img_tmo);
+            img_tmo = drago_tmo->Process(&img, img_tmo, 100.0f, 0.95f);
+            break;
+
+        case 3:
+            //applying Durand et al.'s TMO
+            img_tmo = durand_tmo->Process(&img, img_tmo, 5.0f);
             break;
         }
 
@@ -156,7 +165,7 @@ public:
      */
     void update()
     {
-        method = (method + 1) % 3;
+        method = (method + 1) % 4;
     }
 };
 

@@ -68,13 +68,13 @@ public:
     /**
      * @brief Process
      * @param imgIn
+     * @param imgOut
      * @param Ld_Max
      * @param bias
-     * @param imgOut
      * @return
      */
-    ImageGL *Process(ImageGL *imgIn, float Ld_Max = 100.0f, float bias = 0.95f,
-                     ImageGL *imgOut = NULL)
+    ImageGL *Process(ImageGL *imgIn, ImageGL *imgOut = NULL,
+                     float Ld_Max = 100.0f, float bias = 0.95f)
     {
         if(imgIn == NULL) {
             return imgOut;

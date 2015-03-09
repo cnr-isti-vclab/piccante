@@ -138,23 +138,23 @@ public:
 
         switch(value) {
         case 0: {
-            imgOut = tone_drago->Process(imgIn, Ld_Max, b, imgOut);
+            imgOut = tone_drago->Process(imgIn, imgOut, Ld_Max, b);
         }
         break;
 
         case 1: {
-            imgOut = tone_reinhard->ProcessLocal(imgIn, 0.18f, 8.0f, NULL, imgOut);
+            imgOut = tone_reinhard->ProcessLocal(imgIn, imgOut, 0.18f, 8.0f, NULL);
         }
         break;
 
         case 10: {
             //Drago TMO
-            imgDrago = tone_drago->Process(imgIn, Ld_Max, b, imgDrago);
+            imgDrago = tone_drago->Process(imgIn, imgDrago, Ld_Max, b);
             imgDrago->loadToMemory();
             imgDrago->Write("tmp.pfm");
 
             //Reinhard TMO
-            imgReinhard = tone_reinhard->ProcessLocal(imgIn, 0.18f, 8.0f, NULL, imgReinhard);
+            imgReinhard = tone_reinhard->ProcessLocal(imgIn, imgReinhard, 0.18f, 8.0f, NULL);
 
             //Genarating/updating pryamids
             if(pyrA == NULL) {

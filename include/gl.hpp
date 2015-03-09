@@ -109,6 +109,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/tone_mapping/segmentation_tmo_approx.hpp"
 #include "gl/tone_mapping/drago_tmo.hpp"
 #include "gl/tone_mapping/reinhard_tmo.hpp"
+#include "gl/tone_mapping/durand_tmo.hpp"
 #include "gl/tone_mapping/hybrid_tmo.hpp"
 #include "gl/tone_mapping/get_all_exposures.hpp"
 #include "gl/tone_mapping/exposure_fusion.hpp"

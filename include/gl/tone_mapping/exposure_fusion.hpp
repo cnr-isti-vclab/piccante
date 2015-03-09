@@ -69,13 +69,14 @@ public:
     /**
      * @brief Process
      * @param imgIn
+     * @param imgOut
      * @param wC
      * @param wE
-     * @param wC
-     * @param imgOut
+     * @param wS
      * @return
      */
-    ImageGL *Process(ImageGLVec imgIn, float wC = 1.0f, float wE = 1.0f, float wS = 1.0f, ImageGL *imgOut = NULL)
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut = NULL,
+                     float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
     {
         int n = imgIn.size();
 

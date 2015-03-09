@@ -101,7 +101,7 @@ public:
             ef = new ExposureFusionGL();
         }
 
-        imgOut = ef->Process(img_vec, 1.0f, 1.0f, 0.0f, imgOut);
+        imgOut = ef->Process(img_vec, imgOut, 1.0f, 1.0f, 0.0f);
 
         return imgOut;
     }

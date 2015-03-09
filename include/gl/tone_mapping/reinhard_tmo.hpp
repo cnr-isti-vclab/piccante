@@ -94,11 +94,11 @@ public:
     /**
      * @brief ProcessGlobal
      * @param imgIn
-     * @param alpha
      * @param imgOut
+     * @param alpha
      * @return
      */
-    ImageGL *ProcessGlobal(ImageGL *imgIn, float alpha = 0.18f, ImageGL *imgOut = NULL)
+    ImageGL *ProcessGlobal(ImageGL *imgIn, ImageGL *imgOut = NULL, float alpha = 0.18f)
     {
         if(imgIn == NULL) {
             return imgOut;
@@ -118,13 +118,14 @@ public:
     /**
      * @brief ProcessLocal
      * @param imgIn
+     * @param imgOut
      * @param alpha
      * @param phi
      * @param filter
-     * @param imgOut
      * @return
      */
-    ImageGL *ProcessLocal(ImageGL *imgIn, float alpha = 0.18f, float phi = 8.0f, FilterGL *filter = NULL, ImageGL *imgOut = NULL)
+    ImageGL *ProcessLocal(ImageGL *imgIn, ImageGL *imgOut = NULL,
+                          float alpha = 0.18f, float phi = 8.0f, FilterGL *filter = NULL)
     {
         if(imgIn == NULL) {
             return imgOut;
@@ -149,8 +150,6 @@ public:
         }
 
         img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
-
-        img_lum->loadToMemory();
 
         float Lwa;
         img_lum->getLogMeanVal(&Lwa);
