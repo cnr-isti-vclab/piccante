@@ -133,8 +133,8 @@ Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = 0.18f,
     filteredLum->ApplyFunction(&SigmoidInv);
 
     //Applying a sigmoid filter
-    FilterSigmoidTMO fSTMO(SIG_TMO, alpha, whitePoint, LogAverage);
-    Image *tonemapped = fSTMO.Process(Double(lum, filteredLum), NULL);
+    FilterSigmoidTMO flt_sigmoid(SIG_TMO, alpha, whitePoint, LogAverage);
+    Image *tonemapped = flt_sigmoid.Process(Double(lum, filteredLum), NULL);
 
     //Removing HDR luminance and replacing it with LDR one
     *imgOut /= *lum;

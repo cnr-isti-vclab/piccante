@@ -35,15 +35,23 @@ protected:
 
     ImageGL           *img_lum;
 
+    /**
+     * @brief AllocateFilters
+     */
+    void AllocateFilters()
+    {
+        flt_lum = new FilterGLLuminance();
+        flt_tmo = new FilterGLDragoTMO();
+    }
+
 public:
     /**
      * @brief DragoTMOGL
      */
     DragoTMOGL()
     {
-        flt_lum = new FilterGLLuminance();
-        flt_tmo = new FilterGLDragoTMO();
-
+        flt_lum = NULL;
+        flt_tmo = NULL;
         img_lum = NULL;
     }
 
@@ -78,6 +86,10 @@ public:
     {
         if(imgIn == NULL) {
             return imgOut;
+        }
+
+        if(flt_lum == NULL) {
+            AllocateFilters();
         }
 
         img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);

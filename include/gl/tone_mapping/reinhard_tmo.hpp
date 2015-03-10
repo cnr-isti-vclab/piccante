@@ -38,11 +38,10 @@ protected:
     FilterGLOp         *simple_sigmoid, *simple_sigmoid_inv;
     ImageGL            *img_lum, *img_lum_adapt;
 
-public:
     /**
-     * @brief ReinhardTMOGL
+     * @brief AllocateFilters
      */
-    ReinhardTMOGL()
+    void AllocateFilters()
     {
         flt_lum = new FilterGLLuminance();
         flt_tmo_global = new FilterGLSigmoidTMO(0.18f, false, false);
@@ -50,6 +49,20 @@ public:
 
         simple_sigmoid     = new FilterGLOp("I0 / (I0 + 1.0)", true, NULL, NULL);
         simple_sigmoid_inv = new FilterGLOp("I0 / (1.0 - I0)", true, NULL, NULL);
+    }
+
+public:
+    /**
+     * @brief ReinhardTMOGL
+     */
+    ReinhardTMOGL()
+    {
+        flt_lum = NULL;
+        flt_tmo_global = NULL;
+        flt_tmo_local = NULL;
+
+        simple_sigmoid = NULL;
+        simple_sigmoid_inv = NULL;
 
         img_lum = NULL;
         img_lum_adapt = NULL;
@@ -104,6 +117,10 @@ public:
             return imgOut;
         }
 
+        if(flt_lum == NULL) {
+            AllocateFilters();
+        }
+
         img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
 
         float Lwa;
@@ -129,6 +146,10 @@ public:
     {
         if(imgIn == NULL) {
             return imgOut;
+        }
+
+        if(flt_lum == NULL) {
+            AllocateFilters();
         }
 
         bool bDomainChange = false;

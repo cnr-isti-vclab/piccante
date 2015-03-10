@@ -45,8 +45,18 @@ protected:
     float				Ld_Max, b;
     bool				bFirst;
 
-    DragoTMOGL          *tone_drago;
-    ReinhardTMOGL       *tone_reinhard;
+    DragoTMOGL          *flt_drago;
+    ReinhardTMOGL       *flt_reinhard;
+
+    /**
+     * @brief AllocateFilters
+     */
+    void AllocateFilters()
+    {
+        flt_drago    = new DragoTMOGL();
+        flt_reinhard = new ReinhardTMOGL();
+        check = ReduxGL::CreateCheck();
+    }
 
 public:
 
@@ -56,6 +66,10 @@ public:
     HybridTMOGL()
     {
         bFirst = true;
+
+        flt_reinhard = NULL;
+        flt_reinhard = NULL;
+        check = NULL;
 
         imgDrago = NULL;
         imgReinhard = NULL;
@@ -67,11 +81,11 @@ public:
 
         Ld_Max = 100.0f;
         b = 0.95f;
+    }
 
-        check = ReduxGL::CreateCheck();
+    ~HybridTMOGL()
+    {
 
-        tone_drago    = new DragoTMOGL();
-        tone_reinhard = new ReinhardTMOGL();
     }
 
     /**
@@ -93,6 +107,10 @@ public:
         if(imgOut == NULL) {
             imgOut = new ImageGL(1, imgIn->width, imgIn->height, imgIn->channels,
                                     IMG_GPU, GL_TEXTURE_2D);
+        }
+
+        if(flt_drago == NULL) {
+            AllocateFilters();
         }
 
         //Compute segmentation map
@@ -138,23 +156,23 @@ public:
 
         switch(value) {
         case 0: {
-            imgOut = tone_drago->Process(imgIn, imgOut, Ld_Max, b);
+            imgOut = flt_drago->Process(imgIn, imgOut, Ld_Max, b);
         }
         break;
 
         case 1: {
-            imgOut = tone_reinhard->ProcessLocal(imgIn, imgOut, 0.18f, 8.0f, NULL);
+            imgOut = flt_reinhard->ProcessLocal(imgIn, imgOut, 0.18f, 8.0f, NULL);
         }
         break;
 
         case 10: {
             //Drago TMO
-            imgDrago = tone_drago->Process(imgIn, imgDrago, Ld_Max, b);
+            imgDrago = flt_drago->Process(imgIn, imgDrago, Ld_Max, b);
             imgDrago->loadToMemory();
             imgDrago->Write("tmp.pfm");
 
             //Reinhard TMO
-            imgReinhard = tone_reinhard->ProcessLocal(imgIn, imgReinhard, 0.18f, 8.0f, NULL);
+            imgReinhard = flt_reinhard->ProcessLocal(imgIn, imgReinhard, 0.18f, 8.0f, NULL);
 
             //Genarating/updating pryamids
             if(pyrA == NULL) {

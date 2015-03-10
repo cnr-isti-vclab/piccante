@@ -36,18 +36,27 @@ protected:
     ImageGL            *lum, *acc, *weights;
     PyramidGL          *pW, *pI, *pOut;
 
+    /**
+     * @brief AllocateFilters
+     */
+    void AllocateFilters()
+    {
+        flt_lum = new FilterGLLuminance();
+        remove_negative = new FilterGLOp("max(I0, vec4(0.0))", true, NULL, NULL);
+        convert_zero_to_one = new FilterGLOp("I0.x > 0.0 ? I0 : vec4(1.0)", true, NULL, NULL);
+    }
+
 public:
     /**
      * @brief ExposureFusionGL
      */
     ExposureFusionGL()
     {
-        flt_lum = new FilterGLLuminance();
+        flt_lum =  NULL;
         flt_weights = NULL;
+        convert_zero_to_one = NULL;
 
-        remove_negative = new FilterGLOp("max(I0, vec4(0.0))", true, NULL, NULL);
-
-        convert_zero_to_one = new FilterGLOp("I0.x > 0.0 ? I0 : vec4(1.0)", true, NULL, NULL);
+        remove_negative = NULL;
 
         lum = NULL;
         acc = NULL;
@@ -60,9 +69,54 @@ public:
 
     ~ExposureFusionGL()
     {
+        if(lum != NULL) {
+            delete lum;
+            lum = NULL;
+        }
+
+        if(acc != NULL) {
+            delete acc;
+            acc = NULL;
+        }
+
+        if(weights != NULL) {
+            delete weights;
+            weights = NULL;
+        }
+
+        if(pW != NULL) {
+            delete pW;
+            pW = NULL;
+        }
+
+        if(pI != NULL) {
+            delete pI;
+            pI = NULL;
+        }
+
+        if(pOut != NULL) {
+            delete pOut;
+            pOut = NULL;
+        }
+
         if(flt_lum != NULL) {
             delete flt_lum;
             flt_lum = NULL;
+        }
+
+        if(flt_weights != NULL) {
+            delete flt_weights;
+            flt_weights = NULL;
+        }
+
+        if(remove_negative != NULL) {
+            delete remove_negative;
+            remove_negative = NULL;
+        }
+
+        if(convert_zero_to_one != NULL) {
+            delete convert_zero_to_one;
+            convert_zero_to_one = NULL;
         }
     }
 
@@ -97,6 +151,10 @@ public:
 
         if(flt_weights == NULL) {
             flt_weights = new FilterGLExposureFusionWeights(wC, wE, wS);
+        }
+
+        if(flt_lum == NULL) {
+            AllocateFilters();
         }
 
         for(int j = 0; j < n; j++) {

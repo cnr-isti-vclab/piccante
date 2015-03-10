@@ -35,10 +35,20 @@ class DurandTMOGL
 {
 protected:
     FilterGLLuminance       *flt_lum;
-    FilterGLBilateral2DS    *filter;
+    FilterGLBilateral2DS    *flt_bil;
     FilterGLOp              *flt_log10;
-    FilterGLDurandTMO       *filter_durand;
+    FilterGLDurandTMO       *flt_durand;
     ImageGL                 *img_lum, *img_lum_base;
+
+    /**
+     * @brief AllocateFilters
+     */
+    void AllocateFilters()
+    {
+        flt_lum = new FilterGLLuminance();
+        flt_log10 = new FilterGLOp("log(I0) * " + NumberToString(1.0f / logf(10.0f)), true, NULL, NULL);
+        flt_durand = new FilterGLDurandTMO();
+    }
 
 public:
     /**
@@ -46,14 +56,14 @@ public:
      */
     DurandTMOGL()
     {
-        flt_lum = new FilterGLLuminance();
-        flt_log10 = new FilterGLOp("log(I0) * " + NumberToString(1.0f / logf(10.0f)), true, NULL, NULL);
+        flt_lum = NULL;
+        flt_log10 = NULL;
 
         img_lum = NULL;
         img_lum_base = NULL;
 
-        filter = NULL;
-        filter_durand = NULL;
+        flt_bil = NULL;
+        flt_durand = NULL;
     }
 
     ~DurandTMOGL()
@@ -74,19 +84,18 @@ public:
             return imgOut;
         }
 
-        if(filter == NULL) {
+        if(flt_bil == NULL) {
             float sigma_s = MAX(imgIn->widthf, imgIn->heightf) * 0.02f;
             float sigma_r = 0.4f;
-            filter = new FilterGLBilateral2DS(sigma_s, sigma_r);
-
-            filter_durand = new FilterGLDurandTMO();
+            flt_bil = new FilterGLBilateral2DS(sigma_s, sigma_r);
+            AllocateFilters();
         }
 
         img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
 
         img_lum = flt_log10->Process(SingleGL(img_lum), img_lum);
 
-        img_lum_base = filter->Process(SingleGL(img_lum), img_lum_base);
+        img_lum_base = flt_bil->Process(SingleGL(img_lum), img_lum_base);
 
         float max_log_base, min_log_base;
 
@@ -96,9 +105,9 @@ public:
         float compression_factor = log10fPlusEpsilon(target_contrast) / (max_log_base - min_log_base);
         float log_absoulte = compression_factor * max_log_base;
 
-        filter_durand->Update(compression_factor, log_absoulte);
+        flt_durand->Update(compression_factor, log_absoulte);
 
-        return filter_durand->Process(TripleGL(imgIn, img_lum, img_lum_base), imgOut);
+        return flt_durand->Process(TripleGL(imgIn, img_lum, img_lum_base), imgOut);
     }
 
 

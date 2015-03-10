@@ -43,8 +43,8 @@ Image *DragoTMO(Image *imgIn, float Ld_Max = 100.0f, float b = 0.95f, Image *img
     float Lw_a = imgLum->getMaxVal()[0];
 
     //tone mapping
-    FilterDragoTMO filterDrago(Ld_Max, b, Lw_Max, Lw_a);
-    imgOut = filterDrago.ProcessP(Double(imgIn, imgLum), imgOut);
+    flt_dragoTMO flt_drago(Ld_Max, b, Lw_Max, Lw_a);
+    imgOut = flt_drago.ProcessP(Double(imgIn, imgLum), imgOut);
 
     delete imgLum;
 
