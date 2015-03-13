@@ -35,7 +35,7 @@ namespace pic {
  * @param maxFstop
  * @return
  */
-double mPSNR(Image *ori, Image *cmp, int minFstop, int maxFstop)
+double mPSNR(Image *ori, Image *cmp, float gamma = 2.2f, int minFstop = -1, int maxFstop = -1)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -45,9 +45,8 @@ double mPSNR(Image *ori, Image *cmp, int minFstop, int maxFstop)
         return -1.0;
     }
 
-    //TO DO: Calculate fstop
     if(minFstop == maxFstop) {
-
+        getMinMaxFstops(ori, minFstop, maxFstop);
     }
 
     #ifdef PIC_DEBUG
@@ -59,16 +58,18 @@ double mPSNR(Image *ori, Image *cmp, int minFstop, int maxFstop)
     double aMSE = 0.0;
 
     for(int i = minFstop; i <= maxFstop; i++) {
-        double tmp = MSE(ori, cmp, 2.2f, float(i));
+        double tmp = MSE(ori, cmp, gamma, float(i));
+
         #ifdef PIC_DEBUG
             printf("-- Pass: %d \t MSE: %g\n", i, tmp);
        #endif
-       aMSE += tmp;
+
+        aMSE += tmp;
     }
 
     aMSE /= double(maxFstop - minFstop + 1);
 
-    double MSEconst = double(ori->channels) * 65025.0; //255*255;
+    double MSEconst = double(ori->channels) * 65025.0; //NOTE: 65025 = 255 * 255;
     float ret = float(10.0 * log10(MSEconst / aMSE));
 
     #ifdef PIC_DEBUG

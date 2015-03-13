@@ -26,9 +26,49 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- * @brief getAllExposures converts an HDR image into a stack of exposure values
- * @param imgIn
- * @return
+ * @brief getMinMaxFstops computes the minimum and maximum f-stop values of an image.
+ * @param imgIn is an image.
+ * @param minFstop is the mininum f-stop of imgIn, output.
+ * @param maxFstop is the maximum f-stop of imgIn, output.
+ */
+void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
+{
+    if(imgIn == NULL) {
+        return;
+    }
+
+    Image *img_lum = FilterLuminance::Execute(ori, NULL, LT_CIE_LUMINANCE);
+
+    int nData = img_lum->width * img_lum->height;
+
+    IntCoord coord = IndexedArray::findSimple(img_lum->data, nData, IndexedArray::bFuncNotNeg);
+
+    float commonMax = IndexedArray::max(img_lum->data, coord);
+    float commonMin = IndexedArray::min(img_lum->data, coord);
+
+    float tminFstop = logf(commonMin) / logf(2.0f);
+    float tmaxFstop = logf(commonMax) / logf(2.0f);
+
+    minFstop = int(lround(tminFstop));
+    maxFstop = int(lround(tmaxFstop));
+
+    int halfFstops = (maxFstop - minFstop + 1) >> 1;
+    minFstop = -halfFstops + 1;
+    maxFstop =  halfFstops - 1;
+
+    if(minFstop == maxFstop) {
+        minFstop--;
+        maxFstop++;
+    }
+
+    delete img_lum;
+}
+
+/**
+ * @brief getAllExposures converts an image into a stack of exposure values which
+ * generates all required exposure images for reconstructing the input image.
+ * @param imgIn is an input image.
+ * @return It returns an array of exposure values encoding the
  */
 std::vector<float> getAllExposures(Image *imgIn) {
     std::vector<float> exposures;
@@ -52,9 +92,10 @@ std::vector<float> getAllExposures(Image *imgIn) {
 }
 
 /**
- * @brief getAllExposuresImages converts an HDR image into a stack of LDR images
- * @param imgIn
- * @return
+ * @brief getAllExposuresImages converts an image into a stack of images.
+ * @param imgIn is an input image.
+ * @return It returns an ImageVec of images which encode imgIn at different
+ * exposure values.
  */
 ImageVec getAllExposuresImages(Image *imgIn)
 {
