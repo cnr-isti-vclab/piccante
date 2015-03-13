@@ -25,6 +25,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**MaximumError: maximum error*/
+/**
+ * @brief MaximumError computes the maximum error between two images.
+ * @param ori is the original image.
+ * @param cmp is the distorted image.
+ * @param bLargeDifferences, if true, skips big differences for stability.
+ * @return It returns the maxium error value between ori and cmp.
+ */
 double MaximumError(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {

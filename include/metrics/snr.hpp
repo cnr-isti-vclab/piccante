@@ -22,7 +22,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-float SNR(Image *ori, Image *cmp, BBox *box)
+/**
+ * @brief SNR computes the signal to noise ratio between two images.
+ * @param ori is the original image.
+ * @param cmp is the distorted image.
+ * @param box is a bounding box where to limit the computation of SNR.
+ * @return It returns the SNR value between ori and cmp.
+ */
+float SNR(Image *ori, Image *cmp, BBox *box = NULL)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0f;
@@ -38,13 +45,11 @@ float SNR(Image *ori, Image *cmp, BBox *box)
 
     double acc = 0.0;
 
-    int i, j, k, c;
+    for(int j = box->y0; j < box->y1; j++) {
+        for(int i = box->x0; i < box->x1; i++) {
+            int c = i * ori->xstride + j * ori->ystride;
 
-    for(j = box->y0; j < box->y1; j++) {
-        for(i = box->x0; i < box->x1; i++) {
-            c = i * ori->xstride + j * ori->ystride;
-
-            for(k = 0; k < ori->channels; k++) {
+            for(int k = 0; k < ori->channels; k++) {
                 double valO = static_cast<double>(ori->data[c + k]);
                 double valC = static_cast<double>(cmp->data[c + k]);
 

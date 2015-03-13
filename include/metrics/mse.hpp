@@ -24,7 +24,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**MSE: mean squared error*/
+/**
+ * @brief MSE computes the mean square error (MSE) between two images.
+ * @param ori is the original image.
+ * @param cmp is the distorted image.
+ * @param bLargeDifferences, if true, skips big differences for stability.
+ * @return It returns the MSE value between ori and cmp.
+ */
 double MSE(Image *ori, Image *cmp, bool bLargeDifferences=false)
 {
     if(ori == NULL || cmp == NULL) {
@@ -58,8 +64,15 @@ double MSE(Image *ori, Image *cmp, bool bLargeDifferences=false)
     return acc / double(count);
 }
 
-/** MSE: single exposure MSE at 8-bit*/
-double MSE(Image *ori, Image *cmp, float gamma, float fstop)
+/**
+ * @brief MSE computes the mean square error (MSE) between two images with given exposure and gamma.
+ * @param ori is the original image.
+ * @param cmp is the distorted image.
+ * @param gamma is the encoding gamma.
+ * @param fstop is the f-stop value of the image.
+ * @return It returns the MSE value between ori and cmp.
+ */
+double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 0.0f)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -92,7 +105,13 @@ double MSE(Image *ori, Image *cmp, float gamma, float fstop)
     return (double(acc) / double(area));
 }
 
-/** RMSE: root mean squared error*/
+/**
+ * @brief RMSE computes the root mean squared error (RMSE) between two images.
+ * @param ori is the original image.
+ * @param cmp is the distorted image.
+ * @param bLargeDifferences, if true, skips big differences for stability.
+ * @return It returns the MSE value between ori and cmp.
+ */
 double RMSE(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     return sqrt(MSE(ori, cmp, bLargeDifferences));

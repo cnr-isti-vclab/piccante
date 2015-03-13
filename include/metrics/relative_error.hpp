@@ -24,7 +24,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**RelativeError: mean relative error*/
+/**
+ * @brief RelativeError computes the relative error between two images.
+ * @param ori is the original image.
+ * @param cmp is the distorted image.
+ * @param bLargeDifferences, if true, skips big differences for stability.
+ * @return It returns the relative error value between ori and cmp.
+ */
 double RelativeError(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {

@@ -25,7 +25,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**PSNR: Peak Signal to Noise Ratio for images in [0, 1]*/
+/**
+ * @brief PSNR computes the peak signal to noise ratio (PSNR) between two images.
+ * @param ori is the original image.
+ * @param cmp is the distorted image.
+ * @param bLargeDifferences, if true, skips big differences for stability.
+ * @return It returns the PSNR value between ori and cmp.
+ */
 double PSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
@@ -45,7 +51,13 @@ double PSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
     }
 }
 
-/**PSNR: relative Peak Signal to Noise Ratio*/
+/**
+ * @brief rPSNR computes the relateive peak signal to noise ratio (rPSNR) between two images.
+ * @param ori is the original image.
+ * @param cmp is the distorted image.
+ * @param bLargeDifferences, if true, skips big differences for stability.
+ * @return It returns the PSNR value between ori and cmp.
+ */
 double rPSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {

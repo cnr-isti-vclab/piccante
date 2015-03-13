@@ -24,7 +24,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**MAE: mean absolute error*/
+/**
+ * @brief MAE computes the mean abosulute errore (MAE) between two images.
+ * @param ori is the original image.
+ * @param cmp is the distorted image.
+ * @param bLargeDifferences, if true, skips big differences for stability.
+ * @return It returns the MAE value between ori and cmp.
+ */
 double MAE(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
@@ -41,6 +47,7 @@ double MAE(Image *ori, Image *cmp, bool bLargeDifferences = false)
     int count = 0;
 
     double largeDifferences = C_LARGE_DIFFERENCES;
+
     if(!bLargeDifferences) {
         largeDifferences = FLT_MAX;
     }

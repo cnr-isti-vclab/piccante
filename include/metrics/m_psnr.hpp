@@ -27,6 +27,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**mPSNR: multiple-exposure peak signal-to-noise ratio*/
+/**
+ * @brief mPSNR computes the multiple-exposure peak signal-to-noise ratio (mPSNR) between two images.
+ * @param ori
+ * @param cmp
+ * @param minFstop
+ * @param maxFstop
+ * @return
+ */
 double mPSNR(Image *ori, Image *cmp, int minFstop, int maxFstop)
 {
     if(ori == NULL || cmp == NULL) {
@@ -39,34 +47,7 @@ double mPSNR(Image *ori, Image *cmp, int minFstop, int maxFstop)
 
     //TO DO: Calculate fstop
     if(minFstop == maxFstop) {
-        Image *oriLum = FilterLuminance::Execute(ori, NULL, LT_CIE_LUMINANCE);
-        Image *cmpLum = FilterLuminance::Execute(cmp, NULL, LT_CIE_LUMINANCE);
 
-        int nData = oriLum->width * oriLum->height;
-
-        IntCoord coordO = IndexedArray::findSimple(oriLum->data, nData, IndexedArray::bFuncNotNeg);
-        IntCoord coordC = IndexedArray::findSimple(cmpLum->data, nData, IndexedArray::bFuncNotNeg);
-
-        float commonMax = MIN(IndexedArray::max(oriLum->data, coordO),
-                              IndexedArray::max(cmpLum->data, coordC));
-
-        float commonMin = MAX(IndexedArray::min(oriLum->data, coordO),
-                              IndexedArray::min(cmpLum->data, coordC));
-
-        float tminFstop = logf(commonMin) / logf(2.0f);
-        float tmaxFstop = logf(commonMax) / logf(2.0f);
-
-        minFstop = int(lround(tminFstop));
-        maxFstop = int(lround(tmaxFstop));
-
-        int halfFstops = (maxFstop - minFstop + 1) / 2;
-        minFstop = -halfFstops + 1;
-        maxFstop =  halfFstops - 1;
-
-        if(minFstop == maxFstop) {
-            minFstop--;
-            maxFstop++;
-        }
     }
 
     #ifdef PIC_DEBUG

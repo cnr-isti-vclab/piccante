@@ -24,7 +24,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-//RMSE in the log domain
+/**
+ * @brief logRMSE computes root mean square error (RMSE) in the log_e domain.
+ * @param ori is the original image.
+ * @param cmp is the distorted image.
+ * @return It returns RMSE in the log_e domain.
+ */
 double logRMSE(Image *ori, Image *cmp)
 {
     if(ori == NULL || cmp == NULL) {
