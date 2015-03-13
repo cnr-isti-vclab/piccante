@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "image.hpp"
 #include "histogram.hpp"
+#include "util/indexed_array.hpp"
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_simple_tmo.hpp"
 
@@ -37,7 +38,15 @@ void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
         return;
     }
 
-    Image *img_lum = FilterLuminance::Execute(ori, NULL, LT_CIE_LUMINANCE);
+    Image *img_lum = NULL;
+    bool bAllocated = false;
+
+    if(imgIn->channels == 1) {
+        img_lum = imgIn;
+    } else {
+        bAllocated = true;
+        img_lum = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);
+    }
 
     int nData = img_lum->width * img_lum->height;
 
@@ -61,7 +70,9 @@ void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
         maxFstop++;
     }
 
-    delete img_lum;
+    if(bAllocated) {
+        delete img_lum;
+    }
 }
 
 /**

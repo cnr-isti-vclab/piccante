@@ -19,23 +19,28 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_METRICS_M_PSNR_HPP
 
 #include <math.h>
+
+#include "util/array.hpp"
+
 #include "image.hpp"
+#include "tone_mapping/get_all_exposures.hpp"
 #include "metrics/base.hpp"
-#include "util/indexed_array.hpp"
 #include "metrics/mse.hpp"
 
 namespace pic {
 
-/**mPSNR: multiple-exposure peak signal-to-noise ratio*/
+enum MULTI_EXPOSURE_TYPE{MET_HISTOGRAM, MET_MIN_MAX};
+
 /**
  * @brief mPSNR computes the multiple-exposure peak signal-to-noise ratio (mPSNR) between two images.
- * @param ori
- * @param cmp
- * @param minFstop
- * @param maxFstop
- * @return
+ * @param ori is the original image.
+ * @param cmp is the distorted image.
+ * @param type.
+ * @param minFstop is the minimum f-stop value of ori.
+ * @param maxFstop is the maximum f-stop value of ori.
+ * @return It returns the nMPSR error value between ori and cmp.
  */
-double mPSNR(Image *ori, Image *cmp, float gamma = 2.2f, int minFstop = -1, int maxFstop = -1)
+double mPSNR(Image *ori, Image *cmp, MULTI_EXPOSURE_TYPE type, int minFstop = 0, int maxFstop = 0)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -45,8 +50,20 @@ double mPSNR(Image *ori, Image *cmp, float gamma = 2.2f, int minFstop = -1, int 
         return -1.0;
     }
 
-    if(minFstop == maxFstop) {
-        getMinMaxFstops(ori, minFstop, maxFstop);
+    std::vector<float> exposures;
+
+    switch (type) {
+        case MET_HISTOGRAM: {
+            exposures = getAllExposures(ori);
+        } break;
+
+        case MET_MIN_MAX: {
+            if(minFstop == maxFstop) {
+                getMinMaxFstops(ori, minFstop, maxFstop);
+            }
+
+            Array<float>::genRange(float(minFstop), 1.0f, float(maxFstop), exposures);
+        } break;
     }
 
     #ifdef PIC_DEBUG
@@ -56,9 +73,9 @@ double mPSNR(Image *ori, Image *cmp, float gamma = 2.2f, int minFstop = -1, int 
     #endif
 
     double aMSE = 0.0;
-
-    for(int i = minFstop; i <= maxFstop; i++) {
-        double tmp = MSE(ori, cmp, gamma, float(i));
+    float gamma = 2.2f; //typically 2.2
+    for(unsigned int i=0; i<exposures.size(); i++) {
+        double tmp = MSE(ori, cmp, gamma, exposures[i]);
 
         #ifdef PIC_DEBUG
             printf("-- Pass: %d \t MSE: %g\n", i, tmp);

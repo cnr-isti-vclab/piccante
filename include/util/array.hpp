@@ -44,22 +44,16 @@ public:
      * @param minVal
      * @param step
      * @param maxVal
-     * @return
+     * @param ret
      */
-    static std::vector<T> *genRange(T minVal, T step, T maxVal)
+    static void genRange(T minVal, T step, T maxVal, std::vector<T> &ret)
     {
         int n = int((maxVal - minVal) / step) + 1;
 
-        std::vector<T> *ret = new std::vector<T>;
-
-        T val;
-
         for(int i = 0; i < n; i++) {
-            val = minVal + T(i) * step;
-            ret->push_back(val);
+            T val = minVal + T(i) * step;
+            ret.push_back(val);
         }
-
-        return ret;
     }
 
     /**
@@ -67,12 +61,13 @@ public:
      * @param minVal
      * @param maxVal
      * @param n
+     * @param ret
      * @return
      */
-    static std::vector<T> *linspace(T minVal, T maxVal, int n)
+    static std::vector<T> *linspace(T minVal, T maxVal, int n, std::vector<T> &ret)
     {
         T step = (maxVal - minVal) / (n - 1);
-        return genRangeArray(minVal, step, maxVal);
+        genRangeArray(minVal, step, maxVal, ret);
     }
 
     /**
