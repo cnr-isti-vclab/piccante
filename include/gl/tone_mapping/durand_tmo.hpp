@@ -67,8 +67,36 @@ public:
     }
 
     ~DurandTMOGL()
-    {
+    {       
+        if(flt_lum != NULL) {
+            delete flt_lum;
+            flt_lum = NULL;
+        }
 
+        if(flt_log10 != NULL) {
+            delete flt_log10;
+            flt_log10 = NULL;
+        }
+
+        if(flt_bil != NULL) {
+            delete flt_bil;
+            flt_bil = NULL;
+        }
+
+        if(flt_durand != NULL) {
+            delete flt_durand;
+            flt_durand = NULL;
+        }
+
+        if(img_lum != NULL) {
+            delete img_lum;
+            img_lum = NULL;
+        }
+
+        if(img_lum_base != NULL) {
+            delete img_lum_base;
+            img_lum_base = NULL;
+        }
     }
 
     /**
