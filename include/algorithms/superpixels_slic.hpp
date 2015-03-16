@@ -38,12 +38,12 @@ class Slic
 {
 protected:
 
-    int				nSuperPixels;
-    Image		*labels_distance;
-    SlicoCenter		*centers;
-    unsigned int	*prevX, *prevY, *counter;
-    float			*col_values, *mPixel;
-    int				width, height, channels;
+    int             nSuperPixels;
+    Image           *labels_distance;
+    SlicoCenter     *centers;
+    unsigned int    *prevX, *prevY, *counter;
+    float           *col_values, *mPixel;
+    int             width, height, channels;
 
     /**
      * @brief distanceC
@@ -387,8 +387,6 @@ public:
 
             iter++;
         }
-
-        //labels_distance->Write("out.pfm");
 
         #ifdef PIC_DEBUG
             printf("Iterations: %d\n", iter);
