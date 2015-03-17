@@ -39,7 +39,7 @@ class Slic
 protected:
 
     int             nSuperPixels;
-    Image           *labels_distance;
+    Image           *labels_distance, *lap_img;
     SlicoCenter     *centers;
     unsigned int    *prevX, *prevY, *counter;
     float           *col_values, *mPixel;
@@ -198,6 +198,10 @@ protected:
      */
     void Destroy()
     {
+        if(lap_img != NULL) {
+            delete lap_img;
+        }
+
         if(labels_distance != NULL) {
             delete labels_distance;
         }
@@ -234,9 +238,6 @@ protected:
      */
     void Allocate(int nSuperPixels, int channels) 
     {
-        if(this->nSuperPixels == nSuperPixels){
-            return;
-        }
 
         this->nSuperPixels = nSuperPixels;
 
@@ -257,6 +258,7 @@ public:
      */
     Slic()
     {
+        lap_img = NULL;
         labels_distance = NULL;
         centers = NULL;
         prevX = NULL;
@@ -273,6 +275,7 @@ public:
      */
     Slic(Image *img, int nSuperPixels = 64)
     {
+        lap_img = NULL;
         labels_distance = NULL;
         centers = NULL;
         prevX = NULL;
@@ -307,7 +310,13 @@ public:
             return;
         }
 
-        labels_distance = new Image(1, img->width, img->height, 3);
+        nSuperPixels = (img->width / S) * (img->height / S);
+
+        Allocate(nSuperPixels, img->channels);
+
+        if(labels_distance == NULL) {
+            labels_distance = new Image(1, img->width, img->height, 3);
+        }
 
         for(int i = 0; i < labels_distance->size(); i += labels_distance->channels) {
             labels_distance->data[i    ] = -1.0f;
@@ -320,11 +329,7 @@ public:
         channels = img->channels;
 
         FilterLaplacian lap;
-        Image *lap_img = lap.ProcessP(Single(img), NULL);
-
-        nSuperPixels = (img->width / S) * (img->height / S);
-
-        Allocate(nSuperPixels, img->channels);
+        lap_img = lap.ProcessP(Single(img), lap_img);
 
         for(int i = 0; i < nSuperPixels; i++) {
             mPixel[i] = 0.35f * 0.35f;    //10.0f*10.0f;
@@ -369,6 +374,7 @@ public:
 
                 BBox box(centers[ind].x - S_half, centers[ind].x + S_half + 1,
                          centers[ind].y - S_half, centers[ind].y + S_half + 1);
+
                 img->getMeanVal(&box, centers[ind].value);
                 ind++;
             }
