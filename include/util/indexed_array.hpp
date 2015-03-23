@@ -69,20 +69,16 @@ public:
      * @brief findSimple collects coordinates of data which satisfies a bool function func.
      * @param data
      * @param nData
+     * @param ret
      * @param stride
-     * @return
      */
-    static IntCoord findSimple(float *data, int nData, bool(*func)(float), int stride = 1)
+    static void findSimple(float *data, int nData, bool(*func)(float), IntCoord &ret, int stride = 1)
     {
-        IntCoord ret;
-
         for(int i = 0; i < nData; i += stride) {
             if(func(data[i])) {
                 ret.push_back(i);
             }
         }
-
-        return ret;
     }
 
     /**
@@ -90,21 +86,16 @@ public:
      * @param data
      * @param nData
      * @param param
-     * @return
+     * @param ret
      */
-    static std::vector<int> find(float *data, int nData, bool(*func)(float,
-                          std::vector<float>), std::vector<float> param)
+    static void find(float *data, int nData, bool(*func)(float,
+                     std::vector<float>), std::vector<float> param, IntCoord &ret)
     {
-
-        std::vector<int> ret;
-
         for(int i = 0; i < nData; i++) {
             if(func(data[i], param)) {
                 ret.push_back(i);
             }
         }
-
-        return ret;
     }
 
     /**

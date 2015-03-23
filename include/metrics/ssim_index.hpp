@@ -30,14 +30,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- * @brief SSIMIndex computes.
+ * @brief SSIMIndex
  * @param ori
  * @param cmp
- * @param bLargeDifferences
+ * @param K0
+ * @param K1
+ * @param sigma_window
+ * @param dynamic_range
+ * @param bDownsampling
  * @return
  */
-double SSIMIndex(Image *ori, Image *cmp, float K0 = 0.01f, float K1 = 0.03f,
-                 float sigma_window = 2.5f, float dynamic_range = 255.0f, bool bDownsampling = false)
+float SSIMIndex(Image *ori, Image *cmp, float K0 = 0.01f, float K1 = 0.03f,
+                 float sigma_window = 1.5f, float dynamic_range = -1.0f, bool bDownsampling = false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -66,14 +70,24 @@ double SSIMIndex(Image *ori, Image *cmp, float K0 = 0.01f, float K1 = 0.03f,
         }
     }
 
-    float C0 = K0 * dynamic_range  / 256;
-    C0 = C0 * C0;
-
-    float C1 = K1 * dynamic_range / 256;
-    C1 = C1 * C1;
-
     Image *L_ori = FilterLuminance::Execute(ori, NULL);
     Image *L_cmp = FilterLuminance::Execute(cmp, NULL);
+
+    if(dynamic_range < 0.0f) {
+        float min_val, max_val;
+        L_ori->getMaxVal(NULL, &max_val);
+        L_ori->getMinVal(NULL, &min_val);
+
+        dynamic_range = max_val / min_val;
+
+        printf("%f %f %f\n", min_val, max_val, dynamic_range);
+    }
+
+    float C0 = K0 * dynamic_range;
+    C0 = C0 * C0;
+
+    float C1 = K1 * dynamic_range;
+    C1 = C1 * C1;
 
 
     Image *img_mu1 = FilterGaussian2D::Execute(L_ori, NULL, sigma_window);
