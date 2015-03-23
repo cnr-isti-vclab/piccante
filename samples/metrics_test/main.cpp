@@ -34,7 +34,8 @@ int main(int argc, char *argv[])
     printf("Reading an LDR file...");
 
     pic::Image img;
-    img.Read("../data/input/singapore.png");
+    //loading values in [0,255]; note: no gamma removal or normalization in [0,1]
+    img.Read("../data/input/singapore.png", pic::LT_NONE);
 
     printf("Ok\n");
 
@@ -49,7 +50,7 @@ int main(int argc, char *argv[])
         img_flt->Write("../img_flt.pfm");
 
         printf("Computing the SSIM index...");
-        double ssim_index_value = pic::SSIMIndex(&img, img_flt);
+        double ssim_index_value = pic::SSIMIndex(&img, img_flt, 0.01f, 0.03f, 1.5f, 255.0f, true);
         printf("Ok\n");
 
         printf("SSIM value: %f\n", ssim_index_value);

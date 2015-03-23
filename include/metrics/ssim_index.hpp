@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "image.hpp"
 #include "metrics/base.hpp"
+#include "util/indexed_array.hpp"
 
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_gaussian_2d.hpp"
@@ -55,7 +56,9 @@ float SSIMIndex(Image *ori, Image *cmp, float K0 = 0.01f, float K1 = 0.03f,
     if(bDownsampling) {
         float f = MAX(1.0f, lround(MIN(ori->widthf, ori->heightf) / 256.0f));
 
-        printf("Downsampling factor: %f\n", f);
+        #ifdef PIC_DEBUG
+            printf("\nDownsampling factor: %f\n", f);
+        #endif
 
         if(f > 1.0f) {
             Image *ori_d = FilterDownSampler2D::Execute(ori, NULL, f);
@@ -78,9 +81,17 @@ float SSIMIndex(Image *ori, Image *cmp, float K0 = 0.01f, float K1 = 0.03f,
         L_ori->getMaxVal(NULL, &max_val);
         L_ori->getMinVal(NULL, &min_val);
 
-        dynamic_range = max_val / min_val;
+        if(min_val <= 0.0f) {
+            IntCoord coord;
+            IndexedArray::findSimple(L_ori->data, L_ori->size(), IndexedArray::bFuncNotNeg, coord);
+            min_val = IndexedArray::min(L_ori->data, coord);
 
-        printf("%f %f %f\n", min_val, max_val, dynamic_range);
+            if(min_val <= 0.0f) {
+                min_val = 1.0f / 255.0f;
+            }
+        }
+
+        dynamic_range = max_val / min_val;
     }
 
     float C0 = K0 * dynamic_range;
