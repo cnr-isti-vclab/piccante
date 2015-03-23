@@ -179,6 +179,16 @@ float SCurve5(float x)
 }
 
 /**
+ * @brief Square applies square function to a value.
+ * @param x a value.
+ * @return It return x^2.
+ */
+inline float Square(float x)
+{
+    return x * x;
+}
+
+/**
  * @brief Clamp clamps a value, x, in the bound [a,b].
  * @param x
  * @param a
