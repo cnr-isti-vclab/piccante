@@ -24,6 +24,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
+#define PIC_DEBUG
+
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -47,13 +49,19 @@ int main(int argc, char *argv[])
         pic::Image *img_flt = pic::FilterGaussian2D::Execute(&img, NULL, 12.0f);
         printf("Ok\n");
 
-        img_flt->Write("../img_flt.pfm");
+        img_flt->Write("../data/output/metrics_img_flt.pfm");
 
         printf("Computing the SSIM index...");
-        double ssim_index_value = pic::SSIMIndex(&img, img_flt, 0.01f, 0.03f, 1.5f, 255.0f, true);
+        float ssim_index;
+
+        pic::Image *ssim_map = pic::SSIMIndex(&img, img_flt, ssim_index, NULL, 0.01f, 0.03f, 1.5f, 255.0f);
         printf("Ok\n");
 
-        printf("SSIM value: %f\n", ssim_index_value);
+        if(ssim_map != NULL) {
+            ssim_map->Write("../data/output/metrics_ssim_map.pfm");
+        }
+
+        printf("SSIM index: %f\n", ssim_index);
 
     } else {
         printf("No, the file is not valid!\n");

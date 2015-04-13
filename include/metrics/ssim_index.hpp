@@ -27,6 +27,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_gaussian_2d.hpp"
 #include "filtering/filter_downsampler_2d.hpp"
+#include "filtering/filter_ssim.hpp"
 
 namespace pic {
 
@@ -34,6 +35,8 @@ namespace pic {
  * @brief SSIMIndex
  * @param ori
  * @param cmp
+ * @param ssim_index
+ * @param ssim_map
  * @param K0
  * @param K1
  * @param sigma_window
@@ -41,16 +44,19 @@ namespace pic {
  * @param bDownsampling
  * @return
  */
-float SSIMIndex(Image *ori, Image *cmp, float K0 = 0.01f, float K1 = 0.03f,
+Image* SSIMIndex(Image *ori, Image *cmp, float &ssim_index, Image *ssim_map = NULL, float K0 = 0.01f, float K1 = 0.03f,
                  float sigma_window = 1.5f, float dynamic_range = -1.0f, bool bDownsampling = false)
 {
     if(ori == NULL || cmp == NULL) {
-        return -2.0;
+        return NULL;
     }
 
     if(!ori->SimilarType(cmp)) {
-        return -1.0;
+        return NULL;
     }
+
+    Image *ori_d = NULL;
+    Image *cmp_d = NULL;
 
     //downsampling factor as suggested by authors
     if(bDownsampling) {
@@ -61,15 +67,11 @@ float SSIMIndex(Image *ori, Image *cmp, float K0 = 0.01f, float K1 = 0.03f,
         #endif
 
         if(f > 1.0f) {
-            Image *ori_d = FilterDownSampler2D::Execute(ori, NULL, f);
-            Image *cmp_d = FilterDownSampler2D::Execute(cmp, NULL, f);
+            ori_d = FilterDownSampler2D::Execute(ori, NULL, f);
+            cmp_d = FilterDownSampler2D::Execute(cmp, NULL, f);
 
-            double ssim_index_value = SSIMIndex(ori_d, cmp_d, K0, K1, sigma_window, dynamic_range, false);
-
-            delete ori_d;
-            delete cmp_d;
-
-            return ssim_index_value;
+            ori = ori_d;
+            cmp = cmp_d;
         }
     }
 
@@ -100,72 +102,36 @@ float SSIMIndex(Image *ori, Image *cmp, float K0 = 0.01f, float K1 = 0.03f,
     float C1 = K1 * dynamic_range;
     C1 = C1 * C1;
 
-
     Image *img_mu1 = FilterGaussian2D::Execute(L_ori, NULL, sigma_window);
     Image *img_mu2 = FilterGaussian2D::Execute(L_cmp, NULL, sigma_window);
 
-    Image img_mu1_mu2 = (*img_mu1) * (*img_mu2);
-
-    Image *img_mu1_sq = img_mu1;
-    img_mu1_sq->ApplyFunction(Square);
-
-    Image *img_mu2_sq = img_mu2;
-    img_mu2_sq->ApplyFunction(Square);
-
     Image img_ori_cmp = (*L_ori) * (*L_cmp);
 
-    L_ori->ApplyFunction(Square);
-    L_cmp->ApplyFunction(Square);
+    (*L_ori) *= (*L_ori);
+    (*L_cmp) *= (*L_cmp);
 
     Image *img_sigma1_sq = FilterGaussian2D::Execute(L_ori, NULL, sigma_window);
-    (*img_sigma1_sq) -= (*img_mu1_sq);
-
     Image *img_sigma2_sq = FilterGaussian2D::Execute(L_cmp, NULL, sigma_window);
-    (*img_sigma2_sq) -= (*img_mu2_sq);
-
-    Image *img_sigma12 = FilterGaussian2D::Execute(&img_ori_cmp, NULL, sigma_window);
-    (*img_sigma12) -= img_mu1_mu2;
-
-
-    Image *ssim_map = NULL;
+    Image *img_sigma1_sigma2 = FilterGaussian2D::Execute(&img_ori_cmp, NULL, sigma_window);
 
     if(C0 > 0.0f && C1 > 0.0f) {
-        //numerator
-       img_mu1_mu2 *= 2.0f;
-       img_mu1_mu2 += C0;
+        FilterSSIM flt_ssim(C0, C1);
 
-       (*img_sigma12) *= 2.0f;
-       (*img_sigma12) += C1;
+        ImageVec src;
+        src.push_back(img_mu1);
+        src.push_back(img_mu2);
+        src.push_back(img_sigma1_sq);
+        src.push_back(img_sigma2_sq);
+        src.push_back(img_sigma1_sigma2);
 
-       (*img_sigma12) *= img_mu1_mu2;
-
-       //denominator
-       (*img_mu1_sq) += (*img_mu2_sq);
-       (*img_mu1_sq) += C0;
-
-       (*img_sigma1_sq) += (*img_sigma2_sq);
-       (*img_sigma1_sq) += C1;
-
-        (*img_mu1_sq) *= (*img_sigma1_sq);
-
-        //SSIM-map
-        (*img_sigma12) /= (*img_mu1_sq);
-
-        ssim_map = img_sigma12;
+        ssim_map = flt_ssim.ProcessP(src, ssim_map);
     } else {
 
     }
 
-    float ssim_value;
-    ssim_map->getMeanVal(NULL, &ssim_value);
-    ssim_map->Write("../ssim_map.pfm");
+    ssim_map->getMeanVal(NULL, &ssim_index);
 
-    delete img_mu1;
-    delete img_mu2;
-    delete L_ori;
-    delete L_cmp;
-
-    return ssim_value;
+    return ssim_map;
 }
 
 } // end namespace pic
