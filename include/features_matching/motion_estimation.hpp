@@ -24,7 +24,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-class MotionEstimation {
+/**
+ * @brief The MotionEstimation class
+ */
+class MotionEstimation
+{
 protected:
     int         shift, blockSize, halfBlockSize;
     int         width, height;
@@ -35,7 +39,8 @@ protected:
      * @param tiles
      * @param imgOut
      */
-    void ProcessAux(TileList *tiles, Image *imgOut) {
+    void ProcessAux(TileList *tiles, Image *imgOut)
+    {
         bool state = true;
 
         while(state) {
@@ -98,13 +103,15 @@ public:
      * @param blockSize
      * @param maxRadius
      */
-    MotionEstimation(Image *img0, Image *img1, int blockSize, int maxRadius) {
+    MotionEstimation(Image *img0, Image *img1, int blockSize, int maxRadius)
+    {
         pmc = NULL;
 
         Setup(img0, img1, blockSize, maxRadius);
     }
 
-    ~MotionEstimation() {
+    ~MotionEstimation()
+    {
         if(pmc != NULL) {
             delete pmc;
         }
@@ -117,7 +124,8 @@ public:
      * @param blockSize
      * @param maxRadius
      */
-    void Setup(Image *img0, Image *img1, int blockSize, int maxRadius) {
+    void Setup(Image *img0, Image *img1, int blockSize, int maxRadius)
+    {
         if(img0 == NULL || img1 == NULL) {
             return;
         }
@@ -130,7 +138,7 @@ public:
             maxRadius = 1;
         }
 
-        //estimating the blockSize if not inserted
+        //estimating the blockSize if not given
         if(blockSize < 1) {
             float nPixels = float(img0->nPixels());
             float tmp = ceilf(log10f(nPixels));
@@ -152,14 +160,15 @@ public:
      * @param imgOut
      * @return
      */
-    Image *Process(Image *imgOut) {
+    Image *Process(Image *imgOut)
+    {
         if(imgOut == NULL) {
             imgOut = new Image(1, width, height, 3);
         }
 
         TileList lst(blockSize, width, height);
 
-        //Creating threads
+        //creating threads
         int numCores = std::thread::hardware_concurrency();
 
         std::thread **thrd = new std::thread*[numCores];
@@ -169,7 +178,7 @@ public:
                 std::bind(&MotionEstimation::ProcessAux, this, &lst, imgOut));
         }
 
-        //Threads join
+        //threads join
         for(int i = 0; i < numCores; i++) {
             thrd[i]->join();
         }
@@ -186,7 +195,8 @@ public:
      * @param imgOut
      * @return
      */
-    static Image *Execute(Image *img0, Image *img1, int blockSize, int maxRadius, Image *imgOut) {
+    static Image *Execute(Image *img0, Image *img1, int blockSize, int maxRadius, Image *imgOut)
+    {
         MotionEstimation me(img0, img1, blockSize, maxRadius);
 
         return me.Process(imgOut);
