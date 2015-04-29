@@ -108,7 +108,7 @@ protected:
 
         if(method == 0) {
             //computing exposure fusion for the stack (img_vec)
-            img_tmo = ef->Process(img_vec, 0.2f, 1.0f, 0.2f, img_tmo);
+            img_tmo = ef->Process(img_vec, img_tmo, 0.2f, 1.0f, 0.2f);
         } else {
             //simple tone mapping: gamma + exposure correction
             img_tmo = tmo->Process(SingleGL(&img), img_tmo);
