@@ -70,6 +70,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_npasses.hpp"
 #include "filtering/filter_nswe.hpp"
 #include "filtering/filter_remove_nuked.hpp"
+#include "filtering/filter_remove_inf_nan.hpp"
 #include "filtering/filter_sampler_1d.hpp"
 #include "filtering/filter_sampler_2d.hpp"
 #include "filtering/filter_sampler_2dadd.hpp"
