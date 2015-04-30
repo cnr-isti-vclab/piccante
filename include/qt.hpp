@@ -25,6 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef PIC_DISABLE_QT
 
+
 #include <QtCore/QtGlobal>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))

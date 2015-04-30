@@ -119,16 +119,16 @@ public:
 
 
         ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
+        imgIn.generateTextureGL(GL_TEXTURE_2D, false);
 
         ImageGL imgPos(namePos);
-        imgPos.generateTextureGL(false, GL_TEXTURE_2D);
+        imgPos.generateTextureGL(GL_TEXTURE_2D, false);
 
         ImageGL imgNor(nameNor);
-        imgNor.generateTextureGL(false, GL_TEXTURE_2D);
+        imgNor.generateTextureGL(GL_TEXTURE_2D, false);
 
         ImageGL imgAlb(nameAlb);
-        imgAlb.generateTextureGL(false, GL_TEXTURE_2D);
+        imgAlb.generateTextureGL(GL_TEXTURE_2D, false);
 
         ImageGLVec vec;
         vec.push_back(&imgIn);
@@ -253,7 +253,7 @@ void FilterGLBilateral2DSE::FragmentShader()
             float dstPos = dot(tmpEdge2.xyz, tmpEdge2.xyz);
             //nor difference
             tmpEdge = texelFetch(u_edge_nor, coordsFrag.xy + coords.xy, 0).xyz;
-            float dstNor = 1.0 - dot(tmpEdge, edge_norRef);
+            float dstNor = 1.0 - abs(dot(tmpEdge, edge_norRef));
             //alb difference
             tmpEdge = texelFetch(u_edge_alb, coordsFrag.xy + coords.xy, 0).xyz;
             tmpEdge2 = tmpEdge - edge_albRef;
