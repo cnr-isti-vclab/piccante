@@ -15,8 +15,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_TONE_BILATERAL_SEPARATION_HPP
-#define PIC_TONE_BILATERAL_SEPARATION_HPP
+#ifndef PIC_ALGORITHMS_BILATERAL_SEPARATION_HPP
+#define PIC_ALGORITHMS_BILATERAL_SEPARATION_HPP
 
 #include "image.hpp"
 #include "filtering/filter_bilateral_2ds.hpp"
@@ -80,5 +80,5 @@ ImageVec* bilateralSeparation(Image *imgIn, float sigma_s = -1.0f, float sigma_r
 
 } // end namespace pic
 
-#endif /* PIC_TONE_BILATERAL_SEPARATION_HPP */
+#endif /* PIC_ALGORITHMS_BILATERAL_SEPARATION_HPP */
 

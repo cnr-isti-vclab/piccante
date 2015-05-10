@@ -473,6 +473,16 @@ public:
     {
         return -BestInterval(range);
     }
+
+    /**
+     * @brief binarizationOtsu
+     * @param numberPixels
+     * @return
+     */
+    float binarizationOtsu(int numberPixels)
+    {
+
+    }
 };
 
 

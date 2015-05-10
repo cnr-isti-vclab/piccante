@@ -1151,6 +1151,10 @@ PIC_INLINE void Image::ScaleCosine()
 
 PIC_INLINE void Image::ApplyFunction(float(*func)(float))
 {
+    if(!isValid()) {
+        return;
+    }
+
     int size = width * height * channels;
     #pragma omp parallel for
 
@@ -1161,6 +1165,10 @@ PIC_INLINE void Image::ApplyFunction(float(*func)(float))
 
 PIC_INLINE void Image::sort()
 {
+    if(!isValid()) {
+        return;
+    }
+
     int size = frames * width * height * channels;
 
     if(dataTMP == NULL) {
@@ -1173,6 +1181,10 @@ PIC_INLINE void Image::sort()
 
 PIC_INLINE float Image::getMedVal(float perCent = 0.5f)
 {
+    if(!isValid()) {
+        return;
+    }
+
     if(dataTMP == NULL) {
         sort();
     }
@@ -1183,6 +1195,10 @@ PIC_INLINE float Image::getMedVal(float perCent = 0.5f)
 
 PIC_INLINE float Image::getGT(float val)
 {
+    if(!isValid()) {
+        return;
+    }
+
     if(dataTMP == NULL) {
         sort();
     }
@@ -1231,7 +1247,7 @@ PIC_INLINE void Image::Blend(Image *img, Image *weight)
 
 PIC_INLINE void Image::Minimum(Image *img)
 {
-    if(!SimilarType(img)) {
+    if(!isValid() || !SimilarType(img)) {
         return;
     }
 
@@ -1246,7 +1262,7 @@ PIC_INLINE void Image::Minimum(Image *img)
 
 PIC_INLINE void Image::Maximum(Image *img)
 {
-    if(!SimilarType(img)) {
+    if(!isValid() || !SimilarType(img)) {
         return;
     }
 
@@ -1261,6 +1277,10 @@ PIC_INLINE void Image::Maximum(Image *img)
 
 PIC_INLINE void Image::SetZero()
 {
+    if(!isValid()) {
+        return;
+    }
+
     int size = frames * height * width * channels;
 //	memset(data, 0, size * sizeof(float));
 
@@ -1273,6 +1293,10 @@ PIC_INLINE void Image::SetZero()
 
 PIC_INLINE void Image::SetRand()
 {
+    if(!isValid()) {
+        return;
+    }
+
     std::mt19937 m(rand() % 10000);
     int size = frames * height * width * channels;
 
