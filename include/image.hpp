@@ -1182,7 +1182,7 @@ PIC_INLINE void Image::sort()
 PIC_INLINE float Image::getMedVal(float perCent = 0.5f)
 {
     if(!isValid()) {
-        return;
+        return -1.0f;
     }
 
     if(dataTMP == NULL) {
@@ -1196,7 +1196,7 @@ PIC_INLINE float Image::getMedVal(float perCent = 0.5f)
 PIC_INLINE float Image::getGT(float val)
 {
     if(!isValid()) {
-        return;
+        return -1.0f;
     }
 
     if(dataTMP == NULL) {
