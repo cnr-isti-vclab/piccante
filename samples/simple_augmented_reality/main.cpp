@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
 
         printf("Computing ORB descriptors...\n");
 
-        pic::PoissonDescriptor b_desc(16);
-//        pic::ORBDescriptor b_desc(31, 512);
+        //pic::PoissonDescriptor b_desc(16);
+        pic::ORBDescriptor b_desc(31, 512);
 
         std::vector< unsigned int *> descs0;
         for(unsigned int i=0; i<corners_from_img0.size(); i++) {
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        printf("Mathces:\n");
+        printf("Matches:\n");
         std::vector< Eigen::Vector2f > m0, m0f, m1, m1f;
 
         for(unsigned int i=0; i<matches.size(); i++) {

@@ -225,10 +225,10 @@ protected:
                 Scalar err_v = Scalar(0);
 
                 for(unsigned int j = 1; j < (n + 1); j++) {
-                    err_f = MAX(err_f, abs(simplex[j].first - simplex[0].first));
+                    err_f = MAX(err_f, fabs(simplex[j].first - simplex[0].first));
 
                     for(unsigned int i = 0; i < n; i++) {
-                        err_v = MAX(err_v, abs(simplex[j].second[i] - simplex[0].second[i]));
+                        err_v = MAX(err_v, fabs(simplex[j].second[i] - simplex[0].second[i]));
                     }
                 }
 

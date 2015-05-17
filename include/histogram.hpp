@@ -481,7 +481,7 @@ public:
      */
     float binarizationOtsu(int numberPixels)
     {
-
+        return 1.0;
     }
 };
 
