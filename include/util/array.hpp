@@ -188,13 +188,13 @@ public:
     }
 
     /**
-     * @brief max
+     * @brief getMax
      * @param vec
      * @param size
      * @param ind
      * @return
      */
-    static inline T max(T *vec, int size, int &ind)
+    static inline T getMax(T *vec, int size, int &ind)
     {
         if(vec == NULL) {
             return T(size + 1);
@@ -218,13 +218,13 @@ public:
     }
 
     /**
-     * @brief min
+     * @brief getMin
      * @param vec
      * @param size
      * @param ind
      * @return
      */
-    static inline T min(T *vec, int size, int &ind)
+    static inline T getMin(T *vec, int size, int &ind)
     {
         if(vec == NULL) {
             return T(size + 1);

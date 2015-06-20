@@ -339,7 +339,7 @@ public:
         }
 
         int ind;
-        float maxValf = float(Array<unsigned int>::max(bin, nBin, ind));
+        float maxValf = float(Array<unsigned int>::getMax(bin, nBin, ind));
 
         for(int i = 0; i < nBin; i++) {
             bin_nor[i] = float(bin[i]) / maxValf;
@@ -407,7 +407,7 @@ public:
 
         while(Array<unsigned int>::sum(bin_work, nBin) > 0) {
             int ind;
-            Array<unsigned int>::max(bin_work, nBin, ind);
+            Array<unsigned int>::getMax(bin_work, nBin, ind);
 
             int indMin = MAX(ind - removingBins, 0);
             int indMax = MIN(ind + removingBins, nBin);
