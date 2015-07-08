@@ -19,7 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_IO_HDR_HPP
 
 #include <stdio.h>
-#include <string>
+#include <string.h>
 
 #include "colors/rgbe.hpp"
 #include "base.hpp"

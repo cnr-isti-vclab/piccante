@@ -25,6 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <math.h>
 #include <float.h>
 #include <limits>
+#include <string.h>
 
 #include "base.hpp"
 #include "util/compability.hpp"

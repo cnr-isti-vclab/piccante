@@ -34,7 +34,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QtGui/QOpenGLPaintDevice>
 #endif
 
-#include <OpenGL/OpenGL.h>
+#ifdef PIC_MAC_OS_X
+    #include <OpenGL/OpenGL.h>
+#else
+    #include <GL/gl.h>
+#endif
 
 #endif /* os selection */
 

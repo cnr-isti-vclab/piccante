@@ -119,8 +119,7 @@ public:
 
     ~FilterLuminance()
     {
-        if(weights != NULL)
-        {
+        if(weights != NULL) {
             delete[] weights;
         }
     }
