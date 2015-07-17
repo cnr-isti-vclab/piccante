@@ -70,14 +70,20 @@ protected:
                     float weight_norm = 0.0f;
                     float acc = 0.0f;
 
+                    float *tmp_icrf = NULL;
+                    if(icrf != NULL) {
+                        tmp_icrf = icrf->at(k);
+                    }
+
                     for(unsigned int l = 0; l < n; l++) {
                         float x = src[l]->data[c + k];
 
                         float weight = WeightFunction(x, weight_type);
 
                         float x_lin;
+
                         if(bFunction) {
-                            x_lin = Linearize(x, linearization_type, icrf->at(k));
+                            x_lin = Linearize(x, linearization_type, tmp_icrf);
                         } else {
                             x_lin = x;
                         }
@@ -90,6 +96,7 @@ protected:
                     flag = flag || (weight_norm <= 0.0f);
 
                     float final_value = weight_norm > 0.0f ? (acc / weight_norm) : maxVal;
+
                     dst->data[c + k] = final_value;
                 }
             }
