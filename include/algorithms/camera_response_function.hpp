@@ -23,7 +23,7 @@ namespace pic {
 /**
  * @brief The CRF_WEIGHT enum
  */
-enum CRF_WEIGHT {CW_ALL, CW_HAT, CW_DEB97, CW_GAUSS};
+enum CRF_WEIGHT {CW_ALL, CW_HAT, CW_DEB97, CW_DEB97p01, CW_GAUSS};
 
 /**
  * @brief WeightFunction computes weight functions for x in [0,1].
@@ -52,6 +52,19 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
     }
 
     case CW_DEB97: {
+        float Zmin = 0.0f;
+        float Zmax = 1.0f;
+        float tr = (Zmin + Zmax) / 2.0f;
+
+        if(x <= tr) {
+            return x - Zmin;
+        } else {
+            return Zmax - x;
+        }
+    }
+    break;
+
+    case CW_DEB97p01: {
         float Zmin = 0.01f;
         float Zmax = 0.99f;
         float tr = (Zmin + Zmax) / 2.0f;
@@ -62,7 +75,7 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
             return Zmax - x;
         }
     }
-    break;
+
     }
 
     return 1.0f;
@@ -256,12 +269,13 @@ protected:
     }
     
     /**
-    * \brief This function creates a low resolution version of the stack.
+     * @brief subSampleSpatial creates a low resolution version of the stack.
     * \param stack is a stack of Image* at different exposures
     * \param nSamples output number of samples
     * \return samples an array of unsigned char values which is the low resolution stack
-    */
-    unsigned char *subSample(std::vector<Image *> stack, int &nSamples)
+     * @return
+     */
+    unsigned char *subSampleSpatial(std::vector<Image *> stack, int &nSamples)
     {
         if(stack.size() < 1) {
             return NULL;
@@ -296,7 +310,7 @@ protected:
                 p2Ds->getSampleAt(0, i, x, y);              
                 
                 for(unsigned int j = 0; j < stack.size(); j++) {
-                    int converted = int((*stack[j])(x, y)[k]*255.0f);
+                    int converted = int((*stack[j])(x, y)[k] * 255.0f);
                     samples[c] = converted;
                     c++;
                 }
@@ -320,7 +334,7 @@ protected:
 
     CRF_WEIGHT              type;
     float                   w[256];
-    
+
 public:
 
     std::vector<float *>    icrf;
@@ -411,7 +425,7 @@ public:
 
                     int addr = (i * 256 + j ) * channels + k;
 
-                    if(crf[addr]>0) {
+                    if(crf[addr] > 0) {
                         coords.push_back(i);                        
                     }
 
@@ -460,7 +474,6 @@ public:
         this->type = type;
 
         //Subsampling the image stack
-//      unsigned char *samples = subSample(stack, nSamples);
         unsigned char *samples = subSampleGrossberg(stack, nSamples);
         
         //Computing CRF using Debevec and Malik

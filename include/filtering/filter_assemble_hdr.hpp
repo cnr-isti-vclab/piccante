@@ -24,12 +24,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+enum HDR_REC_DOMAIN {HRD_LOG, HRD_LIN};
+
 /**
  * @brief The FilterAssembleHDR class
  */
 class FilterAssembleHDR: public Filter
 {
 protected:
+    HDR_REC_DOMAIN          domain;
     CRF_WEIGHT              weight_type;
     IMG_LIN                 linearization_type;
     std::vector<float *>    *icrf;
@@ -82,7 +85,15 @@ protected:
                             x_lin = x;
                         }
 
-                        acc += (weight * x_lin) / src[l]->exposure;
+                        switch(domain) {
+                            case HRD_LIN: {
+                                acc += (weight * x_lin) / src[l]->exposure;
+                            } break;
+
+                            case HRD_LOG: {
+                                acc += weight * (logf(x_lin) - logf(src[l]->exposure));
+                            } break;
+                        }
 
                         weight_norm += weight;
                     }
@@ -91,6 +102,10 @@ protected:
 
                     float final_value = weight_norm > 0.0f ? (acc / weight_norm) : maxVal;
                     dst->data[c + k] = final_value;
+
+                    if(domain == HRD_LOG) {
+                        dst->data[c + k]  = expf(dst->data[c + k]);
+                    }
                 }
             }
         }
@@ -104,8 +119,11 @@ public:
      * @param linearization_type
      * @param icrf
      */
-    FilterAssembleHDR(CRF_WEIGHT weight_type = CW_GAUSS, IMG_LIN linearization_type = IL_LIN, std::vector<float *> *icrf = NULL)
+    FilterAssembleHDR(CRF_WEIGHT weight_type = CW_GAUSS, HDR_REC_DOMAIN domain = HRD_LOG,
+                      IMG_LIN linearization_type = IL_LIN, std::vector<float *> *icrf = NULL)
     {
+        this->domain = domain;
+
         this->weight_type = weight_type;
 
         this->linearization_type = linearization_type;

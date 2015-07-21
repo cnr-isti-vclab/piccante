@@ -67,8 +67,8 @@ int main(int argc, char *argv[])
         }
 
         printf("Assembling the different exposure images... ");
-        pic::FilterAssembleHDR fltAHDR(pic::CW_DEB97, pic::IL_LUT_8_BIT, &crf.icrf);
-        pic::Image *imgOut = fltAHDR.ProcessP(stack, NULL);
+        pic::FilterAssembleHDR merger(pic::CW_DEB97, pic::HRD_LOG, pic::IL_LUT_8_BIT, &crf.icrf);
+        pic::Image *imgOut = merger.ProcessP(stack, NULL);
         printf("Ok\n");
 
         if(imgOut != NULL) {
