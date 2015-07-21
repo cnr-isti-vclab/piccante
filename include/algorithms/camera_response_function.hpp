@@ -23,7 +23,11 @@ namespace pic {
 /**
  * @brief The CRF_WEIGHT enum
  */
+<<<<<<< HEAD
 enum CRF_WEIGHT {CW_ALL, CW_HAT, CW_DEB97, CW_DEB97p01, CW_GAUSS};
+=======
+enum CRF_WEIGHT {CW_ALL, CW_HAT, CW_DEB97, CW_DEB97_p01, CW_GAUSS};
+>>>>>>> origin/develop
 
 /**
  * @brief WeightFunction computes weight functions for x in [0,1].
@@ -64,7 +68,11 @@ inline float WeightFunction(float x, CRF_WEIGHT type)
     }
     break;
 
+<<<<<<< HEAD
     case CW_DEB97p01: {
+=======
+    case CW_DEB97_p01: {
+>>>>>>> origin/develop
         float Zmin = 0.01f;
         float Zmax = 0.99f;
         float tr = (Zmin + Zmax) / 2.0f;
@@ -209,7 +217,7 @@ protected:
         }
      
         if(nSamples < 1) {
-            nSamples = 100;
+            nSamples = 256;
         }
 
         int channels  = stack[0]->channels;
@@ -230,6 +238,7 @@ protected:
                 c++;
             }
         }
+
         #ifdef PIC_DEBUG
             printf("Ok\n");
         #endif        
@@ -242,10 +251,10 @@ protected:
         
         c = 0;
         for(int k = 0; k < channels; k++) {
-            for(int i = 0; i <nSamples; i++) {
+            for(int i = 0; i < nSamples; i++) {
 
-                float u = float(i)/float(nSamples);
-                
+                float u = float(i) / float(nSamples);
+
                 for(unsigned int j = 0; j < exposures; j++) {
         
                     int ind = k * exposures + j;

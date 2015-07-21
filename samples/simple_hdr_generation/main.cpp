@@ -55,20 +55,28 @@ int main(int argc, char *argv[])
 
         //Estimating the camera response function
         printf("Estimating the camera response function... ");
-        pic::ImageVec stack = Triple(&img[0], img_dark, img_bright);
+
+        pic::ImageVec stack_crf = Triple(&img[0], &img[1], &img[2]);
 
         pic::CameraResponseFunction crf;
-        crf.DebevecMalik(stack, exposureTime);
+        crf.DebevecMalik(stack_crf, exposureTime);
         printf("Ok.\n");
 
         //Setting each exposure time to the related image
-        for(int i=0; i<3; i++) {            
+        pic::ImageVec stack = Triple(&img[0], img_dark, img_bright);
+        for(int i=0; i<3; i++) {
             stack[i]->exposure = exposureTime[i];
         }
 
+<<<<<<< HEAD
         printf("Assembling the different exposure images... ");
         pic::FilterAssembleHDR merger(pic::CW_DEB97, pic::HRD_LOG, pic::IL_LUT_8_BIT, &crf.icrf);
         pic::Image *imgOut = merger.ProcessP(stack, NULL);
+=======
+        printf("Assembling the images at different exposure times... ");
+        pic::FilterAssembleHDR fltAHDR(pic::CW_GAUSS, pic::IL_LUT_8_BIT, &crf.icrf);
+        pic::Image *imgOut = fltAHDR.ProcessP(stack, NULL);
+>>>>>>> origin/develop
         printf("Ok\n");
 
         if(imgOut != NULL) {
