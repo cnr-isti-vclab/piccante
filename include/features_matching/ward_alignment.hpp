@@ -42,8 +42,8 @@ protected:
     float tolerance, percentile;
 
 public:
-    ImageVec             img1_v, img2_v, luminance;
-    std::vector< bool* >    tb1_v, tb2_v, eb2_shifted_v, tb2_shifted_v;
+    ImageVec img1_v, img2_v, luminance;
+    std::vector< bool* > tb1_v, tb2_v, eb2_shifted_v, tb2_shifted_v;
 
     /**
      * @brief WardAlignment
@@ -186,18 +186,24 @@ public:
         cur_shift = Eigen::Vector2i(0, 0);
         ret_shift = Eigen::Vector2i(0, 0);
 
-        Image *sml_img1 = NULL;
-        Image *sml_img2 = NULL;
+        //downsampling
+        Image *tmp_1 = L1;
+        Image *tmp_2 = L2;
+        for(int i=0; i< shift_bits; i++) {
+            Image* sml_img1 = FilterDownSampler2D::Execute(tmp_1, NULL, 0.5f);
+            Image* sml_img2 = FilterDownSampler2D::Execute(tmp_2, NULL, 0.5f);
 
-        while(shift_bits > 0) {
-            float scale = powf(2.0f, float(-shift_bits));
-
-            sml_img1 = FilterDownSampler2D::Execute(L1, NULL, scale);
-            sml_img2 = FilterDownSampler2D::Execute(L2, NULL, scale);
-
-            //tracking memory
             img1_v.push_back(sml_img1);
             img2_v.push_back(sml_img2);
+
+            tmp_1 = sml_img1;
+            tmp_2 = sml_img2;
+        }
+
+        //computing the shift
+        while(shift_bits > 0) {
+            Image* sml_img1 = img1_v[shift_bits - 1];
+            Image* sml_img2 = img2_v[shift_bits - 1];
 
             int width  = sml_img1->width;
             int height = sml_img1->height;
