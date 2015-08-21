@@ -108,7 +108,7 @@ void FilterGLDurandTMO::FragmentShader()
         float L_log  = texelFetch(u_lum_log, coords, 0).x;\n
         float base   = texelFetch(u_base, coords, 0).x;\n
         float detail = L_log - base;\n
-        float L_comp = (base * compression_factor + detail) - (compression_factor + log_absolute);\n
+        float L_comp = (base * compression_factor + detail) -  log_absolute;\n
         L_comp = pow(10.0, L_comp);\n
         color = (color * L_comp / L);\n
         __GAMMA__CORRECTION__ \n

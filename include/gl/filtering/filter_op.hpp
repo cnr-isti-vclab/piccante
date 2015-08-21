@@ -62,6 +62,17 @@ public:
     }
 
     /**
+     * @brief CreateOpSetOne
+     * @return
+     */
+    static FilterGLOp *CreateOpSetOne()
+    {
+        float val[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+        FilterGLOp *filter = new FilterGLOp("C0", true, val, NULL);
+        return filter;
+    }
+
+    /**
      * @brief CreateOpIdentity
      * @param bType
      * @return

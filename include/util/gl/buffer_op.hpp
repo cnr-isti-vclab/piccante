@@ -268,7 +268,7 @@ void BufferOpGL::InitShaders()
     fragment_source.replace(processing_found, 21, strOp);
 
     std::string prefix;
-    prefix += glw::version("400");
+    prefix += glw::version("330");
 
     filteringProgram.setup(prefix, vertex_source, fragment_source);
 

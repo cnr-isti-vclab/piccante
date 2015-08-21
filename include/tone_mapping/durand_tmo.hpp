@@ -69,7 +69,7 @@ Image *DurandTMO(Image *imgIn, Image *imgOut = NULL, float target_contrast = 5.0
 
     *base *= compression_factor;
     *base += detail;
-    *base -= (compression_factor + log_absoulte);
+    *base -= log_absoulte;
     base->ApplyFunction(powf10fe);
 
     imgOut = imgIn->Clone();
