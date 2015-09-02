@@ -87,7 +87,7 @@ public:
             sigma_r = 0.05f;
         }
 
-        unsigned int iterations = int(ceilf(5.0f * sigma_s));
+        unsigned int iterations = 2;//int(ceilf(5.0f * sigma_s));
 
         FilterAnsiotropicDiffusion ansio_flt(sigma_r, 1);
         FilterIterative iter_flt(&ansio_flt, iterations);

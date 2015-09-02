@@ -129,7 +129,7 @@ void FilterIterative::Destroy()
 
 void FilterIterative::Update(Filter *flt, int iterations)
 {
-    if(iterations > 1) {
+    if(iterations > 0) {
         this->iterations = iterations;
     }
 
