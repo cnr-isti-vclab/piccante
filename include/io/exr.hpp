@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_IO_EXR_HPP
 #define PIC_IO_EXR_HPP
 
-#ifdef PIC_ENABLE_OPEN_EXR
-
 #include "base.hpp"
+
+#ifdef PIC_ENABLE_OPEN_EXR
 
 #include <ImfRgbaFile.h>
 #include <ImfStringAttribute.h>
@@ -196,8 +196,144 @@ PIC_INLINE bool WriteEXR(std::string nameFile, const float *data, int width,
 }
 
 } // end namespace pic
+#else
 
-#endif
+#ifndef PIC_DISABLE_TINY_EXR
+
+#define TINYEXR_IMPLEMENTATION
+#include "externals/tinyexr/tinyexr.h"
+
+namespace pic {
+
+/**
+ * @brief ReadEXR
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @return
+ */
+PIC_INLINE float *ReadEXR(std::string nameFile, float *data, int &width, int &height, int &channels)
+{
+    EXRImage image;
+    InitEXRImage(&image);
+
+    const char* err;
+    int ret = ParseMultiChannelEXRHeaderFromFile(&image, nameFile.c_str(), &err);
+    if (ret != 0) {
+        #ifdef PIC_DEBUG
+            printf("Parse EXR error: %s\n", err);
+        #endif
+
+        return NULL;
+    }
+
+    width = image.width;
+    height = image.height;
+    channels = image.num_channels;
+
+    //Allocate into memory
+    if(data == NULL) {
+        data = new float[width * height * channels];
+    }
+
+    for (int i = 0; i < image.num_channels; i++) {
+        if (image.pixel_types[i] = TINYEXR_PIXELTYPE_HALF) {
+            image.requested_pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT;
+        }
+    }
+
+    ret = LoadMultiChannelEXRFromFile(&image, nameFile.c_str(), &err);
+    if (ret != 0) {
+        #ifdef PIC_DEBUG
+            printf("Load EXR error: %s\n", err);
+        #endif
+        return data;
+    }
+
+    float **images = (float**) image.images;
+
+    int nPixels = width * height;
+    for (int i = 0; i < nPixels; i++){
+        int index = i * channels;
+
+        data[index    ] = images[2][i];
+        data[index + 1] = images[1][i];
+        data[index + 2] = images[0][i];
+    }
+
+    return data;
+}
+
+/**
+ * @brief WriteEXR
+ * @param nameFile
+ * @param data
+ * @param width
+ * @param height
+ * @param channels
+ * @return
+ */
+PIC_INLINE bool WriteEXR(std::string nameFile, const float *data, int width,
+                         int height, int channels = 3)
+{
+    EXRImage image;
+    InitEXRImage(&image);
+
+     image.num_channels = channels;
+
+     const char* channel_names[] = {"B", "G", "R"}; // "B", "G", "R", "A" for RGBA image
+
+     std::vector<float> images[3];
+     images[0].resize(width * height);
+     images[1].resize(width * height);
+     images[2].resize(width * height);
+
+     int nPixels = width * height;
+     for (int i = 0; i < nPixels; i++){
+         int index = i * channels;
+
+         images[0][i] = data[index    ];
+         images[1][i] = data[index + 1];
+         images[2][i] = data[index + 2];
+     }
+
+     float* image_ptr[3];
+     image_ptr[0] = &(images[2].at(0)); // B
+     image_ptr[1] = &(images[1].at(0)); // G
+     image_ptr[2] = &(images[0].at(0)); // R
+
+     image.channel_names = channel_names;
+     image.images = (unsigned char**)image_ptr;
+     image.width = width;
+     image.height = height;
+
+     image.pixel_types = (int *)malloc(sizeof(int) * image.num_channels);
+     image.requested_pixel_types = (int *)malloc(sizeof(int) * image.num_channels);
+     for (int i = 0; i < image.num_channels; i++) {
+       image.pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT; // pixel type of input image
+       image.requested_pixel_types[i] = TINYEXR_PIXELTYPE_HALF; // pixel type of output image to be stored in .EXR
+     }
+
+     const char* err;
+     int ret = SaveMultiChannelEXRToFile(&image, nameFile.c_str(), &err);
+     if (ret != 0) {
+         printf("Save EXR err: %s\n", err);
+         return false;
+     }
+
+     free(image.pixel_types);
+     free(image.requested_pixel_types);
+
+     return true;
+}
+
+}
+
+#endif //PIC_DISABLE_TINY_EXR
+
+#endif //PIC_ENABLE_OPEN_EXR
 
 #endif /* PIC_IO_EXR_HPP */
 

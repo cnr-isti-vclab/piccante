@@ -1814,6 +1814,10 @@ PIC_INLINE bool Image::Read(std::string nameFile,
         case IO_EXR:
 #ifdef PIC_ENABLE_OPEN_EXR
             tmp = ReadEXR(nameFile, dataReader, width, height, channels, dataEXR);
+#else
+#ifndef PIC_DISABLE_TINY_EXR
+            tmp = ReadEXR(nameFile, dataReader, width, height, channels);
+#endif
 #endif
             break;
 
@@ -1971,6 +1975,10 @@ PIC_INLINE bool Image::Write(std::string nameFile, LDR_type typeWrite = LT_NOR_G
         case IO_EXR:
 #ifdef PIC_ENABLE_OPEN_EXR
             ret = WriteEXR(nameFile, dataWriter, width, height, channels);
+#else
+#ifndef PIC_DISABLE_TINY_EXR
+            ret = WriteEXR(nameFile, dataWriter, width, height, channels);
+#endif
 #endif
             break;
 

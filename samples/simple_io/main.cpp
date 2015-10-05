@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
         outputFormats.push_back("pgm");
         outputFormats.push_back("pfm");
         outputFormats.push_back("hdr");
+        outputFormats.push_back("exr");
 
         for(unsigned int i=0; i<outputFormats.size(); i++) {
             std::string text = "Writing the file to disk as " + outputFormats[i] + " file... ";
