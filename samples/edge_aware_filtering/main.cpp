@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     printf("Reading an HDR file...");
 
     pic::Image img;
-    img.Read("../data/input/bottles.hdr");
+    img.Read("../data/input/tommaseo_statue.png");
     printf("Ok\n");
 
     printf("Is it valid? ");
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
         printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
 
         //Creating the filter
-        pic::FilterBilateral2DS flt(4.0f, 0.05f);
+        pic::FilterBilateral2DS flt(8.0f, 0.05f);
 
         //Filtering the image
         output = flt.ProcessP(input, output);
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         //Filtering with the Anisotropic Diffusion
         printf("Filtering the image with the Anisotropic Diffusion;\n");
         printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
-        output = pic::FilterAnsiotropicDiffusion::AnisotropicDiffusion(input, output, 4.0f, 0.05f);
+        output = pic::FilterAnsiotropicDiffusion::AnisotropicDiffusion(input, output, 8.0f, 0.05f);
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
