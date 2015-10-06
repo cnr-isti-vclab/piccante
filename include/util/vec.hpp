@@ -101,6 +101,28 @@ public:
     }
 
     /**
+     * @brief add
+     * @param a
+     */
+    void add(Vec<N, T> a)
+    {
+        for(unsigned int i=0; i<N; i++) {
+            data[i] += a[i];
+        }
+    }
+
+    /**
+     * @brief div
+     * @param value
+     */
+    void div(T value)
+    {
+        for(unsigned int i=0; i<N; i++) {
+            data[i] /= value;
+        }
+    }
+
+    /**
      * @brief operator []
      * @param index
      * @return
@@ -207,6 +229,16 @@ Vec<N, float> randomPoint(std::mt19937 *m)
     }
 
     return x;
+}
+
+template<unsigned int N>
+void printVec(Vec<N, float> x)
+{
+    printf("[");
+    for(unsigned int i = 0; i < N; i++) {
+        printf("%f ", x[i]);
+    }
+    printf("]\n");
 }
 
 /**

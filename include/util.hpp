@@ -60,6 +60,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/rasterizer.hpp"
 
 //optimization
+#include "util/k_means.hpp"
+
 #include "util/nelder_mead_opt_base.hpp"
 #include "util/nelder_mead_opt_homography.hpp"
 #include "util/nelder_mead_opt_fundamental.hpp"
