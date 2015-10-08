@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "image.hpp"
 #include "filtering/filter_laplacian.hpp"
+#include "filtering/filter_max.hpp"
 
 namespace pic {
 
@@ -37,26 +38,22 @@ void InitState(Image *state, Image *seeds)
     }
 }
 
-Image *GrowCut(Image *img, Image *seeds, Image *mask, float sigma = 0.1f)
+Image *GrowCut(Image *img, Image *seeds, Image *mask)
 {
     Image *state_cur = new Image(img->width, img->height, 2);
     InitState(state_cur, seeds);
+
+    Image *img_max = FilterMax::Execute(img, NULL, 5);
 
     Image *state_next = state_cur->AllocateSimilarOne();
 
 /*    float dx[] = {-1, 1,  0, 0};
     float dy[] = { 0, 0, -1, 1};*/
 
-    float dx[] = {-1, 0, 1, -1, 1, -1, 0,   1};
+    float dx[] = {-1, 0, 1, -1, 1, -1,  0,  1};
     float dy[] = { 1, 1, 1,  0, 0, -1, -1, -1};
 
-    float sigma2 = 2.0f * sigma * sigma;
-
-
     int iterations = int(sqrtf(img->widthf * img->widthf + img->heightf * img->heightf));
-
-    iterations = iterations >> 1;
-
     int channels = img->channels;
 
     for(int p = 0; p < iterations; p++) {
@@ -68,6 +65,12 @@ Image *GrowCut(Image *img, Image *seeds, Image *mask, float sigma = 0.1f)
                 float *s_cur = (*state_cur)(j, i);
                 float *s_next = (*state_next)(j, i);
                 float *col = (*img)(j, i);
+
+                float *col_max = (*img_max)(j, i);
+                float C = col_max[0] * col_max[0];
+                for(int c = 1; c < channels; c++) {
+                    C += col_max[c] * col_max[c];
+                }
 
                 s_next[0] = s_cur[0];
                 s_next[1] = s_cur[1];
@@ -85,7 +88,9 @@ Image *GrowCut(Image *img, Image *seeds, Image *mask, float sigma = 0.1f)
                         dist += tmp * tmp;
                     }
 
-                    float g_theta = expf(-dist / sigma2) * s_cur_k[1];
+                    float g_theta = 1.0f - (dist / C);
+
+                    g_theta *= s_cur_k[1];
 
                     if(g_theta > s_cur[1]) {
                         s_next[0] = s_cur_k[0];
@@ -98,7 +103,8 @@ Image *GrowCut(Image *img, Image *seeds, Image *mask, float sigma = 0.1f)
         }
 
         if(bNotChanged) {
-            printf("Iterations: %d\n",p);
+            delete img_max;
+            delete state_next;
             return state_cur;
         }
 
@@ -106,7 +112,9 @@ Image *GrowCut(Image *img, Image *seeds, Image *mask, float sigma = 0.1f)
         state_cur = state_next;
         state_next = tmp;
     }
-    printf("Iterations: %d\n", iterations);
+
+    delete img_max;
+    delete state_next;
 
     return state_cur;
 }
