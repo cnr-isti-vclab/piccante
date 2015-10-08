@@ -44,12 +44,24 @@ Image *GrowCut(Image *img, Image *seeds, Image *mask, float sigma = 0.1f)
 
     Image *state_next = state_cur->AllocateSimilarOne();
 
-    float dx[] = {-1, 1,  0, 0};
-    float dy[] = { 0, 0, -1, 1};
+/*    float dx[] = {-1, 1,  0, 0};
+    float dy[] = { 0, 0, -1, 1};*/
+
+    float dx[] = {-1, 0, 1, -1, 1, -1, 0,   1};
+    float dy[] = { 1, 1, 1,  0, 0, -1, -1, -1};
 
     float sigma2 = 2.0f * sigma * sigma;
 
-    for(int p = 0; p < 1000; p++) {
+
+    int iterations = int(sqrtf(img->widthf * img->widthf + img->heightf * img->heightf));
+
+    iterations = iterations >> 1;
+
+    int channels = img->channels;
+
+    for(int p = 0; p < iterations; p++) {
+        bool bNotChanged = true;
+
         for(int i = 0; i < img->height; i++) {
             for(int j = 0; j < img->width; j++) {
 
@@ -60,7 +72,7 @@ Image *GrowCut(Image *img, Image *seeds, Image *mask, float sigma = 0.1f)
                 s_next[0] = s_cur[0];
                 s_next[1] = s_cur[1];
 
-                for(int k = 0; k < 4; k++) {
+                for(int k = 0; k < 8; k++) {
                     int x = j + dx[k];
                     int y = i + dy[k];
 
@@ -68,28 +80,33 @@ Image *GrowCut(Image *img, Image *seeds, Image *mask, float sigma = 0.1f)
                     float *col_k = (*img)(x, y);
 
                     float dist = 0.0f;
-                    for(int c = 0; c < img->channels; c++) {
+                    for(int c = 0; c < channels; c++) {
                         float tmp = col[c] - col_k[c];
                         dist += tmp * tmp;
                     }
 
-                    float g = expf(-dist / sigma2);
-
-                    float g_theta = g * s_cur_k[1];
+                    float g_theta = expf(-dist / sigma2) * s_cur_k[1];
 
                     if(g_theta > s_cur[1]) {
                         s_next[0] = s_cur_k[0];
                         s_next[1] = g_theta;
+                        bNotChanged = false;
                     }
                 }
             }
 
         }
 
+        if(bNotChanged) {
+            printf("Iterations: %d\n",p);
+            return state_cur;
+        }
+
         Image *tmp = state_cur;
         state_cur = state_next;
         state_next = tmp;
     }
+    printf("Iterations: %d\n", iterations);
 
     return state_cur;
 }

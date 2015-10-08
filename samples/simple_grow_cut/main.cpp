@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     if(img.isValid() && strokes.isValid()) {
         printf("OK\n");
 
-        pic::Image *gc = pic::GrowCut(&img, &strokes, NULL, 0.25f);
+        pic::Image *gc = pic::GrowCut(&img, &strokes, NULL, 0.1f);
 
         gc->Write("../data/output/gc.pfm");
 
