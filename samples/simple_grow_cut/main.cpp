@@ -27,17 +27,18 @@ int main(int argc, char *argv[])
     Q_UNUSED(argc);
     Q_UNUSED(argv);
 
-    printf("Reading an HDR file...");
+    printf("Reading an image...");
 
     pic::Image img, strokes;
     img.Read("../data/input/yellow_flowers.png");
     strokes.Read("../data/input/strokes.png");
+    printf("OK\n");
 
     printf("Are input images valid? ");
     if(img.isValid() && strokes.isValid()) {
         printf("OK\n");
 
-        pic::Image *gc = pic::GrowCut(&img, &strokes, NULL);
+        pic::Image *gc = pic::GrowCut(&img, &strokes);
 
         gc->Write("../data/output/gc.pfm");
 

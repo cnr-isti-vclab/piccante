@@ -80,6 +80,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_sigmoid_tmo.hpp"
 #include "filtering/filter_simple_tmo.hpp"
 #include "filtering/filter_wls.hpp"
+#include "filtering/filter_grow_cut.hpp"
 
 #endif /* PIC_FILTERING_HPP */
 

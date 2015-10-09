@@ -21,102 +21,72 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "image.hpp"
 #include "filtering/filter_laplacian.hpp"
 #include "filtering/filter_max.hpp"
+#include "filtering/filter_grow_cut.hpp"
 
 namespace pic {
 
-void InitState(Image *state, Image *seeds)
+/**
+ * @brief GrowCut
+ * @param img
+ * @param seeds
+ * @param state_cur
+ * @return
+ */
+Image *GrowCut(Image *img, Image *seeds, Image *state_cur = NULL)
 {
-    for(int i = 0; i < state->nPixels(); i++) {
-        int j = i * 2;
-        state->data[j] = seeds->data[i];
-
-        if(seeds->data[i] > 0.0f) {
-            state->data[j + 1] = 1.0f;
-        } else {
-            state->data[j + 1] = 0.0f;
-        }
+    if(img == NULL || seeds == NULL) {
+        return NULL;
     }
-}
 
-Image *GrowCut(Image *img, Image *seeds, Image *mask)
-{
-    Image *state_cur = new Image(img->width, img->height, 2);
-    InitState(state_cur, seeds);
-
-    Image *img_max = FilterMax::Execute(img, NULL, 5);
+    if(state_cur == NULL) {
+        state_cur = new Image(img->width, img->height, 2);
+    }
 
     Image *state_next = state_cur->AllocateSimilarOne();
 
-/*    float dx[] = {-1, 1,  0, 0};
-    float dy[] = { 0, 0, -1, 1};*/
+    //computing max
+    Image *img_max = FilterMax::Execute(img, NULL, 5);
 
-    float dx[] = {-1, 0, 1, -1, 1, -1,  0,  1};
-    float dy[] = { 1, 1, 1,  0, 0, -1, -1, -1};
+    for(int i = 0; i < state_cur->nPixels(); i++) {
+        //init state_cur
+        int j = i * state_cur->channels;
+        int j2 = i * seeds->channels;
+        state_cur->data[j] = seeds->data[j2];
+        state_cur->data[j + 1] = seeds->data[j2] > 0.0f ? 1.0f : 0.0f;
 
-    int iterations = int(sqrtf(img->widthf * img->widthf + img->heightf * img->heightf));
-    int channels = img->channels;
-
-    for(int p = 0; p < iterations; p++) {
-        bool bNotChanged = true;
-
-        for(int i = 0; i < img->height; i++) {
-            for(int j = 0; j < img->width; j++) {
-
-                float *s_cur = (*state_cur)(j, i);
-                float *s_next = (*state_next)(j, i);
-                float *col = (*img)(j, i);
-
-                float *col_max = (*img_max)(j, i);
-                float C = col_max[0] * col_max[0];
-                for(int c = 1; c < channels; c++) {
-                    C += col_max[c] * col_max[c];
-                }
-
-                s_next[0] = s_cur[0];
-                s_next[1] = s_cur[1];
-
-                for(int k = 0; k < 8; k++) {
-                    int x = j + dx[k];
-                    int y = i + dy[k];
-
-                    float *s_cur_k = (*state_cur)(x, y);
-                    float *col_k = (*img)(x, y);
-
-                    float dist = 0.0f;
-                    for(int c = 0; c < channels; c++) {
-                        float tmp = col[c] - col_k[c];
-                        dist += tmp * tmp;
-                    }
-
-                    float g_theta = 1.0f - (dist / C);
-
-                    g_theta *= s_cur_k[1];
-
-                    if(g_theta > s_cur[1]) {
-                        s_next[0] = s_cur_k[0];
-                        s_next[1] = g_theta;
-                        bNotChanged = false;
-                    }
-                }
-            }
-
+        //fixing max
+        j = i * img_max->channels;
+        float C = img_max->data[j] * img_max->data[j];
+        for(int c = 1; c < img_max->channels; c++) {
+            float tmp = img_max->data[j + c];
+            C += tmp * tmp;
         }
-
-        if(bNotChanged) {
-            delete img_max;
-            delete state_next;
-            return state_cur;
-        }
-
-        Image *tmp = state_cur;
-        state_cur = state_next;
-        state_next = tmp;
+        img_max->data[j] = C;
     }
 
-    delete img_max;
-    delete state_next;
+    //iterative filtering...
+    int iterations = int(sqrtf(img->widthf * img->widthf + img->heightf * img->heightf));
+    if((iterations % 2) == 1) {
+        iterations++;
+    }
 
-    return state_cur;
+    FilterGrowCut flt;
+    ImageVec input = Triple(state_cur, img, img_max);
+    Image *output = state_next;
+
+    for(int i = 0; i < iterations; i++) {
+
+        output = flt.ProcessP(input, output);
+
+        Image *tmp = input[0];
+        input[0] = output;
+        output = tmp;
+    }
+
+    delete output;
+    delete img_max;
+
+    return input[0];
 }
 
 } // end namespace pic
