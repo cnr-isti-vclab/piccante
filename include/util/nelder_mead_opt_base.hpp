@@ -63,7 +63,7 @@ protected:
             if(vertex[i] != 0.0f) {
                 vertex[i] += x0[i] * delta;
             } else {
-                    vertex[i] = delta_zero;
+                vertex[i] = delta_zero;
             }
 
             Scalar function_vertex = function(vertex, n);

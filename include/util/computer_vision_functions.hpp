@@ -656,6 +656,39 @@ Eigen::Matrix34d getCameraMatrixFromHomography(Eigen::Matrix3d &H, Eigen::Matrix
 }
 
 /**
+ * @brief RectifyCameras
+ * @param K0
+ * @param R0
+ * @param t0
+ * @param K1
+ * @param R1
+ * @param t1
+ * @param T0
+ * @param T1
+ */
+void RectifyCameras(Eigen::Matrix3d &K0, Eigen::Matrix3d &R0, Eigen::Vector3d &t0,
+                    Eigen::Matrix3d &K1, Eigen::Matrix3d &R1, Eigen::Vector3d &t1,
+                    Eigen::Matrix3d &T0, Eigen::Matrix3d &T1)
+{
+    Eigen::Matrix3d K0_inv = K0.inverse();
+    Eigen::Matrix3d K1_inv = K1.inverse();
+
+    Eigen::Matrix3d R0_t = Eigen::Transpose<Eigen::Matrix3d>(R0);
+    Eigen::Matrix3d R1_t = Eigen::Transpose<Eigen::Matrix3d>(R1);
+
+    Eigen::Vector3d c0 = -R0_t * K0_inv * t0;
+    Eigen::Vector3d c1 = -R1_t * K1_inv * t1;
+
+    Eigen::Vector3d v0 = c1 - c0;
+
+    Eigen::Vector3d R0_t_2 = Eigen::Vector3d(R0_t(2, 0), R0_t(2, 1), R0_t(2, 2));
+    Eigen::Vector3d v1 = R0_t_2.cross(v0);
+    Eigen::Vector3d v2 = v0.cross(v1);
+
+}
+
+
+/**
  * @brief getCameraMatrixIdentity
  * @param K
  * @return
@@ -816,7 +849,8 @@ Eigen::Vector3d triangulationLonguetHiggins(Eigen::Vector3d &point_0, Eigen::Vec
 }
 
 /**
- * @brief triangulationHartleySturm
+ * @brief triangulationHartl
+ * Sturm
  * @param point_0
  * @param point_1
  * @param R
