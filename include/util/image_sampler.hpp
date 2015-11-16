@@ -90,12 +90,25 @@ inline float Rx(float x)
     float px1  = MAX(x + 1.0f, 0.0f);
     float px2  = MAX(x + 2.0f, 0.0f);
 
-    return (px2 * px2 * px2
-            - 4.0f * px1 * px1 * px1 +
-            6.0f * px * px * px
+    return (         px2  * px2  * px2
+            - 4.0f * px1  * px1  * px1 +
+              6.0f * px   * px   * px
             - 4.0f * px_1 * px_1 * px_1
            ) / 6.0f;
 }
+
+inline float Quadric(float x)
+{
+    float px_1 = MAX(x - 1.0f, 0.0f);
+    float px   = MAX(x,        0.0f);
+    float px1  = MAX(x + 1.0f, 0.0f);
+
+    return (        px_1  * px_1 +
+                    px1  * px1 +
+              2.0f * px   * px
+           ) / 2.0f;
+}
+
 
 } // end namespace pic
 
