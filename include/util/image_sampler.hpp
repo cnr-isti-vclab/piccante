@@ -97,19 +97,6 @@ inline float Rx(float x)
            ) / 6.0f;
 }
 
-inline float Quadric(float x)
-{
-    float px_1 = MAX(x - 1.0f, 0.0f);
-    float px   = MAX(x,        0.0f);
-    float px1  = MAX(x + 1.0f, 0.0f);
-
-    return (        px_1  * px_1 +
-                    px1  * px1 +
-              2.0f * px   * px
-           ) / 2.0f;
-}
-
-
 } // end namespace pic
 
 #endif /* PIC_UTIL_IMAGE_SAMPLER_HPP */

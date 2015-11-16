@@ -239,7 +239,7 @@ PIC_INLINE float *ReadEXR(std::string nameFile, float *data, int &width, int &he
     }
 
     for (int i = 0; i < image.num_channels; i++) {
-        if (image.pixel_types[i] = TINYEXR_PIXELTYPE_HALF) {
+        if (image.pixel_types[i] == TINYEXR_PIXELTYPE_HALF) {
             image.requested_pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT;
         }
     }

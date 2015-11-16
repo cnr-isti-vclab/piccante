@@ -75,21 +75,19 @@ PIC_INLINE void ImageSamplerBSplines::SampleImage(Image *img, float x, float y,
     int ix = int(xx);
     int iy = int(yy);
 
-    int ex, ey;
-
     for(int k = 0; k < img->channels; k++) {
         vOut[k] = 0.0f;
     }
 
     //BSplines interpolation
     float rx, ry;
-
-    for(int j = 0; j < 4; j++) {
-        ry = Rx(float(j) - 1.0f - dy);
+    int ey, ex;
+    for(int j = -1; j < 3; j++) {
+        ry = Rx(float(j) - dy);
         ey = CLAMP(iy + j, img->height);
 
-        for(int i = 0; i < 4; i++) {
-            rx = Rx(float(i) - 1.0f - dx) * ry;
+        for(int i = -1; i < 3; i++) {
+            rx = Rx(float(i) - dx) * ry;
             ex = CLAMP(ix + i, img->width);
             int ind = (ey * img->width + ex) * img->channels;
 
@@ -98,6 +96,7 @@ PIC_INLINE void ImageSamplerBSplines::SampleImage(Image *img, float x, float y,
             }
         }
     }
+
 }
 
 PIC_INLINE void ImageSamplerBSplines::SampleImage(Image *img, float x, float y,
