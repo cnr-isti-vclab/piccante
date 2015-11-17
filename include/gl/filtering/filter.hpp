@@ -203,9 +203,14 @@ ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
     glw::bind_program(0);
 
     //Textures
-    for(unsigned int i=0; i< (m + n); i++) {
+    for(unsigned int i=0; i< n; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         imgIn[i]->unBindTexture();
+    }
+
+    for(unsigned int i=0; i< m; i++) {
+        glActiveTexture(GL_TEXTURE0 + n + i);
+        param[i]->unBindTexture();
     }
 
     return imgOut;

@@ -48,7 +48,7 @@ public:
      * @brief Update
      * @param type
      */
-    void Update();
+    void Update(Image *grid_move);
 };
 
 FilterGLDeformGrid::FilterGLDeformGrid(Image *grid_move): FilterGL()
@@ -74,15 +74,19 @@ void FilterGLDeformGrid::InitShaders()
     out     vec4 f_color; \n
     \n
     void main(void) {
-        \n
-        ivec2 coords = ivec2(gl_FragCoord.xy); \n
+        vec2 tSize = vec2(textureSize(u_tex, 0));
+        vec2 coords = gl_FragCoord.xy / tSize.xy; \n
+        vec2 shifts = texture(u_grid, gl_FragCoord.xy / tSize.xy).xy;
+        f_color = texture(u_tex, coords + shifts);
+    }
+                      );
+
+    /*
         vec2 shift = texelFetch(u_grid, coords, 0).xy; \n
         vec3 color = texelFetch(u_grid, coords + shift, 0).xy; \n
         float L = dot(color, weights); \n
         f_color = vec4(L, L, L, 1.0); \n
-        \n
-    }
-                      );
+*/
 
     filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 
@@ -96,11 +100,21 @@ void FilterGLDeformGrid::InitShaders()
     filteringProgram.relink();
     glw::bind_program(0);
 
-    Update();
+    Update(NULL);
 }
 
-void FilterGLDeformGrid::Update()
+void FilterGLDeformGrid::Update(Image *grid_move)
 {
+    if(grid_move != NULL) {
+
+        this->grid_move = grid_move;
+
+        grid_diff = *grid_rest;
+        grid_diff -= *this->grid_move;
+
+        grid_diff_gl->loadFromMemory();
+    }
+
     glw::bind_program(filteringProgram);
     filteringProgram.uniform("u_tex", 0);
     filteringProgram.uniform("u_grid", 1);

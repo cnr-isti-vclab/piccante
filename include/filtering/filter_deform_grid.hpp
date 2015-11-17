@@ -19,7 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FILTERING_FILTER_DEFORM_GRID_HPP
 
 #include "filtering/filter.hpp"
-#include "image_samplers/image_sampler_bsplines.hpp"
+#include "image_samplers/image_sampler_bicubic.hpp"
 #include "image_samplers/image_sampler_bilinear.hpp"
 #include "util/vec.hpp"
 
@@ -31,8 +31,7 @@ namespace pic {
 class FilterDeformGrid: public Filter
 {
 protected:
-//    ImageSamplerBilinear    isb;
-    ImageSamplerBSplines   isb;
+    ImageSamplerBicubic isb;
     Image *grid_rest, *grid_move, grid_diff;
 
     /**
@@ -87,7 +86,7 @@ public:
             sampleY = 5;
         }
 
-        Image *ret = new Image(1, sampleX, sampleY, 2);
+        Image *ret = new Image(1, sampleX, sampleY, 3);
 
         float tmp_x = 1.0f / float(sampleX - 1);
         float tmp_y = 1.0f / float(sampleY - 1);
