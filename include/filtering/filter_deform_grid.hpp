@@ -43,11 +43,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        float *data  = src[0]->data;
-
-        float dx = 1.0f / grid_diff.widthf;
-        float dy = 1.0f / grid_diff.heightf;
-
         for(int j = box->y0; j < box->y1; j++) {
             for(int i = box->x0; i < box->x1; i++) {
                 float *tmp_dst = (*dst)(i, j);

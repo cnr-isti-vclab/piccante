@@ -18,9 +18,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-//This means we do not use QT for I/O
-#define PIC_DISABLE_QT
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -28,7 +25,7 @@ int main(int argc, char *argv[])
     printf("Reading an HDR file...");
 
     pic::Image img;
-    img.Read("../data/input/grid.bmp");
+    img.Read("../data/input/grid.png");
     printf("Ok\n");
 
     printf("Is it valid? ");
@@ -43,7 +40,7 @@ int main(int argc, char *argv[])
 
         pic::Image *out = flt_dg.ProcessP(Single(&img), NULL);
 
-        out->Write("../data/output/grid_deform.bmp");
+        out->Write("../data/output/grid_deform.png");
     } else {
         printf("No, the file is not valid!\n");
     }
