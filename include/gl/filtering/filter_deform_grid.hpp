@@ -30,8 +30,8 @@ class FilterGLDeformGrid: public FilterGL
 {
 protected:
 
-    DEFORM_GRID_TYPE type;
-    float weights[3];
+    Image *grid_rest, *grid_move, grid_diff;
+    ImageGL *grid_diff_gl;
 
     /**
      * @brief InitShaders
@@ -42,7 +42,7 @@ public:
     /**
      * @brief FilterGLDeformGrid
      */
-    FilterGLDeformGrid();
+    FilterGLDeformGrid(Image *grid_move);
 
     /**
      * @brief Update
@@ -51,8 +51,17 @@ public:
     void Update();
 };
 
-FilterGLDeformGrid::FilterGLDeformGrid(): FilterGL()
+FilterGLDeformGrid::FilterGLDeformGrid(Image *grid_move): FilterGL()
 {
+    this->grid_rest = FilterDeformGrid::getUniformGrid(grid_move->width, grid_move->height);
+    this->grid_move = grid_move;
+
+    grid_diff = *grid_rest - *grid_move;
+
+    grid_diff_gl = new ImageGL(&grid_diff, true);
+    grid_diff_gl->generateTextureGL();
+    param.push_back(grid_diff_gl);
+
     InitShaders();
 }
 
@@ -87,7 +96,7 @@ void FilterGLDeformGrid::InitShaders()
     filteringProgram.relink();
     glw::bind_program(0);
 
-    Update(type);
+    Update();
 }
 
 void FilterGLDeformGrid::Update()

@@ -106,6 +106,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/filtering/filter_slicer.hpp"
 #include "gl/filtering/filter_thresholding.hpp"
 #include "gl/filtering/filter_durand_tmo.hpp"
+#include "gl/filtering/filter_deform_grid.hpp"
 #include "gl/image.hpp"
 #include "gl/image_vec.hpp"
 #include "gl/point_samplers/sampler_random_m.hpp"

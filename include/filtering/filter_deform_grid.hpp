@@ -93,12 +93,9 @@ public:
         float tmp_y = 1.0f / float(sampleY - 1);
 
         for(int y = 0; y < sampleY; y++) {
-            int ind = y * sampleX;
-
             float y_f = float(y) * tmp_y;
 
             for(int x = 0; x < sampleX; x++) {
-                int ind1 = ind + x;
                 float *ret_val = (*ret)(x, y);
 
                 ret_val[0]= float(x) * tmp_x;

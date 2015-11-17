@@ -50,6 +50,7 @@ protected:
     glw::program filteringProgram;
     GLenum target;
 
+    ImageGLVec param;
 public:
 
     std::vector<FilterGL *> filters;
@@ -179,9 +180,17 @@ ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
     glw::bind_program(filteringProgram);
 
     //Textures
-    for(unsigned int i=0; i<imgIn.size(); i++) {
+    unsigned int n = imgIn.size();
+    for(unsigned int i = 0; i < n; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         imgIn[i]->bindTexture();
+    }
+
+    //Texture internal filter parameters
+    unsigned int m = param.size();
+    for(unsigned int i = 0; i < m; i++) {
+        glActiveTexture(GL_TEXTURE0 + n + i);
+        param[i]->bindTexture();
     }
 
     //Rendering aligned quad
@@ -194,7 +203,7 @@ ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
     glw::bind_program(0);
 
     //Textures
-    for(unsigned int i=0; i<imgIn.size(); i++) {
+    for(unsigned int i=0; i< (m + n); i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         imgIn[i]->unBindTexture();
     }
