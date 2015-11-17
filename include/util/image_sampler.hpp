@@ -97,6 +97,78 @@ inline float Rx(float x)
            ) / 6.0f;
 }
 
+/**
+ * @brief MitchellNetravali
+ * @param x
+ * @param B
+ * @param C
+ * @return
+ */
+inline float MitchellNetravali(float x, float B, float C)
+{
+    float y = fabsf(x);
+    if(y < 1.0f) {
+        float y_sq = y * y;
+        float t_3 =  12.0f - 9.0f * B - 6.0f * C;
+        float t_2 = -18.0f + 12.0f * B + 6.0f * C;
+        float c   = 6.0f - 2.0f * B;
+        return (t_3 * y_sq * y + t_2 * y_sq + c) / 6.0f;
+    } else {
+        if(y < 2.0f) {
+            float y_sq = y * y;
+            float t_3 = -B - 6.0f * C;
+            float t_2 = 6.0f * B + 30.0f * C;
+            float t_1 = -12.0f * B - 48.0f * C;
+            float c   = 8.0f * B + 24.0f * C;
+            return (t_3 * y_sq * y + t_2 * y_sq + t_1 * y + c) / 6.0f;
+        } else {
+            return 0.0f;
+        }
+    }
+}
+
+/**
+ * @brief Bicubic
+ * @param x
+ * @return
+ */
+inline float Bicubic(float x)
+{
+    float y = fabsf(x);
+    if(y < 1.0f) {
+        float y_sq = y * y;
+        return (3.0f * y_sq * y -6.0f * y_sq + 4.0f) / 6.0f;
+    } else {
+        if(y < 2.0f) {
+            float y_sq = y * y;
+            return (-1.0f * y_sq * y + 6.0f * y_sq -12.0f * y + 8.0f) / 6.0f;
+        } else {
+            return 0.0f;
+        }
+    }
+}
+
+/**
+ * @brief CatmullRom
+ * @param x
+ * @return
+ */
+inline float CatmullRom(float x)
+{
+    float y = fabsf(x);
+    if(y < 1.0f) {
+        float y_sq = y * y;
+        return (9.0f * y_sq * y - 15.0f * y_sq + 6.0f) / 6.0f;
+    } else {
+        if(y < 2.0f) {
+            float y_sq = y * y;
+            return (-3.0f * y_sq * y + 15.0f * y_sq -24.0f * y + 12.0f) / 6.0f;
+        } else {
+            return 0.0f;
+        }
+    }
+}
+
 } // end namespace pic
 
 #endif /* PIC_UTIL_IMAGE_SAMPLER_HPP */

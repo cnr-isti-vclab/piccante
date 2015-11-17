@@ -40,7 +40,7 @@ std::string GLSL_SIMPLE_EXPOSURE_GAMMA()
 
 /**
  * @brief GLSL_DRAGO_TMO returns Drago et al.'s tone mapping operator.
- * @return It returns a string which represents a part of a shader.
+ * @return It returns a string; a building block for a shader.
  */
 std::string GLSL_DRAGO_TMO()
 {

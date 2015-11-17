@@ -40,13 +40,33 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("OK\n");
 
-        pic::ImageSamplerBSplines isb;
-        pic::Image *out = pic::FilterSampler2D::Execute(&img, NULL, 2.0f, &isb);
+        pic::ImageSamplerNearest is_near;
+        pic::Image *out = pic::FilterSampler2D::Execute(&img, NULL, 2.0f, &is_near);
 
         if(out != NULL) {
-            out->Write("../data/output/bottles_2x.hdr");
+            out->Write("../data/output/bottles_2x_nearest.hdr");
         }
 
+        pic::ImageSamplerBilinear is_bil;
+        out = pic::FilterSampler2D::Execute(&img, out, 2.0f, &is_bil);
+
+        if(out != NULL) {
+            out->Write("../data/output/bottles_2x_bilinear.hdr");
+        }
+
+        pic::ImageSamplerCatmullRom is_cr;
+        out = pic::FilterSampler2D::Execute(&img, out, 2.0f, &is_cr);
+
+        if(out != NULL) {
+            out->Write("../data/output/bottles_2x_catmull_rom.hdr");
+        }
+
+        pic::ImageSamplerBicubic is_bic;
+        out = pic::FilterSampler2D::Execute(&img, out, 2.0f, &is_bic);
+
+        if(out != NULL) {
+            out->Write("../data/output/bottles_2x_bicubic.hdr");
+        }
     } else {
         printf("No, the file is not valid!\n");
     }
