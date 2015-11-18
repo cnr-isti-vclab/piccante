@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_DEFORM_GRID_HPP
 #define PIC_GL_FILTERING_FILTER_DEFORM_GRID_HPP
 
+#include "util/gl/bicubic.hpp"
 #include "filtering/filter_DEFORM_GRID.hpp"
 #include "gl/filtering/filter.hpp"
 
@@ -67,26 +68,24 @@ FilterGLDeformGrid::FilterGLDeformGrid(Image *grid_move): FilterGL()
 
 void FilterGLDeformGrid::InitShaders()
 {
-    fragment_source = GLW_STRINGFY
+    fragment_source  = GLSL_BICUBIC();
+    fragment_source += GLSL_TEXTURE_BICUBIC();
+
+    fragment_source += GLW_STRINGFY
                       (
     uniform sampler2D u_tex; \n
     uniform sampler2D u_grid; \n
     out     vec4 f_color; \n
     \n
+
     void main(void) {
         vec2 tSize = vec2(textureSize(u_tex, 0));
         vec2 coords = gl_FragCoord.xy / tSize.xy; \n
-        vec2 shifts = texture(u_grid, gl_FragCoord.xy / tSize.xy).xy;
-        f_color = texture(u_tex, coords + shifts);
+
+        vec2 shifts = textureBicubic(u_grid, gl_FragCoord.xy / tSize.xy).xy;
+        f_color = texture(u_tex, coords + shifts.xy);
     }
                       );
-
-    /*
-        vec2 shift = texelFetch(u_grid, coords, 0).xy; \n
-        vec3 color = texelFetch(u_grid, coords + shift, 0).xy; \n
-        float L = dot(color, weights); \n
-        f_color = vec4(L, L, L, 1.0); \n
-*/
 
     filteringProgram.setup(glw::version("330"), vertex_source, fragment_source);
 

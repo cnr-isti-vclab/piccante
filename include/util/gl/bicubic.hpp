@@ -29,30 +29,69 @@ std::string GLSL_BICUBIC()
     std::string ret;
 
     ret = GLW_STRINGFY(
-                float Rx(float x)
+                float Bicubic(float x)
                 {
-                    float px_1 = MAX(x - 1.0f, 0.0f);
-                    float px   = MAX(x,        0.0f);
-                    float px1  = MAX(x + 1.0f, 0.0f);
-                    float px2  = MAX(x + 2.0f, 0.0f);
-
-                    return (         px2  * px2  * px2
-                            - 4.0f * px1  * px1  * px1 +
-                              6.0f * px   * px   * px
-                            - 4.0f * px_1 * px_1 * px_1
-                           ) / 6.0f;
-                }
-
-                vec4 textureBicubic(, vec2 coord)
-                {
-                    float Lw = dot(LUM_XYZ, col);
-                    float Ld = c2 * log(1 + L) / log(2.0 + 8.0 * pow((L / maxL), c2));
-                    return (col.xyz * Ld) / Lw;
+                    float y = abs(x);
+                    if(y < 1.0) {
+                        float y_sq = y * y;
+                        return (3.0 * y_sq * y - 6.0 * y_sq + 4.0) / 6.0;
+                    } else {
+                        if(y < 2.0) {
+                            float y_sq = y * y;
+                            return (-1.0 * y_sq * y + 6.0 * y_sq - 12.0 * y + 8.0) / 6.0;
+                        } else {
+                            return 0.0;
+                        }
+                    }
                 }
     );
 
     return ret;
 }
+
+/*
+
+*/
+
+/**
+ * @brief GLSL_TEXTURE_BICUBIC
+ * @return
+ */
+std::string GLSL_TEXTURE_BICUBIC()
+{
+    std::string ret;
+
+    ret = GLW_STRINGFY(
+
+            vec4 textureBicubic(in sampler2D u_tex, vec2 coords)
+            {
+                vec2 tSize = vec2(textureSize(u_tex, 0));
+                vec2 coords_uc = vec2(coords * tSize);
+                vec2 d = fract(coords_uc);
+
+                ivec2 coords_i = ivec2(floor(coords_uc));
+                vec2 r;
+                ivec2 e;
+                vec4 ret = vec4(0.0);
+                for(int j = -1; j < 3; j++) {
+                    r.y = Bicubic(float(j) - d.y);
+                    e.y = coords_i.y + j;
+
+                    for(int i = -1; i < 3; i++) {
+                        r.x = Bicubic(-(float(i) - d.x));
+                        e.x = coords_i.x + i;
+                        r.x *= r.y;
+
+                        ret += r.x * texelFetch(u_tex, e, 0);
+                    }
+                }
+                return ret;
+            }
+    );
+
+    return ret;
+}
+
 
 } // end namespace pic
 

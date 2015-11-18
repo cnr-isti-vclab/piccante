@@ -40,6 +40,12 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("OK\n");
 
+        pic::ImageSamplerLanczos is_lc;
+        pic::Image *out_d = pic::FilterDownSampler2D::Execute(&img, NULL, 0.5f);
+        if(out_d != NULL) {
+            out_d->Write("../data/output/bottles_half_gaussian.hdr");
+        }
+
         pic::ImageSamplerNearest is_near;
         pic::Image *out = pic::FilterSampler2D::Execute(&img, NULL, 2.0f, &is_near);
 

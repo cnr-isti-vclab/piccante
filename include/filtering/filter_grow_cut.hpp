@@ -43,8 +43,8 @@ protected:
 
         Image *state_next  = dst;
 
-        float dx[] = {-1, 0, 1, -1, 1, -1,  0,  1};
-        float dy[] = { 1, 1, 1,  0, 0, -1, -1, -1};
+        int dx[] = {-1, 0, 1, -1, 1, -1,  0,  1};
+        int dy[] = { 1, 1, 1,  0, 0, -1, -1, -1};
 
         int channels = img->channels;
 

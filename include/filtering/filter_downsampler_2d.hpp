@@ -38,6 +38,16 @@ protected:
     float					scaleX, scaleY;
     int						width, height;
 
+
+    void Allocate()
+    {
+        flt[X_DIRECTION] = NULL;
+        flt[Y_DIRECTION] = NULL;
+
+        isg[X_DIRECTION] = new ImageSamplerGaussian();
+        isg[Y_DIRECTION] = new ImageSamplerGaussian();
+    }
+
 public:
 
     /**
@@ -112,40 +122,45 @@ public:
     }
 };
 
-PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(float scaleX, float scaleY = -1.0f)
+PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(float scaleX, float scaleY = -1.0f) : FilterNPasses()
 {
-    this->scaleX = scaleX;
+    this->scaleX = 1.0f;
+    this->scaleY = 1.0f;
 
-    if(scaleY > 0.0f) {
-        this->scaleY = scaleY;
-    } else {
-        this->scaleY = scaleX;
+    if(scaleX > 0.0f) {
+        this->scaleX = scaleX;
+
+        if(scaleY > 0.0f) {
+            this->scaleY = scaleY;
+        } else {
+            this->scaleY = scaleX;
+        }
     }
 
     width  = -1;
     height = -1;
 
-    flt[X_DIRECTION] = NULL;
-    flt[Y_DIRECTION] = NULL;
-
-    isg[X_DIRECTION] = new ImageSamplerGaussian(1.0f / (5.0f * scaleX), X_DIRECTION);
-    isg[Y_DIRECTION] = new ImageSamplerGaussian(1.0f / (5.0f * scaleY), Y_DIRECTION);
+    Allocate();
 
     swh = true;
 }
 
-PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(int width, int height)
+PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(int width, int height) : FilterNPasses()
 {
-    this->width  = width;
-    this->height = height;
+    this->scaleX = 1.0f;
+    this->scaleY = 1.0f;
 
-    flt[X_DIRECTION] = NULL;
-    flt[Y_DIRECTION] = NULL;
+    if(width > 0) {
+        this->width  = width;
+    }
 
-    isg[X_DIRECTION] = new ImageSamplerGaussian();
-    isg[Y_DIRECTION] = new ImageSamplerGaussian();
+    if(height > 0) {
+        this->height = height;
+    }
 
-    swh = false;
+    Allocate();
+
+    swh = (width < 1 ||  height < 1);
 }
 
 PIC_INLINE FilterDownSampler2D::~FilterDownSampler2D()
@@ -167,10 +182,10 @@ PIC_INLINE void FilterDownSampler2D::PreProcess(ImageVec imgIn,
     if(!swh) {
         scaleX = float(width)  / imgIn[0]->widthf;
         scaleY = float(height) / imgIn[0]->heightf;
-
-        isg[X_DIRECTION]->Update(1.0f / (5.0f * scaleX), X_DIRECTION);
-        isg[Y_DIRECTION]->Update(1.0f / (5.0f * scaleY), Y_DIRECTION);
     }
+
+    isg[X_DIRECTION]->Update(1.0f / (5.0f * scaleX), X_DIRECTION);
+    isg[Y_DIRECTION]->Update(1.0f / (5.0f * scaleY), Y_DIRECTION);
 
     if(flt[X_DIRECTION] == NULL) {
         flt[X_DIRECTION] = new FilterSampler1D(scaleX, X_DIRECTION, isg[X_DIRECTION]);

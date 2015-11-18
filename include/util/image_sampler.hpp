@@ -27,6 +27,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_IMAGE_SAMPLER_HPP
 #define PIC_UTIL_IMAGE_SAMPLER_HPP
 
+#include "util/math.hpp"
+
 namespace pic {
 
 /*
@@ -165,6 +167,30 @@ inline float CatmullRom(float x)
             return (-3.0f * y_sq * y + 15.0f * y_sq -24.0f * y + 12.0f) / 6.0f;
         } else {
             return 0.0f;
+        }
+    }
+}
+
+/**
+ * @brief Lanczos
+ * @param x
+ * @param a
+ * @return
+ */
+float Lanczos(float x, float a)
+{
+    float y = fabsf(x);
+
+    if(y > 0.0f && y < a) {
+        float t = C_PI * x;
+        float d = C_PI_2 * x * x;
+
+        return (a * sinf(t) * sinf(t / a)) / d;
+    } else {
+        if(y > 0.0f) {
+            return 0.0f;
+        } else {
+            return 1.0f;
         }
     }
 }

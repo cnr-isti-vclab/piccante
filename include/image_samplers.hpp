@@ -24,6 +24,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "image_samplers/image_sampler_bicubic.hpp"
 #include "image_samplers/image_sampler_catmull_rom.hpp"
 #include "image_samplers/image_sampler_gaussian.hpp"
+#include "image_samplers/image_sampler_lanczos.hpp"
 #include "image_samplers/image_sampler_nearest.hpp"
 
 #endif /* PIC_IMAGE_SAMPLERS_HPP */
