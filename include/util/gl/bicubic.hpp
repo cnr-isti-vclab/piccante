@@ -63,7 +63,7 @@ std::string GLSL_TEXTURE_BICUBIC()
 
     ret = GLW_STRINGFY(
 
-            vec4 textureBicubic(in sampler2D u_tex, vec2 coords)
+            vec4 textureBicubic(sampler2D u_tex, vec2 coords)
             {
                 vec2 tSize = vec2(textureSize(u_tex, 0));
                 vec2 coords_uc = vec2(coords * tSize);
