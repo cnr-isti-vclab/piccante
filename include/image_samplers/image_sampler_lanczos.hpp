@@ -28,9 +28,8 @@ namespace pic {
 class ImageSamplerLanczos: public ImageSampler
 {
 protected:
-    float	a;
-    int		halfSize;
-    int		dirs[3];
+    float a;
+    int a_i;
 
 public:
     /**
@@ -38,6 +37,8 @@ public:
      */
     ImageSamplerLanczos()
     {
+        a = 2.0f;
+        a_i = 2;
     }
 
     /**
@@ -45,24 +46,10 @@ public:
      * @param sigma
      * @param direction
      */
-    ImageSamplerLanczos(float a, int direction)
-    {
-        Update(a, direction);
-    }
-
-    /**
-     * @brief Update
-     * @param sigma
-     * @param direction
-     */
-    void Update(float a, int direction)
+    ImageSamplerLanczos(float a)
     {
         this->a = a;
-        halfSize = MAX(int(a), 1);
-
-        dirs[ direction      % 3] = 1;
-        dirs[(direction + 1) % 3] = 0;
-        dirs[(direction + 2) % 3] = 0;
+        a_i = int(a);
     }
 
     /**
@@ -74,35 +61,43 @@ public:
      */
     void SampleImage(Image *img, float x, float y, float *vOut)
     {
+        float xx, yy, dx, dy;
+
+        //Coordiantes in [0,width-1]x[0,height-1]
+        x *= img->width1f;
+        y *= img->height1f;
+
+        //Coordinates without fractions
+        xx = floorf(x);
+        yy = floorf(y);
+
+        //Interpolation values
+        dx = (x - xx);
+        dy = (y - yy);
+
+        //Integer coordinates
+        int ix = int(xx);
+        int iy = int(yy);
+
         for(int k = 0; k < img->channels; k++) {
             vOut[k] = 0.0f;
         }
 
-        int ix = int(x * img->widthf);
-        int iy = int(y * img->heightf);
+        float rx, ry;
+        int ey, ex;
+        for(int j = - a_i + 1; j <= a_i; j++) {
+            ry = Lanczos(dy - float(j), a);
+            ey = CLAMP(iy + j, img->height);
 
-        //Gaussian
-        float weight = 0.0f;
+            for(int i = - a_i + 1; i <= a_i; i++) {
+                rx = Lanczos(dx - float(i), a);
+                ex = CLAMP(ix + i, img->width);
+                int ind = (ey * img->width + ex) * img->channels;
 
-        for(int j = -halfSize; j <= halfSize; j++) {
-            int ex = CLAMP(ix + j * dirs[0], img->width);
-            int ey = CLAMP(iy + j * dirs[1], img->height);
-
-            int ind = (ey * img->width + ex) * img->channels;
-
-            float tmpWeight = Lanczos(float(j), a);
-
-            for(int k = 0; k < img->channels; k++) {
-                vOut[k] += img->data[ind] * tmpWeight;
-                ind++;
-            }
-
-            weight += tmpWeight;
-        }
-
-        if(weight > 0.0f) {
-            for(int k = 0; k < img->channels; k++) {
-                vOut[k] /= weight;
+                rx *= ry;
+                for(int k = 0; k < img->channels; k++) {
+                    vOut[k] += img->data[ind + k] * rx;
+                }
             }
         }
     }

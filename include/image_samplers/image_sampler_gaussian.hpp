@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_IMAGE_SAMPLERS_IMAGE_SAMPLER_GAUSSIAN_HPP
 
 #include "image_samplers/image_sampler.hpp"
+#include "util/precomputed_gaussian.hpp"
 
 namespace pic {
 
@@ -28,9 +29,7 @@ namespace pic {
 class ImageSamplerGaussian: public ImageSampler
 {
 protected:
-    float	sigma;
-    float	sigma2;
-    int		halfSize;
+    PrecomputedGaussian *pg;
 
 public:
     /**
@@ -38,6 +37,7 @@ public:
      */
     ImageSamplerGaussian()
     {
+        pg = NULL;
     }
 
     /**
@@ -45,7 +45,7 @@ public:
      * @param sigma
      * @param direction
      */
-    ImageSamplerGaussian(float sigma, int direction)
+    ImageSamplerGaussian(float sigma, unsigned int direction)
     {
         Update(sigma, direction);
     }
@@ -55,15 +55,16 @@ public:
      * @param sigma
      * @param direction
      */
-    void Update(float sigma, int direction)
+    void Update(float sigma, unsigned int direction)
     {
-        this->sigma = sigma;
-        sigma2      = 2.0f * sigma * sigma;
-        halfSize    = MAX(int(sigma * 2.5f), 1);
+        if(pg != NULL) {
+            delete pg;
+            pg = NULL;
+        }
 
-        dirs[ direction      % 3] = 1;
-        dirs[(direction + 1) % 3] = 0;
-        dirs[(direction + 2) % 3] = 0;
+        pg = new PrecomputedGaussian(sigma);
+
+        SetDirection(direction);
     }
 
     /**
@@ -82,29 +83,15 @@ public:
         int ix = int(x * img->widthf);
         int iy = int(y * img->heightf);
 
-        //Gaussian
-        float weight = 0.0f;
-
-        for(int j = -halfSize; j <= halfSize; j++) {
-            int ex = CLAMP(ix + j * dirs[0], img->width);
-            int ey = CLAMP(iy + j * dirs[1], img->height);
+        for(int i = 0; i < pg->kernelSize ; i++) {
+            int ex = CLAMP(ix + i * dirs[0], img->width);
+            int ey = CLAMP(iy + i * dirs[1], img->height);
 
             int ind = (ey * img->width + ex) * img->channels;
 
-            float t = float(j) / float(halfSize);
-            float tmpWeight = expf(-(t * t) / sigma2);
-
             for(int k = 0; k < img->channels; k++) {
-                vOut[k] += img->data[ind] * tmpWeight;
+                vOut[k] += img->data[ind] * pg->coeff[i];
                 ind++;
-            }
-
-            weight += tmpWeight;
-        }
-
-        if(weight > 0.0f) {
-            for(int k = 0; k < img->channels; k++) {
-                vOut[k] /= weight;
             }
         }
     }

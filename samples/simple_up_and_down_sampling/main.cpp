@@ -73,6 +73,13 @@ int main(int argc, char *argv[])
         if(out != NULL) {
             out->Write("../data/output/bottles_2x_bicubic.hdr");
         }
+
+        pic::ImageSamplerLanczos is_lan;
+        out = pic::FilterSampler2D::Execute(&img, out, 2.0f, &is_lan);
+
+        if(out != NULL) {
+            out->Write("../data/output/bottles_2x_lanczos.hdr");
+        }
     } else {
         printf("No, the file is not valid!\n");
     }

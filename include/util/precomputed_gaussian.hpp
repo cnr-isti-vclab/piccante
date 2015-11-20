@@ -45,7 +45,7 @@ protected:
             sum += coeff[i];
         }
 
-        //kernel's normalization
+        //normalize the kernel
         if(sum > 0.0f) {
             for(int i = 0; i < kernelSize; i++) {
                 coeff[i] /= sum;

@@ -40,7 +40,7 @@ public:
 
     ~ImageSampler() {}
 
-    void Update(unsigned int direction)
+    void SetDirection(unsigned int direction)
     {
         dirs[ direction      % 3] = 1;
         dirs[(direction + 1) % 3] = 0;

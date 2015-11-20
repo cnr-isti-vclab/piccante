@@ -28,7 +28,9 @@ namespace pic {
 class ImageSamplerBilinear: public ImageSampler
 {
 public:
-    ImageSamplerBilinear() {}
+    ImageSamplerBilinear()
+    {
+    }
 
     /**
      * @brief SampleImage samples an image in normalized coordiantes (0,1).
@@ -41,12 +43,10 @@ public:
     {
         //	x = CLAMPi(x,0.0f,1.0f);
         //	y = CLAMPi(y,0.0f,1.0f);
-
-            //Coordiantes in [0,width-1]x[0,height-1]
-            x *= img->width1f;
-            y *= img->height1f;
-
-            SampleImageUC(img, x, y, vOut);
+        //Coordiantes in [0,width-1]x[0,height-1]
+        x *= img->width1f;
+        y *= img->height1f;
+        SampleImageUC(img, x, y, vOut);
     }
 
     /**
