@@ -40,7 +40,17 @@ public:
      * @param y
      * @param vOut
      */
-    void SampleImage(Image *img, float x, float y, float *vOut);
+    void SampleImage(Image *img, float x, float y, float *vOut)
+    {
+        x = CLAMPi(x, 0.0f, 1.0f);
+        y = CLAMPi(y, 0.0f, 1.0f);
+
+        //Coordiantes in [0,width-1]x[0,height-1]
+        x = x * img->width1f;
+        y = y * img->height1f;
+
+        SampleImageUC(img, x, y, vOut);
+    }
 
     /**
      * @brief SampleImageUC samples an image in unnormalized coordinates [0,width-1]x[0,height-1].
@@ -49,7 +59,19 @@ public:
      * @param y
      * @param vOut
      */
-    void SampleImageUC(Image *img, float x, float y, float *vOut);
+    void SampleImageUC(Image *img, float x, float y, float *vOut)
+    {
+        //Integer coordinates
+        int ix = CLAMP(int(x), img->width);
+        int iy = CLAMP(int(y), img->height);
+
+        //Bilinear interpolation indicies
+        int ind = (ix * img->xstride + iy * img->ystride);
+
+        for(int i = 0; i < img->channels; i++) {
+            vOut[i] = img->data[ind + i];
+        }
+    }
 
     /**
      * @brief SampleImage samples an image in uniform coordiantes.
@@ -59,69 +81,30 @@ public:
      * @param t
      * @param vOut
      */
-    void SampleImage(Image *img, float x, float y, float t, float *vOut);
+    void SampleImage(Image *img, float x, float y, float t, float *vOut)
+    {
+        x = CLAMPi(x, 0.0f, 1.0f);
+        y = CLAMPi(y, 0.0f, 1.0f);
+        t = CLAMPi(t, 0.0f, 1.0f);
+
+        //coordiantes in [0,width-1] x [0,height-1] x [0,frames-1]
+        x = x * img->width1f;
+        y = y * img->height1f;
+        t = t * img->frames1f;
+
+        //integer coordinates
+        int ix = int(x);
+        int iy = int(y);
+        int it = int(t);
+
+        //indicies
+        int ind = (ix * img->xstride + iy * img->ystride + it * img->tstride);
+
+        for(int i = 0; i < img->channels; i++) {
+            vOut[i] = img->data[ind + i];
+        }
+    }
 };
-
-PIC_INLINE void ImageSamplerNearest::SampleImage(Image *img, float x, float y,
-        float *vOut)
-{
-    x = CLAMPi(x, 0.0f, 1.0f);
-    y = CLAMPi(y, 0.0f, 1.0f);
-
-    //Coordiantes in [0,width-1]x[0,height-1]
-    x = x * img->width1f;
-    y = y * img->height1f;
-    
-    //Integer coordinates
-    int ix = int(x);
-    int iy = int(y);
-    
-    //Bilinear interpolation indicies
-    int ind = (ix * img->xstride + iy * img->ystride);
-
-    for(int i = 0; i < img->channels; i++) {
-        vOut[i] = img->data[ind + i];
-    }
-}
-
-PIC_INLINE void ImageSamplerNearest::SampleImageUC(Image *img, float x, float y, float *vOut)
-{
-    //Integer coordinates
-    int ix = CLAMP(int(x), img->width);
-    int iy = CLAMP(int(y), img->height);
-
-    //Bilinear interpolation indicies
-    int ind = (ix * img->xstride + iy * img->ystride);
-
-    for(int i = 0; i < img->channels; i++) {
-        vOut[i] = img->data[ind + i];
-    }
-}
-
-PIC_INLINE void ImageSamplerNearest::SampleImage(Image *img, float x, float y,
-        float t, float *vOut)
-{
-    x = CLAMPi(x, 0.0f, 1.0f);
-    y = CLAMPi(y, 0.0f, 1.0f);
-    t = CLAMPi(t, 0.0f, 1.0f);
-
-    //Coordiantes in [0,width-1] x [0,height-1] x [0,frames-1]
-    x = x * img->width1f;
-    y = y * img->height1f;
-    t = t * img->frames1f;
-    
-    //Integer coordinates
-    int ix = int(x);
-    int iy = int(y);
-    int it = int(t);
-    
-    //Bilinear interpolation indicies
-    int ind = (ix * img->xstride + iy * img->ystride + it * img->tstride);
-
-    for(int i = 0; i < img->channels; i++) {
-        vOut[i] = img->data[ind + i];
-    }
-}
 
 } // end namespace pic
 

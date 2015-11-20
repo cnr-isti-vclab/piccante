@@ -31,27 +31,40 @@ protected:
     float	sigma;
     float	sigma2;
     int		halfSize;
-    int		dirs[3];
 
 public:
     /**
      * @brief ImageSamplerGaussian
      */
-    ImageSamplerGaussian();
+    ImageSamplerGaussian()
+    {
+    }
 
     /**
      * @brief ImageSamplerGaussian
      * @param sigma
      * @param direction
      */
-    ImageSamplerGaussian(float sigma, int direction);
+    ImageSamplerGaussian(float sigma, int direction)
+    {
+        Update(sigma, direction);
+    }
 
     /**
      * @brief Update
      * @param sigma
      * @param direction
      */
-    void Update(float sigma, int direction);
+    void Update(float sigma, int direction)
+    {
+        this->sigma = sigma;
+        sigma2      = 2.0f * sigma * sigma;
+        halfSize    = MAX(int(sigma * 2.5f), 1);
+
+        dirs[ direction      % 3] = 1;
+        dirs[(direction + 1) % 3] = 0;
+        dirs[(direction + 2) % 3] = 0;
+    }
 
     /**
      * @brief SampleImage samples an image in uniform coordiantes.
@@ -60,78 +73,42 @@ public:
      * @param y
      * @param vOut
      */
-    void SampleImage(Image *img, float x, float y, float *vOut);
+    void SampleImage(Image *img, float x, float y, float *vOut)
+    {
+        for(int k = 0; k < img->channels; k++) {
+            vOut[k] = 0.0f;
+        }
 
-    /**
-     * @brief SampleImage
-     * @param img
-     * @param x
-     * @param y
-     * @param t
-     * @param vOut
-     */
-    void SampleImage(Image *img, float x, float y, float t, float *vOut) {}
+        int ix = int(x * img->widthf);
+        int iy = int(y * img->heightf);
+
+        //Gaussian
+        float weight = 0.0f;
+
+        for(int j = -halfSize; j <= halfSize; j++) {
+            int ex = CLAMP(ix + j * dirs[0], img->width);
+            int ey = CLAMP(iy + j * dirs[1], img->height);
+
+            int ind = (ey * img->width + ex) * img->channels;
+
+            float t = float(j) / float(halfSize);
+            float tmpWeight = expf(-(t * t) / sigma2);
+
+            for(int k = 0; k < img->channels; k++) {
+                vOut[k] += img->data[ind] * tmpWeight;
+                ind++;
+            }
+
+            weight += tmpWeight;
+        }
+
+        if(weight > 0.0f) {
+            for(int k = 0; k < img->channels; k++) {
+                vOut[k] /= weight;
+            }
+        }
+    }
 };
-
-PIC_INLINE ImageSamplerGaussian::ImageSamplerGaussian()
-{
-    Update(1.0f, 0);
-}
-
-PIC_INLINE ImageSamplerGaussian::ImageSamplerGaussian(float sigma,
-        int direction)
-{
-    Update(sigma, direction);
-}
-
-PIC_INLINE void ImageSamplerGaussian::Update(float sigma, int direction)
-{
-    this->sigma = sigma;
-    sigma2      = 2.0f * sigma * sigma;
-
-    halfSize    = MAX(int(sigma * 2.5f), 1);
-
-    dirs[ direction      % 3] = 1;
-    dirs[(direction + 1) % 3] = 0;
-    dirs[(direction + 2) % 3] = 0;
-}
-
-PIC_INLINE void ImageSamplerGaussian::SampleImage(Image *img, float x, float y,
-        float *vOut)
-{
-    for(int k = 0; k < img->channels; k++) {
-        vOut[k] = 0.0f;
-    }
-
-    int ix = int(x * img->widthf);
-    int iy = int(y * img->heightf);
-
-    //Gaussian
-    float weight = 0.0f;
-
-    for(int j = -halfSize; j <= halfSize; j++) {
-        int ex = CLAMP(ix + j * dirs[0], img->width);
-        int ey = CLAMP(iy + j * dirs[1], img->height);
-
-        int ind = (ey * img->width + ex) * img->channels;
-
-        float t = float(j) / float(halfSize);
-        float tmpWeight = expf(-(t * t) / sigma2);
-
-        for(int k = 0; k < img->channels; k++) {
-            vOut[k] += img->data[ind] * tmpWeight;
-            ind++;
-        }
-
-        weight += tmpWeight;
-    }
-
-    if(weight > 0.0f) {
-        for(int k = 0; k < img->channels; k++) {
-            vOut[k] /= weight;
-        }
-    }
-}
 
 } // end namespace pic
 

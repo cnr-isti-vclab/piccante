@@ -28,6 +28,9 @@ namespace pic {
  */
 class ImageSampler
 {
+protected:
+    int dirs[3];
+
 public:
 
     /**
@@ -36,6 +39,13 @@ public:
     ImageSampler() {}
 
     ~ImageSampler() {}
+
+    void Update(unsigned int direction)
+    {
+        dirs[ direction      % 3] = 1;
+        dirs[(direction + 1) % 3] = 0;
+        dirs[(direction + 2) % 3] = 0;
+    }
 
     /**
      * @brief SampleImage samples an image in uniform coordiantes.

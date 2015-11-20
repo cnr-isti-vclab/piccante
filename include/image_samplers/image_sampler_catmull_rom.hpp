@@ -37,68 +37,50 @@ public:
      * @param y
      * @param vOut
      */
-    void SampleImage(Image *img, float x, float y, float *vOut);
+    void SampleImage(Image *img, float x, float y, float *vOut)
+    {
+        float xx, yy, dx, dy;
 
-    /**
-     * @brief SampleImage samples an image in uniform coordiantes.
-     * @param img
-     * @param x
-     * @param y
-     * @param t
-     * @param vOut
-     */
-    void SampleImage(Image *img, float x, float y, float t, float *vOut);
-};
+        //Coordiantes in [0,width-1]x[0,height-1]
+        x *= img->width1f;
+        y *= img->height1f;
 
-PIC_INLINE void ImageSamplerCatmullRom::SampleImage(Image *img, float x, float y,
-        float *vOut)
-{
-    float xx, yy, dx, dy;
+        //Coordinates without fractions
+        xx = floorf(x);
+        yy = floorf(y);
 
-    //Coordiantes in [0,width-1]x[0,height-1]
-    x *= img->width1f;
-    y *= img->height1f;
-    
-    //Coordinates without fractions
-    xx = floorf(x);
-    yy = floorf(y);
-    
-    //Interpolation values
-    dx = (x - xx);
-    dy = (y - yy);
-    
-    //Integer coordinates
-    int ix = int(xx);
-    int iy = int(yy);
+        //Interpolation values
+        dx = (x - xx);
+        dy = (y - yy);
 
-    for(int k = 0; k < img->channels; k++) {
-        vOut[k] = 0.0f;
-    }
+        //Integer coordinates
+        int ix = int(xx);
+        int iy = int(yy);
 
-    //Catmull-rom interpolation
-    float rx, ry;
-    int ey, ex;
-    for(int j = -1; j < 3; j++) {
-        ry = CatmullRom(float(j) - dy);
-        ey = CLAMP(iy + j, img->height);
+        for(int k = 0; k < img->channels; k++) {
+            vOut[k] = 0.0f;
+        }
 
-        for(int i = -1; i < 3; i++) {
-            rx = CatmullRom(-(float(i) - dx));
-            ex = CLAMP(ix + i, img->width);
-            int ind = (ey * img->width + ex) * img->channels;
+        //Catmull-rom interpolation
+        float rx, ry;
+        int ey, ex;
+        for(int j = -1; j < 3; j++) {
+            ry = CatmullRom(float(j) - dy);
+            ey = CLAMP(iy + j, img->height);
 
-            rx *= ry;
-            for(int k = 0; k < img->channels; k++) {
-                vOut[k] += img->data[ind + k] * rx;
+            for(int i = -1; i < 3; i++) {
+                rx = CatmullRom(-(float(i) - dx));
+                ex = CLAMP(ix + i, img->width);
+                int ind = (ey * img->width + ex) * img->channels;
+
+                rx *= ry;
+                for(int k = 0; k < img->channels; k++) {
+                    vOut[k] += img->data[ind + k] * rx;
+                }
             }
         }
     }
-}
-
-PIC_INLINE void ImageSamplerCatmullRom::SampleImage(Image *img, float x, float y,
-        float t, float *vOut)
-{
-}
+};
 
 } // end namespace pic
 
