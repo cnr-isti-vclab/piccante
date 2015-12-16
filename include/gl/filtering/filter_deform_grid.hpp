@@ -82,7 +82,7 @@ void FilterGLDeformGrid::InitShaders()
         vec2 tSize = vec2(textureSize(u_tex, 0));
         vec2 coords = gl_FragCoord.xy / tSize.xy; \n
 
-        vec2 shifts = textureBicubic(u_grid, gl_FragCoord.xy / tSize.xy).xy;
+        vec2 shifts = textureBicubic(u_grid, coords.xy).xy;
         f_color = texture(u_tex, coords + shifts.xy);
     }
                       );

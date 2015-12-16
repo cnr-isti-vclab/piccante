@@ -82,9 +82,9 @@ protected:
         //allocating a new deform grid filter
         pic::Image *grid_move = pic::FilterDeformGrid::getUniformGrid(17, 17);
 
-        float *grid_values = (*grid_move)(16, 0);
-        grid_values[0] += 0.0f;
-        grid_values[1] += 1 / 32.0f;
+        float *grid_values = (*grid_move)(4, 4);
+        grid_values[0] += 1.0f / 32.0f;
+        grid_values[1] += 1.0f / 32.0f;
 
         fltDeformGrid = new pic::FilterGLDeformGrid(grid_move);
     }
