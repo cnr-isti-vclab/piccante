@@ -44,9 +44,9 @@ int main(int argc, char *argv[])
         bool bWrite = out->Write("../data/output/deform_grid.png");
 
         if(bWrite) {
-            printf("The output was not written\n");
-        } else {
             printf("The output was written sucessfully!\n");
+        } else {
+            printf("The output was not written\n");
         }
     } else {
         printf("No, the file is not valid!\n");
