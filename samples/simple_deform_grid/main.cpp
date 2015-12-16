@@ -22,7 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 int main(int argc, char *argv[])
 {
-    printf("Reading an HDR file...");
+    printf("Reading an image...");
 
     pic::Image img;
     img.Read("../data/input/grid.png");
@@ -32,15 +32,22 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("OK\n");
 
-        pic::Image *grid_move = pic::FilterDeformGrid::getUniformGrid(16, 16);
-        (*grid_move)(4,4)[0] += 1 / 32.0f;
-        (*grid_move)(4,4)[1] += 1 / 32.0f;
+        pic::Image *grid_move = pic::FilterDeformGrid::getUniformGrid(17, 17);
+        float *grid = (*grid_move)(4, 4);
+        grid[0] += 1 / 32.0f;
+        grid[1] += 1 / 32.0f;
 
         pic::FilterDeformGrid flt_dg(grid_move);
 
         pic::Image *out = flt_dg.ProcessP(Single(&img), NULL);
 
-        out->Write("../data/output/grid_deform.png");
+        bool bWrite = out->Write("../data/output/deform_grid.png");
+
+        if(bWrite) {
+            printf("The output was not written\n");
+        } else {
+            printf("The output was written sucessfully!\n");
+        }
     } else {
         printf("No, the file is not valid!\n");
     }

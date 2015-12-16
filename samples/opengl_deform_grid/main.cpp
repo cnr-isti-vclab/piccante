@@ -80,9 +80,11 @@ protected:
         tmo = new pic::FilterGLSimpleTMO();
 
         //allocating a new deform grid filter
-        pic::Image *grid_move = pic::FilterDeformGrid::getUniformGrid(16, 16);
-        (*grid_move)(4,4)[0] += 1 / 32.0f;
-        (*grid_move)(4,4)[1] += 1 / 32.0f;
+        pic::Image *grid_move = pic::FilterDeformGrid::getUniformGrid(17, 17);
+
+        float *grid_values = (*grid_move)(16, 0);
+        grid_values[0] += 0.0f;
+        grid_values[1] += 1 / 32.0f;
 
         fltDeformGrid = new pic::FilterGLDeformGrid(grid_move);
     }
@@ -109,7 +111,7 @@ protected:
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        if(method == 0) {
+        if(method == 1) {
             //applying the deformation filter
             img_flt = fltDeformGrid->Process(SingleGL(&img), img_flt);
 
@@ -175,7 +177,7 @@ public:
         layout->addWidget(window_gl);
 
         label = new QLabel(
-        "Pease hit the space bar in order to switch from the filtered image to the original one.", this);
+        "Pease hit the space bar for applying the deformation grid.", this);
         label->setAlignment(Qt::AlignHCenter);
         label->setFixedWidth(512);
         label->setFixedHeight(64);

@@ -32,6 +32,7 @@ class FilterDeformGrid: public Filter
 {
 protected:
     ImageSamplerBicubic isb;
+    ImageSamplerBilinear isb_lin;
     Image *grid_rest, *grid_move, grid_diff;
 
     /**
@@ -43,17 +44,17 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         for(int j = box->y0; j < box->y1; j++) {
+            float y = float(j) / dst->height1f;
+
             for(int i = box->x0; i < box->x1; i++) {
                 float *tmp_dst = (*dst)(i, j);
 
-                float x = float(i) / dst->widthf;
-                float y = float(j) / dst->heightf;
+                float x = float(i) / dst->width1f;
 
-                float vDiff[2];
-
+                float vDiff[3];
                 isb.SampleImage(&grid_diff, x, y, vDiff);
 
-                isb.SampleImage(src[0], x + vDiff[0], y + vDiff[1] , tmp_dst);
+                isb_lin.SampleImage(src[0], x + vDiff[0], y + vDiff[1] , tmp_dst);
             }
         }
     }
@@ -76,6 +77,12 @@ public:
     {
     }
 
+    /**
+     * @brief getUniformGrid
+     * @param sampleX
+     * @param sampleY
+     * @return
+     */
     static Image* getUniformGrid(int sampleX, int sampleY)
     {
         if(sampleX < 1) {
@@ -85,6 +92,9 @@ public:
         if(sampleY < 1) {
             sampleY = 5;
         }
+
+        //the grid has sampleX \times sampleY squares, so it has to have
+        //some one extra control point for each direction
 
         Image *ret = new Image(1, sampleX, sampleY, 3);
 

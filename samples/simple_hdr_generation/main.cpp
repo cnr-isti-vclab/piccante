@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     Q_UNUSED(argv);
 
     printf("Reading a stack of LDR images...");
-
+    //reading images and storing them with normalized values in [0,1]
     pic::Image img[3];
     img[0].Read("../data/input/stack_alignment/IMG_4209.jpg", pic::LT_NOR);
     img[1].Read("../data/input/stack_alignment/IMG_4210.jpg", pic::LT_NOR);
@@ -77,7 +77,6 @@ int main(int argc, char *argv[])
         if(imgOut != NULL) {
             imgOut->Write("../data/output/simple_hdr_assembled.hdr");
         }
-
 
     } else {
         printf("No, the files are not valid!\n");
