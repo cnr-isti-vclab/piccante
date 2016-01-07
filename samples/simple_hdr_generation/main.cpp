@@ -1,4 +1,4 @@
-/*
+ /*
 
 PICCANTE
 The hottest HDR imaging library!

@@ -52,12 +52,15 @@ protected:
 
         bool bFunction = (icrf != NULL) && (linearization_type == IL_LUT_8_BIT);
 
-        float maxVal = FLT_MAX;
+        float t_min = FLT_MAX;
+        int index = -1;
         for(unsigned int j = 0; j < n; j++) {
-            maxVal = MIN(maxVal, src[j]->exposure);
-        }
-
-        maxVal = 1.0f / maxVal;
+            if(src[j]->exposure < t_min) {
+                t_min = src[j]->exposure;
+                index = j;
+            }
+        }        
+        float max_val_saturation = 1.0f / t_min;
 
         for(int j = box->y0; j < box->y1; j++) {
             int ind = j * width;
@@ -66,8 +69,6 @@ protected:
 
                 //Assembling kernel
                 int c = (ind + i) * channels;
-
-                bool flag = false;
 
                 for(int k = 0; k < channels; k++) {
                     float weight_norm = 0.0f;
@@ -104,15 +105,23 @@ protected:
                         weight_norm += weight;
                     }
 
-                    flag = flag || (weight_norm <= 0.0f);
+                    float val;
+                    if(weight_norm > 1e-4f) {
+                        val = acc / weight_norm;
+                        if(domain == HRD_LOG) {
+                            val = expf(val);
+                        }
+                    } else {
+                        if(src[index]->data[c + k] < 0.5f) {
+                            val = 0.0f;
+                        }
 
-                    float final_value = weight_norm > 0.0f ? (acc / weight_norm) : maxVal;
-
-                    dst->data[c + k] = final_value;
-
-                    if(domain == HRD_LOG) {
-                        dst->data[c + k]  = expf(dst->data[c + k]);
+                        if(src[index]->data[c + k] > 0.9f) {
+                            val = max_val_saturation;
+                        }
                     }
+
+                    dst->data[c + k] = val;
                 }
             }
         }
