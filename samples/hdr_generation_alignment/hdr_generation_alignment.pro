@@ -18,7 +18,7 @@
 # See the GNU Lesser General Public License
 # ( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
 
-TARGET = simple_hdr_generation
+TARGET = hdr_generation_alignment
 
 QT       += core
 TEMPLATE = app
