@@ -28,12 +28,11 @@ namespace pic {
 class FilterNPasses: public Filter
 {
 protected:
+    Image   *imgAllocated;
     Image	*imgTmpSame[2];
     ImageVec imgTmp;
 
-    bool        bSame;
-
-    void CheckSame(ImageVec imgIn);
+    bool CheckSame(ImageVec imgIn);
 
 public:
 
@@ -116,7 +115,7 @@ public:
 
 PIC_INLINE FilterNPasses::FilterNPasses()
 {
-    bSame = true;
+    imgAllocated = NULL;
 
     for(int i = 0; i < 2; i++) {
         imgTmpSame[i] = NULL;
@@ -130,14 +129,9 @@ PIC_INLINE FilterNPasses::~FilterNPasses()
 
 PIC_INLINE void FilterNPasses::Destroy()
 {
-    if((filters.size() % 2) == 0) {
-        if(imgTmpSame[0] != NULL) {
-            delete imgTmpSame[0];
-        }
-    } else {
-        if(imgTmpSame[1] != NULL) {
-            delete imgTmpSame[1];
-        }
+    if(imgAllocated != NULL) {
+        delete imgAllocated;
+        imgAllocated = NULL;
     }
     
     imgTmpSame[0] = NULL;
@@ -150,10 +144,8 @@ PIC_INLINE void FilterNPasses::Destroy()
     imgTmp.clear();
 }
 
-PIC_INLINE void FilterNPasses::CheckSame(ImageVec imgIn)
+PIC_INLINE bool FilterNPasses::CheckSame(ImageVec imgIn)
 {
-    bSame = true;
-
     Image *tmp = imgIn[0];
 
     for(unsigned int i = 0; i < filters.size(); i++) {
@@ -163,10 +155,10 @@ PIC_INLINE void FilterNPasses::CheckSame(ImageVec imgIn)
 
         if( (tmp->width != width) || (tmp->height != height) ||
             (tmp->channels != channels) || (tmp->frames != frames) ) {
-                bSame = false;
-                break;
+                return false;
         }
     }
+    return true;
 }
 
 PIC_INLINE void FilterNPasses::InsertFilter(Filter *flt)
@@ -203,29 +195,18 @@ PIC_INLINE Image *FilterNPasses::SetupAuxNSame(ImageVec imgIn,
         imgOut = imgIn[0]->AllocateSimilarOne();
     }
 
+    if(imgAllocated != NULL) {
+        delete imgAllocated;
+    }
+    imgAllocated = imgOut->AllocateSimilarOne();
+
     //Bug:
     if((filters.size() % 2) == 0) {
         imgTmpSame[1] = imgOut;
-
-        if(imgTmpSame[0] == NULL) {
-            imgTmpSame[0] = imgOut->AllocateSimilarOne();
-        } else {
-            if(!imgOut->SimilarType(imgTmpSame[0])) {
-                delete imgTmpSame[0];
-                imgTmpSame[0] = imgOut->AllocateSimilarOne();
-            }
-        }
+        imgTmpSame[0] = imgAllocated;
     } else {
         imgTmpSame[0] = imgOut;
-
-        if(imgTmpSame[1] == NULL) {
-            imgTmpSame[1] = imgOut->AllocateSimilarOne();
-        } else {
-            if(!imgOut->SimilarType(imgTmpSame[1])) {
-                delete imgTmpSame[1];
-                imgTmpSame[1] = imgOut->AllocateSimilarOne();
-            }
-        }
+        imgTmpSame[1] = imgAllocated;
     }
 
     return imgOut;
@@ -299,9 +280,7 @@ PIC_INLINE Image *FilterNPasses::Process(ImageVec imgIn,
 {
     PreProcess(imgIn, imgOut);
 
-    CheckSame(imgIn);
-
-    if(bSame) {
+    if(CheckSame(imgIn)) {
         return ProcessSame(imgIn, imgOut, parallel);
     } else {
         return ProcessGen(imgIn, imgOut, parallel);
