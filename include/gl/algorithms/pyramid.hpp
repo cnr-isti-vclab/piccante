@@ -162,33 +162,38 @@ PyramidGL::~PyramidGL()
     for(unsigned int i = 0; i < stack.size(); i++) {
         if(stack[i] != NULL) {
             delete stack[i];
+            stack[i] = NULL;
         }
     }
 
-    if(flt_gauss != NULL) {
-        delete flt_gauss;
-        flt_gauss = NULL;
+    for(unsigned int i = 0; i < trackerUp.size(); i++) {
+        if(trackerUp[i] != NULL) {
+            delete trackerUp[i];
+            trackerUp[i] = NULL;
+        }
     }
 
-    if(flt_sampler != NULL) {
-        delete flt_sampler;
-        flt_sampler = NULL;
+    for(unsigned int i = 0; i < trackerRec.size(); i++) {
+        if(trackerRec[i] != NULL) {
+            delete trackerRec[i];
+            trackerRec[i] = NULL;
+        }
     }
 
-    if(flt_add != NULL) {
-        delete flt_add;
-        flt_add = NULL;
-    }
+    delete flt_gauss;
+    flt_gauss = NULL;
 
-    if(flt_sub != NULL) {
-        delete flt_sub;
-        flt_sub = NULL;
-    }
+    delete flt_sampler;
+    flt_sampler = NULL;
 
-    if(flt_blend != NULL) {
-        delete flt_blend;
-        flt_blend = NULL;
-    }
+    delete flt_add;
+    flt_add = NULL;
+
+    delete flt_sub;
+    flt_sub = NULL;
+
+    delete flt_blend;
+    flt_blend = NULL;
 }
 
 void PyramidGL::InitFilters()

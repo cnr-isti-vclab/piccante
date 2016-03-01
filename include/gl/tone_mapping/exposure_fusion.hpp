@@ -60,10 +60,35 @@ public:
 
     ~ExposureFusionGL()
     {
-        if(flt_lum != NULL) {
-            delete flt_lum;
-            flt_lum = NULL;
-        }
+        delete lum;
+        lum = NULL;
+
+        delete weights;
+        weights = NULL;
+
+        delete flt_lum;
+        flt_lum = NULL;
+
+        delete remove_negative;
+        remove_negative = NULL;
+
+        delete convert_zero_to_one;
+        convert_zero_to_one = NULL;
+
+        delete pW;
+        pW = NULL;
+
+        delete pI;
+        pI = NULL;
+
+        delete pOut;
+        pOut = NULL;
+
+        delete acc;
+        acc = NULL;
+
+        delete flt_weights;
+        flt_weights = NULL;
     }
 
     /**

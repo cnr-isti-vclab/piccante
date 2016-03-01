@@ -35,6 +35,7 @@ public:
      * @brief FilterGLNPasses
      */
     FilterGLNPasses();
+    ~FilterGLNPasses();
 
     virtual ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
@@ -68,6 +69,13 @@ FilterGLNPasses::FilterGLNPasses(): FilterGL()
     target = GL_TEXTURE_2D;
 }
 
+FilterGLNPasses::~FilterGLNPasses()
+{
+    delete imgTmp[1];
+    imgTmp[1] = NULL;
+    delete imgTmp[0];
+    imgTmp[0] = NULL;
+}
 void FilterGLNPasses::InsertFilter(FilterGL *flt)
 {
     if(flt == NULL) {
