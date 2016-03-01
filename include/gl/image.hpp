@@ -679,7 +679,8 @@ ImageGL::ImageGL(int frames, int width, int height, int channels,
 }
 
 ImageGL::~ImageGL()
-{
+{   
+    DestroyGL();
     Destroy();
 }
 

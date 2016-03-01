@@ -28,7 +28,7 @@ Piccante is distributed under the MPL 2.0 license: https://www.mozilla.org/MPL/2
 REFERENCE:
 ==========
 
-Please reference PICCANTE in your work using this reference:
+If you use PICCANTE in your work, please cite it using this reference:
 
 @misc{banterle:pic:2014,
 
@@ -53,7 +53,7 @@ Piccante can manage different color spaces, and new ones can be added to its cor
 
 ![Color Spaces](http://vcg.isti.cnr.it/piccante/img/color_spaces.png?raw=true "Color Spaces")
 
-Piccante has provides algorithms for tone mapping HDR images in order to be visualized on traditional displays.
+Piccante provides algorithms for tone mapping HDR images in order to be visualized on traditional displays.
 
 ![Tone Mapping](http://vcg.isti.cnr.it/piccante/img/tone_mapping.png?raw=true "Tone Mapping")
 

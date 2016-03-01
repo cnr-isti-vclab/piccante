@@ -79,6 +79,10 @@ public:
         if(quad != NULL) {
             delete quad;
         }
+
+        if(fbo != NULL) {
+            delete fbo;
+        }
     }
 
     /**
