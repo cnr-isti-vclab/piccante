@@ -140,15 +140,16 @@ public:
     {
         glw::bind_program(program);
 
+        glEnable(GL_TEXTURE_2D);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
 
         Render();
 
-        glw::bind_program(0);
-
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
+
+        glw::bind_program(0);
     }
 
     /**
@@ -325,6 +326,8 @@ public:
         ret.fragment_target("f_color",    0);
 
         ret.relink();
+
+        glw::bind_program(ret);
         ret.uniform("u_tex", 0);
         glw::bind_program(0);
     }
@@ -361,7 +364,6 @@ public:
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex);
 
-
         #ifndef PIC_DISABLE_OPENGL_NON_CORE
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -394,7 +396,6 @@ public:
     static void Draw(GLuint tex, float *color)
     {
         glEnable(GL_TEXTURE_2D);
-
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex);
 
