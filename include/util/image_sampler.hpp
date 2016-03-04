@@ -143,7 +143,7 @@ inline float Bicubic(float x)
     } else {
         if(y < 2.0f) {
             float y_sq = y * y;
-            return (-1.0f * y_sq * y + 6.0f * y_sq -12.0f * y + 8.0f) / 6.0f;
+            return (-1.0f * y_sq * y + 6.0f * y_sq - 12.0f * y + 8.0f) / 6.0f;
         } else {
             return 0.0f;
         }

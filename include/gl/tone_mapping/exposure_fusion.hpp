@@ -55,7 +55,6 @@ public:
         flt_lum =  NULL;
         flt_weights = NULL;
         convert_zero_to_one = NULL;
-
         remove_negative = NULL;
 
         lum = NULL;

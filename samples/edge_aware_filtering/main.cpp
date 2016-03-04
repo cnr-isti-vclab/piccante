@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
-        //Filering with the Guided Filter
+        //Filtering with the Guided Filter
         printf("Filtering the image with the Guided filter...");
         pic::FilterGuided fltG;
         output = fltG.ProcessP(input, output);//filtering the image
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
-        //Filering with Kuwahara
+        //Filtering with Kuwahara
         printf("Filtering the image with the Kuwahara filter...");
         pic::FilterKuwahara fltK(11);
         output = fltK.ProcessP(input, output);//filtering the image

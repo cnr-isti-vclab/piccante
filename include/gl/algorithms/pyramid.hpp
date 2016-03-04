@@ -162,6 +162,21 @@ PyramidGL::~PyramidGL()
     for(unsigned int i = 0; i < stack.size(); i++) {
         if(stack[i] != NULL) {
             delete stack[i];
+            stack[i] = NULL;
+        }
+    }
+
+    for(unsigned int i = 0; i < trackerUp.size(); i++) {
+        if(trackerUp[i] != NULL) {
+            delete trackerUp[i];
+            trackerUp[i] = NULL;
+        }
+    }
+
+    for(unsigned int i = 0; i < trackerRec.size(); i++) {
+        if(trackerRec[i] != NULL) {
+            delete trackerRec[i];
+            trackerRec[i] = NULL;
         }
     }
 

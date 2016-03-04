@@ -49,10 +49,6 @@ std::string GLSL_BICUBIC()
     return ret;
 }
 
-/*
-
-*/
-
 /**
  * @brief GLSL_TEXTURE_BICUBIC
  * @return
@@ -65,7 +61,8 @@ std::string GLSL_TEXTURE_BICUBIC()
 
             vec4 textureBicubic(sampler2D u_tex, vec2 coords)
             {
-                vec2 tSize = vec2(textureSize(u_tex, 0));
+                ivec2 tSize_u = textureSize(u_tex, 0) - ivec2(1, 1);
+                vec2 tSize = vec2(tSize_u);
                 vec2 coords_uc = vec2(coords * tSize);
                 vec2 d = fract(coords_uc);
 
@@ -73,13 +70,14 @@ std::string GLSL_TEXTURE_BICUBIC()
                 vec2 r;
                 ivec2 e;
                 vec4 ret = vec4(0.0);
+
                 for(int j = -1; j < 3; j++) {
                     r.y = Bicubic(float(j) - d.y);
-                    e.y = coords_i.y + j;
+                    e.y = clamp(coords_i.y + j, 0, tSize_u.y);
 
                     for(int i = -1; i < 3; i++) {
                         r.x = Bicubic(-(float(i) - d.x));
-                        e.x = coords_i.x + i;
+                        e.x = clamp(coords_i.x + i, 0, tSize_u.x);
                         r.x *= r.y;
 
                         ret += r.x * texelFetch(u_tex, e, 0);
@@ -91,7 +89,6 @@ std::string GLSL_TEXTURE_BICUBIC()
 
     return ret;
 }
-
 
 } // end namespace pic
 

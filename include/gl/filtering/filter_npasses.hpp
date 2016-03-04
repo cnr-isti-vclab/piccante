@@ -25,6 +25,7 @@ namespace pic {
 class FilterGLNPasses: public FilterGL
 {
 protected:
+    ImageGL *imgAllocated;
     ImageGL *imgTmp[2];
 
     void InitShaders() {}
@@ -35,6 +36,7 @@ public:
      * @brief FilterGLNPasses
      */
     FilterGLNPasses();
+    ~FilterGLNPasses();
 
     virtual ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
@@ -64,10 +66,18 @@ public:
 
 FilterGLNPasses::FilterGLNPasses(): FilterGL()
 {
+    imgAllocated = NULL;
     imgTmp[0] = imgTmp[1] = NULL;
     target = GL_TEXTURE_2D;
 }
 
+FilterGLNPasses::~FilterGLNPasses()
+{
+    if(imgAllocated != NULL) {
+        delete imgAllocated;
+        imgAllocated = NULL;
+    }
+}
 void FilterGLNPasses::InsertFilter(FilterGL *flt)
 {
     if(flt == NULL) {
@@ -93,17 +103,21 @@ ImageGL *FilterGLNPasses::SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
         imgOut = imgIn[0]->AllocateSimilarOneGL();
     }
 
+    if(imgAllocated == NULL) {
+        imgAllocated = imgOut->AllocateSimilarOneGL();
+    }
+
     if((filters.size() % 2) == 0) {
         imgTmp[1] = imgOut;
 
         if(imgTmp[0] == NULL) {
-            imgTmp[0] = imgOut->AllocateSimilarOneGL();
+            imgTmp[0] = imgAllocated;
         }
     } else {
         imgTmp[0] = imgOut;
 
         if(imgTmp[1] == NULL) {
-            imgTmp[1] = imgOut->AllocateSimilarOneGL();
+            imgTmp[1] = imgAllocated;
         }
     }
 
