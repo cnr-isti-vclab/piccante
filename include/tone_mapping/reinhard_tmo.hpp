@@ -23,6 +23,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_bilateral_2ds.hpp"
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_sigmoid_tmo.hpp"
+#include "tone_mapping/input_estimates.hpp"
 
 namespace pic {
 
@@ -44,42 +45,6 @@ inline float Sigmoid(float x)
 inline float SigmoidInv(float x)
 {
     return x / (1.0f - x);
-}
-
-/**
- * @brief EstimateAlpha
- * @param LMax
- * @param LMin
- * @param logAverage
- * @return
- */
-inline float EstimateAlpha(float LMax, float LMin, float logAverage)
-{
-
-    float log2f       = logf(2.0f);
-    float log2Max     = logf(LMax      + 1e-9f) / log2f;
-    float log2Min     = logf(LMin      + 1e-9f) / log2f;
-    float log2Average = logf(logAverage + 1e-9f) / log2f;
-
-    float tmp = (2.0f * log2Average - log2Min - log2Max) / (log2Max - log2Min);
-
-    return 0.18f * powf(4.0f, tmp);
-}
-
-/**
- * @brief EstimateWhitePoint
- * @param LMax
- * @param LMin
- * @return
- */
-inline float EstimateWhitePoint(float LMax, float LMin)
-{
-
-    float log2f       = logf(2.0f);
-    float log2Max     = logf(LMax + 1e-9f) / log2f;
-    float log2Min     = logf(LMin + 1e-9f) / log2f;
-
-    return 1.5f * powf(2.0f, (log2Max - log2Min - 5.0f));
 }
 
 /**
