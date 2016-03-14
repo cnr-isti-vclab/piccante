@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
         }
 
         printf("Tone mapping using Lischinski et al. 2006 automatic TMO...");
-        pic::Image *imgToneMapped_lischinski = pic::LischinskiTMO(&img, NULL, 0.5f);
+        pic::Image *imgToneMapped_lischinski = pic::LischinskiTMO(&img, NULL);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
