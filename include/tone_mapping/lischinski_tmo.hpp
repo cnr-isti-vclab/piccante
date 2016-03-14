@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_DISABLE_EIGEN
 
 #include "tone_mapping/lischinski_minimization.hpp"
+#include "tone_mapping/input_estimates.hpp"
 
 namespace pic {
 
@@ -31,8 +32,8 @@ namespace pic {
  * @param alpha
  * @return
  */
-Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL,
-                        float alpha = 0.5f)
+Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
+        float whitePoint = -1.0f)
 {
     if(imgIn == NULL) {
         return NULL;
@@ -40,10 +41,6 @@ Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL,
 
     if(imgIn->channels != 3) {
         return NULL;
-    }
-
-    if(alpha <= 0.0f) {
-        alpha = 0.5f;
     }
 
     //extract luminance
@@ -58,6 +55,14 @@ Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL,
     float maxL_log = log2f(maxL);
     float minL_log = log2f(minL);
     float Lav = lum->getLogMeanVal()[0];
+
+    if(alpha <= 0.0f) {
+        alpha = EstimateAlpha(maxL, minL, Lav);
+    }
+
+    if(whitePoint <= 0.0f) {
+        whitePoint = EstimateWhitePoint(maxL, minL);
+    }
 
     int Z = int(ceilf(maxL_log - minL_log));
 
