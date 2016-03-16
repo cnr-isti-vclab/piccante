@@ -15,8 +15,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_TONE_MAPPING_INPUT_ESTIMATES_HPP_
-#define PIC_TONE_MAPPING_INPUT_ESTIMATES_HPP_
+#ifndef PIC_TONE_MAPPING_INPUT_ESTIMATES_HPP
+#define PIC_TONE_MAPPING_INPUT_ESTIMATES_HPP
 
 namespace pic {
 
@@ -30,8 +30,8 @@ namespace pic {
 inline float EstimateAlpha(float LMax, float LMin, float logAverage)
 {
     float log2f       = logf(2.0f);
-    float log2Max     = logf(LMax      + 1e-9f) / log2f;
-    float log2Min     = logf(LMin      + 1e-9f) / log2f;
+    float log2Max     = logf(LMax       + 1e-9f) / log2f;
+    float log2Min     = logf(LMin       + 1e-9f) / log2f;
     float log2Average = logf(logAverage + 1e-9f) / log2f;
 
     float tmp = (2.0f * log2Average - log2Min - log2Max) / (log2Max - log2Min);
@@ -56,4 +56,4 @@ inline float EstimateWhitePoint(float LMax, float LMin)
 
 } // end namespace pic
 
-#endif /* PIC_TONE_MAPPING_INPUT_ESTIMATES_HPP_ */
+#endif //PIC_TONE_MAPPING_INPUT_ESTIMATES_HPP
