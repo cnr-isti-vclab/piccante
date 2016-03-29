@@ -403,7 +403,7 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
     int nSamples;
 
     //Mersenne Twister
-    std::mt19937 m(rand() % 10000);
+    std::mt19937 m(0);
 
     for(int j = box->y0; j < box->y1; j++) {
         for(int i = box->x0; i < box->x1; i++) {
