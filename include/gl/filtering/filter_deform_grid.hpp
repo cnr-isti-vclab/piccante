@@ -19,7 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_GL_FILTERING_FILTER_DEFORM_GRID_HPP
 
 #include "util/gl/bicubic.hpp"
-#include "filtering/filter_DEFORM_GRID.hpp"
+#include "filtering/filter_deform_grid.hpp"
 #include "gl/filtering/filter.hpp"
 
 namespace pic {
