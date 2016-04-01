@@ -38,3 +38,8 @@ win32-msvc*{
 win32{
 	DEFINES += NOMINMAX
 }
+
+linux-g++*{
+    QMAKE_CXXFLAGS += -fopenmp -pthread
+    QMAKE_LFLAGS += -fopenmp
+}

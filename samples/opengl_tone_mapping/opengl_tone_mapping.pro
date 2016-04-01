@@ -26,3 +26,8 @@ win32{
 }
 
 
+
+linux-g++*{
+    QMAKE_CXXFLAGS += -fopenmp -pthread
+    QMAKE_LFLAGS += -fopenmp
+}
