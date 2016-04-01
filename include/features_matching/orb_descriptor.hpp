@@ -85,9 +85,9 @@ public:
      * @param S
      * @param n
      */
-    ORBDescriptor(int S = 31, int n = 256)
+    ORBDescriptor(int S = 31, int n = 256, unsigned int seed = 0)
     {
-        m = new std::mt19937(rand() % 10000);
+        m = new std::mt19937(seed);
 
         this->S = S;
         this->halfS = S >> 1;

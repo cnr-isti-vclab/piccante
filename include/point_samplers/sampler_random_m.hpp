@@ -110,7 +110,7 @@ template <unsigned int N> PIC_INLINE MRSamplers<N>::MRSamplers(
     #pragma omp parallel for
 
     for(int i = 0; i < nSamplers; i++) {
-        samplers[i] = new RandomSampler< N >(type, window, nSamples, nLevels);
+        samplers[i] = new RandomSampler< N >(type, window, nSamples, nLevels, 0);
     }
 }
 

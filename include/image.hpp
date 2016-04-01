@@ -257,9 +257,10 @@ public:
     void SetZero();
 
     /**
-     * @brief SetRand sets data to random values.
+     * @brief SetRand
+     * @param seed
      */
-    void SetRand();
+    void SetRand(unsigned int seed);
 
     /**
      * @brief isValid checks if the current image is valid, which means if they
@@ -1292,13 +1293,13 @@ PIC_INLINE void Image::SetZero()
     }
 }
 
-PIC_INLINE void Image::SetRand()
+PIC_INLINE void Image::SetRand(unsigned int seed = 0)
 {
     if(!isValid()) {
         return;
     }
 
-    std::mt19937 m(rand() % 10000);
+    std::mt19937 m(seed);
     int size = frames * height * width * channels;
 
     for(int i = 0; i < size; i++) {

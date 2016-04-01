@@ -111,10 +111,10 @@ public:
      * @brief PoissonDescriptor
      * @param kernelSize
      */
-    PoissonDescriptor(int kernelSize = 16)
+    PoissonDescriptor(int kernelSize = 16, unsigned int seed = 0)
     {
         subBlock = 0;
-        m = new std::mt19937(rand() % 10000);
+        m = new std::mt19937(seed);
 
         GenerateSamples(kernelSize);
     }

@@ -288,7 +288,7 @@ protected:
         
         Vec<2, int> vec(width, height);
         
-        RandomSampler<2> *p2Ds = new RandomSampler<2>(ST_BRIDSON, vec, nSamples, 1);
+        RandomSampler<2> *p2Ds = new RandomSampler<2>(ST_BRIDSON, vec, nSamples, 1, 0);
         
         #ifdef PIC_DEBUG
             int oldNSamples = nSamples;

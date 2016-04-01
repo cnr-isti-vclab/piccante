@@ -19,6 +19,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FEATURES_MATCHING_BRIEF_DESCRIPTOR_HPP
 
 #include <random>
+#include <chrono>
+
 #include "util/math.hpp"
 #include "image.hpp"
 
@@ -146,9 +148,13 @@ public:
      * @param S
      * @param n
      */
-    BRIEFDescriptor(int S = 32, int n = 256)
+    BRIEFDescriptor(int S = 32, int n = 256, int seed = 0)
     {
-        m = new std::mt19937(rand() % 10000);
+        if(seed >= 0) {
+            m = new std::mt19937(seed);
+        } else {
+            m = new std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());
+        }
 
         this->S = S;
         this->sigma2 = float(S * S) / 25.0f;

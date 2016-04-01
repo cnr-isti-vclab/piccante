@@ -71,7 +71,7 @@ public:
      * @param nSamples
      * @param nLevels
      */
-    RandomSampler(SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels);
+    RandomSampler(SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels, unsigned int seed);
 
     /**
      * @brief Update
@@ -133,7 +133,7 @@ public:
     static void GenerateFigureRS(std::string nameOut, SAMPLER_TYPE type, int window,
                                  int nSamples, int nLevels)
     {
-        RandomSampler<2> *p2Ds = new RandomSampler<2>(type, window, nSamples, nLevels);
+        RandomSampler<2> *p2Ds = new RandomSampler<2>(type, window, nSamples, nLevels, 0);
 
         for(int i = 0; i < p2Ds->levelsR.size(); i++) {
             std::string str = nameOut;
@@ -169,9 +169,9 @@ public:
 };
 
 template <unsigned int N> PIC_INLINE RandomSampler<N>::RandomSampler(
-    SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels)
+    SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels, unsigned int seed)
 {
-    m = new std::mt19937(rand());
+    m = new std::mt19937(seed);
     Update(type, window, nSamples, nLevels);
 }
 

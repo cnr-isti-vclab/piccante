@@ -35,11 +35,10 @@ class FilterBilateral2DAS: public Filter
 {
 protected:
     float					sigma_s, sigma_r;
+    PrecomputedGaussian		*pg;
+    int                     seed;
 
     MRSamplers<2>			*ms;
-
-    int						halfSizeKernel;
-    PrecomputedGaussian		*pg;
 
     //Process in a box
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
@@ -117,19 +116,9 @@ public:
 
 FilterBilateral2DAS::FilterBilateral2DAS()
 {
+    seed = 0;
     pg = NULL;
     ms = NULL;
-}
-
-FilterBilateral2DAS::~FilterBilateral2DAS()
-{
-    if(pg != NULL) {
-        delete pg;
-    }
-       
-    if(ms != NULL) {
-        delete ms;
-    }
 }
 
 FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s,
@@ -150,6 +139,19 @@ FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s,
         mult = -mult;
         ms = new MRSamplers<2>(type, pg->halfKernelSize, pg->halfKernelSize / mult, 3,
                                64);
+    }
+
+    seed = 0;
+}
+
+FilterBilateral2DAS::~FilterBilateral2DAS()
+{
+    if(pg != NULL) {
+        delete pg;
+    }
+
+    if(ms != NULL) {
+        delete ms;
     }
 }
 
@@ -185,7 +187,7 @@ void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox *box)
     float valOut[3];
 
     //Mersenne Twister
-    std::mt19937 m(rand() % 10000);
+    std::mt19937 m(seed);
 
     for(int i = box->x0; i < box->x1; i++) {
         float x = float(i) / float(width);

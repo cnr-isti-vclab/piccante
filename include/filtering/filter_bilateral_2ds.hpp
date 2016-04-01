@@ -33,12 +33,11 @@ class FilterBilateral2DS: public Filter
 {
 protected:
     float					sigma_s, sigma_r;
+    PrecomputedGaussian		*pg;
 
     MRSamplers<2>			*ms;
 
-    int						halfSizeKernel;
-    PrecomputedGaussian		*pg;
-
+    int                     seed;
     /**
      * @brief ProcessBBox
      * @param dst
@@ -55,6 +54,7 @@ public:
      */
     FilterBilateral2DS()
     {
+        seed = 0;
         pg = NULL;
         ms = NULL;
     }
@@ -352,6 +352,8 @@ PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
 //	nSamples = MIN(	(pg->halfKernelSize*mult),nMaxSamples);
 
     ms = new MRSamplers<2>(type, pg->halfKernelSize, nSamples, 1, 64);
+
+    seed = 0;
 }
 
 PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
@@ -403,7 +405,7 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
     int nSamples;
 
     //Mersenne Twister
-    std::mt19937 m(0);
+    std::mt19937 m(seed);
 
     for(int j = box->y0; j < box->y1; j++) {
         for(int i = box->x0; i < box->x1; i++) {

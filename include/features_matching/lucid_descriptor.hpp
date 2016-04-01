@@ -18,7 +18,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FEATURES_MATCHING_LUCID_DESCRIPTOR_HPP
 #define PIC_FEATURES_MATCHING_LUCID_DESCRIPTOR_HPP
 
-#include <random>
 #include "util/math.hpp"
 #include "image.hpp"
 
