@@ -356,6 +356,16 @@ inline float log2f(float x)
 }
 
 /**
+ * @brief log2fPlusEpsilon
+ * @param x
+ * @return
+ */
+float log2fPlusEpsilon(float x)
+{
+    return logf(x + 1e-6f) * C_INV_LOG_NAT_2;
+}
+
+/**
  * @brief pow2f
  * @param x
  * @return

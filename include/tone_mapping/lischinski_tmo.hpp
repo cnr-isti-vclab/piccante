@@ -48,12 +48,13 @@ Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
     Image *lum = fltLum.ProcessP(Single(imgIn), NULL);
 
     Image *lum_log = lum->Clone();
-    lum_log->ApplyFunction(log2f);
+    lum_log->ApplyFunction(log2fPlusEpsilon);
 
+    const float epsilon = 1e-6;
     float maxL = lum->getMaxVal()[0];
     float minL = lum->getMinVal()[0];
     float maxL_log = log2f(maxL);
-    float minL_log = log2f(minL);
+    float minL_log = log2f(minL + epsilon);
     float Lav = lum->getLogMeanVal()[0];
 
     if(alpha <= 0.0f) {
