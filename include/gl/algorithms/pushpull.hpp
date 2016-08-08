@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_ALGORITHMS_PUSHPULL_HPP
 #define PIC_GL_ALGORITHMS_PUSHPULL_HPP
 
-#include "gl/Image.hpp"
+#include "gl/image.hpp"
 #include "gl/filtering/filter_down_pp.hpp"
 #include "gl/filtering/filter_up_pp.hpp"
 
