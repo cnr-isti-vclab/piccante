@@ -207,7 +207,7 @@ public:
                     point[1] = (*corners)[i][1];
                     int point_c = 1;
 
-                    for(unsigned int j = 0; j < indices.size(); j++) {
+                    for(auto j = 0; j < indices.size(); j++) {
                         auto k = indices[j];
                         if(!processed[k]) {
                             processed[k] = true;
