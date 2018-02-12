@@ -172,7 +172,7 @@ PIC_INLINE void drawPoints(Image *img, std::vector< Eigen::Vector2f > &points, f
 
     for(size_t i = 0; i < points.size(); i++) {
         int x = int(points[i][0]);
-        int y = int(points[i][y]);
+        int y = int(points[i][1]);
         float *pixel = (*img)(x, y);
 
         for(int j = 0; j < img->channels; j++) {

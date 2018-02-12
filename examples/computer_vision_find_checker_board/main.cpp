@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
     }
 
     printf("Reading images...");
+
     pic::Image img, img_pattern;
     ImageRead(img_str0, &img);
     ImageRead(img_str1, &img_pattern);
@@ -71,10 +72,12 @@ int main(int argc, char *argv[])
         float red[] = {1.0f, 0.0f, 0.0f};
         float green[] = {0.0f, 1.0f, 0.0f};
 
+        (*img_wb) *= 0.25f;
+
         pic::drawPoints(img_wb, corners_from_img, red);
 
         std::vector< Eigen::Vector2f > cfi_out;
-        pic::GeneralCornerDetector::removeClosestCorners(&corners_from_img, &cfi_out, 16.0f, 60);
+        pic::GeneralCornerDetector::removeClosestCorners(&corners_from_img, &cfi_out, 16.0f, 100);
 
         pic::drawPoints(img_wb, cfi_out, green);
 

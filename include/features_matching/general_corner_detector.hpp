@@ -172,17 +172,20 @@ public:
                                      float threshold,
                                      int max_limit)
     {
-        unsigned int n = MIN(int(corners->size()), max_limit);
+        int n = MIN(int(corners->size()), max_limit);
         bool *processed = new bool [n];
         memset(processed, 0, sizeof(bool) * n);
 
-        for(unsigned int i = 0; i < n; i++) {
+        for(int i = 0; i < n; i++) {
             //find the closest
             if(!processed[i]) {
                 processed[i] = true;
 
                 std::vector< int > indices;
-                for(unsigned int j = 0; j < n; j++) {
+                for(int j = 0; j < n; j++) {
+                    if(j != i) {
+                        continue;
+                    }
 
                     if(!processed[j]) {
                         float dx = (*corners)[j][0] - (*corners)[i][0];
@@ -190,33 +193,37 @@ public:
                         float dist = sqrtf(dx * dx + dy * dy);
 
                         if(dist < threshold) {
-                            processed[j] = true;
+                            //processed[j] = true;
                             indices.push_back(j);
                         }
                     }
                 }
 
                 auto n_i = indices.size();
+                Eigen::Vector2f point;
+
                 if(n_i > 0) {
-                    Eigen::Vector2f point;
                     point[0] = (*corners)[i][0];
                     point[1] = (*corners)[i][1];
+                    int point_c = 1;
 
                     for(unsigned int j = 0; j < indices.size(); j++) {
                         auto k = indices[j];
-                        point[0] += (*corners)[k][0];
-                        point[1] += (*corners)[k][1];
+                        if(!processed[k]) {
+                            processed[k] = true;
+                            point[0] += (*corners)[k][0];
+                            point[1] += (*corners)[k][1];
+                            point_c++;
+                        }
                     }
 
-                    point[0] /= float(n_i + 1);
-                    point[1] /= float(n_i + 1);
-                    out->push_back(point);
+                    point[0] /= float(point_c);
+                    point[1] /= float(point_c);
                 } else {
-                    Eigen::Vector2f point;
                     point[0] = (*corners)[i][0];
                     point[1] = (*corners)[i][1];
-                    out->push_back(point);
                 }
+                out->push_back(point);
             }
         }
 
