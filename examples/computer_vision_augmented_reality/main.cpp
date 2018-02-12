@@ -151,9 +151,9 @@ int main(int argc, char *argv[])
         Eigen::Vector2i coord3 = pic::cameraMatrixProject(cam, p3);
 
         float color[]={0.25f, 1.0f, 0.25f};
-        DrawLine(&img1, pic::Vec<2, int>(coord0[0], coord0[1]), pic::Vec<2, int>(coord1[0], coord1[1]), color);
-        DrawLine(&img1, pic::Vec<2, int>(coord0[0], coord0[1]), pic::Vec<2, int>(coord2[0], coord2[1]), color);
-        DrawLine(&img1, pic::Vec<2, int>(coord0[0], coord0[1]), pic::Vec<2, int>(coord3[0], coord3[1]), color);
+        pic::drawLine(&img1, pic::Vec<2, int>(coord0[0], coord0[1]), pic::Vec<2, int>(coord1[0], coord1[1]), color);
+        pic::drawLine(&img1, pic::Vec<2, int>(coord0[0], coord0[1]), pic::Vec<2, int>(coord2[0], coord2[1]), color);
+        pic::drawLine(&img1, pic::Vec<2, int>(coord0[0], coord0[1]), pic::Vec<2, int>(coord3[0], coord3[1]), color);
 
         ImageWrite(&img1, "../data/output/simple_augmented_reality.png", pic::LT_NOR);
 

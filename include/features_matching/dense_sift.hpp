@@ -114,7 +114,7 @@ public:
         CONST_GRADIENT_SUPRESSIO_THRESHOLD = 0.2f;
 
         gauss = new Image(1, 5, 5, 1);
-        EvaluateGaussian(gauss, -1.0f, true);
+        evaluateGaussian(gauss, -1.0f, true);
 
         setNULL();
 

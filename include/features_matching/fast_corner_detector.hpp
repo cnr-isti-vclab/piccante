@@ -286,14 +286,7 @@ public:
             }
         }
 
-        sortCorners(&corners_w_quality, true);
-
-        for(size_t i = 0; i < corners_w_quality.size(); i++) {
-            Eigen::Vector2f p;
-            p[0] = corners_w_quality[i][0];
-            p[1] = corners_w_quality[i][1];
-            corners->push_back(p);
-        }
+        sortCornersAndTransfer(&corners_w_quality, corners);
     }
 };
 

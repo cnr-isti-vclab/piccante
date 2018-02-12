@@ -112,6 +112,27 @@ public:
     }
 
     /**
+     * @brief sortCornersAndTransfer
+     * @param corners
+     * @param cornersOut
+     * @param bDescend
+     */
+    static void sortCornersAndTransfer(std::vector< Eigen::Vector3f > *corners, std::vector< Eigen::Vector2f > *cornersOut, bool bDescend = true)
+    {
+        sortCorners(corners, bDescend);
+
+        for(size_t i = 0; i < corners->size(); i++) {
+            Eigen::Vector3f tmp = corners->at(i);
+
+            Eigen::Vector2f p;
+            p[0] = tmp[0];
+            p[1] = tmp[1];
+
+            cornersOut->push_back(p);
+        }
+    }
+
+    /**
      * @brief sortCorners
      * @param corners
      */

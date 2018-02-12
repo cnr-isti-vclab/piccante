@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
         printf("Matches:\n");
         std::vector< Eigen::Vector2f > m0, m1;
         pic::BinaryFeatureMatcher::filterMatches(corners_from_img0, corners_from_img1, matches, m0, m1);
-        printf("\n Total matches: (%lu | %lu)\n", m0.size(), m1.size());
+        printf("\n Total matches: (%zd | %zd)\n", m0.size(), m1.size());
         
         printf("\nEstimating the fundamental matrix F from the matches...");
         
