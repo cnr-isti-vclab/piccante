@@ -57,11 +57,11 @@ protected:
         int width = dst->width;
         int channels = dst->channels;
 
-        unsigned int n = src.size();
+        int n = int(src.size());
 
         float t_min = FLT_MAX;
         int index = -1;
-        for(unsigned int j = 0; j < n; j++) {
+        for(int j = 0; j < n; j++) {
             if(src[j]->exposure < t_min) {
                 t_min = src[j]->exposure;
                 index = j;
@@ -87,7 +87,7 @@ protected:
                 float max_val_saturation = 1.0f;
 
                 //for each exposure...
-                for(unsigned int l = 0; l < n; l++) {
+                for(int l = 0; l < n; l++) {
 
                     float x = 0.0f;
                     for(int k = 0; k < channels; k++) {

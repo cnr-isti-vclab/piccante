@@ -367,7 +367,7 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
     Image *edge, *base, *selector;
     selector = NULL;
 
-    int nImg = src.size();
+    int nImg = int(src.size());
 
     switch(nImg) {
     //Bilateral filter
@@ -432,7 +432,7 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
             sum = 0.0;
 
             ps = ms->getSampler(&m);
-            nSamples = ps->samplesR.size();
+            nSamples = int(ps->samplesR.size());
 
             for(int k = 0; k < nSamples; k += 2) {
                 //Spatial Gaussian kernel

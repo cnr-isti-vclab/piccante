@@ -121,7 +121,7 @@ public:
             list.push_back(entry);
         }
 
-        n = list.size();
+        n = int(list.size());
     }
 
     /**

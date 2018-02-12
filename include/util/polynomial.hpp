@@ -66,7 +66,7 @@ std::vector<float> polynomialFit(std::vector<float> &x, std::vector<float> &y, u
 
     unsigned int np1 = n + 1;
 
-    unsigned int s = x.size();
+    unsigned int s = int(x.size());
     Eigen::MatrixXf A(s, np1);
     Eigen::VectorXf b(s);
 

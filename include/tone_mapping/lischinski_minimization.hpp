@@ -69,9 +69,12 @@ inline float LischinskiFunctionGauss(float Lcur, float Lref, float param[2])
  * @param LISCHINSKI_EPSILON
  * @return
  */
-Image *LischinskiMinimization(Image *L, Image *g,
-                                 Image *omega = NULL, float alpha = 1.0f, float lambda = 0.2f,
-                                 float LISCHINSKI_EPSILON = 0.0001f)
+Image *LischinskiMinimization(Image *L,
+                              Image *g,
+                              Image *omega = NULL,
+                              float alpha = 1.0f,
+                              float lambda = 0.4f,
+                              float LISCHINSKI_EPSILON = 1e-4f)
 {
     if(L == NULL || g == NULL) {
         return NULL;
@@ -79,7 +82,7 @@ Image *LischinskiMinimization(Image *L, Image *g,
 
     if(omega == NULL) {
         omega = L->allocateSimilarOne();
-        *omega = 0.0f;
+        *omega = 1.0f;
     }
 
     int width = L->width;

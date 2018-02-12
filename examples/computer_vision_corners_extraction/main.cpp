@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
         bool bWritten = true;
 
         //FAST corners
-        std::vector< Eigen::Vector3f > corners_fast;
+        std::vector< Eigen::Vector2f > corners_fast;
         pic::FastCornerDetector fcd;
         fcd.update(1.0f, 5);
         fcd.execute(&img, &corners_fast);
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
         bWritten = ImageWrite(imgCorners_fast, "../data/output/corner_fast_output.png", pic::LT_NOR);
 
         //Harris corners
-        std::vector< Eigen::Vector3f > corners_harris;
+        std::vector< Eigen::Vector2f > corners_harris;
         pic::HarrisCornerDetector hcd;
         hcd.update(1.0f, 5);
         hcd.execute(&img, &corners_harris);
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
         bWritten = ImageWrite(imgCorners_harris, "../data/output/corner_harris_output.png", pic::LT_NOR);
 
         //SUSAN corners
-        std::vector< Eigen::Vector3f > corners_susan;
+        std::vector< Eigen::Vector2f > corners_susan;
         pic::SusanCornerDetector scd;
         scd.execute(&img, &corners_susan);
 

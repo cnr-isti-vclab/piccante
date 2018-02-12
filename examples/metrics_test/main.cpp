@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         bCreate = true;
     }
 
-    //loading values in [0,255]; note: no gamma removal or normalization in [0,1]
+    //load  values in [0,255]; note: no gamma removal or normalization in [0,1]
     pic::Image img0, img1;
     ImageRead(img0_str, &img0, pic::LT_NOR);
 

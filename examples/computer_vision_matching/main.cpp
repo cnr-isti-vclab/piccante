@@ -53,8 +53,8 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         //output corners
-        std::vector< Eigen::Vector3f > corners_from_img0;
-        std::vector< Eigen::Vector3f > corners_from_img1;
+        std::vector< Eigen::Vector2f > corners_from_img0;
+        std::vector< Eigen::Vector2f > corners_from_img1;
 
         //compute the luminance images
         pic::Image *L0 = pic::FilterLuminance::Execute(&img0, NULL, pic::LT_CIE_LUMINANCE);
@@ -76,20 +76,10 @@ int main(int argc, char *argv[])
         pic::ORBDescriptor b_desc(31, 512);
 
         std::vector< unsigned int *> descs0;
-        for(unsigned int i=0; i<corners_from_img0.size(); i++) {
-            int x = corners_from_img0[i][0];
-            int y = corners_from_img0[i][1];
-
-            descs0.push_back(b_desc.get(L0_flt, x, y));
-        }
+        b_desc.getAll(L0_flt, corners_from_img0, descs0);
 
         std::vector< unsigned int *> descs1;
-        for(unsigned int i=0; i<corners_from_img1.size(); i++) {
-            int x = corners_from_img1[i][0];
-            int y = corners_from_img1[i][1];
-
-            descs1.push_back(b_desc.get(L1_flt, x, y));
-        }
+        b_desc.getAll(L1_flt, corners_from_img1, descs1);
 
         printf("Matching ORB descriptors...\n");
         int n = b_desc.getDescriptorSize();
@@ -97,6 +87,7 @@ int main(int argc, char *argv[])
         pic::BinaryFeatureBruteForceMatcher bfm(&descs1, n);
         std::vector< Eigen::Vector3i > matches;
         bfm.getAllMatches(descs0, matches);
+        printf("Number of Matches: %d\n", matches.size());
 
         printf("Matches:\n");
         std::vector< Eigen::Vector2f > m0, m1;

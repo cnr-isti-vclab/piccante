@@ -138,7 +138,7 @@ public:
      */
     int size()
     {
-        return stack.size();
+        return int(stack.size());
     }
 
     /**
@@ -345,7 +345,7 @@ Image *Pyramid::reconstruct(Image *imgOut = NULL)
         return imgOut;
     }
 
-    int n = stack.size() - 1;
+    int n = int(stack.size()) - 1;
     Image *tmp = stack[n];
 
     if(trackerRec.empty()) {

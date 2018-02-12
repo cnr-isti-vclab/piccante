@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
         printf("OK\n");
         
         //output corners
-        std::vector< Eigen::Vector3f > corners_from_img0;
-        std::vector< Eigen::Vector3f > corners_from_img1;
+        std::vector< Eigen::Vector2f > corners_from_img0;
+        std::vector< Eigen::Vector2f > corners_from_img1;
         
         //compute the luminance images
         pic::Image *L0 = pic::FilterLuminance::Execute(&img0, NULL, pic::LT_CIE_LUMINANCE);

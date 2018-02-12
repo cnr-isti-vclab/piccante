@@ -95,7 +95,7 @@ void BridsonSampler(std::mt19937 *m, float radius, std::vector<float> &samples,
                 //checking if sample does not have neighbors in grid with distance radius
                 if(checkNeighborsBruteForce(vecSamples, x, radius)) {
                     vecSamples.push_back(x);
-                    int value = vecSamples.size() - 1;
+                    int value = int(vecSamples.size()) - 1;
 
                     activeList.push_back(value);
                     //                grid.setValue(value, x);

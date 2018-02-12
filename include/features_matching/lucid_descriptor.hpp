@@ -85,7 +85,7 @@ public:
                     float *tmp_val = (*img)(x, y);
 
                     float f = tmp_val[k];
-                    unsigned int s = data.size();
+                    int s = int(data.size());
 
                     std::pair<float, int> pair = std::make_pair(f, s);
                     data.push_back(pair);

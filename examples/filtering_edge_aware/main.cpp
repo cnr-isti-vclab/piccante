@@ -96,6 +96,12 @@ int main(int argc, char *argv[])
         printf("Writing the file to disk...");
         bWritten = ImageWrite(output, "../data/output/filtered_guided.png");
 
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+
         //filter using WLS
         printf("Filtering the image with the WLS filter...");
         pic::FilterWLS fltWLS;//creating the filter
@@ -118,12 +124,6 @@ int main(int argc, char *argv[])
 
         printf("Writing the file to disk...");
         bWritten = ImageWrite(output, "../data/output/filtered_kuwahara.png");
-
-        if(bWritten) {
-            printf("Ok\n");
-        } else {
-            printf("Writing had some issues!\n");
-        }
 
         if(bWritten) {
             printf("Ok\n");

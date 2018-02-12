@@ -38,7 +38,7 @@ namespace pic {
 Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
                       float wS = 1.0f, Image *imgOut = NULL)
 {
-    int n = imgIn.size();
+    int n = int(imgIn.size());
 
     if(n < 2) {
         return imgOut;

@@ -146,7 +146,7 @@ Eigen::Matrix3d estimateFundamentalRansac(std::vector< Eigen::Vector2f > &points
 
     std::mt19937 m(seed);
 
-    unsigned int n = points0.size();
+    unsigned int n = int(points0.size());
 
     unsigned int *subSet = new unsigned int [nSubSet];
 

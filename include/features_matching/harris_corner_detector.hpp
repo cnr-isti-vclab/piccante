@@ -171,9 +171,9 @@ public:
      * @param img
      * @param corners
      */
-    void execute(Image *img, std::vector< Eigen::Vector3f > *corners)
+    void execute(Image *img, std::vector< Eigen::Vector2f > *corners)
     {
-        if(img == NULL) {
+        if(img == NULL || corners == NULL) {
             return;
         }
 
@@ -198,11 +198,9 @@ public:
         *lum -= minL;
         *lum *= delta;
 
-        if(corners == NULL) {
-            corners = new std::vector< Eigen::Vector3f >;
-        }
-
         corners->clear();
+
+        std::vector< Eigen::Vector3f > corners_w_quality;
 
         float kernel[] = { -1.0f, 0.0f, 1.0f};
 
@@ -306,9 +304,18 @@ public:
                     by = ay + cy - Rd;
                     y = -w * by / (2.0f * ay);
 
-                    corners->push_back(Eigen::Vector3f(float(j) + x, i_f + y, R));
+                    corners_w_quality.push_back(Eigen::Vector3f(float(j) + x, i_f + y, R));
                 }
             }
+        }
+
+        sortCorners(&corners_w_quality, true);
+
+        for(size_t i = 0; i < corners_w_quality.size(); i++) {
+            Eigen::Vector2f p;
+            p[0] = corners_w_quality[i][0];
+            p[1] = corners_w_quality[i][1];
+            corners->push_back(p);
         }
     }
 };

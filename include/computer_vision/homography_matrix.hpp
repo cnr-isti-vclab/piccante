@@ -60,11 +60,11 @@ Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > &points0,
     Eigen::Matrix3d mat_0 = getShiftScaleMatrix(transform_0);
     Eigen::Matrix3d mat_1 = getShiftScaleMatrix(transform_1);
 
-    unsigned int n = points0.size();
+    int n = int(points0.size());
     Eigen::MatrixXd A(n * 2, 9);
 
     //set up the linear system
-    for(unsigned int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
         //transform coordinates for increasing stability of the system
         Eigen::Vector2f p0 = points0[i];
         Eigen::Vector2f p1 = points1[i];
@@ -146,7 +146,7 @@ Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f > &points0
 
     std::mt19937 m(seed);
 
-    unsigned int n = points0.size();
+    unsigned int n = int(points0.size());
 
     unsigned int *subSet = new unsigned int [nSubSet];
 

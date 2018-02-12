@@ -216,15 +216,15 @@ PIC_INLINE Image *FilterNPasses::SetupAuxNSame(ImageVec imgIn,
 PIC_INLINE Image *FilterNPasses::ProcessGen(ImageVec imgIn, Image *imgOut,
         bool parallel = false)
 {
-    if((imgIn.size() <= 0) || (filters.size() < 1)) {
+    if(imgIn.empty() || filters.empty()) {
         return NULL;
     }
 
     SetupAuxNGen(imgIn, NULL);
 
-    unsigned int n =  filters.size() - 1;
+    int n =  int(filters.size()) - 1;
     
-    for(unsigned int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
         filters[i]->ChangePass(i, imgIn[0]->frames);
         
         if(parallel) {

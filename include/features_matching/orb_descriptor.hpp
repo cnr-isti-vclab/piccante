@@ -132,7 +132,7 @@ public:
 
         float theta_nor = CLAMPi(theta / C_PI_2, 0.0f, 1.0f);
 
-        int n = x_theta.size() - 1;
+        int n = int(x_theta.size()) - 1;
         float n_f = float(n);
 
         int index = int(theta_nor * n_f);

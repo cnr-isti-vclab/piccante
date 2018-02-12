@@ -77,12 +77,18 @@ public:
         nWhite = -1;
     }
 
-    FilterWhiteBalance(float *white, unsigned int nWhite)
+    /**
+     * @brief FilterWhiteBalance
+     * @param white
+     * @param nWhite
+     * @param bComputeScalingFactors
+     */
+    FilterWhiteBalance(float *white, unsigned int nWhite, bool bComputeScalingFactors)
     {
         this->white = NULL;
         this->nWhite = -1;
 
-        update(white, nWhite);
+        update(white, nWhite, bComputeScalingFactors);
     }
 
     ~FilterWhiteBalance()
@@ -100,12 +106,13 @@ public:
             return NULL;
         }
 
-        float tot = Array<float>::sum(white, nWhite) / float(nWhite);
+        float white_mean = Array<float>::sum(white, nWhite) / float(nWhite);
+
         float *out = new float[nWhite];
 
         for(int i = 0; i < nWhite; i++) {
             if(white[i] > 0.0f) {
-                out[i] = tot / white[i];
+                out[i] = white_mean / white[i];
             } else {
                 out[i] = 1.0f;
             }
@@ -116,18 +123,24 @@ public:
 
     /**
      * @brief update
-     * @param type
+     * @param white
+     * @param nWhite
+     * @param bComputeScalingFactors
      */
-    void update(float *white, unsigned int nWhite)
+    void update(float *white, unsigned int nWhite, bool bComputeScalingFactors)
     {
+        this->nWhite = nWhite;
+
         if(this->white != NULL) {
             delete [] this->white;
         }
 
-        this->white = new float[nWhite];
-
-        this->nWhite = nWhite;
-        memcpy(this->white, white, sizeof(float) * nWhite);
+        if(bComputeScalingFactors) {
+             this->white = getScalingFactors(white, nWhite);
+        } else {
+            this->white = new float[nWhite];
+            memcpy(this->white, white, sizeof(float) * nWhite);
+        }
 
         for(unsigned int i = 0; i < nWhite; i++) {
             if(fabsf(this->white[i]) <= 1e-9f) {

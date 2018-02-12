@@ -215,7 +215,7 @@ void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox *box)
             int levelInt = int(floorf(levelVal));
             int nSamples = ps->levelsR[levelInt];
 
-            int levelsRsize = (ps->levelsR.size() - 1);
+            int levelsRsize = int(ps->levelsR.size()) - 1;
             if(levelInt < levelsRsize) {
                 if((levelVal - float(levelInt)) > 0.0f) {
                     nSamples += int(float(ps->levelsR[levelInt + 1] - ps->levelsR[levelInt]) *

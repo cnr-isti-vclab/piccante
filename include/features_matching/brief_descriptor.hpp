@@ -224,7 +224,7 @@ public:
      * @param img
      */
     void getAll(Image *img,
-                std::vector< Eigen::Vector3f > &corners,
+                std::vector< Eigen::Vector2f > &corners,
                 std::vector< unsigned int *> &descs)
     {
         descs.clear();

@@ -81,8 +81,8 @@ public:
      * @param p0
      * @param p1
      */
-    static void filterMatches(  std::vector< Eigen::Vector3f > &c0,
-                                std::vector< Eigen::Vector3f > &c1,
+    static void filterMatches(  std::vector< Eigen::Vector2f > &c0,
+                                std::vector< Eigen::Vector2f > &c1,
                                 std::vector< Eigen::Vector3i > &matches,
                                 std::vector< Eigen::Vector2f > &p0,
                                 std::vector< Eigen::Vector2f > &p1)
@@ -90,23 +90,20 @@ public:
         p0.clear();
         p1.clear();
 
-        for(unsigned int i=0; i<matches.size(); i++) {
+        for(size_t i = 0; i < matches.size(); i++) {
             int I0 = matches[i][0];
             int I1 = matches[i][1];
 
-            Eigen::Vector2f x, y;
-
-            x[0] = c0[I0][0];
-            x[1] = c0[I0][1];
-
-            y[0] = c1[I1][0];
-            y[1] = c1[I1][1];
+            Eigen::Vector2f x = c0.at(I0);
+            Eigen::Vector2f y = c1.at(I1);
 
             p0.push_back(x);
             p1.push_back(y);
 
+            #ifdef PIC_DEBUG
             printf("I1: %d (%d %d) -- I2: %d (%d %d) -- Score: %d\n",
                    I0, int(x[0]), int(x[1]), I1, int(y[0]), int(y[1]), matches[i][2]);
+            #endif
         }
     }
 

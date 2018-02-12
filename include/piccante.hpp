@@ -32,11 +32,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * \li \c PIC_DEBUG used for debugging; it mostly enables some printf messages;
  * i.e. for warning when a computation succeeds or fails.
  * \li \c PIC_DISABLE_OPENGL disables the OpenGL support.
- * \li \c PIC_DISABLE_QT disables the QT support. Note that JPEG and PNG files
- * are read using QT, therefore it is required for reading such files.
  * \li \c PIC_ENABLE_OPEN_EXR enables the support for the OpenEXR library. This may be useful to have
  * in the case .exr images are used. Note that you need to manually install OpenEXR on your developing maching in order
  * to enable this flag.
+ * \li \c PIC_DISABLE_TINY_EXR disables the support for the reading EXR files using TinyEXR library (https://github.com/syoyo/tinyexr).
+ * This may be useful to have in the case .exr images are used. Note that TinyEXR is already bundled into Piccante (include/externals).
  *
  * Note that when using Eigen types and standard containters, if you do not align containters, a good practice is to enable the following #define:
  * \li \c #define EIGEN_DONT_VECTORIZE
@@ -131,8 +131,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * tasks such as: HDR exposures stack alignment, generation of panoramas, etc.
  * Different features can be extracted and matched:
  * \li \c Corners (Key-point): SUSAN, Harris' method, and FAST.
- * \li \c Edges: Canny's method, Ward's MTB.
+ * \li \c Edges: Canny's method, and Ward's MTB.
  * \li \c Key-point descriptors: BRIEF, ORB, and LUCID.
+ *
+ *  \subsection cv_module Computer Vision
+ *
+ * This module provides classes and functions for Computer Vision tasks such as
+ * checker board extraction, computation of the Essential matrix, computation of the Fundamental Matrix,
+ * estimation of homographies, and triangulation.
  *
  * \subsection gl_module OpenGL
  * This module provides GPU acceleration for some functionalities of PICCANTE through OpenGL.

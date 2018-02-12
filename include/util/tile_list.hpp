@@ -273,7 +273,7 @@ PIC_INLINE bool TileList::read(std::string name, bool flag)
     char tmp[128];
     char txt[128];
 
-    //Number of tiles
+    //number of tiles
     int n;
     fscanf(file, "%s", tmp);
     fscanf(file, "%d", &n);
@@ -302,6 +302,7 @@ PIC_INLINE bool TileList::read(std::string name, bool flag)
         fscanf(file, "%d", &tmpTile.height);
 
         tmpTile.name = tmp_name;
+
         if(flag) {
             tmpTile.tile = new Image(tmpTile.name);
         } else {
@@ -323,14 +324,14 @@ PIC_INLINE bool TileList::write(std::string name)
         return false;
     }
 
-    //Number of tiles
-    unsigned int n = tiles.size();
+    //number of tiles
+    int n = int(tiles.size());
     fprintf(file, "NUMBER_OF_TILES: %d\n", n);
 
     //flag
     fprintf(file, "FLAG: NONE\n");
 
-    for(unsigned int i = 0; i < n; i++) { //for each tile
+    for(int i = 0; i < n; i++) { //for each tile
 
         bool bName = !tiles[i].name.empty();
         if(bName) {

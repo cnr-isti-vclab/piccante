@@ -47,7 +47,7 @@ protected:
 
         int c = 0;
         for(int j = 0; j < channels; j++) {
-            for(unsigned int i = 0; i < exposures; i++) {
+            for(int i = 0; i < exposures; i++) {
                 h[c].calculate(stack[i], VS_LDR, 256, j);
                 h[c].cumulativef(true);
                 c++;
@@ -72,7 +72,7 @@ protected:
 
                 float u = float(i) / div;
 
-                for(unsigned int j = 0; j < exposures; j++) {
+                for(int j = 0; j < exposures; j++) {
 
                     int ind = k * exposures + j;
 
@@ -128,7 +128,7 @@ protected:
                 int x, y;
                 sampler->getSampleAt(0, i, x, y);
 
-                for(unsigned int j = 0; j < exposures; j++) {
+                for(int j = 0; j < exposures; j++) {
                     float fetched = (*stack[j])(x, y)[k];
                     float tmp = lround(fetched * 255.0f);
                     samples[c] = CLAMPi(int(tmp), 0, 255);
@@ -140,7 +140,7 @@ protected:
         delete sampler;
     }
 
-    unsigned int exposures;
+    int exposures;
     int channels;
     int nSamples;
     int total;
@@ -197,7 +197,7 @@ public:
 
         this->nSamples = nSamples;
         this->channels  = stack[0]->channels;
-        this->exposures = stack.size();
+        this->exposures = int(stack.size());
 
         if(bSpatial) {
             spatial(stack, sub_type);

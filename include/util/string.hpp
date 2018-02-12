@@ -65,16 +65,16 @@ inline std::string stdStringRep(std::string str, std::string strSub,
 inline std::string stdStringRepAll(std::string str, std::string strSub,
                                    std::string strRep)
 {
-    unsigned int n = strSub.size();
-    unsigned int n2 = strRep.size();
+    int n_sub  = int(strSub.size());
+    int n_rep = int(strRep.size());
 
     std::string ret = str;
     std::string::size_type pos = ret.find(strSub);
 
     while(pos != std::string::npos) {
-        ret.replace(pos, n, strRep);
+        ret.replace(pos, n_sub, strRep);
 
-        pos = ret.find(strSub, pos + 1 - n + n2);
+        pos = ret.find(strSub, pos + 1 - n_sub + n_rep);
     }
 
     return ret;

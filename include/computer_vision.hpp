@@ -31,5 +31,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "computer_vision/nelder_mead_opt_gordon_lowe.hpp"
 #include "computer_vision/nelder_mead_opt_radial_distortion.hpp"
 
+#include "computer_vision/iterative_closest_point_2D.hpp"
+#include "computer_vision/find_checker_board.hpp"
+
 #endif /* PIC_COMPUTER_VISION_HPP */
 

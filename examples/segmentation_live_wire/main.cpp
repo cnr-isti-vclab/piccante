@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
         std::vector< pic::Vec<2, int> > out;
         pic::Vec<2, int> pS(227, 206);
-        pic::Vec<2, int> pE(229, 324);
+        pic::Vec<2, int> pE(221, 351);
         lw->execute(pS, pE, out);
 
         for(unsigned int i = 0; i < out.size(); i++) {

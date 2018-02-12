@@ -95,7 +95,7 @@ Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
     }
 
     for(int i = 0; i < Z; i++) {
-        unsigned int n = zones[i].size();
+        int n = int(zones[i].size());
         if(n > 0) {
             std::sort(zones[i].begin(), zones[i].end());
             Rz[i] = zones[i][n / 2];
@@ -108,7 +108,7 @@ Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
         }
     }
 
-    //creating the fstop maps
+    //create the fstop map
     lum->applyFunction(log2fPlusEpsilon);
 
     Image *fstopMap = lum->allocateSimilarOne();

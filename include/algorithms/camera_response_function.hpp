@@ -52,7 +52,7 @@ protected:
     {
 		#ifndef PIC_DISABLE_EIGEN
 
-        unsigned int nExposure = log_exposure.size();
+        int nExposure = int(log_exposure.size());
 
         int n = 256;
         int rows = nSamples * nExposure + n + 1;
@@ -410,7 +410,7 @@ public:
             w[i] = weightFunction(float(i) / 255.0f, type);
         }
 
-        unsigned int nExposure = stack.size();
+        int nExposure = int(stack.size());
 
         //log domain exposure time        
         std::vector< float > log_exposures;
@@ -477,7 +477,7 @@ public:
         std::vector< float > exposures;
         ImaveVecGetExposureTimesAsArray(stack, exposures, false);
 
-        int stride = nSamples * nExposures;
+        int stride = nSamples * int(nExposures);
 
         float error = std::numeric_limits<float>::infinity();
         std::vector<float> R(nExposures - 1);
@@ -583,21 +583,21 @@ public:
 
                     if (tj > t && tj < tHigh) {
                         tHigh = tj;
-                        higher[i] = j;
+                        higher[i] = int(j);
                     }
                     if (tj < t && tj > tLow) {
                         tLow = tj;
-                        lower[i] = j;
+                        lower[i] = int(j);
                     }
                 }
             }
 
             if (lower[i]  == -1) {
-                lower[i]  = i;
+                lower[i]  = int(i);
             }
 
             if (higher[i] == -1) {
-                higher[i] = i;
+                higher[i] = int(i);
             }
         }
 

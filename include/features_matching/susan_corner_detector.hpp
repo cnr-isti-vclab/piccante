@@ -115,9 +115,9 @@ public:
      * @param img
      * @param corners
      */
-    void execute(Image *img, std::vector< Eigen::Vector3f > *corners)
+    void execute(Image *img, std::vector< Eigen::Vector2f > *corners)
     {
-        if(img == NULL) {
+        if(img == NULL || corners == NULL) {
             return;
         }
 
@@ -129,11 +129,9 @@ public:
             lum = FilterLuminance::Execute(img, lum, LT_CIE_LUMINANCE);
         }
 
-        if(corners == NULL) {
-            corners = new std::vector< Eigen::Vector3f >;
-        }
-
         corners->clear();
+
+        std::vector< Eigen::Vector3f > corners_w_quality;
 
         //filter the input image
         FilterGaussian2D flt(sigma);
@@ -247,12 +245,21 @@ public:
                     }
 
                     if(index == 0){
-                        corners->push_back(Eigen::Vector3f (float(j), float(i), 1.0f) );
+                        corners_w_quality.push_back(Eigen::Vector3f (float(j), float(i), 1.0f) );
                     }
                 } else {
-                    corners->push_back(Eigen::Vector3f (float(j), float(i), 1.0f) );
+                    corners_w_quality.push_back(Eigen::Vector3f (float(j), float(i), 1.0f) );
                 }
             }
+        }
+
+        sortCorners(&corners_w_quality, true);
+
+        for(size_t i = 0; i < corners_w_quality.size(); i++) {
+            Eigen::Vector2f p;
+            p[0] = corners_w_quality[i][0];
+            p[1] = corners_w_quality[i][1];
+            corners->push_back(p);
         }
     }
 };

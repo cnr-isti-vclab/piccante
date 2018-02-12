@@ -101,7 +101,7 @@ template< typename T > inline bool isnan(T value)
 template< typename T > inline bool isinf(T value)
 {
     return std::numeric_limits<T>::has_infinity &&
-           (value == std::numeric_limits<T>::infinity() ||
+           (value ==  std::numeric_limits<T>::infinity() ||
             value == -std::numeric_limits<T>::infinity());
 }
 

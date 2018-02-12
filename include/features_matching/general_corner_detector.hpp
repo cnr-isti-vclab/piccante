@@ -68,7 +68,7 @@ public:
      * @param img
      * @param corners
      */
-    virtual void execute(Image *img, std::vector< Eigen::Vector3f > *corners)
+    virtual void execute(Image *img, std::vector< Eigen::Vector2f > *corners)
     {
 
     }
@@ -80,7 +80,7 @@ public:
      * @param bColor
      * @return
      */
-    Image *getCornersImage(std::vector< Eigen::Vector3f > *corners,
+    Image *getCornersImage(std::vector< Eigen::Vector2f > *corners,
                               Image *imgOut, unsigned int width, unsigned int height, bool bColor)
     {
         if(corners == NULL) {
@@ -146,12 +146,12 @@ public:
     /**
      * @brief removeClosestCorners
      */
-    static void removeClosestCorners(std::vector< Eigen::Vector3f > *corners,
+    static void removeClosestCorners(std::vector< Eigen::Vector2f > *corners,
                                      std::vector< Eigen::Vector2f > *out,
                                      float threshold,
                                      int max_limit)
     {
-        unsigned int n = MIN(corners->size(), max_limit);
+        unsigned int n = MIN(int(corners->size()), max_limit);
         bool *processed = new bool [n];
         memset(processed, 0, sizeof(bool) * n);
 
@@ -220,7 +220,7 @@ public:
 
         full_image.copySubImage(&quad, 192, 192);
 
-        std::vector< Eigen::Vector3f > corners;
+        std::vector< Eigen::Vector2f > corners;
         gcd->execute(&full_image, &corners);
 
         printf("\n Corner Detector Test:\n");
