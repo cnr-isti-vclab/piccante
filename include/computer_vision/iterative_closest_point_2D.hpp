@@ -34,11 +34,259 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 #ifndef PIC_DISABLE_EIGEN
 
-/*
-void iterativeClosestPoints2D(std::vector<>)
+/**
+ * @brief getMean
+ * @param p
+ * @return
+ */
+Eigen::Vector2f getMeanVector2f(std::vector< Eigen::Vector2f > &p)
 {
+    auto c = p[0];
+    for(auto i = 1; i < p.size(); i++) {
+        c += p[i];
+    }
+    c /= float(p.size());
 
-}*/
+    return c;
+}
+
+/**
+ * @brief getMedianVector2f
+ * @param p
+ * @return
+ */
+Eigen::Vector2f getMedianVector2f(std::vector< Eigen::Vector2f > &p)
+{
+    auto n = p.size();
+    float *x = new float[n];
+    float *y = new float[n];
+
+    for(auto i = 0; i < n; i++) {
+        x[i] = p[i][0];
+        y[i] = p[i][1];
+    }
+
+    std::sort(x, x + n);
+    std::sort(y, y + n);
+
+    Eigen::Vector2f med;
+
+    med[0] = x[n >> 1];
+    med[1] = y[n >> 1];
+
+    printf("%f %f\n", med[0], med[1]);
+
+    delete[] x;
+    delete[] y;
+    return med;
+}
+
+class ICP2DTransform
+{
+public:
+    Eigen::Matrix2f R;
+    Eigen::Vector2f t;
+    float scale;
+
+    ICP2DTransform()
+    {
+        R.setZero();
+        R(0,0) = 1.0f;
+        R(1,1) = 1.0f;
+
+        t.setZero();
+
+        scale = 1.0f;
+    }
+
+    void print()
+    {
+        printf("R:\n %f %f\n %f %f\n", R(0,0), R(0,1), R(1,0), R(1,1));
+
+        printf("T: %f %f\n", t[0], t[1]);
+
+        printf("S: %f\n\n", scale);
+    }
+
+
+    void apply(std::vector< Eigen::Vector2f > &points) {
+
+        //compute centroid to points
+        Eigen::Vector2f c = getMeanVector2f(points);
+
+        //apply transform
+        for(auto i  = 0; i < points.size(); i++) {
+            Eigen::Vector2f tmp = points[i];
+            points[i] = ((R * tmp) + t) * scale;
+        }
+    }
+};
+
+/**
+ * @brief estimateRotatioMatrixAndTranslation
+ * @param p0
+ * @param p1
+ * @param ind
+ * @return
+ */
+ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f > &p0,
+                                                   std::vector< Eigen::Vector2f > &p1,
+                                                   int *ind = NULL)
+{
+    ICP2DTransform ret;
+
+    if(p0.size() < 2 || p1.size() < 2) {
+        return ret;
+    }
+
+    bool bFlag = false;
+    if(ind == NULL) {
+        ind = new int[p0.size()];
+        bFlag = true;
+    }
+
+    //compute c0
+    Eigen::Vector2f c0 = getMeanVector2f(p0);
+
+    //compute c1
+    Eigen::Vector2f c1;
+    c1.setZero();
+    int n = 0;
+    for(int i = 0; i < p0.size(); i++) {
+        auto p_i = p0[i];
+
+        float d_min = FLT_MAX;
+        int index = -1;
+        for(int j = 0; j < p1.size(); j++) {
+            auto delta_ij = p_i - p1[j];
+            float d_tmp = delta_ij.norm();
+
+            if(d_tmp < d_min) {
+                d_min = d_tmp;
+                index = j;
+            }
+
+        }
+
+        if(index > -1) {
+            ind[i] = index;
+            c1 += p1[index];
+            n++;
+        }
+    }
+    c1 /= float(n);
+
+
+    //compute R
+    Eigen::Matrix2f H;
+    H.setZero();
+
+    for(auto i = 0; i < p0.size(); i++) {
+        int j = ind[i];
+
+        auto t0 = p0[i] - c0;
+        auto t1 = p1[j] - c1;
+
+        Eigen::Matrix2f tmp;
+        tmp(0, 0) = t0(0) * t1(0);
+        tmp(0, 1) = t0(0) * t1(1);
+        tmp(1, 0) = t0(1) * t1(0);
+        tmp(1, 1) = t0(1) * t1(1);
+
+        H += tmp;
+    }
+
+    //SVD decomposition
+    Eigen::JacobiSVD< Eigen::Matrix2f > svd(H, Eigen::ComputeFullV | Eigen::ComputeFullU);
+    Eigen::Matrix2f U = svd.matrixU();
+    Eigen::Matrix2f V = svd.matrixV();
+
+    Eigen::Matrix2f U_t = U.transpose();
+    Eigen::Matrix2f R = V * U_t;
+
+    if(R.determinant() < 0.0f) {
+        for(auto i = 0; i < V.rows(); i++) {
+            V(i, 1) = -V(i, 1);
+        }
+
+        Eigen::MatrixXf U_t = U.transpose();
+        R = V * U_t;
+    }
+
+    ret.R = R;
+    ret.t = c0 - (ret.R * c1);
+
+    if(bFlag) {
+        delete[] ind;
+    }
+
+    return ret;
+}
+
+/**
+ * @brief getErrorPointsList
+ * @param p0
+ * @param p1
+ * @return
+ */
+float getErrorPointsList(std::vector< Eigen::Vector2f > &p0,
+                         std::vector< Eigen::Vector2f > &p1)
+{
+    float err = 0.0f;
+    for(auto i = 0; i < p0.size(); i++) {
+        auto p_i = p0[i];
+
+        float tmp_err = FLT_MAX;
+        for(auto j = 0; j < p1.size(); j++) {
+            auto delta_ij = p_i - p1[j];
+            float dist = delta_ij.norm();
+
+            if(dist < tmp_err) {
+                tmp_err = dist;
+            }
+        }
+
+        err += tmp_err;
+    }
+
+    return err / float(p0.size());
+}
+
+/**
+ * @brief iterativeClosestPoints2D
+ * @param points_pattern
+ * @param points
+ * @param thresholdErr
+ * @param maxIterations
+ */
+void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pattern,
+                              std::vector<Eigen::Vector2f> &points,
+                              float thresholdErr = 1e-6f,
+                              int maxIterations = 1000)
+{
+    Eigen::Vector2f shift = getMedianVector2f(points);
+    shift[0] = 750;
+    shift[1] = 450;
+
+    ICP2DTransform t_init;
+    t_init.t = shift;
+    t_init.apply(points_pattern);
+
+    float err = getErrorPointsList(points_pattern, points);;
+    float prev_err;
+    int iter = 0;
+    while((err > thresholdErr) && (iter < maxIterations)) {
+        prev_err = err;
+        ICP2DTransform t = estimateRotatioMatrixAndTranslation(points, points_pattern);
+        t.print();
+        t.apply(points_pattern);
+
+        err = getErrorPointsList(points_pattern, points);
+
+        printf("Error: %f %f\n", err, prev_err);
+        iter++;
+    }
+}
 
 #endif
 } // end namespace pic

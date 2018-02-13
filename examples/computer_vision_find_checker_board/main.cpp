@@ -54,34 +54,9 @@ int main(int argc, char *argv[])
     if(img.isValid() && img_pattern.isValid()) {
         printf("OK\n");
 
-        //compute the luminance images
-        pic::Image *L = pic::FilterLuminance::Execute(&img, NULL, pic::LT_CIE_LUMINANCE);
+        pic::findCheckerBoard(&img, &img_pattern);
 
-        //get corners
-        printf("Extracting corners...\n");
-        pic::HarrisCornerDetector hcd(2.5f, 5);
-        std::vector< Eigen::Vector2f > corners_from_img;
-        hcd.execute(L, &corners_from_img);
 
-        float *col_mu = img.getMeanVal(NULL, NULL);
-        float *scaling = pic::FilterWhiteBalance::getScalingFactors(col_mu, img.channels);
-        pic::FilterWhiteBalance fwb(scaling, img.channels, true);
-
-        pic::Image *img_wb = fwb.Process(Single(&img), NULL);
-
-        float red[] = {1.0f, 0.0f, 0.0f};
-        float green[] = {0.0f, 1.0f, 0.0f};
-
-        (*img_wb) *= 0.25f;
-
-        pic::drawPoints(img_wb, corners_from_img, red);
-
-        std::vector< Eigen::Vector2f > cfi_out;
-        pic::GeneralCornerDetector::removeClosestCorners(&corners_from_img, &cfi_out, 16.0f, 100);
-
-        pic::drawPoints(img_wb, cfi_out, green);
-
-        ImageWrite(img_wb, "../data/output/img_wb.png");
     } else {
         printf("No there is at least an invalid file!\n");
     }

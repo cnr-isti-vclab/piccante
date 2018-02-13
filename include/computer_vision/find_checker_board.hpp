@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "filtering/filter_luminance.hpp"
 
+#include "computer_vision/iterative_closest_point_2D.hpp"
+
 #ifndef PIC_DISABLE_EIGEN
 #include "externals/Eigen/Dense"
 #include "externals/Eigen/SVD"
@@ -28,6 +30,35 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #endif
 
 namespace pic {
+
+/**
+ * @brief getMinDistance
+ * @param points
+ * @return
+ */
+float getMinDistance(std::vector< Eigen::Vector2f > &points)
+{
+    float ret = FLT_MAX;
+    for(auto i = 0; i < points.size(); i++) {
+
+        auto p_i = points[i];
+
+        for(auto j = 0; j < points.size(); j++) {
+            if(j == i) {
+                continue;
+            }
+
+            auto delta_ij = p_i - points[j];
+            float dist = delta_ij.norm();
+
+            if(dist < ret) {
+                ret = dist;
+            }
+        }
+    }
+
+    return ret;
+}
 
 /**
  * @brief estimateCheckerBoardSize
@@ -46,7 +77,7 @@ float estimateCheckerBoardSize(std::vector< Eigen::Vector2f > &points)
 
     std::vector<float> m_d;
     for(int i = 0; i < n; i++) {
-        Eigen::Vector2f p_i = points.at(i);
+        auto p_i = points[i];
 
         float closest = FLT_MAX;
 
@@ -55,11 +86,11 @@ float estimateCheckerBoardSize(std::vector< Eigen::Vector2f > &points)
                 continue;
             }
 
-            Eigen::Vector2f delta_ij = p_i - points.at(j);
+            auto delta_ij = p_i - points[j];
 
             float dist = delta_ij.norm();
 
-            if(closest < dist) {
+            if(dist < closest) {
                 closest = dist;
             }
         }
@@ -69,22 +100,95 @@ float estimateCheckerBoardSize(std::vector< Eigen::Vector2f > &points)
         }
     }
 
-    std::sort(m_d.begin(), m_d.end());
+    if(!m_d.empty()) {
+        std::sort(m_d.begin(), m_d.end());
 
-    ret = m_d[m_d.size() / 2];
+        ret = m_d[m_d.size() / 2];
+    }
 
     return ret;
 }
 
-void findCheckerBoard(Image *img)
+/**
+ * @brief findCheckerBoard
+ * @param img
+ * @param image_pattern
+ */
+void findCheckerBoard(Image *img, Image *img_pattern)
 {
-    pic::Image *img_L = FilterLuminance::Execute(img, NULL, pic::LT_CIE_LUMINANCE);
+    //compute the luminance images
+    Image *L = FilterLuminance::Execute(img, NULL, LT_CIE_LUMINANCE);
 
-    std::vector< Eigen::Vector2f > corners, corners_new;
-    pic::FastCornerDetector fcd;
-    fcd.update(1.0f, 5);
-    fcd.execute(img, &corners);
+    //get corners
+    printf("Extracting corners...\n");
+    HarrisCornerDetector hcd(2.5f, 5);
+    std::vector< Eigen::Vector2f > corners_from_img;
+    hcd.execute(L, &corners_from_img);
 
+    float *col_mu = img->getMeanVal(NULL, NULL);
+    float *scaling = FilterWhiteBalance::getScalingFactors(col_mu, img->channels);
+    FilterWhiteBalance fwb(scaling, img->channels, true);
+
+    Image *img_wb = fwb.Process(Single(img), NULL);
+
+    float red[] = {1.0f, 0.0f, 0.0f};
+    float green[] = {0.0f, 1.0f, 0.0f};
+    float blue[] = {0.0f, 0.0f, 1.0f};
+
+    (*img_wb) *= 0.125f;
+
+    std::vector< Eigen::Vector2f > cfi_out;
+    GeneralCornerDetector::removeClosestCorners(&corners_from_img, &cfi_out, 16.0f, 100);
+
+    //compute checkerboard size
+    float checker_size = estimateCheckerBoardSize(corners_from_img);
+    float threshold_checker = (checker_size * 0.75f);
+
+    std::vector< Eigen::Vector2f > cfi_valid;
+    auto n =  cfi_out.size();
+    for(auto i = 0; i < n; i++) {
+        auto p_i = cfi_out[i];
+
+        bool bFlag = true;
+        for(auto j = 0; j < n; j++) {
+            if(j == i) {
+                continue;
+            }
+            auto delta_ij = p_i - cfi_out[j];
+            float dist = delta_ij.norm();
+            if(dist < threshold_checker) {
+                bFlag = false;
+                break;
+            }
+        }
+        if(bFlag) {
+            cfi_valid.push_back(p_i);
+        }
+    }
+
+    checker_size = estimateCheckerBoardSize(cfi_valid);
+
+    drawPoints(img_wb, cfi_valid, green);
+
+
+    //pattern image
+    Image *L_pattern = FilterLuminance::Execute(img_pattern, NULL, LT_CIE_LUMINANCE);
+    std::vector< Eigen::Vector2f > corners_from_img_pattern;
+    hcd.execute(L_pattern, &corners_from_img_pattern);
+
+    float min_dist = getMinDistance(corners_from_img_pattern);
+    float scaling_factor = checker_size / min_dist;
+
+    ICP2DTransform t;
+    t.scale = scaling_factor;
+    t.apply(corners_from_img_pattern);
+
+    drawPoints(img_wb, corners_from_img_pattern, blue);
+
+    iterativeClosestPoints2D(corners_from_img_pattern, cfi_valid, 1e-6f, 10);
+
+    drawPoints(img_wb, corners_from_img_pattern, red);
+    img_wb->Write("../data/output/img_wb.bmp");
 
 }
 
