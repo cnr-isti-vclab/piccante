@@ -278,6 +278,8 @@ protected:
             printf("\nNelder-Mead iterations: %d Err: %f\n", i, simplex[0].first);
         #endif
 
+        output_error = simplex[0].first;
+
         memcpy(x, simplex[0].second, n_size);
 
         delete[] x_mean;
@@ -291,6 +293,7 @@ protected:
 public:
 
     int max_iterations;
+    float output_error;
 
     /**
      * @brief NelderMeadOptBase

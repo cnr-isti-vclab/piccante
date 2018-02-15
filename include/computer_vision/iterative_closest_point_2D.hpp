@@ -99,6 +99,21 @@ public:
         scale = 1.0f;
     }
 
+    ICP2DTransform(float tx, float ty, float angle, float scale)
+    {
+        this->scale = scale;
+        t[0] = tx;
+        t[1] = ty;
+
+        float cos_a = cosf(angle);
+        float sin_a = sinf(angle);
+
+        R(0, 0) =  cos_a;
+        R(0, 1) = -sin_a;
+        R(1, 0) =  sin_a;
+        R(1, 1) =  cos_a;
+    }
+
     void print()
     {
         printf("R:\n %f %f\n %f %f\n", R(0,0), R(0,1), R(1,0), R(1,1));
@@ -108,16 +123,50 @@ public:
         printf("S: %f\n\n", scale);
     }
 
-
     void apply(std::vector< Eigen::Vector2f > &points) {
+        //apply transform
+        for(auto i  = 0; i < points.size(); i++) {
+            Eigen::Vector2f tmp = points[i];
+            points[i] = ((R * tmp) + t) * scale;
+        }
+    }
+
+    void apply(std::vector< Eigen::Vector2f > &points,
+               std::vector< Eigen::Vector2f > &out) {
+        //apply transform
+        for(auto i  = 0; i < points.size(); i++) {
+            Eigen::Vector2f tmp = ((R * points[i]) + t) * scale;
+            out.push_back(tmp);
+        }
+    }
+
+    //
+    //
+    //
+
+    void applyC(std::vector< Eigen::Vector2f > &points) {
 
         //compute centroid to points
         Eigen::Vector2f c = getMeanVector2f(points);
 
         //apply transform
         for(auto i  = 0; i < points.size(); i++) {
-            Eigen::Vector2f tmp = points[i];
-            points[i] = ((R * tmp) + t) * scale;
+            Eigen::Vector2f tmp = points[i] - c;
+            points[i] = ((R * tmp) * scale) + c + t;
+        }
+    }
+
+    void applyC(std::vector< Eigen::Vector2f > &points,
+               std::vector< Eigen::Vector2f > &out) {
+
+        //compute centroid to points
+        Eigen::Vector2f c = getMeanVector2f(points);
+
+        //apply transform
+        for(auto i  = 0; i < points.size(); i++) {
+            Eigen::Vector2f tmp = points[i] - c;
+            Eigen::Vector2f tmp2 = ((R * tmp) * scale) + c + t;
+            out.push_back(tmp2);
         }
     }
 };
@@ -141,24 +190,24 @@ ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f 
 
     bool bFlag = false;
     if(ind == NULL) {
-        ind = new int[p0.size()];
+        ind = new int[p1.size()];
         bFlag = true;
     }
 
     //compute c0
-    Eigen::Vector2f c0 = getMeanVector2f(p0);
+    Eigen::Vector2f c1 = getMeanVector2f(p1);
 
     //compute c1
-    Eigen::Vector2f c1;
-    c1.setZero();
+    Eigen::Vector2f c0;
+    c0.setZero();
     int n = 0;
-    for(int i = 0; i < p0.size(); i++) {
-        auto p_i = p0[i];
+    for(int i = 0; i < p1.size(); i++) {
+        auto p_i = p1[i];
 
         float d_min = FLT_MAX;
         int index = -1;
-        for(int j = 0; j < p1.size(); j++) {
-            auto delta_ij = p_i - p1[j];
+        for(int j = 0; j < p0.size(); j++) {
+            auto delta_ij = p_i - p0[j];
             float d_tmp = delta_ij.norm();
 
             if(d_tmp < d_min) {
@@ -170,18 +219,18 @@ ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f 
 
         if(index > -1) {
             ind[i] = index;
-            c1 += p1[index];
+            c0 += p0[index];
             n++;
         }
     }
-    c1 /= float(n);
+    c0 /= float(n);
 
 
     //compute R
     Eigen::Matrix2f H;
     H.setZero();
 
-    for(auto i = 0; i < p0.size(); i++) {
+    for(auto i = 0; i < p1.size(); i++) {
         int j = ind[i];
 
         auto t0 = p0[i] - c0;
@@ -265,8 +314,6 @@ void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pattern,
                               int maxIterations = 1000)
 {
     Eigen::Vector2f shift = getMedianVector2f(points);
-    shift[0] = 750;
-    shift[1] = 450;
 
     ICP2DTransform t_init;
     t_init.t = shift;

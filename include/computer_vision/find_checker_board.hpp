@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_luminance.hpp"
 
 #include "computer_vision/iterative_closest_point_2D.hpp"
+#include "computer_vision/nelder_mead_opt_ICP_2D.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
 #include "externals/Eigen/Dense"
@@ -134,6 +135,7 @@ void findCheckerBoard(Image *img, Image *img_pattern)
     float red[] = {1.0f, 0.0f, 0.0f};
     float green[] = {0.0f, 1.0f, 0.0f};
     float blue[] = {0.0f, 0.0f, 1.0f};
+    float yellow[] = {1.0f, 1.0f, 0.0f};
 
     (*img_wb) *= 0.125f;
 
@@ -170,7 +172,6 @@ void findCheckerBoard(Image *img, Image *img_pattern)
 
     drawPoints(img_wb, cfi_valid, green);
 
-
     //pattern image
     Image *L_pattern = FilterLuminance::Execute(img_pattern, NULL, LT_CIE_LUMINANCE);
     std::vector< Eigen::Vector2f > corners_from_img_pattern;
@@ -185,11 +186,38 @@ void findCheckerBoard(Image *img, Image *img_pattern)
 
     drawPoints(img_wb, corners_from_img_pattern, blue);
 
-    iterativeClosestPoints2D(corners_from_img_pattern, cfi_valid, 1e-6f, 10);
+    iterativeClosestPoints2D(corners_from_img_pattern, cfi_valid, 1e-6f, 1000);
 
     drawPoints(img_wb, corners_from_img_pattern, red);
-    img_wb->Write("../data/output/img_wb.bmp");
 
+
+    NelderMeadOptICP2D opt(corners_from_img_pattern, cfi_valid);
+
+    float prev_err = FLT_MAX;
+    float *x;
+    int nSample = 36;
+    for(float i = 0; i < nSample; i++) {
+        float angle = float(i) * C_PI_2 / float(nSample);
+        float start[] = {0.0f, 0.0f, angle, 1.0f};
+        float *tmp = opt.run(start, 4, 1e-9f, 1000);
+
+        if(opt.output_error < prev_err) {
+            x = tmp;
+            prev_err = opt.output_error;
+        } else {
+            delete[] tmp;
+        }
+    }
+    for(int i=0; i<4;i++) {
+        printf("%f\n", x[i]);
+    }
+
+    ICP2DTransform t2(x[0], x[1], x[2], x[3]);
+
+    t2.applyC(corners_from_img_pattern);
+    drawPoints(img_wb, corners_from_img_pattern, yellow);
+
+    img_wb->Write("../data/output/img_wb.bmp");
 }
 
 } // end namespace pic
