@@ -25,7 +25,7 @@ This program is free software: you can redistribute it and/or modify
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
-
+#define PIC_DEBUG
 #include "../common_code/image_qimage_interop.hpp"
 
 #include "piccante.hpp"
@@ -36,25 +36,22 @@ int main(int argc, char *argv[])
 
     if(argc == 3) {
         img_str0 = argv[1];
-        img_str1 = argv[2];
     } else {
-        img_str0 = "../data/input/features/checker_board_photo.png";
-        img_str1 = "../data/input/features/checker_board_pattern.png";
+        img_str0 = "../data/input/features/checker_board_photo_2.png";
     }
 
     printf("Reading images...");
 
     pic::Image img, img_pattern;
     ImageRead(img_str0, &img);
-    ImageRead(img_str1, &img_pattern);
 
     printf("Ok\n");
 
     printf("Is the image valid? ");
-    if(img.isValid() && img_pattern.isValid()) {
+    if(img.isValid()) {
         printf("OK\n");
 
-        pic::findCheckerBoard(&img, &img_pattern);
+        pic::findCheckerBoard(&img);
 
 
     } else {

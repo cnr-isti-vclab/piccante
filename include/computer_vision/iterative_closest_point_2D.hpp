@@ -148,11 +148,12 @@ public:
 
         //compute centroid to points
         Eigen::Vector2f c = getMeanVector2f(points);
+        auto shift = c + t;
 
         //apply transform
         for(auto i  = 0; i < points.size(); i++) {
             Eigen::Vector2f tmp = points[i] - c;
-            points[i] = ((R * tmp) * scale) + c + t;
+            points[i] = (R * tmp) * scale + shift;
         }
     }
 
@@ -161,11 +162,12 @@ public:
 
         //compute centroid to points
         Eigen::Vector2f c = getMeanVector2f(points);
+        auto shift = c + t;
 
         //apply transform
         for(auto i  = 0; i < points.size(); i++) {
             Eigen::Vector2f tmp = points[i] - c;
-            Eigen::Vector2f tmp2 = ((R * tmp) * scale) + c + t;
+            Eigen::Vector2f tmp2 = (R * tmp) * scale + shift;
             out.push_back(tmp2);
         }
     }
@@ -258,7 +260,6 @@ ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f 
             V(i, 1) = -V(i, 1);
         }
 
-        Eigen::MatrixXf U_t = U.transpose();
         R = V * U_t;
     }
 
@@ -313,10 +314,8 @@ void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pattern,
                               float thresholdErr = 1e-6f,
                               int maxIterations = 1000)
 {
-    Eigen::Vector2f shift = getMedianVector2f(points);
-
     ICP2DTransform t_init;
-    t_init.t = shift;
+    t_init.t = getMedianVector2f(points) - getMeanVector2f(points_pattern);
     t_init.apply(points_pattern);
 
     float err = getErrorPointsList(points_pattern, points);;
@@ -330,7 +329,9 @@ void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pattern,
 
         err = getErrorPointsList(points_pattern, points);
 
-        printf("Error: %f %f\n", err, prev_err);
+        #ifdef PIC_DEBUG
+            printf("Error: %f %f\n", err, prev_err);
+        #endif
         iter++;
     }
 }

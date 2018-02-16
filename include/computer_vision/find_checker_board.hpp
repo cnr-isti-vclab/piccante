@@ -111,11 +111,31 @@ float estimateCheckerBoardSize(std::vector< Eigen::Vector2f > &points)
 }
 
 /**
+ * @brief getCheckerBoardModel
+ * @param chekers_x
+ * @param checkers_y
+ * @param checkers_size
+ * @param out
+ */
+void getCheckerBoardModel(int chekers_x, int checkers_y, int checkers_size, std::vector< Eigen::Vector2f > &out)
+{
+    float size_f = float(checkers_size);
+    for(int i = 0; i < checkers_y; i++) {
+        for(int j = 0; j < chekers_x; j++) {
+            Eigen::Vector2f point;
+            point[0] = float(j) * size_f;
+            point[1] = float(i) * size_f;
+
+            out.push_back(point);
+        }
+    }
+}
+
+/**
  * @brief findCheckerBoard
  * @param img
- * @param image_pattern
  */
-void findCheckerBoard(Image *img, Image *img_pattern)
+void findCheckerBoard(Image *img)
 {
     //compute the luminance images
     Image *L = FilterLuminance::Execute(img, NULL, LT_CIE_LUMINANCE);
@@ -163,6 +183,7 @@ void findCheckerBoard(Image *img, Image *img_pattern)
                 break;
             }
         }
+
         if(bFlag) {
             cfi_valid.push_back(p_i);
         }
@@ -173,25 +194,23 @@ void findCheckerBoard(Image *img, Image *img_pattern)
     drawPoints(img_wb, cfi_valid, green);
 
     //pattern image
-    Image *L_pattern = FilterLuminance::Execute(img_pattern, NULL, LT_CIE_LUMINANCE);
-    std::vector< Eigen::Vector2f > corners_from_img_pattern;
-    hcd.execute(L_pattern, &corners_from_img_pattern);
+    std::vector< Eigen::Vector2f > corners_model;
 
-    float min_dist = getMinDistance(corners_from_img_pattern);
+    int checkers_size = 32;
+    getCheckerBoardModel(4, 6, checkers_size, corners_model);
+
+    float min_dist = getMinDistance(corners_model);
     float scaling_factor = checker_size / min_dist;
 
-    ICP2DTransform t;
-    t.scale = scaling_factor;
-    t.apply(corners_from_img_pattern);
+    ICP2DTransform t_init;
+    t_init.scale = scaling_factor;
+    t_init.applyC(corners_model);
 
-    drawPoints(img_wb, corners_from_img_pattern, blue);
+    iterativeClosestPoints2D(corners_model, cfi_valid, 1e-3f, 1000);
 
-    iterativeClosestPoints2D(corners_from_img_pattern, cfi_valid, 1e-6f, 1000);
+    drawPoints(img_wb, corners_model, red);
 
-    drawPoints(img_wb, corners_from_img_pattern, red);
-
-
-    NelderMeadOptICP2D opt(corners_from_img_pattern, cfi_valid);
+    NelderMeadOptICP2D opt(corners_model, cfi_valid);
 
     float prev_err = FLT_MAX;
     float *x;
@@ -214,8 +233,8 @@ void findCheckerBoard(Image *img, Image *img_pattern)
 
     ICP2DTransform t2(x[0], x[1], x[2], x[3]);
 
-    t2.applyC(corners_from_img_pattern);
-    drawPoints(img_wb, corners_from_img_pattern, yellow);
+    t2.applyC(corners_model);
+    drawPoints(img_wb, corners_model, yellow);
 
     img_wb->Write("../data/output/img_wb.bmp");
 }
