@@ -217,8 +217,8 @@ void findCheckerBoard(Image *img)
     int nSample = 36;
     for(float i = 0; i < nSample; i++) {
         float angle = float(i) * C_PI_2 / float(nSample);
-        float start[] = {0.0f, 0.0f, angle, 1.0f};
-        float *tmp = opt.run(start, 4, 1e-9f, 1000);
+        float start[] = {0.0f, 0.0f, angle};
+        float *tmp = opt.run(start, 3, 1e-10f, 1000);
 
         if(opt.output_error < prev_err) {
             x = tmp;
@@ -231,8 +231,13 @@ void findCheckerBoard(Image *img)
         printf("%f\n", x[i]);
     }
 
-    ICP2DTransform t2(x[0], x[1], x[2], x[3]);
+    float start[] = {x[0], x[1], x[2], 1.0f};
 
+    float *tmp = opt.run(start, 4, 1e-10f, 1000);
+    ICP2DTransform t2(tmp[0], tmp[1], tmp[2], tmp[3]);
+    for(int i=0; i<4;i++) {
+        printf("%f\n", tmp[i]);
+    }
     t2.applyC(corners_model);
     drawPoints(img_wb, corners_model, yellow);
 

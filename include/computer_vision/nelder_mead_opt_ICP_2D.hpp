@@ -61,11 +61,16 @@ public:
      */
     float function(float *x, unsigned int n)
     {
-        if(x[3] < 1.0f) {
-            return FLT_MAX;
+        float scale = 1.0f;
+        if(n == 4) {
+            if(x[3] < 1.0f) {
+                return FLT_MAX;
+            }
+
+            scale = x[3];
         }
 
-        ICP2DTransform t(x[0], x[1], x[2], x[3]);
+        ICP2DTransform t(x[0], x[1], x[2], scale);
 
         std::vector< Eigen::Vector2f > out;
         t.applyC(points_pattern, out);

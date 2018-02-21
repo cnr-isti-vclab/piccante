@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     if(argc == 3) {
         img_str0 = argv[1];
     } else {
-        img_str0 = "../data/input/features/checker_board_photo_2.png";
+        img_str0 = "../data/input/features/checker_board_photo.png";
     }
 
     printf("Reading images...");
