@@ -38,11 +38,11 @@ class BRIEFDescriptor
 protected:
     int                 S;
     unsigned int        n;
-    float   		sigma_sq_2, sigma_sq;
-    std::mt19937	*m;
+    float               sigma_sq_2, sigma_sq;
+    std::mt19937        *m;
 
     //samples coordinates
-    int             *x, *y;
+    int                 *x, *y;
 
     /**
      * @brief generateSample

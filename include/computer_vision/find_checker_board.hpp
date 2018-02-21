@@ -23,6 +23,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "computer_vision/iterative_closest_point_2D.hpp"
 #include "computer_vision/nelder_mead_opt_ICP_2D.hpp"
 
+#include "features_matching/orb_descriptor.hpp"
+
 #ifndef PIC_DISABLE_EIGEN
 #include "externals/Eigen/Dense"
 #include "externals/Eigen/SVD"
@@ -116,19 +118,51 @@ float estimateCheckerBoardSize(std::vector< Eigen::Vector2f > &points)
  * @param checkers_y
  * @param checkers_size
  * @param out
+ * @return
  */
-void getCheckerBoardModel(int chekers_x, int checkers_y, int checkers_size, std::vector< Eigen::Vector2f > &out)
+Image *getCheckerBoardModel(int checkers_x, int checkers_y, int checkers_size, std::vector< Eigen::Vector2f > &out)
 {
-    float size_f = float(checkers_size);
-    for(int i = 0; i < checkers_y; i++) {
-        for(int j = 0; j < chekers_x; j++) {
-            Eigen::Vector2f point;
-            point[0] = float(j) * size_f;
-            point[1] = float(i) * size_f;
+    Image *ret = new Image(1, (checkers_x + 1) * checkers_size, (checkers_y + 1) * checkers_size, 1);
+    *ret = 1.0f;
+
+    for(int i = 1; i <= checkers_y; i++) {
+        Eigen::Vector2f point;
+
+        int y = i * checkers_size;
+        point[1] = float(y);
+
+        for(int j = 1; j <= checkers_x; j++) {
+
+            int x = j * checkers_size;
+            point[0] = float(x);
+
+            bool bDraw = false;
+            if(j < checkers_x) {
+                if(((j % 2) == 0) && ((i % 2) == 0)) {
+                    bDraw = true;
+                }
+            }
+
+            if(i < checkers_y) {
+                if(((j % 2) == 1) && ((i % 2) == 1)) {
+                    bDraw = true;
+                }
+            }
+
+            if(bDraw) {
+                for(int yy = y; yy < (y + checkers_size); yy++) {
+                    for(int xx = x; xx < (x + checkers_size); xx++) {
+                        float *pixel_value = (*ret)(xx, yy);
+                        pixel_value[0] = 0.0f;
+                    }
+                }
+            }
 
             out.push_back(point);
         }
     }
+
+    return ret;
 }
 
 /**
@@ -154,7 +188,7 @@ void findCheckerBoard(Image *img)
 
     float red[] = {1.0f, 0.0f, 0.0f};
     float green[] = {0.0f, 1.0f, 0.0f};
-    float blue[] = {0.0f, 0.0f, 1.0f};
+    float blue[] = {1.0f, 0.0f, 1.0f};
     float yellow[] = {1.0f, 1.0f, 0.0f};
 
     (*img_wb) *= 0.125f;
@@ -164,7 +198,8 @@ void findCheckerBoard(Image *img)
 
     //compute checkerboard size
     float checker_size = estimateCheckerBoardSize(corners_from_img);
-    float threshold_checker = (checker_size * 0.75f);
+
+    drawPoints(img_wb, cfi_out, blue);
 
     std::vector< Eigen::Vector2f > cfi_valid;
     auto n =  cfi_out.size();
@@ -173,14 +208,14 @@ void findCheckerBoard(Image *img)
 
         bool bFlag = true;
         for(auto j = 0; j < n; j++) {
-            if(j == i) {
-                continue;
-            }
-            auto delta_ij = p_i - cfi_out[j];
-            float dist = delta_ij.norm();
-            if(dist < threshold_checker) {
-                bFlag = false;
-                break;
+            if(j != i) {
+                auto delta_ij = p_i - cfi_out[j];
+                float dist = delta_ij.norm();
+
+                if(dist < checker_size) {
+                    bFlag = false;
+                    break;
+                }
             }
         }
 
@@ -188,6 +223,8 @@ void findCheckerBoard(Image *img)
             cfi_valid.push_back(p_i);
         }
     }
+
+    printf("Size: %f", checker_size);
 
     checker_size = estimateCheckerBoardSize(cfi_valid);
 
@@ -197,16 +234,22 @@ void findCheckerBoard(Image *img)
     std::vector< Eigen::Vector2f > corners_model;
 
     int checkers_size = 32;
-    getCheckerBoardModel(4, 6, checkers_size, corners_model);
+    Image *img_pattern = getCheckerBoardModel(4, 6, checkers_size, corners_model);
 
     float min_dist = getMinDistance(corners_model);
     float scaling_factor = checker_size / min_dist;
+
+    pic::ORBDescriptor b_desc((checkers_size >> 1) + 1, checkers_size);
+
+    std::vector< unsigned int *> descs_model, descs_cfi_valid;
+    b_desc.getAll(img_pattern, corners_model, descs_model);
+    b_desc.getAll(L, cfi_valid, descs_cfi_valid);
 
     ICP2DTransform t_init;
     t_init.scale = scaling_factor;
     t_init.applyC(corners_model);
 
-    iterativeClosestPoints2D(corners_model, cfi_valid, 1e-3f, 1000);
+    iterativeClosestPoints2D(corners_model, cfi_valid, descs_model, descs_cfi_valid, b_desc.getDescriptorSize(), 1000);
 
     drawPoints(img_wb, corners_model, red);
 

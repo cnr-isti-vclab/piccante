@@ -24,6 +24,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "util/math.hpp"
 
+#include "features_matching/brief_descriptor.hpp"
+
 #ifndef PIC_DISABLE_EIGEN
 #include "externals/Eigen/Dense"
 #include "externals/Eigen/SVD"
@@ -177,11 +179,16 @@ public:
  * @brief estimateRotatioMatrixAndTranslation
  * @param p0
  * @param p1
+ * @param p0_descs
+ * @param p1_descs
  * @param ind
  * @return
  */
 ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f > &p0,
                                                    std::vector< Eigen::Vector2f > &p1,
+                                                   std::vector< unsigned int *> &p0_descs,
+                                                   std::vector< unsigned int *> &p1_descs,
+                                                   int size_descs,
                                                    int *ind = NULL)
 {
     ICP2DTransform ret;
@@ -203,6 +210,7 @@ ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f 
     Eigen::Vector2f c0;
     c0.setZero();
     int n = 0;
+    printf("Size: %d\n", size_descs);
     for(int i = 0; i < p1.size(); i++) {
         auto p_i = p1[i];
 
@@ -211,6 +219,10 @@ ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f 
         for(int j = 0; j < p0.size(); j++) {
             auto delta_ij = p_i - p0[j];
             float d_tmp = delta_ij.norm();
+
+            int value = BRIEFDescriptor::match(p0_descs[j], p1_descs[i], size_descs);
+
+            d_tmp += float(size_descs * 32) - float(value);
 
             if(d_tmp < d_min) {
                 d_min = d_tmp;
@@ -235,8 +247,8 @@ ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f 
     for(auto i = 0; i < p1.size(); i++) {
         int j = ind[i];
 
-        auto t0 = p0[i] - c0;
-        auto t1 = p1[j] - c1;
+        auto t0 = p0[j] - c0;
+        auto t1 = p1[i] - c1;
 
         Eigen::Matrix2f tmp;
         tmp(0, 0) = t0(0) * t1(0);
@@ -306,12 +318,16 @@ float getErrorPointsList(std::vector< Eigen::Vector2f > &p0,
  * @brief iterativeClosestPoints2D
  * @param points_pattern
  * @param points
+ * @param points_pattern_descs
+ * @param points_descs
  * @param thresholdErr
  * @param maxIterations
  */
 void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pattern,
                               std::vector<Eigen::Vector2f> &points,
-                              float thresholdErr = 1e-6f,
+                              std::vector< unsigned int *> &points_pattern_descs,
+                              std::vector< unsigned int *> &points_descs,
+                              int size_descs,
                               int maxIterations = 1000)
 {
     ICP2DTransform t_init;
@@ -321,13 +337,28 @@ void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pattern,
     float err = getErrorPointsList(points_pattern, points);;
     float prev_err;
     int iter = 0;
-    while((err > thresholdErr) && (iter < maxIterations)) {
+    while(iter < maxIterations) {
         prev_err = err;
-        ICP2DTransform t = estimateRotatioMatrixAndTranslation(points, points_pattern);
+        ICP2DTransform t = estimateRotatioMatrixAndTranslation(points, points_pattern,
+                                                               points_descs, points_pattern_descs,
+                                                               size_descs);
         t.print();
+
+        std::vector< Eigen::Vector2f > points_pattern_tmp;
         t.apply(points_pattern);
 
         err = getErrorPointsList(points_pattern, points);
+
+        /*
+        if(err < prev_err) {
+            points_pattern.clear();
+            std::copy(points_pattern_tmp.begin(), points_pattern_tmp.end(),
+                      std::back_inserter(points_pattern));
+        } else {
+            iter = maxIterations * 2;
+        }
+        */
+
 
         #ifdef PIC_DEBUG
             printf("Error: %f %f\n", err, prev_err);
