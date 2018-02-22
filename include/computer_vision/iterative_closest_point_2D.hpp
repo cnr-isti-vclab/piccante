@@ -221,7 +221,6 @@ ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f 
             float d_tmp = delta_ij.norm();
 
             int value = BRIEFDescriptor::match(p0_descs[j], p1_descs[i], size_descs);
-
             d_tmp += float(size_descs * 32) - float(value);
 
             if(d_tmp < d_min) {
@@ -250,12 +249,14 @@ ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f 
         auto t0 = p0[j] - c0;
         auto t1 = p1[i] - c1;
 
-        Eigen::Matrix2f tmp;
-        tmp(0, 0) = t0(0) * t1(0);
+        Eigen::RowVector2f t1r = t1;
+        Eigen::Matrix2f tmp = t0 * t1r;
+
+/*      tmp(0, 0) = t0(0) * t1(0);
         tmp(0, 1) = t0(0) * t1(1);
         tmp(1, 0) = t0(1) * t1(0);
         tmp(1, 1) = t0(1) * t1(1);
-
+*/
         H += tmp;
     }
 
@@ -343,7 +344,6 @@ void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pattern,
                                                                points_descs, points_pattern_descs,
                                                                size_descs);
         t.print();
-
         std::vector< Eigen::Vector2f > points_pattern_tmp;
         t.apply(points_pattern);
 
@@ -355,7 +355,7 @@ void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pattern,
             std::copy(points_pattern_tmp.begin(), points_pattern_tmp.end(),
                       std::back_inserter(points_pattern));
         } else {
-            iter = maxIterations * 2;
+            iter = maxIterations;
         }
         */
 
@@ -363,6 +363,7 @@ void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pattern,
         #ifdef PIC_DEBUG
             printf("Error: %f %f\n", err, prev_err);
         #endif
+
         iter++;
     }
 }

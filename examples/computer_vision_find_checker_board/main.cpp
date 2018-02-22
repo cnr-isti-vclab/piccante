@@ -32,18 +32,18 @@ This program is free software: you can redistribute it and/or modify
 
 int main(int argc, char *argv[])
 {
-    std::string img_str0, img_str1;
+    std::string img_str;
 
     if(argc == 3) {
-        img_str0 = argv[1];
+        img_str = argv[1];
     } else {
-        img_str0 = "../data/input/features/checker_board_photo.png";
+        img_str = "../data/input/features/checker_board_photo.png";
     }
 
     printf("Reading images...");
 
-    pic::Image img, img_pattern;
-    ImageRead(img_str0, &img);
+    pic::Image img;
+    ImageRead(img_str, &img);
 
     printf("Ok\n");
 
@@ -52,7 +52,6 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         pic::findCheckerBoard(&img);
-
 
     } else {
         printf("No there is at least an invalid file!\n");

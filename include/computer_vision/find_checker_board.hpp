@@ -224,7 +224,9 @@ void findCheckerBoard(Image *img)
         }
     }
 
-    printf("Size: %f", checker_size);
+    #ifdef PIC_DEBUG
+        printf("Size: %f\n", checker_size);
+    #endif
 
     checker_size = estimateCheckerBoardSize(cfi_valid);
 
@@ -235,56 +237,68 @@ void findCheckerBoard(Image *img)
 
     int checkers_size = 32;
     Image *img_pattern = getCheckerBoardModel(4, 6, checkers_size, corners_model);
-
-    float min_dist = getMinDistance(corners_model);
-    float scaling_factor = checker_size / min_dist;
-
     pic::ORBDescriptor b_desc((checkers_size >> 1) + 1, checkers_size);
 
     std::vector< unsigned int *> descs_model, descs_cfi_valid;
     b_desc.getAll(img_pattern, corners_model, descs_model);
     b_desc.getAll(L, cfi_valid, descs_cfi_valid);
 
+    //scale the model using the checker size
+    float min_dist = getMinDistance(corners_model);
+    float scaling_factor = checker_size / min_dist;
+
     ICP2DTransform t_init;
     t_init.scale = scaling_factor;
     t_init.applyC(corners_model);
 
+    //run 2D ICP
     iterativeClosestPoints2D(corners_model, cfi_valid, descs_model, descs_cfi_valid, b_desc.getDescriptorSize(), 1000);
 
     drawPoints(img_wb, corners_model, red);
 
+
+    //At this point, the rotation may be wrong so
+    //this brute-force trick does the job.
     NelderMeadOptICP2D opt(corners_model, cfi_valid);
 
     float prev_err = FLT_MAX;
-    float *x;
+    float *x = new float[3];
     int nSample = 36;
+
+    float *tmp = new float[4];
     for(float i = 0; i < nSample; i++) {
         float angle = float(i) * C_PI_2 / float(nSample);
         float start[] = {0.0f, 0.0f, angle};
-        float *tmp = opt.run(start, 3, 1e-10f, 1000);
+        opt.run(start, 3, 1e-10f, 1000, tmp);
 
         if(opt.output_error < prev_err) {
-            x = tmp;
+            memcpy(x, tmp, sizeof(float) * 3);
             prev_err = opt.output_error;
-        } else {
-            delete[] tmp;
         }
     }
-    for(int i=0; i<4;i++) {
+
+    #ifdef PIC_DEBUG
+    for(int i = 0; i < 4; i++) {
         printf("%f\n", x[i]);
     }
+    #endif
 
     float start[] = {x[0], x[1], x[2], 1.0f};
-
-    float *tmp = opt.run(start, 4, 1e-10f, 1000);
+    opt.run(start, 4, 1e-10f, 1000, tmp);
     ICP2DTransform t2(tmp[0], tmp[1], tmp[2], tmp[3]);
-    for(int i=0; i<4;i++) {
+
+    #ifdef PIC_DEBUG
+    for(int i = 0; i < 4; i++) {
         printf("%f\n", tmp[i]);
     }
+    #endif
+
     t2.applyC(corners_model);
     drawPoints(img_wb, corners_model, yellow);
 
-    img_wb->Write("../data/output/img_wb.bmp");
+    #ifdef PIC_DEBUG
+        img_wb->Write("../data/output/img_wb.bmp");
+    #endif
 }
 
 } // end namespace pic
