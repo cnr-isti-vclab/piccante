@@ -255,8 +255,7 @@ ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f 
 /*      tmp(0, 0) = t0(0) * t1(0);
         tmp(0, 1) = t0(0) * t1(1);
         tmp(1, 0) = t0(1) * t1(0);
-        tmp(1, 1) = t0(1) * t1(1);
-*/
+        tmp(1, 1) = t0(1) * t1(1);*/
         H += tmp;
     }
 

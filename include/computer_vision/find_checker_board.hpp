@@ -263,13 +263,13 @@ void findCheckerBoard(Image *img)
 
     float prev_err = FLT_MAX;
     float *x = new float[3];
-    int nSample = 36;
+    int nSample = 72;
 
     float *tmp = new float[4];
     for(float i = 0; i < nSample; i++) {
         float angle = float(i) * C_PI_2 / float(nSample);
         float start[] = {0.0f, 0.0f, angle};
-        opt.run(start, 3, 1e-10f, 1000, tmp);
+        opt.run(start, 3, 1e-9f, 1000, tmp);
 
         if(opt.output_error < prev_err) {
             memcpy(x, tmp, sizeof(float) * 3);
@@ -284,7 +284,7 @@ void findCheckerBoard(Image *img)
     #endif
 
     float start[] = {x[0], x[1], x[2], 1.0f};
-    opt.run(start, 4, 1e-10f, 1000, tmp);
+    opt.run(start, 4, 1e-12f, 1000, tmp);
     ICP2DTransform t2(tmp[0], tmp[1], tmp[2], tmp[3]);
 
     #ifdef PIC_DEBUG
