@@ -53,10 +53,15 @@ public:
     FilterGLConv2D(ImageGL *weights, GLenum target);
 
     /**
-     * @brief SetUniformAux
+     * @brief InitShaders
+     */
+    void InitShaders();
+
+    /**
+     * @brief SetUniform
      * @return
      */
-    void SetUniformAux()
+    void SetUniform()
     {
         int kernelSize = 0;
         int halfKernelSize = 0;
@@ -66,18 +71,34 @@ public:
             halfKernelSize = kernelSize >> 1;
         }
 
+        technique.bind();
+        technique.setUniform("u_tex", 0);
         technique.setUniform("u_weights", 1);
         technique.setUniform("halfKernelSize", halfKernelSize);
+        technique.setUniform("kernelSize", kernelSize);
+
+        if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY) {
+           // technique.setUniform("slice", slice);
+        }
+
+        technique.unbind();
     }
 };
 
-FilterGLConv2D::FilterGLConv2D(ImageGL *weights, GLenum target): FilterGL
+FilterGLConv2D::FilterGLConv2D(ImageGL *weights, GLenum target): FilterGL()
 {
     this->weights = weights;
     this->target = target;
 
     FragmentShader();
     InitShaders();
+}
+
+void FilterGLConv2D::InitShaders()
+{
+    technique.initStandard("330", vertex_source, fragment_source, "FilterGL1D");
+
+    SetUniform();
 }
 
 void FilterGLConv2D::FragmentShader()
@@ -100,7 +121,7 @@ void FilterGLConv2D::FragmentShader()
         for(int i = 0; i < kernelSize; i++) {
             for(int j = 0; j < kernelSize; j++) {
                 //Texture fetch
-                tmpCol = texelFetch(u_tex, coordsFrag.xy + ivec2(j, i) - shift), 0);
+                tmpCol = texelFetch(u_tex, coordsFrag.xy + ivec2(j, i) - shift, 0);
 
                 //Weight
                 float tmp = texelFetch(u_weights, ivec2(j, i), 0).x;

@@ -110,7 +110,7 @@ public:
      */
     std::string getDirectFunctionAux()
     {
-
+        return "";
     }
 
     /**
@@ -119,7 +119,7 @@ public:
      */
     std::string getInverseFunctionAux()
     {
-
+        return "";
     }
 
     /**
@@ -128,7 +128,7 @@ public:
      */
     std::string getDirectUniforms()
     {
-
+        return "";
     }
 
     /**
@@ -137,7 +137,7 @@ public:
      */
     std::string getInverseUniforms()
     {
-
+        return "";
     }
 
 };

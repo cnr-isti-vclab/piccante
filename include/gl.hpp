@@ -83,6 +83,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/filtering/filter_drago_tmo.hpp"
 #include "gl/filtering/filter_1d.hpp"
 #include "gl/filtering/filter_conv_1d.hpp"
+#include "gl/filtering/filter_conv_2d.hpp"
 #include "gl/filtering/filter_non_linear_1d.hpp"
 #include "gl/filtering/filter_mean.hpp"
 #include "gl/filtering/filter_min.hpp"
