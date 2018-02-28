@@ -58,12 +58,12 @@ public:
     }
 
     /**
-     * @brief Process
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL Process(ImageGL *imgIn, ImageGL *imgOut)
+    ImageGL execute(ImageGL *imgIn, ImageGL *imgOut)
     {
         if(imgIn == NULL){
             return imgOut;

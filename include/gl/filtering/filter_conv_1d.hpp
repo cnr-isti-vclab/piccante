@@ -82,13 +82,13 @@ void FilterGLConv1D::FragmentShader()
 {
     std::string fragment_source_2D = MAKE_STRING
                                      (
-                                         uniform sampler2D	u_tex;
-                                         uniform sampler2D	u_weights;
-                                         uniform int        iX;
-                                         uniform int        iY;
-                                         uniform int        halfKernelSize;
-                                         uniform int        kernelSize;
-                                         out     vec4		f_color;
+                                         uniform sampler2D u_tex;
+                                         uniform sampler2D u_weights;
+                                         uniform int       iX;
+                                         uniform int       iY;
+                                         uniform int       halfKernelSize;
+                                         uniform int       kernelSize;
+                                         out    vec4       f_color;
 
     void main(void) {
         vec4  color = vec4(0.0);
