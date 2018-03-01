@@ -26,8 +26,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
-#define PIC_DEBUG
-
 #include "../common_code/image_qimage_interop.hpp"
 
 #include "piccante.hpp"
@@ -71,7 +69,9 @@ protected:
 
         //read weights
         ImageRead("../data/input/star.png", &weights);
+        float *sum = weights.getSumVal();
         weights.generateTextureGL();
+        weights /= sum[0];
 
         //create a screen aligned quad
         pic::QuadGL::getTechnique(technique,

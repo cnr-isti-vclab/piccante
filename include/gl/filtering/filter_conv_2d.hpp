@@ -92,26 +92,24 @@ void FilterGLConv2D::FragmentShader()
 
     void main(void) {
         ivec2 kernelSize = textureSize(u_weights, 0);
-        ivec2 halfKernelSize = (kernelSize / 2);
-        vec4  color = vec4(1.0);
+        ivec2 halfKernelSize = kernelSize >> 1;
 
-        ivec2 coordsFrag = ivec2(gl_FragCoord.xy);
         ivec2 shift = ivec2(halfKernelSize.x, halfKernelSize.y);
+        ivec2 coordsFrag = ivec2(gl_FragCoord.xy) - shift;
 
-        float weight = 0.0;
+        vec4  color = vec4(0.0);
         for(int i = 0; i < kernelSize.y; i++) {
             for(int j = 0; j < kernelSize.x; j++) {
                 //do a texture fetch
-                vec4 tmpCol = texelFetch(u_tex, coordsFrag.xy + ivec2(j, i) - shift, 0);
+                vec4 tmpCol = texelFetch(u_tex, coordsFrag.xy + ivec2(j, i), 0);
 
                 //weight
                 float tmp = texelFetch(u_weights, ivec2(j, i), 0).x;
-                color  += tmpCol * tmp;
-                weight += tmp;
+                color += tmpCol * tmp;
             }
         }
 
-        f_color = weight > 0.0 ? vec4(color / weight) : color;
+        f_color = color;
     }
                                      );
 
