@@ -25,12 +25,11 @@ namespace pic {
 /**
  * @brief The FilterGLConv2D class
  */
-class FilterGLConv2D: FilterGL
+class FilterGLConv2D: public FilterGL
 {
 protected:
 
     GLenum target;
-    ImageGL *weights;
 
     /**
      * @brief FragmentShader
@@ -41,16 +40,9 @@ public:
 
     /**
      * @brief FilterGLConv2D
-     */
-    FilterGLConv2D();
-
-    /**
-     * @brief FilterGLConv2D
-     * @param weights
-     * @param direction
      * @param target
      */
-    FilterGLConv2D(ImageGL *weights, GLenum target);
+    FilterGLConv2D(GLenum target);
 
     /**
      * @brief InitShaders
@@ -63,19 +55,9 @@ public:
      */
     void SetUniform()
     {
-        int kernelSize = 0;
-        int halfKernelSize = 0;
-
-        if(weights != NULL) {
-            kernelSize = weights->width;
-            halfKernelSize = kernelSize >> 1;
-        }
-
         technique.bind();
         technique.setUniform("u_tex", 0);
         technique.setUniform("u_weights", 1);
-        technique.setUniform("halfKernelSize", halfKernelSize);
-        technique.setUniform("kernelSize", kernelSize);
 
         if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY) {
            // technique.setUniform("slice", slice);
@@ -85,9 +67,8 @@ public:
     }
 };
 
-FilterGLConv2D::FilterGLConv2D(ImageGL *weights, GLenum target): FilterGL()
+FilterGLConv2D::FilterGLConv2D(GLenum target): FilterGL()
 {
-    this->weights = weights;
     this->target = target;
 
     FragmentShader();
@@ -96,7 +77,7 @@ FilterGLConv2D::FilterGLConv2D(ImageGL *weights, GLenum target): FilterGL()
 
 void FilterGLConv2D::InitShaders()
 {
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGL1D");
+    technique.initStandard("330", vertex_source, fragment_source, "FilterGLConv2D");
 
     SetUniform();
 }
@@ -107,23 +88,23 @@ void FilterGLConv2D::FragmentShader()
                                      (
                                          uniform sampler2D u_tex;
                                          uniform sampler2D u_weights;
-                                         uniform int       halfKernelSize;
-                                         uniform int       kernelSize;
                                          out     vec4      f_color;
 
     void main(void) {
-        vec4  color = vec4(0.0);
+        ivec2 kernelSize = textureSize(u_weights, 0);
+        ivec2 halfKernelSize = (kernelSize / 2);
+        vec4  color = vec4(1.0);
+
         ivec2 coordsFrag = ivec2(gl_FragCoord.xy);
-        ivec2 shift = ivec2(halfKernelSize, halfKernelSize);
-        vec4 tmpCol;
+        ivec2 shift = ivec2(halfKernelSize.x, halfKernelSize.y);
+
         float weight = 0.0;
+        for(int i = 0; i < kernelSize.y; i++) {
+            for(int j = 0; j < kernelSize.x; j++) {
+                //do a texture fetch
+                vec4 tmpCol = texelFetch(u_tex, coordsFrag.xy + ivec2(j, i) - shift, 0);
 
-        for(int i = 0; i < kernelSize; i++) {
-            for(int j = 0; j < kernelSize; j++) {
-                //Texture fetch
-                tmpCol = texelFetch(u_tex, coordsFrag.xy + ivec2(j, i) - shift, 0);
-
-                //Weight
+                //weight
                 float tmp = texelFetch(u_weights, ivec2(j, i), 0).x;
                 color  += tmpCol * tmp;
                 weight += tmp;

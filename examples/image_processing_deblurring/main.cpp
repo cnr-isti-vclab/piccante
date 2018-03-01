@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
         psf /= psf.getSumVal(NULL, NULL)[0];
 
         pic::Image *conv = pic::FilterConv2D::Execute(&img, &psf, NULL);
-        ImageWrite(conv, "../data/output/bottles_conv_kernel_psf.hdr");
+        ImageWrite(conv, "../data/output/image_conv_kernel_psf.png");
 
         printf("Ok!\n");
 
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bool bWritten = ImageWrite(deconv, "../data/output/bottles_deconv_kernel_psf.hdr");
+        bool bWritten = ImageWrite(deconv, "../data/output/image_deconv_kernel_psf.png");
 
         if(bWritten) {
             printf("Ok\n");

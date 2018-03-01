@@ -171,7 +171,7 @@ void FilterGL1D::SetUniform()
 
 void FilterGL1D::InitShaders()
 {
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGL1D");
+    technique.initStandard("330", vertex_source, fragment_source, "FilterGLConv1D");
 
     SetUniform();
 }
