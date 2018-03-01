@@ -50,9 +50,9 @@ protected:
     std::vector<GLuint> stack;
 
     /**
-     * @brief DestroyGL
+     * @brief destroyGL
      */
-    void DestroyGL();
+    void destroyGL();
 
     /**
      * @brief assignGL assigns an (r, g, b, a) value to an image using glClearColor.
@@ -227,10 +227,10 @@ public:
     ImageGL(int frames, int width, int height, int channels, IMAGESTORE mode, GLenum target);
 
     /**
-     * @brief AllocateSimilarOneGL
+     * @brief allocateSimilarOneGL
      * @return
      */
-    ImageGL *AllocateSimilarOneGL();
+    ImageGL *allocateSimilarOneGL();
 
     /**
      * @brief cloneGL
@@ -680,7 +680,7 @@ ImageGL::ImageGL(int frames, int width, int height, int channels,
 
 ImageGL::~ImageGL()
 {   
-    DestroyGL();
+    destroyGL();
     Destroy();
 }
 
@@ -759,7 +759,7 @@ ImageGL *ImageGL::cloneGL()
     return new ImageGL(tmp, target, false, true);
 }
 
-void ImageGL::DestroyGL()
+void ImageGL::destroyGL()
 {
     if(notOwnedGL) {
         return;
@@ -779,7 +779,7 @@ void ImageGL::DestroyGL()
     }
 }
 
-ImageGL *ImageGL::AllocateSimilarOneGL()
+ImageGL *ImageGL::allocateSimilarOneGL()
 {
 #ifdef PIC_DEBUG
     printf("%d %d %d %d %d\n", frames, width, height, channels, mode);

@@ -26,46 +26,60 @@ namespace pic {
 class RichardsonLucyDeconvolution
 {
 public:
-    ImageGL *psf;
+    FilterGLConv2D *flt_conv;
 
     RichardsonLucyDeconvolution()
     {
-        psf = NULL;
+        flt_conv = NULL;
     }
 
-    void update()
+    ~RichardsonLucyDeconvolution()
     {
-
+        delete flt_conv;
     }
+
+    /**
+     * @brief compute
+     * @param imgIn
+     * @param psf
+     * @param nIterations
+     * @param imgOut
+     * @return
+     */
+    ImageGL *compute(ImageGL *imgIn, ImageGL *psf, int nIterations, ImageGL *imgOut);
+
 };
 
-Image *computeRichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterations = 10, Image *imgOut = NULL)
+ImageGL *RichardsonLucyDeconvolution::compute(ImageGL *imgIn, ImageGL *psf, int nIterations = 10, ImageGL *imgOut = NULL)
 {
-    if(imgIn == NULL) {
+    if((imgIn == NULL) || (psf == NULL)) {
         return imgOut;
     }
 
+    if(flt_conv == NULL) {
+        flt_conv = new FilterGLConv2D(GL_TEXTURE_2D);
+    }
+
     if(imgOut == NULL) {
-        imgOut = imgIn->allocateSimilarOne();
+        imgOut = imgIn->allocateSimilarOneGL();
     }
 
     if(nIterations < 1) {
         nIterations = 10;
     }
 
-    Image *psf_hat = psf->clone();
+    ImageGL *psf_hat = psf->cloneGL();
     psf_hat->flipHV();
 
     *imgOut = 0.5f;
 
-    Image *img_rel_blur = imgIn->allocateSimilarOne();
+    ImageGL *img_rel_blur = imgIn->allocateSimilarOneGL();
 
-    Image *img_est_conv = NULL;
-    Image *img_err = NULL;
+    ImageGL *img_est_conv = NULL;
+    ImageGL *img_err = NULL;
 
-    FilterConv2D flt_conv;
-    ImageVec vec = Double(imgOut, psf);
-    ImageVec vec_err = Double(img_rel_blur, psf_hat);
+    ImageGLVec vec = DoubleGL(imgOut, psf);
+    ImageGLVec vec_err = DoubleGL(img_rel_blur, psf_hat);
 
     for(int i = 0; i < nIterations; i++) {
 
@@ -73,12 +87,12 @@ Image *computeRichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterati
             printf("%d\n", i);
         #endif
 
-        img_est_conv = flt_conv.ProcessP(vec, img_est_conv);
+        img_est_conv = flt_conv->Process(vec, img_est_conv);
 
         img_rel_blur->assign(imgIn);
         *img_rel_blur /= *img_est_conv;
 
-        img_err = flt_conv.ProcessP(vec_err, img_err);
+        img_err = flt_conv->Process(vec_err, img_err);
 
         *imgOut *= *img_err;
     }

@@ -100,11 +100,11 @@ void FilterGLNPasses::InsertFilter(FilterGL *flt)
 ImageGL *FilterGLNPasses::SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = imgIn[0]->AllocateSimilarOneGL();
+        imgOut = imgIn[0]->allocateSimilarOneGL();
     }
 
     if(imgAllocated == NULL) {
-        imgAllocated = imgOut->AllocateSimilarOneGL();
+        imgAllocated = imgOut->allocateSimilarOneGL();
     }
 
     if((filters.size() % 2) == 0) {

@@ -33,7 +33,7 @@ namespace pic {
  */
 Image *computeRichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterations = 10, Image *imgOut = NULL)
 {
-    if(imgIn == NULL) {
+    if((imgIn == NULL) || (psf == NULL)) {
         return imgOut;
     }
 

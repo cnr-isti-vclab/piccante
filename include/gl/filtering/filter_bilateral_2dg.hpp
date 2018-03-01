@@ -31,15 +31,14 @@ namespace pic {
 class FilterGLBilateral2DG: public FilterGL
 {
 protected:
-    float				sigma_s, sigma_r, s_S, s_R;
+    float               sigma_s, sigma_r, s_S, s_R;
 
-    FilterGLScatter		*scatter;
-    FilterGLGaussian3D	*gauss3D;
-
+    FilterGLScatter     *scatter;
+    FilterGLGaussian3D  *gauss3D;
     ImageGL             *gridGL, *gridBlurGL;
 
 public:
-    FilterGLSlicer		*slicer;
+    FilterGLSlicer      *slicer;
 
     /**
      * @brief FilterGLBilateral2DG
@@ -92,7 +91,7 @@ public:
         FilterGLBilateral2DG *filter = new FilterGLBilateral2DG(sigma_s, sigma_r);//, imgIn.channels);
 
         ImageGL *imgOut = new ImageGL(1, imgIn.width, imgIn.height, 4,
-                                            IMG_GPU_CPU, GL_TEXTURE_2D);
+                                      IMG_GPU_CPU, GL_TEXTURE_2D);
 
         GLuint testTQ1;
 
@@ -159,20 +158,20 @@ ImageGL *FilterGLBilateral2DG::Process(ImageGLVec imgIn,
     }
 
     if(imgOut == NULL) {
-        imgOut = imgIn[0]->AllocateSimilarOneGL();
+        imgOut = imgIn[0]->allocateSimilarOneGL();
     }
 
     if(scatter == NULL) {
         scatter = new FilterGLScatter(s_S, s_R, imgIn[0]->width, imgIn[0]->height);
     }
 
-    //Splatting
+    //splat
     gridGL = scatter->Process(imgIn, gridGL);
 
-    //Blurring
+    //blur
     gridBlurGL = gauss3D->Process(SingleGL(gridGL), gridBlurGL);
 
-    //Slicing
+    //slice
     imgOut = slicer->Process(DoubleGL(imgIn[0], gridBlurGL), imgOut);
 
     return imgOut;

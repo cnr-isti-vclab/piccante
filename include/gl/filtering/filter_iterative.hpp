@@ -117,7 +117,7 @@ ImageGL *FilterGLIterative::SetupAuxN(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = imgIn[0]->AllocateSimilarOneGL();
+        imgOut = imgIn[0]->allocateSimilarOneGL();
     }
 
     /*
@@ -131,13 +131,13 @@ ImageGL *FilterGLIterative::SetupAuxN(ImageGLVec imgIn,
         imgTmp[1] = imgOut;
 
         if(imgTmp[0] == NULL) {
-            imgTmp[0] = imgOut->AllocateSimilarOneGL();
+            imgTmp[0] = imgOut->allocateSimilarOneGL();
         }
     } else {
         imgTmp[0] = imgOut;
 
         if(imgTmp[1] == NULL) {
-            imgTmp[1] = imgOut->AllocateSimilarOneGL();
+            imgTmp[1] = imgOut->allocateSimilarOneGL();
         }
     }
 
