@@ -67,7 +67,6 @@ protected:
 
         //read an input image
         ImageRead("../data/input/bottles.hdr", &img);
-        img *= 0.5;
         img.generateTextureGL();
 
         //read weights
@@ -82,6 +81,7 @@ protected:
 
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
+        tmo->Update(2.2f, -2.0f);
 
         conv2D = new pic::FilterGLConv2D(GL_TEXTURE_2D);
     }
