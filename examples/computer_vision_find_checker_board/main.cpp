@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 {
     std::string img_str;
 
-    if(argc == 3) {
+    if(argc == 2) {
         img_str = argv[1];
     } else {
         img_str = "../data/input/features/checker_board_photo.png";

@@ -81,7 +81,7 @@ protected:
 
         //allocating a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
-        tmo->Update(2.2f, -2.0f);
+        tmo->Update(2.2f, 0.0f);
 
         conv2D = new pic::FilterGLConv2D(GL_TEXTURE_2D);
     }
