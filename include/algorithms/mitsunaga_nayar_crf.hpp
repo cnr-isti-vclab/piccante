@@ -19,6 +19,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_MITSUNAGA_NAYAR_CRF_HPP
 #define PIC_ALGORITHMS_MITSUNAGA_NAYAR_CRF_HPP
 
+#include<algorithm>
+#include<limits>
+#include<vector>
+
 #ifndef PIC_DISABLE_EIGEN
     #include "externals/Eigen/LU"
 #endif
