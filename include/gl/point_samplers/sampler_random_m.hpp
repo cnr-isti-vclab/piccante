@@ -133,7 +133,7 @@ template <unsigned int N> GLuint MRSamplersGL<N>::generateTexture()
         return 0;
     }
 
-    nSamples = this->samplers[0]->samplesR.size();
+    nSamples = int(this->samplers[0]->samplesR.size());
 
     for(int i = 1; i < this->nSamplers; i++) {
         nSamples = MIN(nSamples, int(this->samplers[i]->samplesR.size()));

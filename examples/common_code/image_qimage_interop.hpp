@@ -27,6 +27,7 @@ This program is free software: you can redistribute it and/or modify
 #define IMAGE_QIMAGE_INTEROP_HPP
 
 #include "qt_includes.hpp"
+
 #include "piccante.hpp"
 
 #ifdef PIC_QT

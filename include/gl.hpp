@@ -22,27 +22,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 //OpenGL library
 #ifdef PIC_WIN32
-
-#include <GL/GL.h>
-#pragma comment( lib, "opengl32" )
-
+    #include <gl/GL.h>
+    #pragma comment( lib, "opengl32" )
 #else /* PIC_MAC_OS_X or PIC_UNIX */
 
-#ifdef PIC_MAC_OS_X
-    #include <OpenGL/OpenGL.h>
-#else
-    #include <GL/gl.h>
-#endif
-
+    #ifdef PIC_MAC_OS_X
+        #include <OpenGL/OpenGL.h>
+    #else
+        #include <GL/gl.h>
+    #endif
 #endif /* os selection */
 
-#ifdef PIC_DEPRECATE_CODE
-    #pragma message("GLW is deprecated. It will be removed in the next version!")
-    #warning "GLW is deprecated. It will be removed in the next version!"
-    #include "externals/glw/base.hpp"
-    #include "externals/glw/program.hpp"
-    #include "externals/glw/utility.hpp"
-#endif
+//end os selection
 
 #include "util/gl/program.hpp"
 #include "util/gl/technique.hpp"

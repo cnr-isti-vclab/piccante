@@ -293,7 +293,7 @@ void Pyramid::create(Image *img, int width, int height, int channels, bool lapGa
     }
 
 #ifdef PIC_DEBUG
-    printf("Pyramid size: %lu\n", stack.size());
+    printf("Pyramid size: %zu\n", stack.size());
 #endif
 }
 

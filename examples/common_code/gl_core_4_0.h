@@ -1852,3 +1852,4 @@ int ogl_IsVersionGEQ(int majorVersion, int minorVersion);
 #endif /*__cplusplus*/
 
 #endif //POINTER_C_GENERATED_HEADER_OPENGL_H
+

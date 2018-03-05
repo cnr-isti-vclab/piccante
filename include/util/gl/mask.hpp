@@ -75,16 +75,12 @@ GLuint GenerateMask(int width, int height, bool *buffer = NULL,
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     }
 
-    //Note: GL_LUMINANCE is deprecated since OpenGL 3.1
-    #ifndef PIC_DISABLE_OPENGL_NON_CORE
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8 , width, height, 0, GL_LUMINANCE,
-                 GL_UNSIGNED_BYTE, data);
-    #endif
+    /*
+        Note: GL_LUMINANCE is deprecated since OpenGL 3.1
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8 , width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
+    */
 
-    #ifdef PIC_DISABLE_OPENGL_NON_CORE
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED,
-                     GL_UNSIGNED_BYTE, data);
-    #endif
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
 
     if(mipmap && bGen) {
         glGenerateMipmap(GL_TEXTURE_2D);
