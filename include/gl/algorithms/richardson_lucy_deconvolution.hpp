@@ -89,7 +89,7 @@ ImageGL *RichardsonLucyDeconvolution::compute(ImageGL *imgIn, ImageGL *psf, int 
 
         img_est_conv = flt_conv->Process(vec, img_est_conv);
 
-        img_rel_blur->assignGL(imgIn);
+        //img_rel_blur->assignGL(imgIn);
 
         *img_rel_blur /= *img_est_conv;
 

@@ -39,6 +39,8 @@ namespace pic {
  * @param points
  * @return
  */
+#ifndef PIC_DISABLE_EIGEN
+
 float getMinDistance(std::vector< Eigen::Vector2f > &points)
 {
     float ret = FLT_MAX;
@@ -300,6 +302,8 @@ void findCheckerBoard(Image *img)
         img_wb->Write("../data/output/img_wb.bmp");
     #endif
 }
+
+#endif
 
 } // end namespace pic
 
