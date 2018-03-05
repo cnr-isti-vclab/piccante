@@ -76,6 +76,7 @@ Image *computeRichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterati
     }
 
     delete img_est_conv;
+    delete img_err;
 
     return imgOut;
 }
