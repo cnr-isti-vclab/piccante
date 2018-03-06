@@ -351,7 +351,7 @@ ImageGL *PyramidGL::reconstruct(ImageGL *imgOut)
         return imgOut;
     }
 
-    int n = stack.size() - 1;
+    int n = int(stack.size()) - 1;
     ImageGL *tmp = stack[n];
 
     if(trackerRec.empty()) {

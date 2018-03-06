@@ -293,7 +293,7 @@ protected:
 public:
 
     int max_iterations;
-    float output_error;
+    Scalar output_error;
 
     /**
      * @brief NelderMeadOptBase

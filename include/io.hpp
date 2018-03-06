@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "io/bmp.hpp"
 #include "io/exr.hpp"
+#include "io/exr_tiny.hpp"
 #include "io/hdr.hpp"
 #include "io/pfm.hpp"
 #include "io/ppm.hpp"

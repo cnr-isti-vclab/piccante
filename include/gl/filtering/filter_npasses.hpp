@@ -142,11 +142,11 @@ ImageGL *FilterGLNPasses::Process(ImageGLVec imgIn, ImageGL *imgOut)
     //Allocate FBOs
     imgOut = SetupAuxN(imgIn, imgOut);
 
-    filters[0]->ChangePass(0, filters.size());
+    filters[0]->ChangePass(0, int(filters.size()));
     filters[0]->Process(imgIn, imgTmp[0]);
 
-    for(unsigned int i = 1; i < filters.size(); i++) {
-        filters[i]->ChangePass(i, filters.size());
+    for(auto i = 1; i < filters.size(); i++) {
+        filters[i]->ChangePass(i, int(filters.size()));
         imgIn[0] = imgTmp[(i + 1) % 2];
         filters[i]->Process(imgIn, imgTmp[i % 2]);
     }

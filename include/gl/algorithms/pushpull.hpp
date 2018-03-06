@@ -118,7 +118,7 @@ public:
         }
 
         //sampling from the pyramid (stack): Push
-        int n = (stack.size() - 2);
+        int n = int(stack.size() - 2);
 
         for(int i = n; i >= 0; i--) {
             flt_up->Process(DoubleGL(stack[i + 1], stack[i]), stack[i]);

@@ -184,15 +184,15 @@ ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
     technique.bind();
 
     //Textures
-    unsigned int n = imgIn.size();
-    for(unsigned int i = 0; i < n; i++) {
+    int n = int(imgIn.size());
+    for(auto i = 0; i < n; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         imgIn[i]->bindTexture();
     }
 
     //Texture internal filter parameters
-    unsigned int m = param.size();
-    for(unsigned int i = 0; i < m; i++) {
+    int m = int(param.size());
+    for(auto i = 0; i < m; i++) {
         glActiveTexture(GL_TEXTURE0 + n + i);
         param[i]->bindTexture();
     }
@@ -207,12 +207,12 @@ ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
     technique.unbind();
 
     //Textures
-    for(unsigned int i=0; i< n; i++) {
+    for(auto i = 0; i< n; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         imgIn[i]->unBindTexture();
     }
 
-    for(unsigned int i=0; i< m; i++) {
+    for(auto i = 0; i < m; i++) {
         glActiveTexture(GL_TEXTURE0 + n + i);
         param[i]->unBindTexture();
     }
