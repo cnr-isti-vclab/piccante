@@ -103,7 +103,7 @@ Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > &points0,
     Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeFullV);
     Eigen::MatrixXd V = svd.matrixV();
 
-    n = V.cols() - 1;
+    n = int(V.cols()) - 1;
 
     //assign and transpose
     H(0, 0) = V(0, n);

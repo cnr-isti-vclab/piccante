@@ -8121,11 +8121,11 @@ int hufEncode                  // return: output size (in bits)
 
 //
 // In order to force the compiler to inline them,
-// getChar() and getCode() are implemented as macros
+// tiny_exr_getChar() and getCode() are implemented as macros
 // instead of "inline" functions.
 //
 
-#define getChar(c, lc, in)                                                     \
+#define tiny_exr_getChar(c, lc, in)                                                     \
   {                                                                            \
     c = (c << 8) | *(unsigned char *)(in++);                                   \
     lc += 8;                                                                   \
@@ -8135,7 +8135,7 @@ int hufEncode                  // return: output size (in bits)
   {                                                                            \
     if (po == rlc) {                                                           \
       if (lc < 8)                                                              \
-        getChar(c, lc, in);                                                    \
+        tiny_exr_getChar(c, lc, in);                                                    \
                                                                                \
       lc -= 8;                                                                 \
                                                                                \
@@ -8178,7 +8178,7 @@ bool hufDecode(const long long *hcode, // i : encoding table
   //
 
   while (in < ie) {
-    getChar(c, lc, in);
+    tiny_exr_getChar(c, lc, in);
 
     //
     // Access decoding table
@@ -8210,7 +8210,7 @@ bool hufDecode(const long long *hcode, // i : encoding table
           int l = hufLength(hcode[pl.p[j]]);
 
           while (lc < l && in < ie) // get more bits
-            getChar(c, lc, in);
+            tiny_exr_getChar(c, lc, in);
 
           if (lc >= l) {
             if (hufCode(hcode[pl.p[j]]) ==

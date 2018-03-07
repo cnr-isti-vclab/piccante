@@ -160,15 +160,20 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_PICCANTE_HPP
 #define PIC_PICCANTE_HPP
 
+#define PIC_DEPRECATED
+
 #ifdef _MSC_VER
 //we are using windows
-#define PIC_WIN32
+    #define PIC_WIN32
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
 #elif __APPLE__
-//we are using mac os x
-#define PIC_MAC_OS_X
+    //we are using mac os x
+    #define PIC_MAC_OS_X
 #else
-// we assume that we are using a UNIX system
-#define PIC_UNIX
+    // we assume that we are using a UNIX system
+    #define PIC_UNIX
 #endif
 
 //Mac OS X

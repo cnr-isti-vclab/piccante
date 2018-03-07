@@ -91,7 +91,7 @@ Eigen::Matrix3d estimateFundamental(std::vector< Eigen::Vector2f > &points0,
     Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeFullV);
     Eigen::MatrixXd V = svd.matrixV();
 
-    int n = V.cols() - 1;
+    int n = int(V.cols()) - 1;
 
     F(0, 0) = V(0, n);
     F(1, 0) = V(1, n);

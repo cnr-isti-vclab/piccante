@@ -28,18 +28,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**
- * @brief ReadEXR
- * @param nameFile
- * @param data
- * @param width
- * @param height
- * @param channels
- * @return
- */
 PIC_INLINE float *ReadEXR(std::string nameFile, float *data, int &width, int &height, int &channels)
 {
-    /*
     EXRImage image;
     InitEXRImage(&image);
 
@@ -86,7 +76,7 @@ PIC_INLINE float *ReadEXR(std::string nameFile, float *data, int &width, int &he
         data[index + 1] = images[1][i];
         data[index + 2] = images[0][i];
     }
-*/
+
     return data;
 }
 
@@ -102,7 +92,6 @@ PIC_INLINE float *ReadEXR(std::string nameFile, float *data, int &width, int &he
 PIC_INLINE bool WriteEXR(std::string nameFile, float *data, int width,
                          int height, int channels = 3)
 {
-    /*
     EXRImage image;
     InitEXRImage(&image);
 
@@ -150,7 +139,7 @@ PIC_INLINE bool WriteEXR(std::string nameFile, float *data, int width,
 
      free(image.pixel_types);
      free(image.requested_pixel_types);
-*/
+
      return true;
 }
 
