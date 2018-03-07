@@ -32,7 +32,7 @@ namespace pic {
  * @return It returns a big-endian float if value was stored as little-endian. Otherwise,
  * it rerturns a little-endian.
  */
-float convertFloatEndianess(float value)
+PIC_INLINE float convertFloatEndianess(float value)
 {
     float ret;
 

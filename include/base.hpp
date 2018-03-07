@@ -30,9 +30,17 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 typedef unsigned int uint;
 
 #ifdef PIC_ENABLE_INLINING
-#define PIC_INLINE inline
+
+#ifndef PIC_INLINE
+    #define PIC_INLINE inline
+#endif
+
 #else
-#define PIC_INLINE
+
+#ifndef PIC_INLINE
+    #define PIC_INLINE
+#endif
+
 #endif /* PIC_ENABLE_INLINING */
 
 #endif /* PIC_BASE_HPP */
