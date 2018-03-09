@@ -22,6 +22,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <stdlib.h>
 
+#include "base.hpp"
+
 #include "util/math.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
@@ -39,7 +41,7 @@ namespace pic {
  * @param fovy is an angle in radians.
  * @return
  */
-double getFocalLengthFromFOVAngle(double fovy)
+PIC_INLINE double getFocalLengthFromFOVAngle(double fovy)
 {
     return 1.0 / tan(fovy / 2.0);
 }
@@ -51,7 +53,7 @@ double getFocalLengthFromFOVAngle(double fovy)
  * @param y is the sensor height in mm
  * @return
  */
-double getFOVAngleFromFocalSensor(double f, double x, double y)
+PIC_INLINE double getFOVAngleFromFocalSensor(double f, double x, double y)
 {
     double d = sqrt(x * x + y * y);
     return 2.0 * atan(d /  (2.0 * f));
@@ -64,7 +66,7 @@ double getFOVAngleFromFocalSensor(double f, double x, double y)
  * @param sensor_size_px
  * @return
  */
-double getFocalLengthPixels(double focal_length_mm, double sensor_size_mm, double sensor_size_px)
+PIC_INLINE double getFocalLengthPixels(double focal_length_mm, double sensor_size_mm, double sensor_size_px)
 {
     return (focal_length_mm * sensor_size_px) / sensor_size_mm;
 }
@@ -78,7 +80,7 @@ double getFocalLengthPixels(double focal_length_mm, double sensor_size_mm, doubl
  * @param opitical_center_y
  * @return
  */
-Eigen::Matrix3d getIntrinsicsMatrix(double focal_length, double m_x, double m_y, double opitical_center_x, double opitical_center_y)
+PIC_INLINE Eigen::Matrix3d getIntrinsicsMatrix(double focal_length, double m_x, double m_y, double opitical_center_x, double opitical_center_y)
 {
     Eigen::Matrix3d K;
     K.setZero();
@@ -99,7 +101,7 @@ Eigen::Matrix3d getIntrinsicsMatrix(double focal_length, double m_x, double m_y,
  * @param opitical_center_y
  * @return
  */
-Eigen::Matrix3d getIntrinsicsMatrix(double focal_length_x, double focal_length_y, double opitical_center_x, double opitical_center_y)
+PIC_INLINE Eigen::Matrix3d getIntrinsicsMatrix(double focal_length_x, double focal_length_y, double opitical_center_x, double opitical_center_y)
 {
     Eigen::Matrix3d K;
     K.setZero();
@@ -119,7 +121,7 @@ Eigen::Matrix3d getIntrinsicsMatrix(double focal_length_x, double focal_length_y
  * @param K
  * @return
  */
-Eigen::Vector2d removeLensDistortion(Eigen::Vector2d &p, double k[5])
+PIC_INLINE Eigen::Vector2d removeLensDistortion(Eigen::Vector2d &p, double k[5])
 {
     Eigen::Vector2d ret;
 

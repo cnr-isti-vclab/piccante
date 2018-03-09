@@ -31,7 +31,7 @@ enum CRF_WEIGHT {CW_ALL, CW_HAT, CW_DEB97, CW_DEB97p01, CW_ROBERTSON};
  * @param type is the type of the function.
  * @return It returns a weight for x.
  */
-inline float weightFunction(float x, CRF_WEIGHT type)
+PIC_INLINE float weightFunction(float x, CRF_WEIGHT type)
 {
     switch(type) {
 

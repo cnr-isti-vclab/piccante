@@ -4,3 +4,8 @@
 *.o
 
 *.stash
+*.obj
+*.Release
+*.Debug
+*.exe
+*.pdb

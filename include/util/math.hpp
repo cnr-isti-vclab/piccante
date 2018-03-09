@@ -85,6 +85,7 @@ const float C_PI_OVER_ONE_80    = 0.017453292519943295769236907685f;
  * @param value
  * @return
  */
+PIC_INLINE
 template< typename T > inline bool isnan(T value)
 {
     return value != value ;
@@ -100,6 +101,7 @@ template< typename T > inline bool isnan(T value)
  * @param value
  * @return
  */
+PIC_INLINE
 template< typename T > inline bool isinf(T value)
 {
     return std::numeric_limits<T>::has_infinity &&

@@ -30,7 +30,7 @@ namespace pic {
  * @param imgOut
  * @return
  */
-Image *colorToGray(Image *imgIn, Image *imgOut)
+PIC_INLINE Image *colorToGray(Image *imgIn, Image *imgOut)
 {
     if(imgIn == NULL){
         return imgOut;

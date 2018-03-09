@@ -33,7 +33,7 @@ namespace pic {
  * @param ret
  * @return
  */
-Image *computePoissonSolver(Image *f, Image *ret = NULL)
+PIC_INLINE Image *computePoissonSolver(Image *f, Image *ret = NULL)
 {
     if(f == NULL) {
         return NULL;
@@ -133,7 +133,7 @@ Image *computePoissonSolver(Image *f, Image *ret = NULL)
  * @param maxSteps
  * @return
  */
-Image *computePoissonSolverIterative(Image *img, Image *laplacian,
+PIC_INLINE Image *computePoissonSolverIterative(Image *img, Image *laplacian,
                               std::vector<int> coords,
                               int maxSteps = 100)
 {

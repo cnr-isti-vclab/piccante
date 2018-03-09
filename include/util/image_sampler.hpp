@@ -27,6 +27,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_IMAGE_SAMPLER_HPP
 #define PIC_UTIL_IMAGE_SAMPLER_HPP
 
+#include "base.hpp"
+
 #include "util/math.hpp"
 
 namespace pic {
@@ -49,7 +51,7 @@ namespace pic {
  * @param y is the vertical coordinate.
  * @return the evaluation of the B-spline.
  */
-
+PIC_INLINE
 template<class Scalar> inline Scalar Bilinear(Scalar a, Scalar b, Scalar c, Scalar d, float x, float y)
 {
     Scalar px0 = a + y * (c - a);
@@ -177,7 +179,7 @@ inline float CatmullRom(float x)
  * @param a
  * @return
  */
-float Lanczos(float x, float a)
+inline float Lanczos(float x, float a)
 {
     float y = fabsf(x);
 

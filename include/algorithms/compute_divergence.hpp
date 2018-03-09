@@ -28,7 +28,7 @@ namespace pic {
  * @param div is the output divergence of the gradient of img; i.e. Laplacian.
  * @return
  */
-Image *computeDivergence(Image *img, Image *div = NULL)
+PIC_INLINE Image *computeDivergence(Image *img, Image *div = NULL)
 {
     if(img == NULL) {
         return div;

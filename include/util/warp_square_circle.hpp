@@ -27,6 +27,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_WARP_SQUARE_CIRCLE_HPP
 #define PIC_UTIL_WARP_SQUARE_CIRCLE_HPP
 
+#include "base.hpp"
+
 namespace pic {
 
 /**
@@ -36,7 +38,7 @@ namespace pic {
  * @param xo
  * @param yo
  */
-void WarpSquareCircle(float x, float y, float *xo, float *yo)
+PIC_INLINE void WarpSquareCircle(float x, float y, float *xo, float *yo)
 {
     float phi, r;
 

@@ -30,7 +30,7 @@ namespace pic {
  * @param out is
  * @return It returns out.
  */
-Image *matchHistograms(Image* img_source, Image* img_target, int nBin = 256, Image* out = NULL)
+PIC_INLINE Image *matchHistograms(Image* img_source, Image* img_target, int nBin = 256, Image* out = NULL)
 {
     if(img_source == NULL || img_target == NULL) {
         return out;

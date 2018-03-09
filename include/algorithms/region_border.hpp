@@ -28,7 +28,7 @@ namespace pic {
  * @param coordsBorder
  * @return
  */
-std::set<int> *setBorder(Image *img, std::set<int> *coordsBorder)
+PIC_INLINE std::set<int> *setBorder(Image *img, std::set<int> *coordsBorder)
 {
     //Second border
     int ind, c, x, y;
@@ -78,7 +78,7 @@ std::set<int> *setBorder(Image *img, std::set<int> *coordsBorder)
  * @param widthBorder
  * @return
  */
-std::set<int> *setBorderNth(Image *img, std::set<int> *coordsBorder,
+PIC_INLINE std::set<int> *setBorderNth(Image *img, std::set<int> *coordsBorder,
                             int widthBorder)
 {
     std::set<int> *ret = new std::set<int>;

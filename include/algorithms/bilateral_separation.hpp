@@ -29,7 +29,7 @@ namespace pic {
  * @param x
  * @return
  */
-inline float powf10fe(float x)
+PIC_INLINE float powf10fe(float x)
 {
     return MAX(powf(10.0f, x) - 1e-6f, 0.0f);
 }
@@ -41,7 +41,7 @@ inline float powf10fe(float x)
  * @param simga_r
  * @return
  */
-ImageVec* bilateralSeparation(Image *imgIn, float sigma_s = -1.0f, float sigma_r = 0.4f)
+PIC_INLINE ImageVec* bilateralSeparation(Image *imgIn, float sigma_s = -1.0f, float sigma_r = 0.4f)
 {
     if(imgIn == NULL) {
         return NULL;

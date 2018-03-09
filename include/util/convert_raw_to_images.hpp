@@ -30,7 +30,7 @@ namespace pic {
  * @param width
  * @param height
  */
-void ConvertRAWtoImages(std::string nameDirectory, std::string format,
+PIC_INLINE void ConvertRAWtoImages(std::string nameDirectory, std::string format,
                         int width, int height)
 {
     StringVec vec;
@@ -56,7 +56,7 @@ void ConvertRAWtoImages(std::string nameDirectory, std::string format,
  * @param width
  * @param height
  */
-void ConvertDetect(std::string nameDirectory, std::string format, int width,
+PIC_INLINE void ConvertDetect(std::string nameDirectory, std::string format, int width,
                    int height)
 {
 

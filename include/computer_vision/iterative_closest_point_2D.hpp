@@ -22,6 +22,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <stdlib.h>
 
+#include "base.hpp"
+
 #include "util/math.hpp"
 
 #include "features_matching/brief_descriptor.hpp"
@@ -41,7 +43,7 @@ namespace pic {
  * @param p
  * @return
  */
-Eigen::Vector2f getMeanVector2f(std::vector< Eigen::Vector2f > &p)
+PIC_INLINE Eigen::Vector2f getMeanVector2f(std::vector< Eigen::Vector2f > &p)
 {
     auto c = p[0];
     for(auto i = 1; i < p.size(); i++) {
@@ -57,7 +59,7 @@ Eigen::Vector2f getMeanVector2f(std::vector< Eigen::Vector2f > &p)
  * @param p
  * @return
  */
-Eigen::Vector2f getMedianVector2f(std::vector< Eigen::Vector2f > &p)
+PIC_INLINE Eigen::Vector2f getMedianVector2f(std::vector< Eigen::Vector2f > &p)
 {
     auto n = p.size();
     float *x = new float[n];
@@ -184,7 +186,7 @@ public:
  * @param ind
  * @return
  */
-ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f > &p0,
+PIC_INLINE ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f > &p0,
                                                    std::vector< Eigen::Vector2f > &p1,
                                                    std::vector< unsigned int *> &p0_descs,
                                                    std::vector< unsigned int *> &p1_descs,
@@ -291,7 +293,7 @@ ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen::Vector2f 
  * @param p1
  * @return
  */
-float getErrorPointsList(std::vector< Eigen::Vector2f > &p0,
+PIC_INLINE float getErrorPointsList(std::vector< Eigen::Vector2f > &p0,
                          std::vector< Eigen::Vector2f > &p1)
 {
     float err = 0.0f;
@@ -323,7 +325,7 @@ float getErrorPointsList(std::vector< Eigen::Vector2f > &p0,
  * @param thresholdErr
  * @param maxIterations
  */
-void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pattern,
+PIC_INLINE void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pattern,
                               std::vector<Eigen::Vector2f> &points,
                               std::vector< unsigned int *> &points_pattern_descs,
                               std::vector< unsigned int *> &points_descs,

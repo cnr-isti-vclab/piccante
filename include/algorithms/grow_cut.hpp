@@ -32,7 +32,7 @@ namespace pic {
  * @param state_cur
  * @return
  */
-Image *computeGrowCut(Image *img, Image *seeds, Image *state_cur = NULL)
+PIC_INLINE Image *computeGrowCut(Image *img, Image *seeds, Image *state_cur = NULL)
 {
     if(img == NULL || seeds == NULL) {
         return NULL;

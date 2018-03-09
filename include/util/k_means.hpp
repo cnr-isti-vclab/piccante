@@ -266,9 +266,6 @@ T* kMeansSelect(T *samples, int nSamples, int nDim,
     return centers;
 }
 
-
-
-
 }
 
 #endif // PIC_UTIL_K_MEANS_HPP

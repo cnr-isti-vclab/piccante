@@ -21,7 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 #ifndef PIC_WIN32
-inline int timeGetTime()
+PIC_INLINE int timeGetTime()
 {
     return 1;
 }

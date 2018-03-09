@@ -43,6 +43,7 @@ This program is free software: you can redistribute it and/or modify
 /* we got Qt 5 */
 #define PIC_QT
 
+/*
 #include <QtCore/qstring.h>
 #include <QtCore/qstringlist.h>
 #include <QtCore/qfile.h>
@@ -52,7 +53,8 @@ This program is free software: you can redistribute it and/or modify
 #include <QtCore/qdir.h>
 #include <QtCore/QTextStream>
 
-#include <QtGui/QColor>
+#include <QtGui/QColor>*/
+
 #include <QtGui/QImage>
 
 #elif (QT_VERSION >= QT_VERSION_CHECK(4, 0, 0))

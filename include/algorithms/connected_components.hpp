@@ -76,7 +76,7 @@ public:
  * @param channel
  * @return
  */
-Image *computeConnectedComponents(Image *img, std::vector<LabelOutput> &ret,
+PIC_INLINE Image *computeConnectedComponents(Image *img, std::vector<LabelOutput> &ret,
                               Image *comp = NULL, float thr = 0.05f)
 {
     //Check input paramters

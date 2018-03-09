@@ -41,7 +41,7 @@ namespace pic {
  */
 #ifndef PIC_DISABLE_EIGEN
 
-float getMinDistance(std::vector< Eigen::Vector2f > &points)
+PIC_INLINE float getMinDistance(std::vector< Eigen::Vector2f > &points)
 {
     float ret = FLT_MAX;
     for(auto i = 0; i < points.size(); i++) {
@@ -70,7 +70,7 @@ float getMinDistance(std::vector< Eigen::Vector2f > &points)
  * @param points
  * @return
  */
-float estimateCheckerBoardSize(std::vector< Eigen::Vector2f > &points)
+PIC_INLINE float estimateCheckerBoardSize(std::vector< Eigen::Vector2f > &points)
 {
     if(points.size() < 2) {
         return -1.0f;
@@ -122,7 +122,7 @@ float estimateCheckerBoardSize(std::vector< Eigen::Vector2f > &points)
  * @param out
  * @return
  */
-Image *getCheckerBoardModel(int checkers_x, int checkers_y, int checkers_size, std::vector< Eigen::Vector2f > &out)
+PIC_INLINE Image *getCheckerBoardModel(int checkers_x, int checkers_y, int checkers_size, std::vector< Eigen::Vector2f > &out)
 {
     Image *ret = new Image(1, (checkers_x + 1) * checkers_size, (checkers_y + 1) * checkers_size, 1);
     *ret = 1.0f;
@@ -171,7 +171,7 @@ Image *getCheckerBoardModel(int checkers_x, int checkers_y, int checkers_size, s
  * @brief findCheckerBoard
  * @param img
  */
-void findCheckerBoard(Image *img)
+PIC_INLINE void findCheckerBoard(Image *img)
 {
     //compute the luminance images
     Image *L = FilterLuminance::Execute(img, NULL, LT_CIE_LUMINANCE);

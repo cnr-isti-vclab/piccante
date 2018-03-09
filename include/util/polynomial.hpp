@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
+#include "base.hpp"
+
 #ifndef PIC_DISABLE_EIGEN
     #include "externals/Eigen/QR"
 #endif
@@ -32,7 +34,7 @@ namespace pic {
  * @param x
  * @return
  */
-float polynomialVal(std::vector< float > & poly, float x)
+PIC_INLINE float polynomialVal(std::vector< float > & poly, float x)
 {
     float val = 0.f;
     float M = 1.f;
@@ -52,7 +54,7 @@ float polynomialVal(std::vector< float > & poly, float x)
  * @param n is the degree of the polynomial
  * @return
  */
-std::vector<float> polynomialFit(std::vector<float> &x, std::vector<float> &y, unsigned int n)
+PIC_INLINE std::vector<float> polynomialFit(std::vector<float> &x, std::vector<float> &y, unsigned int n)
 {
     std::vector<float> poly;
 
@@ -93,7 +95,7 @@ std::vector<float> polynomialFit(std::vector<float> &x, std::vector<float> &y, u
 /**
  * @brief polynomialTest
  */
-void polynomialTest()
+PIC_INLINE void polynomialTest()
 {
     std::vector<float> x, y;
 

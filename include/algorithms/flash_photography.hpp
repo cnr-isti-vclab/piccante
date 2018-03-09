@@ -32,7 +32,7 @@ namespace pic {
  * @param filter
  * @return
  */
-Image *flashPhotography(std::string nameFlash, std::string nameNoFlash,
+PIC_INLINE Image *flashPhotography(std::string nameFlash, std::string nameNoFlash,
                            std::string nameOut,
                            Filter *filter)
 {
@@ -63,7 +63,7 @@ Image *flashPhotography(std::string nameFlash, std::string nameNoFlash,
  * @param sigma_r
  * @return
  */
-Image *flashPhotography2DF(std::string nameFlash, std::string nameNoFlash,
+PIC_INLINE Image *flashPhotography2DF(std::string nameFlash, std::string nameNoFlash,
                               std::string nameOut,
                               float sigma_s, float sigma_r)
 {
@@ -80,7 +80,7 @@ Image *flashPhotography2DF(std::string nameFlash, std::string nameNoFlash,
  * @param sigma_r
  * @return
  */
-Image *flashPhotography2DS(std::string nameFlash, std::string nameNoFlash,
+PIC_INLINE Image *flashPhotography2DS(std::string nameFlash, std::string nameNoFlash,
                               std::string nameOut,
                               float sigma_s, float sigma_r)
 {

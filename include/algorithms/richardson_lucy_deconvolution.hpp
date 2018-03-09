@@ -31,7 +31,7 @@ namespace pic {
  * @param imgOut
  * @return
  */
-Image *computeRichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterations = 10, Image *imgOut = NULL)
+PIC_INLINE Image *computeRichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterations = 10, Image *imgOut = NULL)
 {
     if((imgIn == NULL) || (psf == NULL)) {
         return imgOut;

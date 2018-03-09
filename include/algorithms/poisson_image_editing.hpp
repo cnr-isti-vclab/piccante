@@ -36,7 +36,7 @@ namespace pic {
  * @param ret
  * @return
  */
-Image *computePoissonImageEditing(Image *source, Image *target, bool *mask, Image *ret = NULL)
+PIC_INLINE Image *computePoissonImageEditing(Image *source, Image *target, bool *mask, Image *ret = NULL)
 {
     if((source == NULL) || (target == NULL) || (mask == NULL)) {
         return NULL;

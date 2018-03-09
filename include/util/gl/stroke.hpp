@@ -289,7 +289,7 @@ void StrokeGL::Resample()
     //Calculate length of the path
     float len = 0.0f;
     float tmpLen;
-    const int n = size_t(positions.size()) - 2;
+    const int n = int(positions.size()) - 2;
     float x, y;
     std::vector<float> lengths;
 
@@ -440,7 +440,7 @@ void StrokeGL::RenderGL()
     brushProgram.bind();
 
     brushProgram.setUniform("current_color", color[0], color[1], color[2], 1.0f);
-    const int n = size_t(positions.size());
+    const int n = int(positions.size());
 
     for(int i = 0; i < n; i += 2) {
         brushProgram.setUniform("shift_position", positions[i], positions[i + 1]);
@@ -472,7 +472,7 @@ void StrokeGL::RenderAnnotationGL()
     glActiveTexture(GL_TEXTURE0);
     shape->bindTexture();
 
-    const int n = size_t(positions.size());
+    const int n = int(positions.size());
 
     for(int i = 0; i < n; i += 2) {
         annotationProgram.setUniform("shift_position", positions[i], positions[i + 1]);

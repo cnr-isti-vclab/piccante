@@ -22,7 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-inline Image *edgeEnhancement(Image *imgIn, float sigma_s = 4.0f,
+PIC_INLINE Image *edgeEnhancement(Image *imgIn, float sigma_s = 4.0f,
                                  float sigma_r = 0.05f)
 {
     if(imgIn == NULL) {

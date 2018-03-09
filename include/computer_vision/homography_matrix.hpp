@@ -22,6 +22,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <stdlib.h>
 
+#include "base.hpp"
+
 #include "util/math.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
@@ -44,7 +46,7 @@ namespace pic {
  * @param points1 is an array of points computed from image 2.
  * @return It returns the homography matrix H.
  */
-Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > &points0,
+PIC_INLINE Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > &points0,
                                    std::vector< Eigen::Vector2f > &points1)
 {
     Eigen::Matrix3d  H;
@@ -130,7 +132,7 @@ Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > &points0,
  * @param maxIterations
  * @return
  */
-Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f > &points0,
+PIC_INLINE Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f > &points0,
                                          std::vector< Eigen::Vector2f > &points1,
                                          std::vector< unsigned int > &inliers,
                                          unsigned int maxIterations = 100,
@@ -211,15 +213,15 @@ Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f > &points0
     return H;
 }
     
-    /**
-     * @brief estimateHomographyRansac computes the homography such that: points1 = H * points0
-     * @param points0
-     * @param points1
-     * @param inliers
-     * @param maxIterations
-     * @return
-     */
-Eigen::Matrix3d estimateHomographyWithNonLinearRefinement(
+/**
+* @brief estimateHomographyRansac computes the homography such that: points1 = H * points0
+* @param points0
+* @param points1
+* @param inliers
+* @param maxIterations
+* @return
+*/
+PIC_INLINE Eigen::Matrix3d estimateHomographyWithNonLinearRefinement(
                                          std::vector< Eigen::Vector2f > &points0,
                                          std::vector< Eigen::Vector2f > &points1,
                                          std::vector< unsigned int > &inliers,

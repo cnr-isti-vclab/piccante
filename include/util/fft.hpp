@@ -31,7 +31,7 @@ namespace pic {
  * @param x
  * @return
  */
-unsigned int RE(unsigned int x) {
+PIC_INLINE unsigned int RE(unsigned int x) {
     return x << 1;
 }
 
@@ -40,7 +40,7 @@ unsigned int RE(unsigned int x) {
  * @param x
  * @return
  */
-unsigned int IM(unsigned int x) {
+PIC_INLINE unsigned int IM(unsigned int x) {
     return (x << 1) + 1;
 }
 
@@ -61,7 +61,7 @@ typedef std::complex<double> complexd;
  * @param out
  * @return
  */
-float *DFT1D(float *in, unsigned int n, float *out = NULL)
+PIC_INLINE float *DFT1D(float *in, unsigned int n, float *out = NULL)
 {
     if(out == NULL) {
         out = new float[n * 2];
@@ -94,7 +94,7 @@ float *DFT1D(float *in, unsigned int n, float *out = NULL)
  * @param nbit
  * @return
  */
-unsigned int bitReversal(unsigned int n, unsigned int nbit)
+PIC_INLINE unsigned int bitReversal(unsigned int n, unsigned int nbit)
 {
     unsigned int out = 0;
     for(int i = nbit; i>0; i--) {
@@ -112,7 +112,7 @@ unsigned int bitReversal(unsigned int n, unsigned int nbit)
  * @param out
  * @return
  */
-float *FFTIterative1D(float *in, unsigned int n, float *out = NULL)
+PIC_INLINE float *FFTIterative1D(float *in, unsigned int n, float *out = NULL)
 {
     if(out == NULL) {
         out = new float[n * 2];
@@ -162,7 +162,7 @@ float *FFTIterative1D(float *in, unsigned int n, float *out = NULL)
 /**
  * @brief fftTest
  */
-void fftTest()
+PIC_INLINE void fftTest()
 {
     int n = 16;
     float *values = new float[n];

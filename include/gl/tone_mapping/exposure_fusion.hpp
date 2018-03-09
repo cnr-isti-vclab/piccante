@@ -131,7 +131,7 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut = NULL,
                      float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
     {
-        int n = imgIn.size();
+        int n = int(imgIn.size());
 
         if(n < 2) {
             return imgOut;
