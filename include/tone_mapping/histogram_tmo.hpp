@@ -19,6 +19,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_TONE_MAPPING_HISTOGRAM_TMO_HPP
 
 #include <vector>
+
+#include "base.hpp"
 #include "image.hpp"
 #include "filtering/filter_luminance.hpp"
 
@@ -30,7 +32,7 @@ namespace pic {
  * @param imgIn
  * @return
  */
-inline Image *HistogramTMO(Image *imgOut, Image *imgIn)
+PIC_INLINE  Image *HistogramTMO(Image *imgOut, Image *imgIn)
 {
     if(imgOut == NULL) {
         imgOut = imgIn->clone();

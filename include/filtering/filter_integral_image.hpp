@@ -58,12 +58,12 @@ public:
         int height = imgIn[0]->height;
         int channels = imgIn[0]->channels;
 
-        //setting up the first pixel (0,0)
+        //set up the first pixel (0,0)
         for(int k=0; k<channels; k++) {
             imgOut->data[k] = imgIn[0]->data[k];
         }
 
-        //seting up the first row
+        //set up the first row
         for(int j=1; j<width; j++) {
             int ind1 = j * channels;
             int ind2 = ind1 - channels;

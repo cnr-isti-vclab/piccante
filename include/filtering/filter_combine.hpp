@@ -121,7 +121,7 @@ public:
     }
 };
 
-Image *FilterCombine::SetupAux(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterCombine::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         int channels = 0;
@@ -137,7 +137,7 @@ Image *FilterCombine::SetupAux(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-void FilterCombine::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterCombine::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     for(int p = box->z0; p < box->z1; p++) {
         for(int j = box->y0; j < box->y1; j++) {

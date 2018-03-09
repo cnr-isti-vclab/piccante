@@ -115,7 +115,6 @@ public:
     }
 };
 
-
 } // end namespace pic
 
 #endif /* PIC_FEATURES_MATCHING_HASH_TABLE_LSH_HPP */

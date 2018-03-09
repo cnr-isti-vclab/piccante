@@ -250,6 +250,15 @@ public:
         channels = imgIn->channels;
     }
 
+    /**
+     * @brief Execute
+     * @param img
+     * @param imgOut
+     * @param h
+     * @param bSameSize
+     * @param bCentroid
+     * @return
+     */
     static Image *Execute(Image *img, Image *imgOut, Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
     {
         FilterWarp2D flt(h, bSameSize, bCentroid);

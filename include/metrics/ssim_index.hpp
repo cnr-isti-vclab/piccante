@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <math.h>
 
+#include "base.hpp"
 #include "image.hpp"
 #include "metrics/base.hpp"
 #include "util/indexed_array.hpp"
@@ -44,7 +45,7 @@ namespace pic {
  * @param bDownsampling
  * @return
  */
-Image* SSIMIndex(Image *ori, Image *cmp, float &ssim_index, Image *ssim_map = NULL, float K0 = 0.01f, float K1 = 0.03f,
+PIC_INLINE Image* SSIMIndex(Image *ori, Image *cmp, float &ssim_index, Image *ssim_map = NULL, float K0 = 0.01f, float K1 = 0.03f,
                  float sigma_window = 1.5f, float dynamic_range = -1.0f, bool bDownsampling = false)
 {
     if(ori == NULL || cmp == NULL) {

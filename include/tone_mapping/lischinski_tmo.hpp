@@ -32,7 +32,7 @@ namespace pic {
  * @param alpha
  * @return
  */
-Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
+PIC_INLINE Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
         float whitePoint = -1.0f)
 {
     if(imgIn == NULL) {

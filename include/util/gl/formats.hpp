@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_GL_FORMATS_HPP
 #define PIC_UTIL_GL_FORMATS_HPP
 
+#include "base.hpp"
+
 #include "gl.hpp"
 
 namespace pic {
@@ -168,7 +170,7 @@ inline int getChannelsFromInternalFormatGL(int internalFormat)
  * @param frames is the number of frames of texture.
  * @param channels is the number of color channels of texture.
  */
-void getTextureInformationGL(GLuint texture, GLuint target, int &width, int &height,
+PIC_INLINE void getTextureInformationGL(GLuint texture, GLuint target, int &width, int &height,
                              int &frames, int &channels)
 {
     if(texture == 0) {

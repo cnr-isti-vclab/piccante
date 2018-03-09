@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_GL_MASK_HPP
 #define PIC_UTIL_GL_MASK_HPP
 
+#include "base.hpp"
+
 namespace pic {
 
 /**
@@ -30,7 +32,7 @@ namespace pic {
  * @param mipmap
  * @return
  */
-GLuint GenerateMask(int width, int height, bool *buffer = NULL,
+PIC_INLINE GLuint GenerateMask(int width, int height, bool *buffer = NULL,
                     GLuint tex = 0, unsigned char *tmpBuffer = NULL, bool mipmap = false)
 {
     bool bGen = (tex == 0);

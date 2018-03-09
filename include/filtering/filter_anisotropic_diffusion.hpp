@@ -97,7 +97,7 @@ public:
 
 };
 
-FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
+PIC_INLINE FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
         unsigned int mode)
 {
     if(k <= 0.0f) {
@@ -114,7 +114,7 @@ FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
     this->mode = mode;
 }
 
-void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src,
+PIC_INLINE void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
     //Filtering

@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_METRICS_SNR_HPP
 #define PIC_METRICS_SNR_HPP
 
+#include "base.hpp"
 #include "image.hpp"
 
 namespace pic {
@@ -29,7 +30,7 @@ namespace pic {
  * @param box is a bounding box where to limit the computation of SNR.
  * @return It returns the SNR value between ori and cmp.
  */
-float SNR(Image *ori, Image *cmp, BBox *box = NULL)
+PIC_INLINE float SNR(Image *ori, Image *cmp, BBox *box = NULL)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0f;

@@ -87,7 +87,6 @@ public:
     }
 };
 
-
 } // end namespace pic
 
 #endif /* PIC_IMAGE_SAMPLERS_IMAGE_SAMPLER_BSPLINES_HPP */

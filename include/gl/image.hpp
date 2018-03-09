@@ -678,7 +678,7 @@ ImageGL::ImageGL(int frames, int width, int height, int channels,
     }
 }
 
-ImageGL::~ImageGL()
+PIC_INLINE ImageGL::~ImageGL()
 {   
     destroyGL();
     Destroy();
@@ -691,7 +691,7 @@ ImageGL::~ImageGL()
  * @param mipmap
  * @return
  */
-GLuint ImageGL::generateTextureGL(GLenum target = GL_TEXTURE_2D, GLenum format_type = GL_FLOAT, bool mipmap = false)
+PIC_INLINE GLuint ImageGL::generateTextureGL(GLenum target = GL_TEXTURE_2D, GLenum format_type = GL_FLOAT, bool mipmap = false)
 {
     this->texture = 0;
     this->target  = target;
@@ -750,7 +750,7 @@ GLuint ImageGL::generateTextureGL(GLenum target = GL_TEXTURE_2D, GLenum format_t
     return texture;
 }
 
-ImageGL *ImageGL::cloneGL()
+PIC_INLINE ImageGL *ImageGL::cloneGL()
 {
     //call Image clone function
     Image *tmp = this->clone();
@@ -759,7 +759,7 @@ ImageGL *ImageGL::cloneGL()
     return new ImageGL(tmp, target, false, true);
 }
 
-void ImageGL::destroyGL()
+PIC_INLINE void ImageGL::destroyGL()
 {
     if(notOwnedGL) {
         return;
@@ -779,7 +779,7 @@ void ImageGL::destroyGL()
     }
 }
 
-ImageGL *ImageGL::allocateSimilarOneGL()
+PIC_INLINE ImageGL *ImageGL::allocateSimilarOneGL()
 {
 #ifdef PIC_DEBUG
     printf("%d %d %d %d %d\n", frames, width, height, channels, mode);
@@ -789,7 +789,7 @@ ImageGL *ImageGL::allocateSimilarOneGL()
     return ret;
 }
 
-void ImageGL::loadFromMemory()
+PIC_INLINE void ImageGL::loadFromMemory()
 {
     int mode, modeInternalFormat;
     getModesGL(channels, mode, modeInternalFormat);
@@ -812,7 +812,7 @@ void ImageGL::loadFromMemory()
     glBindTexture(target, 0);
 }
 
-void ImageGL::loadToMemory()
+PIC_INLINE void ImageGL::loadToMemory()
 {
     if(texture == 0) {
         #ifdef PIC_DEBUG
@@ -840,7 +840,7 @@ void ImageGL::loadToMemory()
     unBindTexture();
 }
 
-void ImageGL::loadSliceIntoTexture(int i)
+PIC_INLINE void ImageGL::loadSliceIntoTexture(int i)
 {
     int mode, modeInternalFormat;
     getModesGL(channels, mode, modeInternalFormat);
@@ -853,7 +853,7 @@ void ImageGL::loadSliceIntoTexture(int i)
     glBindTexture(target, 0);
 }
 
-void ImageGL::loadAllSlicesIntoTexture()
+PIC_INLINE void ImageGL::loadAllSlicesIntoTexture()
 {
     if(target != GL_TEXTURE_3D && target != GL_TEXTURE_2D_ARRAY) {
         return;
@@ -864,7 +864,7 @@ void ImageGL::loadAllSlicesIntoTexture()
     }
 }
 
-void ImageGL::readFromFBO(Fbo *fbo, GLenum format)
+PIC_INLINE void ImageGL::readFromFBO(Fbo *fbo, GLenum format)
 {
     //TO DO: check data
     bool bCheck =   (fbo->width  != width) ||
@@ -884,7 +884,7 @@ void ImageGL::readFromFBO(Fbo *fbo, GLenum format)
     	glBindTexture(GL_TEXTURE_2D, 0);*/
 }
 
-void ImageGL::readFromFBO(Fbo *fbo)
+PIC_INLINE void ImageGL::readFromFBO(Fbo *fbo)
 {
     if(mode == IMG_NULL) {
         mode = IMG_CPU;
@@ -893,7 +893,7 @@ void ImageGL::readFromFBO(Fbo *fbo)
     readFromFBO(fbo, GL_RGBA);
 }
 
-void ImageGL::readFromBindedFBO()
+PIC_INLINE void ImageGL::readFromBindedFBO()
 {
 
     int mode, modeInternalFormat;
@@ -912,109 +912,109 @@ void ImageGL::readFromBindedFBO()
     flipV();
 }
 
-void ImageGL::bindTexture()
+PIC_INLINE void ImageGL::bindTexture()
 {
     glBindTexture(target, texture);
 }
 
-void ImageGL::unBindTexture()
+PIC_INLINE void ImageGL::unBindTexture()
 {
     glBindTexture(target, 0);
 }
 
-void ImageGL::clamp(float a = 0.0f, float b = 1.0f)
+PIC_INLINE void ImageGL::clamp(float a = 0.0f, float b = 1.0f)
 {
     BufferOpsGL *ops = BufferOpsGL::getInstance();
     ops->list[BOGL_CLAMP]->Update(a, b);
     ops->list[BOGL_CLAMP]->Process(getTexture(), 0, getTexture(), width, height);
 }
 
-void ImageGL::operator =(const ImageGL &a)
+PIC_INLINE void ImageGL::operator =(const ImageGL &a)
 {
     thisOperatorImage(a, BOGL_ID);
 }
 
-void ImageGL::operator =(const float &a)
+PIC_INLINE void ImageGL::operator =(const float &a)
 {
     thisOperatorConst(a, BOGL_ID_CONST);
 }
 
-void ImageGL::operator +=(const ImageGL &a)
+PIC_INLINE void ImageGL::operator +=(const ImageGL &a)
 {
     thisOperatorImage(a, BOGL_ADD);
 }
 
-void ImageGL::operator +=(const float &a)
+PIC_INLINE void ImageGL::operator +=(const float &a)
 {
     thisOperatorConst(a, BOGL_ADD_CONST);
 }
 
-ImageGL ImageGL::operator +(const ImageGL &a)
+PIC_INLINE ImageGL ImageGL::operator +(const ImageGL &a)
 {
     return newOperatorImage(a, BOGL_ADD);
 }
 
-ImageGL ImageGL::operator +(const float &a)
+PIC_INLINE ImageGL ImageGL::operator +(const float &a)
 {
     return newOperatorConst(a, BOGL_ADD_CONST);
 }
 
-void ImageGL::operator -=(const ImageGL &a)
+PIC_INLINE void ImageGL::operator -=(const ImageGL &a)
 {
     thisOperatorImage(a, BOGL_SUB);
 }
 
-void ImageGL::operator -=(const float &a)
+PIC_INLINE void ImageGL::operator -=(const float &a)
 {
     thisOperatorConst(a, BOGL_SUB_CONST);
 }
 
-ImageGL ImageGL::operator -(const ImageGL &a)
+PIC_INLINE ImageGL ImageGL::operator -(const ImageGL &a)
 {
     return newOperatorImage(a, BOGL_SUB);
 }
 
-ImageGL ImageGL::operator -(const float &a)
+PIC_INLINE ImageGL ImageGL::operator -(const float &a)
 {
     return newOperatorConst(a, BOGL_SUB_CONST);
 }
 
-void ImageGL::operator *=(const ImageGL &a)
+PIC_INLINE void ImageGL::operator *=(const ImageGL &a)
 {
     thisOperatorImage(a, BOGL_MUL);
 }
 
-void ImageGL::operator *=(const float &a)
+PIC_INLINE void ImageGL::operator *=(const float &a)
 {
     thisOperatorConst(a, BOGL_MUL_CONST);
 }
 
-ImageGL ImageGL::operator *(const ImageGL &a)
+PIC_INLINE ImageGL ImageGL::operator *(const ImageGL &a)
 {
     return newOperatorImage(a, BOGL_MUL);
 }
 
-ImageGL ImageGL::operator *(const float &a)
+PIC_INLINE ImageGL ImageGL::operator *(const float &a)
 {
     return newOperatorConst(a, BOGL_MUL_CONST);
 }
 
-void ImageGL::operator /=(const ImageGL &a)
+PIC_INLINE void ImageGL::operator /=(const ImageGL &a)
 {
     thisOperatorImage(a, BOGL_DIV);
 }
 
-void ImageGL::operator /=(const float &a)
+PIC_INLINE void ImageGL::operator /=(const float &a)
 {
     thisOperatorConst(a, BOGL_DIV_CONST);
 }
 
-ImageGL ImageGL::operator /(const ImageGL &a)
+PIC_INLINE ImageGL ImageGL::operator /(const ImageGL &a)
 {
     return newOperatorImage(a, BOGL_DIV);
 }
 
-ImageGL ImageGL::operator /(const float &a)
+PIC_INLINE ImageGL ImageGL::operator /(const float &a)
 {
     return newOperatorConst(a, BOGL_DIV_CONST);
 }

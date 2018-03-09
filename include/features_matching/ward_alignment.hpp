@@ -186,7 +186,7 @@ public:
         cur_shift = Eigen::Vector2i(0, 0);
         ret_shift = Eigen::Vector2i(0, 0);
 
-        //downsampling
+        //downsample
         Image *tmp_1 = L1;
         Image *tmp_2 = L2;
         for(int i=0; i< shift_bits; i++) {
@@ -200,7 +200,7 @@ public:
             tmp_2 = sml_img2;
         }
 
-        //computing the shift
+        //compute the shift
         while(shift_bits > 0) {
             Image* sml_img1 = img1_v[shift_bits - 1];
             Image* sml_img2 = img2_v[shift_bits - 1];
@@ -209,14 +209,14 @@ public:
             int height = sml_img1->height;
             int n = width * height;
 
-             //Computing the median threshold mask
+             //compute the median threshold mask
             bool *tb1 = MTB(sml_img1, NULL);
             bool *eb1  = &tb1[n];
 
             bool *tb2 = MTB(sml_img2, NULL);
             bool *eb2  = &tb2[n];
 
-            //tracking memory
+            //track memory
             tb1_v.push_back(tb1);
             tb2_v.push_back(tb2);
             

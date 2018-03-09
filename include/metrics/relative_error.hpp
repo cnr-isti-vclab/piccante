@@ -19,7 +19,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_METRICS_RELATIVE_ERROR_HPP
 
 #include <math.h>
+
+#include "base.hpp"
 #include "image.hpp"
+
 #include "metrics/base.hpp"
 
 namespace pic {
@@ -31,7 +34,7 @@ namespace pic {
  * @param bLargeDifferences, if true, skips big differences for stability.
  * @return It returns the relative error value between ori and cmp.
  */
-double RelativeError(Image *ori, Image *cmp, bool bLargeDifferences = false)
+PIC_INLINE double RelativeError(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;

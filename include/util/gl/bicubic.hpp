@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_GL_BICUBIC_HPP
 #define PIC_UTIL_GL_BICUBIC_HPP
 
+#include "base.hpp"
+
 #include "util/string.hpp"
 
 namespace pic {
@@ -26,7 +28,7 @@ namespace pic {
  * @brief GLSL_BICUBIC returns bicubic sample.
  * @return It returns a string; a building block for a shader.
  */
-std::string GLSL_BICUBIC()
+PIC_INLINE std::string GLSL_BICUBIC()
 {
     std::string ret;
 
@@ -55,7 +57,7 @@ std::string GLSL_BICUBIC()
  * @brief GLSL_TEXTURE_BICUBIC
  * @return
  */
-std::string GLSL_TEXTURE_BICUBIC()
+PIC_INLINE std::string GLSL_TEXTURE_BICUBIC()
 {
     std::string ret;
 

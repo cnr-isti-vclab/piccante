@@ -18,9 +18,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_GET_ALL_EXPOSURES_HPP
 #define PIC_TONE_MAPPING_GET_ALL_EXPOSURES_HPP
 
+#include "base.hpp"
 #include "image.hpp"
 #include "histogram.hpp"
+
 #include "util/indexed_array.hpp"
+
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_simple_tmo.hpp"
 
@@ -32,7 +35,7 @@ namespace pic {
  * @param minFstop is the mininum f-stop of imgIn, output.
  * @param maxFstop is the maximum f-stop of imgIn, output.
  */
-void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
+PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
 {
     if(imgIn == NULL) {
         return;
@@ -82,7 +85,7 @@ void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
  * @param imgIn is an input image.
  * @return It returns an array of exposure values encoding the
  */
-std::vector<float> getAllExposures(Image *imgIn) {
+PIC_INLINE std::vector<float> getAllExposures(Image *imgIn) {
     std::vector<float> exposures;
 
     if(imgIn == NULL) {
@@ -109,7 +112,7 @@ std::vector<float> getAllExposures(Image *imgIn) {
  * @return It returns an ImageVec of images which encode imgIn at different
  * exposure values.
  */
-ImageVec getAllExposuresImages(Image *imgIn)
+PIC_INLINE ImageVec getAllExposuresImages(Image *imgIn)
 {
     ImageVec ret;
 

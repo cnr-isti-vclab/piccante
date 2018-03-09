@@ -73,13 +73,13 @@ public:
     void ChangePass(int pass, int tPass);
 };
 
-FilterBilateral1D::FilterBilateral1D(float sigma_s, float sigma_r)
+PIC_INLINE FilterBilateral1D::FilterBilateral1D(float sigma_s, float sigma_r)
 {
     pg = NULL;
     Update(sigma_s, sigma_r);
 }
 
-void FilterBilateral1D::Update(float sigma_s, float sigma_r)
+PIC_INLINE void FilterBilateral1D::Update(float sigma_s, float sigma_r)
 {
     //protected values are assigned/computed
     this->sigma_s = sigma_s;
@@ -94,7 +94,7 @@ void FilterBilateral1D::Update(float sigma_s, float sigma_r)
     pg = new PrecomputedGaussian(sigma_s);
 }
 
-void FilterBilateral1D::ChangePass(int pass, int tPass)
+PIC_INLINE void FilterBilateral1D::ChangePass(int pass, int tPass)
 {
     /*	tPass++;
     	dirs[ pass%tPass] = 1;
@@ -125,7 +125,7 @@ void FilterBilateral1D::ChangePass(int pass, int tPass)
 #endif
 }
 
-void FilterBilateral1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterBilateral1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 

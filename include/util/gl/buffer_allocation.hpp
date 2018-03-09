@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_GL_BUFFER_ALLOCATION_HPP
 #define PIC_UTIL_GL_BUFFER_ALLOCATION_HPP
 
+#include "base.hpp"
+
 #include "util/string.hpp"
 #include "util/gl/quad.hpp"
 
@@ -32,7 +34,7 @@ namespace pic {
  * @param mipmap
  * @return
  */
-GLuint generateTexture2DGL(int width, int height, int channels, float *data = NULL, bool mipmap = false)
+PIC_INLINE GLuint generateTexture2DGL(int width, int height, int channels, float *data = NULL, bool mipmap = false)
 {
     if(width < 1 || height < 1 || channels < 1) {
         return 0;
@@ -79,7 +81,7 @@ GLuint generateTexture2DGL(int width, int height, int channels, float *data = NU
  * @param data
  * @return
  */
-GLuint generateTextureCubeMapGL(int width, int height, int channels, int frames, float *data = NULL)
+PIC_INLINE GLuint generateTextureCubeMapGL(int width, int height, int channels, int frames, float *data = NULL)
 {
     if(width < 1 || height < 1 || channels < 1 || frames < 6) {
         return 0;
@@ -120,7 +122,7 @@ GLuint generateTextureCubeMapGL(int width, int height, int channels, int frames,
  * @param data
  * @return
  */
-GLuint generateTexture3DGL(int width, int height, int channels, int frames, float *data = NULL)
+PIC_INLINE GLuint generateTexture3DGL(int width, int height, int channels, int frames, float *data = NULL)
 {
     if(width <1 || height < 1 || channels < 1 || frames < 1) {
         return 0;
@@ -159,7 +161,7 @@ GLuint generateTexture3DGL(int width, int height, int channels, int frames, floa
  * @param data
  * @return
  */
-GLuint generateTexture2DArrayGL(int width, int height, int channels, int frames, float *data = NULL)
+PIC_INLINE GLuint generateTexture2DArrayGL(int width, int height, int channels, int frames, float *data = NULL)
 {
     if(width < 1 || height < 1 || channels < 1 || frames < 1) {
         return 0;
@@ -192,7 +194,7 @@ GLuint generateTexture2DArrayGL(int width, int height, int channels, int frames,
  * @param channels
  * @return
  */
-GLuint generateTexture2DU32GL(int width, int height, int channels, int *data = NULL)
+PIC_INLINE GLuint generateTexture2DU32GL(int width, int height, int channels, int *data = NULL)
 {
     if(width < 1 || height < 1 || channels < 1) {
         return 0;

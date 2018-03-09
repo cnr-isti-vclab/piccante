@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <math.h>
 
+#include "base.hpp"
+
 #include "util/array.hpp"
 
 #include "image.hpp"
@@ -40,7 +42,7 @@ enum MULTI_EXPOSURE_TYPE{MET_HISTOGRAM, MET_MIN_MAX};
  * @param maxFstop is the maximum f-stop value of ori.
  * @return It returns the nMPSR error value between ori and cmp.
  */
-double mPSNR(Image *ori, Image *cmp, MULTI_EXPOSURE_TYPE type, int minFstop = 0, int maxFstop = 0)
+PIC_INLINE double mPSNR(Image *ori, Image *cmp, MULTI_EXPOSURE_TYPE type, int minFstop = 0, int maxFstop = 0)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;

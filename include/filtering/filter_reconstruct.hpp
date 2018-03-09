@@ -57,7 +57,12 @@ protected:
         }
     }
 
-
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() < 2) {

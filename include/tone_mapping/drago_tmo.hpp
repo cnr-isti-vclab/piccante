@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_DRAGO_TMO_HPP
 #define PIC_TONE_MAPPING_DRAGO_TMO_HPP
 
+#include "base.hpp"
+
 #include "filtering/filter.hpp"
 #include "filtering/filter_luminance.hpp"
 #include "filtering/filter_drago_tmo.hpp"
@@ -33,7 +35,7 @@ namespace pic {
  * @param imgOut
  * @return
  */
-Image *DragoTMO(Image *imgIn, float Ld_Max = 100.0f, float b = 0.95f, Image *imgOut = NULL)
+PIC_INLINE Image *DragoTMO(Image *imgIn, float Ld_Max = 100.0f, float b = 0.95f, Image *imgOut = NULL)
 {
     //Computing luminance and its statistics
     FilterLuminance filterLum;

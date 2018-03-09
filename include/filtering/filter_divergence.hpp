@@ -70,13 +70,11 @@ public:
     }
 };
 
-void FilterDivergence::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterDivergence::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-
     int width = dst->width;
     int height = dst->height;
 
-    //Filtering
     float *data = src[0]->data;
     float gradX, gradY;
 

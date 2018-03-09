@@ -79,10 +79,20 @@ public:
 
     ~FilterBilateral2DG();
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *Process(ImageVec imgIn, Image *imgOut);
 
-    //Processing in parallel
+    /**
+     * @brief ProcessP
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *ProcessP(ImageVec imgIn, Image *imgOut);
 
     /**
@@ -130,7 +140,15 @@ public:
         return imgOut;
     }
 
-    //Filtering
+    /**
+     * @brief Execute
+     * @param nameBase
+     * @param nameEdge
+     * @param nameOut
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
     static Image *Execute(std::string nameBase,
                              std::string nameEdge,
                              std::string nameOut,
@@ -153,7 +171,7 @@ public:
     }
 };
 
-FilterBilateral2DG::FilterBilateral2DG(float sigma_s, float sigma_r)
+PIC_INLINE FilterBilateral2DG::FilterBilateral2DG(float sigma_s, float sigma_r)
 {
     //protected values are assigned/computed
     this->sigma_s = sigma_s;
@@ -167,7 +185,7 @@ FilterBilateral2DG::FilterBilateral2DG(float sigma_s, float sigma_r)
     fltG = new FilterGaussian3D(1.0f);
 }
 
-FilterBilateral2DG::~FilterBilateral2DG()
+PIC_INLINE FilterBilateral2DG::~FilterBilateral2DG()
 {
     if(grid != NULL) {
         delete grid;
@@ -182,7 +200,7 @@ FilterBilateral2DG::~FilterBilateral2DG()
     }
 }
 
-Image *FilterBilateral2DG::Splat(Image *base, Image *edge, int channels)
+PIC_INLINE Image *FilterBilateral2DG::Splat(Image *base, Image *edge, int channels)
 {
     if(grid == NULL) {
         #ifdef PIC_DEBUG
@@ -314,7 +332,7 @@ void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge,
     }
 }
 
-Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
 {
     if(imgIn[0] == NULL) {
         return NULL;
@@ -379,7 +397,7 @@ Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-Image *FilterBilateral2DG::ProcessP(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterBilateral2DG::ProcessP(ImageVec imgIn, Image *imgOut)
 {
     parallel = true;
     return Process(imgIn, imgOut);

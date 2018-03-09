@@ -23,6 +23,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "externals/Eigen/Sparse"
 #include "externals/Eigen/src/SparseCore/SparseMatrix.h"
 
+#include "base.hpp"
 #include "image.hpp"
 
 namespace pic {
@@ -69,7 +70,7 @@ inline float LischinskiFunctionGauss(float Lcur, float Lref, float param[2])
  * @param LISCHINSKI_EPSILON
  * @return
  */
-Image *LischinskiMinimization(Image *L,
+PIC_INLINE Image *LischinskiMinimization(Image *L,
                               Image *g,
                               Image *omega = NULL,
                               float alpha = 1.0f,

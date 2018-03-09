@@ -19,6 +19,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_METRICS_LOG_RMSE_HPP
 
 #include <math.h>
+
+#include "base.hpp"
 #include "image.hpp"
 #include "metrics/base.hpp"
 
@@ -30,7 +32,7 @@ namespace pic {
  * @param cmp is the distorted image.
  * @return It returns RMSE in the log_e domain.
  */
-double logRMSE(Image *ori, Image *cmp)
+PIC_INLINE double logRMSE(Image *ori, Image *cmp)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;

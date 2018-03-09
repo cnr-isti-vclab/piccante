@@ -203,7 +203,6 @@ PIC_INLINE void FilterDownSampler2D::PreProcess(ImageVec imgIn,
     InsertFilter(flt[Y_DIRECTION]);
 }
 
-
 } // end namespace pic
 
 #endif /* PIC_FILTERING_FILTER_DOWNSAMPLER_2D_HPP */

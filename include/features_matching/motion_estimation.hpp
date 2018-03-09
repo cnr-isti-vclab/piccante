@@ -168,7 +168,7 @@ public:
 
         TileList lst(blockSize, width, height);
 
-        //creating threads
+        //create threads
         int numCores = std::thread::hardware_concurrency();
 
         std::thread **thrd = new std::thread*[numCores];

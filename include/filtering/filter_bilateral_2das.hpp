@@ -114,14 +114,14 @@ public:
     }
 };
 
-FilterBilateral2DAS::FilterBilateral2DAS()
+PIC_INLINE FilterBilateral2DAS::FilterBilateral2DAS()
 {
     seed = 1;
     pg = NULL;
     ms = NULL;
 }
 
-FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s,
+PIC_INLINE FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s,
         float sigma_r, int mult = 1)
 {
     //protected values are assigned/computed
@@ -144,7 +144,7 @@ FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s,
     seed = 1;
 }
 
-FilterBilateral2DAS::~FilterBilateral2DAS()
+PIC_INLINE FilterBilateral2DAS::~FilterBilateral2DAS()
 {
     if(pg != NULL) {
         delete pg;
@@ -155,7 +155,7 @@ FilterBilateral2DAS::~FilterBilateral2DAS()
     }
 }
 
-void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE  FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int width = dst->width;
     int height = dst->height;

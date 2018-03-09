@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_GL_REDUX_HPP
 #define PIC_UTIL_GL_REDUX_HPP
 
+#include "base.hpp"
+
 #include "util/gl/technique.hpp"
 #include "util/gl/fbo.hpp"
 #include "util/gl/quad.hpp"
@@ -211,7 +213,7 @@ public:
 
 };
 
-ReduxGL::ReduxGL(std::string reduxOperation, bool bDomainTransform)
+PIC_INLINE ReduxGL::ReduxGL(std::string reduxOperation, bool bDomainTransform)
 {
     fbo = NULL;
 
@@ -229,7 +231,7 @@ ReduxGL::ReduxGL(std::string reduxOperation, bool bDomainTransform)
     InitShaders();
 }
 
-ReduxGL::~ReduxGL()
+PIC_INLINE ReduxGL::~ReduxGL()
 {
     if(quad != NULL) {
         delete quad;
@@ -242,7 +244,7 @@ ReduxGL::~ReduxGL()
     }
 }
 
-void ReduxGL::InitShaders()
+PIC_INLINE void ReduxGL::InitShaders()
 {
     fragment_source = MAKE_STRING
                       (
@@ -296,7 +298,7 @@ void ReduxGL::InitShaders()
     }
 }
 
-GLuint ReduxGL::Process(GLuint texIn, int width, int height, int channels, GLuint texOut)
+PIC_INLINE GLuint ReduxGL::Process(GLuint texIn, int width, int height, int channels, GLuint texOut)
 {
     if(texIn == 0) {
         return texOut;

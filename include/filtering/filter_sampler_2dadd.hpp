@@ -83,7 +83,7 @@ public:
     }
 };
 
-FilterSampler2DAdd::FilterSampler2DAdd(ImageSampler *isb)
+PIC_INLINE FilterSampler2DAdd::FilterSampler2DAdd(ImageSampler *isb)
 {
     if(isb != NULL) {
         bIsb = false;
@@ -94,14 +94,14 @@ FilterSampler2DAdd::FilterSampler2DAdd(ImageSampler *isb)
     }
 }
 
-FilterSampler2DAdd::~FilterSampler2DAdd()
+PIC_INLINE FilterSampler2DAdd::~FilterSampler2DAdd()
 {
     if(bIsb) {
         delete isb;
     }
 }
 
-void FilterSampler2DAdd::Update(ImageSampler *isb)
+PIC_INLINE void FilterSampler2DAdd::Update(ImageSampler *isb)
 {
     if((this->isb != NULL) && (bIsb)) {
         delete this->isb;
@@ -111,7 +111,7 @@ void FilterSampler2DAdd::Update(ImageSampler *isb)
     bIsb = false;
 }
 
-void FilterSampler2DAdd::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterSampler2DAdd::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     if(src.size() != 2) {
         return;

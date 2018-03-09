@@ -73,19 +73,19 @@ public:
     void Update(float Ld_Max, float b, float Lw_Max, float Lwa);
 };
 
-FilterDragoTMO::FilterDragoTMO()
+PIC_INLINE FilterDragoTMO::FilterDragoTMO()
 {
     Update(100.0f, 0.95f, 1e6f, 0.5f);
 }
 
 
-FilterDragoTMO::FilterDragoTMO(float Ld_Max, float b, float Lw_Max,
+PIC_INLINE FilterDragoTMO::FilterDragoTMO(float Ld_Max, float b, float Lw_Max,
                                float Lw_a)
 {
     Update(Ld_Max, b, Lw_Max, Lw_a);
 }
 
-void FilterDragoTMO::Update(float Ld_Max, float b, float Lw_Max,
+PIC_INLINE void FilterDragoTMO::Update(float Ld_Max, float b, float Lw_Max,
                             float Lw_a)
 {
     //protected values are assigned/computed
@@ -121,7 +121,7 @@ void FilterDragoTMO::Update(float Ld_Max, float b, float Lw_Max,
     constant2 = (Ld_Max / 100.0f) / (log10f(1.0f + Lw_Max_scaled));
 }
 
-Image *FilterDragoTMO::SetupAux(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterDragoTMO::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgIn.size() < 2) {
         #ifdef PIC_DEBUG
@@ -137,7 +137,7 @@ Image *FilterDragoTMO::SetupAux(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-void FilterDragoTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterDragoTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = src[0]->channels;
 

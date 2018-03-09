@@ -33,14 +33,14 @@ namespace pic {
 class FilterSamplingMap: public FilterNPasses
 {
 protected:
-    ImageSamplerBilinear    isb;
-    float					scale;
+    ImageSamplerBilinear isb;
+    float scale;
 
-    FilterLuminance			*fltL;
-    FilterGradient			*fltG;
-    FilterSigmoidTMO		*fltS;
-    FilterSampler2D			*fltD;
-    FilterGaussian2D		*fltG2D;
+    FilterLuminance *fltL;
+    FilterGradient *fltG;
+    FilterSigmoidTMO *fltS;
+    FilterSampler2D *fltD;
+    FilterGaussian2D *fltG2D;
 
     /**
      * @brief Setup
@@ -95,7 +95,7 @@ public:
     }
 };
 
-FilterSamplingMap::FilterSamplingMap(float sigma) : FilterNPasses()
+PIC_INLINE FilterSamplingMap::FilterSamplingMap(float sigma) : FilterNPasses()
 {
     fltL = NULL;
     fltD = NULL;
@@ -107,12 +107,12 @@ FilterSamplingMap::FilterSamplingMap(float sigma) : FilterNPasses()
     Setup(rateScale, rateScale / sigma);
 }
 
-FilterSamplingMap::FilterSamplingMap(float sigma, float scale) : FilterNPasses()
+PIC_INLINE FilterSamplingMap::FilterSamplingMap(float sigma, float scale) : FilterNPasses()
 {
     Setup(sigma * scale, scale);
 }
 
-FilterSamplingMap::~FilterSamplingMap()
+PIC_INLINE FilterSamplingMap::~FilterSamplingMap()
 {
     if(fltL != NULL) {
         delete fltL;
@@ -136,7 +136,7 @@ FilterSamplingMap::~FilterSamplingMap()
 
 }
 
-void FilterSamplingMap::Setup(float sigma, float scale)
+PIC_INLINE void FilterSamplingMap::Setup(float sigma, float scale)
 {
     this->scale = scale;
 

@@ -165,7 +165,7 @@ public:
     void ChangePass(int x, int y, int z);
 };
 
-FilterDCT1D::FilterDCT1D(int nCoeff, bool bForward)
+PIC_INLINE FilterDCT1D::FilterDCT1D(int nCoeff, bool bForward)
 {
     this->coeff = NULL;
     this->nCoeff = nCoeff;
@@ -191,7 +191,7 @@ FilterDCT1D::~FilterDCT1D()
     }
 }
 
-void FilterDCT1D::ChangePass(int pass, int tPass)
+PIC_INLINE void FilterDCT1D::ChangePass(int pass, int tPass)
 {
     int tMod;
 
@@ -214,14 +214,14 @@ void FilterDCT1D::ChangePass(int pass, int tPass)
 
 }
 
-void FilterDCT1D::ChangePass(int x, int y, int z)
+PIC_INLINE void FilterDCT1D::ChangePass(int x, int y, int z)
 {
     dirs[0] = y;
     dirs[1] = x;
     dirs[2] = z;
 }
 
-void FilterDCT1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterDCT1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 

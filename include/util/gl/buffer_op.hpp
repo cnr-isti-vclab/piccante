@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_GL_BUFFER_OP_HPP
 #define PIC_UTIL_GL_BUFFER_OP_HPP
 
+#include "base.hpp"
+
 #include "util/string.hpp"
 #include "util/gl/quad.hpp"
 #include "util/gl/fbo.hpp"
@@ -89,7 +91,7 @@ public:
 
 };
 
-BufferOpGL::BufferOpGL(std::string op, bool bTexelFetch = false, float *c0 = NULL, float *c1 = NULL)
+PIC_INLINE BufferOpGL::BufferOpGL(std::string op, bool bTexelFetch = false, float *c0 = NULL, float *c1 = NULL)
 {
     fbo = NULL;
 
@@ -127,7 +129,7 @@ BufferOpGL::BufferOpGL(std::string op, bool bTexelFetch = false, float *c0 = NUL
     InitShaders();
 }
 
-void BufferOpGL::InitShaders()
+PIC_INLINE void BufferOpGL::InitShaders()
 {
     std::string strOp = "vec4 ret = ";
     strOp.append(op);
@@ -292,7 +294,7 @@ void BufferOpGL::InitShaders()
     technique.unbind();
 }
 
-void BufferOpGL::Update(float *c0, float *c1)
+PIC_INLINE void BufferOpGL::Update(float *c0, float *c1)
 {
     if(c0 != NULL) {
         for(int i = 0; i < 4; i++) {
@@ -314,7 +316,7 @@ void BufferOpGL::Update(float *c0, float *c1)
     technique.unbind();
 }
 
-void BufferOpGL::Update(float c0 = 0.0f, float c1 = 0.0f)
+PIC_INLINE void BufferOpGL::Update(float c0 = 0.0f, float c1 = 0.0f)
 {
     for(int i = 0; i < 4; i++) {
         this->c0[i] = c0;
@@ -332,7 +334,7 @@ void BufferOpGL::Update(float c0 = 0.0f, float c1 = 0.0f)
     technique.unbind();
 }
 
-void BufferOpGL::Process(GLuint tex0, GLuint tex1, GLuint texOut, int width, int height)
+PIC_INLINE void BufferOpGL::Process(GLuint tex0, GLuint tex1, GLuint texOut, int width, int height)
 {
     if(texOut == 0) {
         #ifdef PIC_DEBUG

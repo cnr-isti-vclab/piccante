@@ -104,7 +104,7 @@ public:
      */
     unsigned int Size()
     {
-        return positions.size();
+        return unsigned int (positions.size());
     }
 
     /**
@@ -134,7 +134,7 @@ public:
             float x0 = positions[0];
             float y0 = positions[1];
 
-            int n = positions.size() - 2;
+            int n = int(positions.size()) - 2;
             float x1 = positions[n];
             float y1 = positions[n + 1];
 
@@ -147,7 +147,7 @@ public:
     }
 };
 
-StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
+PIC_INLINE StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
                  float *color = NULL)
 {
     annotation = 1.0f;
@@ -191,7 +191,7 @@ StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
     SetupShaders();
 }
 
-StrokeGL::~StrokeGL()
+PIC_INLINE StrokeGL::~StrokeGL()
 {
     if(shape != NULL) {
         delete shape;
@@ -200,7 +200,7 @@ StrokeGL::~StrokeGL()
     shape = NULL;
 }
 
-void StrokeGL::SetupShaders()
+PIC_INLINE void StrokeGL::SetupShaders()
 {
     //common vertex program
     std::string vertex_source = MAKE_STRING
@@ -216,7 +216,7 @@ void StrokeGL::SetupShaders()
     }
                                 );
 
-    //rendering
+    //render
     std::string fragment_source_brush = MAKE_STRING
                                   (
     uniform sampler2D   u_tex;
@@ -278,7 +278,7 @@ void StrokeGL::SetupShaders()
     annotationProgram.unbind();
 }
 
-void StrokeGL::Resample()
+PIC_INLINE void StrokeGL::Resample()
 {
     if(positions.size() <= 0) {
         return;
@@ -375,7 +375,7 @@ void StrokeGL::Resample()
     }
 }
 
-void StrokeGL::Insert2DPoint(int x, int y)
+PIC_INLINE void StrokeGL::Insert2DPoint(int x, int y)
 {
     /*
     	float xf = -(x/float(width) -0.5f)*2.0f;
@@ -388,12 +388,12 @@ void StrokeGL::Insert2DPoint(int x, int y)
     positions.push_back(yf);
 }
 
-void StrokeGL::Reset()
+PIC_INLINE void StrokeGL::Reset()
 {
     positions.clear();
 }
 
-void StrokeGL::RenderBrushGL(int x, int y)
+PIC_INLINE void StrokeGL::RenderBrushGL(int x, int y)
 {
     float xf = (x / float(width)  - 0.5f) * 2.0f;
     float yf = (y / float(height) - 0.5f) * 2.0f;
@@ -426,7 +426,7 @@ void StrokeGL::RenderBrushGL(int x, int y)
     glDisable(GL_TEXTURE_2D);
 }
 
-void StrokeGL::RenderGL()
+PIC_INLINE void StrokeGL::RenderGL()
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
@@ -455,7 +455,7 @@ void StrokeGL::RenderGL()
     glDisable(GL_TEXTURE_2D);
 }
 
-void StrokeGL::RenderAnnotationGL()
+PIC_INLINE void StrokeGL::RenderAnnotationGL()
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
