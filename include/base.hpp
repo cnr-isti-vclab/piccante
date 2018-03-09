@@ -27,9 +27,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_BASE_HPP
 #define PIC_BASE_HPP
 
+namespace pic {
+
 typedef unsigned int uint;
 
-#ifdef PIC_ENABLE_INLINING
+#ifndef PIC_DISABLE_INLINING
 
 #ifndef PIC_INLINE
     #define PIC_INLINE inline
@@ -42,6 +44,8 @@ typedef unsigned int uint;
 #endif
 
 #endif /* PIC_ENABLE_INLINING */
+
+}
 
 #endif /* PIC_BASE_HPP */
 

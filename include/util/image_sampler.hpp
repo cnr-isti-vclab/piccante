@@ -51,7 +51,6 @@ namespace pic {
  * @param y is the vertical coordinate.
  * @return the evaluation of the B-spline.
  */
-PIC_INLINE
 template<class Scalar> inline Scalar Bilinear(Scalar a, Scalar b, Scalar c, Scalar d, float x, float y)
 {
     Scalar px0 = a + y * (c - a);
