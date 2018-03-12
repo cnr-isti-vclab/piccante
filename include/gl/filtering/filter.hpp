@@ -153,7 +153,7 @@ public:
     }
 };
 
-ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
+PIC_INLINE ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.empty()) {
         return imgOut;
@@ -174,39 +174,40 @@ ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
         fbo = new Fbo();
     }
 
+    //create an FBO
     fbo->create(width, height, imgIn[0]->frames, false, imgOut->getTexture());
 
-    //Rendering
+    //bind the FBO
     fbo->bind();
     glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 
-    //Shaders
+    //bind shaders
     technique.bind();
 
-    //Textures
+    //bind textures
     int n = int(imgIn.size());
     for(auto i = 0; i < n; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         imgIn[i]->bindTexture();
     }
 
-    //Texture internal filter parameters
+    //bind texture internal filter parameters
     int m = int(param.size());
     for(auto i = 0; i < m; i++) {
         glActiveTexture(GL_TEXTURE0 + n + i);
         param[i]->bindTexture();
     }
 
-    //Rendering aligned quad
+    //render an aligned quad
     quad->Render();
 
-    //Fbo
+    //unbind the FBO
     fbo->unbind();
 
-    //Shaders
+    //unbind shaders
     technique.unbind();
 
-    //Textures
+    //unbind textures
     for(auto i = 0; i< n; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         imgIn[i]->unBindTexture();
@@ -219,7 +220,6 @@ ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
 
     return imgOut;
 }
-
 
 } // end namespace pic
 

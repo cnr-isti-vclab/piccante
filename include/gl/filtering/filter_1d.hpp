@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_1D_HPP
 #define PIC_GL_FILTERING_FILTER_1D_HPP
 
+#include "base.hpp"
+
 #include "gl/filtering/filter.hpp"
 
 namespace pic {
@@ -104,7 +106,7 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-FilterGL1D::FilterGL1D(int direction, GLenum target): FilterGL()
+PIC_INLINE FilterGL1D::FilterGL1D(int direction, GLenum target): FilterGL()
 {
     weights = NULL;
 
@@ -131,7 +133,7 @@ FilterGL1D::FilterGL1D(int direction, GLenum target): FilterGL()
 
 }
 
-void FilterGL1D::ChangePass(int pass, int tPass)
+PIC_INLINE void FilterGL1D::ChangePass(int pass, int tPass)
 {
 
     if(target == GL_TEXTURE_2D) {
@@ -152,7 +154,7 @@ void FilterGL1D::ChangePass(int pass, int tPass)
     SetUniform();
 }
 
-void FilterGL1D::SetUniform()
+PIC_INLINE void FilterGL1D::SetUniform()
 {
     technique.bind();
     technique.setUniform("u_tex", 0);
@@ -169,14 +171,14 @@ void FilterGL1D::SetUniform()
     technique.unbind();
 }
 
-void FilterGL1D::InitShaders()
+PIC_INLINE void FilterGL1D::InitShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLConv1D");
 
     SetUniform();
 }
 
-ImageGL *FilterGL1D::Process(ImageGLVec imgIn, ImageGL *imgOut)
+PIC_INLINE ImageGL *FilterGL1D::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn[0] == NULL || imgIn.size() > 1) {
         return imgOut;

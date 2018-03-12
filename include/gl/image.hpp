@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_IMAGE_RAW_HPP
 #define PIC_GL_IMAGE_RAW_HPP
 
+#include "base.hpp"
+
 #include "image.hpp"
 
 #include "gl.hpp"
@@ -557,7 +559,7 @@ public:
     ImageGL operator /(const float &a);
 };
 
-ImageGL::ImageGL() : Image()
+PIC_INLINE ImageGL::ImageGL() : Image()
 {
     notOwnedGL = false;
     texture = 0;
@@ -566,7 +568,7 @@ ImageGL::ImageGL() : Image()
     tmpFbo = NULL;
 }
 
-ImageGL::ImageGL(GLuint texture, GLuint target) : Image()
+PIC_INLINE ImageGL::ImageGL(GLuint texture, GLuint target) : Image()
 {
     notOwnedGL = true;
 
@@ -583,7 +585,7 @@ ImageGL::ImageGL(GLuint texture, GLuint target) : Image()
     allocateAux();
 }
 
-ImageGL::ImageGL(Image *img, GLenum target, bool mipmap, bool transferOwnership = false): Image()
+PIC_INLINE ImageGL::ImageGL(Image *img, GLenum target, bool mipmap, bool transferOwnership = false): Image()
 {
     if(transferOwnership) {
         notOwned = false;
@@ -611,7 +613,7 @@ ImageGL::ImageGL(Image *img, GLenum target, bool mipmap, bool transferOwnership 
     mode = IMG_CPU_GPU;
 }
 
-ImageGL::ImageGL(Image *img, bool transferOwnership = false) : Image()
+PIC_INLINE ImageGL::ImageGL(Image *img, bool transferOwnership = false) : Image()
 {
     if(transferOwnership) {
         notOwned = false;
@@ -637,7 +639,7 @@ ImageGL::ImageGL(Image *img, bool transferOwnership = false) : Image()
     mode = IMG_CPU;
 }
 
-ImageGL::ImageGL(int frames, int width, int height, int channels,
+PIC_INLINE ImageGL::ImageGL(int frames, int width, int height, int channels,
                        IMAGESTORE mode, GLenum target) : Image()
 {
     notOwnedGL = false;

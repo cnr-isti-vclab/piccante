@@ -50,7 +50,7 @@ public:
 
 };
 
-ImageGL *RichardsonLucyDeconvolution::compute(ImageGL *imgIn, ImageGL *psf, int nIterations = 10, ImageGL *imgOut = NULL)
+PIC_INLINE ImageGL *RichardsonLucyDeconvolution::compute(ImageGL *imgIn, ImageGL *psf, int nIterations = 10, ImageGL *imgOut = NULL)
 {
     if((imgIn == NULL) || (psf == NULL)) {
         return imgOut;

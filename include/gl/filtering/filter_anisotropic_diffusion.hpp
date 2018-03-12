@@ -27,6 +27,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_ANISOTROPIC_DIFFUSION_HPP
 #define PIC_GL_FILTERING_FILTER_ANISOTROPIC_DIFFUSION_HPP
 
+#include "base.hpp"
+
 #include "gl/filtering/filter.hpp"
 #include "gl/filtering/filter_iterative.hpp"
 
@@ -64,8 +66,7 @@ public:
     }
 };
 
-//Basic constructor
-FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float k,
+PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float k,
         unsigned int iterations): FilterGL()
 {
     if(k <= 0.0f) {
@@ -87,7 +88,7 @@ FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float k,
     InitShaders();
 }
 
-FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigma_r,
+PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigma_r,
         float sigma_s): FilterGL()
 {
     if(sigma_r <= 0.0f) {
@@ -106,7 +107,7 @@ FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigma_r,
     InitShaders();
 }
 
-void FilterGLAnisotropicDiffusion::FragmentShader()
+PIC_INLINE void FilterGLAnisotropicDiffusion::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -147,14 +148,14 @@ void FilterGLAnisotropicDiffusion::FragmentShader()
                       );
 }
 
-void FilterGLAnisotropicDiffusion::InitShaders()
+PIC_INLINE void FilterGLAnisotropicDiffusion::InitShaders()
 {
     FragmentShader();
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLAnisotropicDiffusion");
     Update(k);
 }
 
-void FilterGLAnisotropicDiffusion::Update(float k)
+PIC_INLINE void FilterGLAnisotropicDiffusion::Update(float k)
 {
     if(k > 0.0f) {
         this->k = k;
@@ -169,8 +170,7 @@ void FilterGLAnisotropicDiffusion::Update(float k)
     technique.unbind();
 }
 
-//Processing
-ImageGL *FilterGLAnisotropicDiffusion::Process(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLAnisotropicDiffusion::Process(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
@@ -190,27 +190,26 @@ ImageGL *FilterGLAnisotropicDiffusion::Process(ImageGLVec imgIn,
 
     fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
 
-    //Rendering
     fbo->bind();
     glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 
-    //Shaders
+    //bind shaders
     technique.bind();
 
-    //Textures
+    //bind Textures
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
 
-    //Rendering aligned quad
+    //render an aligned quad
     quad->Render();
 
-    //Fbo
+    //unbind the FBO
     fbo->unbind();
 
-    //Shaders
+    //unbind shaders
     technique.unbind();
 
-    //Textures
+    //unbind textures
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return imgOut;
