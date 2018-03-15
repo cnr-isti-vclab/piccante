@@ -26,8 +26,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../common_code/gl_core_4_0.h"
 #endif
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 #include <QKeyEvent>
@@ -64,11 +62,11 @@ protected:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
         //read an input image
-        ImageRead("../data/input/bottles.hdr", &img);
+        img.Read("../data/input/bottles.hdr");
         img.generateTextureGL();
 
         //read weights
-        ImageRead("../data/input/star.png", &weights);
+        weights.Read("../data/input/star.bmp");
         float *sum = weights.getSumVal();
         weights.generateTextureGL();
         weights /= sum[0];
