@@ -581,9 +581,11 @@ public:
      */
     void gamma(float g)
     {
-        x = powf(x, g);
-        y = powf(y, g);
-        z = powf(z, g);
+        if (g > 0.0f) {
+            x = powf(x, g);
+            y = powf(y, g);
+            z = powf(z, g);
+        }
     }
 
     /**
