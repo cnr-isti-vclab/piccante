@@ -26,8 +26,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../common_code/gl_core_4_0.h"
 #endif
 
-#include "piccante.hpp"
-
 #include <QKeyEvent>
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
@@ -35,6 +33,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QOpenGLFunctions>
 #include <QVBoxLayout>
 #include <QLabel>
+
+#include "piccante.hpp"
 
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
 {  

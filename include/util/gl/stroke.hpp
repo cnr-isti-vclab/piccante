@@ -104,7 +104,7 @@ public:
      */
     unsigned int Size()
     {
-        return unsigned int (positions.size());
+        return (unsigned int)(positions.size());
     }
 
     /**

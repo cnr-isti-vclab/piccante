@@ -61,7 +61,7 @@ protected:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
         //read an input image
-        ImageRead("../data/input/bottles.hdr", &img);
+        img.Read("../data/input/bottles.hdr");
 
         img.generateTextureGL();
 
