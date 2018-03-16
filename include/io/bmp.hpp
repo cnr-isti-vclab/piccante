@@ -97,7 +97,7 @@ PIC_INLINE unsigned char *ReadBMP(std::string nameFile, unsigned char *data,
     FILE *file = fopen(nameFile.c_str(), "rb");
 
     if(file == NULL) {
-        return NULL;
+        return data;
     }
 
     BITMAPFILEHEADER    bmpfh;
@@ -117,12 +117,17 @@ PIC_INLINE unsigned char *ReadBMP(std::string nameFile, unsigned char *data,
     //24-bit images only!
     if(bmpih.biCompression != BI_RGB) {
         fclose(file);
-        return NULL;
+        return data;
     }
 
     int bpp = bmpih.biBitCount;
 
     channels = bpp / 8;
+
+    if(!(channels == 3 || channels == 1)) {
+        fclose(file);
+        return data;
+    }
 
     fseek(file, bmpfh.bfOffBits, SEEK_SET);
 
