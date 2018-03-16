@@ -809,6 +809,13 @@ PIC_INLINE void Image::setNULL()
     depth = -1;
     channels = -1;
 
+    widthf = -1.0f;
+    heightf = -1.0f;
+    width1f = -1.0f;
+    height1f = -1.0f;
+    framesf = -1.0f;
+    frames1f = -1.0f;
+
     dataTMP = NULL;
     data = NULL;
     dataUC = NULL;
@@ -1285,6 +1292,10 @@ PIC_INLINE void Image::setRand(unsigned int seed = 1)
 
 PIC_INLINE float *Image::getMaxVal(BBox *box = NULL, float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = new BBox(width, height, frames);
     }
@@ -1314,6 +1325,10 @@ PIC_INLINE float *Image::getMaxVal(BBox *box = NULL, float *ret = NULL)
 
 PIC_INLINE float *Image::getMinVal(BBox *box = NULL, float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = new BBox(width, height, frames);
     }
@@ -1343,6 +1358,10 @@ PIC_INLINE float *Image::getMinVal(BBox *box = NULL, float *ret = NULL)
 
 PIC_INLINE float *Image::getSumVal(BBox *box = NULL, float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = new BBox(width, height, frames);
     }
@@ -1372,6 +1391,10 @@ PIC_INLINE float *Image::getSumVal(BBox *box = NULL, float *ret = NULL)
 
 PIC_INLINE float *Image::getMeanVal(BBox *box = NULL, float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = &fullBox;
     }
@@ -1389,6 +1412,10 @@ PIC_INLINE float *Image::getMeanVal(BBox *box = NULL, float *ret = NULL)
 
 PIC_INLINE float *Image::getMomentsVal(int x0, int y0, int radius, float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     int channels_2 = channels * 2;
 
     if(ret == NULL) {
@@ -1420,6 +1447,10 @@ PIC_INLINE float *Image::getMomentsVal(int x0, int y0, int radius, float *ret = 
 PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL, BBox *box = NULL,
                                         float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = &fullBox;
     }
@@ -1461,6 +1492,10 @@ PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL, BBox *box = NULL,
 
 PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = &fullBox;
     }
@@ -1508,6 +1543,10 @@ PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
 
 PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = &fullBox;
     }

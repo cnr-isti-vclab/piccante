@@ -30,15 +30,9 @@ This program is free software: you can redistribute it and/or modify
 #define PIC_ENABLE_INLINING
 
 #include "piccante.hpp"
-#include "Foo.h"
 
 int main(int argc, char *argv[])
 {
-    pic::Image img2;
-
-    Foo test;
-    test.process(img2);
-
     std::string img_str = "";
 
     if(argc == 2) {

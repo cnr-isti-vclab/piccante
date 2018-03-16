@@ -29,8 +29,7 @@ QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
 
 INCLUDEPATH += ../../include
 
-SOURCES += main.cpp \
-           foo.cpp
+SOURCES += main.cpp
 
 win32-msvc*{
     DEFINES += _CRT_SECURE_NO_DEPRECATE

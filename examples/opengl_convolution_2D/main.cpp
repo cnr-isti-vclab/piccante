@@ -22,7 +22,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
 #ifdef _MSC_VER
-    #define PIC_DISABLE_OPENGL_NON_CORE
     #include "../common_code/gl_core_4_0.h"
 #endif
 
@@ -69,7 +68,10 @@ protected:
         weights.Read("../data/input/star.bmp");
         float *sum = weights.getSumVal();
         weights.generateTextureGL();
-        weights /= sum[0];
+
+        if(sum != NULL) {
+            weights /= sum[0];
+        }
 
         //create a screen aligned quad
         pic::QuadGL::getTechnique(technique,
