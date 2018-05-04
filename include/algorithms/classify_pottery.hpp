@@ -1,11 +1,41 @@
+/*
+
+PICCANTE
+The hottest HDR imaging library!
+http://vcg.isti.cnr.it/piccante
+
+Copyright (C) 2014
+Visual Computing Laboratory - ISTI CNR
+http://vcg.isti.cnr.it
+First author: Francesco Banterle
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+*/
+
+#ifndef PIC_ALGORITHMS_CLASSIFY_POTTERY_HPP
+#define PIC_ALGORITHMS_CLASSIFY_POTTERY_HPP
+
+#include "util/math.hpp"
+
+#include "image.hpp"
+#include "filtering/filter_white_balance.hpp"
+#include "filtering/filter_radial_basis_function.hpp"
+#include "tone_mapping/lischinski_minimization.hpp"
+#include "util/mask.hpp"
+
+namespace pic {
+
 #ifndef DATA_POTTERY_HPP
 #define DATA_POTTERY_HPP
 
-float mu_c[] = {0.7323f, 0.5415f, 0.3707f};
+float data_pottery_mu_c[] = {0.7323f, 0.5415f, 0.3707f};
 
-float var_distance = 0.0067f;
+float data_pottery_var_distance = 0.0067f;
 
-float colors[] = {
+float data_pottery_colors[] = {
      0.905880f, 0.551079f, 0.324502f,
      0.763653f, 0.595515f, 0.439585f,
      0.622630f, 0.364378f, 0.257991f,
@@ -185,3 +215,85 @@ float colors[] = {
      0.886393f, 0.648476f, 0.365666f};
 
 #endif //DATA_POTTERY_HPP
+
+/**
+ * @brief classifyPottery
+ * @param img
+ * @param white_pixel
+ * @return
+ */
+bool *classifyPottery(Image *img, float *white_pixel)
+{
+    RadialBasisFunction rbf;
+    rbf.update(data_pottery_colors, 177, 3, data_pottery_var_distance);
+
+    FilterRadialBasisFunction flt_rbf;
+    flt_rbf.update(&rbf);
+
+    FilterWhiteBalance flt_wb;
+    flt_wb.update(white_pixel, img->channels, true);
+
+    Image *img_wb = NULL;
+
+    bool bFlag = true;
+
+    if(white_pixel != NULL) {
+       img_wb = flt_wb.ProcessP(Single(img), NULL);
+    } else {
+        img_wb = img;
+        bFlag = false;
+    }
+
+    #ifdef PIC_DEBUG
+        img_wb->Write("../data/output/s_input_wb.bmp");
+    #endif
+
+    Image *img_wb_rbf = flt_rbf.ProcessP(Single(img_wb), NULL);
+
+    img_wb_rbf->clamp(0.0f, 1.0f);
+
+    Image *img_L = FilterLuminance::Execute(img, NULL);
+
+    Image *opt = LischinskiMinimization(img_L, img_wb_rbf);
+
+    float value = 1.0f;
+    bool *mask = opt->convertToMask(&value, 0.25f, false, NULL);
+
+    int width = opt->width;
+    int height = opt->height;
+    bool *tmp;
+    tmp = MaskDilate(mask, NULL, width, height, 3);
+    MaskDilate(tmp, mask, width, height, 3);
+    MaskDilate(mask, tmp, width, height, 3);
+    MaskDilate(tmp, mask, width, height, 3);
+
+    MaskRemoveIsolatedPixels(mask, tmp, width, height);
+
+    MaskErode(tmp, mask, width, height, 3);
+    MaskErode(mask, tmp, width, height, 3);
+    MaskErode(tmp, mask, width, height, 3);
+
+
+    #ifdef PIC_DEBUG
+        opt->convertFromMask(mask, width, height);
+        opt->Write("../data/output/opt.bmp");
+    #endif
+
+    if(tmp != mask) {
+        delete[] tmp;
+    }
+
+    delete opt;
+    delete img_L;
+    delete img_wb_rbf;
+
+    if(bFlag) {
+        delete img_wb;
+    }
+
+    return mask;
+}
+
+} // end namespace pic
+
+#endif /* PIC_ALGORITHMS_CLASSIFY_POTTERY_HPP */

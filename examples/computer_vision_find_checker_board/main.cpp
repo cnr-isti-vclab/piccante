@@ -26,8 +26,8 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 #define PIC_DEBUG
-#include "../common_code/image_qimage_interop.hpp"
 
+#include "../common_code/image_qimage_interop.hpp"
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -51,7 +51,8 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("OK\n");
 
-        pic::findCheckerBoard(&img);
+        std::vector< Eigen::Vector2f> corners;
+        pic::findCheckerBoard(&img, corners);
 
     } else {
         printf("No there is at least an invalid file!\n");

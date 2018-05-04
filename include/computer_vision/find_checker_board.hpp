@@ -170,9 +170,12 @@ PIC_INLINE Image *getCheckerBoardModel(int checkers_x, int checkers_y, int check
 /**
  * @brief findCheckerBoard
  * @param img
+ * @param corners_model
  */
-PIC_INLINE void findCheckerBoard(Image *img)
+PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &corners_model)
 {
+     corners_model.clear();
+
     //compute the luminance images
     Image *L = FilterLuminance::Execute(img, NULL, LT_CIE_LUMINANCE);
 
@@ -201,7 +204,10 @@ PIC_INLINE void findCheckerBoard(Image *img)
     //compute checkerboard size
     float checker_size = estimateCheckerBoardSize(corners_from_img);
 
-    drawPoints(img_wb, cfi_out, blue);
+
+    #ifdef PIC_DEBUG
+        drawPoints(img_wb, cfi_out, blue);
+    #endif
 
     std::vector< Eigen::Vector2f > cfi_valid;
     auto n =  cfi_out.size();
@@ -228,14 +234,12 @@ PIC_INLINE void findCheckerBoard(Image *img)
 
     #ifdef PIC_DEBUG
         printf("Size: %f\n", checker_size);
+        drawPoints(img_wb, cfi_valid, green);
     #endif
 
     checker_size = estimateCheckerBoardSize(cfi_valid);
 
-    drawPoints(img_wb, cfi_valid, green);
-
     //pattern image
-    std::vector< Eigen::Vector2f > corners_model;
 
     int checkers_size = 32;
     Image *img_pattern = getCheckerBoardModel(4, 6, checkers_size, corners_model);
@@ -280,9 +284,9 @@ PIC_INLINE void findCheckerBoard(Image *img)
     }
 
     #ifdef PIC_DEBUG
-    for(int i = 0; i < 4; i++) {
-        printf("%f\n", x[i]);
-    }
+        for(int i = 0; i < 4; i++) {
+            printf("%f\n", x[i]);
+        }
     #endif
 
     float start[] = {x[0], x[1], x[2], 1.0f};
@@ -290,17 +294,21 @@ PIC_INLINE void findCheckerBoard(Image *img)
     ICP2DTransform t2(tmp[0], tmp[1], tmp[2], tmp[3]);
 
     #ifdef PIC_DEBUG
-    for(int i = 0; i < 4; i++) {
-        printf("%f\n", tmp[i]);
-    }
+        for(int i = 0; i < 4; i++) {
+            printf("%f\n", tmp[i]);
+        }
     #endif
 
     t2.applyC(corners_model);
-    drawPoints(img_wb, corners_model, yellow);
 
     #ifdef PIC_DEBUG
+        drawPoints(img_wb, corners_model, yellow);
         img_wb->Write("../data/output/img_wb.bmp");
     #endif
+
+    if(img_wb != NULL) {
+        delete img_wb;
+    }
 }
 
 #endif

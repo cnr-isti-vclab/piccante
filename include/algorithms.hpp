@@ -41,6 +41,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "algorithms/grow_cut.hpp"
 #include "algorithms/live_wire.hpp"
 #include "algorithms/radial_basis_function.hpp"
+#include "algorithms/classify_pottery.hpp"
 
 #endif /* PIC_ALGORITHMS_HPP */
 
