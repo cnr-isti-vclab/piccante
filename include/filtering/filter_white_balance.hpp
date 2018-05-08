@@ -142,7 +142,7 @@ public:
             memcpy(this->white, white, sizeof(float) * nWhite);
         }
 
-        for(unsigned int i = 0; i < nWhite; i++) {
+        for(auto i = 0; i < nWhite; i++) {
             if(fabsf(this->white[i]) <= 1e-9f) {
                 this->white[i] = 1.0f;
             }

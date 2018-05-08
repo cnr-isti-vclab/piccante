@@ -21,7 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/math.hpp"
 
 #include "image.hpp"
-#include "filtering/filter_white_balance.hpp"
+#include "algorithms/white_balance.hpp"
 #include "filtering/filter_radial_basis_function.hpp"
 #include "tone_mapping/lischinski_minimization.hpp"
 #include "util/mask.hpp"
@@ -236,9 +236,8 @@ bool *classifyPottery(Image *img, float *white_pixel)
     Image *img_wb = NULL;
 
     bool bFlag = true;
-
     if(white_pixel != NULL) {
-       img_wb = flt_wb.ProcessP(Single(img), NULL);
+       img_wb = applyWhiteBalance(img, white_pixel);
     } else {
         img_wb = img;
         bFlag = false;
