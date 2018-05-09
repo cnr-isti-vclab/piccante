@@ -34,6 +34,14 @@ This program is free software: you can redistribute it and/or modify
 
 int main(int argc, char *argv[])
 {
+    std::string img_str;
+
+    if(argc == 2) {
+        img_str = argv[1];
+    } else {
+        img_str = "../data/input/features/bottles.hdr";
+    }
+
     pic::applyWhiteBalanceToFile("../data/input/bottles.hdr", "../data/output/img_wb.hdr", 200, 200);
 
     return 0;

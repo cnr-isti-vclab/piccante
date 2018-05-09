@@ -54,6 +54,10 @@ int main(int argc, char *argv[])
         std::vector< Eigen::Vector2f> corners;
         pic::findCheckerBoard(&img, corners);
 
+        Eigen::Vector2f p0, p1;
+        float length = estimateLengthOfCheckers(corners, p0, p1);
+
+        printf("The checkers' length is %3.3f pixels.\n", length);
     } else {
         printf("No there is at least an invalid file!\n");
     }

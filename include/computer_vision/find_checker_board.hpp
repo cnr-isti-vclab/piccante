@@ -204,7 +204,6 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     //compute checkerboard size
     float checker_size = estimateCheckerBoardSize(corners_from_img);
 
-
     #ifdef PIC_DEBUG
         drawPoints(img_wb, cfi_out, blue);
     #endif
@@ -310,6 +309,40 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
         delete img_wb;
     }
 }
+
+/**
+ * @brief estimateLengthInPixelOfCheckers
+ * @param corners_model
+ * @param p0
+ * @param p1
+ * @return
+ */
+PIC_INLINE float estimateLengthOfCheckers(std::vector< Eigen::Vector2f > &corners_model, Eigen::Vector2f &p0, Eigen::Vector2f &p1)
+{
+    if(corners_model.empty()) {
+        return -1.0f;
+    }
+
+    auto p_0 = corners_model[0];
+
+    int closest = -1;
+    float ret = FLT_MAX;
+    for(auto j = 1; j < corners_model.size(); j++) {
+        auto delta_ij = p_0 - corners_model[j];
+        float dist = delta_ij.norm();
+
+        if(dist < ret) {
+            ret = dist;
+            closest = j;
+        }
+    }
+
+    p0 = p_0;
+    p1 = corners_model[closest];
+
+    return ret;
+}
+
 
 #endif
 
