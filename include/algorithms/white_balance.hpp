@@ -58,6 +58,24 @@ PIC_INLINE Image* applyWhiteBalance(Image *img, int x, int y)
     return applyWhiteBalance(img, white_color);
 }
 
+/**
+ * @brief applyWhiteBalanceToFile
+ * @param nameFileInput
+ * @param nameFileOutput
+ * @param x
+ * @param y
+ */
+PIC_INLINE void applyWhiteBalanceToFile(char nameFileInput[], char nameFileOutput[], int x, int y)
+{
+    Image img(nameFileInput);
+
+    Image *img_wb = applyWhiteBalance(&img, x, y);
+
+    img_wb->Write(nameFileOutput);
+
+    delete img_wb;
+}
+
 } // end namespace pic
 
 #endif /* PIC_ALGORITHMS_WHITE_BALANCE_HPP */

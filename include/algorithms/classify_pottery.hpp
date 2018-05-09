@@ -213,8 +213,9 @@ float data_pottery_colors[] = {
      0.737622f, 0.527599f, 0.372707f,
      0.932369f, 0.614163f, 0.285938f,
      0.886393f, 0.648476f, 0.365666f};
-
 #endif //DATA_POTTERY_HPP
+
+#ifndef PIC_DISABLE_EIGEN
 
 /**
  * @brief classifyPottery
@@ -292,6 +293,8 @@ bool *classifyPottery(Image *img, float *white_pixel)
 
     return mask;
 }
+
+#endif
 
 } // end namespace pic
 

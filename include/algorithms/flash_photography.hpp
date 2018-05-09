@@ -19,76 +19,23 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_ALGORITHMS_FLASH_PHOTOGRAPHY_HPP
 
 #include "image.hpp"
-#include "filtering/filter.hpp"
 #include "filtering/filter_bilateral_2df.hpp"
 
 namespace pic {
 
 /**
- * @brief flashPhotography implements basic flash photography.
- * @param nameFlash
- * @param nameNoFlash
- * @param nameOut
- * @param filter
+ * @brief flashPhotography
+ * @param flash is a flash image that is linearized
+ * @param no_flash is a no-flash image that is linearized
+ * @param s_s spatial sigma of the bilateral filter in [5.0, 10.0]
+ * @param s_r range sigma of the biltareal filter in [0.05, 0.1]
  * @return
  */
-PIC_INLINE Image *flashPhotography(std::string nameFlash, std::string nameNoFlash,
-                           std::string nameOut,
-                           Filter *filter)
+Image *flashPhotography(Image *flash, Image *no_flash, float s_s = 5.0f, float s_r = 0.05f)
 {
-
-    //Loading Images
-    printf("Read flash image...");
-    Image imgFlash(nameFlash);
-    printf("ok\n");
-    printf("Read no-flash image...");
-    Image imgNoFlash(nameNoFlash);
-    printf("ok\n");
-
-    //Filter
-    Image *imgOut = filter->ProcessP(Double(&imgNoFlash, &imgFlash), NULL);
-
-    //Write image
-    imgOut->Write(nameOut);
-
-    return imgOut;
-}
-
-/**
- * @brief flashPhotography2DF
- * @param nameFlash
- * @param nameNoFlash
- * @param nameOut
- * @param sigma_s
- * @param sigma_r
- * @return
- */
-PIC_INLINE Image *flashPhotography2DF(std::string nameFlash, std::string nameNoFlash,
-                              std::string nameOut,
-                              float sigma_s, float sigma_r)
-{
-    FilterBilateral2DF filter(sigma_s, sigma_r);
-    return flashPhotography(nameFlash, nameNoFlash, nameOut, (Filter *)&filter);
-}
-
-/**
- * @brief flashPhotography2DS
- * @param nameFlash
- * @param nameNoFlash
- * @param nameOut
- * @param sigma_s
- * @param sigma_r
- * @return
- */
-PIC_INLINE Image *flashPhotography2DS(std::string nameFlash, std::string nameNoFlash,
-                              std::string nameOut,
-                              float sigma_s, float sigma_r)
-{
-    FilterBilateral2DS filter(sigma_s, sigma_r, 1);
-    return flashPhotography(nameFlash, nameNoFlash, nameOut, (Filter *)&filter);
+    return NULL;
 }
 
 } // end namespace pic
 
 #endif /* PIC_ALGORITHMS_FLASH_PHOTOGRAPHY_HPP */
-
