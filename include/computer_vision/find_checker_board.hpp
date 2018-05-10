@@ -171,8 +171,10 @@ PIC_INLINE Image *getCheckerBoardModel(int checkers_x, int checkers_y, int check
  * @brief findCheckerBoard
  * @param img
  * @param corners_model
+ * @param checkerBoardSizeX
+ * @param checkerBoardSizeY
  */
-PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &corners_model)
+PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &corners_model, int checkerBoardSizeX = 4, int checkerBoardSizeY = 6)
 {
      corners_model.clear();
 
@@ -241,7 +243,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     //pattern image
 
     int checkers_size = 32;
-    Image *img_pattern = getCheckerBoardModel(4, 6, checkers_size, corners_model);
+    Image *img_pattern = getCheckerBoardModel(checkerBoardSizeX, checkerBoardSizeY, checkers_size, corners_model);
     pic::ORBDescriptor b_desc((checkers_size >> 1) + 1, checkers_size);
 
     std::vector< unsigned int *> descs_model, descs_cfi_valid;
@@ -343,6 +345,77 @@ PIC_INLINE float estimateLengthOfCheckers(std::vector< Eigen::Vector2f > &corner
     return ret;
 }
 
+/**
+ * @brief estimateCoordinatesWhitePointFromCheckerBoard
+ * @param img
+ * @param corners_model
+ * @param checkerBoardSizeX
+ * @param checkerBoardSizeY
+ * @return
+ */
+PIC_INLINE Eigen::Vector2f estimateCoordinatesWhitePointFromCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &corners_model, int checkerBoardSizeX = 4, int checkerBoardSizeY = 6)
+{
+    Eigen::Vector2f ret(-1.0f, -1.0f);
+
+    if(img == NULL || corners_model.empty()) {
+        return ret;
+    }
+
+    float maxVal = 0.0f;
+
+    for(int i = 0; i < (checkerBoardSizeY -1) ; i++) {
+        for(int j = 0; j < (checkerBoardSizeX - 1); j++) {
+
+            int ind0 = (i * checkerBoardSizeX) + j;
+            int ind1 = (i + 1) * checkerBoardSizeX + j + 1;
+
+            auto p0 = corners_model[ind0];
+            auto p1 = corners_model[ind1];
+
+            auto pMid = (p0 + p1) / 2.0f;
+
+            int x = pMid[0];
+            int y = pMid[1];
+            float *color = (*img)(x, y);
+
+            float meanColor = 0.0f;
+            for(auto c = 0; c < img->channels; c++) {
+                meanColor += color[c];
+            }
+
+            if(meanColor > maxVal) {
+                maxVal = meanColor;
+                ret = pMid;
+            }
+        }
+    }
+
+    return ret;
+}
+
+/**
+ * @brief estimateWhitePointFromCheckerBoard
+ * @param img
+ * @param corners_model
+ * @param checkerBoardSizeX
+ * @param checkerBoardSizeY
+ * @return
+ */
+PIC_INLINE float *estimateWhitePointFromCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &corners_model, int checkerBoardSizeX = 4, int checkerBoardSizeY = 6)
+{
+    Eigen::Vector2f point = estimateCoordinatesWhitePointFromCheckerBoard(img, corners_model, checkerBoardSizeX, checkerBoardSizeY);
+
+    if(point[0] >= 0.0f && point[1] >= 0.0f) {
+
+        float *ret = new float[img->channels];
+        float *color = (*img)(int(point[0]), int(point[1]));
+        memcpy(ret, color, img->channels * sizeof(float));
+
+        return ret;
+    } else {
+        return NULL;
+    }
+}
 
 #endif
 

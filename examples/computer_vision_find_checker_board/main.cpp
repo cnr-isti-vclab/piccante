@@ -42,8 +42,7 @@ int main(int argc, char *argv[])
 
     printf("Reading images...");
 
-    pic::Image img;
-    ImageRead(img_str, &img);
+    pic::Image img(img_str);
 
     printf("Ok\n");
 
@@ -55,9 +54,15 @@ int main(int argc, char *argv[])
         pic::findCheckerBoard(&img, corners);
 
         Eigen::Vector2f p0, p1;
-        float length = estimateLengthOfCheckers(corners, p0, p1);
+        float length = pic::estimateLengthOfCheckers(corners, p0, p1);
 
         printf("The checkers' length is %3.3f pixels.\n", length);
+
+        float *color = pic::estimateWhitePointFromCheckerBoard(&img, corners);
+
+        pic::Image *img_wb = pic::applyWhiteBalance(&img, color);
+
+        img_wb->Write("../data/output/checker_board_photo_wb.png");
     } else {
         printf("No there is at least an invalid file!\n");
     }
