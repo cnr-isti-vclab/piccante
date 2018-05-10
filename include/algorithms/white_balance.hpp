@@ -66,7 +66,7 @@ PIC_INLINE Image* applyWhiteBalance(Image *img, int x, int y)
  * @param y
  * @return
  */
-int applyWhiteBalanceJNI(std::string imageInPath, std::string imageOutPath, int x, int y)
+PIC_INLINE int applyWhiteBalanceJNI(std::string imageInPath, std::string imageOutPath, int x, int y)
 {
     if(x < 0 || y < 0) {
         return 0;
