@@ -39,10 +39,10 @@ int main(int argc, char *argv[])
     if(argc == 2) {
         img_str = argv[1];
     } else {
-        img_str = "../data/input/features/bottles.hdr";
+        img_str = "../data/input/features/tommaseo_statue.png";
     }
 
-    pic::applyWhiteBalanceToFile("../data/input/bottles.hdr", "../data/output/img_wb.hdr", 200, 200);
+    pic::applyWhiteBalanceJNI("../data/input/tommaseo_statue.png", "../data/output/tommaseo_statue_wb.png", 200, 200);
 
     return 0;
 }

@@ -46,6 +46,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "io/tga.hpp"
 #include "io/vol.hpp"
 #include "util/io.hpp"
+#include "io/stb.hpp"
 
 namespace pic {
 
@@ -1746,7 +1747,7 @@ PIC_INLINE bool Image::Read(std::string nameFile,
             break;
 
         case IO_TGA:
-            tmp = ReadTGA(nameFile.c_str(), dataReader, width, height, channels);
+            tmp = ReadTGA(nameFile, dataReader, width, height, channels);
             break;
 
         case IO_JPG:
@@ -1762,7 +1763,7 @@ PIC_INLINE bool Image::Read(std::string nameFile,
         }
 
          if(bExt) {
-             return false;
+             tmp = ReadSTB(nameFile, width, height, channels);
          }
 
          if(tmp != NULL) { //move the handle where it's trackable
@@ -1863,24 +1864,26 @@ PIC_INLINE bool Image::Write(std::string nameFile, LDR_type typeWrite = LT_NOR_G
 
         bool bExt = (label == IO_JPG) || (label == IO_PNG);
 
-        if(bExt) {
-            return false;
+        //allocate memory: begin
+        float *dataWriter = NULL;
+
+        if((writerCounter > 0) && (writerCounter < frames)) {
+            dataWriter = &data[tstride * writerCounter];
         } else {
-            float *dataWriter = NULL;
+            dataWriter = data;
+        }
 
-            if((writerCounter > 0) && (writerCounter < frames)) {
-                dataWriter = &data[tstride * writerCounter];
-            } else {
-                dataWriter = data;
-            }
+        unsigned char *tmp = ConvertHDR2LDR(dataWriter, dataUC,
+                                            width * height * channels, typeWrite);
 
-            unsigned char *tmp = ConvertHDR2LDR(dataWriter, dataUC,
-                                                width * height * channels, typeWrite);
+        if(dataUC == NULL) {
+            dataUC = tmp;
+        }
+        //allocate memory: end
 
-            if(dataUC == NULL) {
-                dataUC = tmp;
-            }
-
+        if(bExt) {
+            return WriteSTB(nameFile, dataUC, width, height, channels);
+        } else {
             switch(label) {
             case IO_BMP:
                 return WriteBMP(nameFile, dataUC, width, height, channels);

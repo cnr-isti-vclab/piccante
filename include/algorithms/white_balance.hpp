@@ -58,6 +58,42 @@ PIC_INLINE Image* applyWhiteBalance(Image *img, int x, int y)
     return applyWhiteBalance(img, white_color);
 }
 
+/**
+ * @brief applyWhiteBalanceEXT
+ * @param imageInPath
+ * @param imageOutPath
+ * @param x
+ * @param y
+ * @return
+ */
+int applyWhiteBalanceJNI(std::string imageInPath, std::string imageOutPath, int x, int y)
+{
+    if(x < 0 || y < 0) {
+        return 0;
+    }
+
+    Image in;
+    bool bRead = in.Read(imageInPath);
+
+    if(bRead) {
+        Image *out = applyWhiteBalance(&in, x, y);
+        bool bWrite = out->Write(imageOutPath);
+
+        if(!bWrite) {
+            printf("applyWhiteBalanceJNI: the image could not be written.\n");
+        }
+
+        if(out != NULL) {
+            delete out;
+        }
+
+        return bWrite ? 1 : 0;
+    } else {
+        printf("applyWhiteBalanceJNI: the image could not be read.\n");
+        return 0;
+    }
+}
+
 } // end namespace pic
 
 #endif /* PIC_ALGORITHMS_WHITE_BALANCE_HPP */
