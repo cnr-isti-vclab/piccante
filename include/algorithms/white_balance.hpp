@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_WHITE_BALANCE_HPP
 #define PIC_ALGORITHMS_WHITE_BALANCE_HPP
 
+#include "base.hpp"
+
 #include "filtering/filter_white_balance.hpp"
 
 namespace pic {

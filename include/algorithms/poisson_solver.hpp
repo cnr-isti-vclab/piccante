@@ -23,6 +23,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "externals/Eigen/Sparse"
 #include "externals/Eigen/src/SparseCore/SparseMatrix.h"
 
+#include "base.hpp"
+
 #include "image.hpp"
 
 namespace pic {

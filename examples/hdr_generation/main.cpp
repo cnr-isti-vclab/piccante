@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     bool valid = true;
     pic::ImageVec stack_vec;
 
-    for(unsigned int i=0; i<7; i++) {
+    for(int i = 0; i < 7; i++) {
         pic::Image *img = new pic::Image();
         std::string name = "../data/input/stack/stack_room_exp_" + pic::fromNumberToString(i) + ".jpg";
         printf("\n%s", name.c_str());

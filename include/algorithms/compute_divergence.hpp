@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_COMPUTE_DIVERGENCE_HPP
 #define PIC_ALGORITHMS_COMPUTE_DIVERGENCE_HPP
 
+#include "base.hpp"
+
 #include "filtering/filter_conv_1d.hpp"
 
 namespace pic {

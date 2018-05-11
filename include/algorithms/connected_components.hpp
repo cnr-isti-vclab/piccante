@@ -22,6 +22,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <set>
 #include <map>
 
+#include "base.hpp"
+
 #include "image.hpp"
 #include "filtering/filter_luminance.hpp"
 
@@ -267,7 +269,7 @@ PIC_INLINE Image *computeConnectedComponents(Image *img, std::vector<LabelOutput
             comp->data[i] = it->minLabel;
         }
 
-        //Storing coordiantes of the connected components
+        //store coordiantes of the connected components
         float id = comp->data[i];
         uniqueIt = unique.find(id);
 
