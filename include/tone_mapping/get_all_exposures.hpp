@@ -18,14 +18,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_GET_ALL_EXPOSURES_HPP
 #define PIC_TONE_MAPPING_GET_ALL_EXPOSURES_HPP
 
-#include "base.hpp"
-#include "image.hpp"
-#include "histogram.hpp"
+#include "../base.hpp"
+#include "../image.hpp"
+#include "../histogram.hpp"
 
-#include "util/indexed_array.hpp"
+#include "../util/indexed_array.hpp"
 
-#include "filtering/filter_luminance.hpp"
-#include "filtering/filter_simple_tmo.hpp"
+#include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_simple_tmo.hpp"
 
 namespace pic {
 

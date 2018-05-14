@@ -18,10 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_PUSHPULL_HPP
 #define PIC_ALGORITHMS_PUSHPULL_HPP
 
-#include "image.hpp"
-#include "image_samplers/image_sampler_bsplines.hpp"
-#include "filtering/filter_down_pp.hpp"
-#include "filtering/filter_up_pp.hpp"
+#include "../image.hpp"
+#include "../image_samplers/image_sampler_bsplines.hpp"
+#include "../filtering/filter_down_pp.hpp"
+#include "../filtering/filter_up_pp.hpp"
 
 namespace pic {
 

@@ -18,12 +18,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_WLS_HPP
 #define PIC_FILTERING_FILTER_WLS_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
 
-#include "externals/Eigen/Sparse"
-#include "externals/Eigen/src/SparseCore/SparseMatrix.h"
+#include "../externals/Eigen/Sparse"
+#include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
 
 namespace pic {
 

@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_COLORS_COLOR_CONV_RGB_TO_SRGB_HPP
 #define PIC_COLORS_COLOR_CONV_RGB_TO_SRGB_HPP
 
-#include "colors/color_conv.hpp"
+#include "../colors/color_conv.hpp"
 
 namespace pic {
 

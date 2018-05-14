@@ -22,18 +22,17 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <stdlib.h>
 
-#include "base.hpp"
+#include "../base.hpp"
 
-#include "util/math.hpp"
+#include "../util/math.hpp"
 
-#include "computer_vision/nelder_mead_opt_fundamental.hpp"
+#include "../computer_vision/nelder_mead_opt_fundamental.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
-#include "externals/Eigen/SVD"
-#include "externals/Eigen/Geometry"
-
-#include "util/eigen_util.hpp"
+#include "../externals/Eigen/Dense"
+#include "../externals/Eigen/SVD"
+#include "../externals/Eigen/Geometry"
+#include "../util/eigen_util.hpp"
 #endif
 
 namespace pic {

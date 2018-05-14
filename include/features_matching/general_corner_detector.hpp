@@ -18,12 +18,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FEATURES_MATCHING_GENERAL_CORNER_DETECTOR_HPP
 #define PIC_FEATURES_MATCHING_GENERAL_CORNER_DETECTOR_HPP
 
-#include "image.hpp"
-#include "util/string.hpp"
-#include "util/string.hpp"
+#include "../image.hpp"
+#include "../util/string.hpp"
+#include "../util/string.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
+#include "../externals/Eigen/Dense"
 #endif
 
 namespace pic {

@@ -22,13 +22,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <stdlib.h>
 
-#include "base.hpp"
+#include "../base.hpp"
 
-#include "util/math.hpp"
+#include "../util/math.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
-#include "externals/Eigen/Geometry"
+#include "../externals/Eigen/Dense"
+#include "../externals/Eigen/Geometry"
 
 #endif
 

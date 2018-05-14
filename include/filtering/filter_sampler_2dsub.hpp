@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_SAMPLER_2DSUB_HPP
 #define PIC_FILTERING_FILTER_SAMPLER_2DSUB_HPP
 
-#include "filtering/filter.hpp"
-#include "image_samplers/image_sampler_bilinear.hpp"
+#include "../filtering/filter.hpp"
+#include "../image_samplers/image_sampler_bilinear.hpp"
 
 namespace pic {
 

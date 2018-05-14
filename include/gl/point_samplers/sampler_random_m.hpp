@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_POINT_SAMPLERS_SAMPLER_RANDOM_M_HPP
 #define PIC_GL_POINT_SAMPLERS_SAMPLER_RANDOM_M_HPP
 
-#include "base.hpp"
+#include "../../base.hpp"
 
-#include "point_samplers/sampler_random_m.hpp"
+#include "../../point_samplers/sampler_random_m.hpp"
 
 namespace pic {
 

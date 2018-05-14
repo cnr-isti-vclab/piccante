@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -27,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_HPP
 #define PIC_GL_FILTERING_FILTER_HPP
 
-#include "gl/image_vec.hpp"
-#include "util/gl/technique.hpp"
-#include "util/gl/quad.hpp"
+#include "../../gl/image_vec.hpp"
+#include "../../util/gl/technique.hpp"
+#include "../../util/gl/quad.hpp"
 
 namespace pic {
 

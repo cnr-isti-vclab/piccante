@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_DIFF_GAUSS_2D_HPP
 #define PIC_FILTERING_FILTER_DIFF_GAUSS_2D_HPP
 
-#include "filtering/filter.hpp"
-#include "filtering/filter_gaussian_2d.hpp"
+#include "../filtering/filter.hpp"
+#include "../filtering/filter_gaussian_2d.hpp"
 
 namespace pic {
 

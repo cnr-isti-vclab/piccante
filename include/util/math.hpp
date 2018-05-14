@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_MATH_HPP
 #define PIC_UTIL_MATH_HPP
 
-#include "base.hpp"
-
 #include <math.h>
 #include <random>
 #include <stdlib.h>
+
+#include "../base.hpp"
 
 namespace pic {
 

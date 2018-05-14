@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -27,10 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_ANISOTROPIC_DIFFUSION_HPP
 #define PIC_GL_FILTERING_FILTER_ANISOTROPIC_DIFFUSION_HPP
 
-#include "base.hpp"
+#include "../../base.hpp"
 
-#include "gl/filtering/filter.hpp"
-#include "gl/filtering/filter_iterative.hpp"
+#include "../../gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter_iterative.hpp"
 
 namespace pic {
 

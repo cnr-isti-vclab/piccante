@@ -18,14 +18,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_ALGORITHMS_PYRAMID_HPP
 #define PIC_GL_ALGORITHMS_PYRAMID_HPP
 
-#include "base.hpp"
+#include "../../base.hpp"
 
-#include "gl/image.hpp"
+#include "../../gl/image.hpp"
 
-#include "gl/filtering/filter_gaussian_2d.hpp"
-#include "gl/filtering/filter_sampler_2d.hpp"
-#include "gl/filtering/filter_blend.hpp"
-#include "gl/filtering/filter_op.hpp"
+#include "../../gl/filtering/filter_gaussian_2d.hpp"
+#include "../../gl/filtering/filter_sampler_2d.hpp"
+#include "../../gl/filtering/filter_blend.hpp"
+#include "../../gl/filtering/filter_op.hpp"
 
 namespace pic {
 

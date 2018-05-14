@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_GL_STROKE_HPP
 #define PIC_UTIL_GL_STROKE_HPP
 
-#include "gl/image.hpp"
-#include "util/gl/quad.hpp"
-#include "util/gl/technique.hpp"
+#include "../../gl/image.hpp"
+#include "../../util/gl/quad.hpp"
+#include "../../util/gl/technique.hpp"
 
 namespace pic {
 

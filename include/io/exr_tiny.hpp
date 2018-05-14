@@ -18,13 +18,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_IO_EXR_TINY_HPP
 #define PIC_IO_EXR_TINY_HPP
 
-#include "base.hpp"
+#include "../base.hpp"
 
 #ifndef PIC_DISABLE_TINY_EXR
 
 #define TINYEXR_IMPLEMENTATION
 
-#include "externals/tinyexr/tinyexr.h"
+#include "../externals/tinyexr/tinyexr.h"
 
 namespace pic {
 

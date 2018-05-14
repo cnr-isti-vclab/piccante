@@ -21,15 +21,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <stdio.h>
 #include <string>
 
-#include "util/math.hpp"
+#include "../base.hpp"
 
-#include "base.hpp"
-
+#define STB_IMAGE_WRITE_STATIC
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "externals/stb/stb_image_write.h"
+#include "../externals/stb/stb_image_write.h"
 
+#define STB_IMAGE_STATIC
 #define STB_IMAGE_IMPLEMENTATION
-#include "externals/stb/stb_image.h"
+#include "../externals/stb/stb_image.h"
 
 namespace pic {
 

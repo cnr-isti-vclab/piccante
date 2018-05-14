@@ -18,10 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_HYBRID_TMO_HPP
 #define PIC_TONE_MAPPING_HYBRID_TMO_HPP
 
-#include "tone_mapping/segmentation_tmo_approx.hpp"
-#include "algorithms/pyramid.hpp"
-#include "filtering/filter_drago_tmo.hpp"
-#include "filtering/filter_sigmoid_tmo.hpp"
+#include "../tone_mapping/segmentation_tmo_approx.hpp"
+#include "../algorithms/pyramid.hpp"
+#include "../filtering/filter_drago_tmo.hpp"
+#include "../filtering/filter_sigmoid_tmo.hpp"
 
 namespace pic {
 

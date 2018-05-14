@@ -20,18 +20,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <algorithm>
 
-#include "image.hpp"
-#include "point_samplers/sampler_random.hpp"
-#include "histogram.hpp"
-#include "filtering/filter_mean.hpp"
-#include "util/polynomial.hpp"
+#include "../image.hpp"
+#include "../point_samplers/sampler_random.hpp"
+#include "../histogram.hpp"
+#include "../filtering/filter_mean.hpp"
+#include "../util/polynomial.hpp"
 
-#include "algorithms/sub_sample_stack.hpp"
-#include "algorithms/weight_function.hpp"
-#include "algorithms/mitsunaga_nayar_crf.hpp"
+#include "../algorithms/sub_sample_stack.hpp"
+#include "../algorithms/weight_function.hpp"
+#include "../algorithms/mitsunaga_nayar_crf.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-    #include "externals/Eigen/SVD"
+    #include "../externals/Eigen/SVD"
 #endif
 
 namespace pic {
@@ -620,7 +620,7 @@ public:
         std::vector<unsigned char *> qstack;
         for (Image * slice : stack) {
             assert(slice->frames == 1);
-            unsigned char * q = pic::ConvertHDR2LDR(slice->data, NULL, slice->size(), pic::LT_NOR);
+            unsigned char * q = pic::convertHDR2LDR(slice->data, NULL, slice->size(), pic::LT_NOR);
             qstack.push_back(q);
         }
 

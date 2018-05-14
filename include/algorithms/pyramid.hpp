@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_PYRAMID_HPP
 #define PIC_ALGORITHMS_PYRAMID_HPP
 
-#include "image.hpp"
-#include "filtering/filter_gaussian_2d.hpp"
-#include "filtering/filter_sampler_2d.hpp"
-#include "filtering/filter_sampler_2dsub.hpp"
-#include "filtering/filter_sampler_2dadd.hpp"
+#include "../image.hpp"
+#include "../filtering/filter_gaussian_2d.hpp"
+#include "../filtering/filter_sampler_2d.hpp"
+#include "../filtering/filter_sampler_2dsub.hpp"
+#include "../filtering/filter_sampler_2dadd.hpp"
 
 namespace pic {
 

@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_MEAN_HPP
 #define PIC_FILTERING_FILTER_MEAN_HPP
 
-#include "filtering/filter_npasses.hpp"
+#include "../filtering/filter_npasses.hpp"
 
 namespace pic {
 

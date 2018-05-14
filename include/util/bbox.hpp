@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_BBOX_HPP
 #define PIC_UTIL_BBOX_HPP
 
-#include "base.hpp"
-#include "util/string.hpp"
+#include "../base.hpp"
+#include "../util/string.hpp"
 
 namespace pic {
 

@@ -22,10 +22,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <set>
 #include <map>
 
-#include "base.hpp"
+#include "../base.hpp"
 
-#include "image.hpp"
-#include "filtering/filter_luminance.hpp"
+#include "../image.hpp"
+#include "../filtering/filter_luminance.hpp"
 
 namespace pic {
 

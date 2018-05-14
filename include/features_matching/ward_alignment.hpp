@@ -20,13 +20,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
-#include "image.hpp"
-#include "image_samplers/image_sampler_bilinear.hpp"
-#include "filtering/filter_downsampler_2d.hpp"
-#include "filtering/filter_luminance.hpp"
+#include "../image.hpp"
+#include "../image_samplers/image_sampler_bilinear.hpp"
+#include "../filtering/filter_downsampler_2d.hpp"
+#include "../filtering/filter_luminance.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
+#include "../externals/Eigen/Dense"
 #endif
 
 namespace pic {

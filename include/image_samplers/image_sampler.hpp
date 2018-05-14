@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_IMAGE_SAMPLERS_IMAGE_SAMPLER_HPP
 #define PIC_IMAGE_SAMPLERS_IMAGE_SAMPLER_HPP
 
-#include "image.hpp"
-#include "util/image_sampler.hpp"
+#include "../image.hpp"
+#include "../util/image_sampler.hpp"
 
 namespace pic {
 

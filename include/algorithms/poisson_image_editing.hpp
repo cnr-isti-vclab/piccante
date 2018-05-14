@@ -20,13 +20,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef PIC_DISABLE_EIGEN
 
-#include "externals/Eigen/Sparse"
-#include "externals/Eigen/src/SparseCore/SparseMatrix.h"
+#include "../externals/Eigen/Sparse"
+#include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
 
-#include "base.hpp"
+#include "../base.hpp"
 
-#include "image.hpp"
-#include "filtering/filter_laplacian.hpp"
+#include "../image.hpp"
+#include "../filtering/filter_laplacian.hpp"
 
 namespace pic {
 

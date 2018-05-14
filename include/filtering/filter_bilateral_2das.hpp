@@ -20,11 +20,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <random>
 
-#include "util/precomputed_gaussian.hpp"
+#include "../util/precomputed_gaussian.hpp"
 
-#include "filtering/filter_sampling_map.hpp"
+#include "../filtering/filter_sampling_map.hpp"
 
-#include "point_samplers/sampler_random_m.hpp"
+#include "../point_samplers/sampler_random_m.hpp"
 
 namespace pic {
 

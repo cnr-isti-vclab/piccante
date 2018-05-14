@@ -18,15 +18,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_COMPUTER_VISION_NELDER_MEAD_OPT_ICP_2D_HPP
 #define PIC_COMPUTER_VISION_NELDER_MEAD_OPT_ICP_2D_HPP
 
-#include "util/eigen_util.hpp"
-#include "util/std_util.hpp"
-#include "util/matrix_3_x_3.hpp"
-#include "util/nelder_mead_opt_base.hpp"
+#include "../util/eigen_util.hpp"
+#include "../util/std_util.hpp"
+#include "../util/matrix_3_x_3.hpp"
+#include "../util/nelder_mead_opt_base.hpp"
 
-#include "computer_vision/iterative_closest_point_2D.hpp"
+#include "../computer_vision/iterative_closest_point_2D.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-   #include "externals/Eigen/Dense"
+   #include "../externals/Eigen/Dense"
 #endif
 
 namespace pic {

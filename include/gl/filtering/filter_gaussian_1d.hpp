@@ -18,16 +18,16 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_GAUSSIAN_1D_HPP
 #define PIC_GL_FILTERING_FILTER_GAUSSIAN_1D_HPP
 
-#include "util/precomputed_gaussian.hpp"
+#include "../../util/precomputed_gaussian.hpp"
 
-#include "gl/filtering/filter_conv_1d.hpp"
+#include "../../gl/filtering/filter_conv_1d.hpp"
 
 namespace pic {
 
 class FilterGLGaussian1D: public FilterGLConv1D
 {
 protected:
-    float               sigma;
+    float sigma;
     PrecomputedGaussian *pg;
 
 public:

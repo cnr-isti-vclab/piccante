@@ -20,9 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
-#include "base.hpp"
+#include "../base.hpp"
 
-#include "gl/image.hpp"
+#include "../gl/image.hpp"
 
 namespace pic {
 

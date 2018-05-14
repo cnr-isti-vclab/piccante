@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_OP_HPP
 #define PIC_GL_FILTERING_FILTER_OP_HPP
 
-#include "gl/filtering/filter.hpp"
-#include "util/string.hpp"
+#include "../../gl/filtering/filter.hpp"
+#include "../../util/string.hpp"
 
 namespace pic {
 

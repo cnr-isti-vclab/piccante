@@ -18,10 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_2DG_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_2DG_HPP
 
-#include "gl/filtering/filter.hpp"
-#include "gl/filtering/filter_slicer.hpp"
-#include "gl/filtering/filter_scatter.hpp"
-#include "gl/filtering/filter_gaussian_3d.hpp"
+#include "../../gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter_slicer.hpp"
+#include "../../gl/filtering/filter_scatter.hpp"
+#include "../../gl/filtering/filter_gaussian_3d.hpp"
 
 namespace pic {
 

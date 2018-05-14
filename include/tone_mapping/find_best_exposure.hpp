@@ -18,12 +18,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_FIND_BEST_EXPOSURE_HPP
 #define PIC_TONE_MAPPING_FIND_BEST_EXPOSURE_HPP
 
-#include "base.hpp"
-#include "image.hpp"
+#include "../base.hpp"
+#include "../image.hpp"
 
-#include "filtering/filter_luminance.hpp"
-#include "filtering/filter_simple_tmo.hpp"
-#include "histogram.hpp"
+#include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_simple_tmo.hpp"
+#include "../histogram.hpp"
 
 namespace pic {
 

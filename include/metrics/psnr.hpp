@@ -20,11 +20,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <math.h>
 
-#include "base.hpp"
-#include "image.hpp"
+#include "../base.hpp"
+#include "../image.hpp"
 
-#include "metrics/base.hpp"
-#include "metrics/mse.hpp"
+#include "../metrics/base.hpp"
+#include "../metrics/mse.hpp"
 
 namespace pic {
 

@@ -20,8 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <random>
 
-#include "util/vec.hpp"
-#include "util/math.hpp"
+#include "../util/vec.hpp"
+#include "../util/math.hpp"
 
 namespace pic {
 

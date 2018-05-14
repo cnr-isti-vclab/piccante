@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_REINHARD_TMO_SINGLE_PASS_HPP
 #define PIC_GL_FILTERING_REINHARD_TMO_SINGLE_PASS_HPP
 
-#include "gl/filtering/filter.hpp"
-#include "util/file_lister.hpp"
-#include "gl/point_samplers/sampler_random_m.hpp"
+#include "../../gl/filtering/filter.hpp"
+#include "../../util/file_lister.hpp"
+#include "../../gl/point_samplers/sampler_random_m.hpp"
 
 namespace pic {
 

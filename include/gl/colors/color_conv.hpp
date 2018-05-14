@@ -20,7 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <string>
 
-#include "util/gl/technique.hpp"
+#include "../../util/gl/technique.hpp"
 
 namespace pic {
 

@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_GL_TIMINGS_HPP
 #define PIC_UTIL_GL_TIMINGS_HPP
 
-#include "gl.hpp"
+#include "../../gl.hpp"
 
 namespace pic {
 

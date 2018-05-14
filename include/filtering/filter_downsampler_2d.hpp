@@ -18,10 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_DOWNSAMPLER_2D_HPP
 #define PIC_FILTERING_FILTER_DOWNSAMPLER_2D_HPP
 
-#include "filtering/filter_npasses.hpp"
-#include "filtering/filter_sampler_1d.hpp"
-#include "image_samplers/image_sampler_nearest.hpp"
-#include "image_samplers/image_sampler_gaussian.hpp"
+#include "../filtering/filter_npasses.hpp"
+#include "../filtering/filter_sampler_1d.hpp"
+#include "../image_samplers/image_sampler_nearest.hpp"
+#include "../image_samplers/image_sampler_gaussian.hpp"
 
 namespace pic {
 

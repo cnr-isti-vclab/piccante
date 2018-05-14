@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_METRICS_SNR_HPP
 #define PIC_METRICS_SNR_HPP
 
-#include "base.hpp"
-#include "image.hpp"
+#include "../base.hpp"
+#include "../image.hpp"
 
 namespace pic {
 

@@ -20,8 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef PIC_DISABLE_EIGEN
 
-#include "tone_mapping/lischinski_minimization.hpp"
-#include "tone_mapping/input_estimates.hpp"
+#include "../base.hpp"
+#include "../tone_mapping/lischinski_minimization.hpp"
+#include "../tone_mapping/input_estimates.hpp"
 
 namespace pic {
 

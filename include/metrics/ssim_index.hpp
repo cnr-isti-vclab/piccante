@@ -20,15 +20,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <math.h>
 
-#include "base.hpp"
-#include "image.hpp"
-#include "metrics/base.hpp"
-#include "util/indexed_array.hpp"
+#include "../base.hpp"
+#include "../image.hpp"
+#include "../metrics/base.hpp"
+#include "../util/indexed_array.hpp"
 
-#include "filtering/filter_luminance.hpp"
-#include "filtering/filter_gaussian_2d.hpp"
-#include "filtering/filter_downsampler_2d.hpp"
-#include "filtering/filter_ssim.hpp"
+#include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_gaussian_2d.hpp"
+#include "../filtering/filter_downsampler_2d.hpp"
+#include "../filtering/filter_ssim.hpp"
 
 namespace pic {
 

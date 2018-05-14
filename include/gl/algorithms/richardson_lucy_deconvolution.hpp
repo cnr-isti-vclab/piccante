@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_ALGORITHMS_RICHARDSON_LUCY_DECONVOLUTION_HPP
 #define PIC_GL_ALGORITHMS_RICHARDSON_LUCY_DECONVOLUTION_HPP
 
-#include "gl/image.hpp"
-#include "gl/filtering/filter_conv_2d.hpp"
+#include "../../gl/image.hpp"
+#include "../../gl/filtering/filter_conv_2d.hpp"
 
 namespace pic {
 

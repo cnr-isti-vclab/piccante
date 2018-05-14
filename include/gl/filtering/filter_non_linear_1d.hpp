@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_NON_LINEAR_1D_HPP
 #define PIC_GL_FILTERING_FILTER_NON_LINEAR_1D_HPP
 
-#include "gl/filtering/filter_1d.hpp"
+#include "../../gl/filtering/filter_1d.hpp"
 
 namespace pic {
 

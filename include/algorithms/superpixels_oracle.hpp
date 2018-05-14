@@ -21,7 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <vector>
 #include <set>
 
-#include "algorithms/quadtree.hpp"
+#include "../algorithms/quadtree.hpp"
 
 namespace pic {
 

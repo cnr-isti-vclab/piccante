@@ -18,15 +18,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FEATURES_MATCHING_DENSE_SIFT_HPP
 #define PIC_FEATURES_MATCHING_DENSE_SIFT_HPP
 
-#include "util/array.hpp"
+#include "../util/array.hpp"
 
-#include "util/rasterizer.hpp"
+#include "../util/rasterizer.hpp"
 
-#include "filtering/filter_luminance.hpp"
-#include "filtering/filter_gradient.hpp"
-#include "filtering/filter_channel.hpp"
-#include "filtering/filter_conv_2d.hpp"
-#include "filtering/filter_conv_2dsp.hpp"
+#include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_gradient.hpp"
+#include "../filtering/filter_channel.hpp"
+#include "../filtering/filter_conv_2d.hpp"
+#include "../filtering/filter_conv_2dsp.hpp"
 
 namespace pic {
 

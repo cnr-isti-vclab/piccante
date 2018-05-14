@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_DURAND_TMO_HPP
 #define PIC_GL_FILTERING_FILTER_DURAND_TMO_HPP
 
-#include "gl/filtering/filter.hpp"
-#include "gl/filtering/filter_luminance.hpp"
+#include "../../gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter_luminance.hpp"
 
 namespace pic {
 

@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_2DAS_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_2DAS_HPP
 
-#include "gl/filtering/filter.hpp"
-#include "gl/filtering/filter_sampling_map.hpp"
-#include "gl/point_samplers/sampler_random_m.hpp"
+#include "../../gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter_sampling_map.hpp"
+#include "../../gl/point_samplers/sampler_random_m.hpp"
 
 namespace pic {
 

@@ -18,13 +18,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_TONE_MAPPING_DURAND_TMO_HPP
 #define PIC_GL_TONE_MAPPING_DURAND_TMO_HPP
 
-#include "util/string.hpp"
-#include "util/math.hpp"
+#include "../../util/string.hpp"
+#include "../../util/math.hpp"
 
-#include "gl/filtering/filter_luminance.hpp"
-#include "gl/filtering/filter_bilateral_2ds.hpp"
-#include "gl/filtering/filter_op.hpp"
-#include "gl/filtering/filter_durand_tmo.hpp"
+#include "../../gl/filtering/filter_luminance.hpp"
+#include "../../gl/filtering/filter_bilateral_2ds.hpp"
+#include "../../gl/filtering/filter_op.hpp"
+#include "../../gl/filtering/filter_durand_tmo.hpp"
 
 namespace pic {
 

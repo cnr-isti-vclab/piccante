@@ -29,7 +29,7 @@ namespace pic {
  * @param vecOut
  */
 template<class T>
-void filterInliers(std::vector< T > &vec, std::vector< unsigned int > &inliers, std::vector< T > &vecOut)
+inline void filterInliers(std::vector< T > &vec, std::vector< unsigned int > &inliers, std::vector< T > &vecOut)
 {
     vecOut.clear();
 

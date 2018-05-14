@@ -18,15 +18,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_COLOR_CLASSIFICATION_HPP
 #define PIC_ALGORITHMS_COLOR_CLASSIFICATION_HPP
 
-#include "base.hpp"
+#include "../base.hpp"
 
-#include "util/math.hpp"
+#include "../util/math.hpp"
 
-#include "image.hpp"
-#include "algorithms/white_balance.hpp"
-#include "filtering/filter_radial_basis_function.hpp"
-#include "tone_mapping/lischinski_minimization.hpp"
-#include "util/mask.hpp"
+#include "../image.hpp"
+#include "../algorithms/white_balance.hpp"
+#include "../filtering/filter_radial_basis_function.hpp"
+#include "../tone_mapping/lischinski_minimization.hpp"
+#include "../util/mask.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
 

@@ -1778,7 +1778,7 @@ PIC_INLINE bool Image::Read(std::string nameFile,
              tmpFloat = &data[tstride * readerCounter];
          }
 
-         float *tmpConv = ConvertLDR2HDR(tmp, tmpFloat, width * height * channels,
+         float *tmpConv = convertLDR2HDR(tmp, tmpFloat, width * height * channels,
                                          typeLoad);
 
          if(tmpConv != NULL) {
@@ -1873,7 +1873,7 @@ PIC_INLINE bool Image::Write(std::string nameFile, LDR_type typeWrite = LT_NOR_G
             dataWriter = data;
         }
 
-        unsigned char *tmp = ConvertHDR2LDR(dataWriter, dataUC,
+        unsigned char *tmp = convertHDR2LDR(dataWriter, dataUC,
                                             width * height * channels, typeWrite);
 
         if(dataUC == NULL) {

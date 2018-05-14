@@ -18,19 +18,19 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_IMAGE_RAW_HPP
 #define PIC_GL_IMAGE_RAW_HPP
 
-#include "base.hpp"
+#include "../base.hpp"
 
-#include "image.hpp"
+#include "../image.hpp"
 
-#include "gl.hpp"
-#include "util/gl/fbo.hpp"
-#include "util/gl/formats.hpp"
-#include "util/gl/timings.hpp"
-#include "util/gl/buffer_ops.hpp"
-#include "util/gl/buffer_allocation.hpp"
-#include "util/gl/mask.hpp"
-#include "util/gl/redux.hpp"
-#include "util/gl/redux_ops.hpp"
+#include "../gl.hpp"
+#include "../util/gl/fbo.hpp"
+#include "../util/gl/formats.hpp"
+#include "../util/gl/timings.hpp"
+#include "../util/gl/buffer_ops.hpp"
+#include "../util/gl/buffer_allocation.hpp"
+#include "../util/gl/mask.hpp"
+#include "../util/gl/redux.hpp"
+#include "../util/gl/redux_ops.hpp"
 
 namespace pic {
 

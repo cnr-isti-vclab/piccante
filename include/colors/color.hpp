@@ -19,7 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_COLORS_COLOR_HPP
 
 //typedef float float;
-#include "util/math.hpp"
+#include "../util/math.hpp"
 
 namespace pic {
 

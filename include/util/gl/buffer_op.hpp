@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_GL_BUFFER_OP_HPP
 #define PIC_UTIL_GL_BUFFER_OP_HPP
 
-#include "base.hpp"
+#include "../../base.hpp"
 
-#include "util/string.hpp"
-#include "util/gl/quad.hpp"
-#include "util/gl/fbo.hpp"
+#include "../../util/string.hpp"
+#include "../../util/gl/quad.hpp"
+#include "../../util/gl/fbo.hpp"
 
 namespace pic {
 

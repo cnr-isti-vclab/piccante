@@ -22,8 +22,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <string>
 #include <iostream>
 
-#include "base.hpp"
-#include "util/buffer.hpp"
+#include "../base.hpp"
+#include "../util/buffer.hpp"
 
 namespace pic {
 

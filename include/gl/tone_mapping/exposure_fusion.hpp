@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_TONE_MAPPING_EXPOSURE_FUSION_TMO_HPP
 #define PIC_GL_TONE_MAPPING_EXPOSURE_FUSION_TMO_HPP
 
-#include "gl/filtering/filter_luminance.hpp"
-#include "gl/filtering/filter_exposure_fusion_weights.hpp"
-#include "gl/filtering/filter_op.hpp"
+#include "../../gl/filtering/filter_luminance.hpp"
+#include "../../gl/filtering/filter_exposure_fusion_weights.hpp"
+#include "../../gl/filtering/filter_op.hpp"
 
 namespace pic {
 

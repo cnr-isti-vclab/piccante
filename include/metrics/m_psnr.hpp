@@ -20,14 +20,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <math.h>
 
-#include "base.hpp"
+#include "../base.hpp"
 
-#include "util/array.hpp"
+#include "../util/array.hpp"
 
-#include "image.hpp"
-#include "tone_mapping/get_all_exposures.hpp"
-#include "metrics/base.hpp"
-#include "metrics/mse.hpp"
+#include "../image.hpp"
+#include "../tone_mapping/get_all_exposures.hpp"
+#include "../metrics/base.hpp"
+#include "../metrics/mse.hpp"
 
 namespace pic {
 

@@ -18,10 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_WARP_2D_HPP
 #define PIC_GL_FILTERING_FILTER_WARP_2D_HPP
 
-#include "util/matrix_3_x_3.hpp"
+#include "../util/matrix_3_x_3.hpp"
 
-#include "filtering/filter.hpp"
-#include "image_samplers/image_sampler_bilinear.hpp"
+#include "../filtering/filter.hpp"
+#include "../image_samplers/image_sampler_bilinear.hpp"
 
 namespace pic {
 

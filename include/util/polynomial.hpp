@@ -20,10 +20,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
-#include "base.hpp"
+#include "../base.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-    #include "externals/Eigen/QR"
+    #include "../externals/Eigen/QR"
 #endif
 
 namespace pic {

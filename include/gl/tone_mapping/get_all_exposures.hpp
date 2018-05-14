@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_TONE_MAPPING_GET_ALL_EXPOSURES_HPP
 #define PIC_GL_TONE_MAPPING_GET_ALL_EXPOSURES_HPP
 
-#include "base.hpp"
+#include "../../base.hpp"
 
-#include "tone_mapping/get_all_exposures.hpp"
+#include "../../tone_mapping/get_all_exposures.hpp"
 
-#include "gl/filtering/filter_simple_tmo.hpp"
+#include "../../gl/filtering/filter_simple_tmo.hpp"
 
 namespace pic {
 

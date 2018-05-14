@@ -18,13 +18,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FEATURES_MATCHING_CANNY_EDGE_DETECTOR_HPP
 #define PIC_FEATURES_MATCHING_CANNY_EDGE_DETECTOR_HPP
 
-#include "util/vec.hpp"
+#include "../util/vec.hpp"
 
-#include "image.hpp"
+#include "../image.hpp"
 
-#include "filtering/filter_luminance.hpp"
-#include "filtering/filter_gaussian_2d.hpp"
-#include "filtering/filter_gradient.hpp"
+#include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_gaussian_2d.hpp"
+#include "../filtering/filter_gradient.hpp"
 
 namespace pic {
 

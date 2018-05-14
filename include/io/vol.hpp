@@ -21,9 +21,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <stdio.h>
 #include <string>
 
-#include "util/math.hpp"
+#include "../base.hpp"
 
-#include "base.hpp"
+#include "../util/math.hpp"
 
 namespace pic {
 
@@ -88,10 +88,10 @@ PIC_INLINE float *ReadVOL(std::string nameFile, float *data, int &width,
             for(int k = 0; k < len; k++) {
                 ind0 = (tmpJ + k) * 3;
                 ind1 = (tmpJ + k) * channels;
-                data[ind1]   = float(tmpData[ind0  ]) / 255.0f;
+                data[ind1    ] = float(tmpData[ind0    ]) / 255.0f;
                 data[ind1 + 1] = float(tmpData[ind0 + 1]) / 255.0f;
                 data[ind1 + 2] = float(tmpData[ind0 + 2]) / 255.0f;
-                data[ind1 + 3] = sqrtf(data[ind1  ] * data[ind1  ] +
+                data[ind1 + 3] = sqrtf(data[ind1    ] * data[ind1    ] +
                                        data[ind1 + 1] * data[ind1 + 1] +
                                        data[ind1 + 2] * data[ind1 + 2]);
 //				data[ind1+3] = 1.0f;

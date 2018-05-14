@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_ASSEMBLE_HDR_HPP
 #define PIC_FILTERING_FILTER_ASSEMBLE_HDR_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
-#include "algorithms/camera_response_function.hpp"
+#include "../algorithms/camera_response_function.hpp"
 
 namespace pic {
 

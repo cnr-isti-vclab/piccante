@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_HSL_REPLACE_HPP
 #define PIC_GL_FILTERING_FILTER_HSL_REPLACE_HPP
 
-#include "gl/colors/color_conv_rgb_to_hsl.hpp"
-#include "gl/filtering/filter.hpp"
+#include "../../gl/colors/color_conv_rgb_to_hsl.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 

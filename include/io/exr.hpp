@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_IO_EXR_HPP
 #define PIC_IO_EXR_HPP
 
-#include "base.hpp"
+#include "../base.hpp"
 
 #ifdef PIC_ENABLE_OPEN_EXR
 

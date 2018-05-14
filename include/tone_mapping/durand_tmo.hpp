@@ -18,12 +18,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_DURAND_TMO_HPP
 #define PIC_TONE_MAPPING_DURAND_TMO_HPP
 
-#include "base.hpp"
+#include "../base.hpp"
 
-#include "util/string.hpp"
-#include "filtering/filter.hpp"
-#include "filtering/filter_luminance.hpp"
-#include "algorithms/bilateral_separation.hpp"
+#include "../util/string.hpp"
+#include "../filtering/filter.hpp"
+#include "../filtering/filter_luminance.hpp"
+#include "../algorithms/bilateral_separation.hpp"
 
 namespace pic {
 

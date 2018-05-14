@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_COMPUTER_VISION_NELDER_MEAD_OPT_GRAY_MATCH_HPP
 #define PIC_COMPUTER_VISION_NELDER_MEAD_OPT_GRAY_MATCH_HPP
 
-#include "util/nelder_mead_opt_base.hpp"
-#include "util/array.hpp"
+#include "../util/nelder_mead_opt_base.hpp"
+#include "../util/array.hpp"
 
 namespace pic {
 

@@ -20,9 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 //#define BILATERAL_GRID_MULTI_PASS
 
-#include "filtering/filter.hpp"
-#include "filtering/filter_gaussian_3d.hpp"
-#include "image_samplers/image_sampler_bilinear.hpp"
+#include "../filtering/filter.hpp"
+#include "../filtering/filter_gaussian_3d.hpp"
+#include "../image_samplers/image_sampler_bilinear.hpp"
 
 namespace pic {
 

@@ -23,7 +23,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <thread>
 #include <mutex>
 
-#include "util/gl/redux.hpp"
+#include "../../util/gl/redux.hpp"
 
 namespace pic {
 

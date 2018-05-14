@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_WEIGHT_FUNCTION_HPP
 #define PIC_ALGORITHMS_WEIGHT_FUNCTION_HPP
 
-#include "base.hpp"
+#include "../base.hpp"
 
 namespace pic {
 

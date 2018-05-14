@@ -21,11 +21,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <chrono>
 
-#include "util/math.hpp"
-#include "image.hpp"
+#include "../util/math.hpp"
+#include "../image.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-    #include "externals/Eigen/Dense"
+    #include "../externals/Eigen/Dense"
 #endif
 
 namespace pic {

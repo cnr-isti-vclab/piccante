@@ -17,13 +17,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
-#include "base.hpp"
+#include "../base.hpp"
 
-#include "util/matrix_3_x_3.hpp"
+#include "../util/matrix_3_x_3.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-    #include "externals/Eigen/LU"
-    #include "externals/Eigen/Geometry"
+    #include "../externals/Eigen/LU"
+    #include "../externals/Eigen/Geometry"
 #endif
 
 #ifndef PIC_EIGEN_UTIL

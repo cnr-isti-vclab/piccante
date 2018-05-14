@@ -18,10 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_HISTOGRAM_MATCHING_HPP
 #define PIC_ALGORITHMS_HISTOGRAM_MATCHING_HPP
 
-#include "base.hpp"
+#include "../base.hpp"
 
-#include "image.hpp"
-#include "histogram.hpp"
+#include "../image.hpp"
+#include "../histogram.hpp"
 
 namespace pic {
 

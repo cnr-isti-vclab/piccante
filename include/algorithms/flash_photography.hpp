@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_FLASH_PHOTOGRAPHY_HPP
 #define PIC_ALGORITHMS_FLASH_PHOTOGRAPHY_HPP
 
-#include "image.hpp"
-#include "filtering/filter_bilateral_2df.hpp"
+#include "../image.hpp"
+#include "../filtering/filter_bilateral_2df.hpp"
 
 namespace pic {
 

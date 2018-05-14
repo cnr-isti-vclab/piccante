@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_COLOR_CONV_HPP
 #define PIC_FILTERING_FILTER_COLOR_CONV_HPP
 
-#include "filtering/filter.hpp"
-#include "colors/color_conv.hpp"
-#include "colors/color_conv_rgb_to_xyz.hpp"
-#include "colors/color_conv_xyz_to_logluv.hpp"
-#include "colors/color_conv_xyz_to_cielab.hpp"
+#include "../filtering/filter.hpp"
+#include "../colors/color_conv.hpp"
+#include "../colors/color_conv_rgb_to_xyz.hpp"
+#include "../colors/color_conv_xyz_to_logluv.hpp"
+#include "../colors/color_conv_xyz_to_cielab.hpp"
 
 namespace pic {
 

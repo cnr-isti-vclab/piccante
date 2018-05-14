@@ -18,8 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_CONVERT_RAW_TO_IMAGES_HPP
 #define PIC_UTIL_CONVERT_RAW_TO_IMAGES_HPP
 
-#include "util/string.hpp"
-#include "image.hpp"
+#include "../base.hpp"
+#include "../util/string.hpp"
+#include "../image.hpp"
 
 namespace pic {
 

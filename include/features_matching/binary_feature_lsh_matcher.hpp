@@ -20,8 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
-#include "features_matching/hash_table_lsh.hpp"
-#include "features_matching/binary_feature_matcher.hpp"
+#include "../features_matching/hash_table_lsh.hpp"
+#include "../features_matching/binary_feature_matcher.hpp"
 
 namespace pic {
 

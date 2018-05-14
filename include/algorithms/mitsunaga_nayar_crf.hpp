@@ -23,10 +23,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include<limits>
 #include<vector>
 
-#include "base.hpp"
+#include "../base.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-    #include "externals/Eigen/LU"
+    #include "../externals/Eigen/LU"
 #endif
 
 namespace pic {

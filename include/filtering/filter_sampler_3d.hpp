@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_SAMPLER_3D_HPP
 #define PIC_FILTERING_FILTER_SAMPLER_3D_HPP
 
-#include "filtering/filter.hpp"
-#include "image_samplers/image_sampler.hpp"
+#include "../filtering/filter.hpp"
+#include "../image_samplers/image_sampler.hpp"
 
 namespace pic {
 

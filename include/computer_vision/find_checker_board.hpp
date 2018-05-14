@@ -18,18 +18,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_COMPUTER_VISION_FIND_CHECKER_BOARD_HPP
 #define PIC_COMPUTER_VISION_FIND_CHECKER_BOARD_HPP
 
-#include "filtering/filter_luminance.hpp"
+#include "../filtering/filter_luminance.hpp"
 
-#include "computer_vision/iterative_closest_point_2D.hpp"
-#include "computer_vision/nelder_mead_opt_ICP_2D.hpp"
+#include "../computer_vision/iterative_closest_point_2D.hpp"
+#include "../computer_vision/nelder_mead_opt_ICP_2D.hpp"
 
-#include "features_matching/orb_descriptor.hpp"
+#include "../features_matching/orb_descriptor.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
-#include "externals/Eigen/SVD"
-#include "externals/Eigen/Geometry"
-#include "util/eigen_util.hpp"
+#include "../externals/Eigen/Dense"
+#include "../externals/Eigen/SVD"
+#include "../externals/Eigen/Geometry"
+#include "../util/eigen_util.hpp"
 #endif
 
 namespace pic {

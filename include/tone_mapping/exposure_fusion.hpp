@@ -18,12 +18,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_EXPOSURE_FUSION_HPP
 #define PIC_TONE_MAPPING_EXPOSURE_FUSION_HPP
 
-#include "base.hpp"
-#include "colors/saturation.hpp"
-#include "filtering/filter_luminance.hpp"
-#include "filtering/filter_laplacian.hpp"
-#include "filtering/filter_exposure_fusion_weights.hpp"
-#include "algorithms/pyramid.hpp"
+#include "../base.hpp"
+#include "../colors/saturation.hpp"
+#include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_laplacian.hpp"
+#include "../filtering/filter_exposure_fusion_weights.hpp"
+#include "../algorithms/pyramid.hpp"
 
 namespace pic {
 

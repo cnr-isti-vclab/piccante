@@ -19,9 +19,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FEATURES_MATCHING_POISSON_DESCRIPTOR_HPP
 
 #include <random>
-#include "util/math.hpp"
-#include "image.hpp"
-#include "point_samplers/sampler_random.hpp"
+#include "../util/math.hpp"
+#include "../image.hpp"
+#include "../point_samplers/sampler_random.hpp"
 
 namespace pic {
 

@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_SUB_SAMPLE_STACK_HPP
 #define PIC_ALGORITHMS_SUB_SAMPLE_STACK_HPP
 
-#include "util/math.hpp"
+#include "../util/math.hpp"
 
-#include "image.hpp"
-#include "point_samplers/sampler_random.hpp"
-#include "histogram.hpp"
+#include "../image.hpp"
+#include "../point_samplers/sampler_random.hpp"
+#include "../histogram.hpp"
 
 namespace pic {
 

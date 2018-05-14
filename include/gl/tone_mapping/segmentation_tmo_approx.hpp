@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_TONE_MAPPING_SEGMENTATION_TMO_APPROX_HPP
 #define PIC_GL_TONE_MAPPING_SEGMENTATION_TMO_APPROX_HPP
 
-#include "gl/filtering/filter_luminance.hpp"
-#include "gl/filtering/filter_remove_nuked.hpp"
-#include "gl/filtering/filter_iterative.hpp"
-#include "gl/filtering/filter_bilateral_2ds.hpp"
-#include "gl/filtering/filter_op.hpp"
+#include "../../gl/filtering/filter_luminance.hpp"
+#include "../../gl/filtering/filter_remove_nuked.hpp"
+#include "../../gl/filtering/filter_iterative.hpp"
+#include "../../gl/filtering/filter_bilateral_2ds.hpp"
+#include "../../gl/filtering/filter_op.hpp"
 
 namespace pic {
 

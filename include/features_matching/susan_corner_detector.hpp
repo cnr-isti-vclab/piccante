@@ -18,15 +18,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FEATURES_MATCHING_SUSAN_CORNER_DETECTOR_HPP
 #define PIC_FEATURES_MATCHING_SUSAN_CORNER_DETECTOR_HPP
 
-#include "util/vec.hpp"
+#include "../util/vec.hpp"
 
-#include "image.hpp"
-#include "filtering/filter_luminance.hpp"
+#include "../image.hpp"
+#include "../filtering/filter_luminance.hpp"
 
-#include "features_matching/general_corner_detector.hpp"
+#include "../features_matching/general_corner_detector.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
+#include "../externals/Eigen/Dense"
 #endif
 namespace pic {
 
