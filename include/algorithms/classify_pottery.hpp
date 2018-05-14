@@ -28,10 +28,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "tone_mapping/lischinski_minimization.hpp"
 #include "util/mask.hpp"
 
-namespace pic {
+#ifndef PIC_DISABLE_EIGEN
 
-#ifndef DATA_POTTERY_HPP
-#define DATA_POTTERY_HPP
+namespace pic {
 
 float data_pottery_mu_c[] = {0.7323f, 0.5415f, 0.3707f};
 
@@ -215,9 +214,6 @@ float data_pottery_colors[] = {
      0.737622f, 0.527599f, 0.372707f,
      0.932369f, 0.614163f, 0.285938f,
      0.886393f, 0.648476f, 0.365666f};
-#endif //DATA_POTTERY_HPP
-
-#ifndef PIC_DISABLE_EIGEN
 
 /**
  * @brief classifyPottery
@@ -275,7 +271,6 @@ bool *classifyPottery(Image *img, float *white_pixel)
     MaskErode(mask, tmp, width, height, 3);
     MaskErode(tmp, mask, width, height, 3);
 
-
     #ifdef PIC_DEBUG
         opt->convertFromMask(mask, width, height);
         opt->Write("../data/output/opt.bmp");
@@ -296,8 +291,8 @@ bool *classifyPottery(Image *img, float *white_pixel)
     return mask;
 }
 
-#endif
-
 } // end namespace pic
+
+#endif
 
 #endif /* PIC_ALGORITHMS_CLASSIFY_POTTERY_HPP */
