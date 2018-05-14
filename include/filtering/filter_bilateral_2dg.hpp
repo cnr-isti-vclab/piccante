@@ -272,7 +272,7 @@ PIC_INLINE Image *FilterBilateral2DG::Splat(Image *base, Image *edge, int channe
     return grid;
 }
 
-void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge,
+PIC_INLINE void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge,
                                int channels)
 {
     float widthf = float(grid->width);

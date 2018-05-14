@@ -31,7 +31,7 @@ namespace pic {
  * @param s_r range sigma of the biltareal filter in [0.05, 0.1]
  * @return
  */
-Image *flashPhotography(Image *flash, Image *no_flash, float s_s = 5.0f, float s_r = 0.05f)
+PIC_INLINE Image *flashPhotography(Image *flash, Image *no_flash, float s_s = 5.0f, float s_r = 0.05f)
 {
     return NULL;
 }
