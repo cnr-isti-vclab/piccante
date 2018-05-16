@@ -115,7 +115,7 @@ pic::Image *ImageConvertFromQImage(QImage *imgIn,
         }
      }
 
-    pic::ConvertLDR2HDR(imgOut->dataUC, &imgOut->data[tmpInd], n, typeLoad);
+    pic::convertLDR2HDR(imgOut->dataUC, &imgOut->data[tmpInd], n, typeLoad);
 
     return imgOut;
 }
@@ -163,7 +163,7 @@ QImage *ImageConvertToQImage(pic::Image *imgIn,
 
     float *tmpData = &imgIn->data[writerCoutner % frames];
 
-    imgIn->dataUC = pic::ConvertHDR2LDR(tmpData, imgIn->dataUC, width * height * channels, type, gamma);
+    imgIn->dataUC = pic::convertHDR2LDR(tmpData, imgIn->dataUC, width * height * channels, type, gamma);
 
     int shifter[2];
     shifter[0] = 1;

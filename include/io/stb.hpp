@@ -23,7 +23,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 
-#define STB_IMAGE_WRITE_STATIC
+#define STBIWDEF
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../externals/stb/stb_image_write.h"
 

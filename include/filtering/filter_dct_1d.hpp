@@ -184,7 +184,7 @@ PIC_INLINE FilterDCT1D::FilterDCT1D(int nCoeff, bool bForward)
     dirs[2] = 0;
 }
 
-FilterDCT1D::~FilterDCT1D()
+PIC_INLINE FilterDCT1D::~FilterDCT1D()
 {
     if(coeff != NULL) {
         delete[] coeff;

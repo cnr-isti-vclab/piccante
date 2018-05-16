@@ -105,7 +105,7 @@ PIC_INLINE FilterIterative::FilterIterative(Filter *flt, int iterations)
     Update(flt, iterations);
 }
 
-FilterIterative::~FilterIterative()
+PIC_INLINE FilterIterative::~FilterIterative()
 {
     Destroy();
 }
