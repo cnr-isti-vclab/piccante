@@ -47,7 +47,7 @@ protected:
      * @param y
      * @return
      */
-    float getCost(Vec<2, int> &p, Vec<2, int> &q)
+    float getCost(Vec2i &p, Vec2i &q)
     {
         float out;
         float *tmp;
@@ -201,7 +201,7 @@ public:
      * @param pE
      * @param out
      */
-    void execute(Vec<2, int> pS, Vec<2, int> pE, std::vector< Vec<2, int> > &out)
+    void execute(Vec2i pS, Vec2i pE, std::vector< Vec2i > &out)
     {
         float *tmp;
 
@@ -219,13 +219,13 @@ public:
         tmp = (*g)(pS[0], pS[1]);
         tmp[0] = 0.0f;
 
-        std::vector< Vec<2, int> > list;
+        std::vector< Vec2i > list;
         list.push_back(pS);
 
         while(!list.empty()) {
             //get the best
-            std::vector< Vec<2, int> >::iterator index;
-            Vec<2, int> q;
+            std::vector< Vec2i >::iterator index;
+            Vec2i q;
 
             float g_q = FLT_MAX;
             bool bCheck = false;
@@ -251,7 +251,7 @@ public:
             e[q[1] * width + q[0]] = true;
 
             for(int i = 0; i < 8; i++) {
-                Vec<2, int> r(  q[0] + nx[i],
+                Vec2i r(  q[0] + nx[i],
                                 q[1] + ny[i]);
 
                 if(r[0] > -1 && r[0] < width &&
@@ -294,8 +294,8 @@ public:
         out.clear();
 
         out.push_back(pE);
-        Vec<2, int> m = pE;
-        Vec<2, int> prev(-1, -1);
+        Vec2i m = pE;
+        Vec2i prev(-1, -1);
 
         int maxIter = (width + height) * 4;
         int i = 0;
@@ -307,7 +307,7 @@ public:
             }
 
             int index = (m[1] * width + m[0]) * 2;
-            Vec<2, int> t(pointers[index], pointers[index + 1]);
+            Vec2i t(pointers[index], pointers[index + 1]);
 
             out.push_back(t);
             m = t;

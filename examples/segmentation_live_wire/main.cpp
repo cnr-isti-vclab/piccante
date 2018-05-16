@@ -48,12 +48,12 @@ int main(int argc, char *argv[])
         printf(" Ok!\n");
         pic::LiveWire *lw = new pic::LiveWire(&img);
 
-        std::vector< pic::Vec<2, int> > out;
-        pic::Vec<2, int> pS(227, 206);
-        pic::Vec<2, int> pE(221, 351);
+        std::vector< pic::Vec2i > out;
+        pic::Vec2i pS(227, 206);
+        pic::Vec2i pE(221, 351);
         lw->execute(pS, pE, out);
 
-        for(unsigned int i = 0; i < out.size(); i++) {
+        for(auto i = 0; i < out.size(); i++) {
             float *tmp = img(out[i][0], out[i][1]);
 
             tmp[0] = 1.0f;

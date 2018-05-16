@@ -25,7 +25,6 @@ This program is free software: you can redistribute it and/or modify
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
-#define PIC_DEBUG
 
 #include "../common_code/image_qimage_interop.hpp"
 
@@ -233,6 +232,9 @@ int main(int argc, char *argv[])
         float *white_pixel = img(82, 126);
 
         bool *mask = pic::computeColorClassification(&img, white_pixel, data_pottery_colors, 171, 3,  data_pottery_var_distance);
+
+        opt->convertFromMask(mask, width, height);
+        opt->Write("../data/output/opt.bmp");
     }
 
     return 0;
