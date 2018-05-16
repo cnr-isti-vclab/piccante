@@ -45,8 +45,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "io/tmp.hpp"
 #include "io/tga.hpp"
 #include "io/vol.hpp"
-#include "util/io.hpp"
 #include "io/stb.hpp"
+#include "util/io.hpp"
 
 namespace pic {
 
