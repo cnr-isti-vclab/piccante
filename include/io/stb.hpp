@@ -23,12 +23,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 
-#define STBIWDEF
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "../externals/stb/stb_image_write.h"
-
+#define STBIWDEF inline
 #define STB_IMAGE_STATIC
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
+
+#include "../externals/stb/stb_image_write.h"
 #include "../externals/stb/stb_image.h"
 
 namespace pic {
