@@ -51,7 +51,16 @@ int main(int argc, char *argv[])
         std::vector< pic::Vec2i > out;
         pic::Vec2i pS(227, 206);
         pic::Vec2i pE(221, 351);
+
+        auto start = std::chrono::system_clock::now();
         lw->execute(pS, pE, out);
+        auto end = std::chrono::system_clock::now();
+
+        std::chrono::duration<double> elapsed_seconds = end-start;
+           std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+           std::cout << "finished computation at " << std::ctime(&end_time)
+                     << "elapsed time: " << elapsed_seconds.count() << "s\n";
 
         for(auto i = 0; i < out.size(); i++) {
             float *tmp = img(out[i][0], out[i][1]);

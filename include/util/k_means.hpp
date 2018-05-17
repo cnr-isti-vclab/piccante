@@ -38,12 +38,12 @@ namespace pic{
  */
 template<class T>
 PIC_INLINE unsigned int kMeansAssignLabel( T* sample_j, int nDim,
-                                T* centers, int k)
+                                T* centers, unsigned int k)
 {
     T dist = Array<T>::distanceSq(sample_j, &centers[0], nDim);
     unsigned int label = 0;
 
-    for(unsigned int i = 1; i < k; i++) {
+    for(auto i = 1; i < k; i++) {
         T *center_i = &centers[i * nDim];
 
         T tmp_dist = Array<T>::distanceSq(sample_j, center_i, nDim);

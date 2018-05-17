@@ -63,6 +63,10 @@ protected:
                 return log10f(x + epsilon);
             }
             break;
+                
+            default: {
+                return x;
+            } break;
         }
 
         return x;
@@ -88,6 +92,11 @@ protected:
 
             case VS_LOG_10: {
                 return powf(10.0f, x) - epsilon;
+            }
+            break;
+                
+            default: {
+                return x;
             }
             break;
         }

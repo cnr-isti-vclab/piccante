@@ -204,7 +204,7 @@ public:
             break;
 
             case IL_LUT_8_BIT: {
-                int index =  CLAMP(int(std::round(x * 255.0f)), 256);
+                int index =  CLAMP(int(round(x * 255.0f)), 256);
                 return icrf.at(channel)[index];
             }
             break;

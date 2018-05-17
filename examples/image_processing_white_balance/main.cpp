@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
         img_str = "../data/input/features/tommaseo_statue.png";
     }
 
-    pic::applyWhiteBalanceJNI("../data/input/tommaseo_statue.png", "../data/output/tommaseo_statue_wb.png", 200, 200);
+    pic::applyWhiteBalanceJNI("../data/input/tommaseo_statue.png", "../data/output/tommaseo_statue_wb.png", 200, 200, true);
 
     return 0;
 }

@@ -53,6 +53,7 @@ PIC_INLINE float weightFunction(float x, CRF_WEIGHT type)
         float val_quartic = val_squared * val_squared;
         return (1.0f - val_quartic * val_quartic * val_quartic);
     }
+    break;
 
     case CW_DEB97: {
         static const float Zmin = 0.0f;
@@ -78,7 +79,12 @@ PIC_INLINE float weightFunction(float x, CRF_WEIGHT type)
             return CLAMPi(Zmax - x, 0.0f, 1.0f);
         }
     }
+    break;
 
+    default: {
+        return 1.0f;
+    }
+    break;
     }
 
     return 1.0f;

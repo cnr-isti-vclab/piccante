@@ -323,6 +323,11 @@ typedef Vec<3, int> Vec3i;
 typedef Vec<4, int> Vec4i;
 
 /**
+ * @brief Vec2f
+ */
+typedef Vec<2, float> Vec2f;
+
+/**
  * @brief Vec3f
  */
 typedef Vec<3, float> Vec3f;

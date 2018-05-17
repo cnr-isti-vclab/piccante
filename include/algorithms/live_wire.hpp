@@ -37,7 +37,7 @@ class LiveWire
 protected:
     float fG_min, fG_max;
 
-    Image *img_L, *img_G, *fG, *fZ, *g;
+    Image *img_G, *fG, *fZ, *g;
     int *pointers;
     bool *e;
 
@@ -65,7 +65,7 @@ protected:
 
         //D_p
         tmp = (*img_G)(p[0], p[1]);
-        Vec<2, float> D_p(tmp[1], -tmp[0]);
+        Vec2f D_p(tmp[1], -tmp[0]);
         float n_D_p_sq = D_p.lengthSq();
         if(n_D_p_sq > 0.0f) {
             D_p.div(sqrtf(n_D_p_sq));
@@ -73,16 +73,16 @@ protected:
 
         //D_q
         tmp = (*img_G)(q[0], q[1]);
-        Vec<2, float> D_q(tmp[1], -tmp[0]);
+        Vec2f D_q(tmp[1], -tmp[0]);
         float n_D_q_sq = D_q.lengthSq();
         if(n_D_q_sq > 0.0f) {
             D_q.div(sqrtf(n_D_q_sq));
         }
 
         //Delta_qp
-        Vec<2, float> delta_qp(float(q[0] - p[0]), float(q[1] - p[1]));
+        Vec2f delta_qp(float(q[0] - p[0]), float(q[1] - p[1]));
 
-        Vec<2, float> L;
+        Vec2f L;
         if(D_p.dot(delta_qp) >= 0.0f) {
             L = delta_qp;
         } else {
@@ -110,10 +110,6 @@ protected:
      */
     void release()
     {
-        if(img_L != NULL) {
-            delete img_L;
-        }
-
         if(img_G != NULL) {
             delete img_G;
         }
@@ -148,7 +144,6 @@ public:
 
     LiveWire(Image *img)
     {
-        img_L = NULL;
         img_G = NULL;
         fZ = NULL;
         fG = NULL;
@@ -172,7 +167,7 @@ public:
     {
         release();
 
-        img_L = FilterLuminance::Execute(img, img_L);
+        Image *img_L = FilterLuminance::Execute(img, NULL);
 
         //compute fG
         img_G = FilterGradient::Execute(img_L, img_G);
@@ -189,7 +184,7 @@ public:
         fZ->applyFunction(f1minusx);
 
         //aux buffers
-        g = img_L->allocateSimilarOne();
+        g = img_L;
         e = new bool[img_L->nPixels()];
 
         pointers = new int[img_L->nPixels() * 2];
@@ -207,11 +202,11 @@ public:
 
         *g = FLT_MAX;
 
-        e = Buffer<bool>::assign(e, img_L->nPixels(), false);
-        pointers = Buffer<int>::assign(pointers, img_L->nPixels() * 2, 0);
+        e = Buffer<bool>::assign(e, g->nPixels(), false);
+        pointers = Buffer<int>::assign(pointers, g->nPixels() * 2, 0);
 
-        int width  = img_L->width;
-        int height = img_L->height;
+        int width  = g->width;
+        int height = g->height;
 
         int nx[] = {-1, 0, 1, -1, 1, -1, 0, 1};
         int ny[] = {1, 1, 1, 0, 0, -1, -1, -1};
@@ -251,8 +246,8 @@ public:
             e[q[1] * width + q[0]] = true;
 
             for(int i = 0; i < 8; i++) {
-                Vec2i r(  q[0] + nx[i],
-                                q[1] + ny[i]);
+                Vec2i r(q[0] + nx[i],
+                        q[1] + ny[i]);
 
                 if(r[0] > -1 && r[0] < width &&
                    r[1] > -1 && r[1] < height) {

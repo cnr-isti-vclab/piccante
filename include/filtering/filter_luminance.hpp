@@ -148,7 +148,6 @@ public:
 
         switch(type)
         {
-
         case LT_WARD_LUMINANCE:
             {
                 weights = new float[3];
@@ -170,6 +169,13 @@ public:
             break;
 
         case LT_MEAN:
+            {
+                weights = NULL;
+                weights_size = -1;
+            }
+            break;
+                
+        default:
             {
                 weights = NULL;
                 weights_size = -1;

@@ -47,17 +47,33 @@ PIC_INLINE Image* applyWhiteBalance(Image *img, float *white_color)
  * @param img
  * @param x
  * @param y
+ * @param bRobust
  * @return
  */
-PIC_INLINE Image* applyWhiteBalance(Image *img, int x, int y)
+PIC_INLINE Image* applyWhiteBalance(Image *img, int x, int y, bool bRobust = false)
 {
     if(img == NULL) {
         return NULL;
     }
 
-    float *white_color = (*img)(x, y);
+    float *white_color;
 
-    return applyWhiteBalance(img, white_color);
+    int patchSize = 5;
+
+    if(!bRobust) {
+        white_color = (*img)(x, y);
+    } else {
+        BBox patch(x - patchSize, x + patchSize, y - patchSize, y + patchSize);
+        white_color = img->getMeanVal(&patch, NULL);
+    }
+
+    Image *out = applyWhiteBalance(img, white_color);
+
+    if(bRobust) {
+        delete[] white_color;
+    }
+
+    return out;
 }
 
 /**
@@ -66,20 +82,22 @@ PIC_INLINE Image* applyWhiteBalance(Image *img, int x, int y)
  * @param imageOutPath
  * @param x
  * @param y
+ * @param bRobust
  * @return
  */
-PIC_INLINE int applyWhiteBalanceJNI(std::string imageInPath, std::string imageOutPath, int x, int y)
+PIC_INLINE int applyWhiteBalanceJNI(std::string imageInPath, std::string imageOutPath, int x, int y, bool bRobust = false)
 {
     if(x < 0 || y < 0) {
         return 0;
     }
 
     Image in;
-    bool bRead = in.Read(imageInPath);
+    bool bRead = in.Read(imageInPath, LT_NOR_GAMMA);
 
     if(bRead) {
-        Image *out = applyWhiteBalance(&in, x, y);
-        bool bWrite = out->Write(imageOutPath);
+        Image *out = applyWhiteBalance(&in, x, y, bRobust);
+
+        bool bWrite = out->Write(imageOutPath.c_str(), LT_NOR_GAMMA, 0);
 
         if(!bWrite) {
             printf("applyWhiteBalanceJNI: the image could not be written.\n");
