@@ -74,16 +74,16 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         if(imgOut != NULL) {
-            ImageWrite(imgOut, "../data/output/hdr_generation_image_log.hdr");
-            pic::Image *imgToneMapped_reinhard = pic::ReinhardTMO(imgOut);
-            ImageWrite(imgToneMapped_reinhard, "../data/output/image_debevec_crf_tone_mapped.png", pic::LT_NOR_GAMMA);
-       //     delete imgToneMapped_reinhard;
-        //    delete imgOut;
+            ImageWrite(imgOut, "../data/output/image_debevec_crf.hdr");
+            pic::Image *imgTmo = pic::ReinhardTMO(imgOut);
+            ImageWrite(imgTmo, "../data/output/image_debevec_crf_tmo.png", pic::LT_NOR_GAMMA);
+            delete imgTmo;
+            delete imgOut;
         }
 
         printf("Estimating the polynomial camera response function... ");
 
-        bool ok = crf.MitsunagaNayar(stack_vec, -6, 256, true, 0.08f, true);
+        bool ok = crf.MitsunagaNayar(stack_vec, -6, 256, false, 0.08f, true);
 
         if (ok) {
             printf("Ok.\n");
@@ -96,12 +96,12 @@ int main(int argc, char *argv[])
             printf("Ok\n");
 
             if(imgOut != NULL) {
-                ImageWrite(imgOut, "../data/output/hdr_generation_image_poly.hdr");
+                ImageWrite(imgOut, "../data/output/image_mitusunaga_crf.hdr");
 
-                pic::Image *imgToneMapped_reinhard = pic::ReinhardTMO(imgOut);
-                ImageWrite(imgToneMapped_reinhard, "../data/output/image_mitusunaga_crf_tone_mapped.png", pic::LT_NOR_GAMMA);
+                pic::Image *imgTmo = pic::ReinhardTMO(imgOut);
+                ImageWrite(imgTmo, "../data/output/image_mitusunaga_crf_tmo.png", pic::LT_NOR_GAMMA);
 
-                delete imgToneMapped_reinhard;
+                delete imgTmo;
                 delete imgOut;
             }
         } else {
