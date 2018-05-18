@@ -36,9 +36,11 @@ namespace pic {
 class LiveWire
 {
 protected:
-    float fG_min, fG_max;
+    float fD_const;
 
-    Image *img_G, *fG, *fZ, *g;
+    float *fG_min, *fG_max;
+
+    Image *img_G, *fZ, *g;
     int *pointers;
     bool *e;
 
@@ -58,9 +60,11 @@ protected:
         out = 0.43f * tmp[0];
 
         //fG cost
-        tmp = (*fG)(q[0], q[1]);
+        tmp = (*img_G)(q[0], q[1]);
+
+        float fG = 1.0f - (tmp[2] - fG_min[2]) / fG_max[2];
         float dist_qp = sqrtf(float(q.distanceSq(p)));
-        out += 0.14f * tmp[0] / dist_qp;
+        out += 0.14f * fG / dist_qp;
 
         //fD cost
 
@@ -99,7 +103,7 @@ protected:
         float dp_pq = D_p.dot(L);
         float dq_pq = L.dot(D_q);
 
-        float fD = (acosf(dp_pq) + acosf(dq_pq)) * 2.0f / (3.0f * C_PI);
+        float fD = (acosf(dp_pq) + acosf(dq_pq)) * fD_const;
 
         out +=  0.43f * fD;
 
@@ -132,12 +136,8 @@ protected:
         }
     }
 
-    /**
-     * @brief f1minusx
-     * @param x
-     * @return
-     */
-    static float f1minusx(float x) {
+    static float f1minusx(float x)
+    {
         return 1.0f - x;
     }
 
@@ -145,9 +145,10 @@ public:
 
     LiveWire(Image *img)
     {
+        fD_const = 2.0f / (C_PI * 3.0f);
+
         img_G = NULL;
         fZ = NULL;
-        fG = NULL;
         g = NULL;
         e = NULL;
         pointers = NULL;
@@ -172,13 +173,8 @@ public:
 
         //compute fG
         img_G = FilterGradient::Execute(img_L, img_G);
-        fG = FilterChannel::Execute(img_G, fG, 2);
-
-        fG->getMinVal(NULL, &fG_min);
-        *fG -= fG_min;
-        fG->getMaxVal(NULL, &fG_max);
-        *fG /= fG_max;
-        fG->applyFunction(f1minusx);
+        fG_min = img_G->getMinVal(NULL, NULL);
+        fG_max = img_G->getMaxVal(NULL, NULL);
 
         //compute fZ
         fZ = FilterLoG2D::Execute(img_L, fZ, 1.0f);
@@ -186,9 +182,10 @@ public:
 
         //aux buffers
         g = img_L;
+
         e = new bool[img_L->nPixels()];
 
-        pointers = new int[img_L->nPixels() * 2];
+        pointers = new int[img_L->nPixels() << 1];
     }
 
     /**
@@ -205,13 +202,13 @@ public:
         *g = FLT_MAX;
 
         e = Buffer<bool>::assign(e, g->nPixels(), false);
-        pointers = Buffer<int>::assign(pointers, g->nPixels() * 2, 0);
+        pointers = Buffer<int>::assign(pointers, g->nPixels() << 1, 0);
 
         int width  = g->width;
         int height = g->height;
 
-        int nx[] = {-1, 0, 1, -1, 1, -1, 0, 1};
-        int ny[] = {1, 1, 1, 0, 0, -1, -1, -1};
+        int nx[] = {-1, 0, 1, -1, 1, -1,  0, 1};
+        int ny[] = { 1, 1, 1,  0, 0, -1, -1, -1};
 
         int bX[2], bY[2];
 
@@ -290,7 +287,7 @@ public:
                             tmp = (*g)(r[0], r[1]);
                             tmp[0] = g_tmp;
 
-                            int index = (r[1] * width + r[0]) * 2;
+                            int index = (r[1] * width + r[0]) << 1;
                             pointers[index    ] = q[0];
                             pointers[index + 1] = q[1];
                             list.push_back(r);
@@ -310,7 +307,7 @@ public:
         Vec2i m = pE;
         Vec2i prev(-1, -1);
 
-        int maxIter = (width + height) * 4;
+        int maxIter = (width + height) << 2;
         int i = 0;
 
         while(true) {
@@ -319,7 +316,7 @@ public:
                 break;
             }
 
-            int index = (m[1] * width + m[0]) * 2;
+            int index = (m[1] * width + m[0]) << 1;
             Vec2i t(pointers[index], pointers[index + 1]);
 
             out.push_back(t);
