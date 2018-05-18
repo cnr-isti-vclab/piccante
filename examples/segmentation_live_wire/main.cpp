@@ -40,38 +40,33 @@ int main(int argc, char *argv[])
         img_str = "../data/input/tommaseo_statue.png";
     }
 
-    printf("Reading an image...");
-    pic::Image img;
-    ImageRead(img_str, &img);
-
-    if(img.isValid()) {
-        printf(" Ok!\n");
-        pic::LiveWire *lw = new pic::LiveWire(&img);
-
-        std::vector< pic::Vec2i > out, out2;
-        pic::Vec2i pS(227, 206);
-        pic::Vec2i pE(221, 351);
-
-        auto start = std::chrono::system_clock::now();
-        lw->execute(pS, pE, out, false);
-        auto end = std::chrono::system_clock::now();
-
-        std::chrono::duration<double> elapsed_seconds = end-start;
-           std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-
-           std::cout << "finished computation at " << std::ctime(&end_time)
-                     << "elapsed time: " << elapsed_seconds.count() << "s\n";
 
 
-            start = std::chrono::system_clock::now();
-           lw->execute(pS, pE, out2, true);
-            end = std::chrono::system_clock::now();
+    std::vector< pic::Vec2i > out, out2;
+    pic::Vec2i pS(227, 206);
+    pic::Vec2i pE(221, 351);
+    pic::executeLiveWireSingleJNI(img_str, pS, pE, out);
 
-            elapsed_seconds = end-start;
-            end_time = std::chrono::system_clock::to_time_t(end);
+    //how to use multiple LiveWire points
+    pic::Vec2i pE1(221, 381);
+    std::vector< pic::Vec2i > cp;
+    cp.push_back(pS);
+    cp.push_back(pE);
+    cp.push_back(pE1);
+    pic::executeLiveWireMultipleJNI(img_str, cp, out2);
 
-              std::cout << "finished computation at " << std::ctime(&end_time)
-                        << "elapsed time: " << elapsed_seconds.count() << "s\n";
+
+       pic::Image img(img_str, pic::LT_NOR_GAMMA);
+
+       for(auto i = 0; i < out.size(); i++) {
+           float *tmp = img(out[i][0], out[i][1]);
+
+           tmp[0] = 0.0f;
+           tmp[1] = 1.0f;
+           tmp[2] = 0.0f;
+       }
+
+       img.Write("../data/output/s_livewire_single.png", pic::LT_NOR_GAMMA);
 
         for(auto i = 0; i < out2.size(); i++) {
             float *tmp = img(out2[i][0], out2[i][1]);
@@ -80,16 +75,10 @@ int main(int argc, char *argv[])
             tmp[1] = 0.0f;
             tmp[2] = 0.0f;
         }
-        for(auto i = 0; i < out.size(); i++) {
-            float *tmp = img(out[i][0], out[i][1]);
+       img.Write("../data/output/s_livewire_multiple.png", pic::LT_NOR_GAMMA);
 
-            tmp[1] = 1.0f;
-        }
 
-        ImageWrite(&img, "../data/output/s_livewire_opt.png");
-    } else {
-        printf("No, the file is not valid!\n");
-    }
+
 
     return 0;
 }

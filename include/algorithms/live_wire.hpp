@@ -194,8 +194,9 @@ public:
      * @param pE
      * @param out
      * @param bConstrained
+     * @param bMultiple
      */
-    void execute(Vec2i pS, Vec2i pE, std::vector< Vec2i > &out, bool bConstrained = false)
+    void execute(Vec2i pS, Vec2i pE, std::vector< Vec2i > &out, bool bConstrained = false, bool bMultiple = false)
     {
         float *tmp;
 
@@ -301,7 +302,9 @@ public:
         }
 
         //forward pass -- tracking
-        out.clear();
+        if(!bMultiple) {
+            out.clear();
+        }
 
         out.push_back(pE);
         Vec2i m = pE;
@@ -335,6 +338,49 @@ public:
 
     }
 };
+
+/**
+ * @brief executeLiveWireSingleJNI
+ * @param imageInPath
+ * @param pS
+ * @param pE
+ * @param out
+ */
+PIC_INLINE void executeLiveWireSingleJNI(std::string imageInPath, Vec2i pS, Vec2i pE, std::vector< Vec2i > &out)
+{
+    Image in;
+    bool bRead = in.Read(imageInPath, LT_NOR_GAMMA);
+
+    if(bRead) {
+        pic::LiveWire *lw = new pic::LiveWire(&in);
+
+        lw->execute(pS, pE, out, true, false);
+
+        delete lw;
+    }
+}
+
+/**
+ * @brief executeLiveWireMultipleJNI
+ * @param imageInPath
+ * @param controlPoint
+ * @param out
+ */
+PIC_INLINE void executeLiveWireMultipleJNI(std::string imageInPath, std::vector< Vec2i > &controlPoint, std::vector< Vec2i > &out)
+{
+    Image in;
+    bool bRead = in.Read(imageInPath, LT_NOR_GAMMA);
+
+    if(bRead) {
+        pic::LiveWire *lw = new pic::LiveWire(&in);
+
+        for(auto i = 0; i < (controlPoint.size() - 1); i++) {
+            lw->execute(controlPoint.at(i), controlPoint.at(i + 1), out, true, true);
+        }
+
+        delete lw;
+    }
+}
 
 } // end namespace pic
 
