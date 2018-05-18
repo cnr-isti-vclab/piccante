@@ -28,6 +28,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter_gradient.hpp"
 #include "../filtering/filter_log_2d.hpp"
 #include "../filtering/filter_channel.hpp"
+#include "../filtering/filter_crop.hpp"
 #include "../util/vec.hpp"
 
 namespace pic {
@@ -195,8 +196,9 @@ public:
      * @param pS
      * @param pE
      * @param out
+     * @param bConstrained
      */
-    void execute(Vec2i pS, Vec2i pE, std::vector< Vec2i > &out)
+    void execute(Vec2i pS, Vec2i pE, std::vector< Vec2i > &out, bool bConstrained = false)
     {
         float *tmp;
 
@@ -211,14 +213,31 @@ public:
         int nx[] = {-1, 0, 1, -1, 1, -1, 0, 1};
         int ny[] = {1, 1, 1, 0, 0, -1, -1, -1};
 
+        int bX[2], bY[2];
+
+        if(!bConstrained) {
+            bX[0] = -1;
+            bX[1] = width;
+
+            bY[0] = -1;
+            bY[1] = height;
+        } else {
+            int boundSize = 11;
+
+            bX[0] = MAX(MIN(pS[0], pE[0]) - boundSize, -1);
+            bX[1] = MIN(MAX(pS[0], pE[0]) + boundSize, width);
+
+            bY[0] = MAX(MIN(pS[1], pE[1]) - boundSize, -1);
+            bY[1] = MIN(MAX(pS[1], pE[1]) + boundSize, height);
+        }
+
         tmp = (*g)(pS[0], pS[1]);
         tmp[0] = 0.0f;
 
         std::vector< Vec2i > list;
         list.push_back(pS);
 
-        while(!list.empty()) {
-            //get the best
+        while(!list.empty()) { //get the best
             std::vector< Vec2i >::iterator index;
             Vec2i q;
 
@@ -246,11 +265,10 @@ public:
             e[q[1] * width + q[0]] = true;
 
             for(int i = 0; i < 8; i++) {
-                Vec2i r(q[0] + nx[i],
-                        q[1] + ny[i]);
+                Vec2i r(q[0] + nx[i], q[1] + ny[i]);
 
-                if(r[0] > -1 && r[0] < width &&
-                   r[1] > -1 && r[1] < height) {
+                if(r[0] > bX[0] && r[0] < bX[1] &&
+                   r[1] > bY[0] && r[1] < bY[1]) {
 
                     if(!e[r[1] * width + r[0]]) {
                         float g_tmp = g_q + getCost(q, r);

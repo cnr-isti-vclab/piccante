@@ -30,9 +30,9 @@ enum GRADIENT_TYPE {G_SOBEL, G_PREWITT, G_NORMAL};
 class FilterGradient: public Filter
 {
 protected:
-    int				colorChannel;
-    GRADIENT_TYPE	type;
-    float			mask[3];
+    int colorChannel;
+    GRADIENT_TYPE type;
+    float mask[3];
 
     /**
      * @brief ProcessBBox
@@ -174,9 +174,7 @@ PIC_INLINE void FilterGradient::ProcessBBox(Image *dst, ImageVec src,
     //Filtering
     Image *img = src[0];
 
-    int channels = img->channels;
-
-    int tmpColorChannel = (channels == 1) ? 0 : colorChannel;
+    int channel = (img->channels == 1) ? 0 : colorChannel;
 
     for(int j = box->y0; j < box->y1; j++) {
         for(int i = box->x0; i < box->x1; i++) {
@@ -186,11 +184,11 @@ PIC_INLINE void FilterGradient::ProcessBBox(Image *dst, ImageVec src,
             for(int k = -1; k < 2; k++) {
                 float val = mask[k + 1];
 
-                gradX += val * (*img)(i + 1, j + k)[tmpColorChannel];
-                gradX -= val * (*img)(i - 1, j + k)[tmpColorChannel];
+                gradX += val * (*img)(i + 1, j + k)[channel];
+                gradX -= val * (*img)(i - 1, j + k)[channel];
 
-                gradY += val * (*img)(i + k, j + 1)[tmpColorChannel];
-                gradY -= val * (*img)(i + k, j - 1)[tmpColorChannel];
+                gradY += val * (*img)(i + k, j + 1)[channel];
+                gradY -= val * (*img)(i + k, j - 1)[channel];
             }
 
             float *dst_data = (*dst)(i, j);
