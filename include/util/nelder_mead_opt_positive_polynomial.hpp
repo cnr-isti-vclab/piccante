@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 
 #include "../util/nelder_mead_opt_base.hpp"
+#include "../util/math.hpp"
 #include "../util/polynomial.hpp"
 
 namespace pic {
@@ -57,6 +58,37 @@ public:
 
         return err;
     }
+
+#ifndef PIC_DISABLE_EIGEN
+
+    static void test()
+    {
+        std::mt19937 m(1);
+
+        std::vector< float > x, y;
+
+        for(int i = 0; i < 100; i++) {
+            float tx = float(i) / 100.0f;
+            float ty = tx + (Random(m()) * 0.1f - 0.5f);
+            x.push_back(tx);
+            y.push_back(ty);
+        }
+
+        NelderMeadOptPositivePolynomial test(x, y);
+
+        std::vector<float> poly = polynomialFit(x, y, 2);
+
+        float *in = new float[poly.size()];
+        for(int i = 0; i < poly.size(); i++) {
+            in[i] = poly[i];
+        }
+
+        float *out = test.run(in, 3, 1e-12f, 10000);
+
+        printf("Init: %f %f %f\nOut: %f %f %f\n", in[0], in[1], in[2], out[0], out[1], out[2]);
+    }
+
+#endif
 };
 
 }
