@@ -141,7 +141,7 @@ public:
      */
     void sub(Vec<N, T> a)
     {
-        for(unsigned int i=0; i<N; i++) {
+        for(unsigned int i = 0; i < N; i++) {
             data[i] -= a[i];
         }
     }
@@ -152,7 +152,7 @@ public:
      */
     void neg()
     {
-        for(unsigned int i=0; i<N; i++) {
+        for(unsigned int i = 0; i < N; i++) {
             data[i] = -data[i];
         }
     }

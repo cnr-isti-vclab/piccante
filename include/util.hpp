@@ -60,6 +60,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/vec.hpp"
 #include "util/warp_square_circle.hpp"
 #include "util/rasterizer.hpp"
+#include "util/polyline.hpp"
 
 //optimization
 #include "util/k_means.hpp"

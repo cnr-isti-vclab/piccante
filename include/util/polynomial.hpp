@@ -54,11 +54,11 @@ PIC_INLINE float polynomialVal(std::vector< float > & poly, float x)
  * @param n is the degree of the polynomial
  * @return
  */
-PIC_INLINE std::vector<float> polynomialFit(std::vector<float> &x, std::vector<float> &y, unsigned int n)
+PIC_INLINE std::vector<float> polynomialFit(std::vector<float> &x, std::vector<float> &y, int n)
 {
     std::vector<float> poly;
 
-    if(n == 0) {
+    if(n < 1) {
         return poly;
     }
 
@@ -66,19 +66,19 @@ PIC_INLINE std::vector<float> polynomialFit(std::vector<float> &x, std::vector<f
         return poly;
     }
 
-    unsigned int np1 = n + 1;
+    int np1 = n + 1;
 
-    unsigned int s = int(x.size());
+    int s = int(x.size());
     Eigen::MatrixXf A(s, np1);
     Eigen::VectorXf b(s);
 
-    for(unsigned int i = 0; i < s; i++) {
+    for(int i = 0; i < s; i++) {
         b(i) = y[i];
         A(i, n) = 1.0f;
     }
 
     for(int j = (n - 1); j >= 0; j--) {
-        for(unsigned int i = 0; i < s; i++) {
+        for(int i = 0; i < s; i++) {
             A(i, j) = x[i] * A(i, j + 1);
         }
     }
