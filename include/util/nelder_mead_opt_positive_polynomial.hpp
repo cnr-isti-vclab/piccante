@@ -69,9 +69,9 @@ public:
 
         for(int i = 0; i < 100; i++) {
             float tx = float(i) / 100.0f;
-            float ty = tx + (Random(m()) * 0.1f - 0.5f);
+            float ty = tx + (Random(m()) * 0.01f - 0.05f);
             x.push_back(tx);
-            y.push_back(ty);
+            y.push_back(ty * ty);
         }
 
         NelderMeadOptPositivePolynomial test(x, y);
@@ -85,7 +85,7 @@ public:
 
         float *out = test.run(in, 3, 1e-12f, 10000);
 
-        printf("Init: %f %f %f\nOut: %f %f %f\n", in[0], in[1], in[2], out[0], out[1], out[2]);
+        printf("In: [%f %f %f]\nOut: [%f %f %f]\n", in[2], in[0], in[1], out[2], out[1], out[0]);
     }
 
 #endif
