@@ -39,12 +39,15 @@ int main(int argc, char *argv[])
         img_str = "../data/input/test.png";
     }
 
+
     std::vector< pic::Vec2i > out, out2;
     pic::Vec2i pS(227, 206);
     pic::Vec2i pE(221, 351);
 
     auto start = std::chrono::system_clock::now();
+
     auto out_single_jni = pic::executeLiveWireSingleJNI(img_str, 277, 804, 656, 667);
+
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end-start;
      std::time_t end_time = std::chrono::system_clock::to_time_t(end);

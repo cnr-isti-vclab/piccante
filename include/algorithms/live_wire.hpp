@@ -390,8 +390,9 @@ PIC_INLINE std::vector< int > executeLiveWireSingleJNI(std::string imageInPath, 
     Image in;
     bool bRead = in.Read(imageInPath, LT_NOR_GAMMA);
 
-    Image *in_sub = FilterSampler2D::Execute(&in, NULL, 0.25f, NULL);
-                {
+    ImageSamplerBilinear isb;
+    Image *in_sub = FilterSampler2D::Execute(&in, NULL, 0.25f, &isb);
+
     if(bRead) {
         pic::LiveWire *lw = new pic::LiveWire(in_sub);
 
