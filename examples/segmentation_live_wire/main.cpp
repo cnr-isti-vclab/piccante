@@ -25,27 +25,32 @@ This program is free software: you can redistribute it and/or modify
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
-
-#include "../common_code/image_qimage_interop.hpp"
+#define PIC_DISABLE_EIGEN
 
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    pic::NelderMeadOptPositivePolynomial::test();
-
     std::string img_str;
 
     if(argc == 2) {
         img_str = argv[1];
     } else {
-        img_str = "../data/input/tommaseo_statue.png";
+        img_str = "../data/input/test.png";
     }
 
     std::vector< pic::Vec2i > out, out2;
     pic::Vec2i pS(227, 206);
     pic::Vec2i pE(221, 351);
-    auto out_single_jni = pic::executeLiveWireSingleJNI(img_str, 227, 206, 221, 351);
+
+    auto start = std::chrono::system_clock::now();
+    auto out_single_jni = pic::executeLiveWireSingleJNI(img_str, 277, 804, 656, 667);
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end-start;
+     std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+     std::cout << "finished computation at " << std::ctime(&end_time)
+               << "elapsed time: " << elapsed_seconds.count() << "s\n";
 
     //how to use multiple LiveWire points
     pic::Vec2i pE1(221, 381);

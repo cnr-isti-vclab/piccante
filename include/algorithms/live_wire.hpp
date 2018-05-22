@@ -28,7 +28,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter_gradient.hpp"
 #include "../filtering/filter_log_2d.hpp"
 #include "../filtering/filter_channel.hpp"
-#include "../filtering/filter_crop.hpp"
+#include "../filtering/filter_sampler_2d.hpp"
 #include "../util/vec.hpp"
 
 namespace pic {
@@ -390,11 +390,13 @@ PIC_INLINE std::vector< int > executeLiveWireSingleJNI(std::string imageInPath, 
     Image in;
     bool bRead = in.Read(imageInPath, LT_NOR_GAMMA);
 
+    Image *in_sub = FilterSampler2D::Execute(&in, NULL, 0.25f, NULL);
+                {
     if(bRead) {
-        pic::LiveWire *lw = new pic::LiveWire(&in);
+        pic::LiveWire *lw = new pic::LiveWire(in_sub);
 
-        Vec2i pS(x0, y0);
-        Vec2i pE(x1, y1);
+        Vec2i pS(x0 >> 2, y0 >> 2);
+        Vec2i pE(x1 >> 2, y1 >> 2);
 
         std::vector< Vec2i > out_tmp;
 
@@ -402,8 +404,8 @@ PIC_INLINE std::vector< int > executeLiveWireSingleJNI(std::string imageInPath, 
 
         for(auto i = 0; i < out_tmp.size(); i++) {
             auto point = out_tmp.at(i);
-            out.push_back(point[0]);
-            out.push_back(point[1]);
+            out.push_back(point[0] << 2);
+            out.push_back(point[1] << 2);
         }
 
         delete lw;
