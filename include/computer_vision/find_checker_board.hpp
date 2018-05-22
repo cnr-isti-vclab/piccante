@@ -244,7 +244,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
 
     int checkers_size = 32;
     Image *img_pattern = getCheckerBoardModel(checkerBoardSizeX, checkerBoardSizeY, checkers_size, corners_model);
-    pic::ORBDescriptor b_desc((checkers_size >> 1) + 1, checkers_size);
+    ORBDescriptor b_desc((checkers_size >> 1) + 1, checkers_size);
 
     std::vector< unsigned int *> descs_model, descs_cfi_valid;
     b_desc.getAll(img_pattern, corners_model, descs_model);

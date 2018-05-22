@@ -79,7 +79,7 @@ PIC_INLINE float *DFT1D(float *in, unsigned int n, float *out = NULL)
         float i_f = float(i);
         for(unsigned int j = 0; j < n ; j++) {
 
-            float angle = -pic::C_PI_2 * i_f * float(j) / n_f;
+            float angle = -C_PI_2 * i_f * float(j) / n_f;
             out[re] += in[j] * cosf(angle);
             out[im] += in[j] * sinf(angle);
         }
@@ -129,7 +129,7 @@ PIC_INLINE float *FFTIterative1D(float *in, unsigned int n, float *out = NULL)
 
     for(unsigned int s = 1; s <= logn; s++) {
         int m = 1 << s;
-        float angle = -pic::C_PI_2 / float(m);
+        float angle = -C_PI_2 / float(m);
 
         complexf omega_m = complexf(cosf(angle), sinf(angle));
         complexf omega = complexf(1.0f, 0.0f);

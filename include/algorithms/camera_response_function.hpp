@@ -546,7 +546,7 @@ public:
 
         // precompute robertson weighting function
         for (size_t i=0; i<256; i++) {
-            this->w[i] = pic::weightFunction(float(i) / 255.0f, pic::CW_ROBERTSON);
+            this->w[i] = weightFunction(float(i) / 255.0f, CW_ROBERTSON);
         }
 
         // avoid saturation
@@ -620,7 +620,7 @@ public:
         std::vector<unsigned char *> qstack;
         for (Image * slice : stack) {
             assert(slice->frames == 1);
-            unsigned char * q = pic::convertHDR2LDR(slice->data, NULL, slice->size(), pic::LT_NOR);
+            unsigned char * q = convertHDR2LDR(slice->data, NULL, slice->size(), LT_NOR);
             qstack.push_back(q);
         }
 
@@ -785,7 +785,7 @@ public:
         float maxV = -1.0f;
         for (int ch=0; ch<channels; ch++) {
             int ind;
-            maxV = std::max(pic::Array<float>::getMax(this->icrf[ch], 256, ind), maxV);
+            maxV = std::max(Array<float>::getMax(this->icrf[ch], 256, ind), maxV);
         }
 
         for (int ch=0; ch<channels; ch++) {
@@ -804,14 +804,14 @@ public:
 };
 
 /**
- * @brief EstimateAverageLuminance
+ * @brief estimateAverageLuminance
  * @param shutter_speed
  * @param aperture_value
  * @param iso_value
  * @param K_value
  * @return
  */
-PIC_INLINE float EstimateAverageLuminance(float shutter_speed, float aperture_value = 1.0f, float iso_value = 1.0f, float K_value = 12.5f)
+PIC_INLINE float estimateAverageLuminance(float shutter_speed, float aperture_value = 1.0f, float iso_value = 1.0f, float K_value = 12.5f)
 {
     K_value = CLAMPi(K_value, 10.6f, 13.4f);
 
