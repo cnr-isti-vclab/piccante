@@ -337,6 +337,43 @@ public:
         }
 
     }
+
+    /**
+     * @brief executeLiveWireSingle
+     * @param in
+     * @param pS
+     * @param pE
+     * @param out
+     */
+    static void executeLiveWireSingle(Image *in, Vec2i pS, Vec2i pE, std::vector< Vec2i > &out)
+    {
+        if(in != NULL) {
+            pic::LiveWire *lw = new pic::LiveWire(in);
+
+            lw->execute(pS, pE, out, true, false);
+
+            delete lw;
+        }
+    }
+
+    /**
+     * @brief executeLiveWireMultiple
+     * @param in
+     * @param controlPoint
+     * @param out
+     */
+    static void executeLiveWireMultiple(Image *in, std::vector< Vec2i > &controlPoint, std::vector< Vec2i > &out)
+    {
+        if(in != NULL) {
+            pic::LiveWire *lw = new pic::LiveWire(in);
+
+            for(auto i = 0; i < (controlPoint.size() - 1); i++) {
+                lw->execute(controlPoint.at(i), controlPoint.at(i + 1), out, true, true);
+            }
+
+            delete lw;
+        }
+    }
 };
 
 /**
@@ -344,42 +381,35 @@ public:
  * @param imageInPath
  * @param pS
  * @param pE
- * @param out
+ * @return
  */
-PIC_INLINE void executeLiveWireSingleJNI(std::string imageInPath, Vec2i pS, Vec2i pE, std::vector< Vec2i > &out)
+PIC_INLINE std::vector< int > executeLiveWireSingleJNI(std::string imageInPath, int x0, int y0, int x1, int y1)
 {
+    std::vector< int > out;
+
     Image in;
     bool bRead = in.Read(imageInPath, LT_NOR_GAMMA);
 
     if(bRead) {
         pic::LiveWire *lw = new pic::LiveWire(&in);
 
-        lw->execute(pS, pE, out, true, false);
+        Vec2i pS(x0, y0);
+        Vec2i pE(x1, y1);
 
-        delete lw;
-    }
-}
+        std::vector< Vec2i > out_tmp;
 
-/**
- * @brief executeLiveWireMultipleJNI
- * @param imageInPath
- * @param controlPoint
- * @param out
- */
-PIC_INLINE void executeLiveWireMultipleJNI(std::string imageInPath, std::vector< Vec2i > &controlPoint, std::vector< Vec2i > &out)
-{
-    Image in;
-    bool bRead = in.Read(imageInPath, LT_NOR_GAMMA);
+        lw->execute(pS, pE, out_tmp, true, false);
 
-    if(bRead) {
-        pic::LiveWire *lw = new pic::LiveWire(&in);
-
-        for(auto i = 0; i < (controlPoint.size() - 1); i++) {
-            lw->execute(controlPoint.at(i), controlPoint.at(i + 1), out, true, true);
+        for(auto i = 0; i < out_tmp.size(); i++) {
+            auto point = out_tmp.at(i);
+            out.push_back(point[0]);
+            out.push_back(point[1]);
         }
 
         delete lw;
     }
+
+    return out;
 }
 
 } // end namespace pic

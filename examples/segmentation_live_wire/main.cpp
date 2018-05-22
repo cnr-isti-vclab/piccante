@@ -32,6 +32,8 @@ This program is free software: you can redistribute it and/or modify
 
 int main(int argc, char *argv[])
 {
+    pic::NelderMeadOptPositivePolynomial::test();
+
     std::string img_str;
 
     if(argc == 2) {
@@ -43,7 +45,7 @@ int main(int argc, char *argv[])
     std::vector< pic::Vec2i > out, out2;
     pic::Vec2i pS(227, 206);
     pic::Vec2i pE(221, 351);
-    pic::executeLiveWireSingleJNI(img_str, pS, pE, out);
+    auto out_single_jni = pic::executeLiveWireSingleJNI(img_str, 227, 206, 221, 351);
 
     //how to use multiple LiveWire points
     pic::Vec2i pE1(221, 381);
@@ -51,12 +53,13 @@ int main(int argc, char *argv[])
     cp.push_back(pS);
     cp.push_back(pE);
     cp.push_back(pE1);
-    pic::executeLiveWireMultipleJNI(img_str, cp, out2);
+    //pic::executeLiveWireMultipleJNI(img_str, cp, out2);
 
     pic::Image img(img_str, pic::LT_NOR_GAMMA);
 
-    for(auto i = 0; i < out.size(); i++) {
-        float *tmp = img(out[i][0], out[i][1]);
+    for(auto i = 0; i < out_single_jni.size(); i+=2) {
+
+        float *tmp = img(out_single_jni[i], out_single_jni[i + 1]);
 
         tmp[0] = 0.0f;
         tmp[1] = 1.0f;
