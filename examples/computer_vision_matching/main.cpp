@@ -26,8 +26,6 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -43,8 +41,8 @@ int main(int argc, char *argv[])
     }
 
     pic::Image img0, img1;
-    ImageRead(img0_str, &img0, pic::LT_NOR);
-    ImageRead(img1_str, &img1, pic::LT_NOR);
+    img0.Read(img0_str, pic::LT_NOR);
+    img1.Read(img1_str, pic::LT_NOR);
 
     printf("Ok\n");
 
@@ -102,7 +100,7 @@ int main(int argc, char *argv[])
 
         printf("Applying H to the first image..");
         pic::Image *img0_H = pic::FilterWarp2D::Execute(&img0, NULL, pic::MatrixConvert(H), true, false);
-        ImageWrite(img0_H, "../data/output/simple_matching_img_0_H_applied.png", pic::LT_NOR);
+        img0_H->Write("../data/output/simple_matching_img_0_H_applied.png", pic::LT_NOR);
         printf("Ok.\n");
 
         printf("\nEstimating the fundamental matrix F from the matches...");

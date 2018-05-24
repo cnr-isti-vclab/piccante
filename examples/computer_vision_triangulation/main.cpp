@@ -30,15 +30,10 @@ This program is free software: you can redistribute it and/or modify
 
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
-{
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
-    
+{   
     printf("Reading an LDR images...");
     
     //estimating K matrix from camera
@@ -47,8 +42,8 @@ int main(int argc, char *argv[])
     Eigen::Matrix3d K = pic::getIntrinsicsMatrix(fx, fy, 2592.0 / 2.0, 1728.0 / 2.0);
     
     pic::Image img0, img1;
-    ImageRead("../data/input/triangulation/campo_s_stefano_l.jpg", &img0, pic::LT_NOR);
-    ImageRead("../data/input/triangulation/campo_s_stefano_r.jpg", &img1, pic::LT_NOR);
+    img0.Read("../data/input/triangulation/campo_s_stefano_l.jpg", pic::LT_NOR);
+    img1.Read("../data/input/triangulation/campo_s_stefano_r.jpg", pic::LT_NOR);
     
     printf("Ok\n");
     
@@ -134,7 +129,7 @@ int main(int argc, char *argv[])
         pic::printfMat34d(M1);
         
         pic::NelderMeadOptTriangulation nmTri(M0, M1);
-        for(unsigned int i = 0; i < m0f.size(); i++) {
+        for(auto i = 0; i < m0f.size(); i++) {
             //normalized coordinates
             Eigen::Vector3d p0 = Eigen::Vector3d(m0f[i][0], m0f[i][1], 1.0);
             Eigen::Vector3d p1 = Eigen::Vector3d(m1f[i][0], m1f[i][1], 1.0);
@@ -189,8 +184,8 @@ int main(int argc, char *argv[])
         }
         
         //write reprojection images
-        ImageWrite(&imgOut0, "../data/output/triangulation_reprojection_l.png");
-        ImageWrite(&imgOut1, "../data/output/triangulation_reprojection_r.png");
+        imgOut0.Write("../data/output/triangulation_reprojection_l.png");
+        imgOut1.Write("../data/output/triangulation_reprojection_r.png");
         
         //write a PLY file
         FILE *file = fopen("../data/output/triangulation_mesh.ply","w");

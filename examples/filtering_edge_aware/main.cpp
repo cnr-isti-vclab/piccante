@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an image...");
     pic::Image img;
-    ImageRead(img_str, &img);
+    img.Read(img_str);
     printf("Ok\n");
 
     printf("Is it valid? ");
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 
         bool bWritten;
 
-        bWritten = ImageWrite(output, "../data/output/filtered_bilateral.png");
+        bWritten = output->Write("../data/output/filtered_bilateral.png");
 
         if(bWritten) {
             printf("Ok\n");
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bWritten = ImageWrite(output, "../data/output/filtered_anisotropic_diffusion.png");
+        bWritten = output->Write("../data/output/filtered_anisotropic_diffusion.png");
 
         if(bWritten) {
             printf("Ok\n");
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
         output = fltG.ProcessP(input, output);//filtering the image
 
         printf("Writing the file to disk...");
-        bWritten = ImageWrite(output, "../data/output/filtered_guided.png");
+        bWritten = output->Write("../data/output/filtered_guided.png");
 
         if(bWritten) {
             printf("Ok\n");
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bWritten = ImageWrite(output, "../data/output/filtered_wls.png");
+        bWritten = output->Write("../data/output/filtered_wls.png");
 
         if(bWritten) {
             printf("Ok\n");
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
         output = fltK.ProcessP(input, output);
 
         printf("Writing the file to disk...");
-        bWritten = ImageWrite(output, "../data/output/filtered_kuwahara.png");
+        bWritten = output->Write("../data/output/filtered_kuwahara.png");
 
         if(bWritten) {
             printf("Ok\n");

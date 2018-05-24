@@ -31,8 +31,6 @@ This program is free software: you can redistribute it and/or modify
 
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -54,8 +52,8 @@ int main(int argc, char *argv[])
 
     printf("Reading LDR images...");
     pic::Image img0, img1;
-    ImageRead(img0_str, &img0, pic::LT_NOR);
-    ImageRead(img1_str, &img1, pic::LT_NOR);
+    img0.Read(img0_str, pic::LT_NOR);
+    img1.Read(img1_str, pic::LT_NOR);
 
     printf("Ok\n");
 
@@ -155,7 +153,7 @@ int main(int argc, char *argv[])
         pic::drawLine(&img1, pic::Vec<2, int>(coord0[0], coord0[1]), pic::Vec<2, int>(coord2[0], coord2[1]), color);
         pic::drawLine(&img1, pic::Vec<2, int>(coord0[0], coord0[1]), pic::Vec<2, int>(coord3[0], coord3[1]), color);
 
-        ImageWrite(&img1, "../data/output/simple_augmented_reality.png", pic::LT_NOR);
+        img1.Write("../data/output/simple_augmented_reality.png", pic::LT_NOR);
 
     } else {
         printf("No, there is at least an invalid file!\n");
