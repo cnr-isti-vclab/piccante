@@ -68,3 +68,13 @@ examples/data/output/s_livewire_multiple.png
 examples/data/output/s_livewire_single.png
 
 examples/build-hdr_generation-Desktop_Qt_5_4_2_clang_64bit-Debug/hdr_generation
+
+examples/build-hdr_exposure_fusion-Desktop_Qt_5_4_2_clang_64bit-Debug/hdr_exposure_fusion
+
+examples/build-hdr_exposure_fusion-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
+
+examples/build-hdr_generation-Desktop_Qt_5_4_2_clang_64bit-Debug/hdr_generation
+
+examples/build-hdr_generation-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
+
+*.o-02dd9f2a

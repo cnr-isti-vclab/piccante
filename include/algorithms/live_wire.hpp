@@ -315,6 +315,8 @@ public:
 
         while(true) {
             prev = m;
+
+            printf("point(%d, %d)\n", prev[0], prev[1]);
             if(m.equal(pS)) {
                 break;
             }

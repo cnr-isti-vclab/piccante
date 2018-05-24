@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     if(argc == 2) {
         img_str = argv[1];
     } else {
-        img_str = "../data/input/test.png";
+        img_str = "../data/input/tommaseo_statue.png";
     }
 
 
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
     auto start = std::chrono::system_clock::now();
 
-    auto out_single_jni = pic::executeLiveWireSingleJNI(img_str, 512, 512, 10, 10, true);
+    auto out_single_jni = pic::executeLiveWireSingleJNI(img_str, 227, 206, 221, 351, true);
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end-start;
@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
 
         float *tmp = img(out_single_jni[i], out_single_jni[i + 1]);
 
+        printf("X: %d Y:%d\n", out_single_jni[i], out_single_jni[i + 1]);
         tmp[0] = 0.0f;
         tmp[1] = 1.0f;
         tmp[2] = 0.0f;
