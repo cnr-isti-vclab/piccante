@@ -265,8 +265,8 @@ public:
             for(int i = 0; i < 8; i++) {
                 Vec2i r(q[0] + nx[i], q[1] + ny[i]);
 
-                if(r[0] > bX[0] && r[0] < bX[1] &&
-                   r[1] > bY[0] && r[1] < bY[1]) {
+                if((r[0] > bX[0]) && (r[0] < bX[1]) &&
+                   (r[1] > bY[0]) && (r[1] < bY[1])) {
 
                     if(!e[r[1] * width + r[0]]) {
                         float g_tmp = g_q + getCost(q, r);
@@ -310,7 +310,7 @@ public:
         Vec2i m = pE;
         Vec2i prev(-1, -1);
 
-        int maxIter = (width + height) << 2;
+        int maxIter = (width * height);
         int i = 0;
 
         while(true) {
@@ -381,23 +381,36 @@ public:
  * @param imageInPath
  * @param pS
  * @param pE
+ * @param bDownsample
  * @return
  */
-PIC_INLINE std::vector< int > executeLiveWireSingleJNI(std::string imageInPath, int x0, int y0, int x1, int y1)
+PIC_INLINE std::vector< int > executeLiveWireSingleJNI(std::string imageInPath, int x0, int y0, int x1, int y1, bool bDownsample)
 {
     std::vector< int > out;
 
     Image in;
     bool bRead = in.Read(imageInPath, LT_NOR_GAMMA);
 
-    ImageSamplerBilinear isb;
-    Image *in_sub = FilterSampler2D::Execute(&in, NULL, 0.25f, &isb);
-
     if(bRead) {
-        pic::LiveWire *lw = new pic::LiveWire(in_sub);
+        pic::LiveWire *lw ;
+        Image *in_sub = NULL;
+        Vec2i pS(x0, y0);
+        Vec2i pE(x1, y1);
 
-        Vec2i pS(x0 >> 2, y0 >> 2);
-        Vec2i pE(x1 >> 2, y1 >> 2);
+        if(bDownsample) {
+            ImageSamplerBilinear isb;
+            in_sub = FilterSampler2D::Execute(&in, NULL, 0.25f, &isb);
+            lw = new pic::LiveWire(in_sub);
+
+            pS[0] = pS[0] >> 2;
+            pS[1] = pS[1] >> 2;
+
+            pE[0] = pE[0] >> 2;
+            pE[1] = pE[1] >> 2;
+
+        } else {
+            lw = new pic::LiveWire(&in);
+        }
 
         std::vector< Vec2i > out_tmp;
 
@@ -405,8 +418,17 @@ PIC_INLINE std::vector< int > executeLiveWireSingleJNI(std::string imageInPath, 
 
         for(auto i = 0; i < out_tmp.size(); i++) {
             auto point = out_tmp.at(i);
-            out.push_back(point[0] << 2);
-            out.push_back(point[1] << 2);
+
+            int x = point[0];
+            int y = point[1];
+
+            if(bDownsample) {
+                out.push_back(x << 2);
+                out.push_back(y << 2);
+            } else {
+                out.push_back(x);
+                out.push_back(y);
+            }
         }
 
         delete lw;

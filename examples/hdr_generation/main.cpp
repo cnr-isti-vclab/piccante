@@ -26,15 +26,10 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
-
     //exposure time in seconds: exposureTime[0] ==> img[0], etc.
     float exposure_time_vec[] = {2.0f, 1.0f / 2.0f, 1.0f / 8.0f, 1.0f / 30.0f, 1.0f / 125.0f, 1.0f / 1000.0f, 1.0f / 4000.0f};
 
@@ -46,11 +41,11 @@ int main(int argc, char *argv[])
         pic::Image *img = new pic::Image();
         std::string name = "../data/input/stack/stack_room_exp_" + pic::fromNumberToString(i) + ".jpg";
         printf("\n%s", name.c_str());
-        ImageRead(name, img, pic::LT_NOR);
+        img->Read(name, pic::LT_NOR);
 
         valid = valid && img->isValid();
 
-        img->exposure = pic::EstimateAverageLuminance(exposure_time_vec[i], 4.5f, 200.0f);
+        img->exposure = pic::estimateAverageLuminance(exposure_time_vec[i], 4.5f, 200.0f);
 
         stack_vec.push_back(img);
     }
@@ -74,9 +69,9 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         if(imgOut != NULL) {
-            ImageWrite(imgOut, "../data/output/image_debevec_crf.hdr");
+            imgOut->Write("../data/output/image_debevec_crf.hdr");
             pic::Image *imgTmo = pic::ReinhardTMO(imgOut);
-            ImageWrite(imgTmo, "../data/output/image_debevec_crf_tmo.png", pic::LT_NOR_GAMMA);
+            imgTmo->Write("../data/output/image_debevec_crf_tmo.png", pic::LT_NOR_GAMMA);
             delete imgTmo;
             delete imgOut;
         }
@@ -96,10 +91,10 @@ int main(int argc, char *argv[])
             printf("Ok\n");
 
             if(imgOut != NULL) {
-                ImageWrite(imgOut, "../data/output/image_mitusunaga_crf.hdr");
+                imgOut->Write("../data/output/image_mitusunaga_crf.hdr");
 
                 pic::Image *imgTmo = pic::ReinhardTMO(imgOut);
-                ImageWrite(imgTmo, "../data/output/image_mitusunaga_crf_tmo.png", pic::LT_NOR_GAMMA);
+                imgTmo->Write("../data/output/image_mitusunaga_crf_tmo.png", pic::LT_NOR_GAMMA);
 
                 delete imgTmo;
                 delete imgOut;

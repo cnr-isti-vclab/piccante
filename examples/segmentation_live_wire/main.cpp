@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
     auto start = std::chrono::system_clock::now();
 
-    auto out_single_jni = pic::executeLiveWireSingleJNI(img_str, 277, 804, 656, 667);
+    auto out_single_jni = pic::executeLiveWireSingleJNI(img_str, 512, 512, 10, 10, true);
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end-start;
@@ -55,13 +55,7 @@ int main(int argc, char *argv[])
      std::cout << "finished computation at " << std::ctime(&end_time)
                << "elapsed time: " << elapsed_seconds.count() << "s\n";
 
-    //how to use multiple LiveWire points
-    pic::Vec2i pE1(221, 381);
-    std::vector< pic::Vec2i > cp;
-    cp.push_back(pS);
-    cp.push_back(pE);
-    cp.push_back(pE1);
-    //pic::executeLiveWireMultipleJNI(img_str, cp, out2);
+
 
     pic::Image img(img_str, pic::LT_NOR_GAMMA);
 
@@ -76,6 +70,16 @@ int main(int argc, char *argv[])
 
     img.Write("../data/output/s_livewire_single.png", pic::LT_NOR_GAMMA);
 
+
+    /*
+    //how to use multiple LiveWire points
+    pic::Vec2i pE1(221, 381);
+
+    std::vector< pic::Vec2i > cp;
+    cp.push_back(pS);
+    cp.push_back(pE);
+    cp.push_back(pE1);
+    //pic::executeLiveWireMultipleJNI(img_str, cp, out2);
 
     pic::Polyline2i out2_s(out2);
 
@@ -97,6 +101,7 @@ int main(int argc, char *argv[])
     }
 
     img.Write("../data/output/s_livewire_multiple.png", pic::LT_NOR_GAMMA);
+    */
 
     return 0;
 }
