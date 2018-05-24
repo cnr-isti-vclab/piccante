@@ -223,7 +223,7 @@ public:
  * @return
  */
 template<unsigned int N>
-bool insideVecBBox(const Vec<N, float> &sample)
+PIC_INLINE bool insideVecBBox(const Vec<N, float> &sample)
 {
     for(unsigned int i = 0; i < N; i++) {
         if((sample[i] < -1.0f) || (sample[i] > 1.0f)) {
@@ -235,7 +235,7 @@ bool insideVecBBox(const Vec<N, float> &sample)
 }
 
 template<unsigned int N>
-Vec<N, float> normalize(Vec<N, float> x)
+PIC_INLINE Vec<N, float> normalize(Vec<N, float> x)
 {
     float length = x.distanceSq();
 
@@ -255,7 +255,7 @@ Vec<N, float> normalize(Vec<N, float> x)
  * @return
  */
 template<unsigned int N>
-Vec<N, float> randomPoint(std::mt19937 *m)
+PIC_INLINE Vec<N, float> randomPoint(std::mt19937 *m)
 {
     Vec<N, float> x;
 
@@ -267,7 +267,7 @@ Vec<N, float> randomPoint(std::mt19937 *m)
 }
 
 template<unsigned int N>
-void printVec(Vec<N, float> x)
+PIC_INLINE void printVec(Vec<N, float> x)
 {
     printf("[");
     for(unsigned int i = 0; i < N; i++) {
@@ -284,7 +284,7 @@ void printVec(Vec<N, float> x)
  * @return
  */
 template<unsigned int N>
-Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, float radius)
+PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, float radius)
 {
     Vec<N, float> x;
 
@@ -305,6 +305,29 @@ Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, float radiu
     }
 
     return x;
+}
+
+template<unsigned int N, class T>
+void transferFromVecToPlain(std::vector< Vec<N, T> > &in, std::vector< T > &out)
+{
+    for(auto i = 0; i < in.size(); i++) {
+        for(auto j = 0; j < N; j++) {
+            out.push_back(in[i][j]);
+        }
+    }
+}
+
+template<unsigned int N, class T>
+void transferFromPlainToVec(std::vector< T > &in, std::vector< Vec<N, T> > &out)
+{
+    for(auto i = 0; i < in.size(); i+= N) {
+        Vec<N, T> tmp;
+        for(auto j = 0; j < N; j++) {
+            tmp[j] = in[i + j];
+        }
+
+        out.push_back(tmp);
+    }
 }
 
 /**
