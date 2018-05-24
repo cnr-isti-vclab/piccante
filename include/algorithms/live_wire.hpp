@@ -313,10 +313,9 @@ public:
         int maxIter = (width * height);
         int i = 0;
 
-        while(true) {
+        while((!prev.equal(m)) && (i < maxIter)) {
             prev = m;
 
-            printf("point(%d, %d)\n", prev[0], prev[1]);
             if(m.equal(pS)) {
                 break;
             }
@@ -327,15 +326,7 @@ public:
             out.push_back(t);
             m = t;
 
-            if(prev.equal(m)) {
-                break;
-            }
-
             i++;
-
-            if(i > maxIter) {
-                break;
-            }
         }
 
     }
