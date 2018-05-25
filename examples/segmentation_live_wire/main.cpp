@@ -39,7 +39,6 @@ int main(int argc, char *argv[])
         img_str = "../data/input/tommaseo_statue.png";
     }
 
-
     std::vector< pic::Vec2i > out, out2;
     pic::Vec2i pS(227, 206);
     pic::Vec2i pE(221, 351);
@@ -72,6 +71,7 @@ int main(int argc, char *argv[])
     //
     //how to use multiple LiveWire points
     //
+
     pic::Vec2i pE1(221, 381);
 
     std::vector< pic::Vec2i > cp;

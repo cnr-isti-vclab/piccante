@@ -26,21 +26,16 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
-
     printf("Reading a stack of LDR images...");
     //reading images and storing them with normalized values in [0,1]
     pic::Image img[3];
-    ImageRead("../data/input/stack_alignment/IMG_4209.jpg", &img[0], pic::LT_NOR);
-    ImageRead("../data/input/stack_alignment/IMG_4210.jpg", &img[1], pic::LT_NOR);
-    ImageRead("../data/input/stack_alignment/IMG_4211.jpg", &img[2], pic::LT_NOR);
+    img[0].Read("../data/input/stack_alignment/IMG_4209.jpg", pic::LT_NOR);
+    img[1].Read("../data/input/stack_alignment/IMG_4210.jpg", pic::LT_NOR);
+    img[2].Read("../data/input/stack_alignment/IMG_4211.jpg", pic::LT_NOR);
 
     printf("Ok\n");
 
@@ -51,11 +46,11 @@ int main(int argc, char *argv[])
         printf("Aligning bright and dark exposure images to the well-exposed one... ");
         Eigen::Vector2i shift_dark;
         pic::Image *img_dark = pic::WardAlignment::execute(&img[0], &img[1], shift_dark);
-        ImageWrite(img_dark, "../data/output/stack_aligned_dark.jpg", pic::LT_NOR);
+        img_dark->Write("../data/output/stack_aligned_dark.jpg", pic::LT_NOR);
 
         Eigen::Vector2i shift_bright;
         pic::Image *img_bright = pic::WardAlignment::execute(&img[0], &img[2], shift_bright);
-        ImageWrite(img_bright, "../data/output/stack_aligned_bright.jpg", pic::LT_NOR);
+        img_bright->Write("../data/output/stack_aligned_bright.jpg", pic::LT_NOR);
         printf("Ok\n");
 
         printf("Estimating the camera response function... ");
@@ -64,7 +59,7 @@ int main(int argc, char *argv[])
         float exposureTime[] = {1.0f, 0.25f, 4.0f};
 
         pic::ImageVec stack_crf = Triple(&img[0], &img[1], &img[2]);
-        for(int i=0; i<3; i++) {
+        for(int i = 0; i < 3; i++) {
             stack_crf[i]->exposure = exposureTime[i];
         }
 
@@ -74,7 +69,7 @@ int main(int argc, char *argv[])
 
         //Set each exposure time to the related image
         pic::ImageVec stack = Triple(&img[0], img_dark, img_bright);
-        for(int i=0; i<3; i++) {
+        for(int i = 0; i < 3; i++) {
             stack[i]->exposure = exposureTime[i];
         }
 
@@ -85,7 +80,7 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         if(imgOut != NULL) {
-            ImageWrite(imgOut, "../data/output/stack_aligned_hdr.hdr");
+            imgOut->Write("../data/output/stack_aligned_hdr.hdr");
         }
 
     } else {

@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
         printf("Extracting exposures from the HDR image...");
         pic::ImageVec stack = pic::getAllExposuresImages(&img);
 
-        for(unsigned int i = 0; i < stack.size(); i++) {
+        for(auto i = 0; i < stack.size(); i++) {
             std::string img_str_out = "../data/output/exposure_" + pic::fromNumberToString(i) + ".png";
             stack[i]->clamp(0.0f, 1.0f);
 

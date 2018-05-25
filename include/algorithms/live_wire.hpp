@@ -370,67 +370,6 @@ public:
 };
 
 /**
- * @brief executeLiveWireSingleJNI
- * @param imageInPath
- * @param pS
- * @param pE
- * @param bDownsample
- * @return
- */
-PIC_INLINE std::vector< int > executeLiveWireSingleJNI(std::string imageInPath, int x0, int y0, int x1, int y1, bool bDownsample)
-{
-    std::vector< int > out;
-
-    Image in;
-    bool bRead = in.Read(imageInPath, LT_NOR_GAMMA);
-
-    if(bRead) {
-        pic::LiveWire *lw ;
-        Image *in_sub = NULL;
-        Vec2i pS(x0, y0);
-        Vec2i pE(x1, y1);
-
-        if(bDownsample) {
-            ImageSamplerBilinear isb;
-            in_sub = FilterSampler2D::Execute(&in, NULL, 0.25f, &isb);
-            lw = new pic::LiveWire(in_sub);
-
-            pS[0] = pS[0] >> 2;
-            pS[1] = pS[1] >> 2;
-
-            pE[0] = pE[0] >> 2;
-            pE[1] = pE[1] >> 2;
-
-        } else {
-            lw = new pic::LiveWire(&in);
-        }
-
-        std::vector< Vec2i > out_tmp;
-
-        lw->execute(pS, pE, out_tmp, true, false);
-
-        for(auto i = 0; i < out_tmp.size(); i++) {
-            auto point = out_tmp.at(i);
-
-            int x = point[0];
-            int y = point[1];
-
-            if(bDownsample) {
-                out.push_back(x << 2);
-                out.push_back(y << 2);
-            } else {
-                out.push_back(x);
-                out.push_back(y);
-            }
-        }
-
-        delete lw;
-    }
-
-    return out;
-}
-
-/**
  * @brief executeLiveWireMultipleJNI
  * @param imageInPath
  * @param controPoints
@@ -493,7 +432,6 @@ PIC_INLINE std::vector< int > executeLiveWireMultipleJNI(std::string imageInPath
 
     return out;
 }
-
 
 } // end namespace pic
 
