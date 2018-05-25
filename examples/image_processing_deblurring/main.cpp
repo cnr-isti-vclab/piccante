@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
         img_str = argv[1];
     } else {
         img_str = "../data/input/bottles.hdr";
-        psf_str = "../data/input/kernel_psf.png"
+        psf_str = "../data/input/kernel_psf.png";
     }
 
     printf("Reading images...");

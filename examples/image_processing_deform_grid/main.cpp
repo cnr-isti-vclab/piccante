@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an image...");
     pic::Image img;
-    ImageRead(img_str, &img, pic::LT_NOR);
+    img.Read(img_str, pic::LT_NOR);
 
     printf("Ok\n");
 
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
         pic::Image *out = flt_dg.ProcessP(Single(&img), NULL);
 
-        bool bWrite = ImageWrite(out, "../data/output/grid_output_deformation.png", pic::LT_NOR);
+        bool bWrite = out->Write("../data/output/img_deformation.png", pic::LT_NOR);
 
         if(bWrite) {
             printf("The output was written sucessfully!\n");
