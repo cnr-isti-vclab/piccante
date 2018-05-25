@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
 
     printf("Is it valid? ");
     if(img.isValid()) {
+
         printf("OK\n");
 
         printf("Creating an image with bayering RGGB...");
@@ -58,9 +59,8 @@ int main(int argc, char *argv[])
         printf("Writing results...");
         img_RGGB->Write("../data/output/img_mosaiced.png");
         out.Write("../data/output/img_demosaiced.png");
-        img->Write("../data/output/img_demosaiced_difference.png");
+        img.Write("../data/output/img_demosaiced_difference.png");
         printf("Ok\n");
-
 
     } else {
         printf("No, the file is not valid!\n");

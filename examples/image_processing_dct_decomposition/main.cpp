@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     printf("Reading an LDR file...");
 
     pic::Image img;
-    img->Read(img_str);
+    img.Read(img_str);
 
     printf("Ok\n");
 
