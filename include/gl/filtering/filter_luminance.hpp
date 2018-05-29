@@ -148,9 +148,9 @@ void FilterGLLuminance::Update(LUMINANCE_TYPE type)
 
     case LT_CIE_LUMINANCE:
         {
-            weights[0] = 0.213f;
-            weights[1] = 0.715f;
-            weights[2] = 0.072f;
+            weights[0] = 0.2126f;
+            weights[1] = 0.7152f;
+            weights[2] = 0.0722f;
         }
         break;
 

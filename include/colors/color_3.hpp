@@ -455,9 +455,9 @@ public:
      */
     float luminance()
     {
-        return	0.213f * x +
-                0.715f * y +
-                0.072f * z;
+        return	0.2126f * x +
+                0.7152f * y +
+                0.0722f * z;
     }
 
     /**
