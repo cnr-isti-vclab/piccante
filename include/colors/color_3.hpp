@@ -655,11 +655,18 @@ public:
         Color3 ret(x * exposure, y * exposure, z * exposure);
         ret.gamma(1.0f / gammaCor);
 
-        ret.x = CLAMPi(ret.x, 0.0f, 1.0f);
-        ret.y = CLAMPi(ret.y, 0.0f, 1.0f);
-        ret.z = CLAMPi(ret.z, 0.0f, 1.0f);
-
+        ret.clamp01();
         return ret;
+    }
+
+    /**
+     * @brief clamp01
+     */
+    void clamp01()
+    {
+        x = CLAMPi(x, 0.0f, 1.0f);
+        y = CLAMPi(y, 0.0f, 1.0f);
+        z = CLAMPi(z, 0.0f, 1.0f);
     }
 
     /**
