@@ -26,7 +26,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_gradient.hpp"
-#include "../filtering/filter_log_2d.hpp"
 #include "../filtering/filter_log_2d_opt.hpp"
 #include "../filtering/filter_channel.hpp"
 #include "../filtering/filter_sampler_2d.hpp"
@@ -178,7 +177,7 @@ public:
         fG_max = img_G->getMaxVal(NULL, NULL);
 
         //compute fZ
-        fZ = FilterLoG2D::Execute(img_L, fZ, 1.0f);
+        fZ = FilterLoG2DOpt::Execute(img_L, fZ, 1.0f);
         fZ->applyFunction(f1minusx);
 
         //aux buffers
