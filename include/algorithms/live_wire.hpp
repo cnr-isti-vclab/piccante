@@ -185,7 +185,7 @@ public:
 
         e = new bool[img_L->nPixels()];
 
-        pointers = new int[img_L->nPixels() << 1];
+        pointers = new int[img_L->nPixels()];
     }
 
     /**
@@ -203,7 +203,7 @@ public:
         *g = FLT_MAX;
 
         e = Buffer<bool>::assign(e, g->nPixels(), false);
-        pointers = Buffer<int>::assign(pointers, g->nPixels() << 1, 0);
+        pointers = Buffer<int>::assign(pointers, g->nPixels(), 0);
 
         int width  = g->width;
         int height = g->height;
@@ -288,9 +288,8 @@ public:
                             tmp = (*g)(r[0], r[1]);
                             tmp[0] = g_tmp;
 
-                            int index = (r[1] * width + r[0]) << 1;
-                            pointers[index    ] = q[0];
-                            pointers[index + 1] = q[1];
+                            int index = (r[1] * width + r[0]);
+                            pointers[index] =  q[1] * width + q[0];
                             list.push_back(r);
                         }
 
@@ -320,8 +319,10 @@ public:
                 break;
             }
 
-            int index = (m[1] * width + m[0]) << 1;
-            Vec2i t(pointers[index], pointers[index + 1]);
+            int index = (m[1] * width + m[0]);
+            int t_x = pointers[index] % width;
+            int t_y = pointers[index] / width;
+            Vec2i t(t_x, t_y);
 
             out.push_back(t);
             m = t;
@@ -384,15 +385,15 @@ PIC_INLINE std::vector< int > executeLiveWireMultipleJNI(std::string imageInPath
     bool bRead = in.Read(imageInPath, LT_NOR_GAMMA);
 
     if(bRead) {
-        pic::LiveWire *lw ;
+        LiveWire *lw ;
         Image *in_sub = NULL;
 
         if(bDownsample) {
             ImageSamplerBilinear isb;
             in_sub = FilterSampler2D::Execute(&in, NULL, 0.25f, &isb);
-            lw = new pic::LiveWire(in_sub);
+            lw = new LiveWire(in_sub);
         } else {
-            lw = new pic::LiveWire(&in);
+            lw = new LiveWire(&in);
         }
 
         std::vector< Vec2i > out_tmp;

@@ -72,20 +72,18 @@ PIC_INLINE float *convertLDR2HDR(unsigned char *dataIn, float *dataOut,
         float i_f = float(i);
 
         switch(type) {
-        case LT_NONE: {//Simple cast
-                LUT[i] = i_f;
+        case LT_NONE: {//simple cast
+            LUT[i] = i_f;
         }
         break;
 
-        case LT_NOR: {//Normalization in [0,1]
-                LUT[i] = i_f / 255.0f;
+        case LT_NOR: {//normalize in [0,1]
+            LUT[i] = i_f / 255.0f;
         }
         break;
 
-        case LT_NOR_GAMMA: {//Normalization in [0,1] + GAMMA correction removal
-            for(int i = 0; i < 256; i++) {
-                LUT[i] = powf(i_f / 255.0f, gamma);
-            }
+        case LT_NOR_GAMMA: {//normalize in [0,1] + GAMMA correction removal
+            LUT[i] = powf(i_f / 255.0f, gamma);
         }
         break;
         }
