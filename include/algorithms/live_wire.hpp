@@ -27,6 +27,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_gradient.hpp"
 #include "../filtering/filter_log_2d.hpp"
+#include "../filtering/filter_log_2d_opt.hpp"
 #include "../filtering/filter_channel.hpp"
 #include "../filtering/filter_sampler_2d.hpp"
 #include "../util/vec.hpp"
@@ -200,10 +201,9 @@ public:
     {
         float *tmp;
 
-        *g = FLT_MAX;
-
         e = Buffer<bool>::assign(e, g->nPixels(), false);
-        pointers = Buffer<int>::assign(pointers, g->nPixels(), 0);
+        //*g = FLT_MAX;
+        //pointers = Buffer<int>::assign(pointers, g->nPixels(), 0);
 
         int width  = g->width;
         int height = g->height;
@@ -260,7 +260,8 @@ public:
             list.erase(index);
 
             //update
-            e[q[1] * width + q[0]] = true;
+            int index_q = q[1] * width + q[0];
+            e[index_q] = true;
 
             for(int i = 0; i < 8; i++) {
                 Vec2i r(q[0] + nx[i], q[1] + ny[i]);
@@ -289,7 +290,7 @@ public:
                             tmp[0] = g_tmp;
 
                             int index = (r[1] * width + r[0]);
-                            pointers[index] =  q[1] * width + q[0];
+                            pointers[index] = index_q;
                             list.push_back(r);
                         }
 
