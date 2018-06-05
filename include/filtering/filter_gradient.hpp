@@ -171,7 +171,6 @@ PIC_INLINE Image *FilterGradient::SetupAux(ImageVec imgIn,
 PIC_INLINE void FilterGradient::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
-    //Filtering
     Image *img = src[0];
 
     int channel = (img->channels == 1) ? 0 : colorChannel;
