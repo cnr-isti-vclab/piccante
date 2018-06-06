@@ -108,3 +108,13 @@ examples/build-ip_debayering-Desktop_Qt_5_4_2_clang_64bit-Debug/ip_debayering
 examples/build-hdr_generation-Desktop_Qt_5_8_0_clang_64bit-Release/main.o-02dd9f2a
 
 examples/build-hdr_generation-Desktop_Qt_5_4_2_clang_64bit-Debug/hdr_generation
+
+examples/segmentation_live_wire/main.cpp
+
+examples/segmentation_live_wire/main.cpp
+
+examples/build-ip_deform_grid-Desktop_Qt_5_4_2_clang_64bit-Debug/ip_deform_grid
+
+examples/build-ip_deform_grid-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
+
+examples/data/input/test.jpg
