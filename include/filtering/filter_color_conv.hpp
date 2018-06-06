@@ -169,6 +169,25 @@ public:
     }
 
     /**
+    * @brief fromRGBtoLogLuv
+    * @param imgIn
+    * @param imgOut
+    * @return
+    */
+    static Image *fromRGBtoLogLuv(Image *imgIn, Image *imgOut)
+    {
+        ColorConvRGBtoXYZ    cc_from_RGB_to_XYZ;
+        ColorConvXYZtoLogLuv cc_from_XYZ_to_LogLuv;
+
+        FilterColorConv flt;
+
+        flt.insertColorConv(&cc_from_RGB_to_XYZ, true);
+        flt.insertColorConv(&cc_from_XYZ_to_LogLuv, true);
+
+        return flt.Process(Single(imgIn), imgOut);
+    }
+
+    /**
      * @brief fromCIELABtoRGB
      * @param imgIn
      * @param imgOut

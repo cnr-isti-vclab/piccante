@@ -230,7 +230,7 @@ PIC_INLINE void StrokeGL::SetupShaders()
     }
                                   );
 
-    brushProgram.init("330", vertex_source, fragment_source_brush, "");
+    brushProgram.init("330", vertex_source, fragment_source_brush);
     brushProgram.printLog("Brush - StrokeGL");
     
     brushProgram.bind();
@@ -261,8 +261,8 @@ PIC_INLINE void StrokeGL::SetupShaders()
     }
                                   );
 
-    annotationProgram.init("330", vertex_source, fragment_source_annotation, "");
-    annotationProgram.printLog("Brush - StrokeGL");
+    annotationProgram.init("330", vertex_source, fragment_source_annotation);
+    annotationProgram.printLog("Brush (Annotation) - StrokeGL");
 
     annotationProgram.bind();
     annotationProgram.setAttributeIndex("a_position", 0);

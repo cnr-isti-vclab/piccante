@@ -172,7 +172,7 @@ public:
         bType = false;
         object = glCreateProgram();
 
-        for(unsigned int i = 0; i < shaders.size(); i++)
+        for(auto i = 0; i < shaders.size(); i++)
         {
             GLuint tmp = shaders[i]->getObject();
             if(tmp != 0) {
