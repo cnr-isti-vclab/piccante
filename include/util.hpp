@@ -53,6 +53,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/eigen_util.hpp"
 #include "util/point_samplers.hpp"
 #include "util/precomputed_gaussian.hpp"
+#include "util/precomputed_diff_of_gaussians.hpp"
 #include "util/raw.hpp"
 #include "util/string.hpp"
 #include "util/tile.hpp"

@@ -29,10 +29,10 @@ namespace pic {
 class FilterGaussian1D: public FilterConv1D
 {
 protected:
-    float				sigma;
+    float               sigma;
     PrecomputedGaussian *pg;
     bool                bPgOwned;
-    int					dirs[3];
+    int                 dirs[3];
 
 public:
     /**

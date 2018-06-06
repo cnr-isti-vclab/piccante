@@ -26,7 +26,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_gradient.hpp"
-#include "../filtering/filter_log_2d.hpp"
+#include "../filtering/filter_log_2d_opt.hpp"
 #include "../filtering/filter_channel.hpp"
 #include "../filtering/filter_sampler_2d.hpp"
 #include "../util/vec.hpp"
@@ -177,7 +177,7 @@ public:
         fG_max = img_G->getMaxVal(NULL, NULL);
 
         //compute fZ
-        fZ = FilterLoG2D::Execute(img_L, fZ, 1.0f);
+        fZ = FilterLoG2DOpt::Execute(img_L, fZ, 1.0f);
         fZ->applyFunction(f1minusx);
 
         //aux buffers
@@ -185,7 +185,7 @@ public:
 
         e = new bool[img_L->nPixels()];
 
-        pointers = new int[img_L->nPixels() << 1];
+        pointers = new int[img_L->nPixels()];
     }
 
     /**
@@ -200,10 +200,9 @@ public:
     {
         float *tmp;
 
-        *g = FLT_MAX;
-
         e = Buffer<bool>::assign(e, g->nPixels(), false);
-        pointers = Buffer<int>::assign(pointers, g->nPixels() << 1, 0);
+        //*g = FLT_MAX;
+        //pointers = Buffer<int>::assign(pointers, g->nPixels(), 0);
 
         int width  = g->width;
         int height = g->height;
@@ -260,7 +259,8 @@ public:
             list.erase(index);
 
             //update
-            e[q[1] * width + q[0]] = true;
+            int index_q = q[1] * width + q[0];
+            e[index_q] = true;
 
             for(int i = 0; i < 8; i++) {
                 Vec2i r(q[0] + nx[i], q[1] + ny[i]);
@@ -288,9 +288,8 @@ public:
                             tmp = (*g)(r[0], r[1]);
                             tmp[0] = g_tmp;
 
-                            int index = (r[1] * width + r[0]) << 1;
-                            pointers[index    ] = q[0];
-                            pointers[index + 1] = q[1];
+                            int index = (r[1] * width + r[0]);
+                            pointers[index] = index_q;
                             list.push_back(r);
                         }
 
@@ -320,8 +319,10 @@ public:
                 break;
             }
 
-            int index = (m[1] * width + m[0]) << 1;
-            Vec2i t(pointers[index], pointers[index + 1]);
+            int index = (m[1] * width + m[0]);
+            int t_x = pointers[index] % width;
+            int t_y = pointers[index] / width;
+            Vec2i t(t_x, t_y);
 
             out.push_back(t);
             m = t;
@@ -384,15 +385,15 @@ PIC_INLINE std::vector< int > executeLiveWireMultipleJNI(std::string imageInPath
     bool bRead = in.Read(imageInPath, LT_NOR_GAMMA);
 
     if(bRead) {
-        pic::LiveWire *lw ;
+        LiveWire *lw ;
         Image *in_sub = NULL;
 
         if(bDownsample) {
             ImageSamplerBilinear isb;
             in_sub = FilterSampler2D::Execute(&in, NULL, 0.25f, &isb);
-            lw = new pic::LiveWire(in_sub);
+            lw = new LiveWire(in_sub);
         } else {
-            lw = new pic::LiveWire(&in);
+            lw = new LiveWire(&in);
         }
 
         std::vector< Vec2i > out_tmp;

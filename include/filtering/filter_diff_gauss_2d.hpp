@@ -92,7 +92,6 @@ public:
         return imgOut;
     }
 
-
     /**
      * @brief Execute
      * @param imgIn

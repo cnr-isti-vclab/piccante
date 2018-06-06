@@ -67,38 +67,31 @@ PIC_INLINE float *convertLDR2HDR(unsigned char *dataIn, float *dataOut,
         dataOut = new float[size];
     }
 
-    switch(type) {
-    //Simple cast
-    case LT_NONE: {
-        #pragma omp parallel for
+    float LUT[256];
+    for(int i = 0; i < 256; i++) {
+        float i_f = float(i);
 
-        for(int i = 0; i < size; i++) {
-            dataOut[i] = float(dataIn[i]);
+        switch(type) {
+        case LT_NONE: {//simple cast
+            LUT[i] = i_f;
+        }
+        break;
+
+        case LT_NOR: {//normalize in [0,1]
+            LUT[i] = i_f / 255.0f;
+        }
+        break;
+
+        case LT_NOR_GAMMA: {//normalize in [0,1] + GAMMA correction removal
+            LUT[i] = powf(i_f / 255.0f, gamma);
+        }
+        break;
         }
     }
-    break;
 
-    //Normalization in [0,1]
-    case LT_NOR: {
-        float inv_255 = 1.0f / 255.0f;
-        #pragma omp parallel for
-
-        for(int i = 0; i < size; i++) {
-            dataOut[i] = float(dataIn[i]) * inv_255;
-        }
-    }
-    break;
-
-    //Normalization in [0,1] + GAMMA removal
-    case LT_NOR_GAMMA: {
-        float inv_255 = 1.0f / 255.0f;
-        #pragma omp parallel for
-
-        for(int i = 0; i < size; i++) {
-            dataOut[i] = powf(float(dataIn[i]) * inv_255, gamma);
-        }
-    }
-    break;
+    #pragma omp parallel for
+    for(int i = 0; i < size; i++) {
+        dataOut[i] = LUT[dataIn[i]];
     }
 
     return dataOut;
@@ -131,30 +124,25 @@ PIC_INLINE unsigned char *convertHDR2LDR(const float *dataIn, unsigned char *dat
     float invGamma = 1.0f / gamma;
 
     switch(type) {
-    //Simple cast
-    case LT_NONE: {
-        #pragma omp parallel for
 
+    case LT_NONE: {//simple cast
+        #pragma omp parallel for
         for(int i = 0; i < size; i++) {
             dataOut[i] = CLAMPi(int(lround(dataIn[i])), 0, 255);
         }
     }
     break;
 
-    //Converting into 8-bit
-    case LT_NOR: {
+    case LT_NOR: {//convert into 8-bit
         #pragma omp parallel for
-
         for(int i = 0; i < size; i++) {
             dataOut[i] = CLAMPi(int(lround(dataIn[i] * 255.0f)), 0, 255);
         }
     }
     break;
 
-    //Normalization in [0,1] + GAMMA removal
-    case LT_NOR_GAMMA: {
+    case LT_NOR_GAMMA: {//convert into 8-bit + GAMMA correction application
         #pragma omp parallel for
-
         for(int i = 0; i < size; i++) {
             float tmp = powf(dataIn[i], invGamma);
             dataOut[i] = CLAMPi(int(lround(tmp * 255.0f)), 0, 255);

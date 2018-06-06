@@ -1812,7 +1812,7 @@ PIC_INLINE bool Image::Write(std::string nameFile, LDR_type typeWrite = LT_NOR_G
 
     LABEL_IO_EXTENSION label;
 
-    //Reading an HDR format
+    //read an image in an HDR format
     label = getLabelHDRExtension(nameFile);
 
     if(label != IO_NULL) {
