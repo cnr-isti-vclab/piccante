@@ -32,7 +32,7 @@ namespace pic {
  * @param imgIn
  * @return
  */
-PIC_INLINE  Image *HistogramTMO(Image *imgOut, Image *imgIn)
+PIC_INLINE Image *HistogramTMO(Image *imgOut, Image *imgIn)
 {
     if(imgOut == NULL) {
         imgOut = imgIn->clone();
@@ -47,7 +47,7 @@ PIC_INLINE  Image *HistogramTMO(Image *imgOut, Image *imgIn)
     float table[257];
 
     for(int i = 1; i <= 256; i++) {
-        table[i] = lum->getMedVal(float(i) / 256.0f);
+        table[i] = lum->getPercentileVal(float(i) / 256.0f);
     }
 
     table[0] = lum->getMinVal()[0];

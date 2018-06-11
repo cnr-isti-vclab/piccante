@@ -404,11 +404,17 @@ public:
     float *getCovMtxVal(float *meanVal, BBox *box, float *ret);
 
     /**
-     * @brief getMedVal computes the n-th value given a percentile.
+     * @brief getPercentileVal computes the n-th value given a percentile.
      * @param perCent is the percentile.
      * @return This function returns the n-value given a percentile.
      */
-    float getMedVal(float perCent);
+    float getPercentileVal(float perCent);
+
+    /**
+     * @brief getMedVal computes the median value.
+     * @return This function returns the median value.
+     */
+    float getMedVal();
 
     /**
      * @brief getGT finds the first value greater than val.
@@ -1166,7 +1172,7 @@ PIC_INLINE void Image::sort()
     std::sort(dataTMP, dataTMP + size);
 }
 
-PIC_INLINE float Image::getMedVal(float perCent = 0.5f)
+PIC_INLINE float Image::getPercentileVal(float perCent = 0.5f)
 {
     if(!isValid()) {
         return -1.0f;
@@ -1178,6 +1184,11 @@ PIC_INLINE float Image::getMedVal(float perCent = 0.5f)
 
     int size = frames * width * height * channels;
     return dataTMP[int(perCent * float(size))];
+}
+
+PIC_INLINE float Image::getMedVal()
+{
+    return getPercentileVal(0.5f);
 }
 
 PIC_INLINE float Image::getGT(float val)
