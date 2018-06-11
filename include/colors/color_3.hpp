@@ -480,6 +480,11 @@ public:
         z = sqrtf(z);
     }
 
+    float squaredSum()
+    {
+        return x * x + y * y + z * z;
+    }
+
     /**
      * @brief scan
      * @param file
