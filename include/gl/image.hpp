@@ -677,6 +677,11 @@ PIC_INLINE ImageGL::ImageGL(int frames, int width, int height, int channels,
         generateTextureGL(target, GL_FLOAT, false);
     }
     break;
+
+    default: {
+
+    }break;
+
     }
 }
 

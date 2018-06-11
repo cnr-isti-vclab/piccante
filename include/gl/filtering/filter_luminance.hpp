@@ -162,6 +162,11 @@ void FilterGLLuminance::Update(LUMINANCE_TYPE type)
             weights[2] = inv_3;
         }
         break;
+
+    default:
+        {
+
+        } break;
     }
 
     technique.bind();
