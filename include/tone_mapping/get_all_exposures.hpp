@@ -106,24 +106,24 @@ PIC_INLINE std::vector<float> getAllExposures(Image *imgIn) {
     return exposures;
 }
 
+
 /**
  * @brief getAllExposuresImages converts an image into a stack of images.
  * @param imgIn is an input image.
+ * @param fstops a vector with fstops.
+ * @param gamma is the gamma correction value for the output stack.
  * @return It returns an ImageVec of images which encode imgIn at different
  * exposure values.
  */
-PIC_INLINE ImageVec getAllExposuresImages(Image *imgIn)
+PIC_INLINE ImageVec getAllExposuresImages(Image *imgIn, std::vector<float> &fstops, float gamma = 2.2f)
 {
     ImageVec ret;
-
-    std::vector<float> fstops = getAllExposures(imgIn);
-
-    FilterSimpleTMO flt(1.0f, 0.0f);
+    FilterSimpleTMO flt(gamma, 0.0f);
 
     ImageVec input = Single(imgIn);
 
     for(unsigned int i = 0; i < fstops.size(); i++) {
-        flt.Update(2.2f, fstops[i]);
+        flt.Update(gamma, fstops[i]);
         Image *expo = flt.ProcessP(input, NULL);
 
         expo->exposure = powf(2.0f, fstops[i]);
@@ -132,6 +132,19 @@ PIC_INLINE ImageVec getAllExposuresImages(Image *imgIn)
     }
 
     return ret;
+}
+
+/**
+ * @brief getAllExposuresImages converts an image into a stack of images.
+ * @param imgIn is an input image.
+ * @param gamma is the gamma correction value for the output stack.
+ * @return It returns an ImageVec of images which encode imgIn at different
+ * exposure values.
+ */
+PIC_INLINE ImageVec getAllExposuresImages(Image *imgIn, float gamma = 2.2f)
+{
+    std::vector<float> fstops = getAllExposures(imgIn);
+    return getAllExposuresImages(imgIn, fstops, gamma);
 }
 
 } // end namespace pic
