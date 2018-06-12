@@ -126,6 +126,8 @@ PIC_INLINE ImageVec getAllExposuresImages(Image *imgIn)
         flt.Update(2.2f, fstops[i]);
         Image *expo = flt.ProcessP(input, NULL);
 
+        expo->exposure = powf(2.0f, fstops[i]);
+
         ret.push_back(expo);
     }
 
