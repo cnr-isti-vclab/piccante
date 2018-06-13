@@ -224,18 +224,18 @@ public:
      * @param name_uniform
      * @param value0
      */
-    void setUniform(const char *name_uniform, int value0)
+    void setUniform1i(const char *name_uniform, int value0)
     {
         glUniform1i(getLocation(name_uniform),
                     GLint(value0));
     }
 
     /**
-     * @brief SetUniform
+     * @brief SetUniform1f
      * @param name_uniform
      * @param value0
      */
-    void setUniform(const char *name_uniform, float value0)
+    void setUniform1f(const char *name_uniform, float value0)
     {
         glUniform1f(getLocation(name_uniform),
                     GLfloat(value0));
@@ -247,7 +247,7 @@ public:
      * @param value0
      * @param value1
      */
-    void setUniform(const char *name_uniform, float value0, float value1)
+    void setUniform2f(const char *name_uniform, float value0, float value1)
     {
         glUniform2f(getLocation(name_uniform),
                     GLfloat(value0),
@@ -261,7 +261,7 @@ public:
      * @param value1
      * @param value2
      */
-    void setUniform(const char *name_uniform, float value0, float value1, float value2)
+    void setUniform3f(const char *name_uniform, float value0, float value1, float value2)
     {
         glUniform3f(getLocation(name_uniform),
                     GLfloat(value0),
@@ -270,14 +270,14 @@ public:
     }
 
     /**
-     * @brief setUniform
+     * @brief setUniform4f
      * @param name_uniform
      * @param value0
      * @param value1
      * @param value2
      * @param value3
      */
-    void setUniform(const char *name_uniform, float value0, float value1, float value2, float value3)
+    void setUniform4f(const char *name_uniform, float value0, float value1, float value2, float value3)
     {
         glUniform4f(getLocation(name_uniform),
                     GLfloat(value0),
@@ -319,7 +319,7 @@ public:
      * @param name_uniform
      * @param value
      */
-    void setUniform3(const char *name_uniform, const float *value)
+    void setUniform3fv(const char *name_uniform, const float *value)
     {
         glUniform3fv(getLocation(name_uniform),
                      GLsizei(1),
@@ -331,7 +331,7 @@ public:
      * @param name_uniform
      * @param value
      */
-    void setUniform4(const char *name_uniform, const float *value)
+    void setUniform4fv(const char *name_uniform, const float *value)
     {
         glUniform4fv(getLocation(name_uniform),
                      GLsizei(1),

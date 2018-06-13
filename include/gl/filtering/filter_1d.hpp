@@ -94,7 +94,7 @@ public:
     void setSlice2(int slice)
     {
         this->slice = slice;
-        technique.setUniform("slice", slice);
+        technique.setUniform1i("slice", slice);
     }
 
     /**
@@ -157,15 +157,15 @@ PIC_INLINE void FilterGL1D::ChangePass(int pass, int tPass)
 PIC_INLINE void FilterGL1D::SetUniform()
 {
     technique.bind();
-    technique.setUniform("u_tex", 0);
+    technique.setUniform1i("u_tex", 0);
     SetUniformAux();
 
-    technique.setUniform("iX", dirs[0]);
-    technique.setUniform("iY", dirs[1]);
+    technique.setUniform1i("iX", dirs[0]);
+    technique.setUniform1i("iY", dirs[1]);
 
     if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY) {
-        technique.setUniform("iZ", dirs[2]);
-        technique.setUniform("slice", slice);
+        technique.setUniform1i("iZ", dirs[2]);
+        technique.setUniform1i("slice", slice);
     }
 
     technique.unbind();

@@ -272,16 +272,16 @@ void FilterGLBilateral3DAS::Update(float sigma_s, float sigma_r, float sigma_t)
     float sigmat2 = 2.0f * this->sigma_t *this->sigma_t;
 
     technique.bind();
-    technique.setUniform("u_tex",      0);
-    technique.setUniform("u_poisson",  1);
-    technique.setUniform("u_rand",	 2);
-    technique.setUniform("u_sample",	 3);
-    technique.setUniform("u_levelsR",	 4);
-    technique.setUniform("frame",  frame);
-    technique.setUniform("sigmas2",  sigmas2);
-    technique.setUniform("sigmar2",  sigmar2);
-    technique.setUniform("sigmat2",  sigmat2);
-    technique.setUniform("levelsR_Size", ms->nLevels);
+    technique.setUniform1i("u_tex",      0);
+    technique.setUniform1i("u_poisson",  1);
+    technique.setUniform1i("u_rand",	 2);
+    technique.setUniform1i("u_sample",	 3);
+    technique.setUniform1i("u_levelsR",	 4);
+    technique.setUniform1i("frame",  frame);
+    technique.setUniform1f("sigmas2",  sigmas2);
+    technique.setUniform1f("sigmar2",  sigmar2);
+    technique.setUniform1f("sigmat2",  sigmat2);
+    technique.setUniform1i("levelsR_Size", ms->nLevels);
     technique.unbind();
 }
 

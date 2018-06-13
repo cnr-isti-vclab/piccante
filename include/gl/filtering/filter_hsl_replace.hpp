@@ -108,10 +108,10 @@ void FilterGLHSLReplace::InitShaders()
     technique.initStandard("330", vertex_source, final_fragment_source, "FilterGLGradient");
 
     technique.bind();
-    technique.setUniform("u_tex",      0);
-    technique.setUniform("u_change",   1);
-    technique.setUniform("delta_hue",  delta_hue);
-    technique.setUniform("delta_saturation",  delta_saturation);
+    technique.setUniform1i("u_tex",      0);
+    technique.setUniform1i("u_change",   1);
+    technique.setUniform1f("delta_hue",  delta_hue);
+    technique.setUniform1f("delta_saturation",  delta_saturation);
     technique.unbind();
 }
 

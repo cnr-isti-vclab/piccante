@@ -141,9 +141,9 @@ void FilterGLDownPP::Update(float *value, float threshold)
     }
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("threshold", this->threshold);
-    technique.setUniform4("value", this->value);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1f("threshold", this->threshold);
+    technique.setUniform4fv("value", this->value);
     technique.unbind();
 }
 

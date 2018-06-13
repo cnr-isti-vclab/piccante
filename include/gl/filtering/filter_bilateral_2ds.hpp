@@ -390,20 +390,20 @@ void FilterGLBilateral2DS::Update(float sigma_s, float sigma_r)
     float sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
 
     technique.bind();
-    technique.setUniform("u_tex",       0);
-    technique.setUniform("u_poisson",   1);
-    technique.setUniform("u_rand",      2);
-    technique.setUniform("u_mask",      3);
+    technique.setUniform1i("u_tex",       0);
+    technique.setUniform1i("u_poisson",   1);
+    technique.setUniform1i("u_rand",      2);
+    technique.setUniform1i("u_mask",      3);
 
     if(type == BF_CROSS) {
-        technique.setUniform("u_edge",  4);
+        technique.setUniform1i("u_edge",  4);
     }
 
-    technique.setUniform("sigmas2",         sigmas2);
-    technique.setUniform("sigmar2",         sigmar2);
-    technique.setUniform("kernelSize",      kernelSize);
-    technique.setUniform("kernelSizef",     float(kernelSize));
-    technique.setUniform("nSamples",        ms->nSamples >> 1);
+    technique.setUniform1f("sigmas2",         sigmas2);
+    technique.setUniform1f("sigmar2",         sigmar2);
+    technique.setUniform1i("kernelSize",      kernelSize);
+    technique.setUniform1f("kernelSizef",     float(kernelSize));
+    technique.setUniform1i("nSamples",        ms->nSamples >> 1);
     technique.unbind();
 }
 

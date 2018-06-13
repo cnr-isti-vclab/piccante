@@ -180,10 +180,10 @@ void FilterGLBilateral2DF::Update(float sigma_s, float sigma_r)
     int halfKernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s) >> 1;
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("sigmas2", sigmas2);
-    technique.setUniform("sigmar2", sigmar2);
-    technique.setUniform("halfKernelSize", halfKernelSize);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1f("sigmas2", sigmas2);
+    technique.setUniform1f("sigmar2", sigmar2);
+    technique.setUniform1i("halfKernelSize", halfKernelSize);
     technique.unbind();
 }
 

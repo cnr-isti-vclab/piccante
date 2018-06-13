@@ -106,8 +106,8 @@ void FilterGLSampler2D::InitShaders()
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLSampler2D");
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("scale", scale);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1f("scale", scale);
     technique.unbind();
 }
 

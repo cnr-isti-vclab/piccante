@@ -63,9 +63,9 @@ public:
             halfKernelSize = kernelSize >> 1;
         }
 
-        technique.setUniform("u_weights", 1);
-        technique.setUniform("halfKernelSize", halfKernelSize);
-        technique.setUniform("kernelSize", kernelSize);
+        technique.setUniform1i("u_weights", 1);
+        technique.setUniform1i("halfKernelSize", halfKernelSize);
+        technique.setUniform1i("kernelSize", kernelSize);
     }
 };
 

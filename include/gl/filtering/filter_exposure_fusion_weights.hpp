@@ -117,13 +117,13 @@ void FilterGLExposureFusionWeights::InitShaders()
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLExposureFusionWeights");
 
     technique.bind();
-    technique.setUniform("u_tex_lum", 0);
-    technique.setUniform("u_tex", 1);
-    technique.setUniform("wC", wC);
-    technique.setUniform("wE", wE);
-    technique.setUniform("wS", wS);
-    technique.setUniform("mu", mu);
-    technique.setUniform("sigma2", sigma2);
+    technique.setUniform1i("u_tex_lum", 0);
+    technique.setUniform1i("u_tex", 1);
+    technique.setUniform1f("wC", wC);
+    technique.setUniform1f("wE", wE);
+    technique.setUniform1f("wS", wS);
+    technique.setUniform1f("mu", mu);
+    technique.setUniform1f("sigma2", sigma2);
     technique.unbind();
 }
 

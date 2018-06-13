@@ -31,8 +31,8 @@ protected:
     void InitShaders();
     void FragmentShader();
 
-    float				delta_t, k;
-    unsigned int		iterations;
+    float delta_t, k;
+    unsigned int iterations;
     FilterGLIterative	*flt;
 
 public:
@@ -155,9 +155,9 @@ PIC_INLINE void FilterGLAnisotropicDiffusion::Update(float k)
     float k2 = this->k * this->k;
 
     technique.bind();
-    technique.setUniform("u_tex",      0);
-    technique.setUniform("k2",		k2);
-    technique.setUniform("delta_t",	delta_t);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1f("k2", k2);
+    technique.setUniform1f("delta_t", delta_t);
     technique.unbind();
 }
 

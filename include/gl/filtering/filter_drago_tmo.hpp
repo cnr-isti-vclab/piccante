@@ -196,12 +196,12 @@ void FilterGLDragoTMO::Update(float Ld_Max, float b, float LMax, float Lwa)
     ComputeConstants();
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    //technique.setUniform("u_lum", 1);
-    technique.setUniform("constant1", constant1);
-    technique.setUniform("constant2", constant2);
-    technique.setUniform("LMax", LMax_scaled);
-    technique.setUniform("Lwa",	Lwa_scaled);
+    technique.setUniform1i("u_tex", 0);
+    //technique.setUniform1i("u_lum", 1);
+    technique.setUniform1f("constant1", constant1);
+    technique.setUniform1f("constant2", constant2);
+    technique.setUniform1f("LMax", LMax_scaled);
+    technique.setUniform1f("Lwa", Lwa_scaled);
     technique.unbind();
 }
 

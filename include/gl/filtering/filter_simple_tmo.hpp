@@ -148,9 +148,9 @@ void FilterGLSimpleTMO::Update(float gamma, float fstop)
     float exposure = powf(2.0f, fstop);
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("tn_gamma", invGamma);
-    technique.setUniform("tn_exposure", exposure);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1f("tn_gamma", invGamma);
+    technique.setUniform1f("tn_exposure", exposure);
     technique.unbind();
 }
 

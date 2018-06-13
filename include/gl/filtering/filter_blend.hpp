@@ -80,9 +80,9 @@ void FilterGLBlend::InitShaders()
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBlend");
 
     technique.bind();
-    technique.setUniform("u_tex0", 0);
-    technique.setUniform("u_tex1", 1);
-    technique.setUniform("u_texMask", 2);
+    technique.setUniform1i("u_tex0", 0);
+    technique.setUniform1i("u_tex1", 1);
+    technique.setUniform1i("u_texMask", 2);
     technique.unbind();
 }
 

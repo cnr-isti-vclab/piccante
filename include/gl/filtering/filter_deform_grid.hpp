@@ -123,8 +123,8 @@ void FilterGLDeformGrid::Update(Image *grid_move)
     }
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("u_grid", 1);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1i("u_grid", 1);
     technique.unbind();
 }
 

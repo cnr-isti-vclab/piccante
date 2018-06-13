@@ -46,7 +46,7 @@ protected:
                                              uniform int        iY;
                                              uniform int        halfKernelSize;
                                              uniform int        kernelSize;
-                                             out     vec4		f_color;
+                                             out     vec4	f_color;
 
         void main(void) {
             ivec2 coordsFrag = ivec2(gl_FragCoord.xy);
@@ -142,8 +142,8 @@ public:
      */
     void SetUniformAux()
     {
-        technique.setUniform("halfKernelSize", halfKernelSize);
-        technique.setUniform("kernelSize", kernelSize);
+        technique.setUniform1i("halfKernelSize", halfKernelSize);
+        technique.setUniform1i("kernelSize", kernelSize);
     }
 
     /**

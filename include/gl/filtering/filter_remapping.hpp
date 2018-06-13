@@ -76,7 +76,7 @@ void FilterGLRemapping::InitShaders()
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLRemapping");
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
+    technique.setUniform1i("u_tex", 0);
     technique.unbind();
 }
 

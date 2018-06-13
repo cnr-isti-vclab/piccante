@@ -32,21 +32,21 @@ namespace pic {
 class StrokeGL
 {
 protected:
-    int					width, height, brushSize;
-    ImageGL			    *shape;
-    float				size, rSize;
-    float				color[4];
-    float				tmpColor[3];
+    int	 width, height, brushSize;
+    ImageGL *shape;
+    float size, rSize;
+    float color[4];
+    float tmpColor[3];
 
     QuadGL              *quad;
 
     std::vector<float>	positions;
 
-    TechniqueGL    annotationProgram;
-    TechniqueGL    brushProgram;
+    TechniqueGL annotationProgram;
+    TechniqueGL brushProgram;
 
 public:
-    float				annotation;
+    float annotation;
 
     /**
      * @brief StrokeGL
@@ -241,9 +241,9 @@ PIC_INLINE void StrokeGL::SetupShaders()
     brushProgram.unbind();
 
     brushProgram.bind();
-    brushProgram.setUniform("u_tex", 0);
-    brushProgram.setUniform("shift_position", 0.0f, 0.0f);
-    brushProgram.setUniform("current_color", 1.0f, 1.0f, 1.0f, 1.0f);
+    brushProgram.setUniform1i("u_tex", 0);
+    brushProgram.setUniform2f("shift_position", 0.0f, 0.0f);
+    brushProgram.setUniform4f("current_color", 1.0f, 1.0f, 1.0f, 1.0f);
     brushProgram.unbind();
 
     //Annotation
@@ -272,9 +272,9 @@ PIC_INLINE void StrokeGL::SetupShaders()
     annotationProgram.unbind();
 
     annotationProgram.bind();
-    annotationProgram.setUniform("u_tex", 0);
-    annotationProgram.setUniform("shift_position", 0.0f, 0.0f);
-    annotationProgram.setUniform("annotation", annotation);
+    annotationProgram.setUniform1i("u_tex", 0);
+    annotationProgram.setUniform2f("shift_position", 0.0f, 0.0f);
+    annotationProgram.setUniform1f("annotation", annotation);
     annotationProgram.unbind();
 }
 
@@ -409,12 +409,12 @@ PIC_INLINE void StrokeGL::RenderBrushGL(int x, int y)
         
     brushProgram.bind();
     if(annotation < 0.0f) {
-        brushProgram.setUniform("current_color", 1.0f - color[0], 1.0f - color[1], 1.0f - color[2], 1.0f);
+        brushProgram.setUniform4f("current_color", 1.0f - color[0], 1.0f - color[1], 1.0f - color[2], 1.0f);
     } else {
-        brushProgram.setUniform("current_color", color[0], color[1], color[2], 0.5f);
+        brushProgram.setUniform4f("current_color", color[0], color[1], color[2], 0.5f);
     }
     
-    brushProgram.setUniform("shift_position", xf, yf);
+    brushProgram.setUniform2f("shift_position", xf, yf);
 
     quad->Render();
 
@@ -439,11 +439,11 @@ PIC_INLINE void StrokeGL::RenderGL()
 
     brushProgram.bind();
 
-    brushProgram.setUniform("current_color", color[0], color[1], color[2], 1.0f);
+    brushProgram.setUniform4f("current_color", color[0], color[1], color[2], 1.0f);
     const int n = int(positions.size());
 
     for(int i = 0; i < n; i += 2) {
-        brushProgram.setUniform("shift_position", positions[i], positions[i + 1]);
+        brushProgram.setUniform2f("shift_position", positions[i], positions[i + 1]);
         quad->Render();
     }
 
@@ -466,7 +466,7 @@ PIC_INLINE void StrokeGL::RenderAnnotationGL()
     printf("Annotation value: %f\n", annotation);
 #endif
 
-    annotationProgram.setUniform("annotation",  annotation);
+    annotationProgram.setUniform1f("annotation",  annotation);
 
     glEnable(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE0);
@@ -475,7 +475,7 @@ PIC_INLINE void StrokeGL::RenderAnnotationGL()
     const int n = int(positions.size());
 
     for(int i = 0; i < n; i += 2) {
-        annotationProgram.setUniform("shift_position", positions[i], positions[i + 1]);
+        annotationProgram.setUniform2f("shift_position", positions[i], positions[i + 1]);
         quad->Render();
     }
 

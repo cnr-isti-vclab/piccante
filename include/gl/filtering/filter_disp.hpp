@@ -190,16 +190,16 @@ void FilterGLDisp::InitShaders()
     int halfKernelSize = PrecomputedGaussian::getKernelSize(sigma_s) >> 1;
 
     technique.bind();
-    technique.setUniform("sigma_s2",	sigma_s2);
-    technique.setUniform("sigma_r2",	sigma_r2);
-    technique.setUniform("sigma",		sigma * sigma * 2.0f);
-    technique.setUniform("halfKernelSize", halfKernelSize);
-    technique.setUniform("bUse", 1.0f);
-    technique.setUniform("bLeft", -1.0f);
+    technique.setUniform1f("sigma_s2", sigma_s2);
+    technique.setUniform1f("sigma_r2", sigma_r2);
+    technique.setUniform1f("sigma", sigma * sigma * 2.0f);
+    technique.setUniform1i("halfKernelSize", halfKernelSize);
+    technique.setUniform1f("bUse", 1.0f);
+    technique.setUniform1f("bLeft", -1.0f);
 
-    technique.setUniform("u_texL",      0);
-    technique.setUniform("u_texR",      1);
-    technique.setUniform("u_texD",      2);
+    technique.setUniform1i("u_texL", 0);
+    technique.setUniform1i("u_texR", 1);
+    technique.setUniform1i("u_texD", 2);
     technique.unbind();
 }
 
@@ -216,26 +216,26 @@ void FilterGLDisp::Update(float sigma, float sigma_s, float sigma_r, bool bUse,
     float sigma_r2 = 2.0f * sigma_r * sigma_r;
 
     technique.bind();
-    technique.setUniform("u_texL",      0);
-    technique.setUniform("u_texR",      1);
-    technique.setUniform("u_texD",      2);
-    technique.setUniform("sigma_s2",	sigma_s2);
-    technique.setUniform("sigma_r2",	sigma_r2);
+    technique.setUniform1i("u_texL",      0);
+    technique.setUniform1i("u_texR",      1);
+    technique.setUniform1i("u_texD",      2);
+    technique.setUniform1f("sigma_s2",	sigma_s2);
+    technique.setUniform1f("sigma_r2",	sigma_r2);
 
     if(bUse) {
-        technique.setUniform("bUse", 1.0f);
+        technique.setUniform1f("bUse", 1.0f);
     } else {
-        technique.setUniform("bUse", 0.0f);
+        technique.setUniform1f("bUse", 0.0f);
     }
 
     if(bLeft) {
-        technique.setUniform("bLeft", 1.0f);
+        technique.setUniform1f("bLeft", 1.0f);
     } else {
-        technique.setUniform("bLeft", -1.0f);
+        technique.setUniform1f("bLeft", -1.0f);
     }
 
-    technique.setUniform("sigma",		sigma * sigma * 2.0f);
-    technique.setUniform("halfKernelSize", halfKernelSize);
+    technique.setUniform1f("sigma", sigma * sigma * 2.0f);
+    technique.setUniform1i("halfKernelSize", halfKernelSize);
     technique.unbind();
 }
 

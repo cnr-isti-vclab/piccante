@@ -149,10 +149,10 @@ void FilterGLSigmoidTMO::Update(float alpha)
     }
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("u_tex_adapt", 1);
-    technique.setUniform("alpha", this->alpha);
-    technique.setUniform("epsilon", epsilon);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1i("u_tex_adapt", 1);
+    technique.setUniform1f("alpha", this->alpha);
+    technique.setUniform1f("epsilon", epsilon);
     technique.unbind();
 }
 

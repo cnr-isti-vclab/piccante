@@ -287,10 +287,10 @@ PIC_INLINE void BufferOpGL::InitShaders()
     technique.unbind();
 
     technique.bind();
-    technique.setUniform("u_tex_0",  0);
-    technique.setUniform("u_tex_1",  1);
-    technique.setUniform4("u_val_0", c0);
-    technique.setUniform4("u_val_1", c1);
+    technique.setUniform1i("u_tex_0",  0);
+    technique.setUniform1i("u_tex_1",  1);
+    technique.setUniform4fv("u_val_0", c0);
+    technique.setUniform4fv("u_val_1", c1);
     technique.unbind();
 }
 
@@ -309,10 +309,10 @@ PIC_INLINE void BufferOpGL::Update(float *c0, float *c1)
     }
 
     technique.bind();
-    technique.setUniform("u_tex_0",  0);
-    technique.setUniform("u_tex_1",  1);
-    technique.setUniform4("u_val_0", this->c0);
-    technique.setUniform4("u_val_1", this->c1);
+    technique.setUniform1i("u_tex_0",  0);
+    technique.setUniform1i("u_tex_1",  1);
+    technique.setUniform4fv("u_val_0", this->c0);
+    technique.setUniform4fv("u_val_1", this->c1);
     technique.unbind();
 }
 
@@ -327,10 +327,10 @@ PIC_INLINE void BufferOpGL::Update(float c0 = 0.0f, float c1 = 0.0f)
     }
 
     technique.bind();
-    technique.setUniform("u_tex_0",  0);
-    technique.setUniform("u_tex_1",  1);
-    technique.setUniform4("u_val_0", this->c0);
-    technique.setUniform4("u_val_1", this->c1);
+    technique.setUniform1i("u_tex_0",  0);
+    technique.setUniform1i("u_tex_1",  1);
+    technique.setUniform4fv("u_val_0", this->c0);
+    technique.setUniform4fv("u_val_1", this->c1);
     technique.unbind();
 }
 

@@ -170,8 +170,8 @@ void FilterGLLuminance::Update(LUMINANCE_TYPE type)
     }
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("weights", weights[0], weights[1], weights[2]);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform3f("weights", weights[0], weights[1], weights[2]);
     technique.unbind();
 }
 

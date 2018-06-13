@@ -281,7 +281,7 @@ PIC_INLINE void ReduxGL::InitShaders()
     techinques[0].initStandard("330", vertex_source, fragment_source, "ReduxGL");
 
     techinques[0].bind();
-    techinques[0].setUniform("u_tex", 0);
+    techinques[0].setUniform1i("u_tex", 0);
     techinques[0].unbind();
 
     if(bDomainTransform) {
@@ -293,7 +293,7 @@ PIC_INLINE void ReduxGL::InitShaders()
         techinques[1].initStandard("330", vertex_source, fragment_source_domain_transform, "ReduxGL");
 
         techinques[1].bind();
-        techinques[1].setUniform("u_tex", 0);
+        techinques[1].setUniform1i("u_tex", 0);
         techinques[1].unbind();
     }
 }

@@ -183,8 +183,8 @@ void FilterGLBilateral2DAS::FragmentShader()
                           uniform isampler2D	u_levelsR;
                           uniform float		sigmas2;
                           uniform float		sigmar2;
-                          uniform	int			levelsR_Size;
-                          out     vec4		f_color;
+                          uniform int           levelsR_Size;
+                          out     vec4          f_color;
 
                           //Calculate the number of samples
     int CalculateSamples(int shifter, ivec2 tSize) {
@@ -284,14 +284,14 @@ void FilterGLBilateral2DAS::Update(float sigma_s, float sigma_r)
     float sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
 
     technique.bind();
-    technique.setUniform("u_tex",      0);
-    technique.setUniform("u_poisson",  1);
-    technique.setUniform("u_rand",	 2);
-    technique.setUniform("u_sample",	 3);
-    technique.setUniform("u_levelsR",	 4);
-    technique.setUniform("sigmas2",  sigmas2);
-    technique.setUniform("sigmar2",  sigmar2);
-    technique.setUniform("levelsR_Size", ms->nLevels);
+    technique.setUniform1i("u_tex",      0);
+    technique.setUniform1i("u_poisson",  1);
+    technique.setUniform1i("u_rand",	 2);
+    technique.setUniform1i("u_sample",	 3);
+    technique.setUniform1i("u_levelsR",	 4);
+    technique.setUniform1f("sigmas2",  sigmas2);
+    technique.setUniform1f("sigmar2",  sigmar2);
+    technique.setUniform1i("levelsR_Size", ms->nLevels);
     technique.unbind();
 }
 

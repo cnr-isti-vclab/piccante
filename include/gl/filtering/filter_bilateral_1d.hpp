@@ -206,9 +206,9 @@ void FilterGLBilateral1D::SetUniformAux()
     int halfKernelSize = PrecomputedGaussian::getKernelSize(sigma_s) >> 1;
 
     technique.bind();
-    technique.setUniform("sigma_s2",	sigma_s2);
-    technique.setUniform("sigma_r2",	sigma_r2);
-    technique.setUniform("halfKernelSize", halfKernelSize);
+    technique.setUniform1f("sigma_s2",	sigma_s2);
+    technique.setUniform1f("sigma_r2",	sigma_r2);
+    technique.setUniform1i("halfKernelSize", halfKernelSize);
     technique.unbind();
 }
 

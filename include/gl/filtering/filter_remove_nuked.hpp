@@ -123,8 +123,8 @@ void FilterGLRemoveNuked::Update(float threshold)
     }
 
     technique.bind();
-    technique.setUniform("u_tex",      0);
-    technique.setUniform("threshold",  this->threshold);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1f("threshold", this->threshold);
     technique.unbind();
 }
 

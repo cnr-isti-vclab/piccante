@@ -74,8 +74,8 @@ PIC_INLINE void FilterGLAnaglyph::InitShaders()
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLAnaglyph");
 
     technique.bind();
-    technique.setUniform("u_texL",      0);
-    technique.setUniform("u_texR",      1);
+    technique.setUniform1i("u_texL", 0);
+    technique.setUniform1i("u_texR", 1);
     technique.unbind();
 }
 

@@ -152,8 +152,8 @@ void FilterGLChannel::Update(int channel)
     setChannel(channel);
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("channel", channel);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1i("channel", channel);
     technique.unbind();
 }
 

@@ -137,11 +137,11 @@ public:
     {
         if(direct) {
             techniques[0].bind();
-            techniques[0].setUniform3("white_point", white_point);
+            techniques[0].setUniform3fv("white_point", white_point);
             techniques[0].unbind();
         } else {
             techniques[1].bind();
-            techniques[1].setUniform3("white_point", white_point);
+            techniques[1].setUniform3fv("white_point", white_point);
             techniques[1].unbind();
         }
     }

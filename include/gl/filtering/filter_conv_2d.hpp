@@ -56,8 +56,8 @@ public:
     void SetUniform()
     {
         technique.bind();
-        technique.setUniform("u_tex", 0);
-        technique.setUniform("u_weights", 1);
+        technique.setUniform1i("u_tex", 0);
+        technique.setUniform1i("u_weights", 1);
 
         if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY) {
            // technique.setUniform("slice", slice);
