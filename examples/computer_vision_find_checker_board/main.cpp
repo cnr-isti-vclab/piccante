@@ -42,6 +42,11 @@ int main(int argc, char *argv[])
 
     printf("Reading images...");
 
+    int x0, y0, x1, y1, xw, yw;
+    float length_pixels;
+    pic::extractCheckerBoardJNI(img_str, "../data/output/checker_board_photo_wb.png", x0, y0, x1, y1, length_pixels, xw, yw);
+
+    /*
     pic::Image img(img_str);
 
     printf("Ok\n");
@@ -50,7 +55,7 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("OK\n");
 
-        std::vector< Eigen::Vector2f> corners;
+        std::vector< Eigen::Vector2f > corners;
         pic::findCheckerBoard(&img, corners);
 
         Eigen::Vector2f p0, p1;
@@ -63,9 +68,12 @@ int main(int argc, char *argv[])
         pic::Image *img_wb = pic::applyWhiteBalance(&img, color);
 
         img_wb->Write("../data/output/checker_board_photo_wb.png");
+
+
     } else {
         printf("No there is at least an invalid file!\n");
     }
+    */
 
     return 0;
 }
