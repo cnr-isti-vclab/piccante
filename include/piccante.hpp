@@ -234,6 +234,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util.hpp"
 #include "computer_vision.hpp"
 
+#include "JNI.hpp"
+
 #ifdef PIC_MAC_OS_X
 #pragma clang diagnostic pop
 #endif

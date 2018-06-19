@@ -106,10 +106,22 @@ public:
      */
     void add(Vec<N, T> a)
     {
-        for(unsigned int i=0; i<N; i++) {
+        for(unsigned int i = 0; i < N; i++) {
             data[i] += a[i];
         }
     }
+
+     Vec<N, T> operator +(const Vec<N, T> &a) const
+     {
+         Vec<N, T> ret = this->clone();
+         ret.add(a);
+         return ret;
+     }
+
+     void operator +=(const Vec<N, T> &a)
+     {
+         this->add(a);
+     }
 
     /**
      * @brief dot
@@ -135,6 +147,11 @@ public:
         }
     }
 
+    void operator /=(const T &a)
+    {
+        this->div(a);
+    }
+
     /**
      * @brief sub
      * @param value
@@ -146,6 +163,14 @@ public:
         }
     }
 
+    Vec<N, T> operator +(const float &a) const
+    {
+        Vec<N, T> ret = this->clone();
+        ret.add(a);
+        return ret;
+    }
+
+
     /**
      * @brief neg
      * @param value
@@ -155,6 +180,13 @@ public:
         for(unsigned int i = 0; i < N; i++) {
             data[i] = -data[i];
         }
+    }
+
+    Vec<N, T> clone()
+    {
+        Vec<N, T> ret;
+        memcpy(ret.data, this->data, N * sizeof(T));
+        return ret;
     }
 
     /**

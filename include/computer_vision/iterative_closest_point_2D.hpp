@@ -46,7 +46,7 @@ namespace pic {
 PIC_INLINE Eigen::Vector2f getMeanVector2f(std::vector< Eigen::Vector2f > &p)
 {
     auto c = p[0];
-    for(auto i = 1; i < p.size(); i++) {
+    for(unsigned int i = 1; i < p.size(); i++) {
         c += p[i];
     }
     c /= float(p.size());
@@ -65,7 +65,7 @@ PIC_INLINE Eigen::Vector2f getMedianVector2f(std::vector< Eigen::Vector2f > &p)
     float *x = new float[n];
     float *y = new float[n];
 
-    for(auto i = 0; i < n; i++) {
+    for(unsigned int i = 0; i < n; i++) {
         x[i] = p[i][0];
         y[i] = p[i][1];
     }
@@ -129,7 +129,7 @@ public:
 
     void apply(std::vector< Eigen::Vector2f > &points) {
         //apply transform
-        for(auto i  = 0; i < points.size(); i++) {
+        for(unsigned int i  = 0; i < points.size(); i++) {
             Eigen::Vector2f tmp = points[i];
             points[i] = ((R * tmp) + t) * scale;
         }
@@ -138,7 +138,7 @@ public:
     void apply(std::vector< Eigen::Vector2f > &points,
                std::vector< Eigen::Vector2f > &out) {
         //apply transform
-        for(auto i  = 0; i < points.size(); i++) {
+        for(unsigned int i  = 0; i < points.size(); i++) {
             Eigen::Vector2f tmp = ((R * points[i]) + t) * scale;
             out.push_back(tmp);
         }
@@ -155,7 +155,7 @@ public:
         auto shift = c + t;
 
         //apply transform
-        for(auto i  = 0; i < points.size(); i++) {
+        for(unsigned int i  = 0; i < points.size(); i++) {
             Eigen::Vector2f tmp = points[i] - c;
             points[i] = (R * tmp) * scale + shift;
         }
@@ -169,7 +169,7 @@ public:
         auto shift = c + t;
 
         //apply transform
-        for(auto i  = 0; i < points.size(); i++) {
+        for(unsigned int i  = 0; i < points.size(); i++) {
             Eigen::Vector2f tmp = points[i] - c;
             Eigen::Vector2f tmp2 = (R * tmp) * scale + shift;
             out.push_back(tmp2);
@@ -245,7 +245,7 @@ PIC_INLINE ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen
     Eigen::Matrix2f H;
     H.setZero();
 
-    for(auto i = 0; i < p1.size(); i++) {
+    for(unsigned int i = 0; i < p1.size(); i++) {
         int j = ind[i];
 
         auto t0 = p0[j] - c0;
@@ -270,7 +270,7 @@ PIC_INLINE ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen
     Eigen::Matrix2f R = V * U_t;
 
     if(R.determinant() < 0.0f) {
-        for(auto i = 0; i < V.rows(); i++) {
+        for(unsigned int i = 0; i < V.rows(); i++) {
             V(i, 1) = -V(i, 1);
         }
 
@@ -297,11 +297,11 @@ PIC_INLINE float getErrorPointsList(std::vector< Eigen::Vector2f > &p0,
                          std::vector< Eigen::Vector2f > &p1)
 {
     float err = 0.0f;
-    for(auto i = 0; i < p0.size(); i++) {
+    for(unsigned int i = 0; i < p0.size(); i++) {
         auto p_i = p0[i];
 
         float tmp_err = FLT_MAX;
-        for(auto j = 0; j < p1.size(); j++) {
+        for(unsigned int j = 0; j < p1.size(); j++) {
             auto delta_ij = p_i - p1[j];
             float dist = delta_ij.norm();
 
@@ -359,7 +359,6 @@ PIC_INLINE void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pa
             iter = maxIterations;
         }
         */
-
 
         #ifdef PIC_DEBUG
             printf("Error: %f %f\n", err, prev_err);
