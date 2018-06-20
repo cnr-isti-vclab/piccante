@@ -41,9 +41,19 @@ int main(int argc, char *argv[])
 
 //    printf("Reading images...");
 
+    auto start = std::chrono::system_clock::now();
+
     int x0, y0, x1, y1, xw, yw;
     float length_pixels;
     pic::extractCheckerBoardJNI(img_str, "../data/output/checker_board_photo_wb.png", x0, y0, x1, y1, length_pixels, xw, yw);
+
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end-start;
+     std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+     std::cout << "finished computation at " << std::ctime(&end_time)
+               << "elapsed time: " << elapsed_seconds.count() << "s\n";
 
     /*
     pic::Image img(img_str);
