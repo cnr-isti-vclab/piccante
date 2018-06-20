@@ -25,7 +25,6 @@ This program is free software: you can redistribute it and/or modify
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
-#define PIC_DEBUG
 
 #include "../common_code/image_qimage_interop.hpp"
 #include "piccante.hpp"
@@ -40,7 +39,7 @@ int main(int argc, char *argv[])
         img_str = "../data/input/features/checker_board_photo.png";
     }
 
-    printf("Reading images...");
+//    printf("Reading images...");
 
     int x0, y0, x1, y1, xw, yw;
     float length_pixels;

@@ -78,7 +78,9 @@ PIC_INLINE Eigen::Vector2f getMedianVector2f(std::vector< Eigen::Vector2f > &p)
     med[0] = x[n >> 1];
     med[1] = y[n >> 1];
 
+#ifdef PIC_DEBUG
     printf("%f %f\n", med[0], med[1]);
+#endif
 
     delete[] x;
     delete[] y;
@@ -212,7 +214,11 @@ PIC_INLINE ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen
     Eigen::Vector2f c0;
     c0.setZero();
     int n = 0;
+
+#ifdef PIC_DEBUG
     printf("Size: %d\n", size_descs);
+#endif
+
     for(int i = 0; i < p1.size(); i++) {
         auto p_i = p1[i];
 
@@ -344,8 +350,12 @@ PIC_INLINE void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pa
         ICP2DTransform t = estimateRotatioMatrixAndTranslation(points, points_pattern,
                                                                points_descs, points_pattern_descs,
                                                                size_descs);
+
+#ifdef PIC_DEBUG
         t.print();
-        std::vector< Eigen::Vector2f > points_pattern_tmp;
+#endif
+
+//        std::vector< Eigen::Vector2f > points_pattern_tmp;
         t.apply(points_pattern);
 
         err = getErrorPointsList(points_pattern, points);

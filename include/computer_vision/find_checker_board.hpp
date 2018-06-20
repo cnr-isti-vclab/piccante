@@ -182,7 +182,10 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     Image *L = FilterLuminance::Execute(img, NULL, LT_CIE_LUMINANCE);
 
     //get corners
+#ifdef PIC_DEBUG
     printf("Extracting corners...\n");
+#endif
+
     HarrisCornerDetector hcd(2.5f, 5);
     std::vector< Eigen::Vector2f > corners_from_img;
     hcd.execute(L, &corners_from_img);
