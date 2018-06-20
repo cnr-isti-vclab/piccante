@@ -23,7 +23,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_gaussian_2d.hpp"
-#include "../filtering/filter_conv_1d.hpp"
+#include "../filtering/filter_gradient_harris_opt.hpp"
 #include "../filtering/filter_max.hpp"
 #include "../features_matching/general_corner_detector.hpp"
 
@@ -41,9 +41,9 @@ namespace pic {
 class HarrisCornerDetector: public GeneralCornerDetector
 {
 protected:
-    Image *Ix, *Iy, *Ixy, *ret;
-    Image *Ix2_flt, *Iy2_flt, *Ixy_flt;
-    Image *ret_flt;
+    Image *I_grad;
+    Image *I_grad_flt;
+    Image *ret;
 
     //Harris Corners detector parameters
     float sigma, threshold;
@@ -63,41 +63,11 @@ protected:
 
         lum = NULL;
 
-        if(Ix != NULL) {
-            delete Ix;
+        if(I_grad_flt != NULL) {
+            delete I_grad_flt;
         }
 
-        Ix = NULL;
-
-        if(Iy != NULL) {
-            delete Iy;
-        }
-
-        Iy = NULL;
-
-        if(Ix2_flt != NULL) {
-            delete Ix2_flt;
-        }
-
-        Ix2_flt = NULL;
-
-        if(Iy2_flt != NULL) {
-            delete Iy2_flt;
-        }
-
-        Iy2_flt = NULL;
-
-        if(Ixy_flt != NULL) {
-            delete Ixy_flt;
-        }
-
-        Ixy_flt = NULL;
-
-        if(ret_flt != NULL) {
-            delete ret_flt;
-        }
-
-        ret_flt = NULL;
+        I_grad_flt = NULL;
 
         if(ret != NULL) {
             delete ret;
@@ -114,13 +84,8 @@ protected:
         width = -1;
         height = -1;
         lum = NULL;
-        Ix = NULL;
-        Iy = NULL;
-        Ixy = NULL;
-        Ix2_flt = NULL;
-        Iy2_flt = NULL;
-        Ixy_flt = NULL;
-        ret_flt = NULL;
+        I_grad = NULL;
+        I_grad_flt = NULL;
         ret = NULL;
     }
 
@@ -202,71 +167,37 @@ public:
 
         std::vector< Eigen::Vector3f > corners_w_quality;
 
-        float kernel[] = { -1.0f, 0.0f, 1.0f};
-
-        //execute gradients
-        Ix = FilterConv1D::Execute(lum, Ix, kernel, 3, true);
-        Iy = FilterConv1D::Execute(lum, Iy, kernel, 3, false);
-
-        if(Ixy == NULL) {
-            Ixy = Ix->clone();
-        } else {
-            *Ixy = *Ix;
-        }
-
-        *Ixy *= *Iy;
-
-        *Ix *= *Ix;
-        *Iy *= *Iy;
+        //compute gradients
+        I_grad = FilterGradientHarrisOPT::Execute(lum, I_grad, 0);
 
         float eps = 2.2204e-16f;
 
         //filter gradient values
         FilterGaussian2D flt(sigma);
-        Ix2_flt = flt.ProcessP(Single(Ix), Ix2_flt);
-        Iy2_flt = flt.ProcessP(Single(Iy), Iy2_flt);
-        Ixy_flt = flt.ProcessP(Single(Ixy), Ixy_flt);
-
-        //ret = (Ix2.*Iy2 - Ixy.^2)./(Ix2 + Iy2 + eps);
+        I_grad_flt = flt.ProcessP(Single(I_grad), I_grad_flt);
 
         if(ret == NULL) {
             ret = lum->allocateSimilarOne();
         }
 
+        //ret = (Ix2.*Iy2 - Ixy.^2)./(Ix2 + Iy2 + eps);
         for(int i = 0; i < height; i++) {
             for(int j = 0; j < width; j++) {
                 float *data_ret = (*ret)(j, i);
 
-                float x2 = (*Ix2_flt)(j, i)[0];
-                float y2 = (*Iy2_flt)(j, i)[0];
-                float xy = (*Ixy_flt)(j, i)[0];
+                float *I_grad_val = (*I_grad_flt)(j, i);
+
+                float x2 = I_grad_val[0];
+                float y2 = I_grad_val[1];
+                float xy = I_grad_val[2];
 
                 data_ret[0] =  (x2 * y2 - xy * xy) / (x2 + y2 + eps);
             }
         }
 
-        /*
-        *Ixy_flt *= *Ixy_flt; //Ixy.^2
-
-
-        if(ret == NULL) {
-            ret = Ix2_flt->Clone();
-        } else {
-            *ret = *Ix2_flt;
-        }
-
-
-        *ret *= *Iy2_flt; //Ix2.*Iy2
-        *ret -= *Ixy_flt;
-
-        *Ix2_flt += *Iy2_flt;
-        *Ix2_flt += eps;
-
-        *ret /= *Ix2_flt;
-        */
-
         //non-maximal supression
-        ret_flt = FilterMax::Execute(ret, ret_flt, radius * 2 + 1);
+        lum = FilterMax::Execute(ret, lum, radius * 2 + 1);
+        Image* ret_flt = lum;
 
         float w = 1.0f;
 

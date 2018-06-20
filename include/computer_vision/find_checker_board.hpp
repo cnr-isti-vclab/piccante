@@ -23,7 +23,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../computer_vision/iterative_closest_point_2D.hpp"
 #include "../computer_vision/nelder_mead_opt_ICP_2D.hpp"
 
+#include "../features_matching/harris_corner_detector.hpp"
 #include "../features_matching/orb_descriptor.hpp"
+
+#include "../util/rasterizer.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
 #include "../externals/Eigen/Dense"
@@ -178,30 +181,32 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
 {
      corners_model.clear();
 
-    //compute the luminance images
-    Image *L = FilterLuminance::Execute(img, NULL, LT_CIE_LUMINANCE);
 
     //get corners
 #ifdef PIC_DEBUG
     printf("Extracting corners...\n");
 #endif
 
+    //compute the luminance images
     HarrisCornerDetector hcd(2.5f, 5);
     std::vector< Eigen::Vector2f > corners_from_img;
-    hcd.execute(L, &corners_from_img);
+    hcd.execute(img, &corners_from_img);
 
-    float *col_mu = img->getMeanVal(NULL, NULL);
-    float *scaling = FilterWhiteBalance::getScalingFactors(col_mu, img->channels);
-    FilterWhiteBalance fwb(scaling, img->channels, true);
+    #ifdef PIC_DEBUG
+        //automatic white balance
+        float *col_mu = img->getMeanVal(NULL, NULL);
+        float *scaling = FilterWhiteBalance::getScalingFactors(col_mu, img->channels);
+        FilterWhiteBalance fwb(scaling, img->channels, true);
 
-    Image *img_wb = fwb.Process(Single(img), NULL);
+        Image *img_wb = fwb.Process(Single(img), NULL);
 
-    float red[] = {1.0f, 0.0f, 0.0f};
-    float green[] = {0.0f, 1.0f, 0.0f};
-    float blue[] = {1.0f, 0.0f, 1.0f};
-    float yellow[] = {1.0f, 1.0f, 0.0f};
+        float red[] = {1.0f, 0.0f, 0.0f};
+        float green[] = {0.0f, 1.0f, 0.0f};
+        float blue[] = {1.0f, 0.0f, 1.0f};
+        float yellow[] = {1.0f, 1.0f, 0.0f};
 
-    (*img_wb) *= 0.125f;
+        (*img_wb) *= 0.125f;
+    #endif
 
     std::vector< Eigen::Vector2f > cfi_out;
     GeneralCornerDetector::removeClosestCorners(&corners_from_img, &cfi_out, 16.0f, 100);
@@ -251,7 +256,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
 
     std::vector< unsigned int *> descs_model, descs_cfi_valid;
     b_desc.getAll(img_pattern, corners_model, descs_model);
-    b_desc.getAll(L, cfi_valid, descs_cfi_valid);
+    b_desc.getAll(img, cfi_valid, descs_cfi_valid);
 
     //scale the model using the checker size
     float min_dist = getMinDistance(corners_model);
@@ -264,8 +269,9 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     //run 2D ICP
     iterativeClosestPoints2D(corners_model, cfi_valid, descs_model, descs_cfi_valid, b_desc.getDescriptorSize(), 1000);
 
+#ifdef PIC_DEBUG
     drawPoints(img_wb, corners_model, red);
-
+#endif
 
     //At this point, the rotation may be wrong so
     //this brute-force trick does the job.
@@ -308,11 +314,11 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     #ifdef PIC_DEBUG
         drawPoints(img_wb, corners_model, yellow);
         img_wb->Write("../data/output/img_wb.bmp");
-    #endif
 
-    if(img_wb != NULL) {
-        delete img_wb;
-    }
+        if(img_wb != NULL) {
+            delete img_wb;
+        }
+    #endif
 }
 
 /**

@@ -25,7 +25,6 @@ This program is free software: you can redistribute it and/or modify
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
-#define PIC_DISABLE_EIGEN
 
 #include "piccante.hpp"
 
@@ -43,9 +42,16 @@ int main(int argc, char *argv[])
     pic::Vec2i pS(227, 206);
     pic::Vec2i pE(221, 351);
 
+    std::vector< pic::Vec2i > cp_s;
+    cp_s.push_back(pS);
+    cp_s.push_back(pE);
+
+    std::vector< int > cp_jni_s;
+    pic::transferFromVecToPlain(cp_s, cp_jni_s);
+
     auto start = std::chrono::system_clock::now();
 
-    auto out_single_jni = pic::executeLiveWireSingleJNI(img_str, 227, 206, 221, 351, false);
+    auto out_single_jni = pic::executeLiveWireMultipleJNI(img_str, cp_jni_s, false);
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end-start;
@@ -56,7 +62,7 @@ int main(int argc, char *argv[])
 
     pic::Image img(img_str, pic::LT_NOR_GAMMA);
 
-    for(auto i = 0; i < out_single_jni.size(); i+=2) {
+    for(unsigned int i = 0; i < out_single_jni.size(); i+=2) {
 
         float *tmp = img(out_single_jni[i], out_single_jni[i + 1]);
 

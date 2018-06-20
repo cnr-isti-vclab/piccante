@@ -29,9 +29,9 @@ namespace pic {
 class FilterConv1D: public Filter
 {
 protected:
-    int					dirs[3];
-    float				*data;
-    int					n;
+    int dirs[3];
+    float *data;
+    int n;
 
     /**
      * @brief ProcessBBox
