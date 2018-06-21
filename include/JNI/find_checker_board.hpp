@@ -56,7 +56,11 @@ PIC_INLINE std::vector<int> extractCheckerBoardJNI(std::string imageInPath, std:
         //scale
         //
         Eigen::Vector2f p0, p1;
-        pic::estimateLengthOfCheckers(corners, p0, p1);
+        float pixel_length = pic::estimateLengthOfCheckers(corners, p0, p1);
+
+#ifdef PIC_DEBUG
+        printf("Pixel length: %f\n", pixel_length);
+#endif
 
         ret.push_back(int(p0[0]));
         ret.push_back(int(p0[1]));

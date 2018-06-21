@@ -181,7 +181,6 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
 {
      corners_model.clear();
 
-
     //get corners
 #ifdef PIC_DEBUG
     printf("Extracting corners...\n");
