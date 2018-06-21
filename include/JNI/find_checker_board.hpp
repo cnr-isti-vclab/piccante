@@ -71,7 +71,7 @@ PIC_INLINE std::vector<int> extractCheckerBoardJNI(std::string imageInPath, std:
         ret.push_back(int(pw[0]));
         ret.push_back(int(pw[1]));
 
-        Image* img_wb =  applyWhiteBalance(&in, pw[0], pw[1], true);
+        Image* img_wb = applyWhiteBalance(&in, pw[0], pw[1], true);
 
         if(img_wb != NULL) {
             bool bWrite = img_wb->Write(imageOutPath.c_str(), LT_NOR_GAMMA, 0);
