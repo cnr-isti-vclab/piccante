@@ -208,7 +208,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     #endif
 
     std::vector< Eigen::Vector2f > cfi_out;
-    GeneralCornerDetector::removeClosestCorners(&corners_from_img, &cfi_out, 16.0f, 100);
+    GeneralCornerDetector::removeClosestCorners(&corners_from_img, &cfi_out, 16.0f, 64);
 
     //compute checkerboard size
     float checker_size = estimateCheckerBoardSize(corners_from_img);

@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_JNI_FIND_CHECKER_BOARD_HPP
 
 #include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_downsampler_2d.hpp"
 
 #include "../computer_vision/iterative_closest_point_2D.hpp"
 #include "../computer_vision/nelder_mead_opt_ICP_2D.hpp"
@@ -47,10 +48,32 @@ PIC_INLINE std::vector<int> extractCheckerBoardJNI(std::string imageInPath, std:
     std::vector<int> ret;
     ret.clear();
 
+    Image *work;
+
     if(bRead) {
 
+        bool bScale = false;
+        float scale = 1.0f;
+
+        if(in.nPixels() > 1000000) {
+
+            int maxLength = MAX(in.width, in.height);
+
+            scale = 1000.0f / float(maxLength);
+
+#ifdef PIC_DEBUG
+            printf("Down scale factor: %f\n", scale);
+#endif
+
+            work = FilterDownSampler2D::Execute(&in, NULL, scale);
+
+            bScale = true;
+        } else {
+            work = &in;
+        }
+
         std::vector< Eigen::Vector2f > corners;
-        pic::findCheckerBoard(&in, corners);
+        pic::findCheckerBoard(work, corners);
 
         //
         //scale
@@ -62,20 +85,28 @@ PIC_INLINE std::vector<int> extractCheckerBoardJNI(std::string imageInPath, std:
         printf("Pixel length: %f\n", pixel_length);
 #endif
 
-        ret.push_back(int(p0[0]));
-        ret.push_back(int(p0[1]));
-        ret.push_back(int(p1[0]));
-        ret.push_back(int(p1[1]));
+        ret.push_back(int(p0[0] / scale));
+        ret.push_back(int(p0[1] / scale));
+        ret.push_back(int(p1[0] / scale));
+        ret.push_back(int(p1[1] / scale));
 
         //
         //white balance
         //
-        Eigen::Vector2f pw = pic::estimateCoordinatesWhitePointFromCheckerBoard(&in, corners, 4, 6);
+        Eigen::Vector2f pw = pic::estimateCoordinatesWhitePointFromCheckerBoard(work, corners, 4, 6);
 
-        ret.push_back(int(pw[0]));
-        ret.push_back(int(pw[1]));
+        ret.push_back(int(pw[0] / scale));
+        ret.push_back(int(pw[1] / scale));
 
-        Image* img_wb = applyWhiteBalance(&in, pw[0], pw[1], true);
+        Image* img_wb;
+        if(bScale) {
+            int patchSize = 5;
+            BBox patch(pw[0] - patchSize, pw[0] + patchSize, pw[1] - patchSize, pw[1] + patchSize);
+            float *white_color = work->getMeanVal(&patch, NULL);
+            img_wb = applyWhiteBalance(&in, white_color);
+        } else {
+            img_wb = applyWhiteBalance(&in, pw[0], pw[1], true);
+        }
 
         if(img_wb != NULL) {
             bool bWrite = img_wb->Write(imageOutPath.c_str(), LT_NOR_GAMMA, 0);
