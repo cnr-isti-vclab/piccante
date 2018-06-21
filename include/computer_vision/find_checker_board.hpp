@@ -284,7 +284,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     for(float i = 0; i < nSample; i++) {
         float angle = float(i) * C_PI_2 / float(nSample);
         float start[] = {0.0f, 0.0f, angle};
-        opt.run(start, 3, 1e-9f, 500, tmp);
+        opt.run(start, 3, 1e-9f, 50, tmp);
 
         if(opt.output_error < prev_err) {
             memcpy(x, tmp, sizeof(float) * 3);
