@@ -299,7 +299,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     #endif
 
     float start[] = {x[0], x[1], x[2], 1.0f};
-    opt.run(start, 4, 1e-12f, 1000, tmp);
+    opt.run(start, 4, 1e-12f, 50, tmp);
     ICP2DTransform t2(tmp[0], tmp[1], tmp[2], tmp[3]);
 
     #ifdef PIC_DEBUG
