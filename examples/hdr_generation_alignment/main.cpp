@@ -44,13 +44,13 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         printf("Aligning bright and dark exposure images to the well-exposed one... ");
-        Eigen::Vector2i shift_dark;
+        pic::Vec2i shift_dark;
         pic::Image *img_dark = pic::WardAlignment::execute(&img[0], &img[1], shift_dark);
-        img_dark->Write("../data/output/stack_aligned_dark.jpg", pic::LT_NOR);
+        img_dark->Write("../data/output/stack_aligned_dark.png", pic::LT_NOR);
 
-        Eigen::Vector2i shift_bright;
+        pic::Vec2i shift_bright;
         pic::Image *img_bright = pic::WardAlignment::execute(&img[0], &img[2], shift_bright);
-        img_bright->Write("../data/output/stack_aligned_bright.jpg", pic::LT_NOR);
+        img_bright->Write("../data/output/stack_aligned_bright.png", pic::LT_NOR);
         printf("Ok\n");
 
         printf("Estimating the camera response function... ");

@@ -38,6 +38,29 @@ int main(int argc, char *argv[])
         img_str = "../data/input/tommaseo_statue.png";
     }
 
+<<<<<<< Updated upstream
+=======
+
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+    if(img.isValid()) {
+        printf(" Ok!\n");
+
+           auto start = std::chrono::system_clock::now();
+        pic::LiveWire *lw = new pic::LiveWire(&img);
+        auto end = std::chrono::system_clock::now();
+
+        std::chrono::duration<double> elapsed_seconds = end-start;
+           std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+        std::cout << "finished computation at " << std::ctime(&end_time)
+                  << "elapsed time: " << elapsed_seconds.count() << "s\n";
+>>>>>>> Stashed changes
+
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
     std::vector< pic::Vec2i > out, out2;
     pic::Vec2i pS(227, 206);
     pic::Vec2i pE(221, 351);
@@ -60,7 +83,30 @@ int main(int argc, char *argv[])
      std::cout << "finished computation at " << std::ctime(&end_time)
                << "elapsed time: " << elapsed_seconds.count() << "s\n";
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+    //how to use multiple LiveWire points
+    pic::Vec2i pE1(221, 381);
+    std::vector< pic::Vec2i > cp;
+    cp.push_back(pS);
+    cp.push_back(pE);
+    cp.push_back(pE1);
+    //pic::executeLiveWireMultipleJNI(img_str, cp, out2);
+
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
     pic::Image img(img_str, pic::LT_NOR_GAMMA);
+=======
+=======
+        start = std::chrono::system_clock::now();
+        lw->execute(pS, pE, out, false);
+        end = std::chrono::system_clock::now();
+
+         elapsed_seconds = end-start;
+            end_time = std::chrono::system_clock::to_time_t(end);
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
     for(unsigned int i = 0; i < out_single_jni.size(); i+=2) {
 

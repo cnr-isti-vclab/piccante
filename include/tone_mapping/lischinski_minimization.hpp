@@ -20,8 +20,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef PIC_DISABLE_EIGEN
 
-#include "../externals/Eigen/Sparse"
-#include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Sparse"
+    #include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
+#elif
+    #include <Eigen/Sparse>
+    #include <Eigen/src/SparseCore/SparseMatrix.h>
+#endif
+
+#endif
 
 #include "../base.hpp"
 #include "../image.hpp"
@@ -81,6 +88,7 @@ PIC_INLINE Image *LischinskiMinimization(Image *L,
         return NULL;
     }
 
+#ifndef PIC_DISABLE_EIGEN
     if(omega == NULL) {
         omega = L->allocateSimilarOne();
         *omega = 1.0f;
@@ -180,11 +188,12 @@ PIC_INLINE Image *LischinskiMinimization(Image *L,
     }
 
     return ret;
+#elif
+    return NULL;
+#endif
 }
 
 } // end namespace pic
-
-#endif
 
 #endif /* PIC_TONE_MAPPING_LISCHINSKI_MINIMIZATION_HPP */
 

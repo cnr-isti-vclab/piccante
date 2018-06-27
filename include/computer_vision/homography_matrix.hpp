@@ -25,12 +25,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../base.hpp"
 
 #include "../util/math.hpp"
+#include "../util/eigen_util.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
+
 #include "../externals/Eigen/Dense"
 #include "../externals/Eigen/SVD"
 #include "../externals/Eigen/Geometry"
-#include "../util/eigen_util.hpp"
 #endif
 
 #include "../computer_vision/nelder_mead_opt_homography.hpp"

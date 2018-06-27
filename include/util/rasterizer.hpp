@@ -26,8 +26,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../util/vec.hpp"
 #include "../util/math.hpp"
 
-#ifndef PIC_DISABLE_EIGEN
+#ifndef PIC_EIGEN_NOT_BUNDLED
     #include "../externals/Eigen/Dense"
+#elif
+    #include <Eigen/Dense>
 #endif
 
 namespace pic {
@@ -39,7 +41,7 @@ namespace pic {
  * @param v1 is the second vertex of the line.
  * @param color is the color of the line (v0, v1).
  */
-PIC_INLINE void drawLine(Image *img, Vec<2, int> v0, Vec<2, int> v1, float *color)
+PIC_INLINE void drawLine(Image *img, Vec2i v0, Vec2i v1, float *color)
 {
     if(img == NULL || color == NULL) {
         return;

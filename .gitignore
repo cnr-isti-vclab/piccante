@@ -118,3 +118,12 @@ examples/build-ip_deform_grid-Desktop_Qt_5_4_2_clang_64bit-Debug/ip_deform_grid
 examples/build-ip_deform_grid-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
 
 examples/data/input/test.jpg
+examples/build-hdr_generation-Desktop_Qt_5_8_0_clang_64bit-Debug/hdr_generation
+examples/build-hdr_generation-Desktop_Qt_5_8_0_clang_64bit-Debug/Makefile
+examples/build-hdr_generation-Desktop_Qt_5_8_0_clang_64bit-Release/hdr_generation
+examples/build-hdr_generation-Desktop_Qt_5_8_0_clang_64bit-Release/Makefile
+examples/build-ip_white_balance-Desktop_Qt_5_8_0_clang_64bit-Release/ip_white_balance
+examples/build-ip_white_balance-Desktop_Qt_5_8_0_clang_64bit-Release/Makefile
+examples/build-opengl_filtering-Desktop_Qt_5_8_0_clang_64bit-Debug/Makefile
+examples/build-opengl_simple_io-Desktop_Qt_5_8_0_clang_64bit-Debug/Makefile
+examples/build-opengl_simple_io-Desktop_Qt_5_8_0_clang_64bit-Debug/opengl_simple_io

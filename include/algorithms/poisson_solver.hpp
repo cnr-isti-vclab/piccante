@@ -18,16 +18,25 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_POISSON_SOLVER_HPP
 #define PIC_ALGORITHMS_POISSON_SOLVER_HPP
 
-#ifndef PIC_DISABLE_EIGEN
-
-#include "../externals/Eigen/Sparse"
-#include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
-
 #include "../base.hpp"
 
 #include "../image.hpp"
 
+#ifndef PIC_DISABLE_EIGEN
+
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Sparse"
+    #include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
+#elif
+    #include <Eigen/Sparse>
+    #include <Eigen/src/SparseCore/SparseMatrix.h>
+#endif
+
+#endif
+
 namespace pic {
+
+#ifndef PIC_DISABLE_EIGEN
 
 /**
  * @brief computePoissonSolver
@@ -127,6 +136,8 @@ PIC_INLINE Image *computePoissonSolver(Image *f, Image *ret = NULL)
     return ret;
 }
 
+#endif
+
 /**
  * @brief computePoissonSolverIterative
  * @param img
@@ -189,7 +200,6 @@ PIC_INLINE Image *computePoissonSolverIterative(Image *img, Image *laplacian,
 
 } // end namespace pic
 
-#endif
 
 #endif /* PIC_ALGORITHMS_POISSON_SOLVER_HPP */
 

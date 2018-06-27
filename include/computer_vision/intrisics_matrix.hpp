@@ -27,14 +27,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../util/math.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "../externals/Eigen/Dense"
-#include "../externals/Eigen/Geometry"
+
+    #ifndef PIC_EIGEN_NOT_BUNDLED
+        #include "../externals/Eigen/Dense"
+        #include "../externals/Eigen/Geometry"
+    #elif
+        #include <Eigen/Dense>
+        #include <Eigen/Geometry>
+    #endif
 
 #endif
 
 namespace pic {
-
-#ifndef PIC_DISABLE_EIGEN
 
 /**
  * @brief getFocalLengthFromFOVAngle
@@ -70,6 +74,8 @@ PIC_INLINE double getFocalLengthPixels(double focal_length_mm, double sensor_siz
 {
     return (focal_length_mm * sensor_size_px) / sensor_size_mm;
 }
+
+#ifndef PIC_DISABLE_EIGEN
 
 /**
  * @brief getIntrinsicsMatrix

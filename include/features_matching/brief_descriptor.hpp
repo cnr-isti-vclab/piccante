@@ -25,10 +25,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
+
+#ifndef PIC_EIGEN_NOT_BUNDLED
     #include "../externals/Eigen/Dense"
+#elif
+    #include <Eigen/Dense>
+#endif
+
 #endif
 
 namespace pic {
+
+#ifndef PIC_DISABLE_EIGEN
 
 /**
  * @brief The BRIEFDescriptor class
@@ -267,6 +275,8 @@ public:
         return ret;
     }
 };
+
+#endif
 
 } // end namespace pic
 

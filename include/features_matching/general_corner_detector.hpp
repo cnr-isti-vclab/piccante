@@ -22,8 +22,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../util/string.hpp"
 #include "../util/string.hpp"
 
-#ifndef PIC_DISABLE_EIGEN
-#include "../externals/Eigen/Dense"
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Dense"
+#elif
+    #include <Eigen/Dense>
 #endif
 
 namespace pic {

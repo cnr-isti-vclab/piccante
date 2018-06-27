@@ -22,8 +22,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../util/matrix_3_x_3.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
+
+#ifndef PIC_EIGEN_NOT_BUNDLED
     #include "../externals/Eigen/LU"
     #include "../externals/Eigen/Geometry"
+#elif
+    #include <Eigen/LU>
+    #include <Eigen/Geometry>
+#endif
+
 #endif
 
 #ifndef PIC_EIGEN_UTIL
