@@ -26,7 +26,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../base.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
+
+#ifndef PIC_EIGEN_NOT_BUNDLED
     #include "../externals/Eigen/LU"
+#elif
+    #include <Eigen/LU>
+#endif
+
 #endif
 
 namespace pic {

@@ -31,7 +31,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../algorithms/mitsunaga_nayar_crf.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-    #include "../externals/Eigen/SVD"
+    #ifndef PIC_EIGEN_NOT_BUNDLED
+        #include "../externals/Eigen/SVD"
+    #elif
+        #include <Eigen/SVD>
+    #endif
 #endif
 
 namespace pic {

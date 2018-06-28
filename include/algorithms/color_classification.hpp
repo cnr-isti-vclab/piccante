@@ -28,9 +28,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../tone_mapping/lischinski_minimization.hpp"
 #include "../util/mask.hpp"
 
-#ifndef PIC_DISABLE_EIGEN
-
 namespace pic {
+
+#ifndef PIC_DISABLE_EIGEN
 
 /**
  * @brief computeColorClassification
@@ -115,9 +115,8 @@ PIC_INLINE bool *computeColorClassification(Image *img, float *white_pixel, floa
 
     return mask;
 }
+#endif
 
 } // end namespace pic
-
-#endif
 
 #endif /* PIC_ALGORITHMS_COLOR_CLASSIFICATION_HPP */

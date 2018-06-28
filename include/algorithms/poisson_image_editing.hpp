@@ -18,18 +18,25 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_POISSON_IMAGE_EDITING_HPP
 #define PIC_ALGORITHMS_POISSON_IMAGE_EDITING_HPP
 
-#ifndef PIC_DISABLE_EIGEN
-
-#include "../externals/Eigen/Sparse"
-#include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
-
 #include "../base.hpp"
-
 #include "../image.hpp"
 #include "../filtering/filter_laplacian.hpp"
 
+#ifndef PIC_DISABLE_EIGEN
+
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Sparse"
+    #include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
+#elif
+    #include <Eigen/Sparse>
+    #include <Eigen/src/SparseCore/SparseMatrix.h>
+#endif
+
+#endif
+
 namespace pic {
 
+#ifndef PIC_DISABLE_EIGEN
 /**
  * @brief computePoissonImageEditing
  * @param source
@@ -214,10 +221,9 @@ PIC_INLINE Image *computePoissonImageEditing(Image *source, Image *target, bool 
 
     return ret;
 }
+#endif
 
 } // end namespace pic
-
-#endif
 
 #endif /* PIC_ALGORITHMS_POISSON_IMAGE_EDITING_HPP */
 
