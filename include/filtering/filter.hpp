@@ -22,6 +22,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <thread>
 #endif
 
+#include <functional>
+
 #include "../image_vec.hpp"
 #include "../util/tile_list.hpp"
 #include "../util/string.hpp"
