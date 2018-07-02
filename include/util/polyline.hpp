@@ -24,6 +24,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../util/vec.hpp"
 
+#ifndef PIC_DISABLE_EIGEN
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Dense"
+#elif
+    #include <Eigen/Dense>
+#endif
+#endif
+
 namespace pic {
 
 /**
@@ -44,6 +52,15 @@ public:
     Polyline(std::vector< Vec<N, T> > &points)
     {
         this->points.assign(points.begin(), points.end());
+    }
+
+    /**
+     * @brief add
+     * @param point
+     */
+    void add(Vec<N, T> &point)
+    {
+        points.push_back(point);
     }
 
     /**
@@ -99,6 +116,21 @@ public:
  * @brief Polyline2i
  */
 typedef Polyline<2, int> Polyline2i;
+
+#ifndef PIC_DISABLE_EIGEN
+/**
+ * @brief convertFromEigenToPolyLine
+ * @param in
+ * @param out
+ */
+void convertFromEigenToPolyLine(std::vector< Eigen::Vector2i > &in, Polyline2i &out)
+{
+    for(unsigned int i = 0; i < in.size(); i++) {
+        auto tmp = Vec2i(in[i][0], in[i][1]);
+        out.add(tmp);
+    }
+}
+#endif
 
 } // end namespace pic
 

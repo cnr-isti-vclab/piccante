@@ -337,11 +337,11 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
  */
 PIC_INLINE float estimateLengthOfCheckers(std::vector< Eigen::Vector2f > &corners_model, Eigen::Vector2f &p0, Eigen::Vector2f &p1)
 {
-    if(corners_model.empty()) {
+    if(corners_model.size() < 8) {
         return -1.0f;
     }
 
-    auto p_0 = corners_model[0];
+    auto p_0 = corners_model[5];
 
     int closest = -1;
     float ret = FLT_MAX;
