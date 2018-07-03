@@ -25,6 +25,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+#ifndef PIC_DISABLE_EIGEN
+
 /**
  * @brief The LSH class
  */
@@ -102,6 +104,8 @@ public:
         return (matched_j != -1);// && (dist_1 * 100 > dist_2 * 105);
     }
 };
+
+#endif
 
 } // end namespace pic
 

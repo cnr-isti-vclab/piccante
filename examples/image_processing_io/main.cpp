@@ -25,7 +25,7 @@ This program is free software: you can redistribute it and/or modify
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
-
+#define PIC_DISABLE_EIGEN
 #define PIC_DISABLE_TINY_EXR
 #define PIC_ENABLE_INLINING
 
