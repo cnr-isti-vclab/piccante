@@ -29,7 +29,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef PIC_EIGEN_NOT_BUNDLED
     #include "../externals/Eigen/LU"
-#elif
+#else
     #include <Eigen/LU>
 #endif
 

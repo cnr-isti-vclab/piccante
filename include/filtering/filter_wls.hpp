@@ -25,7 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_EIGEN_NOT_BUNDLED
     #include "../externals/Eigen/Sparse"
     #include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
-#elif
+#else
     #include <Eigen/Sparse>
     #include <Eigen/src/SparseCore/SparseMatrix.h>
 #endif

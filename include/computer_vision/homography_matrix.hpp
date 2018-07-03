@@ -33,7 +33,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../externals/Eigen/Dense"
     #include "../externals/Eigen/SVD"
     #include "../externals/Eigen/Geometry"
-#elif
+#else
     #include <Eigen/Dense>
     #include <Eigen/SVD>
     #include <Eigen/Geometry>
