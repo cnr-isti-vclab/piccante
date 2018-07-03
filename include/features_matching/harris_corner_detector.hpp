@@ -69,6 +69,12 @@ protected:
 
         lum = NULL;
 
+        if(I_grad != NULL) {
+            delete I_grad;
+        }
+
+        I_grad = NULL;
+
         if(I_grad_flt != NULL) {
             delete I_grad_flt;
         }
@@ -92,7 +98,7 @@ protected:
         lum = NULL;
         I_grad = NULL;
         I_grad_flt = NULL;
-        ret = NULL;
+        ret = NULL;        
     }
 
 public:
@@ -234,12 +240,22 @@ public:
                     cx = R;
                     ax = (Rl + Rr) / 2.0f - cx;
                     bx = ax + cx - Rl;
-                    x = -w * bx / (2.0f * ax);
+
+                    if(ax != 0.0f) {
+                        x = -w * bx / (2.0f * ax);
+                    } else {
+                        x = 0.0f;
+                    }
 
                     cy = R;
                     ay = (Rd + Ru) / 2.0f - cy;
                     by = ay + cy - Rd;
-                    y = -w * by / (2.0f * ay);
+
+                    if(ay != 0.0f) {
+                        y = -w * by / (2.0f * ay);
+                    } else {
+                        y = 0.0f;
+                    }
 
                     corners_w_quality.push_back(Eigen::Vector3f(float(j) + x, i_f + y, R));
                 }

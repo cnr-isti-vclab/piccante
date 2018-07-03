@@ -163,7 +163,7 @@ PIC_INLINE Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f
 
     for(unsigned int i = 0; i < maxIterations; i++) {       
 
-        getPermutation(m, subSet, nSubSet, n);
+        getRandomPermutation(m, subSet, nSubSet, n);
 
         std::vector< Eigen::Vector2f > sub_points0;
         std::vector< Eigen::Vector2f > sub_points1;

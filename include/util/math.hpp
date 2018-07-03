@@ -21,19 +21,20 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <math.h>
 #include <random>
 #include <stdlib.h>
+#include <set>
 
 #include "../base.hpp"
 
 namespace pic {
 
 //Natural logarithm of 2
-const float C_LOG_NAT_2			= 0.69314718055994530941723212145818f;
+const float C_LOG_NAT_2         = 0.69314718055994530941723212145818f;
 
 //Reciprocal natural logarithm of 2
-const float C_INV_LOG_NAT_2		= 1.4426950408889634073599246810019f;
+const float C_INV_LOG_NAT_2     = 1.4426950408889634073599246810019f;
 
 //Epsilon
-const float C_EPSILON			= 1e-6f;
+const float C_EPSILON           = 1e-6f;
 
 //Square root of 2
 const float C_SQRT_2            = 1.4142135623730950488016887242097f;
@@ -85,7 +86,7 @@ const float C_PI_OVER_ONE_80    = 0.017453292519943295769236907685f;
  * @param value
  * @return
  */
-template< typename T > inline bool isnan(T value)
+template< typename T > PIC_INLINE bool isnan(T value)
 {
     return value != value ;
 }
@@ -100,7 +101,7 @@ template< typename T > inline bool isnan(T value)
  * @param value
  * @return
  */
-template< typename T > inline bool isinf(T value)
+template< typename T > PIC_INLINE bool isinf(T value)
 {
     return std::numeric_limits<T>::has_infinity &&
            (value ==  std::numeric_limits<T>::infinity() ||
@@ -395,27 +396,26 @@ PIC_INLINE int powint(int x, int b)
 }
 
 /**
- * @brief getPermutation computes a permutation.
+ * @brief getRandomPermutation computes a random permutation.
  * @param m is a Mersenne Twister random number generator.
  * @param perm is the array where to store the permutation.
  * @param nPerm is the size of perm.
  * @param n is the number of object to permutate.
  */
-PIC_INLINE void getPermutation(std::mt19937 &m, unsigned int *perm, int nPerm, int n)
+PIC_INLINE void getRandomPermutation(std::mt19937 &m, unsigned int *perm, int nPerm, int n)
 {
-    int index = 0;
+    std::set< int > checker;
+
+    int tmp = m() % n;
+    checker.insert(tmp);
+    perm[0] = tmp;
+    int index = 1;
+
     while(index < nPerm) {
-        perm[index] = m() % n;
-        bool flag = true;
+        tmp = m() % n;
 
-        for(int j = 0; j < (index - 1); j++) {
-            if(perm[index] == perm[j]) {
-                flag = false;
-                break;
-            }
-        }
-
-        if(flag) {
+        if(checker.find(tmp) == checker.end()) {
+            perm[index] = tmp;
             index++;
         }
     }

@@ -31,7 +31,7 @@ namespace pic {
 class HybridTMO
 {
 protected:
-    Segmentation		seg;
+    Segmentation        seg;
     FilterDragoTMO		fltDragoTMO;
     FilterSigmoidTMO	fltReinhardTMO;
     Pyramid				*pyrA, *pyrB, *pyrWeight;

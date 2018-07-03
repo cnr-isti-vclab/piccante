@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../base.hpp"
 
 #include "../util/matrix_3_x_3.hpp"
+#include "../util/vec.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
 
@@ -101,6 +102,16 @@ PIC_INLINE Eigen::Vector3d getLastColumn(Eigen::Matrix34d &mat)
     ret[2] = mat(2, 3);
 
     return ret;
+}
+
+/**
+ * @brief addOne
+ * @param x
+ * @return
+ */
+PIC_INLINE Eigen::Vector3f addOne(Eigen::Vector2f &x)
+{
+    return Eigen::Vector3f(x[0], x[1], 1.0f);
 }
 
 /**
@@ -465,6 +476,15 @@ PIC_INLINE Eigen::Vector3f ComputeNormalizationTransform(std::vector< Eigen::Vec
     ret[2] = ret[2] / n / sqrtf(2.0f);
 
     return ret;
+}
+
+/**
+ * @brief convertFromEigenToVec
+ * @param x
+ */
+PIC_INLINE Vec2i convertFromEigenToVec(Eigen::Vector2i &x)
+{
+    return Vec2i(x[0], x[1]);
 }
 
 #endif

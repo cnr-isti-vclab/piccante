@@ -240,7 +240,7 @@ public:
         for(unsigned int i = 0; i < corners.size(); i++) {
             int x0 = int(corners[i][0]);
             int y0 = int(corners[i][1]);
-            descs.push_back(get(img, x0, y0));
+            descs.push_back(get(img, x0, y0, NULL));
         }
     }
     #endif
@@ -262,7 +262,7 @@ public:
      */
     static unsigned int match(unsigned int *fv0, unsigned int *fv1, unsigned int nfv)
     {
-        if((fv0 == NULL) && (fv1 == NULL)) {
+        if((fv0 == NULL) || (fv1 == NULL)) {
             return 0;
         }
 
