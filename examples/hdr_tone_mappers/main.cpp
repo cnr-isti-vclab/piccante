@@ -19,7 +19,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
-#define PIC_EIGEN_NOT_BUNDLED
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])

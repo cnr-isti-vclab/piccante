@@ -25,6 +25,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+#ifndef PIC_DISABLE_EIGEN
+
 /**
  * @brief The ORBDescriptor class
  */
@@ -140,6 +142,8 @@ public:
         return getAux(img, x0, y0, x_theta[index], y_theta[index], desc);
     }
 };
+
+#endif
 
 } // end namespace pic
 
