@@ -123,7 +123,7 @@ typedef Polyline<2, int> Polyline2i;
  * @param in
  * @param out
  */
-PICINLINE void convertFromEigenToPolyLine(std::vector< Eigen::Vector2i > &in, Polyline2i &out)
+PIC_INLINE void convertFromEigenToPolyLine(std::vector< Eigen::Vector2i > &in, Polyline2i &out)
 {
     for(unsigned int i = 0; i < in.size(); i++) {
         auto tmp = Vec2i(in[i][0], in[i][1]);
