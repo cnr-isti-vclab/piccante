@@ -30,6 +30,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter_channel.hpp"
 #include "../filtering/filter_sampler_2d.hpp"
 #include "../util/vec.hpp"
+#include "../util/polyline.hpp"
 
 #include "../algorithms/live_wire.hpp"
 
@@ -81,8 +82,12 @@ PIC_INLINE std::vector< int > executeLiveWireMultipleJNI(std::string imageInPath
             lw->execute(pS, pE, out_tmp, true, true);
         }
 
-        for(auto i = 0; i < out_tmp.size(); i++) {
-            auto point = out_tmp.at(i);
+
+        Polyline2i pl(out_tmp);
+        pl.simplify(32);
+
+        for(auto i = 0; i < pl.points.size(); i++) {
+            auto point = pl.points.at(i);
 
             if(bDownsample) {
                 point[0] = point[0] << 2;
