@@ -210,7 +210,7 @@ public:
 
         mask = imgIn->convertToMask(color, threshold, false);
 
-        maskPoisson = Mask::clone(mask, maskPoisson, imgIn->width, imgIn->height);
+        maskPoisson = Mask::clone(maskPoisson, mask, imgIn->width * imgIn->height, 1);
 
         Image *work[2];
         work[0] = imgTmp;

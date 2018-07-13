@@ -200,24 +200,52 @@ public:
     }
 
     /**
-     * @brief negative negates a mask.
+     * @brief thin thins a mask.
      * @param dataIn
      * @param width
      * @param height
      */
-    static void negative(bool *dataIn, int width, int height)
+    static bool* thin(bool *dataIn, int width, int height)
     {
         if(dataIn == NULL) {
-            return;
+            return dataIn;
         }
+
+        bool *tmp  = clone(NULL, dataIn, width * height, 1);
 
         int n = (height * width);
 
-        #pragma omp parallel for
+        int P[9];
 
-        for(int i = 0; i < n; i++) {
-            dataIn[i] = !dataIn[i];
+        //first-pass
+        for(int i = 1; i < (height - 1); i++) {
+            int tmp = i * width;
+            for(int j = 1; j < (width - 1); j++) {
+                int index = tmp + j;
+
+                if(!data[index]) {
+                    continue;
+                }
+
+                P[0] = index;
+                P[1] = index - width;
+                P[2] = index - width + 1;
+                P[3] = index + 1;
+                P[4] = index + width + 1;
+                P[5] = index + width;
+                P[6] = index + width - 1;
+                P[7] = index - 1;
+                P[8] = index - width - 1;
+
+                int N = 0;
+                for(int k = 1; k < 9; i++) {
+                    N = data[P[k]] ? N + 1 : N;
+                }
+
+            }
         }
+
+        return ;
     }
 };
 
