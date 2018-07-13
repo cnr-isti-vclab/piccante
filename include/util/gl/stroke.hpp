@@ -284,9 +284,9 @@ PIC_INLINE void StrokeGL::Resample()
         return;
     }
 
-    bool *sampleGrid = MaskSetValue(NULL, height * width, false);
+    bool *sampleGrid = Mask::assign(NULL, height * width, false);
 
-    //Calculate length of the path
+    //calculate length of the path
     float len = 0.0f;
     float tmpLen;
     const int n = int(positions.size()) - 2;

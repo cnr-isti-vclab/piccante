@@ -20,246 +20,206 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 #include "../util/math.hpp"
+#include "../util/buffer.hpp"
 
 namespace pic {
 
-/**
- * @brief MaskRemoveIsolatedPixels removes isolated pixels.
- * @param dataIn
- * @param dataOut
- * @param width
- * @param height
- * @return
- */
-PIC_INLINE bool *MaskRemoveIsolatedPixels(bool *dataIn, bool *dataOut,
-        int width, int height)
+class Mask: public Buffer<bool>
 {
-    if(dataIn == NULL) {
-        return dataOut;
-    }
+public:
+    /**
+     * @brief removeIsolatedPixels removes isolated pixels.
+     * @param dataIn
+     * @param dataOut
+     * @param width
+     * @param height
+     * @return
+     */
+    static bool *removeIsolatedPixels(bool *dataIn, bool *dataOut,
+            int width, int height)
+    {
+        if(dataIn == NULL) {
+            return dataOut;
+        }
 
-    if(dataOut == NULL) {
-        dataOut = new bool[width * height];
-    }
+        if(dataOut == NULL) {
+            dataOut = new bool[width * height];
+        }
 
-    #pragma omp parallel for
+        #pragma omp parallel for
 
-    for(int i = 0; i < height; i++) {
-        int ind = i * width;
+        for(int i = 0; i < height; i++) {
+            int ind = i * width;
 
-        for(int j = 0; j < width; j++) {
-            int c = ind + j;
+            for(int j = 0; j < width; j++) {
+                int c = ind + j;
 
-            int counter = 0;
+                int counter = 0;
 
-            for(int k = -1; k <= 1; k++) {
-                int ci = CLAMP((i + k), height) * width;
+                for(int k = -1; k <= 1; k++) {
+                    int ci = CLAMP((i + k), height) * width;
 
-                for(int l = -1; l <= 1; l++) {
-                    if((l != 0) && (k != 0)) {
-                        int cj = CLAMP((j + l), width);
+                    for(int l = -1; l <= 1; l++) {
+                        if((l != 0) && (k != 0)) {
+                            int cj = CLAMP((j + l), width);
 
-                        if(dataIn[ci + cj]) {
-                            counter++;
+                            if(dataIn[ci + cj]) {
+                                counter++;
+                            }
                         }
                     }
                 }
+
+                dataOut[c] = counter > 0;
             }
-
-            dataOut[c] = counter > 0;
         }
-    }
 
-    return dataOut;
-}
-
-/**
- * @brief MaskErode erodes a mask.
- * @param dataIn
- * @param dataOut
- * @param width
- * @param height
- * @param kernelSize
- * @return
- */
-PIC_INLINE bool *MaskErode(bool *dataIn, bool *dataOut, int width, int height,
-                           int kernelSize = 3)
-{
-    if(dataIn == NULL) {
         return dataOut;
     }
 
-    if(dataOut == NULL) {
-        dataOut = new bool[width * height];
-    }
-
-    int halfKernelSize = kernelSize >> 1;
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < height; i++) {
-        int ind = i * width;
-
-        for(int j = 0; j < width; j++) {
-            int c = ind + j;
-
-            bool out = false;
-
-            for(int k = -halfKernelSize; k <= halfKernelSize; k++) {
-                int ci = CLAMP((i + k), height) * width;
-
-                for(int l = -halfKernelSize; l <= halfKernelSize; l++) {
-                    int cj = CLAMP((j + l), width);
-                    out = out || (!dataIn[ci + cj]);
-                }
-            }
-
-            dataOut[c] = !out;
+    /**
+     * @brief erode erodes a mask.
+     * @param dataIn
+     * @param dataOut
+     * @param width
+     * @param height
+     * @param kernelSize
+     * @return
+     */
+    static bool *erode(bool *dataIn, bool *dataOut, int width, int height,
+                               int kernelSize = 3)
+    {
+        if(dataIn == NULL) {
+            return dataOut;
         }
-    }
 
-    return dataOut;
-}
+        if(dataOut == NULL) {
+            dataOut = new bool[width * height];
+        }
 
-/**
- * @brief MaskDilate dilates a mask.
- * @param dataIn
- * @param dataOut
- * @param width
- * @param height
- * @param kernelSize
- * @return
- */
-PIC_INLINE bool *MaskDilate(bool *dataIn, bool *dataOut, int width, int height,
-                            int kernelSize = 3)
-{
-    if(dataIn == NULL) {
+        int halfKernelSize = kernelSize >> 1;
+
+        #pragma omp parallel for
+
+        for(int i = 0; i < height; i++) {
+            int ind = i * width;
+
+            for(int j = 0; j < width; j++) {
+                int c = ind + j;
+
+                bool out = false;
+
+                for(int k = -halfKernelSize; k <= halfKernelSize; k++) {
+                    int ci = CLAMP((i + k), height) * width;
+
+                    for(int l = -halfKernelSize; l <= halfKernelSize; l++) {
+                        int cj = CLAMP((j + l), width);
+                        out = out || (!dataIn[ci + cj]);
+                    }
+                }
+
+                dataOut[c] = !out;
+            }
+        }
+
         return dataOut;
     }
 
-    if(dataOut == NULL) {
-        dataOut = new bool[width * height];
+    /**
+     * @brief MaskDilate dilates a mask.
+     * @param dataIn
+     * @param dataOut
+     * @param width
+     * @param height
+     * @param kernelSize
+     * @return
+     */
+    static bool *dilate(bool *dataIn, bool *dataOut, int width, int height,
+                                int kernelSize = 3)
+    {
+        if(dataIn == NULL) {
+            return dataOut;
+        }
+
+        if(dataOut == NULL) {
+            dataOut = new bool[width * height];
+        }
+
+        int halfKernelSize = kernelSize >> 1;
+
+        #pragma omp parallel for
+
+        for(int i = 0; i < height; i++) {
+            int ind = i * width;
+
+            for(int j = 0; j < width; j++) {
+                int c = ind + j;
+
+                bool out = false;
+
+                for(int k = -halfKernelSize; k <= halfKernelSize; k++) {
+                    int ci = CLAMP((i + k), height) * width;
+
+                    for(int l = -halfKernelSize; l <= halfKernelSize; l++) {
+                        int cj = CLAMP((j + l), width);
+                        out = out || (dataIn[ci + cj]);
+                    }
+                }
+
+                dataOut[c] = out;
+            }
+        }
+
+        return dataOut;
     }
 
-    int halfKernelSize = kernelSize >> 1;
+    /**
+     * @brief MaskEmpty checks if a mask is empty.
+     * @param dataIn
+     * @param width
+     * @param height
+     * @return
+     */
+    static bool empty(bool *dataIn, int width, int height)
+    {
+        if(dataIn == NULL) {
+            return true;
+        }
 
-    #pragma omp parallel for
+        for(int i = 0; i < height; i++) {
+            int ind = i * width;
 
-    for(int i = 0; i < height; i++) {
-        int ind = i * width;
-
-        for(int j = 0; j < width; j++) {
-            int c = ind + j;
-
-            bool out = false;
-
-            for(int k = -halfKernelSize; k <= halfKernelSize; k++) {
-                int ci = CLAMP((i + k), height) * width;
-
-                for(int l = -halfKernelSize; l <= halfKernelSize; l++) {
-                    int cj = CLAMP((j + l), width);
-                    out = out || (dataIn[ci + cj]);
+            for(int j = 0; j < width; j++) {
+                if(dataIn[ind + j]) {
+                    return false;
                 }
             }
-
-            dataOut[c] = out;
         }
-    }
 
-    return dataOut;
-}
-
-/**
- * @brief MaskEmpty checks if a mask is empty.
- * @param dataIn
- * @param width
- * @param height
- * @return
- */
-PIC_INLINE bool MaskEmpty(bool *dataIn, int width, int height)
-{
-    if(dataIn == NULL) {
         return true;
     }
 
-    for(int i = 0; i < height; i++) {
-        int ind = i * width;
+    /**
+     * @brief negative negates a mask.
+     * @param dataIn
+     * @param width
+     * @param height
+     */
+    static void negative(bool *dataIn, int width, int height)
+    {
+        if(dataIn == NULL) {
+            return;
+        }
 
-        for(int j = 0; j < width; j++) {
-            if(dataIn[ind + j]) {
-                return false;
-            }
+        int n = (height * width);
+
+        #pragma omp parallel for
+
+        for(int i = 0; i < n; i++) {
+            dataIn[i] = !dataIn[i];
         }
     }
-
-    return true;
-}
-
-/**
- * @brief MaskNegative negates a mask.
- * @param dataIn
- * @param width
- * @param height
- */
-PIC_INLINE void MaskNegative(bool *dataIn, int width, int height)
-{
-    if(dataIn == NULL) {
-        return;
-    }
-
-    int n = (height * width);
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < n; i++) {
-        dataIn[i] = !dataIn[i];
-    }
-}
-
-/**
- * @brief MaskSetValue assigns a constant value to the mask.
- * @param buffer
- * @param n
- * @param value
- * @return
- */
-PIC_INLINE bool *MaskSetValue(bool *buffer, int n, bool value)
-{
-    if(buffer == NULL) {
-        buffer = new bool[n];
-    }
-
-    #pragma omp parallel for
-
-    for(int i = 0; i < n; i++) {
-        buffer[i] = value;
-    }
-
-    return buffer;
-}
-
-/**
- * @brief MaskClone clones a mask.
- * @param dataIn
- * @param dataOut
- * @param width
- * @param height
- * @return
- */
-PIC_INLINE bool *MaskClone(bool *dataIn, bool *dataOut, int width, int height)
-{
-    if(dataIn == NULL) {
-        return dataOut;
-    }
-
-    if(dataOut == NULL) {
-        dataOut = new bool[width * height];
-    }
-
-    memcpy(dataOut, dataIn, width * height * sizeof(bool));
-
-    return dataOut;
-}
+};
 
 } // end namespace pic
 
