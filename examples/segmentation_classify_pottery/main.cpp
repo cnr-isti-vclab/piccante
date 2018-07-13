@@ -233,7 +233,8 @@ int main(int argc, char *argv[])
 
         bool *mask = pic::computeColorClassification(&img, white_pixel, data_pottery_colors, 171, 3,  data_pottery_var_distance);
 
-        opt->convertFromMask(mask, width, height);
+        pic::Image *opt = new pic::Image();
+        opt->convertFromMask(mask, img.width, img.height);
         opt->Write("../data/output/opt.bmp");
     }
 
