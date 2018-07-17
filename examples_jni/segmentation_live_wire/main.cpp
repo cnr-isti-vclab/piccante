@@ -38,32 +38,43 @@ int main(int argc, char *argv[])
         img_str = "../data/input/tommaseo_statue.png";
     }
 
-    printf("Reading images...");
-    pic::Image img(img_str, pic::LT_NOR_GAMMA);
-    printf("Is the image valid? ");
+    pic::Image img(img_str);
 
-    if(img.isValid()) {
-        std::vector< pic::Vec2i > out;
-        pic::Vec2i pS(227, 206);
-        pic::Vec2i pE(221, 351);
+    std::vector< pic::Vec2i > out, out2;
+    pic::Vec2i pS(227, 206);
+    pic::Vec2i pE(221, 351);
 
-        pic::LiveWire lw(&img);
+    std::vector< pic::Vec2i > cp_s;
+    cp_s.push_back(pS);
+    cp_s.push_back(pE);
 
-        lw.execute(pS, pE, out, true, false);
+    std::vector< int > cp_jni_s;
+    pic::transferFromVecToPlain(cp_s, cp_jni_s);
 
-        for(unsigned int i = 0; i < out.size(); i++) {
+    auto start = std::chrono::system_clock::now();
 
-            float *tmp = img(out[i][0], out[i][1]);
+    auto out_single_jni = pic::executeLiveWireMultipleJNI(img_str, cp_jni_s, false);
 
-            tmp[0] = 0.0f;
-            tmp[1] = 1.0f;
-            tmp[2] = 0.0f;
-        }
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+     std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
-        std::string name = pic::removeExtension(img_str);
-        name = pic::removeLocalPath(name);
-        img.Write("../data/output/" + name + "_lw.png", pic::LT_NOR_GAMMA);
+     std::cout << "finished computation at " << std::ctime(&end_time)
+               << "elapsed time: " << elapsed_seconds.count() << "s\n";
+
+
+    for(unsigned int i = 0; i < out_single_jni.size(); i+=2) {
+
+        float *tmp = img(out_single_jni[i], out_single_jni[i + 1]);
+
+        printf("X: %d Y:%d\n", out_single_jni[i], out_single_jni[i + 1]);
+        tmp[0] = 0.0f;
+        tmp[1] = 1.0f;
+        tmp[2] = 0.0f;
     }
+
+    img.Write("../data/output/s_livewire_single.png", pic::LT_NOR_GAMMA);
+
 
     return 0;
 }

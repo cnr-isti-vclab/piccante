@@ -25,6 +25,7 @@ This program is free software: you can redistribute it and/or modify
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
+#define PIC_DEBUG
 
 #include "../common_code/image_qimage_interop.hpp"
 #include "piccante.hpp"
@@ -39,10 +40,25 @@ int main(int argc, char *argv[])
         img_str = "../data/input/features/checker_board_photo.png";
     }
 
-    printf("Reading images...");
-    pic::Image img(img_str, pic::LT_NOR_GAMMA);
-    printf("Is the image valid? ");
+//    printf("Reading images...");
 
+    auto start = std::chrono::system_clock::now();
+
+    std::vector<int> ret = pic::extractCheckerBoardJNI(img_str, "../data/output/checker_board_photo_wb.png");
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+     std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+     std::cout << "finished computation at " << std::ctime(&end_time)
+               << "elapsed time: " << elapsed_seconds.count() << "s\n";
+
+    /*
+    pic::Image img(img_str);
+
+    printf("Ok\n");
+
+    printf("Is the image valid? ");
     if(img.isValid()) {
         printf("OK\n");
 
@@ -58,14 +74,13 @@ int main(int argc, char *argv[])
 
         pic::Image *img_wb = pic::applyWhiteBalance(&img, color);
 
-        std::string name = pic::removeExtension(img_str);
-        name = pic::removeLocalPath(name);
-        img_wb->Write("../data/output/" + name + "_wb.png");
+        img_wb->Write("../data/output/checker_board_photo_wb.png");
 
 
     } else {
         printf("No there is at least an invalid file!\n");
     }
+    */
 
     return 0;
 }

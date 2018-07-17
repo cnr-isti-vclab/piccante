@@ -23,6 +23,10 @@ This program is free software: you can redistribute it and/or modify
     ( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
 */
 
+//This means that we disable Eigen; some functionalities cannot be used.
+//For example, estimating the camera response function
+#define PIC_DISABLE_EIGEN
+
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
@@ -35,35 +39,10 @@ int main(int argc, char *argv[])
     if(argc == 2) {
         img_str = argv[1];
     } else {
-        img_str = "../data/input/tommaseo_statue.png";
+        img_str = "../data/input/features/tommaseo_statue.png";
     }
 
-    printf("Reading images...");
-    pic::Image img(img_str, pic::LT_NOR_GAMMA);
-    printf("Is the image valid? ");
-
-    if(img.isValid()) {
-        std::vector< pic::Vec2i > out;
-        pic::Vec2i pS(227, 206);
-        pic::Vec2i pE(221, 351);
-
-        pic::LiveWire lw(&img);
-
-        lw.execute(pS, pE, out, true, false);
-
-        for(unsigned int i = 0; i < out.size(); i++) {
-
-            float *tmp = img(out[i][0], out[i][1]);
-
-            tmp[0] = 0.0f;
-            tmp[1] = 1.0f;
-            tmp[2] = 0.0f;
-        }
-
-        std::string name = pic::removeExtension(img_str);
-        name = pic::removeLocalPath(name);
-        img.Write("../data/output/" + name + "_lw.png", pic::LT_NOR_GAMMA);
-    }
+    pic::applyWhiteBalanceJNI("../data/input/tommaseo_statue.png", "../data/output/tommaseo_statue_wb.png", 200, 200, true);
 
     return 0;
 }

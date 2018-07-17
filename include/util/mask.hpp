@@ -223,7 +223,7 @@ public:
             for(int j = 1; j < (width - 1); j++) {
                 int index = tmp + j;
 
-                if(!data[index]) {
+                if(!dataIn[index]) {
                     continue;
                 }
 
@@ -239,13 +239,13 @@ public:
 
                 int N = 0;
                 for(int k = 1; k < 9; i++) {
-                    N = data[P[k]] ? N + 1 : N;
+                    N = dataIn[P[k]] ? N + 1 : N;
                 }
 
             }
         }
 
-        return ;
+//        return ;
     }
 };
 

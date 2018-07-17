@@ -93,6 +93,25 @@ inline std::string fromNumberToString(T num)
 }
 
 /**
+ * @brief whichPath determines the kind of path of the string.
+ * @param path
+ * @return
+ */
+inline std::string whichPath(std::string path)
+{
+    std::string toFind = "";
+    if(path.find("/") != std::string::npos) {
+        toFind = "/";
+    } else {
+        if(path.find("\\") != std::string::npos) {
+            toFind = "\\";
+        }
+    }
+
+    return toFind;
+}
+
+/**
  * @brief RemoveExtension removes the extension of a string.
  * @param name
  * @return
@@ -106,6 +125,31 @@ inline std::string removeExtension(std::string name)
 
     if(pos != std::string::npos) {
         name.erase(name.end() - pos - 1, name.end());
+    }
+
+    return name;
+}
+
+/**
+ * @brief removeLocalPath removes the local path of a string.
+ * @param name
+ * @return
+ */
+inline std::string removeLocalPath(std::string name)
+{
+    std::string toFind = whichPath(name);
+
+    if(toFind.empty()) {
+        return name;
+    } else {
+        size_t oldPos;
+        size_t pos = 0;
+        do{
+            oldPos = pos;
+            pos = name.find(toFind, pos + 1);
+        } while(pos != std::string::npos);
+
+        name.erase(0, oldPos + 1);
     }
 
     return name;
@@ -191,17 +235,12 @@ inline int countSubString(std::string str, std::string subStr)
  */
 inline std::string getLocaDirectory(std::string path)
 {
-    std::string toFind;
     std::string ret = path;
 
-    if(path.find("/") != std::string::npos) {
-        toFind = "/";
-    } else {
-        if(path.find("\\") != std::string::npos) {
-            toFind = "\\";
-        } else {
-            return ret;
-        }
+    std::string toFind = whichPath(path);
+
+    if(toFind.empty()) {
+        return ret;
     }
 
     size_t pos1 = path.rfind(toFind);

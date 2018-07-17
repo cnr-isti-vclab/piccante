@@ -39,10 +39,34 @@ int main(int argc, char *argv[])
     if(argc == 2) {
         img_str = argv[1];
     } else {
-        img_str = "../data/input/features/tommaseo_statue.png";
+        img_str = "../data/input/tommaseo_statue.png";
     }
 
-    pic::applyWhiteBalanceJNI("../data/input/tommaseo_statue.png", "../data/output/tommaseo_statue_wb.png", 200, 200, true);
+    printf("Reading images...");
+    pic::Image img(img_str, pic::LT_NOR_GAMMA);
+    printf("Is the image valid? ");
+
+    if(img.isValid()) {
+        pic::Image *out = pic::applyWhiteBalance(&img, 200, 200, true);
+
+        std::string name = pic::removeExtension(img_str);
+        name = pic::removeLocalPath(name);
+
+        bool bWrite = out->Write("../data/output/" + name + "_wb.png", pic::LT_NOR_GAMMA, 0);
+
+        if(!bWrite) {
+            printf("The image could not be written.\n");
+        }
+
+        if(out != NULL) {
+            delete out;
+        }
+
+        return bWrite ? 1 : 0;
+    } else {
+        printf("The image could not be read.\n");
+        return 0;
+    }
 
     return 0;
 }
