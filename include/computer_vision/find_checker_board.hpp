@@ -195,7 +195,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
 #endif
 
     //compute the luminance images
-    HarrisCornerDetector hcd(2.5f, 5);
+    HarrisCornerDetector hcd(5.0f, 5);
     std::vector< Eigen::Vector2f > corners_from_img;
     hcd.execute(img, &corners_from_img);
 
@@ -216,7 +216,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     #endif
 
     std::vector< Eigen::Vector2f > cfi_out;
-    GeneralCornerDetector::removeClosestCorners(&corners_from_img, &cfi_out, 16.0f, 64);
+    GeneralCornerDetector::removeClosestCorners(&corners_from_img, &cfi_out, 16.0f, 96);
 
     //compute checkerboard size
     float checker_size = estimateCheckerBoardSize(corners_from_img);
@@ -277,7 +277,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     iterativeClosestPoints2D(corners_model, cfi_valid, descs_model, descs_cfi_valid, b_desc.getDescriptorSize(), 1000);
 
 #ifdef PIC_DEBUG
-    drawPoints(img_wb, corners_model, red);
+//    drawPoints(img_wb, corners_model, red);
 #endif
 
     //At this point, the rotation may be wrong so
@@ -286,7 +286,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
 
     float prev_err = FLT_MAX;
     float *x = new float[3];
-    int nSample = 36;
+    int nSample = 72;
 
     float *tmp = new float[4];
     for(float i = 0; i < nSample; i++) {

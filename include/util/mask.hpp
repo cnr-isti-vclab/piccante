@@ -200,12 +200,12 @@ public:
     }
 
     /**
-     * @brief thin thins a mask.
+     * @brief thinning thins a mask.
      * @param dataIn
      * @param width
      * @param height
      */
-    static bool* thin(bool *dataIn, int width, int height)
+    static bool* thinning(bool *dataIn, int width, int height)
     {
         if(dataIn == NULL) {
             return dataIn;

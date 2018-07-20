@@ -487,7 +487,7 @@ public:
     void convertFromMask(bool *mask, int width, int height);
 
     /**
-     * @brief ConvertToMask converts an Image into a boolean mask.
+     * @brief convertToMask converts an Image into a boolean mask.
      * @param color
      * @param threshold
      * @param cmp
@@ -1622,7 +1622,7 @@ PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.5
         bColorAllocated = true;
         color = new float[channels];
 
-        for(int i=0;i<channels;i++) {
+        for(int i = 0; i < channels; i++) {
             color[i] = 0.5f;
         }
     }
@@ -1646,11 +1646,15 @@ PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.5
             val += fabsf(data[ind + k] - color[k]);
         }
 
+        bool bMask = val > tmpThreshold;
+        mask[i] = cmp ? bMask : !bMask;
+
+        /*
         if(cmp) {
             mask[i] = val > tmpThreshold;
         } else {
             mask[i] = val < tmpThreshold;
-        }
+        }*/
     }
 
     if(bColorAllocated) {

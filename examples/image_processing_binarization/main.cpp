@@ -23,8 +23,6 @@ This program is free software: you can redistribute it and/or modify
     ( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
 */
 
-#include "../common_code/image_qimage_interop.hpp"
-
 //This means that we disable Eigen; some functionalities cannot be used.
 //For example, estimating the camera response function
 #define PIC_DISABLE_EIGEN
@@ -55,24 +53,12 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         bool bWritten;
+        std::string name = pic::removeLocalPath(pic::removeExtension(img_str));
 
-        //Computing grey scale by computing the mean of color channels
-        printf("Computing a gray scale image by computing the mean of color channels...");
-        pic::Image *img_mean = pic::FilterLuminance::Execute(&img, NULL, pic::LT_MEAN);
+        pic::Image *img_global_bin = pic::binarization(&img, false);
 
-        bWritten = img_mean->Write("../data/output/singapore_mean.png");
 
-        if(bWritten) {
-            printf("Ok\n");
-        } else {
-            printf("Writing had some issues!\n");
-        }
-
-        //Computing grey scale by computing the weighted average following CIE weights for Y
-        printf("Computing a gray scale image by computing the weighted mean of color channels using CIE weights for Y...");
-        pic::Image *img_cie_y = pic::FilterLuminance::Execute(&img, NULL, pic::LT_CIE_LUMINANCE);
-
-        bWritten = img_cie_y->Write("../data/output/singapore_cie_y.png");
+        bWritten = img_global_bin->Write("../data/output/" + name + "_global_bin.png");
 
         if(bWritten) {
             printf("Ok\n");
@@ -80,12 +66,9 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
+        pic::Image *img_local_bin = pic::binarization(&img, true);
 
-        //Computing grey scale by using Exposure Fusion
-        printf("Computing a gray scale image by using Exposure Fusion...");
-        pic::Image *img_cg_ef = pic::colorToGray(&img, NULL);
-
-        bWritten = img_cg_ef->Write("../data/output/singapore_cg_ef.png");
+        bWritten = img_local_bin->Write("../data/output/" + name + "_adaptive_bin.png");
 
         if(bWritten) {
             printf("Ok\n");
