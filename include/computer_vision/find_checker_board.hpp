@@ -185,7 +185,7 @@ PIC_INLINE Image *getCheckerBoardModel(int checkers_x, int checkers_y, int check
  * @param checkerBoardSizeX
  * @param checkerBoardSizeY
  */
-PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &corners_model, int checkerBoardSizeX = 4, int checkerBoardSizeY = 6)
+PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &corners_model, int checkerBoardSizeX = 4, int checkerBoardSizeY = 7)
 {
      corners_model.clear();
 
@@ -195,7 +195,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
 #endif
 
     //compute the luminance images
-    HarrisCornerDetector hcd(5.0f, 5);
+    HarrisCornerDetector hcd(2.5f, 5);
     std::vector< Eigen::Vector2f > corners_from_img;
     hcd.execute(img, &corners_from_img);
 
@@ -216,7 +216,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     #endif
 
     std::vector< Eigen::Vector2f > cfi_out;
-    GeneralCornerDetector::removeClosestCorners(&corners_from_img, &cfi_out, 16.0f, 96);
+    GeneralCornerDetector::removeClosestCorners(&corners_from_img, &cfi_out, 16.0f, 64);
 
     //compute checkerboard size
     float checker_size = estimateCheckerBoardSize(corners_from_img);
@@ -259,6 +259,9 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
 
     int checkers_size = 32;
     Image *img_pattern = getCheckerBoardModel(checkerBoardSizeX, checkerBoardSizeY, checkers_size, corners_model);
+    corners_model.erase(corners_model.begin() + 3);
+    corners_model.erase(corners_model.begin());
+
     ORBDescriptor b_desc((checkers_size >> 1) + 1, checkers_size);
 
     std::vector< unsigned int *> descs_model, descs_cfi_valid;
@@ -274,7 +277,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     t_init.applyC(corners_model);
 
     //run 2D ICP
-    iterativeClosestPoints2D(corners_model, cfi_valid, descs_model, descs_cfi_valid, b_desc.getDescriptorSize(), 1000);
+    iterativeClosestPoints2D(corners_model, cfi_valid, descs_model, descs_cfi_valid, b_desc.getDescriptorSize(), 3000);
 
 #ifdef PIC_DEBUG
 //    drawPoints(img_wb, corners_model, red);

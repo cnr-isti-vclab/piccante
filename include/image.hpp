@@ -1598,7 +1598,9 @@ PIC_INLINE void Image::convertFromMask(bool *mask, int width, int height)
         return;
     }
 
-    allocate(width, height, 1, 1);
+    if(!isValid() || this->width != width || this->height != height) {
+        allocate(width, height, 1, 1);
+    }
 
     int size = (width * height);
 
@@ -1609,10 +1611,10 @@ PIC_INLINE void Image::convertFromMask(bool *mask, int width, int height)
     }
 }
 
-PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.5f,
+PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.25f,
                                       bool cmp = true,  bool *mask = NULL)
 {
-    if(!isValid() || (color == NULL)) {
+    if(!isValid()) {
         return NULL;
     }
     
@@ -1623,7 +1625,7 @@ PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.5
         color = new float[channels];
 
         for(int i = 0; i < channels; i++) {
-            color[i] = 0.5f;
+            color[i] = 0.0f;
         }
     }
 

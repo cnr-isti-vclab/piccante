@@ -37,7 +37,7 @@ protected:
     bool  bLum;
     Image *lum;
 
-    float    sigma, threshold_1, threshold_2;
+    float sigma, threshold_1, threshold_2;
 
     /**
      * @brief release frees allocated memory for this class.
@@ -75,12 +75,12 @@ public:
      * @param threshold_1
      * @param threshold_2
      */
-    void update(float sigma = 1.4f, float threshold_1 = 0.05f, float threshold_2 = 0.3f)
+    void update(float sigma = 2.0f, float threshold_1 = 0.05f, float threshold_2 = 0.3f)
     {
         if(sigma > 0.0f) {
             this->sigma = sigma;
         } else {
-            this->sigma = 1.4f;
+            this->sigma = 2.0f;
         }
 
         if(threshold_1 > 0.0f) {
@@ -143,45 +143,40 @@ public:
 
                 float angle = atan2(tmp_grad[1], tmp_grad[0]);
 
-                angle = Rad2Deg( angle < 0.0f ? C_PI + angle : angle);
+                angle = Rad2Deg(angle < 0.0f ? C_PI + angle : angle);
 
                 float bMax = false;
 
                 if(((angle >=   0.0f) && (angle < 22.5f)) ||
                    ((angle >= 157.5f))) {
-                    bMax = (tmp_grad[0] > (*grad)(j + 1, i)[0]) &&
-                           (tmp_grad[0] > (*grad)(j - 1, i)[0]);
+                    bMax = (tmp_grad[2] > (*grad)(j + 1, i)[2]) &&
+                           (tmp_grad[2] > (*grad)(j - 1, i)[2]);
                 }
 
                 if((angle >= 22.5f) && (angle < 67.5f)) {
-                    bMax = (tmp_grad[0] > (*grad)(j + 1, i + 1)[0]) &&
-                           (tmp_grad[0] > (*grad)(j - 1, i - 1)[0]);
+                    bMax = (tmp_grad[2] > (*grad)(j + 1, i + 1)[2]) &&
+                           (tmp_grad[2] > (*grad)(j - 1, i - 1)[2]);
                 }
 
                 if((angle >= 67.5f) && (angle < 112.5f)) {
-                    bMax = (tmp_grad[0] > (*grad)(j, i + 1)[0]) &&
-                           (tmp_grad[0] > (*grad)(j, i - 1)[0]);
+                    bMax = (tmp_grad[2] > (*grad)(j, i + 1)[2]) &&
+                           (tmp_grad[2] > (*grad)(j, i - 1)[2]);
                 }
 
                 if((angle >= 112.5f) && (angle < 157.5f)) {
-                    bMax = (tmp_grad[0] > (*grad)(j - 1, i + 1)[0]) &&
-                           (tmp_grad[0] > (*grad)(j + 1, i - 1)[0]);
+                    bMax = (tmp_grad[2] > (*grad)(j - 1, i + 1)[2]) &&
+                           (tmp_grad[2] > (*grad)(j + 1, i - 1)[2]);
                 }
 
                 float *tmp_img_edges = (*imgEdges)(j, i);
 
-                if(bMax){
-                    tmp_img_edges[0] = tmp_grad[0];
-                } else {
-                    tmp_img_edges[0] = 0.0f;
-                }
-
+                tmp_img_edges[0] = bMax ? tmp_grad[2] : 0.0f;
             }
         }
 
         //double thresholding
-        for(int i=0; i < imgEdges->height; i++) {
-            for(int j=0; j < imgEdges->width; j++) {
+        for(int i = 0; i < imgEdges->height; i++) {
+            for(int j = 0; j < imgEdges->width; j++) {
                 float *tmp_imgEdges = (*imgEdges)(j, i);
 
                 if(tmp_imgEdges[0] > threshold_2) {
@@ -209,7 +204,7 @@ public:
                 if((tmp_imgEdges[0] > 0.4f) && (tmp_imgEdges[0] < 0.6f)) {
                     bool bRemove = true;
 
-                    for(int k=0; k<8; k++) {
+                    for(int k = 0; k < 8; k++) {
                         float *tmp_imgEdges_2 = (*imgEdges)(j + x[k], i + y[k]);
 
                         if(tmp_imgEdges_2[0] > 0.9f){
