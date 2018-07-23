@@ -75,12 +75,12 @@ public:
      * @param threshold_1
      * @param threshold_2
      */
-    void update(float sigma = 2.0f, float threshold_1 = 0.05f, float threshold_2 = 0.3f)
+    void update(float sigma = 1.4f, float threshold_1 = 0.05f, float threshold_2 = 0.3f)
     {
         if(sigma > 0.0f) {
             this->sigma = sigma;
         } else {
-            this->sigma = 2.0f;
+            this->sigma = 1.4f;
         }
 
         if(threshold_1 > 0.0f) {
