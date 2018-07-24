@@ -90,7 +90,7 @@ PIC_INLINE std::vector<int> extractCheckerBoardJNI(std::string imageInPath, std:
         work_bin->Write("../bin.bmp");
 
         CannyEdgeDetector ced;
-        ced.update(0.0f, 0.05f, 0.3f);
+        ced.update(1.0f, 0.05f, 0.3f);
         Image *work_bin_edges = ced.execute(work_bin, NULL);
 
         work_bin_edges->Write("../bin_edges.bmp");

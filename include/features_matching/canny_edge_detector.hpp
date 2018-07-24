@@ -136,6 +136,12 @@ public:
 
         imgEdges->setZero();
 
+        int dx0[] = {1, 1, 0, -1, 1};
+        int dy0[] = {0, 1, 1,  1, 0};
+
+        int dx1[] = {-1, -1,  0,  1, -1};
+        int dy1[] = { 0, -1, -1, -1,  0};
+
         for(int i=0; i<grad->height; i++) {
             for(int j=0; j<grad->width; j++) {
 
@@ -144,8 +150,13 @@ public:
                 float angle = atan2(tmp_grad[1], tmp_grad[0]);
 
                 angle = Rad2Deg(angle < 0.0f ? C_PI + angle : angle);
+                int k = int(lround(angle / 45.0f));
 
-                float bMax = false;
+                bool bMax = (tmp_grad[2] > (*grad)(j + dx0[k], i + dy0[k])[2]) &&
+                            (tmp_grad[2] > (*grad)(j + dx1[k], i + dy1[k])[2]);
+
+                /*
+                bool bMax = false;
 
                 if(((angle >=   0.0f) && (angle < 22.5f)) ||
                    ((angle >= 157.5f))) {
@@ -166,7 +177,7 @@ public:
                 if((angle >= 112.5f) && (angle < 157.5f)) {
                     bMax = (tmp_grad[2] > (*grad)(j - 1, i + 1)[2]) &&
                            (tmp_grad[2] > (*grad)(j + 1, i - 1)[2]);
-                }
+                }*/
 
                 float *tmp_img_edges = (*imgEdges)(j, i);
 
