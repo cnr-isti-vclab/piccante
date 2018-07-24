@@ -142,8 +142,8 @@ public:
         int dx1[] = {-1, -1,  0,  1, -1};
         int dy1[] = { 0, -1, -1, -1,  0};
 
-        for(int i=0; i<grad->height; i++) {
-            for(int j=0; j<grad->width; j++) {
+        for(int i = 0; i < grad->height; i++) {
+            for(int j = 0; j < grad->width; j++) {
 
                 float *tmp_grad = (*grad)(j, i);
 
@@ -208,8 +208,8 @@ public:
         int x[] = {1, 1, 0, -1, -1, -1,  0,  1};
         int y[] = {0, 1, 1,  1,  0, -1, -1, -1};
 
-        for(int i=0; i < imgEdges->height; i++) {
-            for(int j=0; j < imgEdges->width; j++) {
+        for(int i = 0; i < imgEdges->height; i++) {
+            for(int j = 0; j < imgEdges->width; j++) {
                 float *tmp_imgEdges = (*imgEdges)(j, i);
 
                 if((tmp_imgEdges[0] > 0.4f) && (tmp_imgEdges[0] < 0.6f)) {

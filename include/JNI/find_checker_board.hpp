@@ -76,6 +76,7 @@ PIC_INLINE std::vector<int> extractCheckerBoardJNI(std::string imageInPath, std:
             work = &in;
         }
 
+        /*
         Image *work_bin = binarization(work, true);
         bool *mask = work_bin->convertToMask(NULL, 0.5f, true, NULL);
         work_bin->convertFromMask(mask, work_bin->width, work_bin->height);
@@ -94,6 +95,7 @@ PIC_INLINE std::vector<int> extractCheckerBoardJNI(std::string imageInPath, std:
         Image *work_bin_edges = ced.execute(work_bin, NULL);
 
         work_bin_edges->Write("../bin_edges.bmp");
+        */
 
         std::vector< Eigen::Vector2f > corners;
         pic::findCheckerBoard(work, corners);
