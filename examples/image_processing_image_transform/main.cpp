@@ -25,8 +25,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //This means we do not use QT for I/O
 #define PIC_DISABLE_QT
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 #include<chrono>
@@ -37,7 +35,7 @@ int main(int argc, char *argv[])
     printf("Reading an HDR file...");
 
     pic::Image img;
-    ImageRead("../data/input/tommaseo_statue.png", &img);
+    img.Read("../data/input/tommaseo_statue.png");
 
     printf("Ok\n");
 

@@ -47,11 +47,10 @@ protected:
     pic::ReinhardTMOGL     *reinhard_tmo;
     pic::DurandTMOGL       *durand_tmo;
 
-    pic::ImageGL    img, *img_tmo, *img_tmo_with_sRGB;
+    pic::ImageGL img, *img_tmo, *img_tmo_with_sRGB;
     pic::TechniqueGL technique;
 
-    int    method;
-
+    int method;
 
     /**
      * @brief initializeGL sets variables up.
@@ -69,7 +68,7 @@ protected:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
         //read an input image
-        ImageRead("../data/input/bottles.hdr", &img);
+        img.Read("../data/input/bottles.hdr");
         img.generateTextureGL();
 
         //create a screen aligned quad

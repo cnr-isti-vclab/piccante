@@ -23,19 +23,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
-
     printf("Reading an LDR file...");
 
     pic::Image img;
-    ImageRead("../data/input/connected_test.png", &img, pic::LT_NOR);
+    img.Read("../data/input/connected_test.png", pic::LT_NOR);
 
     printf("Ok\n");
 

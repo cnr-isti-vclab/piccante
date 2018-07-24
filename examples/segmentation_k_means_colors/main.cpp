@@ -26,8 +26,6 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -42,7 +40,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an image...");
     pic::Image img;
-    ImageRead(img_str, &img);
+    img.Read(img_str);
 
     printf("Ok\n");
 
@@ -79,7 +77,7 @@ int main(int argc, char *argv[])
 
             }
 
-            ImageWrite(&img, "../data/output/s_kmeans_colors.png");
+            img.Write("../data/output/s_kmeans_colors.png");
         }
     }
 

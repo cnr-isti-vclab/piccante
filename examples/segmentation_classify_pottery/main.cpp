@@ -26,8 +26,6 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 float data_pottery_mu_c[] = {0.7323f, 0.5415f, 0.3707f};
@@ -225,7 +223,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an image...");
     pic::Image img;
-    ImageRead(img_str, &img, pic::LT_NOR);
+    img.Read(img_str, pic::LT_NOR);
     printf("Ok\n");
 
     if(img.isValid()) {
@@ -235,7 +233,7 @@ int main(int argc, char *argv[])
 
         pic::Image *opt = new pic::Image();
         opt->convertFromMask(mask, img.width, img.height);
-        opt->Write("../data/output/opt.bmp");
+        opt->Write("../data/output/classify_pottery_opt.png");
     }
 
     return 0;
