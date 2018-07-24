@@ -382,7 +382,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     t_init.applyC(corners_model);
 
     //run 2D ICP
-    iterativeClosestPoints2D(corners_model, cfi_valid, descs_model, descs_cfi_valid, b_desc.getDescriptorSize(), 1000);
+    iterativeClosestPoints2D(corners_model, cfi_valid, descs_model, descs_cfi_valid, b_desc.getDescriptorSize(), 3000);
 
 #ifdef PIC_DEBUG
     drawPoints(img_wb, corners_model, red);
