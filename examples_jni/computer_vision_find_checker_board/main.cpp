@@ -25,9 +25,8 @@ This program is free software: you can redistribute it and/or modify
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
-#define PIC_DEBUG
+//#define PIC_DEBUG
 
-#include "../common_code/image_qimage_interop.hpp"
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -37,10 +36,8 @@ int main(int argc, char *argv[])
     if(argc == 2) {
         img_str = argv[1];
     } else {
-        img_str = "../data/input/features/checker_board_photo.png";
+        img_str = "../data/input/checker_board_photo_2.png";
     }
-
-//    printf("Reading images...");
 
     auto start = std::chrono::system_clock::now();
 
@@ -52,35 +49,6 @@ int main(int argc, char *argv[])
 
      std::cout << "finished computation at " << std::ctime(&end_time)
                << "elapsed time: " << elapsed_seconds.count() << "s\n";
-
-    /*
-    pic::Image img(img_str);
-
-    printf("Ok\n");
-
-    printf("Is the image valid? ");
-    if(img.isValid()) {
-        printf("OK\n");
-
-        std::vector< Eigen::Vector2f > corners;
-        pic::findCheckerBoard(&img, corners);
-
-        Eigen::Vector2f p0, p1;
-        float length = pic::estimateLengthOfCheckers(corners, p0, p1);
-
-        printf("The checkers' length is %3.3f pixels.\n", length);
-
-        float *color = pic::estimateWhitePointFromCheckerBoard(&img, corners);
-
-        pic::Image *img_wb = pic::applyWhiteBalance(&img, color);
-
-        img_wb->Write("../data/output/checker_board_photo_wb.png");
-
-
-    } else {
-        printf("No there is at least an invalid file!\n");
-    }
-    */
 
     return 0;
 }
