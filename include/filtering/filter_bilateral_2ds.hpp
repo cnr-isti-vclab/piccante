@@ -188,8 +188,9 @@ public:
      * @return
      */
     static Image *Execute(std::string nameIn,
-                             std::string nameOut,
-                             float sigma_s, float sigma_r, SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
+                          std::string nameOut,
+                          float sigma_s, float sigma_r,
+                          SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
     {
         //Load the image
         Image imgIn(nameIn);
@@ -218,9 +219,10 @@ public:
      * @return
      */
     static Image *Execute(std::string nameIn,
-                             std::string nameIn2,
-                             std::string nameOut,
-                             float sigma_s, float sigma_r, SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
+                          std::string nameIn2,
+                          std::string nameOut,
+                          float sigma_s, float sigma_r,
+                          SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
     {
         //Load the image
         Image imgIn(nameIn);

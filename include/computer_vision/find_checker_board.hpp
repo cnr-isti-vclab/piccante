@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_COMPUTER_VISION_FIND_CHECKER_BOARD_HPP
 
 #include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_bilateral_2ds.hpp"
 
 #include "../computer_vision/iterative_closest_point_2D.hpp"
 #include "../computer_vision/nelder_mead_opt_ICP_2D.hpp"
@@ -113,6 +114,76 @@ PIC_INLINE float estimateCheckerBoardSize(std::vector< Eigen::Vector2f > &points
 
         if(closest < FLT_MAX) {
             m_d.push_back(closest);
+        }
+    }
+
+    if(!m_d.empty()) {
+        std::sort(m_d.begin(), m_d.end());
+
+        ret = m_d[m_d.size() / 2];
+    }
+
+    return ret;
+}
+
+/**
+ * @brief estimateCheckerBoardSizeCross
+ * @param points
+ * @return
+ */
+PIC_INLINE float estimateCheckerBoardSizeCross(std::vector< Eigen::Vector2f > &points)
+{
+    if(points.size() < 2) {
+        return -1.0f;
+    }
+
+    float ret = 0.0f;
+
+    int n = int(points.size());
+
+    std::vector<float> m_d;
+    for(int i = 0; i < n; i++) {
+        auto p_i = points[i];
+
+        float c[] = {FLT_MAX, FLT_MAX, FLT_MAX};
+        int ci[] = {-1, -1, -1};
+
+        for(int j = 0; j < n; j++) {
+            if(j == i) {
+                continue;
+            }
+
+            auto delta_ij = p_i - points[j];
+
+            float dist = delta_ij.norm();
+
+            if(dist < c[0]) {
+                c[0] = dist;
+                ci[0] = j;
+            } else {
+                if(dist < c[1]) {
+                    c[1] = dist;
+                    ci[1] = j;
+                } else {
+                    if(dist < c[2]) {
+                        c[2] = dist;
+                        ci[2] = j;
+                    }
+                }
+            }
+        }
+
+        Eigen::Vector2f v0 = (points[ci[0]] - p_i) / c[0];
+        Eigen::Vector2f v1 = (points[ci[1]] - p_i) / c[1];
+        Eigen::Vector2f v2 = (points[ci[2]] - p_i) / c[2];
+
+        float v01 = fabsf(v0.dot(v1));
+        float v02 = fabsf(v0.dot(v2));
+        float v12 = fabsf(v1.dot(v2));
+
+        if((v01 < 0.1f) || (v02 < 0.1f) || (v12 < 0.1f))
+        {
+            m_d.push_back(c[0]);
         }
     }
 
@@ -231,12 +302,13 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
         auto p_i = cfi_out[i];
 
         bool bFlag = true;
+
         for(unsigned int j = 0; j < n; j++) {
             if(j != i) {
                 auto delta_ij = p_i - cfi_out[j];
                 float dist = delta_ij.norm();
 
-                if(dist < checker_size) {
+                if(dist < (checker_size)) {
                     bFlag = false;
                     break;
                 }
@@ -249,20 +321,23 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     }
 
     #ifdef PIC_DEBUG
-        printf("Size: %f\n", checker_size);
+        printf("Checker size: %f\n", checker_size);
         drawPoints(img_wb, cfi_valid, green);
     #endif
 
-    checker_size = estimateCheckerBoardSize(cfi_valid);
+    checker_size = estimateCheckerBoardSizeCross(cfi_valid);
 
+#ifdef PIC_DEBUG
+    printf("Re-fit Checker size: %f\n", checker_size);
+#endif
     //pattern image
 
     int checkers_size = 32;
     Image *img_pattern = getCheckerBoardModel(checkerBoardSizeX, checkerBoardSizeY, checkers_size, corners_model);
-    corners_model.erase(corners_model.begin() + 3);
-    corners_model.erase(corners_model.begin());
+//    corners_model.erase(corners_model.begin() + 3);
+//    corners_model.erase(corners_model.begin());
 
-    ORBDescriptor b_desc((checkers_size >> 1) + 1, checkers_size);
+    ORBDescriptor b_desc(checkers_size, 256);
 
     std::vector< unsigned int *> descs_model, descs_cfi_valid;
     b_desc.getAll(img_pattern, corners_model, descs_model);
@@ -310,7 +385,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     #endif
 
     float start[] = {x[0], x[1], x[2], 1.0f};
-    opt.run(start, 4, 1e-12f, 50, tmp);
+    opt.run(start, 4, 1e-12f, 150, tmp);
     ICP2DTransform t2(tmp[0], tmp[1], tmp[2], tmp[3]);
 
     #ifdef PIC_DEBUG

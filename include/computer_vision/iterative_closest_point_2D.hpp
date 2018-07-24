@@ -350,7 +350,7 @@ PIC_INLINE void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pa
     t_init.apply(points_pattern);
 
     float err = getErrorPointsList(points_pattern, points);;
-    float prev_err;
+    float prev_err = 1e32f;
     int iter = 0;
     while(iter < maxIterations) {
         prev_err = err;
