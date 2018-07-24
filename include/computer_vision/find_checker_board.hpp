@@ -296,7 +296,11 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
         //drawPoints(img_wb, cfi_out, blue);
     #endif
 
-    std::vector< Eigen::Vector2f > cfi_valid;
+    //
+    // remove very closed points
+    //
+
+    std::vector< Eigen::Vector2f > cfi_valid2;
     auto n =  cfi_out.size();
     for(unsigned int i = 0; i < n; i++) {
         auto p_i = cfi_out[i];
@@ -316,6 +320,32 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
         }
 
         if(bFlag) {
+            cfi_valid2.push_back(p_i);
+        }
+    }
+
+    //
+    // remove very far away points
+    //
+
+    std::vector< Eigen::Vector2f > cfi_valid;
+    n =  cfi_valid2.size();
+    for(unsigned int i = 0; i < n; i++) {
+        auto p_i = cfi_valid2[i];
+
+        float dist = 1e32f;
+        for(unsigned int j = 0; j < n; j++) {
+            if(j != i) {
+                auto delta_ij = p_i - cfi_valid2[j];
+                float t_dist = delta_ij.norm();
+
+                if(t_dist < dist) {
+                    dist = t_dist;
+                }
+            }
+        }
+
+        if(dist < (checker_size * 3)) {
             cfi_valid.push_back(p_i);
         }
     }
@@ -352,7 +382,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     t_init.applyC(corners_model);
 
     //run 2D ICP
-    iterativeClosestPoints2D(corners_model, cfi_valid, descs_model, descs_cfi_valid, b_desc.getDescriptorSize(), 1000);
+    iterativeClosestPoints2D(corners_model, cfi_valid, descs_model, descs_cfi_valid, b_desc.getDescriptorSize(), 3000);
 
 #ifdef PIC_DEBUG
     drawPoints(img_wb, corners_model, red);
