@@ -76,27 +76,6 @@ PIC_INLINE std::vector<int> extractCheckerBoardJNI(std::string imageInPath, std:
             work = &in;
         }
 
-        /*
-        Image *work_bin = binarization(work, true);
-        bool *mask = work_bin->convertToMask(NULL, 0.5f, true, NULL);
-        work_bin->convertFromMask(mask, work_bin->width, work_bin->height);
-        work_bin->Write("../bin_ori.bmp");
-
-
-        bool *m0 = Mask::erode(mask, NULL, work_bin->width, work_bin->height, 3);
-        bool *m1 = Mask::dilate(m0, NULL, work_bin->width, work_bin->height, 3);
-        bool *m2 = Mask::dilate(m1, NULL, work_bin->width, work_bin->height, 3);
-
-        work_bin->convertFromMask(m2, work_bin->width, work_bin->height);
-        work_bin->Write("../bin.bmp");
-
-        CannyEdgeDetector ced;
-        ced.update(1.0f, 0.05f, 0.3f);
-        Image *work_bin_edges = ced.execute(work_bin, NULL);
-
-        work_bin_edges->Write("../bin_edges.bmp");
-        */
-
         std::vector< Eigen::Vector2f > corners;
         pic::findCheckerBoard(work, corners);
 

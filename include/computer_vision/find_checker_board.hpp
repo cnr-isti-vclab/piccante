@@ -293,7 +293,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     float checker_size = estimateCheckerBoardSize(corners_from_img);
 
     #ifdef PIC_DEBUG
-        drawPoints(img_wb, cfi_out, blue);
+        //drawPoints(img_wb, cfi_out, blue);
     #endif
 
     std::vector< Eigen::Vector2f > cfi_valid;
@@ -352,10 +352,10 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     t_init.applyC(corners_model);
 
     //run 2D ICP
-    iterativeClosestPoints2D(corners_model, cfi_valid, descs_model, descs_cfi_valid, b_desc.getDescriptorSize(), 3000);
+    iterativeClosestPoints2D(corners_model, cfi_valid, descs_model, descs_cfi_valid, b_desc.getDescriptorSize(), 1000);
 
 #ifdef PIC_DEBUG
-//    drawPoints(img_wb, corners_model, red);
+    drawPoints(img_wb, corners_model, red);
 #endif
 
     //At this point, the rotation may be wrong so
@@ -370,7 +370,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     for(float i = 0; i < nSample; i++) {
         float angle = float(i) * C_PI_2 / float(nSample);
         float start[] = {0.0f, 0.0f, angle};
-        opt.run(start, 3, 1e-9f, 50, tmp);
+        opt.run(start, 3, 1e-9f, 100, tmp);
 
         if(opt.output_error < prev_err) {
             memcpy(x, tmp, sizeof(float) * 3);
@@ -385,7 +385,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     #endif
 
     float start[] = {x[0], x[1], x[2], 1.0f};
-    opt.run(start, 4, 1e-12f, 150, tmp);
+    opt.run(start, 4, 1e-12f, 100, tmp);
     ICP2DTransform t2(tmp[0], tmp[1], tmp[2], tmp[3]);
 
     #ifdef PIC_DEBUG
@@ -419,17 +419,20 @@ PIC_INLINE float estimateLengthOfCheckers(std::vector< Eigen::Vector2f > &corner
         return -1.0f;
     }
 
-    auto p_0 = corners_model[5];
+    int selected = 5;
+    auto p_0 = corners_model[selected];
 
     int closest = -1;
     float ret = FLT_MAX;
-    for(auto j = 1; j < corners_model.size(); j++) {
-        auto delta_ij = p_0 - corners_model[j];
-        float dist = delta_ij.norm();
+    for(auto j = 0; j < corners_model.size(); j++) {
+        if(j != selected) {
+            auto delta_ij = p_0 - corners_model[j];
+            float dist = delta_ij.norm();
 
-        if(dist < ret) {
-            ret = dist;
-            closest = j;
+            if(dist < ret) {
+                ret = dist;
+                closest = j;
+            }
         }
     }
 
