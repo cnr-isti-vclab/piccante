@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_IMAGE_SAMPLERS_IMAGE_SAMPLER_CATMULL_ROM_HPP
 #define PIC_IMAGE_SAMPLERS_IMAGE_SAMPLER_CATMULL_ROM_HPP
 
-#include "image_samplers/image_sampler.hpp"
+#include "../image_samplers/image_sampler.hpp"
 
 namespace pic {
 

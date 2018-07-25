@@ -18,12 +18,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_TONE_MAPPING_REINHARD_TMO_HPP
 #define PIC_GL_TONE_MAPPING_REINHARD_TMO_HPP
 
-#include "gl/filtering/filter_luminance.hpp"
-#include "gl/filtering/filter_sigmoid_tmo.hpp"
-#include "gl/filtering/filter_bilateral_2ds.hpp"
-#include "gl/filtering/filter_op.hpp"
+#include "../../gl/filtering/filter_luminance.hpp"
+#include "../../gl/filtering/filter_sigmoid_tmo.hpp"
+#include "../../gl/filtering/filter_bilateral_2ds.hpp"
+#include "../../gl/filtering/filter_op.hpp"
 
-#include "gl/filtering/filter_reinhard_single_pass.hpp"
+#include "../../gl/filtering/filter_reinhard_single_pass.hpp"
 
 namespace pic {
 

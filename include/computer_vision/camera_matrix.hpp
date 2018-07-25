@@ -22,14 +22,23 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <stdlib.h>
 
-#include "util/math.hpp"
+#include "../base.hpp"
+
+#include "../util/math.hpp"
+#include "../util/eigen_util.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
-#include "externals/Eigen/SVD"
-#include "externals/Eigen/Geometry"
 
-#include "util/eigen_util.hpp"
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Dense"
+    #include "../externals/Eigen/SVD"
+    #include "../externals/Eigen/Geometry"
+#else
+    #include <Eigen/Dense>
+    #include <Eigen/SVD>
+    #include <Eigen/Geometry>
+#endif
+
 #endif
 
 namespace pic {
@@ -41,7 +50,7 @@ namespace pic {
  * @param F is a fundamental matrix.
  * @return It returns the epipole of F.
  */
-Eigen::Vector3d computeEpipole(Eigen::Matrix3d &F)
+PIC_INLINE Eigen::Vector3d computeEpipole(Eigen::Matrix3d &F)
 {
     Eigen::JacobiSVD< Eigen::Matrix3d > svdF(F, Eigen::ComputeFullV);
     Eigen::Matrix3d V = svdF.matrixV();
@@ -61,7 +70,7 @@ Eigen::Vector3d computeEpipole(Eigen::Matrix3d &F)
  * @param K
  * @return
  */
-Eigen::Matrix34d getCameraMatrixFromHomography(Eigen::Matrix3d &H, Eigen::Matrix3d &K)
+PIC_INLINE Eigen::Matrix34d getCameraMatrixFromHomography(Eigen::Matrix3d &H, Eigen::Matrix3d &K)
 {
     Eigen::Matrix34d m;
     m.setZero();
@@ -109,7 +118,7 @@ Eigen::Matrix34d getCameraMatrixFromHomography(Eigen::Matrix3d &H, Eigen::Matrix
  * @param T0
  * @param T1
  */
-void RectifyCameras(Eigen::Matrix3d &K0, Eigen::Matrix3d &R0, Eigen::Vector3d &t0,
+PIC_INLINE void RectifyCameras(Eigen::Matrix3d &K0, Eigen::Matrix3d &R0, Eigen::Vector3d &t0,
                     Eigen::Matrix3d &K1, Eigen::Matrix3d &R1, Eigen::Vector3d &t1,
                     Eigen::Matrix3d &T0, Eigen::Matrix3d &T1)
 {
@@ -135,7 +144,7 @@ void RectifyCameras(Eigen::Matrix3d &K0, Eigen::Matrix3d &R0, Eigen::Vector3d &t
  * @param K
  * @return
  */
-Eigen::Matrix34d getCameraMatrixIdentity(Eigen::Matrix3d &K)
+PIC_INLINE Eigen::Matrix34d getCameraMatrixIdentity(Eigen::Matrix3d &K)
 {
     Eigen::Matrix34d m;
     m.setZero();
@@ -154,7 +163,7 @@ Eigen::Matrix34d getCameraMatrixIdentity(Eigen::Matrix3d &K)
  * @param t
  * @return
  */
-Eigen::Matrix34d getCameraMatrix(Eigen::Matrix3d &K, Eigen::Matrix3d &R, Eigen::Vector3d &t)
+PIC_INLINE Eigen::Matrix34d getCameraMatrix(Eigen::Matrix3d &K, Eigen::Matrix3d &R, Eigen::Vector3d &t)
 {
     Eigen::Matrix34d m;
 
@@ -184,7 +193,7 @@ Eigen::Matrix34d getCameraMatrix(Eigen::Matrix3d &K, Eigen::Matrix3d &R, Eigen::
  * @param p is a 3D point encoded in homogenous coordinate (4D vector)
  * @return
  */
-Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector4d &p)
+PIC_INLINE Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector4d &p)
 {
     Eigen::Vector3d proj = M * p;
     proj[0] /= proj[2];
@@ -200,7 +209,7 @@ Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector4d &p)
  * @param p is a 3D point (3D vector)
  * @return
  */
-Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector3d &p)
+PIC_INLINE Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector3d &p)
 {
     Eigen::Vector4d p4d(p[0], p[1], p[2], 1.0);
     return cameraMatrixProject(M, p4d);
@@ -217,7 +226,7 @@ Eigen::Vector2i cameraMatrixProject(Eigen::Matrix34d &M, Eigen::Vector3d &p)
  * @param lambda
  * @return
  */
-Eigen::Vector2i cameraMatrixProjection(Eigen::Matrix34d &M, Eigen::Vector3d &p, double cx, double cy, double fx, double fy, double lambda)
+PIC_INLINE Eigen::Vector2i cameraMatrixProjection(Eigen::Matrix34d &M, Eigen::Vector3d &p, double cx, double cy, double fx, double fy, double lambda)
 {
     Eigen::Vector4d p_t = Eigen::Vector4d(p[0], p[1], p[2], 1.0);
     Eigen::Vector2i out;

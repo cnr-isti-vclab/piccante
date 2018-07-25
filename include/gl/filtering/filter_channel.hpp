@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_CHANNEL_HPP
 #define PIC_GL_FILTERING_FILTER_CHANNEL_HPP
 
-#include "filtering/filter_luminance.hpp"
-#include "gl/filtering/filter.hpp"
+#include "../../filtering/filter_luminance.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -152,8 +152,8 @@ void FilterGLChannel::Update(int channel)
     setChannel(channel);
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("channel", channel);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1i("channel", channel);
     technique.unbind();
 }
 

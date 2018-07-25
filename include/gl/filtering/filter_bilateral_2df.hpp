@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_2DF_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_2DF_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -180,10 +180,10 @@ void FilterGLBilateral2DF::Update(float sigma_s, float sigma_r)
     int halfKernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s) >> 1;
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("sigmas2", sigmas2);
-    technique.setUniform("sigmar2", sigmar2);
-    technique.setUniform("halfKernelSize", halfKernelSize);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1f("sigmas2", sigmas2);
+    technique.setUniform1f("sigmar2", sigmar2);
+    technique.setUniform1i("halfKernelSize", halfKernelSize);
     technique.unbind();
 }
 

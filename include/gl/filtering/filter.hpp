@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -27,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_HPP
 #define PIC_GL_FILTERING_FILTER_HPP
 
-#include "gl/image_vec.hpp"
-#include "util/gl/technique.hpp"
-#include "util/gl/quad.hpp"
+#include "../../gl/image_vec.hpp"
+#include "../../util/gl/technique.hpp"
+#include "../../util/gl/quad.hpp"
 
 namespace pic {
 
@@ -153,7 +144,7 @@ public:
     }
 };
 
-ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
+PIC_INLINE ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.empty()) {
         return imgOut;
@@ -174,52 +165,52 @@ ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
         fbo = new Fbo();
     }
 
+    //create an FBO
     fbo->create(width, height, imgIn[0]->frames, false, imgOut->getTexture());
 
-    //Rendering
+    //bind the FBO
     fbo->bind();
     glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 
-    //Shaders
+    //bind shaders
     technique.bind();
 
-    //Textures
-    unsigned int n = imgIn.size();
-    for(unsigned int i = 0; i < n; i++) {
+    //bind textures
+    int n = int(imgIn.size());
+    for(auto i = 0; i < n; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         imgIn[i]->bindTexture();
     }
 
-    //Texture internal filter parameters
-    unsigned int m = param.size();
-    for(unsigned int i = 0; i < m; i++) {
+    //bind texture internal filter parameters
+    int m = int(param.size());
+    for(auto i = 0; i < m; i++) {
         glActiveTexture(GL_TEXTURE0 + n + i);
         param[i]->bindTexture();
     }
 
-    //Rendering aligned quad
+    //render an aligned quad
     quad->Render();
 
-    //Fbo
+    //unbind the FBO
     fbo->unbind();
 
-    //Shaders
+    //unbind shaders
     technique.unbind();
 
-    //Textures
-    for(unsigned int i=0; i< n; i++) {
+    //unbind textures
+    for(auto i = 0; i< n; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         imgIn[i]->unBindTexture();
     }
 
-    for(unsigned int i=0; i< m; i++) {
+    for(auto i = 0; i < m; i++) {
         glActiveTexture(GL_TEXTURE0 + n + i);
         param[i]->unBindTexture();
     }
 
     return imgOut;
 }
-
 
 } // end namespace pic
 

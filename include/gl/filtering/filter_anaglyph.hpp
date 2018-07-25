@@ -18,7 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_ANAGLYPH_HPP
 #define PIC_GL_FILTERING_FILTER_ANAGLYPH_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "../../base.hpp"
+
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -41,12 +43,12 @@ public:
     FilterGLAnaglyph();
 };
 
-FilterGLAnaglyph::FilterGLAnaglyph(): FilterGL()
+PIC_INLINE FilterGLAnaglyph::FilterGLAnaglyph(): FilterGL()
 {
     InitShaders();
 }
 
-void FilterGLAnaglyph::InitShaders()
+PIC_INLINE void FilterGLAnaglyph::InitShaders()
 {
     fragment_source = MAKE_STRING
                       (
@@ -72,8 +74,8 @@ void FilterGLAnaglyph::InitShaders()
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLAnaglyph");
 
     technique.bind();
-    technique.setUniform("u_texL",      0);
-    technique.setUniform("u_texR",      1);
+    technique.setUniform1i("u_texL", 0);
+    technique.setUniform1i("u_texR", 1);
     technique.unbind();
 }
 

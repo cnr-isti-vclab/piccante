@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_DCT_1D_HPP
 #define PIC_FILTERING_FILTER_DCT_1D_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
 namespace pic {
 
@@ -165,7 +165,7 @@ public:
     void ChangePass(int x, int y, int z);
 };
 
-FilterDCT1D::FilterDCT1D(int nCoeff, bool bForward)
+PIC_INLINE FilterDCT1D::FilterDCT1D(int nCoeff, bool bForward)
 {
     this->coeff = NULL;
     this->nCoeff = nCoeff;
@@ -184,14 +184,14 @@ FilterDCT1D::FilterDCT1D(int nCoeff, bool bForward)
     dirs[2] = 0;
 }
 
-FilterDCT1D::~FilterDCT1D()
+PIC_INLINE FilterDCT1D::~FilterDCT1D()
 {
     if(coeff != NULL) {
         delete[] coeff;
     }
 }
 
-void FilterDCT1D::ChangePass(int pass, int tPass)
+PIC_INLINE void FilterDCT1D::ChangePass(int pass, int tPass)
 {
     int tMod;
 
@@ -214,14 +214,14 @@ void FilterDCT1D::ChangePass(int pass, int tPass)
 
 }
 
-void FilterDCT1D::ChangePass(int x, int y, int z)
+PIC_INLINE void FilterDCT1D::ChangePass(int x, int y, int z)
 {
     dirs[0] = y;
     dirs[1] = x;
     dirs[2] = z;
 }
 
-void FilterDCT1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterDCT1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 

@@ -18,10 +18,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_FIND_BEST_EXPOSURE_HPP
 #define PIC_TONE_MAPPING_FIND_BEST_EXPOSURE_HPP
 
-#include "image.hpp"
-#include "filtering/filter_luminance.hpp"
-#include "filtering/filter_simple_tmo.hpp"
-#include "histogram.hpp"
+#include "../base.hpp"
+#include "../image.hpp"
+
+#include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_simple_tmo.hpp"
+#include "../histogram.hpp"
 
 namespace pic {
 
@@ -30,7 +32,7 @@ namespace pic {
  * @param img
  * @return
  */
-float FindBestExposure(Image *img)
+PIC_INLINE float FindBestExposure(Image *img)
 {
     if(img == NULL) {
         return 0.0f;
@@ -51,7 +53,7 @@ float FindBestExposure(Image *img)
  * @param nameIn
  * @param nameOut
  */
-void FindBestExposureMain(std::string nameIn, std::string nameOut)
+PIC_INLINE void FindBestExposureMain(std::string nameIn, std::string nameOut)
 {
     Image img(nameIn);
 

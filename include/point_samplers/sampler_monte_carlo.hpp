@@ -19,7 +19,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_POINT_SAMPLERS_SAMPLER_MONTE_CARLO_HPP
 
 #include <random>
-#include "util/math.hpp"
+
+#include "../base.hpp"
+
+#include "../util/math.hpp"
 
 namespace pic {
 
@@ -29,7 +32,7 @@ namespace pic {
  * @param nSamples
  * @param samples
  */
-template <unsigned int N>
+template <unsigned int N> PIC_INLINE
 void MonteCarloSampler(std::mt19937 *m, int nSamples, std::vector<float> &samples)
 {
     for(int i = 0; i < nSamples; i++) {
@@ -46,7 +49,7 @@ void MonteCarloSampler(std::mt19937 *m, int nSamples, std::vector<float> &sample
  * @param nSamples
  * @param samples
  */
-template <unsigned int N>
+template <unsigned int N> PIC_INLINE
 void MonteCarloStratifiedSampler(std::mt19937 *m, int nSamples,
                                  std::vector<float> &samples)
 {
@@ -75,7 +78,7 @@ void MonteCarloStratifiedSampler(std::mt19937 *m, int nSamples,
  * @param nSamples
  * @param samples
  */
-template <unsigned int N>
+template <unsigned int N> PIC_INLINE
 void PatternMethodSampler(int nSamples, std::vector<float> &samples)
 {
     int n = int(powf(float(nSamples), 1 / float(N))) + 1; //int(sqrtf(nSamples))+1;

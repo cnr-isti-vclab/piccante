@@ -18,11 +18,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_EDGE_ENHANCEMENT_HPP
 #define PIC_ALGORITHMS_EDGE_ENHANCEMENT_HPP
 
-#include "filtering/filter_bilateral_2ds.hpp"
+#include "../base.hpp"
+
+#include "../filtering/filter_bilateral_2ds.hpp"
 
 namespace pic {
 
-inline Image *edgeEnhancement(Image *imgIn, float sigma_s = 4.0f,
+PIC_INLINE Image *edgeEnhancement(Image *imgIn, float sigma_s = 4.0f,
                                  float sigma_r = 0.05f)
 {
     if(imgIn == NULL) {

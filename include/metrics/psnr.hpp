@@ -19,9 +19,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_METRICS_PSNR_HPP
 
 #include <math.h>
-#include "image.hpp"
-#include "metrics/base.hpp"
-#include "metrics/mse.hpp"
+
+#include "../base.hpp"
+#include "../image.hpp"
+
+#include "../metrics/base.hpp"
+#include "../metrics/mse.hpp"
 
 namespace pic {
 
@@ -32,7 +35,7 @@ namespace pic {
  * @param bLargeDifferences, if true, skips big differences for stability.
  * @return It returns the PSNR value between ori and cmp.
  */
-double PSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
+PIC_INLINE double PSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -58,7 +61,7 @@ double PSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
  * @param bLargeDifferences, if true, skips big differences for stability.
  * @return It returns the PSNR value between ori and cmp.
  */
-double rPSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
+PIC_INLINE double rPSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;

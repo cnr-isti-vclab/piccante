@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_GRADIENT_HPP
 #define PIC_GL_FILTERING_FILTER_GRADIENT_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -105,7 +105,7 @@ void FilterGLGradient::InitShaders()
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLGradient");
 
     technique.bind();
-    technique.setUniform("u_tex",      0);
+    technique.setUniform1i("u_tex", 0);
     technique.unbind();
 }
 

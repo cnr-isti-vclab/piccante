@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_POISSON_FILLING_HPP
 #define PIC_ALGORITHMS_POISSON_FILLING_HPP
 
-#include "util/buffer.hpp"
-#include "util/mask.hpp"
-#include "image.hpp"
+#include "../util/buffer.hpp"
+#include "../util/mask.hpp"
+#include "../image.hpp"
 
 namespace pic {
 
@@ -210,7 +210,7 @@ public:
 
         mask = imgIn->convertToMask(color, threshold, false);
 
-        maskPoisson = MaskClone(mask, maskPoisson, imgIn->width, imgIn->height);
+        maskPoisson = Mask::clone(maskPoisson, mask, imgIn->width * imgIn->height, 1);
 
         Image *work[2];
         work[0] = imgTmp;
@@ -218,7 +218,7 @@ public:
 
         int i = 0;
 
-        while(!MaskEmpty(mask, imgIn->width, imgIn->height)) {
+        while(!Mask::empty(mask, imgIn->width, imgIn->height)) {
             update(work[i % 2], work[(i + 1) % 2]);
             i++;
 

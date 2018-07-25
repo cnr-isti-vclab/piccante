@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_SIMPLE_TMO_HPP
 #define PIC_FILTERING_FILTER_SIMPLE_TMO_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
 namespace pic {
 
@@ -86,19 +86,19 @@ public:
     }
 };
 
-FilterSimpleTMO::FilterSimpleTMO(float gamma, float fstop)
+PIC_INLINE FilterSimpleTMO::FilterSimpleTMO(float gamma, float fstop)
 {
     Update(gamma, fstop);
 }
 
-void FilterSimpleTMO::Update(float gamma, float fstop)
+PIC_INLINE void FilterSimpleTMO::Update(float gamma, float fstop)
 {
     this->gamma = 1.0f / gamma;
     this->fstop = fstop;
     exposure = powf(2.0f, fstop);
 }
 
-void FilterSimpleTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterSimpleTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
 
     int width = dst->width;

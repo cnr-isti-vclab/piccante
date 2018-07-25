@@ -18,21 +18,28 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
+    std::string img0_str, img1_str, img2_str;
+
+    if(argc == 4) {
+        img0_str = argv[1];
+        img1_str = argv[2];
+        img2_str = argv[3];
+    } else {
+        img0_str = "../data/input/laplacian/target.png";
+        img1_str = "../data/input/laplacian/source.png";
+        img2_str = "../data/input/laplacian/mask.png";
+    }
 
     printf("Reading images...");
 
     pic::Image img_source, img_target, mask_target;
-    ImageRead("../data/input/laplacian/target.png", &img_target, pic::LT_NOR);
-    ImageRead("../data/input/laplacian/source.png", &img_source, pic::LT_NOR);
-    ImageRead("../data/input/laplacian/mask.png", &mask_target,pic::LT_NOR);
+    img_target.Read(img0_str, pic::LT_NOR);
+    img_source.Read(img1_str, pic::LT_NOR);
+    mask_target.Read(img2_str,pic::LT_NOR);
 
     printf("Ok\n");
 
@@ -60,7 +67,7 @@ int main(int argc, char *argv[])
 
         pic::Image *imgOut = pyr_target.reconstruct();
 
-        ImageWrite(imgOut, "../data/output/laplacian_blending_result.png", pic::LT_NOR);
+        imgOut->Write("../data/output/laplacian_blending_result.png", pic::LT_NOR);
 
     } else {
         printf("All images are not valid!\n");

@@ -31,8 +31,6 @@ This program is free software: you can redistribute it and/or modify
 
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -54,8 +52,8 @@ int main(int argc, char *argv[])
 
     printf("Reading LDR images...");
     pic::Image img0, img1;
-    ImageRead(img0_str, &img0, pic::LT_NOR);
-    ImageRead(img1_str, &img1, pic::LT_NOR);
+    img0.Read(img0_str, pic::LT_NOR);
+    img1.Read(img1_str, pic::LT_NOR);
 
     printf("Ok\n");
 
@@ -75,7 +73,10 @@ int main(int argc, char *argv[])
         printf("Extracting corners...\n");
         pic::HarrisCornerDetector hcd(2.5f, 5);
         hcd.execute(L0, &corners_from_img0);
+        hcd.getCornersImage(&corners_from_img0, NULL, L0->width, L0->height, true)->Write("../test1.bmp");
+
         hcd.execute(L1, &corners_from_img1);
+        hcd.getCornersImage(&corners_from_img1, NULL, L1->width, L1->height, true)->Write("../test2.bmp");
 
         //compute ORB descriptors for each corner and image
         //compute luminance images
@@ -103,6 +104,7 @@ int main(int argc, char *argv[])
         printf("Matching...");
         std::vector< Eigen::Vector3i > matches;
         bfm.getAllMatches(descs0, matches);
+        printf(" we found %d matches ", matches.size());
         printf("Ok\n");
 
         //filter
@@ -151,11 +153,11 @@ int main(int argc, char *argv[])
         Eigen::Vector2i coord3 = pic::cameraMatrixProject(cam, p3);
 
         float color[]={0.25f, 1.0f, 0.25f};
-        DrawLine(&img1, pic::Vec<2, int>(coord0[0], coord0[1]), pic::Vec<2, int>(coord1[0], coord1[1]), color);
-        DrawLine(&img1, pic::Vec<2, int>(coord0[0], coord0[1]), pic::Vec<2, int>(coord2[0], coord2[1]), color);
-        DrawLine(&img1, pic::Vec<2, int>(coord0[0], coord0[1]), pic::Vec<2, int>(coord3[0], coord3[1]), color);
+        pic::drawLine(&img1, pic::convertFromEigenToVec(coord0), pic::convertFromEigenToVec(coord1), color);
+        pic::drawLine(&img1, pic::convertFromEigenToVec(coord0), pic::convertFromEigenToVec(coord2), color);
+        pic::drawLine(&img1, pic::convertFromEigenToVec(coord0), pic::convertFromEigenToVec(coord3), color);
 
-        ImageWrite(&img1, "../data/output/simple_augmented_reality.png", pic::LT_NOR);
+        img1.Write("../data/output/simple_augmented_reality.png", pic::LT_NOR);
 
     } else {
         printf("No, there is at least an invalid file!\n");

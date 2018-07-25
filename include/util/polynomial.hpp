@@ -20,8 +20,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
+#include "../base.hpp"
+
 #ifndef PIC_DISABLE_EIGEN
-    #include "externals/Eigen/QR"
+    #ifndef PIC_EIGEN_NOT_BUNDLED
+        #include "../externals/Eigen/QR"
+    #else
+        #include <Eigen/QR>
+    #endif
 #endif
 
 namespace pic {
@@ -32,7 +38,7 @@ namespace pic {
  * @param x
  * @return
  */
-float polynomialVal(std::vector< float > & poly, float x)
+PIC_INLINE float polynomialVal(std::vector< float > & poly, float x)
 {
     float val = 0.f;
     float M = 1.f;
@@ -52,11 +58,11 @@ float polynomialVal(std::vector< float > & poly, float x)
  * @param n is the degree of the polynomial
  * @return
  */
-std::vector<float> polynomialFit(std::vector<float> &x, std::vector<float> &y, unsigned int n)
+PIC_INLINE std::vector<float> polynomialFit(std::vector<float> &x, std::vector<float> &y, int n)
 {
     std::vector<float> poly;
 
-    if(n == 0) {
+    if(n < 1) {
         return poly;
     }
 
@@ -64,19 +70,19 @@ std::vector<float> polynomialFit(std::vector<float> &x, std::vector<float> &y, u
         return poly;
     }
 
-    unsigned int np1 = n + 1;
+    int np1 = n + 1;
 
-    unsigned int s = int(x.size());
+    int s = int(x.size());
     Eigen::MatrixXf A(s, np1);
     Eigen::VectorXf b(s);
 
-    for(unsigned int i = 0; i < s; i++) {
+    for(int i = 0; i < s; i++) {
         b(i) = y[i];
         A(i, n) = 1.0f;
     }
 
     for(int j = (n - 1); j >= 0; j--) {
-        for(unsigned int i = 0; i < s; i++) {
+        for(int i = 0; i < s; i++) {
             A(i, j) = x[i] * A(i, j + 1);
         }
     }
@@ -93,7 +99,7 @@ std::vector<float> polynomialFit(std::vector<float> &x, std::vector<float> &y, u
 /**
  * @brief polynomialTest
  */
-void polynomialTest()
+PIC_INLINE void polynomialTest()
 {
     std::vector<float> x, y;
 

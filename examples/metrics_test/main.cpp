@@ -30,8 +30,6 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -47,12 +45,12 @@ int main(int argc, char *argv[])
         bCreate = true;
     }
 
-    //load  values in [0,255]; note: no gamma removal or normalization in [0,1]
+    //load  values in [0, 255]; note: no gamma removal or normalization in [0, 1]
     pic::Image img0, img1;
-    ImageRead(img0_str, &img0, pic::LT_NOR);
+    img0.Read(img0_str, pic::LT_NOR);
 
     if(!bCreate) {
-        ImageRead(img1_str, &img1, pic::LT_NOR);
+        img1.Read(img1_str, pic::LT_NOR);
     }
 
     printf("Is it valid? ");
@@ -66,7 +64,7 @@ int main(int argc, char *argv[])
             printf("Ok\n");
         }
 
-        tmp->Write("../data/output/metrics_img_flt.pfm");
+        tmp->Write("../data/output/metrics_img_flt.hdr");
 
         printf("Computing the SSIM index...");
         float ssim_index;
@@ -75,7 +73,7 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         if(ssim_map != NULL) {
-            ssim_map->Write("../data/output/metrics_ssim_map.pfm");
+            ssim_map->Write("../data/output/metrics_ssim_map.hdr");
         }
 
         printf("SSIM index: %f\n", ssim_index);

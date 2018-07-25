@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_UP_PP_HPP
 #define PIC_GL_FILTERING_FILTER_UP_PP_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -120,10 +120,10 @@ void FilterGLUpPP::Update(float *value, float threshold)
     }
 
     technique.bind();
-    technique.setUniform("u_tex0", 0);
-    technique.setUniform("u_tex1", 1);
-    technique.setUniform("threshold", this->threshold);
-    technique.setUniform4("value", this->value);
+    technique.setUniform1i("u_tex0", 0);
+    technique.setUniform1i("u_tex1", 1);
+    technique.setUniform1f("threshold", this->threshold);
+    technique.setUniform4fv("value", this->value);
     technique.unbind();
 }
 

@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_NPASSES_HPP
 #define PIC_GL_FILTERING_FILTER_NPASSES_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -100,11 +100,11 @@ void FilterGLNPasses::InsertFilter(FilterGL *flt)
 ImageGL *FilterGLNPasses::SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = imgIn[0]->AllocateSimilarOneGL();
+        imgOut = imgIn[0]->allocateSimilarOneGL();
     }
 
     if(imgAllocated == NULL) {
-        imgAllocated = imgOut->AllocateSimilarOneGL();
+        imgAllocated = imgOut->allocateSimilarOneGL();
     }
 
     if((filters.size() % 2) == 0) {
@@ -142,11 +142,11 @@ ImageGL *FilterGLNPasses::Process(ImageGLVec imgIn, ImageGL *imgOut)
     //Allocate FBOs
     imgOut = SetupAuxN(imgIn, imgOut);
 
-    filters[0]->ChangePass(0, filters.size());
+    filters[0]->ChangePass(0, int(filters.size()));
     filters[0]->Process(imgIn, imgTmp[0]);
 
-    for(unsigned int i = 1; i < filters.size(); i++) {
-        filters[i]->ChangePass(i, filters.size());
+    for(auto i = 1; i < filters.size(); i++) {
+        filters[i]->ChangePass(i, int(filters.size()));
         imgIn[0] = imgTmp[(i + 1) % 2];
         filters[i]->Process(imgIn, imgTmp[i % 2]);
     }

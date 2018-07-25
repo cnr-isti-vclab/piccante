@@ -20,10 +20,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef PIC_DISABLE_EIGEN
 
-#include "externals/Eigen/Sparse"
-#include "externals/Eigen/src/SparseCore/SparseMatrix.h"
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Sparse"
+    #include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
+#else
+    #include <Eigen/Sparse>
+    #include <Eigen/src/SparseCore/SparseMatrix.h>
+#endif
 
-#include "image.hpp"
+#endif
+
+#include "../base.hpp"
+#include "../image.hpp"
 
 namespace pic {
 /**
@@ -69,7 +77,7 @@ inline float LischinskiFunctionGauss(float Lcur, float Lref, float param[2])
  * @param LISCHINSKI_EPSILON
  * @return
  */
-Image *LischinskiMinimization(Image *L,
+PIC_INLINE Image *LischinskiMinimization(Image *L,
                               Image *g,
                               Image *omega = NULL,
                               float alpha = 1.0f,
@@ -80,6 +88,7 @@ Image *LischinskiMinimization(Image *L,
         return NULL;
     }
 
+#ifndef PIC_DISABLE_EIGEN
     if(omega == NULL) {
         omega = L->allocateSimilarOne();
         *omega = 1.0f;
@@ -179,11 +188,12 @@ Image *LischinskiMinimization(Image *L,
     }
 
     return ret;
+#else
+    return NULL;
+#endif
 }
 
 } // end namespace pic
-
-#endif
 
 #endif /* PIC_TONE_MAPPING_LISCHINSKI_MINIMIZATION_HPP */
 

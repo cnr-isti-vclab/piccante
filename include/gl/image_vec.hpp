@@ -20,7 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
-#include "gl/image.hpp"
+#include "../base.hpp"
+
+#include "../gl/image.hpp"
 
 namespace pic {
 
@@ -34,7 +36,7 @@ typedef	std::vector<ImageGL*> ImageGLVec;
  * @param img
  * @return
  */
-ImageGLVec SingleGL(ImageGL *img)
+PIC_INLINE ImageGLVec SingleGL(ImageGL *img)
 {
     ImageGLVec ret;
     ret.push_back(img);
@@ -47,7 +49,7 @@ ImageGLVec SingleGL(ImageGL *img)
  * @param img2
  * @return
  */
-ImageGLVec DoubleGL(ImageGL *img1, ImageGL *img2)
+PIC_INLINE ImageGLVec DoubleGL(ImageGL *img1, ImageGL *img2)
 {
     ImageGLVec ret;
     ret.push_back(img1);
@@ -62,7 +64,7 @@ ImageGLVec DoubleGL(ImageGL *img1, ImageGL *img2)
  * @param img3
  * @return
  */
-ImageGLVec TripleGL(ImageGL *img1, ImageGL *img2, ImageGL *img3)
+PIC_INLINE ImageGLVec TripleGL(ImageGL *img1, ImageGL *img2, ImageGL *img3)
 {
     ImageGLVec ret;
     ret.push_back(img1);

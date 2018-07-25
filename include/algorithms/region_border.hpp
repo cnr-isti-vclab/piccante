@@ -18,7 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_REGION_BORDER_HPP
 #define PIC_ALGORITHMS_REGION_BORDER_HPP
 
-#include "image.hpp"
+#include "../base.hpp"
+
+#include "../image.hpp"
 
 namespace pic {
 
@@ -28,7 +30,7 @@ namespace pic {
  * @param coordsBorder
  * @return
  */
-std::set<int> *setBorder(Image *img, std::set<int> *coordsBorder)
+PIC_INLINE std::set<int> *setBorder(Image *img, std::set<int> *coordsBorder)
 {
     //Second border
     int ind, c, x, y;
@@ -78,7 +80,7 @@ std::set<int> *setBorder(Image *img, std::set<int> *coordsBorder)
  * @param widthBorder
  * @return
  */
-std::set<int> *setBorderNth(Image *img, std::set<int> *coordsBorder,
+PIC_INLINE std::set<int> *setBorderNth(Image *img, std::set<int> *coordsBorder,
                             int widthBorder)
 {
     std::set<int> *ret = new std::set<int>;

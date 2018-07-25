@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_PYRAMID_HPP
 #define PIC_ALGORITHMS_PYRAMID_HPP
 
-#include "image.hpp"
-#include "filtering/filter_gaussian_2d.hpp"
-#include "filtering/filter_sampler_2d.hpp"
-#include "filtering/filter_sampler_2dsub.hpp"
-#include "filtering/filter_sampler_2dadd.hpp"
+#include "../image.hpp"
+#include "../filtering/filter_gaussian_2d.hpp"
+#include "../filtering/filter_sampler_2d.hpp"
+#include "../filtering/filter_sampler_2dsub.hpp"
+#include "../filtering/filter_sampler_2dadd.hpp"
 
 namespace pic {
 
@@ -152,7 +152,7 @@ public:
     }
 };
 
-Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 1)
+PIC_INLINE Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 1)
 {
     flt_gauss = NULL;
     flt_sampler = NULL;
@@ -164,8 +164,7 @@ Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 1)
     }
 }
 
-
-Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, int limitLevel = 1)
+PIC_INLINE Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, int limitLevel = 1)
 {
     flt_gauss = NULL;
     flt_sampler = NULL;
@@ -175,7 +174,7 @@ Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, int limitLe
     create(NULL, width, height, channels, lapGauss, limitLevel);
 }
 
-Pyramid::~Pyramid()
+PIC_INLINE Pyramid::~Pyramid()
 {
     for(unsigned int i = 0; i < stack.size(); i++) {
         if(stack[i] != NULL) {
@@ -204,7 +203,7 @@ Pyramid::~Pyramid()
     }
 }
 
-void Pyramid::initFilters()
+PIC_INLINE void Pyramid::initFilters()
 {
     if(flt_gauss == NULL) {
         flt_gauss = new FilterGaussian2D(1.0f);
@@ -223,7 +222,7 @@ void Pyramid::initFilters()
     }
 }
 
-void Pyramid::create(Image *img, int width, int height, int channels, bool lapGauss, int limitLevel = 1)
+PIC_INLINE void Pyramid::create(Image *img, int width, int height, int channels, bool lapGauss, int limitLevel = 1)
 {
     this->lapGauss  = lapGauss;
 
@@ -293,11 +292,11 @@ void Pyramid::create(Image *img, int width, int height, int channels, bool lapGa
     }
 
 #ifdef PIC_DEBUG
-    printf("Pyramid size: %lu\n", stack.size());
+    printf("Pyramid size: %zu\n", stack.size());
 #endif
 }
 
-void Pyramid::update(Image *img)
+PIC_INLINE void Pyramid::update(Image *img)
 {
     //TODO: check if the image and the pyramid are compatible
     if(img == NULL) {
@@ -339,7 +338,7 @@ void Pyramid::update(Image *img)
     }
 }
 
-Image *Pyramid::reconstruct(Image *imgOut = NULL)
+PIC_INLINE Image *Pyramid::reconstruct(Image *imgOut = NULL)
 {
     if(stack.size() < 2) {
         return imgOut;
@@ -369,14 +368,14 @@ Image *Pyramid::reconstruct(Image *imgOut = NULL)
     return imgOut;
 }
 
-void Pyramid::setValue(float value)
+PIC_INLINE void Pyramid::setValue(float value)
 {
     for(unsigned int i = 0; i < stack.size(); i++) {
         *stack[i] = value;
     }
 }
 
-void Pyramid::mul(const Pyramid *pyr)
+PIC_INLINE void Pyramid::mul(const Pyramid *pyr)
 {
     if(stack.size() != pyr->stack.size()) {
         return;
@@ -387,7 +386,7 @@ void Pyramid::mul(const Pyramid *pyr)
     }
 }
 
-void Pyramid::add(const Pyramid *pyr)
+PIC_INLINE void Pyramid::add(const Pyramid *pyr)
 {
     if(stack.size() != pyr->stack.size()) {
         return;
@@ -398,7 +397,7 @@ void Pyramid::add(const Pyramid *pyr)
     }
 }
 
-void Pyramid::blend(Pyramid *pyr, Pyramid *weight)
+PIC_INLINE void Pyramid::blend(Pyramid *pyr, Pyramid *weight)
 {
     if((stack.size() != pyr->stack.size()) && (pyr->stack.size() > 0)) {
         return;

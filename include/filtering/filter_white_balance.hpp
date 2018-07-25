@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_WHITE_BALANCE_HPP
 #define PIC_FILTERING_FILTER_WHITE_BALANCE_HPP
 
-#include "filtering/filter.hpp"
-#include "util/array.hpp"
+#include "../filtering/filter.hpp"
+#include "../util/array.hpp"
 
 namespace pic {
 
@@ -142,7 +142,7 @@ public:
             memcpy(this->white, white, sizeof(float) * nWhite);
         }
 
-        for(unsigned int i = 0; i < nWhite; i++) {
+        for(auto i = 0; i < nWhite; i++) {
             if(fabsf(this->white[i]) <= 1e-9f) {
                 this->white[i] = 1.0f;
             }

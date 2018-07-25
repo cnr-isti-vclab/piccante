@@ -19,8 +19,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_METRICS_MSE_HPP
 
 #include <math.h>
-#include "image.hpp"
-#include "metrics/base.hpp"
+
+#include "../base.hpp"
+#include "../image.hpp"
+#include "../metrics/base.hpp"
 
 namespace pic {
 
@@ -31,7 +33,7 @@ namespace pic {
  * @param bLargeDifferences, if true, skips big differences for stability.
  * @return It returns the MSE value between ori and cmp.
  */
-double MSE(Image *ori, Image *cmp, bool bLargeDifferences=false)
+PIC_INLINE double MSE(Image *ori, Image *cmp, bool bLargeDifferences=false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -72,7 +74,7 @@ double MSE(Image *ori, Image *cmp, bool bLargeDifferences=false)
  * @param fstop is the f-stop value of the image.
  * @return It returns the MSE value between ori and cmp.
  */
-double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 0.0f)
+PIC_INLINE double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 0.0f)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -112,7 +114,7 @@ double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 0.0f)
  * @param bLargeDifferences, if true, skips big differences for stability.
  * @return It returns the MSE value between ori and cmp.
  */
-double RMSE(Image *ori, Image *cmp, bool bLargeDifferences = false)
+PIC_INLINE double RMSE(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     return sqrt(MSE(ori, cmp, bLargeDifferences));
 }

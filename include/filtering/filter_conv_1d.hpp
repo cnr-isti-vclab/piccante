@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_CONV_1D_HPP
 #define PIC_FILTERING_FILTER_CONV_1D_HPP
 
-#include "filtering/filter.hpp"
-#include "util/precomputed_gaussian.hpp"
+#include "../filtering/filter.hpp"
+#include "../util/precomputed_gaussian.hpp"
 
 namespace pic {
 
@@ -29,9 +29,9 @@ namespace pic {
 class FilterConv1D: public Filter
 {
 protected:
-    int					dirs[3];
-    float				*data;
-    int					n;
+    int dirs[3];
+    float *data;
+    int n;
 
     /**
      * @brief ProcessBBox
@@ -131,7 +131,7 @@ public:
     }
 };
 
-FilterConv1D::FilterConv1D()
+PIC_INLINE FilterConv1D::FilterConv1D()
 {
     n = 0;
     data = NULL;
@@ -141,12 +141,12 @@ FilterConv1D::FilterConv1D()
     dirs[2] = 0;
 }
 
-FilterConv1D::FilterConv1D(float *data, int n, int direction = 0)
+PIC_INLINE FilterConv1D::FilterConv1D(float *data, int n, int direction = 0)
 {
     Init(data, n, direction);
 }
 
-void FilterConv1D::Init(float *data, int n, int direction)
+PIC_INLINE void FilterConv1D::Init(float *data, int n, int direction)
 {
     if(data == NULL || n < 0) {
         return;
@@ -160,13 +160,13 @@ void FilterConv1D::Init(float *data, int n, int direction)
     dirs[(direction + 2) % 3] = 0;
 }
 
-FilterConv1D::~FilterConv1D()
+PIC_INLINE FilterConv1D::~FilterConv1D()
 {
     data = NULL;
     n = -1;
 }
 
-void FilterConv1D::ChangePass(int pass, int tPass)
+PIC_INLINE void FilterConv1D::ChangePass(int pass, int tPass)
 {
     int tMod;
 
@@ -192,14 +192,14 @@ void FilterConv1D::ChangePass(int pass, int tPass)
     #endif
 }
 
-void FilterConv1D::ChangePass(int x, int y, int z)
+PIC_INLINE void FilterConv1D::ChangePass(int x, int y, int z)
 {
     dirs[0] = y;
     dirs[1] = x;
     dirs[2] = z;
 }
 
-void FilterConv1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterConv1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 

@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_SAMPLER_2D_HPP
 #define PIC_GL_FILTERING_FILTER_SAMPLER_2D_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -106,8 +106,8 @@ void FilterGLSampler2D::InitShaders()
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLSampler2D");
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("scale", scale);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1f("scale", scale);
     technique.unbind();
 }
 

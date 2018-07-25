@@ -20,11 +20,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <random>
 
-#include "util/precomputed_gaussian.hpp"
+#include "../util/precomputed_gaussian.hpp"
 
-#include "filtering/filter_sampling_map.hpp"
+#include "../filtering/filter_sampling_map.hpp"
 
-#include "point_samplers/sampler_random_m.hpp"
+#include "../point_samplers/sampler_random_m.hpp"
 
 namespace pic {
 
@@ -114,14 +114,14 @@ public:
     }
 };
 
-FilterBilateral2DAS::FilterBilateral2DAS()
+PIC_INLINE FilterBilateral2DAS::FilterBilateral2DAS()
 {
     seed = 1;
     pg = NULL;
     ms = NULL;
 }
 
-FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s,
+PIC_INLINE FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s,
         float sigma_r, int mult = 1)
 {
     //protected values are assigned/computed
@@ -144,7 +144,7 @@ FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s,
     seed = 1;
 }
 
-FilterBilateral2DAS::~FilterBilateral2DAS()
+PIC_INLINE FilterBilateral2DAS::~FilterBilateral2DAS()
 {
     if(pg != NULL) {
         delete pg;
@@ -155,7 +155,7 @@ FilterBilateral2DAS::~FilterBilateral2DAS()
     }
 }
 
-void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int width = dst->width;
     int height = dst->height;
@@ -274,44 +274,3 @@ void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 } // end namespace pic
 
 #endif /* PIC_FILTERING_FILTER_BILATERAL_2DAS_HPP */
-
-//levelVal = 1.0f-levelVal;
-//int nSamples = int(ceilf(levelVal*ps->levelsR[0]));
-
-/*int end,start;
-if(levelVal==0)
-	start = 0;
-else
-	start = ps->levelsR[levelVal-1];
-end = ps->levelsR[levelVal];*/
-
-/*
-			sum = 0.0;
-			for(k=start;k<end;k+=2){
-				//Spatial Gaussian kernel
-				Gauss1=	pg->coeff[ps->samplesR[k]+pg->halfKernelSize]*
-						pg->coeff[ps->samplesR[k+1]+pg->halfKernelSize];
-
-				//Address
-				ci=CLAMP(i+ps->samplesR[k],width);
-				cj=CLAMP(j+ps->samplesR[k+1],height);
-				c2=(cj*width+ci)*channels;
-
-				//Range Gaussian Kernel
-				tmp = 0.0;
-				for(l=0;l<channels;l++){
-					tmp3=edge->data[c2+l]-I_val[l];
-					tmp+=tmp3*tmp3;
-				}
-
-				Gauss2=exp(-tmp*inv_sigma_r2);
-
-				//Weight
-				tmp2=Gauss1*Gauss2;
-				sum+=tmp2;
-
-				//Filtering
-				for(l=0;l<channels;l++)
-					tmpC[l]+=base->data[c2+l]*tmp2;
-			};
-*/

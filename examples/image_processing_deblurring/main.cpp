@@ -26,41 +26,38 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    std::string img_str;
+    std::string img_str, psf_str;
 
-    if(argc == 2) {
+    if(argc == 3) {
         img_str = argv[1];
     } else {
         img_str = "../data/input/bottles.hdr";
+        psf_str = "../data/input/kernel_psf.png";
     }
 
-    printf("Reading an HDR file...");
+    printf("Reading images...");
 
     pic::Image img;
-    ImageRead(img_str, &img);
+    img.Read(img_str);
+
+    pic::Image psf;
+    psf.Read(psf_str);
 
     printf("Ok\n");
 
     printf("Is it valid? ");
-    if(img.isValid()) {
+    if(img.isValid() && psf.isValid()) {
         printf("Ok\n");
-
-        printf("Filtering the image with a PSF read from file...");
-        pic::Image psf;
-
-        ImageRead("../data/input/kernel_psf.png", &psf);
 
         //normalization of the PSF
         psf /= psf.getSumVal(NULL, NULL)[0];
 
         pic::Image *conv = pic::FilterConv2D::Execute(&img, &psf, NULL);
-        ImageWrite(conv, "../data/output/bottles_conv_kernel_psf.hdr");
+        conv->Write("../data/output/image_conv_kernel_psf.png");
 
         printf("Ok!\n");
 
@@ -70,7 +67,7 @@ int main(int argc, char *argv[])
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bool bWritten = ImageWrite(deconv, "../data/output/bottles_deconv_kernel_psf.hdr");
+        bool bWritten = deconv->Write("../data/output/image_deconv_kernel_psf.png");
 
         if(bWritten) {
             printf("Ok\n");

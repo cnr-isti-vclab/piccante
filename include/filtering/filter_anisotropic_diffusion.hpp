@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_ANISOTROPIC_DIFFUSION_HPP
 #define PIC_FILTERING_FILTER_ANISOTROPIC_DIFFUSION_HPP
 
-#include "filtering/filter.hpp"
-#include "filtering/filter_iterative.hpp"
+#include "../filtering/filter.hpp"
+#include "../filtering/filter_iterative.hpp"
 
 namespace pic {
 
@@ -97,7 +97,7 @@ public:
 
 };
 
-FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
+PIC_INLINE FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
         unsigned int mode)
 {
     if(k <= 0.0f) {
@@ -114,7 +114,7 @@ FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
     this->mode = mode;
 }
 
-void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src,
+PIC_INLINE void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
     //Filtering

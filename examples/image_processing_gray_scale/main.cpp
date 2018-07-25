@@ -32,8 +32,6 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -48,8 +46,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an LDR file...");
 
-    pic::Image img;
-    ImageRead(img_str, &img);
+    pic::Image img(img_str);
 
     printf("Ok\n");
 
@@ -63,7 +60,7 @@ int main(int argc, char *argv[])
         printf("Computing a gray scale image by computing the mean of color channels...");
         pic::Image *img_mean = pic::FilterLuminance::Execute(&img, NULL, pic::LT_MEAN);
 
-        bWritten = ImageWrite(img_mean, "../data/output/singapore_mean.png");
+        bWritten = img_mean->Write("../data/output/singapore_mean.png");
 
         if(bWritten) {
             printf("Ok\n");
@@ -75,7 +72,7 @@ int main(int argc, char *argv[])
         printf("Computing a gray scale image by computing the weighted mean of color channels using CIE weights for Y...");
         pic::Image *img_cie_y = pic::FilterLuminance::Execute(&img, NULL, pic::LT_CIE_LUMINANCE);
 
-        bWritten = ImageWrite(img_cie_y, "../data/output/singapore_cie_y.png");
+        bWritten = img_cie_y->Write("../data/output/singapore_cie_y.png");
 
         if(bWritten) {
             printf("Ok\n");
@@ -88,7 +85,7 @@ int main(int argc, char *argv[])
         printf("Computing a gray scale image by using Exposure Fusion...");
         pic::Image *img_cg_ef = pic::colorToGray(&img, NULL);
 
-        bWritten = ImageWrite(img_cg_ef, "../data/output/singapore_cg_ef.png");
+        bWritten = img_cg_ef->Write("../data/output/singapore_cg_ef.png");
 
         if(bWritten) {
             printf("Ok\n");

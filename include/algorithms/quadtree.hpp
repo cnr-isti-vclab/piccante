@@ -28,12 +28,12 @@ namespace pic {
 class Quadtree
 {
 protected:
-    bool						leaf;
-    std::set<int>				list;
-    Quadtree					*children[4];
+    bool leaf;
+    std::set<int> list;
+    Quadtree *children[4];
 
-    //Bounding box
-    int							bmax[2], bmin[2];
+    //bounding box
+    int bmax[2], bmin[2];
 
     /**
      * @brief findAux

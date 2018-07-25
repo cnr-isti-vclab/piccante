@@ -53,6 +53,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/eigen_util.hpp"
 #include "util/point_samplers.hpp"
 #include "util/precomputed_gaussian.hpp"
+#include "util/precomputed_diff_of_gaussians.hpp"
 #include "util/raw.hpp"
 #include "util/string.hpp"
 #include "util/tile.hpp"
@@ -60,11 +61,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/vec.hpp"
 #include "util/warp_square_circle.hpp"
 #include "util/rasterizer.hpp"
+#include "util/polyline.hpp"
 
 //optimization
 #include "util/k_means.hpp"
 
 #include "util/nelder_mead_opt_base.hpp"
+#include "util/nelder_mead_opt_positive_polynomial.hpp"
 
 #endif /* PIC_UTIL_HPP */
 

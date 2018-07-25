@@ -25,7 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <windows.h>
 #endif
 
-#include "base.hpp"
+#include "../base.hpp"
 
 namespace pic {
 
@@ -97,7 +97,7 @@ PIC_INLINE unsigned char *ReadBMP(std::string nameFile, unsigned char *data,
     FILE *file = fopen(nameFile.c_str(), "rb");
 
     if(file == NULL) {
-        return NULL;
+        return data;
     }
 
     BITMAPFILEHEADER    bmpfh;
@@ -115,12 +115,19 @@ PIC_INLINE unsigned char *ReadBMP(std::string nameFile, unsigned char *data,
     fread(&bmpih, sizeof(BITMAPINFOHEADER), 1, file);
 
     //24-bit images only!
-    if((bmpih.biBitCount != 24) && (bmpih.biCompression == BI_RGB)) {
+    if(bmpih.biCompression != BI_RGB) {
         fclose(file);
-        return NULL;
+        return data;
     }
 
-    channels = bmpih.biBitCount / 8;
+    int bpp = bmpih.biBitCount;
+
+    channels = bpp / 8;
+
+    if(!(channels == 3 || channels == 1)) {
+        fclose(file);
+        return data;
+    }
 
     fseek(file, bmpfh.bfOffBits, SEEK_SET);
 
@@ -128,12 +135,10 @@ PIC_INLINE unsigned char *ReadBMP(std::string nameFile, unsigned char *data,
     height = bmpih.biHeight;
 
     if(data == NULL) {
-        data = new unsigned char[width * height * 3];
+        data = new unsigned char[width * height * channels];
     }
 
-    int bpp = 24;//it can't be different!
-
-    //Padding stuff
+    //compute padding
     int padding = BitmapPadding(bpp, width);
 
     unsigned char *pads = NULL;
@@ -147,13 +152,19 @@ PIC_INLINE unsigned char *ReadBMP(std::string nameFile, unsigned char *data,
     for(int j = (height - 1); j > -1; j--) {
         int cj = j * width;
 
-        for(int i = 0; i < width; i++) {
-            int c = (cj + i) * 3;
-            fread(tmp, sizeof(unsigned char), 3, file);
-            //From BGR to RGB
-            data[c + 2] = tmp[0];
-            data[c + 1] = tmp[1];
-            data[c    ] = tmp[2];
+        if(channels == 3) {
+            for(int i = 0; i < width; i++) {
+                int c = (cj + i) * 3;
+                fread(tmp, sizeof(unsigned char), 3, file);
+                //from BGR to RGB
+                data[c + 2] = tmp[0];
+                data[c + 1] = tmp[1];
+                data[c    ] = tmp[2];
+            }
+        }
+
+        if(channels == 1) {
+            fread(&data[cj], sizeof(unsigned char), width, file);
         }
 
         if(padding > 0) {

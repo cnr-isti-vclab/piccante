@@ -21,8 +21,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <stdio.h>
 #include <string.h>
 
-#include "colors/rgbe.hpp"
-#include "base.hpp"
+#include "../colors/rgbe.hpp"
+#include "../base.hpp"
 //SYSTEM: X NEG Y POS
 
 namespace pic {

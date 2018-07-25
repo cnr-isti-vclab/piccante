@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_INDEXED_ARRAY_HPP
 #define PIC_UTIL_INDEXED_ARRAY_HPP
 
+#include <vector>
+
 namespace pic {
 
 /**

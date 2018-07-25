@@ -18,10 +18,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_GROW_CUT_HPP
 #define PIC_ALGORITHMS_GROW_CUT_HPP
 
-#include "image.hpp"
-#include "filtering/filter_laplacian.hpp"
-#include "filtering/filter_max.hpp"
-#include "filtering/filter_grow_cut.hpp"
+#include "../base.hpp"
+
+#include "../image.hpp"
+#include "../filtering/filter_laplacian.hpp"
+#include "../filtering/filter_max.hpp"
+#include "../filtering/filter_grow_cut.hpp"
 
 namespace pic {
 
@@ -32,7 +34,7 @@ namespace pic {
  * @param state_cur
  * @return
  */
-Image *computeGrowCut(Image *img, Image *seeds, Image *state_cur = NULL)
+PIC_INLINE Image *computeGrowCut(Image *img, Image *seeds, Image *state_cur = NULL)
 {
     if(img == NULL || seeds == NULL) {
         return NULL;

@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_TONE_MAPPING_DRAGO_TMO_HPP
 #define PIC_GL_TONE_MAPPING_DRAGO_TMO_HPP
 
-#include "gl/filtering/filter_luminance.hpp"
-#include "gl/filtering/filter_drago_tmo.hpp"
+#include "../../gl/filtering/filter_luminance.hpp"
+#include "../../gl/filtering/filter_drago_tmo.hpp"
 
 namespace pic {
 

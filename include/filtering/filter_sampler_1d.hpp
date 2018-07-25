@@ -22,11 +22,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define Y_DIRECTION 1
 #define Z_DIRECTION 2
 
-#include "filtering/filter.hpp"
-#include "image_samplers/image_sampler_bilinear.hpp"
-#include "image_samplers/image_sampler_bsplines.hpp"
-#include "image_samplers/image_sampler_gaussian.hpp"
-#include "image_samplers/image_sampler_nearest.hpp"
+#include "../filtering/filter.hpp"
+#include "../image_samplers/image_sampler_bilinear.hpp"
+#include "../image_samplers/image_sampler_bsplines.hpp"
+#include "../image_samplers/image_sampler_gaussian.hpp"
+#include "../image_samplers/image_sampler_nearest.hpp"
 
 namespace pic {
 

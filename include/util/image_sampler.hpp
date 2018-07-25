@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -27,7 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_IMAGE_SAMPLER_HPP
 #define PIC_UTIL_IMAGE_SAMPLER_HPP
 
-#include "util/math.hpp"
+#include "../base.hpp"
+
+#include "../util/math.hpp"
 
 namespace pic {
 
@@ -49,7 +42,6 @@ namespace pic {
  * @param y is the vertical coordinate.
  * @return the evaluation of the B-spline.
  */
-
 template<class Scalar> inline Scalar Bilinear(Scalar a, Scalar b, Scalar c, Scalar d, float x, float y)
 {
     Scalar px0 = a + y * (c - a);
@@ -177,7 +169,7 @@ inline float CatmullRom(float x)
  * @param a
  * @return
  */
-float Lanczos(float x, float a)
+inline float Lanczos(float x, float a)
 {
     float y = fabsf(x);
 

@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_3DS_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_3DS_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -152,8 +152,8 @@ void FilterGLBilateral3DS::FragmentShader()
 //		uniform sampler3D		u_tex;
                           uniform isampler2D		u_poisson;
                           uniform sampler2D		u_rand;
-                          uniform int				TOKEN_BANANA;
-                          uniform int				frame;
+                          uniform int			TOKEN_BANANA;
+                          uniform int			frame;
                           uniform float			sigmas2;
                           uniform float			sigmar2;
                           uniform float			sigmat2;
@@ -239,15 +239,15 @@ void FilterGLBilateral3DS::Update(float sigma_s, float sigma_r, float sigma_t)
 void FilterGLBilateral3DS::UpdateUniform()
 {
     technique.bind();
-    technique.setUniform("u_tex",      0);
-    technique.setUniform("u_poisson",  1);
-    technique.setUniform("u_rand",	 2);
+    technique.setUniform1i("u_tex",      0);
+    technique.setUniform1i("u_poisson",  1);
+    technique.setUniform1i("u_rand",	 2);
 
-    technique.setUniform("sigmas2",  sigmas2);
-    technique.setUniform("sigmat2",  sigmat2);
-    technique.setUniform("sigmar2",  sigmar2);
-    technique.setUniform("TOKEN_BANANA",  ms->nSamples / 3);
-    technique.setUniform("frame",  frame);
+    technique.setUniform1f("sigmas2",  sigmas2);
+    technique.setUniform1f("sigmat2",  sigmat2);
+    technique.setUniform1f("sigmar2",  sigmar2);
+    technique.setUniform1i("TOKEN_BANANA",  ms->nSamples / 3);
+    technique.setUniform1i("frame",  frame);
 
     technique.unbind();
 }

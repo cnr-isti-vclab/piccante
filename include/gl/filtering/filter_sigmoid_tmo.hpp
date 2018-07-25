@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_SIGMOID_TMO_HPP
 #define PIC_GL_FILTERING_FILTER_SIGMOID_TMO_HPP
 
-#include "gl/filtering/filter.hpp"
-#include "gl/filtering/filter_luminance.hpp"
+#include "../../gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter_luminance.hpp"
 
 namespace pic {
 
@@ -149,10 +149,10 @@ void FilterGLSigmoidTMO::Update(float alpha)
     }
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("u_tex_adapt", 1);
-    technique.setUniform("alpha", this->alpha);
-    technique.setUniform("epsilon", epsilon);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1i("u_tex_adapt", 1);
+    technique.setUniform1f("alpha", this->alpha);
+    technique.setUniform1f("epsilon", epsilon);
     technique.unbind();
 }
 

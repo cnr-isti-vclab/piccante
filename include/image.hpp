@@ -37,6 +37,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //IO formats
 #include "io/bmp.hpp"
 #include "io/exr.hpp"
+#include "io/exr_tiny.hpp"
 #include "io/hdr.hpp"
 #include "io/pfm.hpp"
 #include "io/ppm.hpp"
@@ -44,7 +45,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "io/tmp.hpp"
 #include "io/tga.hpp"
 #include "io/vol.hpp"
-#include "io/exr.hpp"
+#include "io/stb.hpp"
 #include "util/io.hpp"
 
 namespace pic {
@@ -403,11 +404,17 @@ public:
     float *getCovMtxVal(float *meanVal, BBox *box, float *ret);
 
     /**
-     * @brief getMedVal computes the n-th value given a percentile.
+     * @brief getPercentileVal computes the n-th value given a percentile.
      * @param perCent is the percentile.
      * @return This function returns the n-value given a percentile.
      */
-    float getMedVal(float perCent);
+    float getPercentileVal(float perCent);
+
+    /**
+     * @brief getMedVal computes the median value.
+     * @return This function returns the median value.
+     */
+    float getMedVal();
 
     /**
      * @brief getGT finds the first value greater than val.
@@ -480,7 +487,7 @@ public:
     void convertFromMask(bool *mask, int width, int height);
 
     /**
-     * @brief ConvertToMask converts an Image into a boolean mask.
+     * @brief convertToMask converts an Image into a boolean mask.
      * @param color
      * @param threshold
      * @param cmp
@@ -808,6 +815,13 @@ PIC_INLINE void Image::setNULL()
     frames = -1;
     depth = -1;
     channels = -1;
+
+    widthf = -1.0f;
+    heightf = -1.0f;
+    width1f = -1.0f;
+    height1f = -1.0f;
+    framesf = -1.0f;
+    frames1f = -1.0f;
 
     dataTMP = NULL;
     data = NULL;
@@ -1158,7 +1172,7 @@ PIC_INLINE void Image::sort()
     std::sort(dataTMP, dataTMP + size);
 }
 
-PIC_INLINE float Image::getMedVal(float perCent = 0.5f)
+PIC_INLINE float Image::getPercentileVal(float perCent = 0.5f)
 {
     if(!isValid()) {
         return -1.0f;
@@ -1170,6 +1184,11 @@ PIC_INLINE float Image::getMedVal(float perCent = 0.5f)
 
     int size = frames * width * height * channels;
     return dataTMP[int(perCent * float(size))];
+}
+
+PIC_INLINE float Image::getMedVal()
+{
+    return getPercentileVal(0.5f);
 }
 
 PIC_INLINE float Image::getGT(float val)
@@ -1285,6 +1304,10 @@ PIC_INLINE void Image::setRand(unsigned int seed = 1)
 
 PIC_INLINE float *Image::getMaxVal(BBox *box = NULL, float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = new BBox(width, height, frames);
     }
@@ -1314,6 +1337,10 @@ PIC_INLINE float *Image::getMaxVal(BBox *box = NULL, float *ret = NULL)
 
 PIC_INLINE float *Image::getMinVal(BBox *box = NULL, float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = new BBox(width, height, frames);
     }
@@ -1343,6 +1370,10 @@ PIC_INLINE float *Image::getMinVal(BBox *box = NULL, float *ret = NULL)
 
 PIC_INLINE float *Image::getSumVal(BBox *box = NULL, float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = new BBox(width, height, frames);
     }
@@ -1372,6 +1403,10 @@ PIC_INLINE float *Image::getSumVal(BBox *box = NULL, float *ret = NULL)
 
 PIC_INLINE float *Image::getMeanVal(BBox *box = NULL, float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = &fullBox;
     }
@@ -1389,6 +1424,10 @@ PIC_INLINE float *Image::getMeanVal(BBox *box = NULL, float *ret = NULL)
 
 PIC_INLINE float *Image::getMomentsVal(int x0, int y0, int radius, float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     int channels_2 = channels * 2;
 
     if(ret == NULL) {
@@ -1420,6 +1459,10 @@ PIC_INLINE float *Image::getMomentsVal(int x0, int y0, int radius, float *ret = 
 PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL, BBox *box = NULL,
                                         float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = &fullBox;
     }
@@ -1461,6 +1504,10 @@ PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL, BBox *box = NULL,
 
 PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = &fullBox;
     }
@@ -1508,6 +1555,10 @@ PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
 
 PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
 {
+    if(!isValid()) {
+        return ret;
+    }
+
     if(box == NULL) {
         box = &fullBox;
     }
@@ -1547,7 +1598,9 @@ PIC_INLINE void Image::convertFromMask(bool *mask, int width, int height)
         return;
     }
 
-    allocate(width, height, 1, 1);
+    if(!isValid() || this->width != width || this->height != height) {
+        allocate(width, height, 1, 1);
+    }
 
     int size = (width * height);
 
@@ -1558,10 +1611,10 @@ PIC_INLINE void Image::convertFromMask(bool *mask, int width, int height)
     }
 }
 
-PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.5f,
+PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.25f,
                                       bool cmp = true,  bool *mask = NULL)
 {
-    if(!isValid() || (color == NULL)) {
+    if(!isValid()) {
         return NULL;
     }
     
@@ -1571,8 +1624,8 @@ PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.5
         bColorAllocated = true;
         color = new float[channels];
 
-        for(int i=0;i<channels;i++) {
-            color[i] = 0.5f;
+        for(int i = 0; i < channels; i++) {
+            color[i] = 0.0f;
         }
     }
 
@@ -1595,11 +1648,15 @@ PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.5
             val += fabsf(data[ind + k] - color[k]);
         }
 
+        bool bMask = val > tmpThreshold;
+        mask[i] = cmp ? bMask : !bMask;
+
+        /*
         if(cmp) {
             mask[i] = val > tmpThreshold;
         } else {
             mask[i] = val < tmpThreshold;
-        }
+        }*/
     }
 
     if(bColorAllocated) {
@@ -1707,7 +1764,7 @@ PIC_INLINE bool Image::Read(std::string nameFile,
             break;
 
         case IO_TGA:
-            tmp = ReadTGA(nameFile.c_str(), dataReader, width, height, channels);
+            tmp = ReadTGA(nameFile, dataReader, width, height, channels);
             break;
 
         case IO_JPG:
@@ -1723,7 +1780,7 @@ PIC_INLINE bool Image::Read(std::string nameFile,
         }
 
          if(bExt) {
-             return false;
+             tmp = ReadSTB(nameFile, width, height, channels);
          }
 
          if(tmp != NULL) { //move the handle where it's trackable
@@ -1738,7 +1795,7 @@ PIC_INLINE bool Image::Read(std::string nameFile,
              tmpFloat = &data[tstride * readerCounter];
          }
 
-         float *tmpConv = ConvertLDR2HDR(tmp, tmpFloat, width * height * channels,
+         float *tmpConv = convertLDR2HDR(tmp, tmpFloat, width * height * channels,
                                          typeLoad);
 
          if(tmpConv != NULL) {
@@ -1772,7 +1829,7 @@ PIC_INLINE bool Image::Write(std::string nameFile, LDR_type typeWrite = LT_NOR_G
 
     LABEL_IO_EXTENSION label;
 
-    //Reading an HDR format
+    //read an image in an HDR format
     label = getLabelHDRExtension(nameFile);
 
     if(label != IO_NULL) {
@@ -1824,24 +1881,26 @@ PIC_INLINE bool Image::Write(std::string nameFile, LDR_type typeWrite = LT_NOR_G
 
         bool bExt = (label == IO_JPG) || (label == IO_PNG);
 
-        if(bExt) {
-            return false;
+        //allocate memory: begin
+        float *dataWriter = NULL;
+
+        if((writerCounter > 0) && (writerCounter < frames)) {
+            dataWriter = &data[tstride * writerCounter];
         } else {
-            float *dataWriter = NULL;
+            dataWriter = data;
+        }
 
-            if((writerCounter > 0) && (writerCounter < frames)) {
-                dataWriter = &data[tstride * writerCounter];
-            } else {
-                dataWriter = data;
-            }
+        unsigned char *tmp = convertHDR2LDR(dataWriter, dataUC,
+                                            width * height * channels, typeWrite);
 
-            unsigned char *tmp = ConvertHDR2LDR(dataWriter, dataUC,
-                                                width * height * channels, typeWrite);
+        if(dataUC == NULL) {
+            dataUC = tmp;
+        }
+        //allocate memory: end
 
-            if(dataUC == NULL) {
-                dataUC = tmp;
-            }
-
+        if(bExt) {
+            return WriteSTB(nameFile, dataUC, width, height, channels);
+        } else {
             switch(label) {
             case IO_BMP:
                 return WriteBMP(nameFile, dataUC, width, height, channels);

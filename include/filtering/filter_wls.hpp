@@ -18,14 +18,23 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_WLS_HPP
 #define PIC_FILTERING_FILTER_WLS_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
 
-#include "externals/Eigen/Sparse"
-#include "externals/Eigen/src/SparseCore/SparseMatrix.h"
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Sparse"
+    #include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
+#else
+    #include <Eigen/Sparse>
+    #include <Eigen/src/SparseCore/SparseMatrix.h>
+#endif
+
+#endif
 
 namespace pic {
+
+#ifndef PIC_DISABLE_EIGEN
 
 class FilterWLS: public Filter
 {
@@ -386,9 +395,9 @@ public:
         return 0;
     }
 };
+#endif
 
 } // end namespace pic
 
 #endif /* PIC_FILTERING_FILTER_WLS_HPP */
 
-#endif

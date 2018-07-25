@@ -17,11 +17,21 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
-#include "util/matrix_3_x_3.hpp"
+#include "../base.hpp"
+
+#include "../util/matrix_3_x_3.hpp"
+#include "../util/vec.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-    #include "externals/Eigen/LU"
-    #include "externals/Eigen/Geometry"
+
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/LU"
+    #include "../externals/Eigen/Geometry"
+#else
+    #include <Eigen/LU>
+    #include <Eigen/Geometry>
+#endif
+
 #endif
 
 #ifndef PIC_EIGEN_UTIL
@@ -43,7 +53,7 @@ namespace pic {
  * @param D a vector of size 3.
  * @return It returns a diagonal matrix.
  */
-Eigen::Matrix3d DiagonalMatrix(Eigen::Vector3d D)
+PIC_INLINE Eigen::Matrix3d DiagonalMatrix(Eigen::Vector3d D)
 {
     Eigen::Matrix3d ret;
 
@@ -60,7 +70,7 @@ Eigen::Matrix3d DiagonalMatrix(Eigen::Vector3d D)
  * @param mat
  * @return
  */
-Eigen::Matrix3d getSquareMatrix(Eigen::Matrix34d &mat)
+PIC_INLINE Eigen::Matrix3d getSquareMatrix(Eigen::Matrix34d &mat)
 {
     Eigen::Matrix3d ret;
     ret(0, 0) = mat(0, 0);
@@ -83,7 +93,7 @@ Eigen::Matrix3d getSquareMatrix(Eigen::Matrix34d &mat)
  * @param mat
  * @return
  */
-Eigen::Vector3d getLastColumn(Eigen::Matrix34d &mat)
+PIC_INLINE Eigen::Vector3d getLastColumn(Eigen::Matrix34d &mat)
 {
     Eigen::Vector3d ret;
 
@@ -99,7 +109,17 @@ Eigen::Vector3d getLastColumn(Eigen::Matrix34d &mat)
  * @param x
  * @return
  */
-inline Eigen::Vector3d addOne(Eigen::Vector2d &x)
+PIC_INLINE Eigen::Vector3f addOne(Eigen::Vector2f &x)
+{
+    return Eigen::Vector3f(x[0], x[1], 1.0f);
+}
+
+/**
+ * @brief addOne
+ * @param x
+ * @return
+ */
+PIC_INLINE Eigen::Vector3d addOne(Eigen::Vector2d &x)
 {
     return Eigen::Vector3d(x[0], x[1], 1.0);
 }
@@ -109,7 +129,7 @@ inline Eigen::Vector3d addOne(Eigen::Vector2d &x)
  * @param x
  * @return
  */
-inline Eigen::Vector4d addOne(Eigen::Vector3d &x)
+PIC_INLINE Eigen::Vector4d addOne(Eigen::Vector3d &x)
 {
     return Eigen::Vector4d(x[0], x[1], x[2], 1.0);
 }
@@ -118,7 +138,7 @@ inline Eigen::Vector4d addOne(Eigen::Vector3d &x)
  * @brief printf
  * @param mat
  */
-void printfMat(Eigen::MatrixXd mat)
+PIC_INLINE void printfMat(Eigen::MatrixXd mat)
 {
     for(int i = 0; i < mat.rows(); i++){
         for(int j = 0; j < mat.cols(); j++){
@@ -132,7 +152,7 @@ void printfMat(Eigen::MatrixXd mat)
  * @brief printf
  * @param mat
  */
-void printfMat(Eigen::Matrix3f &mat)
+PIC_INLINE void printfMat(Eigen::Matrix3f &mat)
 {
     for(int i = 0; i < 3; i++){
         for(int j = 0; j < 3; j++){
@@ -146,7 +166,7 @@ void printfMat(Eigen::Matrix3f &mat)
   * @brief printf
   * @param mat
   */
-void printfMat34d(Eigen::Matrix34d &mat)
+PIC_INLINE void printfMat34d(Eigen::Matrix34d &mat)
 {
     for(int i = 0; i < 3; i++){
         for(int j = 0; j < 4; j++){
@@ -160,7 +180,7 @@ void printfMat34d(Eigen::Matrix34d &mat)
  * @brief fprintf
  * @param mat
  */
-void fprintfMat(Eigen::MatrixXd &mat, std::string name)
+PIC_INLINE void fprintfMat(Eigen::MatrixXd &mat, std::string name)
 {
     FILE *file = fopen(name.c_str(), "w");
     for(int i = 0; i < mat.rows(); i++){
@@ -176,7 +196,7 @@ void fprintfMat(Eigen::MatrixXd &mat, std::string name)
  * @brief printf
  * @param mat
  */
-void printfMat(Eigen::Matrix3d &mat)
+PIC_INLINE void printfMat(Eigen::Matrix3d &mat)
 {
     for(int i = 0; i < 3; i++){
         for(int j = 0; j < 3; j++){
@@ -191,7 +211,7 @@ void printfMat(Eigen::Matrix3d &mat)
  * @param info is an array with the center (0 and 1) a scaling factor (3)
  * @return It returns a scaling and shifting matrix.
  */
-Eigen::Matrix3d getShiftScaleMatrix(Eigen::Vector3f &info)
+PIC_INLINE Eigen::Matrix3d getShiftScaleMatrix(Eigen::Vector3f &info)
 {
     Eigen::Matrix3d ret;
 
@@ -211,7 +231,7 @@ Eigen::Matrix3d getShiftScaleMatrix(Eigen::Vector3f &info)
  * @param t a translation vector
  * @return It returns a cross product matrix.
  */
-Eigen::Matrix3d CrossProduct(Eigen::Vector3d &t)
+PIC_INLINE Eigen::Matrix3d CrossProduct(Eigen::Vector3d &t)
 {
     Eigen::Matrix3d ret;
     ret(0, 0) =  0.0;  ret(0, 1) = -t[2]; ret(0, 2) =  t[1];
@@ -227,7 +247,7 @@ Eigen::Matrix3d CrossProduct(Eigen::Vector3d &t)
  * @param t is a translation vector.
  * @return
  */
-Eigen::Vector3d rigidTransform(Eigen::Vector3d &point, Eigen::Matrix3d &R, Eigen::Vector3d &t)
+PIC_INLINE Eigen::Vector3d rigidTransform(Eigen::Vector3d &point, Eigen::Matrix3d &R, Eigen::Vector3d &t)
 {
     return R * point + t;
 }
@@ -237,7 +257,7 @@ Eigen::Vector3d rigidTransform(Eigen::Vector3d &point, Eigen::Matrix3d &R, Eigen
  * @param R
  * @return
  */
-Eigen::Matrix3d RotationMatrixRefinement(Eigen::Matrix3d &R)
+PIC_INLINE Eigen::Matrix3d RotationMatrixRefinement(Eigen::Matrix3d &R)
 {
     Eigen::Quaternion<double> reg(R);
 
@@ -250,7 +270,7 @@ Eigen::Matrix3d RotationMatrixRefinement(Eigen::Matrix3d &R)
  * @param mat is an Eigen 3x3 matrix.
  * @return It returns a Matrix3x3 with values from mat.
  */
-Matrix3x3 MatrixConvert(Eigen::Matrix3f &mat)
+PIC_INLINE Matrix3x3 MatrixConvert(Eigen::Matrix3f &mat)
 {
     Matrix3x3 mtx;
     mtx.data[0] = mat(0, 0);
@@ -275,7 +295,7 @@ Matrix3x3 MatrixConvert(Eigen::Matrix3f &mat)
  * @param mat is an Eigen 3x3 matrix.
  * @return It returns a Matrix3x3 with values from mat.
  */
-Matrix3x3 MatrixConvert(Eigen::Matrix3d &mat)
+PIC_INLINE Matrix3x3 MatrixConvert(Eigen::Matrix3d &mat)
 {
     Matrix3x3 mtx;
     mtx.data[0] = float(mat(0, 0));
@@ -298,7 +318,7 @@ Matrix3x3 MatrixConvert(Eigen::Matrix3d &mat)
  * @param mat
  * @return
  */
-float *getLinearArrayFromMatrix(Eigen::Matrix3d &mat)
+PIC_INLINE float *getLinearArrayFromMatrix(Eigen::Matrix3d &mat)
 {
     int n = mat.cols() * mat.rows();
 
@@ -319,7 +339,7 @@ float *getLinearArrayFromMatrix(Eigen::Matrix3d &mat)
  * @param mat
  * @return
  */
-float *getLinearArrayFromMatrix(Eigen::Matrix3f &mat)
+PIC_INLINE float *getLinearArrayFromMatrix(Eigen::Matrix3f &mat)
 {
     int n = mat.cols() * mat.rows();
 
@@ -342,7 +362,7 @@ float *getLinearArrayFromMatrix(Eigen::Matrix3f &mat)
  * @param cols
  * @return
  */
-Eigen::MatrixXf getMatrixfFromLinearArray(float *array, int rows, int cols)
+PIC_INLINE Eigen::MatrixXf getMatrixfFromLinearArray(float *array, int rows, int cols)
 {
     Eigen::MatrixXf ret = Eigen::MatrixXf(rows, cols);
 
@@ -363,7 +383,7 @@ Eigen::MatrixXf getMatrixfFromLinearArray(float *array, int rows, int cols)
  * @param cols
  * @return
  */
-Eigen::MatrixXd getMatrixdFromLinearArray(float *array, int rows, int cols)
+PIC_INLINE Eigen::MatrixXd getMatrixdFromLinearArray(float *array, int rows, int cols)
 {
     Eigen::MatrixXd ret = Eigen::MatrixXd(rows, cols);
 
@@ -382,7 +402,7 @@ Eigen::MatrixXd getMatrixdFromLinearArray(float *array, int rows, int cols)
  * @param array
  * @return
  */
-Eigen::Matrix3d getMatrix3dFromLinearArray(float *array)
+PIC_INLINE Eigen::Matrix3d getMatrix3dFromLinearArray(float *array)
 {
     Eigen::Matrix3d ret;
 
@@ -401,7 +421,7 @@ Eigen::Matrix3d getMatrix3dFromLinearArray(float *array)
  * @param mat
  * @return
  */
-Eigen::Matrix3f MatrixConvert(Matrix3x3 &mat)
+PIC_INLINE Eigen::Matrix3f MatrixConvert(Matrix3x3 &mat)
 {
     Eigen::Matrix3f mtx;
     mtx(0, 0) = mat.data[0];
@@ -424,7 +444,7 @@ Eigen::Matrix3f MatrixConvert(Matrix3x3 &mat)
  * @param points
  * @return
  */
-Eigen::Vector3f ComputeNormalizationTransform(std::vector< Eigen::Vector2f > &points)
+PIC_INLINE Eigen::Vector3f ComputeNormalizationTransform(std::vector< Eigen::Vector2f > &points)
 {
     Eigen::Vector3f ret;
 
@@ -456,6 +476,15 @@ Eigen::Vector3f ComputeNormalizationTransform(std::vector< Eigen::Vector2f > &po
     ret[2] = ret[2] / n / sqrtf(2.0f);
 
     return ret;
+}
+
+/**
+ * @brief convertFromEigenToVec
+ * @param x
+ */
+PIC_INLINE Vec2i convertFromEigenToVec(Eigen::Vector2i &x)
+{
+    return Vec2i(x[0], x[1]);
 }
 
 #endif

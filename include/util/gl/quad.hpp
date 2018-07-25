@@ -22,7 +22,7 @@ namespace pic {
 
 #include <string>
 
-#include "util/gl/technique.hpp"
+#include "../../util/gl/technique.hpp"
 
 /**
  * @brief The QuadGL class
@@ -328,18 +328,17 @@ public:
         technique.unbind();
 
         technique.bind();
-        technique.setUniform("u_tex", 0);
+        technique.setUniform1i("u_tex", 0);
         technique.unbind();
     }
 
+    #ifndef PIC_DEPRECATED
     /**
      * @brief Draw: draw using compability mode (deprecated!)
      */
     static void Draw()
     {
         glDisable(GL_DEPTH_TEST);
-
-        #ifndef PIC_DISABLE_OPENGL_NON_CORE
 
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -352,7 +351,6 @@ public:
         glVertex2f(  1.0f, -1.0f);
 
         glEnd();
-        #endif
     }
 
     /**
@@ -366,7 +364,6 @@ public:
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex);
 
-        #ifndef PIC_DISABLE_OPENGL_NON_CORE
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         //Rendering an aligned quad
@@ -385,7 +382,6 @@ public:
         glVertex2f(   1.0f, -1.0f);
 
         glEnd();
-        #endif
 
         glDisable(GL_TEXTURE_2D);
     }
@@ -400,8 +396,6 @@ public:
         glEnable(GL_TEXTURE_2D);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex);
-
-        #ifndef PIC_DISABLE_OPENGL_NON_CORE
 
         if(color == NULL) {
             glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -425,7 +419,6 @@ public:
         glVertex2f(  1.0f, -1.0f);
 
         glEnd();
-        #endif
 
         glDisable(GL_TEXTURE_2D);
     }
@@ -440,8 +433,6 @@ public:
     static void Draw(GLuint texture, int width, int height, TechniqueGL &technique)
     {
         glFrontFace(GL_CW);
-
-        #ifndef PIC_DISABLE_OPENGL_NON_CORE
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -469,13 +460,13 @@ public:
         glVertex2f(-1.0f,  1.0f);
 
         glEnd();
-        #endif
 
         glDisable(GL_TEXTURE_2D);
 
         technique.unbind();
-        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);        
     }
+    #endif // end PIC_DEPRECATED
 };
 
 } // end namespace pic

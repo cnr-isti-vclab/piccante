@@ -67,7 +67,7 @@ protected:
 
         //reading an input image
         img = new pic::ImageGL();
-        ImageRead("../data/input/grid.png", (pic::Image*) img);
+        img->Read("../data/input/grid.png");
         img->generateTextureGL();
 
         //creating a screen aligned quad

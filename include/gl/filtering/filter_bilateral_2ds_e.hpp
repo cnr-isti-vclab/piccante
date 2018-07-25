@@ -18,10 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_2DSE_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_2DSE_HPP
 
-
-#include "gl/filtering/filter.hpp"
-#include "util/file_lister.hpp"
-#include "gl/point_samplers/sampler_random_m.hpp"
+#include "../../gl/filtering/filter.hpp"
+#include "../../util/file_lister.hpp"
+#include "../../gl/point_samplers/sampler_random_m.hpp"
 
 namespace pic {
 
@@ -323,21 +322,21 @@ void FilterGLBilateral2DSE::Update(float sigma_s, float sigma_p, float sigma_n, 
     float sigmaa2 = 2.0f * this->sigma_a * this->sigma_a;
 
     technique.bind();
-    technique.setUniform("u_tex",       0);
-    technique.setUniform("u_poisson",   1);
-    technique.setUniform("u_rand",	2);
+    technique.setUniform1i("u_tex",       0);
+    technique.setUniform1i("u_poisson",   1);
+    technique.setUniform1i("u_rand",	2);
 
-    technique.setUniform("u_edge_pos",  3);
-    technique.setUniform("u_edge_nor",  4);
-    technique.setUniform("u_edge_alb",  5);
+    technique.setUniform1i("u_edge_pos",  3);
+    technique.setUniform1i("u_edge_nor",  4);
+    technique.setUniform1i("u_edge_alb",  5);
 
-    technique.setUniform("kernelSize",      kernelSize);
-    technique.setUniform("kernelSizef",     float(kernelSize));
-    technique.setUniform("sigma_s2",        sigmas2);
-    technique.setUniform("sigma_pos2",	    sigmap2);
-    technique.setUniform("sigma_nor2",	    sigman2);
-    technique.setUniform("sigma_alb2",	    sigmaa2);
-    technique.setUniform("nSamples",        ms->nSamples >> 1);
+    technique.setUniform1i("kernelSize",       kernelSize);
+    technique.setUniform1f("kernelSizef",      float(kernelSize));
+    technique.setUniform1f("sigma_s2",         sigmas2);
+    technique.setUniform1f("sigma_pos2",       sigmap2);
+    technique.setUniform1f("sigma_nor2",        sigman2);
+    technique.setUniform1f("sigma_alb2",        sigmaa2);
+    technique.setUniform1f("nSamples",          ms->nSamples >> 1);
     technique.unbind();
 }
 

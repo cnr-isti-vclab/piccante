@@ -18,16 +18,23 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FEATURES_MATCHING_SUSAN_CORNER_DETECTOR_HPP
 #define PIC_FEATURES_MATCHING_SUSAN_CORNER_DETECTOR_HPP
 
-#include "util/vec.hpp"
+#include "../util/vec.hpp"
 
-#include "image.hpp"
-#include "filtering/filter_luminance.hpp"
+#include "../image.hpp"
+#include "../filtering/filter_luminance.hpp"
 
-#include "features_matching/general_corner_detector.hpp"
+#include "../features_matching/general_corner_detector.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
+
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Dense"
+#else
+    #include <Eigen/Dense>
 #endif
+
+#endif
+
 namespace pic {
 
 #ifndef PIC_DISABLE_EIGEN
@@ -139,17 +146,17 @@ public:
 
         //"rasterizing" a circle
         std::vector< int > x, y;
-        int radius_2 = radius * radius;
+        int radius_sq = radius * radius;
         for(int i=-radius; i<=radius; i++) {
-            int i_2 = i * i;
+            int i_sq = i * i;
             for(int j=-radius; j<=radius; j++) {
 
                 if((j == 0) && (i == 0)) {
                     continue;
                 }
 
-                int r_2 = i_2 + j * j;
-                if(r_2 <= radius_2){
+                int r_sq = i_sq + j * j;
+                if(r_sq <= radius_sq){
                     x.push_back(j);
                     y.push_back(i);
                 }
@@ -192,7 +199,6 @@ public:
         }
 
         //non-maximal supression
-
         int side = radius_maxima * 2 + 1;
         int *indices = new int [side * side];
 
@@ -253,14 +259,7 @@ public:
             }
         }
 
-        sortCorners(&corners_w_quality, true);
-
-        for(size_t i = 0; i < corners_w_quality.size(); i++) {
-            Eigen::Vector2f p;
-            p[0] = corners_w_quality[i][0];
-            p[1] = corners_w_quality[i][1];
-            corners->push_back(p);
-        }
+        sortCornersAndTransfer(&corners_w_quality, corners);
     }
 };
 

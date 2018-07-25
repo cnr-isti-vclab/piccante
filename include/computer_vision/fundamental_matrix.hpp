@@ -22,16 +22,25 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <stdlib.h>
 
-#include "util/math.hpp"
+#include "../base.hpp"
 
-#include "computer_vision/nelder_mead_opt_fundamental.hpp"
+#include "../util/math.hpp"
+#include "../util/eigen_util.hpp"
+
+#include "../computer_vision/nelder_mead_opt_fundamental.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
-#include "externals/Eigen/SVD"
-#include "externals/Eigen/Geometry"
 
-#include "util/eigen_util.hpp"
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Dense"
+    #include "../externals/Eigen/SVD"
+    #include "../externals/Eigen/Geometry"
+#else
+    #include <Eigen/Dense>
+    #include <Eigen/SVD>
+    #include <Eigen/Geometry>
+#endif
+
 #endif
 
 namespace pic {
@@ -44,7 +53,7 @@ namespace pic {
  * @param points1 is an array of points computed from image 2.
  * @return It returns the fundamental matrix, F_{1,2}.
  */
-Eigen::Matrix3d estimateFundamental(std::vector< Eigen::Vector2f > &points0,
+PIC_INLINE Eigen::Matrix3d estimateFundamental(std::vector< Eigen::Vector2f > &points0,
                                     std::vector< Eigen::Vector2f > &points1)
 {
     Eigen::Matrix3d F;
@@ -91,7 +100,7 @@ Eigen::Matrix3d estimateFundamental(std::vector< Eigen::Vector2f > &points0,
     Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeFullV);
     Eigen::MatrixXd V = svd.matrixV();
 
-    int n = V.cols() - 1;
+    int n = int(V.cols()) - 1;
 
     F(0, 0) = V(0, n);
     F(1, 0) = V(1, n);
@@ -130,7 +139,7 @@ Eigen::Matrix3d estimateFundamental(std::vector< Eigen::Vector2f > &points0,
  * @param maxIterations
  * @return
  */
-Eigen::Matrix3d estimateFundamentalRansac(std::vector< Eigen::Vector2f > &points0,
+PIC_INLINE Eigen::Matrix3d estimateFundamentalRansac(std::vector< Eigen::Vector2f > &points0,
                                           std::vector< Eigen::Vector2f > &points1,
                                           std::vector< unsigned int > &inliers,
                                           unsigned int maxIterations = 100,
@@ -153,7 +162,7 @@ Eigen::Matrix3d estimateFundamentalRansac(std::vector< Eigen::Vector2f > &points
     inliers.clear();
 
     for(unsigned int i = 0; i < maxIterations; i++) {
-        getPermutation(m, subSet, nSubSet, n);
+        getRandomPermutation(m, subSet, nSubSet, n);
 
         std::vector< Eigen::Vector2f > sub_points0;
         std::vector< Eigen::Vector2f > sub_points1;
@@ -220,7 +229,7 @@ Eigen::Matrix3d estimateFundamentalRansac(std::vector< Eigen::Vector2f > &points
  * @param F
  * @return
  */
-Eigen::Matrix3d estimateFundamentalWithNonLinearRefinement(std::vector< Eigen::Vector2f > &points0,
+PIC_INLINE Eigen::Matrix3d estimateFundamentalWithNonLinearRefinement(std::vector< Eigen::Vector2f > &points0,
                                                            std::vector< Eigen::Vector2f > &points1,
                                                            std::vector< unsigned int >    &inliers,
                                                            unsigned int maxIterationsRansac = 100,
@@ -247,7 +256,7 @@ Eigen::Matrix3d estimateFundamentalWithNonLinearRefinement(std::vector< Eigen::V
  * @param F
  * @return
  */
-Eigen::Matrix3d noramalizeFundamentalMatrix(Eigen::Matrix3d F)
+PIC_INLINE Eigen::Matrix3d noramalizeFundamentalMatrix(Eigen::Matrix3d F)
 {
     Eigen::JacobiSVD< Eigen::Matrix3d > svdF(F, Eigen::ComputeThinU | Eigen::ComputeThinV);
     Eigen::Matrix3d Uf = svdF.matrixU();
@@ -269,7 +278,7 @@ Eigen::Matrix3d noramalizeFundamentalMatrix(Eigen::Matrix3d F)
  * @param e1
  * @return
  */
-Eigen::Matrix3d extractFundamentalMatrix(Eigen::Matrix34d &M0, Eigen::Matrix34d &M1, Eigen::VectorXd &e0, Eigen::VectorXd &e1) {
+PIC_INLINE Eigen::Matrix3d extractFundamentalMatrix(Eigen::Matrix34d &M0, Eigen::Matrix34d &M1, Eigen::VectorXd &e0, Eigen::VectorXd &e1) {
 
     Eigen::Matrix3d M0_3 = getSquareMatrix(M0);
     Eigen::Matrix3d M1_3 = getSquareMatrix(M1);

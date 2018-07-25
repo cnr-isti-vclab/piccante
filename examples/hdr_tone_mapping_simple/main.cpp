@@ -25,16 +25,22 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //This means we do not use QT for I/O
 #define PIC_DISABLE_QT
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
+    std::string img_str;
+
+    if(argc == 2) {
+        img_str = argv[1];
+    } else {
+        img_str = "../data/input/bottles.hdr";
+    }
+
     printf("Reading an HDR file...");
 
     pic::Image img;
-    img.Read("../data/input/bottles.hdr");
+    img.Read(img_str);
 
     printf("Ok\n");
 
@@ -49,13 +55,13 @@ int main(int argc, char *argv[])
 
         pic::FilterSimpleTMO fltSimpleTMO(2.2f, fstop);
 
-        pic::Image *imgToneMapped = fltSimpleTMO.Process(Single(&img), NULL);
+        pic::Image *img_tmo = fltSimpleTMO.Process(Single(&img), NULL);
 
         /*pic::LT_NOR implies that when we save the image
           we just convert it to 8-bit withou applying gamma.
           In this case, this is fine, because gamma was already applied
           in the pic::FilterSimpleTMO*/
-        bool bWritten = ImageWrite(imgToneMapped, "../data/output/simple_tmo.bmp", pic::LT_NOR);
+        bool bWritten = img_tmo->Write("../data/output/simple_tmo.bmp", pic::LT_NOR);
 
         if(bWritten) {
             printf("Ok\n");

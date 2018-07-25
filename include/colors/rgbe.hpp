@@ -26,7 +26,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 *
 **/
 
-#include "base.hpp"
+#include "../base.hpp"
 
 namespace pic {
 

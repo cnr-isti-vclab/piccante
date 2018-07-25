@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_NORMAL_HPP
 #define PIC_FILTERING_FILTER_NORMAL_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
 namespace pic {
 
@@ -81,17 +81,17 @@ public:
     }
 };
 
-FilterNormal::FilterNormal()
+PIC_INLINE FilterNormal::FilterNormal()
 {
     Update(0);
 }
 
-FilterNormal::FilterNormal(int colorChannel)
+PIC_INLINE FilterNormal::FilterNormal(int colorChannel)
 {
     Update(colorChannel);
 }
 
-void FilterNormal::Update(int colorChannel)
+PIC_INLINE void FilterNormal::Update(int colorChannel)
 {
     if(colorChannel<0) {
         colorChannel = 0;
@@ -100,7 +100,7 @@ void FilterNormal::Update(int colorChannel)
     this->colorChannel = colorChannel;
 }
 
-Image *FilterNormal::SetupAux(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterNormal::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
@@ -109,7 +109,7 @@ Image *FilterNormal::SetupAux(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-void FilterNormal::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterNormal::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int width    = dst->width;
     int height   = dst->height;

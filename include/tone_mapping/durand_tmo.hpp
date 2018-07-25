@@ -18,10 +18,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_DURAND_TMO_HPP
 #define PIC_TONE_MAPPING_DURAND_TMO_HPP
 
-#include "util/string.hpp"
-#include "filtering/filter.hpp"
-#include "filtering/filter_luminance.hpp"
-#include "algorithms/bilateral_separation.hpp"
+#include "../base.hpp"
+
+#include "../util/string.hpp"
+#include "../filtering/filter.hpp"
+#include "../filtering/filter_luminance.hpp"
+#include "../algorithms/bilateral_separation.hpp"
 
 namespace pic {
 
@@ -32,7 +34,7 @@ namespace pic {
  * @param target_contrast
  * @return
  */
-Image *DurandTMO(Image *imgIn, Image *imgOut = NULL, float target_contrast = 5.0f)
+PIC_INLINE Image *DurandTMO(Image *imgIn, Image *imgOut = NULL, float target_contrast = 5.0f)
 {
     if(imgIn == NULL) {
         return NULL;

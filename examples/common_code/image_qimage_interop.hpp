@@ -27,6 +27,7 @@ This program is free software: you can redistribute it and/or modify
 #define IMAGE_QIMAGE_INTEROP_HPP
 
 #include "qt_includes.hpp"
+
 #include "piccante.hpp"
 
 #ifdef PIC_QT
@@ -41,7 +42,7 @@ This program is free software: you can redistribute it and/or modify
  * LT_NONE means that image values are not modified.
  * @param readerCounter.
  */
-pic::Image *ImageConvertFromQImage(QImage *imgIn,
+PIC_INLINE pic::Image *ImageConvertFromQImage(QImage *imgIn,
                                    pic::Image *imgOut,
                                    pic::LDR_type typeLoad = pic::LT_NONE,
                                    int readerCounter = 0)
@@ -114,7 +115,7 @@ pic::Image *ImageConvertFromQImage(QImage *imgIn,
         }
      }
 
-    pic::ConvertLDR2HDR(imgOut->dataUC, &imgOut->data[tmpInd], n, typeLoad);
+    pic::convertLDR2HDR(imgOut->dataUC, &imgOut->data[tmpInd], n, typeLoad);
 
     return imgOut;
 }
@@ -131,7 +132,7 @@ pic::Image *ImageConvertFromQImage(QImage *imgIn,
  * @param gamma.
  * @return
  */
-QImage *ImageConvertToQImage(pic::Image *imgIn,
+PIC_INLINE QImage *ImageConvertToQImage(pic::Image *imgIn,
                              QImage *imgOut = NULL,
                              pic::LDR_type type = pic::LT_NOR_GAMMA,
                              int writerCoutner = 0, float gamma = 2.2f)
@@ -162,7 +163,7 @@ QImage *ImageConvertToQImage(pic::Image *imgIn,
 
     float *tmpData = &imgIn->data[writerCoutner % frames];
 
-    imgIn->dataUC = pic::ConvertHDR2LDR(tmpData, imgIn->dataUC, width * height * channels, type, gamma);
+    imgIn->dataUC = pic::convertHDR2LDR(tmpData, imgIn->dataUC, width * height * channels, type, gamma);
 
     int shifter[2];
     shifter[0] = 1;
@@ -203,7 +204,7 @@ QImage *ImageConvertToQImage(pic::Image *imgIn,
  * @param typeWrite
  * @return
  */
-bool ImageWrite(pic::Image *imgIn, std::string nameFile, pic::LDR_type typeWrite = pic::LT_NOR_GAMMA)
+PIC_INLINE bool ImageWrite(pic::Image *imgIn, std::string nameFile, pic::LDR_type typeWrite = pic::LT_NOR_GAMMA)
 {
     if(imgIn == NULL) {
         return false;
@@ -231,7 +232,7 @@ bool ImageWrite(pic::Image *imgIn, std::string nameFile, pic::LDR_type typeWrite
  * @param typeLoad
  * @return
  */
-pic::Image *ImageRead(std::string nameFile, pic::Image *imgOut, pic::LDR_type typeLoad = pic::LT_NOR_GAMMA)
+PIC_INLINE pic::Image *ImageRead(std::string nameFile, pic::Image *imgOut, pic::LDR_type typeLoad = pic::LT_NOR_GAMMA)
 {
     if(imgOut != NULL) {
         bool bRead = imgOut->Read(nameFile, typeLoad);

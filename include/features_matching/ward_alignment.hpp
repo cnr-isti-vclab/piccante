@@ -20,14 +20,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
-#include "image.hpp"
-#include "image_samplers/image_sampler_bilinear.hpp"
-#include "filtering/filter_downsampler_2d.hpp"
-#include "filtering/filter_luminance.hpp"
-
-#ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
-#endif
+#include "../image.hpp"
+#include "../util/vec.hpp"
+#include "../image_samplers/image_sampler_bilinear.hpp"
+#include "../filtering/filter_downsampler_2d.hpp"
+#include "../filtering/filter_luminance.hpp"
 
 namespace pic {
 
@@ -55,32 +52,32 @@ public:
 
     ~WardAlignment()
     {
-        for(unsigned int i=0; i<luminance.size(); i++) {
+        for(unsigned int i=0; i< luminance.size(); i++) {
             delete luminance[i];
         }
 
-        for(unsigned int i=0; i<img1_v.size(); i++) {
+        for(unsigned int i=0; i< img1_v.size(); i++) {
             delete img1_v[i];
         }
 
-        for(unsigned int i=0; i<img2_v.size(); i++) {
+        for(unsigned int i=0; i< img2_v.size(); i++) {
             delete img2_v[i];
         }
 
-        for(unsigned int i=0; i<tb1_v.size(); i++) {
-            delete tb1_v[i];
+        for(unsigned int i=0; i< tb1_v.size(); i++) {
+            delete[] tb1_v[i];
         }
 
-        for(unsigned int i=0; i<tb2_v.size(); i++) {
-            delete tb2_v[i];
+        for(unsigned int i=0; i< tb2_v.size(); i++) {
+            delete[] tb2_v[i];
         }
 
-        for(unsigned int i=0; i<eb2_shifted_v.size(); i++) {
-            delete eb2_shifted_v[i];
+        for(unsigned int i=0; i< eb2_shifted_v.size(); i++) {
+            delete[] eb2_shifted_v[i];
         }
 
         for(unsigned int i=0; i<tb2_shifted_v.size(); i++) {
-            delete tb2_shifted_v[i];
+            delete[] tb2_shifted_v[i];
         }
     }
 
@@ -125,7 +122,7 @@ public:
         bool *maskThr = new bool[n * 2];
         bool *maskEb = &maskThr[n];
 
-        float medVal = L->getMedVal(percentile);
+        float medVal = L->getPercentileVal(percentile);
 
         float A = medVal - tolerance;
         float B = medVal + tolerance;
@@ -149,15 +146,15 @@ public:
      * @param shift_bits
      * @return
      */
-    Eigen::Vector2i getExpShift(Image *img1, Image *img2,
+    Vec2i getExpShift(Image *img1, Image *img2,
                                    int shift_bits = 6)
     {
         if(img1 == NULL || img2 == NULL) {
-            return Eigen::Vector2i(0, 0.0);
+            return Vec2i(0, 0.0);
         }
 
         if(!img1->isSimilarType(img2)) {
-            return Eigen::Vector2i(0, 0);
+            return Vec2i(0, 0);
         }
 
         Image *L1, *L2;
@@ -181,12 +178,12 @@ public:
              shift_bits = MAX(log2(min_coord) - 1, 1);
          }
 
-        Eigen::Vector2i cur_shift, ret_shift;
+        Vec2i cur_shift, ret_shift;
 
-        cur_shift = Eigen::Vector2i(0, 0);
-        ret_shift = Eigen::Vector2i(0, 0);
+        cur_shift = Vec2i(0, 0);
+        ret_shift = Vec2i(0, 0);
 
-        //downsampling
+        //downsample
         Image *tmp_1 = L1;
         Image *tmp_2 = L2;
         for(int i=0; i< shift_bits; i++) {
@@ -200,7 +197,7 @@ public:
             tmp_2 = sml_img2;
         }
 
-        //computing the shift
+        //compute the shift
         while(shift_bits > 0) {
             Image* sml_img1 = img1_v[shift_bits - 1];
             Image* sml_img2 = img2_v[shift_bits - 1];
@@ -209,14 +206,14 @@ public:
             int height = sml_img1->height;
             int n = width * height;
 
-             //Computing the median threshold mask
+             //compute the median threshold mask
             bool *tb1 = MTB(sml_img1, NULL);
             bool *eb1  = &tb1[n];
 
             bool *tb2 = MTB(sml_img2, NULL);
             bool *eb2  = &tb2[n];
 
-            //tracking memory
+            //track memory
             tb1_v.push_back(tb1);
             tb2_v.push_back(tb2);
             
@@ -273,7 +270,7 @@ public:
      * @param shift
      * @return
      */
-    static Image *execute(Image *imgTarget, Image *imgSource, Eigen::Vector2i &shift)
+    static Image *execute(Image *imgTarget, Image *imgSource, Vec2i &shift)
     {
         WardAlignment wa;
 

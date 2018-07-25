@@ -26,8 +26,6 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -43,7 +41,7 @@ int main(int argc, char *argv[])
     printf("Reading an HDR file...");
 
     pic::Image img;
-    ImageRead(img_str, &img, pic::LT_NOR);
+    img.Read(img_str, pic::LT_NOR);
 
     printf("Ok\n");
 
@@ -59,7 +57,7 @@ int main(int argc, char *argv[])
             stack[i]->clamp(0.0f, 1.0f);
 
             //write the extraced exposure image
-            ImageWrite(stack[i], img_str_out, pic::LT_NOR);
+            stack[i]->Write(img_str_out, pic::LT_NOR);
         }
 
         printf("Ok\n");
@@ -70,7 +68,7 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         printf("Writing the tone mapped image to disk...\n");
-        bool bWritten = ImageWrite(imgToneMapped, "../data/output/exposure_fusion_tmo.png", pic::LT_NOR);
+        bool bWritten = imgToneMapped->Write("../data/output/exposure_fusion_tmo.png", pic::LT_NOR);
 
         if(bWritten) {
             printf("Ok\n");

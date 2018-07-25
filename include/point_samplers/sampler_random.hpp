@@ -25,14 +25,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <fstream>
 #include <random>
 
-#include "base.hpp"
-#include "image.hpp"
-#include "util/math.hpp"
-#include "util/point_samplers.hpp"
+#include "../base.hpp"
+#include "../image.hpp"
+#include "../util/math.hpp"
+#include "../util/point_samplers.hpp"
 
-#include "point_samplers/sampler_monte_carlo.hpp"
-#include "point_samplers/sampler_dart_throwing.hpp"
-#include "point_samplers/sampler_bridson.hpp"
+#include "../point_samplers/sampler_monte_carlo.hpp"
+#include "../point_samplers/sampler_dart_throwing.hpp"
+#include "../point_samplers/sampler_bridson.hpp"
 
 namespace pic {
 

@@ -36,14 +36,14 @@ namespace pic {
 class HybridTMOGL
 {
 protected:
-    SegmentationGL		seg;
-    FilterGLRemapping	remap;
-    ReduxGL     		*check;
+    SegmentationGL      seg;
+    FilterGLRemapping   remap;
+    ReduxGL*check;
     ImageGL             *seg_map;
     ImageGL             *imgDrago, *imgReinhard, *remapped;
-    PyramidGL			*pyrA, *pyrB, *pyrWeight;
-    float				Ld_Max, b;
-    bool				bFirst;
+    PyramidGL           *pyrA, *pyrB, *pyrWeight;
+    float               Ld_Max, b;
+    bool                bFirst;
 
     DragoTMOGL          *flt_drago;
     ReinhardTMOGL       *flt_reinhard;

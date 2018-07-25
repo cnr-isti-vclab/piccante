@@ -23,14 +23,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifdef _MSC_VER
     #define PIC_DISABLE_OPENGL_NON_CORE
-    #include "../opengl_common_code/gl_core_4_0.h"
+    #include "../common_code/gl_core_4_0.h"
 #endif
 
-#define PIC_DEBUG
-
-#include "../common_code/image_qimage_interop.hpp"
-
-#include "piccante.hpp"
+//#define PIC_DISABLE_TINY_EXR
 
 #include <QKeyEvent>
 #include <QtCore/QCoreApplication>
@@ -39,6 +35,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QOpenGLFunctions>
 #include <QVBoxLayout>
 #include <QLabel>
+
+#include "piccante.hpp"
 
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
 {
@@ -69,7 +67,7 @@ protected:
 
         //reading an input image
         img = new pic::ImageGL();
-        ImageRead("../data/input/yellow_flowers.png", (pic::Image*) img);
+        img->Read("../data/input/yellow_flowers.png");
         img->generateTextureGL();
 
         //creating a screen aligned quad

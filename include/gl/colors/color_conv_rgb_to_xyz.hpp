@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_COLORS_COLOR_CONV_RGB_TO_XYZ_HPP
 #define PIC_GL_COLORS_COLOR_CONV_RGB_TO_XYZ_HPP
 
-#include "colors/color_conv_rgb_to_xyz.hpp"
+#include "../../colors/color_conv_rgb_to_xyz.hpp"
 
-#include "gl/colors/color_conv.hpp"
+#include "../../gl/colors/color_conv.hpp"
 
 namespace pic {
 

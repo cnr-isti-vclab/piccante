@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -26,6 +17,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef PIC_UTIL_WARP_SQUARE_CIRCLE_HPP
 #define PIC_UTIL_WARP_SQUARE_CIRCLE_HPP
+
+#include "../base.hpp"
 
 namespace pic {
 
@@ -36,7 +29,7 @@ namespace pic {
  * @param xo
  * @param yo
  */
-void WarpSquareCircle(float x, float y, float *xo, float *yo)
+PIC_INLINE void WarpSquareCircle(float x, float y, float *xo, float *yo)
 {
     float phi, r;
 

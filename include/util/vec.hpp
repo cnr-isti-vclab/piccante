@@ -21,7 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <assert.h>
 
-#include "util/math.hpp"
+#include "../util/math.hpp"
 
 namespace pic {
 
@@ -106,10 +106,22 @@ public:
      */
     void add(Vec<N, T> a)
     {
-        for(unsigned int i=0; i<N; i++) {
+        for(unsigned int i = 0; i < N; i++) {
             data[i] += a[i];
         }
     }
+
+     Vec<N, T> operator +(const Vec<N, T> &a) const
+     {
+         Vec<N, T> ret = this->clone();
+         ret.add(a);
+         return ret;
+     }
+
+     void operator +=(const Vec<N, T> &a)
+     {
+         this->add(a);
+     }
 
     /**
      * @brief dot
@@ -135,16 +147,29 @@ public:
         }
     }
 
+    void operator /=(const T &a)
+    {
+        this->div(a);
+    }
+
     /**
      * @brief sub
      * @param value
      */
     void sub(Vec<N, T> a)
     {
-        for(unsigned int i=0; i<N; i++) {
+        for(unsigned int i = 0; i < N; i++) {
             data[i] -= a[i];
         }
     }
+
+    Vec<N, T> operator +(const float &a) const
+    {
+        Vec<N, T> ret = this->clone();
+        ret.add(a);
+        return ret;
+    }
+
 
     /**
      * @brief neg
@@ -152,9 +177,16 @@ public:
      */
     void neg()
     {
-        for(unsigned int i=0; i<N; i++) {
+        for(unsigned int i = 0; i < N; i++) {
             data[i] = -data[i];
         }
+    }
+
+    Vec<N, T> clone()
+    {
+        Vec<N, T> ret;
+        memcpy(ret.data, this->data, N * sizeof(T));
+        return ret;
     }
 
     /**
@@ -223,7 +255,7 @@ public:
  * @return
  */
 template<unsigned int N>
-bool insideVecBBox(const Vec<N, float> &sample)
+PIC_INLINE bool insideVecBBox(const Vec<N, float> &sample)
 {
     for(unsigned int i = 0; i < N; i++) {
         if((sample[i] < -1.0f) || (sample[i] > 1.0f)) {
@@ -235,7 +267,7 @@ bool insideVecBBox(const Vec<N, float> &sample)
 }
 
 template<unsigned int N>
-Vec<N, float> normalize(Vec<N, float> x)
+PIC_INLINE Vec<N, float> normalize(Vec<N, float> x)
 {
     float length = x.distanceSq();
 
@@ -255,7 +287,7 @@ Vec<N, float> normalize(Vec<N, float> x)
  * @return
  */
 template<unsigned int N>
-Vec<N, float> randomPoint(std::mt19937 *m)
+PIC_INLINE Vec<N, float> randomPoint(std::mt19937 *m)
 {
     Vec<N, float> x;
 
@@ -267,7 +299,7 @@ Vec<N, float> randomPoint(std::mt19937 *m)
 }
 
 template<unsigned int N>
-void printVec(Vec<N, float> x)
+PIC_INLINE void printVec(Vec<N, float> x)
 {
     printf("[");
     for(unsigned int i = 0; i < N; i++) {
@@ -284,7 +316,7 @@ void printVec(Vec<N, float> x)
  * @return
  */
 template<unsigned int N>
-Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, float radius)
+PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, float radius)
 {
     Vec<N, float> x;
 
@@ -307,6 +339,29 @@ Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, float radiu
     return x;
 }
 
+template<unsigned int N, class T>
+void transferFromVecToPlain(std::vector< Vec<N, T> > &in, std::vector< T > &out)
+{
+    for(auto i = 0; i < in.size(); i++) {
+        for(auto j = 0; j < N; j++) {
+            out.push_back(in[i][j]);
+        }
+    }
+}
+
+template<unsigned int N, class T>
+void transferFromPlainToVec(std::vector< T > &in, std::vector< Vec<N, T> > &out)
+{
+    for(auto i = 0; i < in.size(); i+= N) {
+        Vec<N, T> tmp;
+        for(auto j = 0; j < N; j++) {
+            tmp[j] = in[i + j];
+        }
+
+        out.push_back(tmp);
+    }
+}
+
 /**
  * @brief Vec2i
  */
@@ -321,6 +376,11 @@ typedef Vec<3, int> Vec3i;
  * @brief Vec4i
  */
 typedef Vec<4, int> Vec4i;
+
+/**
+ * @brief Vec2f
+ */
+typedef Vec<2, float> Vec2f;
 
 /**
  * @brief Vec3f

@@ -18,14 +18,25 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_POISSON_SOLVER_HPP
 #define PIC_ALGORITHMS_POISSON_SOLVER_HPP
 
+#include "../base.hpp"
+
+#include "../image.hpp"
+
 #ifndef PIC_DISABLE_EIGEN
 
-#include "externals/Eigen/Sparse"
-#include "externals/Eigen/src/SparseCore/SparseMatrix.h"
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Sparse"
+    #include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
+#else
+    #include <Eigen/Sparse>
+    #include <Eigen/src/SparseCore/SparseMatrix.h>
+#endif
 
-#include "image.hpp"
+#endif
 
 namespace pic {
+
+#ifndef PIC_DISABLE_EIGEN
 
 /**
  * @brief computePoissonSolver
@@ -33,7 +44,7 @@ namespace pic {
  * @param ret
  * @return
  */
-Image *computePoissonSolver(Image *f, Image *ret = NULL)
+PIC_INLINE Image *computePoissonSolver(Image *f, Image *ret = NULL)
 {
     if(f == NULL) {
         return NULL;
@@ -125,6 +136,8 @@ Image *computePoissonSolver(Image *f, Image *ret = NULL)
     return ret;
 }
 
+#endif
+
 /**
  * @brief computePoissonSolverIterative
  * @param img
@@ -133,7 +146,7 @@ Image *computePoissonSolver(Image *f, Image *ret = NULL)
  * @param maxSteps
  * @return
  */
-Image *computePoissonSolverIterative(Image *img, Image *laplacian,
+PIC_INLINE Image *computePoissonSolverIterative(Image *img, Image *laplacian,
                               std::vector<int> coords,
                               int maxSteps = 100)
 {
@@ -187,7 +200,6 @@ Image *computePoissonSolverIterative(Image *img, Image *laplacian,
 
 } // end namespace pic
 
-#endif
 
 #endif /* PIC_ALGORITHMS_POISSON_SOLVER_HPP */
 

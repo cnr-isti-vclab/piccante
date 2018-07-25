@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_GL_MASK_HPP
 #define PIC_UTIL_GL_MASK_HPP
 
+#include "../../base.hpp"
+
 namespace pic {
 
 /**
@@ -30,7 +32,7 @@ namespace pic {
  * @param mipmap
  * @return
  */
-GLuint GenerateMask(int width, int height, bool *buffer = NULL,
+PIC_INLINE GLuint GenerateMask(int width, int height, bool *buffer = NULL,
                     GLuint tex = 0, unsigned char *tmpBuffer = NULL, bool mipmap = false)
 {
     bool bGen = (tex == 0);
@@ -75,16 +77,12 @@ GLuint GenerateMask(int width, int height, bool *buffer = NULL,
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     }
 
-    //Note: GL_LUMINANCE is deprecated since OpenGL 3.1
-    #ifndef PIC_DISABLE_OPENGL_NON_CORE
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8 , width, height, 0, GL_LUMINANCE,
-                 GL_UNSIGNED_BYTE, data);
-    #endif
+    /*
+        Note: GL_LUMINANCE is deprecated since OpenGL 3.1
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8 , width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
+    */
 
-    #ifdef PIC_DISABLE_OPENGL_NON_CORE
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED,
-                     GL_UNSIGNED_BYTE, data);
-    #endif
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
 
     if(mipmap && bGen) {
         glGenerateMipmap(GL_TEXTURE_2D);

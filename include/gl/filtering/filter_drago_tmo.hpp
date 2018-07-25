@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_DRAGO_TMO_HPP
 #define PIC_GL_FILTERING_FILTER_DRAGO_TMO_HPP
 
-#include "gl/filtering/filter.hpp"
-#include "gl/filtering/filter_luminance.hpp"
+#include "../../gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter_luminance.hpp"
 
 namespace pic {
 
@@ -196,12 +196,12 @@ void FilterGLDragoTMO::Update(float Ld_Max, float b, float LMax, float Lwa)
     ComputeConstants();
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    //technique.setUniform("u_lum", 1);
-    technique.setUniform("constant1", constant1);
-    technique.setUniform("constant2", constant2);
-    technique.setUniform("LMax", LMax_scaled);
-    technique.setUniform("Lwa",	Lwa_scaled);
+    technique.setUniform1i("u_tex", 0);
+    //technique.setUniform1i("u_lum", 1);
+    technique.setUniform1f("constant1", constant1);
+    technique.setUniform1f("constant2", constant2);
+    technique.setUniform1f("LMax", LMax_scaled);
+    technique.setUniform1f("Lwa", Lwa_scaled);
     technique.unbind();
 }
 

@@ -18,15 +18,21 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FEATURES_MATCHING_FAST_CORNER_DETECTOR_HPP
 #define PIC_FEATURES_MATCHING_FAST_CORNER_DETECTOR_HPP
 
-#include "util/vec.hpp"
+#include "../util/vec.hpp"
 
-#include "image.hpp"
-#include "filtering/filter_luminance.hpp"
+#include "../image.hpp"
+#include "../filtering/filter_luminance.hpp"
 
-#include "features_matching/general_corner_detector.hpp"
+#include "../features_matching/general_corner_detector.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
+
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Dense"
+#else
+    #include <Eigen/Dense>
+#endif
+
 #endif
 
 namespace pic {
@@ -286,14 +292,7 @@ public:
             }
         }
 
-        sortCorners(&corners_w_quality, true);
-
-        for(size_t i = 0; i < corners_w_quality.size(); i++) {
-            Eigen::Vector2f p;
-            p[0] = corners_w_quality[i][0];
-            p[1] = corners_w_quality[i][1];
-            corners->push_back(p);
-        }
+        sortCornersAndTransfer(&corners_w_quality, corners);
     }
 };
 

@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_LOG_2D_HPP
 #define PIC_FILTERING_FILTER_LOG_2D_HPP
 
-#include "filtering/filter_diff_gauss_2d.hpp"
+#include "../filtering/filter_diff_gauss_2d.hpp"
 
 namespace pic {
 

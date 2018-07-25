@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_GL_FILTER_WARP_2D_HPP
 #define PIC_GL_FILTERING_GL_FILTER_WARP_2D_HPP
 
-#include "util/matrix_3_x_3.hpp"
-#include "filtering/filter_warp_2d.hpp"
-#include "gl/filtering/filter.hpp"
+#include "../../util/matrix_3_x_3.hpp"
+#include "../../filtering/filter_warp_2d.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -117,7 +117,7 @@ void FilterGLWarp2D::InitShaders()
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLWarp2D");
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
+    technique.setUniform1i("u_tex", 0);
     technique.unbind();
 }
 
@@ -177,8 +177,8 @@ ImageGL *FilterGLWarp2D::Process(ImageGLVec imgIn, ImageGL *imgOut)
         mid[1] = 0.0f;
     }
 
-    technique.setUniform("mid", mid[0], mid[1]);
-    technique.setUniform("inv_tSize", 1.0f / imgIn[0]->widthf, 1.0f / imgIn[0]->heightf);
+    technique.setUniform2f("mid", mid[0], mid[1]);
+    technique.setUniform2f("inv_tSize", 1.0f / imgIn[0]->widthf, 1.0f / imgIn[0]->heightf);
 
     //Textures
     glActiveTexture(GL_TEXTURE0);

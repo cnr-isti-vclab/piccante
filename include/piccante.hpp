@@ -160,15 +160,20 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_PICCANTE_HPP
 #define PIC_PICCANTE_HPP
 
+#define PIC_DEPRECATED
+
 #ifdef _MSC_VER
 //we are using windows
-#define PIC_WIN32
+    #define PIC_WIN32
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
 #elif __APPLE__
-//we are using mac os x
-#define PIC_MAC_OS_X
+    //we are using mac os x
+    #define PIC_MAC_OS_X
 #else
-// we assume that we are using a UNIX system
-#define PIC_UNIX
+    // we assume that we are using a UNIX system
+    #define PIC_UNIX
 #endif
 
 //Mac OS X
@@ -178,7 +183,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wconversion"
 #pragma clang diagnostic ignored "-Wunknown-pragmas"
-#pragma clang diagnostic ignored "-Wswitch"
 #pragma clang diagnostic ignored "-Woverloaded-virtual"
 #pragma clang diagnostic ignored "-Wdelete-non-virtual-dtor"
 #pragma clang diagnostic ignored "-Wsign-compare"
@@ -229,6 +233,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "tone_mapping.hpp"
 #include "util.hpp"
 #include "computer_vision.hpp"
+
+#include "JNI.hpp"
 
 #ifdef PIC_MAC_OS_X
 #pragma clang diagnostic pop

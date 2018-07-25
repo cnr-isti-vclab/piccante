@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_SCATTER_HPP
 #define PIC_GL_FILTERING_FILTER_SCATTER_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -226,9 +226,9 @@ void FilterGLScatter::Update(float s_S, float s_R)
     #endif
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("s_S", s_S);
-    technique.setUniform("mul_E", mul_E);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1f("s_S", s_S);
+    technique.setUniform1f("mul_E", mul_E);
     technique.unbind();
 }
 

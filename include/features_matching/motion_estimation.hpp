@@ -18,9 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FEATURES_MATCHING_MOTION_ESTIMATION_HPP
 #define PIC_FEATURES_MATCHING_MOTION_ESTIMATION_HPP
 
-#include "image.hpp"
+#include <functional>
 
-#include "features_matching/patch_comp.hpp"
+#include "../image.hpp"
+
+#include "../features_matching/patch_comp.hpp"
 
 namespace pic {
 
@@ -168,7 +170,7 @@ public:
 
         TileList lst(blockSize, width, height);
 
-        //creating threads
+        //create threads
         int numCores = std::thread::hardware_concurrency();
 
         std::thread **thrd = new std::thread*[numCores];

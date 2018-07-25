@@ -18,10 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_DOWNSAMPLER_2D_HPP
 #define PIC_FILTERING_FILTER_DOWNSAMPLER_2D_HPP
 
-#include "filtering/filter_npasses.hpp"
-#include "filtering/filter_sampler_1d.hpp"
-#include "image_samplers/image_sampler_nearest.hpp"
-#include "image_samplers/image_sampler_gaussian.hpp"
+#include "../filtering/filter_npasses.hpp"
+#include "../filtering/filter_sampler_1d.hpp"
+#include "../image_samplers/image_sampler_nearest.hpp"
+#include "../image_samplers/image_sampler_gaussian.hpp"
 
 namespace pic {
 
@@ -31,12 +31,12 @@ namespace pic {
 class FilterDownSampler2D: public FilterNPasses
 {
 protected:
-    ImageSamplerGaussian	*isg[2];
-    FilterSampler1D			*flt[2];
+    ImageSamplerGaussian *isg[2];
+    FilterSampler1D *flt[2];
 
-    bool                    swh;
-    float					scaleX, scaleY;
-    int						width, height;
+    bool swh;
+    float scaleX, scaleY;
+    int width, height;
 
 
     void Allocate()
@@ -165,7 +165,7 @@ PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(int width, int height) : Fil
 
 PIC_INLINE FilterDownSampler2D::~FilterDownSampler2D()
 {
-    for(unsigned int i=0; i<2; i++) {
+    for(int i = 0; i < 2; i++) {
         if(flt[i] != NULL) {
             delete flt[i];
         }
@@ -202,7 +202,6 @@ PIC_INLINE void FilterDownSampler2D::PreProcess(ImageVec imgIn,
     InsertFilter(flt[X_DIRECTION]);
     InsertFilter(flt[Y_DIRECTION]);
 }
-
 
 } // end namespace pic
 

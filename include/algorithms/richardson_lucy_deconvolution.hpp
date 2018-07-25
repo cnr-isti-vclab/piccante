@@ -18,8 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_RICHARDSON_LUCY_DECONVOLUTION_HPP
 #define PIC_ALGORITHMS_RICHARDSON_LUCY_DECONVOLUTION_HPP
 
-#include "image.hpp"
-#include "filtering/filter_conv_2d.hpp"
+#include "../base.hpp"
+
+#include "../image.hpp"
+#include "../filtering/filter_conv_2d.hpp"
 
 namespace pic {
 
@@ -31,9 +33,9 @@ namespace pic {
  * @param imgOut
  * @return
  */
-Image *computeRichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterations = 10, Image *imgOut = NULL)
+PIC_INLINE Image *computeRichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterations = 10, Image *imgOut = NULL)
 {
-    if(imgIn == NULL) {
+    if((imgIn == NULL) || (psf == NULL)) {
         return imgOut;
     }
 
@@ -76,6 +78,7 @@ Image *computeRichardsonLucyDeconvolution(Image *imgIn, Image *psf, int nIterati
     }
 
     delete img_est_conv;
+    delete img_err;
 
     return imgOut;
 }

@@ -39,7 +39,7 @@ win32-msvc*{
 }
 
 win32{
-	DEFINES += NOMINMAX
+    DEFINES += NOMINMAX
 }
 
 linux-g++*{

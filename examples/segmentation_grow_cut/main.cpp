@@ -15,26 +15,19 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#include <QCoreApplication>
-
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
-
-#include "../common_code/image_qimage_interop.hpp"
 
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
-
     printf("Reading an image...");
 
     pic::Image img, strokes;
 
-    ImageRead("../data/input/yellow_flowers.png", &img);
-    ImageRead("../data/input/yellow_flowers_segmentation_strokes.png", &strokes);
+    img.Read("../data/input/yellow_flowers.png");
+    strokes.Read("../data/input/yellow_flowers_segmentation_strokes.png");
 
     printf("OK\n");
 

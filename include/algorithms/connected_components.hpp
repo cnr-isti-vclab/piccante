@@ -22,8 +22,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <set>
 #include <map>
 
-#include "image.hpp"
-#include "filtering/filter_luminance.hpp"
+#include "../base.hpp"
+
+#include "../image.hpp"
+#include "../filtering/filter_luminance.hpp"
 
 namespace pic {
 
@@ -76,7 +78,7 @@ public:
  * @param channel
  * @return
  */
-Image *computeConnectedComponents(Image *img, std::vector<LabelOutput> &ret,
+PIC_INLINE Image *computeConnectedComponents(Image *img, std::vector<LabelOutput> &ret,
                               Image *comp = NULL, float thr = 0.05f)
 {
     //Check input paramters
@@ -267,7 +269,7 @@ Image *computeConnectedComponents(Image *img, std::vector<LabelOutput> &ret,
             comp->data[i] = it->minLabel;
         }
 
-        //Storing coordiantes of the connected components
+        //store coordiantes of the connected components
         float id = comp->data[i];
         uniqueIt = unique.find(id);
 

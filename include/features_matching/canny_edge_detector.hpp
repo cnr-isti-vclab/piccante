@@ -18,13 +18,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FEATURES_MATCHING_CANNY_EDGE_DETECTOR_HPP
 #define PIC_FEATURES_MATCHING_CANNY_EDGE_DETECTOR_HPP
 
-#include "util/vec.hpp"
+#include "../util/vec.hpp"
 
-#include "image.hpp"
+#include "../image.hpp"
 
-#include "filtering/filter_luminance.hpp"
-#include "filtering/filter_gaussian_2d.hpp"
-#include "filtering/filter_gradient.hpp"
+#include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_gaussian_2d.hpp"
+#include "../filtering/filter_gradient.hpp"
 
 namespace pic {
 
@@ -37,7 +37,7 @@ protected:
     bool  bLum;
     Image *lum;
 
-    float    sigma, threshold_1, threshold_2;
+    float sigma, threshold_1, threshold_2;
 
     /**
      * @brief release frees allocated memory for this class.
@@ -136,52 +136,58 @@ public:
 
         imgEdges->setZero();
 
-        for(int i=0; i<grad->height; i++) {
-            for(int j=0; j<grad->width; j++) {
+        int dx0[] = {1, 1, 0, -1, 1};
+        int dy0[] = {0, 1, 1,  1, 0};
+
+        int dx1[] = {-1, -1,  0,  1, -1};
+        int dy1[] = { 0, -1, -1, -1,  0};
+
+        for(int i = 0; i < grad->height; i++) {
+            for(int j = 0; j < grad->width; j++) {
 
                 float *tmp_grad = (*grad)(j, i);
 
                 float angle = atan2(tmp_grad[1], tmp_grad[0]);
 
-                angle = Rad2Deg( angle < 0.0f ? C_PI + angle : angle);
+                angle = Rad2Deg(angle < 0.0f ? C_PI + angle : angle);
+                int k = int(lround(angle / 45.0f));
 
-                float bMax = false;
+                bool bMax = (tmp_grad[2] > (*grad)(j + dx0[k], i + dy0[k])[2]) &&
+                            (tmp_grad[2] > (*grad)(j + dx1[k], i + dy1[k])[2]);
+
+                /*
+                bool bMax = false;
 
                 if(((angle >=   0.0f) && (angle < 22.5f)) ||
                    ((angle >= 157.5f))) {
-                    bMax = (tmp_grad[0] > (*grad)(j + 1, i)[0]) &&
-                           (tmp_grad[0] > (*grad)(j - 1, i)[0]);
+                    bMax = (tmp_grad[2] > (*grad)(j + 1, i)[2]) &&
+                           (tmp_grad[2] > (*grad)(j - 1, i)[2]);
                 }
 
                 if((angle >= 22.5f) && (angle < 67.5f)) {
-                    bMax = (tmp_grad[0] > (*grad)(j + 1, i + 1)[0]) &&
-                           (tmp_grad[0] > (*grad)(j - 1, i - 1)[0]);
+                    bMax = (tmp_grad[2] > (*grad)(j + 1, i + 1)[2]) &&
+                           (tmp_grad[2] > (*grad)(j - 1, i - 1)[2]);
                 }
 
                 if((angle >= 67.5f) && (angle < 112.5f)) {
-                    bMax = (tmp_grad[0] > (*grad)(j, i + 1)[0]) &&
-                           (tmp_grad[0] > (*grad)(j, i - 1)[0]);
+                    bMax = (tmp_grad[2] > (*grad)(j, i + 1)[2]) &&
+                           (tmp_grad[2] > (*grad)(j, i - 1)[2]);
                 }
 
                 if((angle >= 112.5f) && (angle < 157.5f)) {
-                    bMax = (tmp_grad[0] > (*grad)(j - 1, i + 1)[0]) &&
-                           (tmp_grad[0] > (*grad)(j + 1, i - 1)[0]);
-                }
+                    bMax = (tmp_grad[2] > (*grad)(j - 1, i + 1)[2]) &&
+                           (tmp_grad[2] > (*grad)(j + 1, i - 1)[2]);
+                }*/
 
                 float *tmp_img_edges = (*imgEdges)(j, i);
 
-                if(bMax){
-                    tmp_img_edges[0] = tmp_grad[0];
-                } else {
-                    tmp_img_edges[0] = 0.0f;
-                }
-
+                tmp_img_edges[0] = bMax ? tmp_grad[2] : 0.0f;
             }
         }
 
         //double thresholding
-        for(int i=0; i < imgEdges->height; i++) {
-            for(int j=0; j < imgEdges->width; j++) {
+        for(int i = 0; i < imgEdges->height; i++) {
+            for(int j = 0; j < imgEdges->width; j++) {
                 float *tmp_imgEdges = (*imgEdges)(j, i);
 
                 if(tmp_imgEdges[0] > threshold_2) {
@@ -202,14 +208,14 @@ public:
         int x[] = {1, 1, 0, -1, -1, -1,  0,  1};
         int y[] = {0, 1, 1,  1,  0, -1, -1, -1};
 
-        for(int i=0; i < imgEdges->height; i++) {
-            for(int j=0; j < imgEdges->width; j++) {
+        for(int i = 0; i < imgEdges->height; i++) {
+            for(int j = 0; j < imgEdges->width; j++) {
                 float *tmp_imgEdges = (*imgEdges)(j, i);
 
                 if((tmp_imgEdges[0] > 0.4f) && (tmp_imgEdges[0] < 0.6f)) {
                     bool bRemove = true;
 
-                    for(int k=0; k<8; k++) {
+                    for(int k = 0; k < 8; k++) {
                         float *tmp_imgEdges_2 = (*imgEdges)(j + x[k], i + y[k]);
 
                         if(tmp_imgEdges_2[0] > 0.9f){

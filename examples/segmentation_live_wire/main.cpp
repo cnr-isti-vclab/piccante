@@ -26,8 +26,6 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -40,30 +38,31 @@ int main(int argc, char *argv[])
         img_str = "../data/input/tommaseo_statue.png";
     }
 
-    printf("Reading an image...");
-    pic::Image img;
-    ImageRead(img_str, &img);
+    printf("Reading images...");
+    pic::Image img(img_str, pic::LT_NOR_GAMMA);
+    printf("Is the image valid? ");
 
     if(img.isValid()) {
-        printf(" Ok!\n");
-        pic::LiveWire *lw = new pic::LiveWire(&img);
+        std::vector< pic::Vec2i > out;
+        pic::Vec2i pS(227, 206);
+        pic::Vec2i pE(221, 351);
 
-        std::vector< pic::Vec<2, int> > out;
-        pic::Vec<2, int> pS(227, 206);
-        pic::Vec<2, int> pE(221, 351);
-        lw->execute(pS, pE, out);
+        pic::LiveWire lw(&img);
+
+        lw.execute(pS, pE, out, true, false);
 
         for(unsigned int i = 0; i < out.size(); i++) {
+
             float *tmp = img(out[i][0], out[i][1]);
 
-            tmp[0] = 1.0f;
-            tmp[1] = 0.0f;
+            tmp[0] = 0.0f;
+            tmp[1] = 1.0f;
             tmp[2] = 0.0f;
         }
 
-        ImageWrite(&img, "../data/output/s_livewire.png");
-    } else {
-        printf("No, the file is not valid!\n");
+        std::string name = pic::removeExtension(img_str);
+        name = pic::removeLocalPath(name);
+        img.Write("../data/output/" + name + "_lw.png", pic::LT_NOR_GAMMA);
     }
 
     return 0;

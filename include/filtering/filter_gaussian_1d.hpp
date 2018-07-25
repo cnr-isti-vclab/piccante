@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_GAUSSIAN_1D_HPP
 #define PIC_FILTERING_FILTER_GAUSSIAN_1D_HPP
 
-#include "filtering/filter_conv_1d.hpp"
-#include "util/precomputed_gaussian.hpp"
+#include "../filtering/filter_conv_1d.hpp"
+#include "../util/precomputed_gaussian.hpp"
 
 namespace pic {
 
@@ -29,10 +29,10 @@ namespace pic {
 class FilterGaussian1D: public FilterConv1D
 {
 protected:
-    float				sigma;
+    float               sigma;
     PrecomputedGaussian *pg;
     bool                bPgOwned;
-    int					dirs[3];
+    int                 dirs[3];
 
 public:
     /**

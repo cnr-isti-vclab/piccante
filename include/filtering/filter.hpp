@@ -18,14 +18,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_HPP
 #define PIC_FILTERING_FILTER_HPP
 
-#include "image_vec.hpp"
-#include "util/tile_list.hpp"
-#include "util/string.hpp"
-
-
 #ifndef PIC_DISABLE_THREAD
 #include <thread>
 #endif
+
+#include <functional>
+
+#include "../image_vec.hpp"
+#include "../util/tile_list.hpp"
+#include "../util/string.hpp"
 
 namespace pic {
 

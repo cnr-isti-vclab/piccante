@@ -21,14 +21,22 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <chrono>
 
-#include "util/math.hpp"
-#include "image.hpp"
+#include "../util/math.hpp"
+#include "../image.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-    #include "externals/Eigen/Dense"
+
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Dense"
+#else
+    #include <Eigen/Dense>
+#endif
+
 #endif
 
 namespace pic {
+
+#ifndef PIC_DISABLE_EIGEN
 
 /**
  * @brief The BRIEFDescriptor class
@@ -38,11 +46,11 @@ class BRIEFDescriptor
 protected:
     int                 S;
     unsigned int        n;
-    float   		sigma_sq_2, sigma_sq;
-    std::mt19937	*m;
+    float               sigma_sq_2, sigma_sq;
+    std::mt19937        *m;
 
     //samples coordinates
-    int             *x, *y;
+    int                 *x, *y;
 
     /**
      * @brief generateSample
@@ -232,7 +240,7 @@ public:
         for(unsigned int i = 0; i < corners.size(); i++) {
             int x0 = int(corners[i][0]);
             int y0 = int(corners[i][1]);
-            descs.push_back(get(img, x0, y0));
+            descs.push_back(get(img, x0, y0, NULL));
         }
     }
     #endif
@@ -254,7 +262,7 @@ public:
      */
     static unsigned int match(unsigned int *fv0, unsigned int *fv1, unsigned int nfv)
     {
-        if((fv0 == NULL) && (fv1 == NULL)) {
+        if((fv0 == NULL) || (fv1 == NULL)) {
             return 0;
         }
 
@@ -267,6 +275,8 @@ public:
         return ret;
     }
 };
+
+#endif
 
 } // end namespace pic
 

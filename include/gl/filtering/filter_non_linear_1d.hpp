@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_NON_LINEAR_1D_HPP
 #define PIC_GL_FILTERING_FILTER_NON_LINEAR_1D_HPP
 
-#include "gl/filtering/filter_1d.hpp"
+#include "../../gl/filtering/filter_1d.hpp"
 
 namespace pic {
 
@@ -46,7 +46,7 @@ protected:
                                              uniform int        iY;
                                              uniform int        halfKernelSize;
                                              uniform int        kernelSize;
-                                             out     vec4		f_color;
+                                             out     vec4	f_color;
 
         void main(void) {
             ivec2 coordsFrag = ivec2(gl_FragCoord.xy);
@@ -142,8 +142,8 @@ public:
      */
     void SetUniformAux()
     {
-        technique.setUniform("halfKernelSize", halfKernelSize);
-        technique.setUniform("kernelSize", kernelSize);
+        technique.setUniform1i("halfKernelSize", halfKernelSize);
+        technique.setUniform1i("kernelSize", kernelSize);
     }
 
     /**

@@ -22,17 +22,26 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <stdlib.h>
 
-#include "util/math.hpp"
+#include "../base.hpp"
+
+#include "../util/math.hpp"
+#include "../util/eigen_util.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
-#include "externals/Eigen/SVD"
-#include "externals/Eigen/Geometry"
 
-#include "util/eigen_util.hpp"
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Dense"
+    #include "../externals/Eigen/SVD"
+    #include "../externals/Eigen/Geometry"
+#else
+    #include <Eigen/Dense>
+    #include <Eigen/SVD>
+    #include <Eigen/Geometry>
 #endif
 
-#include "computer_vision/nelder_mead_opt_homography.hpp"
+#endif
+
+#include "../computer_vision/nelder_mead_opt_homography.hpp"
 
 namespace pic {
 
@@ -44,7 +53,7 @@ namespace pic {
  * @param points1 is an array of points computed from image 2.
  * @return It returns the homography matrix H.
  */
-Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > &points0,
+PIC_INLINE Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > &points0,
                                    std::vector< Eigen::Vector2f > &points1)
 {
     Eigen::Matrix3d  H;
@@ -103,7 +112,7 @@ Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > &points0,
     Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeFullV);
     Eigen::MatrixXd V = svd.matrixV();
 
-    n = V.cols() - 1;
+    n = int(V.cols()) - 1;
 
     //assign and transpose
     H(0, 0) = V(0, n);
@@ -130,7 +139,7 @@ Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > &points0,
  * @param maxIterations
  * @return
  */
-Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f > &points0,
+PIC_INLINE Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f > &points0,
                                          std::vector< Eigen::Vector2f > &points1,
                                          std::vector< unsigned int > &inliers,
                                          unsigned int maxIterations = 100,
@@ -154,7 +163,7 @@ Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f > &points0
 
     for(unsigned int i = 0; i < maxIterations; i++) {       
 
-        getPermutation(m, subSet, nSubSet, n);
+        getRandomPermutation(m, subSet, nSubSet, n);
 
         std::vector< Eigen::Vector2f > sub_points0;
         std::vector< Eigen::Vector2f > sub_points1;
@@ -211,15 +220,15 @@ Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f > &points0
     return H;
 }
     
-    /**
-     * @brief estimateHomographyRansac computes the homography such that: points1 = H * points0
-     * @param points0
-     * @param points1
-     * @param inliers
-     * @param maxIterations
-     * @return
-     */
-Eigen::Matrix3d estimateHomographyWithNonLinearRefinement(
+/**
+* @brief estimateHomographyRansac computes the homography such that: points1 = H * points0
+* @param points0
+* @param points1
+* @param inliers
+* @param maxIterations
+* @return
+*/
+PIC_INLINE Eigen::Matrix3d estimateHomographyWithNonLinearRefinement(
                                          std::vector< Eigen::Vector2f > &points0,
                                          std::vector< Eigen::Vector2f > &points1,
                                          std::vector< unsigned int > &inliers,

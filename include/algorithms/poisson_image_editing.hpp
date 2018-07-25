@@ -18,16 +18,25 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_POISSON_IMAGE_EDITING_HPP
 #define PIC_ALGORITHMS_POISSON_IMAGE_EDITING_HPP
 
+#include "../base.hpp"
+#include "../image.hpp"
+#include "../filtering/filter_laplacian.hpp"
+
 #ifndef PIC_DISABLE_EIGEN
 
-#include "externals/Eigen/Sparse"
-#include "externals/Eigen/src/SparseCore/SparseMatrix.h"
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Sparse"
+    #include "../externals/Eigen/src/SparseCore/SparseMatrix.h"
+#else
+    #include <Eigen/Sparse>
+    #include <Eigen/src/SparseCore/SparseMatrix.h>
+#endif
 
-#include "image.hpp"
-#include "filtering/filter_laplacian.hpp"
+#endif
 
 namespace pic {
 
+#ifndef PIC_DISABLE_EIGEN
 /**
  * @brief computePoissonImageEditing
  * @param source
@@ -36,7 +45,7 @@ namespace pic {
  * @param ret
  * @return
  */
-Image *computePoissonImageEditing(Image *source, Image *target, bool *mask, Image *ret = NULL)
+PIC_INLINE Image *computePoissonImageEditing(Image *source, Image *target, bool *mask, Image *ret = NULL)
 {
     if((source == NULL) || (target == NULL) || (mask == NULL)) {
         return NULL;
@@ -212,10 +221,9 @@ Image *computePoissonImageEditing(Image *source, Image *target, bool *mask, Imag
 
     return ret;
 }
+#endif
 
 } // end namespace pic
-
-#endif
 
 #endif /* PIC_ALGORITHMS_POISSON_IMAGE_EDITING_HPP */
 

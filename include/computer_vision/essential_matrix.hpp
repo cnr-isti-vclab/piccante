@@ -22,17 +22,26 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <stdlib.h>
 
-#include "util/math.hpp"
+#include "../base.hpp"
 
-#include "computer_vision/triangulation.hpp"
-#include "computer_vision/camera_matrix.hpp"
+#include "../util/math.hpp"
+#include "../util/eigen_util.hpp"
+
+#include "../computer_vision/triangulation.hpp"
+#include "../computer_vision/camera_matrix.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
-#include "externals/Eigen/SVD"
-#include "externals/Eigen/Geometry"
 
-#include "util/eigen_util.hpp"
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Dense"
+    #include "../externals/Eigen/SVD"
+    #include "../externals/Eigen/Geometry"
+#else
+    #include <Eigen/Dense>
+    #include <Eigen/SVD>
+    #include <Eigen/Geometry>
+#endif
+
 #endif
 
 namespace pic {
@@ -47,7 +56,7 @@ namespace pic {
  * @param K2 is the camera 2 intrics matrix
  * @return
  */
-Eigen::Matrix3d computeEssentialMatrix(Eigen::Matrix3d &F, Eigen::Matrix3d &K1, Eigen::Matrix3d &K2)
+PIC_INLINE Eigen::Matrix3d computeEssentialMatrix(Eigen::Matrix3d &F, Eigen::Matrix3d &K1, Eigen::Matrix3d &K2)
 {
     Eigen::Matrix3d K2t = Eigen::Transpose<Eigen::Matrix3d>(K2);
     return K2t * F * K1;
@@ -60,7 +69,7 @@ Eigen::Matrix3d computeEssentialMatrix(Eigen::Matrix3d &F, Eigen::Matrix3d &K1, 
  * @param K
  * @return
  */
-Eigen::Matrix3d computeEssentialMatrix(Eigen::Matrix3d &F, Eigen::Matrix3d &K)
+PIC_INLINE Eigen::Matrix3d computeEssentialMatrix(Eigen::Matrix3d &F, Eigen::Matrix3d &K)
 {
     return computeEssentialMatrix(F, K, K);
 }
@@ -79,7 +88,7 @@ Eigen::Matrix3d computeEssentialMatrix(Eigen::Matrix3d &F, Eigen::Matrix3d &K)
  * @param R2 is one possible rotation matrix. Output.
  * @param t is the translation vector which is not normalized. Output.
  */
-void decomposeEssentialMatrix(Eigen::Matrix3d &E, Eigen::Matrix3d &R1, Eigen::Matrix3d &R2, Eigen::Vector3d &t)
+PIC_INLINE void decomposeEssentialMatrix(Eigen::Matrix3d &E, Eigen::Matrix3d &R1, Eigen::Matrix3d &R2, Eigen::Vector3d &t)
 {
     //Solving the linear system
     Eigen::JacobiSVD< Eigen::MatrixXd > svd(E, Eigen::ComputeThinU | Eigen::ComputeThinV);
@@ -134,7 +143,7 @@ void decomposeEssentialMatrix(Eigen::Matrix3d &E, Eigen::Matrix3d &R1, Eigen::Ma
  * @param t
  * @return
  */
-bool decomposeEssentialMatrixWithConfiguration(Eigen::Matrix3d &E, Eigen::Matrix3d &K0, Eigen::Matrix3d &K1,
+PIC_INLINE bool decomposeEssentialMatrixWithConfiguration(Eigen::Matrix3d &E, Eigen::Matrix3d &K0, Eigen::Matrix3d &K1,
                                                std::vector< Eigen::Vector2f > &points0, std::vector< Eigen::Vector2f > &points1,
                                                Eigen::Matrix3d &R, Eigen::Vector3d &t)
 {

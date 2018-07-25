@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_SAMPLER_2DSUB_HPP
 #define PIC_FILTERING_FILTER_SAMPLER_2DSUB_HPP
 
-#include "filtering/filter.hpp"
-#include "image_samplers/image_sampler_bilinear.hpp"
+#include "../filtering/filter.hpp"
+#include "../image_samplers/image_sampler_bilinear.hpp"
 
 namespace pic {
 
@@ -83,7 +83,7 @@ public:
     }
 };
 
-FilterSampler2DSub::FilterSampler2DSub(ImageSampler *isb)
+PIC_INLINE FilterSampler2DSub::FilterSampler2DSub(ImageSampler *isb)
 {
     if(isb != NULL) {
         bIsb = false;
@@ -94,14 +94,14 @@ FilterSampler2DSub::FilterSampler2DSub(ImageSampler *isb)
     }
 }
 
-FilterSampler2DSub::~FilterSampler2DSub()
+PIC_INLINE FilterSampler2DSub::~FilterSampler2DSub()
 {
     if(bIsb) {
         delete isb;
     }
 }
 
-void FilterSampler2DSub::Update(ImageSampler *isb)
+PIC_INLINE void FilterSampler2DSub::Update(ImageSampler *isb)
 {
     if((this->isb != NULL) && (bIsb)) {
         delete this->isb;
@@ -111,7 +111,7 @@ void FilterSampler2DSub::Update(ImageSampler *isb)
     bIsb = false;
 }
 
-void FilterSampler2DSub::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterSampler2DSub::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     if(src.size() != 2) {
         return;

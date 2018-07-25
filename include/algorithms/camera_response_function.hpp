@@ -20,18 +20,22 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <algorithm>
 
-#include "image.hpp"
-#include "point_samplers/sampler_random.hpp"
-#include "histogram.hpp"
-#include "filtering/filter_mean.hpp"
-#include "util/polynomial.hpp"
+#include "../image.hpp"
+#include "../point_samplers/sampler_random.hpp"
+#include "../histogram.hpp"
+#include "../filtering/filter_mean.hpp"
+#include "../util/polynomial.hpp"
 
-#include "algorithms/sub_sample_stack.hpp"
-#include "algorithms/weight_function.hpp"
-#include "algorithms/mitsunaga_nayar_crf.hpp"
+#include "../algorithms/sub_sample_stack.hpp"
+#include "../algorithms/weight_function.hpp"
+#include "../algorithms/mitsunaga_nayar_crf.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-    #include "externals/Eigen/SVD"
+    #ifndef PIC_EIGEN_NOT_BUNDLED
+        #include "../externals/Eigen/SVD"
+    #else
+        #include <Eigen/SVD>
+    #endif
 #endif
 
 namespace pic {
@@ -94,7 +98,7 @@ protected:
             k++;
         }
 
-        //Solving the linear system
+        //solve the linear system
         Eigen::JacobiSVD< Eigen::MatrixXf > svd(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
         Eigen::VectorXf x = svd.solve(b);
@@ -204,7 +208,7 @@ public:
             break;
 
             case IL_LUT_8_BIT: {
-                int index =  CLAMP(int(std::round(x * 255.0f)), 256);
+                int index =  CLAMP(int(round(x * 255.0f)), 256);
                 return icrf.at(channel)[index];
             }
             break;
@@ -546,7 +550,7 @@ public:
 
         // precompute robertson weighting function
         for (size_t i=0; i<256; i++) {
-            this->w[i] = pic::weightFunction(float(i) / 255.0f, pic::CW_ROBERTSON);
+            this->w[i] = weightFunction(float(i) / 255.0f, CW_ROBERTSON);
         }
 
         // avoid saturation
@@ -620,7 +624,7 @@ public:
         std::vector<unsigned char *> qstack;
         for (Image * slice : stack) {
             assert(slice->frames == 1);
-            unsigned char * q = pic::ConvertHDR2LDR(slice->data, NULL, slice->size(), pic::LT_NOR);
+            unsigned char * q = convertHDR2LDR(slice->data, NULL, slice->size(), LT_NOR);
             qstack.push_back(q);
         }
 
@@ -785,7 +789,7 @@ public:
         float maxV = -1.0f;
         for (int ch=0; ch<channels; ch++) {
             int ind;
-            maxV = std::max(pic::Array<float>::getMax(this->icrf[ch], 256, ind), maxV);
+            maxV = std::max(Array<float>::getMax(this->icrf[ch], 256, ind), maxV);
         }
 
         for (int ch=0; ch<channels; ch++) {
@@ -804,14 +808,14 @@ public:
 };
 
 /**
- * @brief EstimateAverageLuminance
+ * @brief estimateAverageLuminance
  * @param shutter_speed
  * @param aperture_value
  * @param iso_value
  * @param K_value
  * @return
  */
-float EstimateAverageLuminance(float shutter_speed, float aperture_value = 1.0f, float iso_value = 1.0f, float K_value = 12.5f)
+PIC_INLINE float estimateAverageLuminance(float shutter_speed, float aperture_value = 1.0f, float iso_value = 1.0f, float K_value = 12.5f)
 {
     K_value = CLAMPi(K_value, 10.6f, 13.4f);
 

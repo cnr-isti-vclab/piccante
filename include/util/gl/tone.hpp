@@ -18,6 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_GL_TONE_HPP
 #define PIC_UTIL_GL_TONE_HPP
 
+#include <string>
+
+#include "../../base.hpp"
+
 namespace pic {
 
 /**
@@ -25,7 +29,7 @@ namespace pic {
  * exposure in a shader.
  * @return It returns a string which represents a part of a shader.
  */
-std::string GLSL_SIMPLE_EXPOSURE_GAMMA()
+PIC_INLINE std::string GLSL_SIMPLE_EXPOSURE_GAMMA()
 {
     std::string ret;
 
@@ -42,7 +46,7 @@ std::string GLSL_SIMPLE_EXPOSURE_GAMMA()
  * @brief GLSL_DRAGO_TMO returns Drago et al.'s tone mapping operator.
  * @return It returns a string; a building block for a shader.
  */
-std::string GLSL_DRAGO_TMO()
+PIC_INLINE std::string GLSL_DRAGO_TMO()
 {
     std::string ret;
 

@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_COLORS_COLOR_CONV_XYZ_TO_CIE_LAB_HPP
 #define PIC_GL_COLORS_COLOR_CONV_XYZ_TO_CIE_LAB_HPP
 
-#include "gl/colors/color_conv.hpp"
+#include "../../gl/colors/color_conv.hpp"
 
 namespace pic {
 
@@ -137,11 +137,11 @@ public:
     {
         if(direct) {
             techniques[0].bind();
-            techniques[0].setUniform3("white_point", white_point);
+            techniques[0].setUniform3fv("white_point", white_point);
             techniques[0].unbind();
         } else {
             techniques[1].bind();
-            techniques[1].setUniform3("white_point", white_point);
+            techniques[1].setUniform3fv("white_point", white_point);
             techniques[1].unbind();
         }
     }

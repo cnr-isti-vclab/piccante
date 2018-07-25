@@ -9,15 +9,6 @@ Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-
-
-
-
-
-
-
-
-
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -28,6 +19,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_UTIL_GL_FBO_HPP
 
 #include <iostream>
+
+#include "../../base.hpp"
 
 namespace pic {
 
@@ -175,7 +168,7 @@ public:
     }
 };
 
-Fbo::Fbo()
+PIC_INLINE Fbo::Fbo()
 {
     depth = 0;
     fbo = 0;
@@ -184,7 +177,7 @@ Fbo::Fbo()
     width = height = frames = 0;
 }
 
-bool Fbo::destroy()
+PIC_INLINE bool Fbo::destroy()
 {
     if(tex != 0) {
         glDeleteTextures(1, &tex);
@@ -204,19 +197,19 @@ bool Fbo::destroy()
     return true;
 }
 
-Fbo *Fbo::clone()
+PIC_INLINE Fbo *Fbo::clone()
 {
     Fbo *ret = new Fbo();
     ret->create(width, height, frames, bDepth, 0);
     return ret;
 }
 
-bool Fbo::create(int width, int height, bool bDepth)
+PIC_INLINE bool Fbo::create(int width, int height, bool bDepth)
 {
     return create(width, height, 1, bDepth, 0);
 }
 
-bool Fbo::create(int width, int height, int frames, bool bDepth, GLuint tex)
+PIC_INLINE bool Fbo::create(int width, int height, int frames, bool bDepth, GLuint tex)
 {
     this->width = width;
     this->height = height;
@@ -300,7 +293,7 @@ bool Fbo::create(int width, int height, int frames, bool bDepth, GLuint tex)
     return fbo != 0;
 }
 
-bool Fbo::createMRT(int width, int height, bool bDepth, unsigned int nMRT)
+PIC_INLINE bool Fbo::createMRT(int width, int height, bool bDepth, unsigned int nMRT)
 {
     this->width = width;
     this->height = height;
@@ -368,7 +361,7 @@ bool Fbo::createMRT(int width, int height, bool bDepth, unsigned int nMRT)
     return fbo != 0;
 }
 
-void Fbo::attachColorBuffer(GLuint tex, GLenum target, int slice)
+PIC_INLINE void Fbo::attachColorBuffer(GLuint tex, GLenum target, int slice)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -403,7 +396,7 @@ void Fbo::attachColorBuffer(GLuint tex, GLenum target, int slice)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Fbo::attachColorBuffer2(GLuint tex, GLenum target, int slice)
+PIC_INLINE void Fbo::attachColorBuffer2(GLuint tex, GLenum target, int slice)
 {
     GLuint texWork = (tex == 0) ? this->tex : tex;
 
@@ -428,7 +421,7 @@ void Fbo::attachColorBuffer2(GLuint tex, GLenum target, int slice)
     }
 }
 
-void Fbo::bind()
+PIC_INLINE void Fbo::bind()
 {
     if(!fbo) {
         return;
@@ -439,7 +432,7 @@ void Fbo::bind()
     glReadBuffer(GL_COLOR_ATTACHMENT0);
 }
 
-void Fbo::unbind()
+PIC_INLINE void Fbo::unbind()
 {
     if(!fbo) {
         return;
@@ -450,7 +443,7 @@ void Fbo::unbind()
     glReadBuffer(GL_BACK);
 }
 
-void Fbo::bindMRT()
+PIC_INLINE void Fbo::bindMRT()
 {
     if(!fbo) {
         return;
@@ -461,7 +454,7 @@ void Fbo::bindMRT()
     glDrawBuffers(nMRT, attachmentsMRT);
 }
 
-void Fbo::unbindMRT()
+PIC_INLINE void Fbo::unbindMRT()
 {
     if(!fbo) {
         return;

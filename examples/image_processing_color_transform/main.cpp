@@ -30,15 +30,13 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
     std::string img_str;
 
-    if(argc == 3) {
+    if(argc == 2) {
         img_str = argv[1];
     } else {
         img_str = "../data/input/singapore.png";
@@ -47,7 +45,7 @@ int main(int argc, char *argv[])
     printf("Reading an LDR file...");
 
     pic::Image img;
-    ImageRead(img_str, &img);
+    img.Read(img_str);
 
     printf("Ok\n");
 
@@ -62,8 +60,8 @@ int main(int argc, char *argv[])
         pic::Image *img_RGB = pic::FilterColorConv::fromCIELABtoRGB2(img_CIE_Lab, NULL);
 
         printf("Writing the file to disk...");
-        bool bWritten = ImageWrite(img_CIE_Lab, "../data/output/singapore_CIE_Lab.pfm");
-        bWritten = bWritten && ImageWrite(img_RGB, "../data/output/singapore_RGB.png");
+        bool bWritten = img_CIE_Lab->Write("../data/output/singapore_CIE_Lab.pfm");
+        bWritten = bWritten && img_RGB->Write("../data/output/singapore_RGB.png");
 
         if(bWritten) {
             printf(" Ok\n");

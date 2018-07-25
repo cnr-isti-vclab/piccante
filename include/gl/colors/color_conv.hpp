@@ -20,7 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <string>
 
-#include "util/gl/technique.hpp"
+#include "../../util/gl/technique.hpp"
 
 namespace pic {
 
@@ -90,14 +90,14 @@ public:
         techniques[0].initStandard("330", vertex_source, getDirectFunction(), "ColorConv (direct)");
 
         techniques[0].bind();
-        techniques[0].setUniform("u_tex", 0);
+        techniques[0].setUniform1i("u_tex", 0);
         techniques[0].unbind();
 
         //inverse transform
         techniques[1].initStandard("330", vertex_source, getInverseFunction(), "ColorConv (inverse)");
 
         techniques[1].bind();
-        techniques[1].setUniform("u_tex", 0);
+        techniques[1].setUniform1i("u_tex", 0);
         techniques[1].unbind();
     }
 

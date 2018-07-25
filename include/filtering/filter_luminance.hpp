@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_LUMINANCE_HPP
 #define PIC_FILTERING_FILTER_LUMINANCE_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
 namespace pic {
 
@@ -148,7 +148,6 @@ public:
 
         switch(type)
         {
-
         case LT_WARD_LUMINANCE:
             {
                 weights = new float[3];
@@ -163,13 +162,20 @@ public:
             {
                 weights = new float[3];
                 weights_size = 3;
-                weights[0] =  0.213f;
-                weights[1] =  0.715f;
-                weights[2] =  0.072f;
+                weights[0] =  0.2126f;
+                weights[1] =  0.7152f;
+                weights[2] =  0.0722f;
             }
             break;
 
         case LT_MEAN:
+            {
+                weights = NULL;
+                weights_size = -1;
+            }
+            break;
+                
+        default:
             {
                 weights = NULL;
                 weights_size = -1;

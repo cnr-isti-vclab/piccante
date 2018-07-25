@@ -26,8 +26,6 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -44,7 +42,7 @@ int main(int argc, char *argv[])
 
     pic::Image img;
 
-    ImageRead(img_str, &img, pic::LT_NOR);
+    img.Read(img_str, pic::LT_NOR);
 
     printf("Ok\n");
 
@@ -69,7 +67,7 @@ int main(int argc, char *argv[])
 
         pic::Image *imgCorners_fast = fcd.getCornersImage(&corners_fast, NULL, img.width, img.height, true);
 
-        bWritten = ImageWrite(imgCorners_fast, "../data/output/corner_fast_output.png", pic::LT_NOR);
+        bWritten = imgCorners_fast->Write("../data/output/corner_fast_output.png", pic::LT_NOR);
 
         //Harris corners
         std::vector< Eigen::Vector2f > corners_harris;
@@ -84,7 +82,7 @@ int main(int argc, char *argv[])
         printf("\n");
 
         pic::Image *imgCorners_harris = hcd.getCornersImage(&corners_harris, NULL, img.width, img.height, true);
-        bWritten = ImageWrite(imgCorners_harris, "../data/output/corner_harris_output.png", pic::LT_NOR);
+        bWritten = imgCorners_harris->Write("../data/output/corner_harris_output.png", pic::LT_NOR);
 
         //SUSAN corners
         std::vector< Eigen::Vector2f > corners_susan;
@@ -98,7 +96,7 @@ int main(int argc, char *argv[])
         printf("\n");
 
         pic::Image *imgCorners_susan = scd.getCornersImage(&corners_susan, NULL, img.width, img.height, true);
-        bWritten = ImageWrite(imgCorners_susan, "../data/output/corner_susan_output.png", pic::LT_NOR);
+        bWritten = imgCorners_susan->Write("../data/output/corner_susan_output.png", pic::LT_NOR);
 
         printf("\n");
 

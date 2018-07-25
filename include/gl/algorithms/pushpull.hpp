@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_ALGORITHMS_PUSHPULL_HPP
 #define PIC_GL_ALGORITHMS_PUSHPULL_HPP
 
-#include "gl/image.hpp"
-#include "gl/filtering/filter_down_pp.hpp"
-#include "gl/filtering/filter_up_pp.hpp"
+#include "../../gl/image.hpp"
+#include "../../gl/filtering/filter_down_pp.hpp"
+#include "../../gl/filtering/filter_up_pp.hpp"
 
 namespace pic {
 
@@ -118,7 +118,7 @@ public:
         }
 
         //sampling from the pyramid (stack): Push
-        int n = (stack.size() - 2);
+        int n = int(stack.size() - 2);
 
         for(int i = n; i >= 0; i--) {
             flt_up->Process(DoubleGL(stack[i + 1], stack[i]), stack[i]);

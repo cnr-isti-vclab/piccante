@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_COLORS_COLOR_CONV_RGB_TO_XYZ_HPP
 #define PIC_COLORS_COLOR_CONV_RGB_TO_XYZ_HPP
 
-#include "colors/color_conv.hpp"
+#include "../colors/color_conv.hpp"
 
 namespace pic {
 
@@ -28,7 +28,7 @@ const float mtxRGBtoXYZ[] = {	0.4124f, 0.3576f, 0.1805f,
                             };
 
 const float mtxXYZtoRGB[] = {	3.2406f,   -1.5372f,   -0.4986f,
-                                -0.9689f,    1.8758f,    0.0415f,
+                               -0.9689f,    1.8758f,    0.0415f,
                                 0.0557f,   -0.2040f,    1.0570f
                             };
 

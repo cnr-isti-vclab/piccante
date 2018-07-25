@@ -18,10 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_DEFORM_GRID_HPP
 #define PIC_GL_FILTERING_FILTER_DEFORM_GRID_HPP
 
-#include "util/gl/bicubic.hpp"
-#include "image_samplers/image_sampler_bicubic.hpp"
-#include "filtering/filter_deform_grid.hpp"
-#include "gl/filtering/filter.hpp"
+#include "../../util/gl/bicubic.hpp"
+#include "../../image_samplers/image_sampler_bicubic.hpp"
+#include "../../filtering/filter_deform_grid.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -123,8 +123,8 @@ void FilterGLDeformGrid::Update(Image *grid_move)
     }
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("u_grid", 1);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1i("u_grid", 1);
     technique.unbind();
 }
 

@@ -18,7 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_1D_HPP
 #define PIC_GL_FILTERING_FILTER_1D_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "../../base.hpp"
+
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -92,7 +94,7 @@ public:
     void setSlice2(int slice)
     {
         this->slice = slice;
-        technique.setUniform("slice", slice);
+        technique.setUniform1i("slice", slice);
     }
 
     /**
@@ -104,7 +106,7 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-FilterGL1D::FilterGL1D(int direction, GLenum target): FilterGL()
+PIC_INLINE FilterGL1D::FilterGL1D(int direction, GLenum target): FilterGL()
 {
     weights = NULL;
 
@@ -131,7 +133,7 @@ FilterGL1D::FilterGL1D(int direction, GLenum target): FilterGL()
 
 }
 
-void FilterGL1D::ChangePass(int pass, int tPass)
+PIC_INLINE void FilterGL1D::ChangePass(int pass, int tPass)
 {
 
     if(target == GL_TEXTURE_2D) {
@@ -152,31 +154,31 @@ void FilterGL1D::ChangePass(int pass, int tPass)
     SetUniform();
 }
 
-void FilterGL1D::SetUniform()
+PIC_INLINE void FilterGL1D::SetUniform()
 {
     technique.bind();
-    technique.setUniform("u_tex", 0);
+    technique.setUniform1i("u_tex", 0);
     SetUniformAux();
 
-    technique.setUniform("iX", dirs[0]);
-    technique.setUniform("iY", dirs[1]);
+    technique.setUniform1i("iX", dirs[0]);
+    technique.setUniform1i("iY", dirs[1]);
 
     if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY) {
-        technique.setUniform("iZ", dirs[2]);
-        technique.setUniform("slice", slice);
+        technique.setUniform1i("iZ", dirs[2]);
+        technique.setUniform1i("slice", slice);
     }
 
     technique.unbind();
 }
 
-void FilterGL1D::InitShaders()
+PIC_INLINE void FilterGL1D::InitShaders()
 {
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGL1D");
+    technique.initStandard("330", vertex_source, fragment_source, "FilterGLConv1D");
 
     SetUniform();
 }
 
-ImageGL *FilterGL1D::Process(ImageGLVec imgIn, ImageGL *imgOut)
+PIC_INLINE ImageGL *FilterGL1D::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn[0] == NULL || imgIn.size() > 1) {
         return imgOut;

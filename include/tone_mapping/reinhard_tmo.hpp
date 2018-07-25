@@ -18,12 +18,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_REINHARD_TMO_HPP
 #define PIC_TONE_MAPPING_REINHARD_TMO_HPP
 
-#include "util/string.hpp"
-#include "filtering/filter.hpp"
-#include "filtering/filter_bilateral_2ds.hpp"
-#include "filtering/filter_luminance.hpp"
-#include "filtering/filter_sigmoid_tmo.hpp"
-#include "tone_mapping/input_estimates.hpp"
+#include "../base.hpp"
+#include "../util/string.hpp"
+#include "../filtering/filter.hpp"
+#include "../filtering/filter_bilateral_2ds.hpp"
+#include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_sigmoid_tmo.hpp"
+#include "../tone_mapping/input_estimates.hpp"
 
 namespace pic {
 
@@ -56,7 +57,7 @@ inline float SigmoidInv(float x)
  * @param phi
  * @return
  */
-Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = 0.18f,
+PIC_INLINE Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = 0.18f,
                       float whitePoint = -1.0f, float phi = 8.0f)
 {
     if(imgIn == NULL) {
@@ -82,7 +83,7 @@ Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = 0.18f,
         whitePoint = EstimateWhitePoint(LMax, LMin);
     }
 
-    //Filtering luminance in the sigmoid-space
+    //filter luminance in the sigmoid-space
     lum->applyFunction(&Sigmoid);
 
     float s_max = 8.0f;
@@ -97,17 +98,17 @@ Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = 0.18f,
 
     filteredLum->applyFunction(&SigmoidInv);
 
-    //Applying a sigmoid filter
+    //apply a sigmoid filter
     FilterSigmoidTMO flt_sigmoid(SIG_TMO, alpha, whitePoint, LogAverage);
     Image *tonemapped = flt_sigmoid.Process(Double(lum, filteredLum), NULL);
 
-    //Removing HDR luminance and replacing it with LDR one
+    //remove HDR luminance and replacing it with LDR one
     *imgOut /= *lum;
     *imgOut *= *tonemapped;
 
     imgOut->removeSpecials();
 
-    //Freeing memory
+    //free memory
     delete filteredLum;
     delete lum;
 

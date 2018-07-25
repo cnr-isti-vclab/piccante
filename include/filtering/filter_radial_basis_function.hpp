@@ -20,7 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-#include "algorithms/radial_basis_function.hpp"
+#include "../algorithms/radial_basis_function.hpp"
 
 /**
  * @brief The FilterRadialBasisFunction class

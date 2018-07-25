@@ -18,8 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_HISTOGRAM_MATCHING_HPP
 #define PIC_ALGORITHMS_HISTOGRAM_MATCHING_HPP
 
-#include "image.hpp"
-#include "histogram.hpp"
+#include "../base.hpp"
+
+#include "../image.hpp"
+#include "../histogram.hpp"
 
 namespace pic {
 
@@ -30,7 +32,7 @@ namespace pic {
  * @param out is
  * @return It returns out.
  */
-Image *matchHistograms(Image* img_source, Image* img_target, int nBin = 256, Image* out = NULL)
+PIC_INLINE Image *matchHistograms(Image* img_source, Image* img_target, int nBin = 256, Image* out = NULL)
 {
     if(img_source == NULL || img_target == NULL) {
         return out;

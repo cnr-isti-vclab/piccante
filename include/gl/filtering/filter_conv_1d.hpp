@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_CONV_1D_HPP
 #define PIC_GL_FILTERING_FILTER_CONV_1D_HPP
 
-#include "gl/filtering/filter_1d.hpp"
+#include "../../gl/filtering/filter_1d.hpp"
 
 namespace pic {
 
@@ -63,9 +63,9 @@ public:
             halfKernelSize = kernelSize >> 1;
         }
 
-        technique.setUniform("u_weights", 1);
-        technique.setUniform("halfKernelSize", halfKernelSize);
-        technique.setUniform("kernelSize", kernelSize);
+        technique.setUniform1i("u_weights", 1);
+        technique.setUniform1i("halfKernelSize", halfKernelSize);
+        technique.setUniform1i("kernelSize", kernelSize);
     }
 };
 
@@ -82,13 +82,13 @@ void FilterGLConv1D::FragmentShader()
 {
     std::string fragment_source_2D = MAKE_STRING
                                      (
-                                         uniform sampler2D	u_tex;
-                                         uniform sampler2D	u_weights;
-                                         uniform int        iX;
-                                         uniform int        iY;
-                                         uniform int        halfKernelSize;
-                                         uniform int        kernelSize;
-                                         out     vec4		f_color;
+                                         uniform sampler2D u_tex;
+                                         uniform sampler2D u_weights;
+                                         uniform int       iX;
+                                         uniform int       iY;
+                                         uniform int       halfKernelSize;
+                                         uniform int       kernelSize;
+                                         out    vec4       f_color;
 
     void main(void) {
         vec4  color = vec4(0.0);

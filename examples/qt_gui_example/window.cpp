@@ -79,7 +79,7 @@ void Window::open()
     }
 
     pic::Image *pic_im = new pic::Image;
-    pic_im->Read(fileName.toStdString());
+    ImageRead(fileName.toStdString(), pic_im);
 
     if(!pic_im->isValid()) {
         QMessageBox::information(this, tr("Simple QT"),
@@ -124,7 +124,8 @@ void Window::save_as()
                                                     *last_filename,
                                                     tr("Images (*.bmp *.tga *.ppm *.pgm *.pfm *.hdr)"));
 
-    bool success = image->Write(fileName.toStdString());
+    bool success = ImageWrite(image, fileName.toStdString());
+
     if(!success) {
         QMessageBox::information(this, tr("Simple QT"),
                                  tr("Cannot save %1.").arg(fileName));

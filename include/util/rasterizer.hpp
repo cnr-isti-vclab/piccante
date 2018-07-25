@@ -21,21 +21,27 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <algorithm>
 #include <cstdlib>
 
-#include "base.hpp"
-#include "image.hpp"
-#include "util/vec.hpp"
-#include "util/math.hpp"
+#include "../base.hpp"
+#include "../image.hpp"
+#include "../util/vec.hpp"
+#include "../util/math.hpp"
+
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Dense"
+#else
+    #include <Eigen/Dense>
+#endif
 
 namespace pic {
 
 /**
- * @brief DrawLine renders a line (v0, v1) with color into img.
+ * @brief drawLine renders a line (v0, v1) with color into img.
  * @param img is the image where to render the line (v0, v1).
  * @param v0 is the first vertex of the line.
  * @param v1 is the second vertex of the line.
  * @param color is the color of the line (v0, v1).
  */
-PIC_INLINE void DrawLine(Image *img, Vec<2, int> v0, Vec<2, int> v1, float *color)
+PIC_INLINE void drawLine(Image *img, Vec2i v0, Vec2i v1, float *color)
 {
     if(img == NULL || color == NULL) {
         return;
@@ -148,14 +154,45 @@ PIC_INLINE void DrawLine(Image *img, Vec<2, int> v0, Vec<2, int> v1, float *colo
 }
 
 /**
- * @brief EvaluateGaussian renders a Gaussian function which is centred
+ * @brief drawPoints
+ * @param img
+ * @param points
+ */
+#ifndef PIC_DISABLE_EIGEN
+PIC_INLINE void drawPoints(Image *img, std::vector< Eigen::Vector2f > &points, float *color)
+{
+    if(img == NULL) {
+        return;
+    }
+
+    if(color == NULL) {
+        color = new float[img->channels];
+        for(int i = 0; i < img->channels; i++) {
+            color[i] = 1.0f;
+        }
+    }
+
+    for(size_t i = 0; i < points.size(); i++) {
+        int x = int(points[i][0]);
+        int y = int(points[i][1]);
+        float *pixel = (*img)(x, y);
+
+        for(int j = 0; j < img->channels; j++) {
+            pixel[j] = color[j];
+        }
+    }
+}
+#endif
+
+/**
+ * @brief evaluateGaussian renders a Gaussian function which is centred
  * in the image.
  * @param img is an input image
  * @param sigma is the standard deviation of the Gaussian function.
  * @param bNormTerm is a boolean value. If it is true the Gaussian function
  * is normalized, false otherwise.
  */
-PIC_INLINE void EvaluateGaussian(Image *img, float sigma = -1.0f,
+PIC_INLINE void evaluateGaussian(Image *img, float sigma = -1.0f,
                                  bool bNormTerm = false)
 {
     if(img != NULL) {

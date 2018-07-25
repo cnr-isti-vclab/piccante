@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_FILE_LISTER_HPP
 #define PIC_UTIL_FILE_LISTER_HPP
 
-#include "util/string.hpp"
-
 #include <string>
 #include <iostream>
 #include <fstream>
+
+#include "../util/string.hpp"
 
 namespace pic {
 

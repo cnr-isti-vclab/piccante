@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_RECONSTRUCT_HPP
 #define PIC_FILTERING_FILTER_RECONSTRUCT_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
 namespace pic {
 
@@ -57,7 +57,12 @@ protected:
         }
     }
 
-
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() < 2) {

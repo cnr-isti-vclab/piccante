@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <string>
 
+#include "../../base.hpp"
+
 namespace pic {
 
 class ProgramGL
@@ -170,7 +172,7 @@ public:
         bType = false;
         object = glCreateProgram();
 
-        for(unsigned int i = 0; i < shaders.size(); i++)
+        for(auto i = 0; i < shaders.size(); i++)
         {
             GLuint tmp = shaders[i]->getObject();
             if(tmp != 0) {

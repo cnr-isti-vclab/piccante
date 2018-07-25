@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_IMAGE_SAMPLERS_IMAGE_SAMPLER_GAUSSIAN_HPP
 #define PIC_IMAGE_SAMPLERS_IMAGE_SAMPLER_GAUSSIAN_HPP
 
-#include "image_samplers/image_sampler.hpp"
-#include "util/precomputed_gaussian.hpp"
+#include "../image_samplers/image_sampler.hpp"
+#include "../util/precomputed_gaussian.hpp"
 
 namespace pic {
 

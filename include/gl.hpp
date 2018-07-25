@@ -22,27 +22,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 //OpenGL library
 #ifdef PIC_WIN32
-
-#include <GL/GL.h>
-#pragma comment( lib, "opengl32" )
-
+    #include <gl/GL.h>
+    #pragma comment( lib, "opengl32" )
 #else /* PIC_MAC_OS_X or PIC_UNIX */
 
-#ifdef PIC_MAC_OS_X
-    #include <OpenGL/OpenGL.h>
-#else
-    #include <GL/gl.h>
-#endif
-
+    #ifdef PIC_MAC_OS_X
+        #include <OpenGL/OpenGL.h>
+    #else
+        #include <GL/gl.h>
+    #endif
 #endif /* os selection */
 
-#ifdef PIC_DEPRECATE_CODE
-    #pragma message("GLW is deprecated. It will be removed in the next version!")
-    #warning "GLW is deprecated. It will be removed in the next version!"
-    #include "externals/glw/base.hpp"
-    #include "externals/glw/program.hpp"
-    #include "externals/glw/utility.hpp"
-#endif
+//end os selection
 
 #include "util/gl/program.hpp"
 #include "util/gl/technique.hpp"
@@ -50,6 +41,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/algorithms/pyramid.hpp"
 #include "gl/algorithms/pushpull.hpp"
 #include "gl/algorithms/color_to_gray.hpp"
+#include "gl/algorithms/richardson_lucy_deconvolution.hpp"
 
 #include "util/gl/buffer_op.hpp"
 #include "util/gl/buffer_ops.hpp"
@@ -83,6 +75,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/filtering/filter_drago_tmo.hpp"
 #include "gl/filtering/filter_1d.hpp"
 #include "gl/filtering/filter_conv_1d.hpp"
+#include "gl/filtering/filter_conv_2d.hpp"
 #include "gl/filtering/filter_non_linear_1d.hpp"
 #include "gl/filtering/filter_mean.hpp"
 #include "gl/filtering/filter_min.hpp"

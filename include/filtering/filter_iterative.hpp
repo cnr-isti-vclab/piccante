@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_ITERATIVE_HPP
 #define PIC_FILTERING_FILTER_ITERATIVE_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
 namespace pic {
 
@@ -86,7 +86,7 @@ public:
     Image *ProcessP(ImageVec imgIn, Image *imgOut);
 };
 
-FilterIterative::FilterIterative()
+PIC_INLINE FilterIterative::FilterIterative()
 {
     parallel = false;
     iterations = 0;
@@ -96,7 +96,7 @@ FilterIterative::FilterIterative()
     }
 }
 
-FilterIterative::FilterIterative(Filter *flt, int iterations)
+PIC_INLINE FilterIterative::FilterIterative(Filter *flt, int iterations)
 {
     for(int i = 0; i < 2; i++) {
         imgTmp[i] = NULL;
@@ -105,12 +105,12 @@ FilterIterative::FilterIterative(Filter *flt, int iterations)
     Update(flt, iterations);
 }
 
-FilterIterative::~FilterIterative()
+PIC_INLINE FilterIterative::~FilterIterative()
 {
     Destroy();
 }
 
-void FilterIterative::Destroy()
+PIC_INLINE void FilterIterative::Destroy()
 {
     if((iterations % 2) == 0) {
         if(imgTmp[0] != NULL) {
@@ -127,7 +127,7 @@ void FilterIterative::Destroy()
     }
 }
 
-void FilterIterative::Update(Filter *flt, int iterations)
+PIC_INLINE void FilterIterative::Update(Filter *flt, int iterations)
 {
     if(iterations > 0) {
         this->iterations = iterations;
@@ -144,7 +144,7 @@ void FilterIterative::Update(Filter *flt, int iterations)
     filters.push_back(flt);
 }
 
-Image *FilterIterative::SetupAuxN(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterIterative::SetupAuxN(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->allocateSimilarOne();
@@ -167,7 +167,7 @@ Image *FilterIterative::SetupAuxN(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-Image *FilterIterative::Process(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterIterative::Process(ImageVec imgIn, Image *imgOut)
 {
     if(imgIn.size() < 1 || imgIn[0] == NULL) {
         return imgOut;
@@ -196,7 +196,7 @@ Image *FilterIterative::Process(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-Image *FilterIterative::ProcessP(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterIterative::ProcessP(ImageVec imgIn, Image *imgOut)
 {
     parallel = true;
     return Process(imgIn, imgOut);

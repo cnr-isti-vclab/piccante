@@ -18,8 +18,16 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_COMPUTER_VISION_NELDER_MEAD_OPT_TRIANGULATION_HPP
 #define PIC_COMPUTER_VISION_NELDER_MEAD_OPT_TRIANGULATION_HPP
 
-#include "util/matrix_3_x_3.hpp"
-#include "util/nelder_mead_opt_base.hpp"
+#include "../util/matrix_3_x_3.hpp"
+#include "../util/nelder_mead_opt_base.hpp"
+
+#ifndef PIC_DISABLE_EIGEN
+#ifndef PIC_EIGEN_NOT_BUNDLED
+   #include "../externals/Eigen/Dense"
+#else
+    #include <Eigen/Dense>
+#endif
+#endif
 
 namespace pic {
 

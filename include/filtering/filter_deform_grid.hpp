@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_DEFORM_GRID_HPP
 #define PIC_FILTERING_FILTER_DEFORM_GRID_HPP
 
-#include "filtering/filter.hpp"
-#include "image_samplers/image_sampler_bicubic.hpp"
-#include "image_samplers/image_sampler_bilinear.hpp"
-#include "image_samplers/image_sampler_nearest.hpp"
-#include "util/vec.hpp"
+#include "../filtering/filter.hpp"
+#include "../image_samplers/image_sampler_bicubic.hpp"
+#include "../image_samplers/image_sampler_bilinear.hpp"
+#include "../image_samplers/image_sampler_nearest.hpp"
+#include "../util/vec.hpp"
 
 namespace pic {
 

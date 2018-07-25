@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_SIMPLE_TMO_HPP
 #define PIC_GL_FILTERING_FILTER_SIMPLE_TMO_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -148,9 +148,9 @@ void FilterGLSimpleTMO::Update(float gamma, float fstop)
     float exposure = powf(2.0f, fstop);
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("tn_gamma", invGamma);
-    technique.setUniform("tn_exposure", exposure);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1f("tn_gamma", invGamma);
+    technique.setUniform1f("tn_exposure", exposure);
     technique.unbind();
 }
 

@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_BILATERAL_2DF_HPP
 #define PIC_FILTERING_FILTER_BILATERAL_2DF_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
 namespace pic {
 
@@ -73,7 +73,7 @@ public:
     static Image *Execute(Image *imgIn, Image *imgOut,
                              float sigma_s, float sigma_r)
     {
-        //Filtering
+        //filter
         FilterBilateral2DF filter(sigma_s, sigma_r);
         long t0 = timeGetTime();
         Image *out = filter.ProcessP(Single(imgIn), imgOut);
@@ -106,12 +106,12 @@ public:
     }
 };
 
-FilterBilateral2DF::FilterBilateral2DF()
+PIC_INLINE FilterBilateral2DF::FilterBilateral2DF()
 {
     pg = NULL;
 }
 
-FilterBilateral2DF::FilterBilateral2DF(float sigma_s, float sigma_r)
+PIC_INLINE FilterBilateral2DF::FilterBilateral2DF(float sigma_s, float sigma_r)
 {
     //protected values are assigned/computed
     this->sigma_s = sigma_s;
@@ -121,7 +121,7 @@ FilterBilateral2DF::FilterBilateral2DF(float sigma_s, float sigma_r)
     pg = new PrecomputedGaussian(sigma_s);
 }
 
-void FilterBilateral2DF::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterBilateral2DF::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     int channels = dst->channels;
 

@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_DIVERGENCE_HPP
 #define PIC_FILTERING_FILTER_DIVERGENCE_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
 namespace pic {
 
@@ -70,13 +70,11 @@ public:
     }
 };
 
-void FilterDivergence::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterDivergence::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-
     int width = dst->width;
     int height = dst->height;
 
-    //Filtering
     float *data = src[0]->data;
     float gradX, gradY;
 

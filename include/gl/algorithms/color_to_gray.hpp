@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_ALGORITHMS_COLOR_TO_GRAY_HPP
 #define PIC_GL_ALGORITHMS_COLOR_TO_GRAY_HPP
 
-#include "gl/image.hpp"
-#include "gl/filtering/filter_channel.hpp"
-#include "gl/tone_mapping/exposure_fusion.hpp"
+#include "../../gl/image.hpp"
+#include "../../gl/filtering/filter_channel.hpp"
+#include "../../gl/tone_mapping/exposure_fusion.hpp"
 
 namespace pic {
 
@@ -58,12 +58,12 @@ public:
     }
 
     /**
-     * @brief Process
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL Process(ImageGL *imgIn, ImageGL *imgOut)
+    ImageGL execute(ImageGL *imgIn, ImageGL *imgOut)
     {
         if(imgIn == NULL){
             return imgOut;

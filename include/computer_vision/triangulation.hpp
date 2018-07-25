@@ -22,14 +22,24 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <stdlib.h>
 
-#include "util/math.hpp"
+#include "../base.hpp"
+
+#include "../util/math.hpp"
+
+#include "../util/eigen_util.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
-#include "externals/Eigen/Dense"
-#include "externals/Eigen/SVD"
-#include "externals/Eigen/Geometry"
 
-#include "util/eigen_util.hpp"
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/Dense"
+    #include "../externals/Eigen/SVD"
+    #include "../externals/Eigen/Geometry"
+#else
+    #include <Eigen/Dense>
+    #include <Eigen/SVD>
+    #include <Eigen/Geometry>
+#endif
+
 #endif
 
 namespace pic {
@@ -44,7 +54,7 @@ namespace pic {
  * @param t is the translation matrix between the two views.
  * @return
  */
-Eigen::Vector3d triangulationLonguetHiggins(Eigen::Vector3d &point_0, Eigen::Vector3d &point_1, Eigen::Matrix3d &R, Eigen::Vector3d &t)
+PIC_INLINE Eigen::Vector3d triangulationLonguetHiggins(Eigen::Vector3d &point_0, Eigen::Vector3d &point_1, Eigen::Matrix3d &R, Eigen::Vector3d &t)
 {
     Eigen::Vector3d ret;
 
@@ -70,7 +80,7 @@ Eigen::Vector3d triangulationLonguetHiggins(Eigen::Vector3d &point_0, Eigen::Vec
  * @param t
  * @return
  */
-Eigen::Vector4d triangulationHartleySturm(Eigen::Vector3d &point_0, Eigen::Vector3d &point_1,
+PIC_INLINE Eigen::Vector4d triangulationHartleySturm(Eigen::Vector3d &point_0, Eigen::Vector3d &point_1,
                                           Eigen::Matrix34d &M0, Eigen::Matrix34d &M1, int maxIter = 100)
 {
     Eigen::Vector4d M0_row[3], M1_row[3];

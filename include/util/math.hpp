@@ -21,17 +21,20 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <math.h>
 #include <random>
 #include <stdlib.h>
+#include <set>
+
+#include "../base.hpp"
 
 namespace pic {
 
 //Natural logarithm of 2
-const float C_LOG_NAT_2			= 0.69314718055994530941723212145818f;
+const float C_LOG_NAT_2         = 0.69314718055994530941723212145818f;
 
 //Reciprocal natural logarithm of 2
-const float C_INV_LOG_NAT_2		= 1.4426950408889634073599246810019f;
+const float C_INV_LOG_NAT_2     = 1.4426950408889634073599246810019f;
 
 //Epsilon
-const float C_EPSILON			= 1e-6f;
+const float C_EPSILON           = 1e-6f;
 
 //Square root of 2
 const float C_SQRT_2            = 1.4142135623730950488016887242097f;
@@ -83,7 +86,7 @@ const float C_PI_OVER_ONE_80    = 0.017453292519943295769236907685f;
  * @param value
  * @return
  */
-template< typename T > inline bool isnan(T value)
+template< typename T > PIC_INLINE bool isnan(T value)
 {
     return value != value ;
 }
@@ -98,7 +101,7 @@ template< typename T > inline bool isnan(T value)
  * @param value
  * @return
  */
-template< typename T > inline bool isinf(T value)
+template< typename T > PIC_INLINE bool isinf(T value)
 {
     return std::numeric_limits<T>::has_infinity &&
            (value ==  std::numeric_limits<T>::infinity() ||
@@ -114,7 +117,7 @@ template< typename T > inline bool isinf(T value)
  * @return This function returns true if a and b are similar,
  * false otherwise.
  */
-inline bool equalf(float a, float b)
+PIC_INLINE bool equalf(float a, float b)
 {
     return ( fabsf(a - b) < C_EPSILON);
 }
@@ -123,7 +126,7 @@ inline bool equalf(float a, float b)
  * @brief Randombase returns a number in [0, 1] based on rand().
  * @return It returns a random number in [0, 1].
  */
-float Randombase()
+PIC_INLINE float Randombase()
 {
     return float(rand() % RAND_MAX) / float(RAND_MAX);
 }
@@ -133,7 +136,7 @@ float Randombase()
  * @param n is a 32-bit unsigned integer number.
  * @return It returns n as a normalized float in [0, 1].
  */
-inline float Random(unsigned int n)
+PIC_INLINE float Random(unsigned int n)
 {
     return float(n) / 4294967295.0f;
 }
@@ -145,7 +148,7 @@ inline float Random(unsigned int n)
  * @param b
  * @return
  */
-inline int RandomInt(unsigned int n, int a, int b)
+PIC_INLINE int RandomInt(unsigned int n, int a, int b)
 {
     if(a < b) {
         return n % (b - a);
@@ -159,7 +162,7 @@ inline int RandomInt(unsigned int n, int a, int b)
  * @param x is a value in [0.0, 1.0]
  * @return it returns 3 x^2 - 2 x^3
  */
-inline float SFunction(float x)
+PIC_INLINE float SFunction(float x)
 {
     float x2 = x * x;
     return 3.0f * x2 - 2.0f * x2 * x;
@@ -170,7 +173,7 @@ inline float SFunction(float x)
  * @param x is a value in [0.0, 1.0]
  * @return
  */
-float SCurve5(float x)
+PIC_INLINE float SCurve5(float x)
 {
     float x2 = x * x;
     float x4 = x2 * x2;
@@ -183,7 +186,7 @@ float SCurve5(float x)
  * @param x a value.
  * @return It return x^2.
  */
-inline float Square(float x)
+PIC_INLINE float Square(float x)
 {
     return x * x;
 }
@@ -196,7 +199,7 @@ inline float Square(float x)
  * @return
  */
 template< class T >
-inline T Clamp(T x, T a, T b)
+PIC_INLINE T Clamp(T x, T a, T b)
 {
     if(x > b) {
         return b;
@@ -214,7 +217,7 @@ inline T Clamp(T x, T a, T b)
  * @param x is a scalar.
  * @return
  */
-inline long lround(double x)
+PIC_INLINE long lround(double x)
 {
     if(x > 0.0) {
         return (x - floor(x) <  0.5) ? (long)floor(x) : (long)ceil(x);
@@ -228,7 +231,7 @@ inline long lround(double x)
  * @param x is a scalar.
  * @return
  */
-inline float lround(float x)
+PIC_INLINE float lround(float x)
 {
     if(x > 0.0f) {
         return (x - floorf(x) < 0.5f)  ? floorf(x) : ceilf(x);
@@ -244,7 +247,7 @@ inline float lround(float x)
  * @param x1 is the max value.
  * @return it returns x0 + t * (x1 - x0)
  */
-inline float lerp(float t, float x0, float x1)
+PIC_INLINE float lerp(float t, float x0, float x1)
 {
     return x0 + t * (x1 - x0);
 }
@@ -256,7 +259,7 @@ inline float lerp(float t, float x0, float x1)
  * @param value is a value in [0.0, 1.0].
  * @return It returns - 2 x^3 + 3 x^2.
  */
-inline float SmoothStep(float a, float b, float value)
+PIC_INLINE float SmoothStep(float a, float b, float value)
 {
     float x = Clamp<float>((value - a) / (b - a), 0.0f, 1.0f);
     return  x * x * (-2.0f * x + 3.0f);
@@ -277,7 +280,7 @@ inline float Deg2Rad(float deg)
  * @param rad is a value of an angle expressed in radians.
  * @return It returns an ang expressed in degrees.
  */
-inline float Rad2Deg(float rad)
+PIC_INLINE float Rad2Deg(float rad)
 {
     return rad * C_ONE_80_OVER_PI;
 }
@@ -287,7 +290,7 @@ inline float Rad2Deg(float rad)
  * @param n is an integer value.
  * @return It returns log2 of n.
  */
-inline int log2(int n)
+PIC_INLINE int log2(int n)
 {
     int val = 1;
     int lg  = 0;
@@ -309,7 +312,7 @@ inline int log2(int n)
  * @param n is a positive exponent.
  * @return It returns 2^n.
  */
-inline int pow2(int n)
+PIC_INLINE int pow2(int n)
 {
     return 1 << n;
 }
@@ -319,7 +322,7 @@ inline int pow2(int n)
  * @param x is a value for which the log10 needs to be computed.
  * @return It returns log10(x + 1).
  */
-float log10Plus(float x)
+PIC_INLINE float log10Plus(float x)
 {
     return log10f(x + 1.0f);
 }
@@ -329,7 +332,7 @@ float log10Plus(float x)
  * @param x
  * @return
  */
-inline float expMinus(float x)
+PIC_INLINE float expMinus(float x)
 {
     float tmp = powf(10.0f, x) - 1.0f;
     return MAX(tmp, 0.0f);
@@ -340,7 +343,7 @@ inline float expMinus(float x)
  * @param x
  * @return
  */
-float log10fPlusEpsilon(float x)
+PIC_INLINE float log10fPlusEpsilon(float x)
 {
     return log10f(x + 1e-6f);
 }
@@ -350,7 +353,7 @@ float log10fPlusEpsilon(float x)
  * @param x
  * @return
  */
-inline float log2f(float x)
+PIC_INLINE float log2f(float x)
 {
     return logf(x) * C_INV_LOG_NAT_2;
 }
@@ -360,7 +363,7 @@ inline float log2f(float x)
  * @param x
  * @return
  */
-float log2fPlusEpsilon(float x)
+PIC_INLINE float log2fPlusEpsilon(float x)
 {
     return logf(x + 1e-6f) * C_INV_LOG_NAT_2;
 }
@@ -370,7 +373,7 @@ float log2fPlusEpsilon(float x)
  * @param x
  * @return
  */
-inline float pow2f(float x)
+PIC_INLINE float pow2f(float x)
 {
     return powf(2.0f, x);
 }
@@ -381,7 +384,7 @@ inline float pow2f(float x)
  * @param b is the exponent.
  * @return it returns x^b.
  */
-static int powint(int x, int b)
+PIC_INLINE int powint(int x, int b)
 {
     int ret = 1;
     
@@ -393,27 +396,26 @@ static int powint(int x, int b)
 }
 
 /**
- * @brief getPermutation computes a permutation.
+ * @brief getRandomPermutation computes a random permutation.
  * @param m is a Mersenne Twister random number generator.
  * @param perm is the array where to store the permutation.
  * @param nPerm is the size of perm.
  * @param n is the number of object to permutate.
  */
-void getPermutation(std::mt19937 &m, unsigned int *perm, int nPerm, int n)
+PIC_INLINE void getRandomPermutation(std::mt19937 &m, unsigned int *perm, int nPerm, int n)
 {
-    int index = 0;
+    std::set< int > checker;
+
+    int tmp = m() % n;
+    checker.insert(tmp);
+    perm[0] = tmp;
+    int index = 1;
+
     while(index < nPerm) {
-        perm[index] = m() % n;
-        bool flag = true;
+        tmp = m() % n;
 
-        for(int j = 0; j < (index - 1); j++) {
-            if(perm[index] == perm[j]) {
-                flag = false;
-                break;
-            }
-        }
-
-        if(flag) {
+        if(checker.find(tmp) == checker.end()) {
+            perm[index] = tmp;
             index++;
         }
     }

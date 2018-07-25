@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_OP_HPP
 #define PIC_GL_FILTERING_FILTER_OP_HPP
 
-#include "gl/filtering/filter.hpp"
-#include "util/string.hpp"
+#include "../../gl/filtering/filter.hpp"
+#include "../../util/string.hpp"
 
 namespace pic {
 
@@ -312,10 +312,10 @@ void FilterGLOp::InitShaders()
     technique.unbind();
 
     technique.bind();
-    technique.setUniform("u_tex_0",  0);
-    technique.setUniform("u_tex_1",  1);
-    technique.setUniform4("u_val_0", c0);
-    technique.setUniform4("u_val_1", c1);
+    technique.setUniform1i("u_tex_0",  0);
+    technique.setUniform1i("u_tex_1",  1);
+    technique.setUniform4fv("u_val_0", c0);
+    technique.setUniform4fv("u_val_1", c1);
     technique.unbind();
 }
 
@@ -334,10 +334,10 @@ void FilterGLOp::Update(float *c0, float *c1)
     }
 
     technique.bind();
-    technique.setUniform("u_tex_0",  0);
-    technique.setUniform("u_tex_1",  1);
-    technique.setUniform4("u_val_0", this->c0);
-    technique.setUniform4("u_val_1", this->c1);
+    technique.setUniform1i("u_tex_0",  0);
+    technique.setUniform1i("u_tex_1",  1);
+    technique.setUniform4fv("u_val_0", this->c0);
+    technique.setUniform4fv("u_val_1", this->c1);
     technique.unbind();
 }
 

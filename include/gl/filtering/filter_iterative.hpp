@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_ITERATIVE_HPP
 #define PIC_GL_FILTERING_FILTER_ITERATIVE_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -117,7 +117,7 @@ ImageGL *FilterGLIterative::SetupAuxN(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgOut == NULL) {
-        imgOut = imgIn[0]->AllocateSimilarOneGL();
+        imgOut = imgIn[0]->allocateSimilarOneGL();
     }
 
     /*
@@ -131,13 +131,13 @@ ImageGL *FilterGLIterative::SetupAuxN(ImageGLVec imgIn,
         imgTmp[1] = imgOut;
 
         if(imgTmp[0] == NULL) {
-            imgTmp[0] = imgOut->AllocateSimilarOneGL();
+            imgTmp[0] = imgOut->allocateSimilarOneGL();
         }
     } else {
         imgTmp[0] = imgOut;
 
         if(imgTmp[1] == NULL) {
-            imgTmp[1] = imgOut->AllocateSimilarOneGL();
+            imgTmp[1] = imgOut->allocateSimilarOneGL();
         }
     }
 

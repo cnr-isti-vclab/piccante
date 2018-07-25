@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_UP_PP_HPP
 #define PIC_FILTERING_FILTER_UP_PP_HPP
 
-#include "filtering/filter.hpp"
-#include "filtering/filter_down_pp.hpp"
-#include "image_samplers/image_sampler_bilinear.hpp"
+#include "../filtering/filter.hpp"
+#include "../filtering/filter_down_pp.hpp"
+#include "../image_samplers/image_sampler_bilinear.hpp"
 
 namespace pic {
 

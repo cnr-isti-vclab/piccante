@@ -27,55 +27,41 @@ This program is free software: you can redistribute it and/or modify
 #define PIC_DISABLE_OPENGL
 
 #include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    std::string img_str0, img_str1;
+    std::string img_str;
 
-    if(argc == 3) {
-        img_str0 = argv[1];
-        img_str1 = argv[2];
+    if(argc == 2) {
+        img_str = argv[1];
     } else {
-        img_str0 = "../data/input/features/checker_board_photo.png";
-        img_str1 = "../data/input/features/checker_board_pattern.png";
+        img_str = "../data/input/features/checker_board_photo.png";
     }
 
-    pic::Image img, img_pattern;
-    ImageRead(img_str0, &img);
-    ImageRead(img_str1, &img_pattern);
-
-    printf("Ok\n");
-
+    printf("Reading images...");
+    pic::Image img(img_str, pic::LT_NOR_GAMMA);
     printf("Is the image valid? ");
-    if(img.isValid() && img_pattern.isValid()) {
+
+    if(img.isValid()) {
         printf("OK\n");
 
-        //compute the luminance images
-        pic::Image *L = pic::FilterLuminance::Execute(&img, NULL, pic::LT_CIE_LUMINANCE);
+        std::vector< Eigen::Vector2f > corners;
+        pic::findCheckerBoard(&img, corners);
 
-        //get corners
-        printf("Extracting corners...\n");
-        pic::HarrisCornerDetector hcd(2.5f, 5);
-        std::vector< Eigen::Vector3f > corners_from_img;
-        hcd.execute(L, &corners_from_img);
+        Eigen::Vector2f p0, p1;
+        float length = pic::estimateLengthOfCheckers(corners, p0, p1);
 
-        pic::GeneralCornerDetector::sortCorners(&corners_from_img);
+        printf("The checkers' length is %3.3f pixels.\n", length);
 
-        float *col_mu = img.getMeanVal(NULL, NULL);
-        float *scaling = pic::FilterWhiteBalance::getScalingFactors(col_mu, img.channels);
-        pic::FilterWhiteBalance fwb(scaling, img.channels);
+        float *color = pic::estimateWhitePointFromCheckerBoard(&img, corners);
 
-        pic::Image *img_wb = fwb.Process(Single(&img), NULL);
+        pic::Image *img_wb = pic::applyWhiteBalance(&img, color);
 
-        ImageWrite(img_wb, "../data/output/img_wb.png");
+        std::string name = pic::removeExtension(img_str);
+        name = pic::removeLocalPath(name);
+        img_wb->Write("../data/output/" + name + "_wb.png");
 
-        std::vector< Eigen::Vector2f > cfi_out;
-
-        pic::GeneralCornerDetector::removeClosestCorners(&corners_from_img, &cfi_out, 16.0f, 60);
-
-        printf("%s\n", pic::GeneralCornerDetector::exportToString(&cfi_out).c_str());
 
     } else {
         printf("No there is at least an invalid file!\n");

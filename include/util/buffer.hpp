@@ -20,8 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <string.h>
 
-#include "base.hpp"
-#include "util/math.hpp"
+#include "../base.hpp"
+#include "../util/math.hpp"
 
 namespace pic {
 
@@ -43,6 +43,13 @@ public:
      */
     static T *assign(T *buffer, int n, T value)
     {
+        if(buffer == NULL) {
+            if(n > 0) {
+                buffer = new T[n];
+            } else {
+                return buffer;
+            }
+        }
         #pragma omp parallel for
 
         for(int i = 0; i < n; i++) {
@@ -51,7 +58,6 @@ public:
 
         return buffer;
     }
-
 
     /**
      * @brief assign
@@ -83,7 +89,6 @@ public:
 
         return buffer;
     }
-
 
     /**
      * @brief add
@@ -617,7 +622,7 @@ public:
      * @param frames
      * @return
      */
-    static T *transpose(T *bufferOut, T *bufferIn, int width, int height,
+    static T* transpose(T *bufferOut, T *bufferIn, int width, int height,
                               int channels, int frames)
     {
         if(bufferIn == NULL) {
@@ -652,11 +657,11 @@ public:
      * @param frames
      * @return
      */
-    static T *BGRtoRGB(T *buffer, int width, int height,
+    static T* BGRtoRGB(T *buffer, int width, int height,
                               int channels, int frames)
     {
         int size = width * height * channels * frames;
-        for(int i=0; i<size; i+=channels) {
+        for(int i = 0; i < size; i += channels) {
             T tmp         = buffer[i];
             buffer[i    ] = buffer[i + 2];
             buffer[i + 2] = tmp;
@@ -673,7 +678,7 @@ public:
      * @param channels
      * @return
      */
-    static T*BufferFromLayerToIntervaleaved(T *bufferOut, T *bufferIn, int n, int channels)
+    static T* BufferFromLayerToIntervaleaved(T *bufferOut, T *bufferIn, int n, int channels)
     {
         #pragma omp parallel for
         for(int i = 0; i < n; i++) {
@@ -687,6 +692,29 @@ public:
                 }
 
         }
+    }
+
+    /**
+     * @brief clone
+     * @param bufferOut
+     * @param bufferIn
+     * @param n
+     * @param channels
+     * @return
+     */
+    static T *clone(T *bufferOut, T *bufferIn, int n, int channels)
+    {
+        if(bufferIn == NULL) {
+            return bufferOut;
+        }
+
+        if(bufferOut == NULL) {
+            bufferOut = new T[n * channels];
+        }
+
+        memcpy(bufferOut, bufferIn, n * channels * sizeof(T));
+
+        return bufferOut;
     }
 };
 

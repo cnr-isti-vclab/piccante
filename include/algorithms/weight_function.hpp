@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_WEIGHT_FUNCTION_HPP
 #define PIC_ALGORITHMS_WEIGHT_FUNCTION_HPP
 
+#include "../base.hpp"
+
 namespace pic {
 
 /**
@@ -31,7 +33,7 @@ enum CRF_WEIGHT {CW_ALL, CW_HAT, CW_DEB97, CW_DEB97p01, CW_ROBERTSON};
  * @param type is the type of the function.
  * @return It returns a weight for x.
  */
-inline float weightFunction(float x, CRF_WEIGHT type)
+PIC_INLINE float weightFunction(float x, CRF_WEIGHT type)
 {
     switch(type) {
 
@@ -51,6 +53,7 @@ inline float weightFunction(float x, CRF_WEIGHT type)
         float val_quartic = val_squared * val_squared;
         return (1.0f - val_quartic * val_quartic * val_quartic);
     }
+    break;
 
     case CW_DEB97: {
         static const float Zmin = 0.0f;
@@ -76,7 +79,12 @@ inline float weightFunction(float x, CRF_WEIGHT type)
             return CLAMPi(Zmax - x, 0.0f, 1.0f);
         }
     }
+    break;
 
+    default: {
+        return 1.0f;
+    }
+    break;
     }
 
     return 1.0f;

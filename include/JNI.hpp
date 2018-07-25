@@ -15,8 +15,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_FEATURES_EXTERNALS_HPP
-#define PIC_FEATURES_EXTERNALS_HPP
+#ifndef PIC_JNI_HPP
+#define PIC_JNI_HPP
 
+#include "JNI/white_balance.hpp"
+#include "JNI/live_wire.hpp"
+#include "JNI/find_checker_board.hpp"
 
-#endif // PIC_FEATURES_EXTERNALS_HPP
+#endif /* PIC_JNI_HPP */
+

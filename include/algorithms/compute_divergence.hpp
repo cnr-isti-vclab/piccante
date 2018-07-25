@@ -18,7 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_COMPUTE_DIVERGENCE_HPP
 #define PIC_ALGORITHMS_COMPUTE_DIVERGENCE_HPP
 
-#include "filtering/filter_conv_1d.hpp"
+#include "../base.hpp"
+
+#include "../filtering/filter_conv_1d.hpp"
 
 namespace pic {
 
@@ -28,7 +30,7 @@ namespace pic {
  * @param div is the output divergence of the gradient of img; i.e. Laplacian.
  * @return
  */
-Image *computeDivergence(Image *img, Image *div = NULL)
+PIC_INLINE Image *computeDivergence(Image *img, Image *div = NULL)
 {
     if(img == NULL) {
         return div;

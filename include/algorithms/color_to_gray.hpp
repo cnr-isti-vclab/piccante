@@ -18,9 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_COLOR_TO_GRAY_HPP
 #define PIC_ALGORITHMS_COLOR_TO_GRAY_HPP
 
-#include "image.hpp"
-#include "filtering/filter_channel.hpp"
-#include "tone_mapping/exposure_fusion.hpp"
+#include "../base.hpp"
+#include "../image.hpp"
+#include "../filtering/filter_channel.hpp"
+#include "../tone_mapping/exposure_fusion.hpp"
 
 namespace pic {
 
@@ -30,7 +31,7 @@ namespace pic {
  * @param imgOut
  * @return
  */
-Image *colorToGray(Image *imgIn, Image *imgOut)
+PIC_INLINE Image *colorToGray(Image *imgIn, Image *imgOut)
 {
     if(imgIn == NULL){
         return imgOut;

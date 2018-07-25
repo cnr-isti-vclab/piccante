@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_DURAND_TMO_HPP
 #define PIC_GL_FILTERING_FILTER_DURAND_TMO_HPP
 
-#include "gl/filtering/filter.hpp"
-#include "gl/filtering/filter_luminance.hpp"
+#include "../../gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter_luminance.hpp"
 
 namespace pic {
 
@@ -133,11 +133,11 @@ void FilterGLDurandTMO::Update(float compression_factor, float log_absolute)
     this->log_absolute = log_absolute;
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("u_lum_log", 1);
-    technique.setUniform("u_base", 2);
-    technique.setUniform("compression_factor", compression_factor);
-    technique.setUniform("log_absolute", log_absolute);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform1i("u_lum_log", 1);
+    technique.setUniform1i("u_base", 2);
+    technique.setUniform1f("compression_factor", compression_factor);
+    technique.setUniform1f("log_absolute", log_absolute);
     technique.unbind();
 }
 

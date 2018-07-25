@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BLEND_HPP
 #define PIC_GL_FILTERING_FILTER_BLEND_HPP
 
-#include "gl/filtering/filter.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -80,9 +80,9 @@ void FilterGLBlend::InitShaders()
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBlend");
 
     technique.bind();
-    technique.setUniform("u_tex0", 0);
-    technique.setUniform("u_tex1", 1);
-    technique.setUniform("u_texMask", 2);
+    technique.setUniform1i("u_tex0", 0);
+    technique.setUniform1i("u_tex1", 1);
+    technique.setUniform1i("u_texMask", 2);
     technique.unbind();
 }
 

@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_LUMINANCE_HPP
 #define PIC_GL_FILTERING_FILTER_LUMINANCE_HPP
 
-#include "filtering/filter_luminance.hpp"
-#include "gl/filtering/filter.hpp"
+#include "../../filtering/filter_luminance.hpp"
+#include "../../gl/filtering/filter.hpp"
 
 namespace pic {
 
@@ -148,9 +148,9 @@ void FilterGLLuminance::Update(LUMINANCE_TYPE type)
 
     case LT_CIE_LUMINANCE:
         {
-            weights[0] = 0.213f;
-            weights[1] = 0.715f;
-            weights[2] = 0.072f;
+            weights[0] = 0.2126f;
+            weights[1] = 0.7152f;
+            weights[2] = 0.0722f;
         }
         break;
 
@@ -162,11 +162,16 @@ void FilterGLLuminance::Update(LUMINANCE_TYPE type)
             weights[2] = inv_3;
         }
         break;
+
+    default:
+        {
+
+        } break;
     }
 
     technique.bind();
-    technique.setUniform("u_tex", 0);
-    technique.setUniform("weights", weights[0], weights[1], weights[2]);
+    technique.setUniform1i("u_tex", 0);
+    technique.setUniform3f("weights", weights[0], weights[1], weights[2]);
     technique.unbind();
 }
 

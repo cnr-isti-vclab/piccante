@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_SAMPLER_2D_HPP
 #define PIC_FILTERING_FILTER_SAMPLER_2D_HPP
 
-#include "filtering/filter.hpp"
-#include "image_samplers/image_sampler_bilinear.hpp"
-#include "image_samplers/image_sampler_bsplines.hpp"
-#include "image_samplers/image_sampler_gaussian.hpp"
-#include "image_samplers/image_sampler_nearest.hpp"
+#include "../filtering/filter.hpp"
+#include "../image_samplers/image_sampler_bilinear.hpp"
+#include "../image_samplers/image_sampler_bsplines.hpp"
+#include "../image_samplers/image_sampler_gaussian.hpp"
+#include "../image_samplers/image_sampler_nearest.hpp"
 
 namespace pic {
 

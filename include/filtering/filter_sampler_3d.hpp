@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_SAMPLER_3D_HPP
 #define PIC_FILTERING_FILTER_SAMPLER_3D_HPP
 
-#include "filtering/filter.hpp"
-#include "image_samplers/image_sampler.hpp"
+#include "../filtering/filter.hpp"
+#include "../image_samplers/image_sampler.hpp"
 
 namespace pic {
 
@@ -70,13 +70,13 @@ public:
     }
 };
 
-FilterSampler3D::FilterSampler3D(float scale, ImageSampler *isb)
+PIC_INLINE FilterSampler3D::FilterSampler3D(float scale, ImageSampler *isb)
 {
     this->scale = scale;
     this->isb = isb;
 }
 
-Image *FilterSampler3D::SetupAux(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterSampler3D::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = new Image( int(imgIn[0]->framesf * scale),
@@ -88,7 +88,7 @@ Image *FilterSampler3D::SetupAux(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-void FilterSampler3D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterSampler3D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     Image *source = src[0];
 

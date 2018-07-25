@@ -22,8 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
 #ifdef _MSC_VER
-    #define PIC_DISABLE_OPENGL_NON_CORE
-    #include "../opengl_common_code/gl_core_4_0.h"
+    #include "../common_code/gl_core_4_0.h"
 #endif
 
 #include <QKeyEvent>
@@ -33,8 +32,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QOpenGLFunctions>
 #include <QVBoxLayout>
 #include <QLabel>
-
-#include "../common_code/image_qimage_interop.hpp"
 
 #include "piccante.hpp"
 
@@ -62,7 +59,7 @@ protected:
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
         //read an input image
-        ImageRead("../data/input/bottles.hdr", &img);
+        img.Read("../data/input/bottles.hdr");
 
         img.generateTextureGL();
 

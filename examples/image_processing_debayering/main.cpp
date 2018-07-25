@@ -20,31 +20,35 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
+    std::string img_str;
+
+    if(argc == 2) {
+        img_str = argv[1];
+    } else {
+        img_str = "../data/input/yellow_flowers.png";
+    }
 
     printf("Reading an HDR file...");
 
     pic::Image img;
-    ImageRead("../data/input/yellow_flowers.png", &img);
+    img.Read(img_str);
 
     printf("Is it valid? ");
     if(img.isValid()) {
+
         printf("OK\n");
 
         printf("Creating an image with bayering RGGB...");
-        pic::Image *imgRGGB = pic::FilterMosaic::Execute(&img, NULL);
+        pic::Image *img_RGGB = pic::FilterMosaic::Execute(&img, NULL);
         printf("Ok\n");
 
         printf("Debayering the image...");
-        pic::Image out(1, img.width, img.height, 3);
-        pic::FilterDemosaic::Execute(imgRGGB, &out);
+        pic::Image out(1, img.width, img.height, img.channels);
+        pic::FilterDemosaic::Execute(img_RGGB, &out);
         printf("Ok\n");
 
         printf("Computing the difference image...");
@@ -53,11 +57,10 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         printf("Writing results...");
-        ImageWrite(imgRGGB, "../data/output/yellow_flowers_mosaiced.png");
-        ImageWrite(&out,    "../data/output/yellow_flowers_demosaiced.png");
-        ImageWrite(&img,    "../data/output/yellow_flowers_demosaiced_difference.png");
+        img_RGGB->Write("../data/output/img_mosaiced.png");
+        out.Write("../data/output/img_demosaiced.png");
+        img.Write("../data/output/img_demosaiced_difference.png");
         printf("Ok\n");
-
 
     } else {
         printf("No, the file is not valid!\n");

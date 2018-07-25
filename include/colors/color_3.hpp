@@ -19,7 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_COLORS_COLOR_3_HPP
 
 //typedef float float;
-#include "util/math.hpp"
+#include "../util/math.hpp"
 
 namespace pic {
 
@@ -455,9 +455,9 @@ public:
      */
     float luminance()
     {
-        return	0.213f * x +
-                0.715f * y +
-                0.072f * z;
+        return	0.2126f * x +
+                0.7152f * y +
+                0.0722f * z;
     }
 
     /**
@@ -478,6 +478,11 @@ public:
         x = sqrtf(x);
         y = sqrtf(y);
         z = sqrtf(z);
+    }
+
+    float squaredSum()
+    {
+        return x * x + y * y + z * z;
     }
 
     /**
@@ -581,9 +586,11 @@ public:
      */
     void gamma(float g)
     {
-        x = powf(x, g);
-        y = powf(y, g);
-        z = powf(z, g);
+        if (g > 0.0f) {
+            x = powf(x, g);
+            y = powf(y, g);
+            z = powf(z, g);
+        }
     }
 
     /**
@@ -653,11 +660,18 @@ public:
         Color3 ret(x * exposure, y * exposure, z * exposure);
         ret.gamma(1.0f / gammaCor);
 
-        ret.x = CLAMPi(ret.x, 0.0f, 1.0f);
-        ret.y = CLAMPi(ret.y, 0.0f, 1.0f);
-        ret.z = CLAMPi(ret.z, 0.0f, 1.0f);
-
+        ret.clamp01();
         return ret;
+    }
+
+    /**
+     * @brief clamp01
+     */
+    void clamp01()
+    {
+        x = CLAMPi(x, 0.0f, 1.0f);
+        y = CLAMPi(y, 0.0f, 1.0f);
+        z = CLAMPi(z, 0.0f, 1.0f);
     }
 
     /**

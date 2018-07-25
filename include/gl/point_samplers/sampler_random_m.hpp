@@ -18,14 +18,16 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_POINT_SAMPLERS_SAMPLER_RANDOM_M_HPP
 #define PIC_GL_POINT_SAMPLERS_SAMPLER_RANDOM_M_HPP
 
-#include "point_samplers/sampler_random_m.hpp"
+#include "../../base.hpp"
+
+#include "../../point_samplers/sampler_random_m.hpp"
 
 namespace pic {
 
 /**
  * @brief glGetPrintError
  */
-void glGetPrintError()
+PIC_INLINE void glGetPrintError()
 {
     GLenum err = glGetError();
 
@@ -133,7 +135,7 @@ template <unsigned int N> GLuint MRSamplersGL<N>::generateTexture()
         return 0;
     }
 
-    nSamples = this->samplers[0]->samplesR.size();
+    nSamples = int(this->samplers[0]->samplesR.size());
 
     for(int i = 1; i < this->nSamplers; i++) {
         nSamples = MIN(nSamples, int(this->samplers[i]->samplesR.size()));
@@ -227,15 +229,4 @@ template <unsigned int N> GLuint MRSamplersGL<N>::generateLevelsRTexture()
 } // end namespace pic
 
 #endif /* PIC_GL_POINT_SAMPLERS_SAMPLER_RANDOM_M_HPP */
-
-//memset(buffer,0xff,sizeof(int)*nSamplers*(nSamples/2)*3);
-
-/*	memset(buffer,0,sizeof(int)*nSamplers*(nSamples/2)*3);
-	glGetTexImage(GL_TEXTURE_2D,0,GL_RGB_INTEGER,GL_INT,buffer);
-	for(i=0;i<nSamplers;i++){
-		for(j=0;j<nSamples;j+=2){
-			ind = (((j*nSamplers)/2)+i)*3;
-			printf("%d %d\n",buffer[ind],buffer[ind+1]);
-		}
-	}*/
 

@@ -21,21 +21,26 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <functional>
 #include <vector>
 
-#include "image.hpp"
-#include "filtering/filter_luminance.hpp"
-#include "filtering/filter_gradient.hpp"
-#include "filtering/filter_log_2d.hpp"
-#include "filtering/filter_channel.hpp"
-#include "util/vec.hpp"
+#include "../base.hpp"
+
+#include "../image.hpp"
+#include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_gradient.hpp"
+#include "../filtering/filter_log_2d_opt.hpp"
+#include "../filtering/filter_channel.hpp"
+#include "../filtering/filter_sampler_2d.hpp"
+#include "../util/vec.hpp"
 
 namespace pic {
 
 class LiveWire
 {
 protected:
-    float fG_min, fG_max;
+    float fD_const;
 
-    Image *img_L, *img_G, *fG, *fZ, *g;
+    float *fG_min, *fG_max;
+
+    Image *img_G, *fZ, *g;
     int *pointers;
     bool *e;
 
@@ -45,7 +50,7 @@ protected:
      * @param y
      * @return
      */
-    float getCost(Vec<2, int> &p, Vec<2, int> &q)
+    float getCost(Vec2i &p, Vec2i &q)
     {
         float out;
         float *tmp;
@@ -55,15 +60,17 @@ protected:
         out = 0.43f * tmp[0];
 
         //fG cost
-        tmp = (*fG)(q[0], q[1]);
+        tmp = (*img_G)(q[0], q[1]);
+
+        float fG = 1.0f - (tmp[2] - fG_min[2]) / fG_max[2];
         float dist_qp = sqrtf(float(q.distanceSq(p)));
-        out += 0.14f * tmp[0] / dist_qp;
+        out += 0.14f * fG / dist_qp;
 
         //fD cost
 
         //D_p
         tmp = (*img_G)(p[0], p[1]);
-        Vec<2, float> D_p(tmp[1], -tmp[0]);
+        Vec2f D_p(tmp[1], -tmp[0]);
         float n_D_p_sq = D_p.lengthSq();
         if(n_D_p_sq > 0.0f) {
             D_p.div(sqrtf(n_D_p_sq));
@@ -71,16 +78,16 @@ protected:
 
         //D_q
         tmp = (*img_G)(q[0], q[1]);
-        Vec<2, float> D_q(tmp[1], -tmp[0]);
+        Vec2f D_q(tmp[1], -tmp[0]);
         float n_D_q_sq = D_q.lengthSq();
         if(n_D_q_sq > 0.0f) {
             D_q.div(sqrtf(n_D_q_sq));
         }
 
         //Delta_qp
-        Vec<2, float> delta_qp(float(q[0] - p[0]), float(q[1] - p[1]));
+        Vec2f delta_qp(float(q[0] - p[0]), float(q[1] - p[1]));
 
-        Vec<2, float> L;
+        Vec2f L;
         if(D_p.dot(delta_qp) >= 0.0f) {
             L = delta_qp;
         } else {
@@ -96,7 +103,7 @@ protected:
         float dp_pq = D_p.dot(L);
         float dq_pq = L.dot(D_q);
 
-        float fD = (acosf(dp_pq) + acosf(dq_pq)) * 2.0f / (3.0f * C_PI);
+        float fD = (acosf(dp_pq) + acosf(dq_pq)) * fD_const;
 
         out +=  0.43f * fD;
 
@@ -108,10 +115,6 @@ protected:
      */
     void release()
     {
-        if(img_L != NULL) {
-            delete img_L;
-        }
-
         if(img_G != NULL) {
             delete img_G;
         }
@@ -133,12 +136,8 @@ protected:
         }
     }
 
-    /**
-     * @brief f1minusx
-     * @param x
-     * @return
-     */
-    static float f1minusx(float x) {
+    static float f1minusx(float x)
+    {
         return 1.0f - x;
     }
 
@@ -146,10 +145,10 @@ public:
 
     LiveWire(Image *img)
     {
-        img_L = NULL;
+        fD_const = 2.0f / (C_PI * 3.0f);
+
         img_G = NULL;
         fZ = NULL;
-        fG = NULL;
         g = NULL;
         e = NULL;
         pointers = NULL;
@@ -170,27 +169,23 @@ public:
     {
         release();
 
-        img_L = FilterLuminance::Execute(img, img_L);
+        Image *img_L = FilterLuminance::Execute(img, NULL);
 
         //compute fG
         img_G = FilterGradient::Execute(img_L, img_G);
-        fG = FilterChannel::Execute(img_G, fG, 2);
-
-        fG->getMinVal(NULL, &fG_min);
-        *fG -= fG_min;
-        fG->getMaxVal(NULL, &fG_max);
-        *fG /= fG_max;
-        fG->applyFunction(f1minusx);
+        fG_min = img_G->getMinVal(NULL, NULL);
+        fG_max = img_G->getMaxVal(NULL, NULL);
 
         //compute fZ
-        fZ = FilterLoG2D::Execute(img_L, fZ, 1.0f);
+        fZ = FilterLoG2DOpt::Execute(img_L, fZ, 1.0f);
         fZ->applyFunction(f1minusx);
 
         //aux buffers
-        g = img_L->allocateSimilarOne();
+        g = img_L;
+
         e = new bool[img_L->nPixels()];
 
-        pointers = new int[img_L->nPixels() * 2];
+        pointers = new int[img_L->nPixels()];
     }
 
     /**
@@ -198,32 +193,50 @@ public:
      * @param pS
      * @param pE
      * @param out
+     * @param bConstrained
+     * @param bMultiple
      */
-    void execute(Vec<2, int> pS, Vec<2, int> pE, std::vector< Vec<2, int> > &out)
+    void execute(Vec2i pS, Vec2i pE, std::vector< Vec2i > &out, bool bConstrained = false, bool bMultiple = false)
     {
         float *tmp;
 
-        *g = FLT_MAX;
+        e = Buffer<bool>::assign(e, g->nPixels(), false);
+        //*g = FLT_MAX;
+        //pointers = Buffer<int>::assign(pointers, g->nPixels(), 0);
 
-        e = Buffer<bool>::assign(e, img_L->nPixels(), false);
-        pointers = Buffer<int>::assign(pointers, img_L->nPixels() * 2, 0);
+        int width  = g->width;
+        int height = g->height;
 
-        int width  = img_L->width;
-        int height = img_L->height;
+        int nx[] = {-1, 0, 1, -1, 1, -1,  0, 1};
+        int ny[] = { 1, 1, 1,  0, 0, -1, -1, -1};
 
-        int nx[] = {-1, 0, 1, -1, 1, -1, 0, 1};
-        int ny[] = {1, 1, 1, 0, 0, -1, -1, -1};
+        int bX[2], bY[2];
+
+        if(!bConstrained) {
+            bX[0] = -1;
+            bX[1] = width;
+
+            bY[0] = -1;
+            bY[1] = height;
+        } else {
+            int boundSize = 11;
+
+            bX[0] = MAX(MIN(pS[0], pE[0]) - boundSize, -1);
+            bX[1] = MIN(MAX(pS[0], pE[0]) + boundSize, width);
+
+            bY[0] = MAX(MIN(pS[1], pE[1]) - boundSize, -1);
+            bY[1] = MIN(MAX(pS[1], pE[1]) + boundSize, height);
+        }
 
         tmp = (*g)(pS[0], pS[1]);
         tmp[0] = 0.0f;
 
-        std::vector< Vec<2, int> > list;
+        std::vector< Vec2i > list;
         list.push_back(pS);
 
-        while(!list.empty()) {
-            //get the best
-            std::vector< Vec<2, int> >::iterator index;
-            Vec<2, int> q;
+        while(!list.empty()) { //get the best
+            std::vector< Vec2i >::iterator index;
+            Vec2i q;
 
             float g_q = FLT_MAX;
             bool bCheck = false;
@@ -246,14 +259,14 @@ public:
             list.erase(index);
 
             //update
-            e[q[1] * width + q[0]] = true;
+            int index_q = q[1] * width + q[0];
+            e[index_q] = true;
 
             for(int i = 0; i < 8; i++) {
-                Vec<2, int> r(  q[0] + nx[i],
-                                q[1] + ny[i]);
+                Vec2i r(q[0] + nx[i], q[1] + ny[i]);
 
-                if(r[0] > -1 && r[0] < width &&
-                   r[1] > -1 && r[1] < height) {
+                if((r[0] > bX[0]) && (r[0] < bX[1]) &&
+                   (r[1] > bY[0]) && (r[1] < bY[1])) {
 
                     if(!e[r[1] * width + r[0]]) {
                         float g_tmp = g_q + getCost(q, r);
@@ -275,9 +288,8 @@ public:
                             tmp = (*g)(r[0], r[1]);
                             tmp[0] = g_tmp;
 
-                            int index = (r[1] * width + r[0]) * 2;
-                            pointers[index    ] = q[0];
-                            pointers[index + 1] = q[1];
+                            int index = (r[1] * width + r[0]);
+                            pointers[index] = index_q;
                             list.push_back(r);
                         }
 
@@ -289,38 +301,72 @@ public:
         }
 
         //forward pass -- tracking
-        out.clear();
+        if(!bMultiple) {
+            out.clear();
+        }
 
         out.push_back(pE);
-        Vec<2, int> m = pE;
-        Vec<2, int> prev(-1, -1);
+        Vec2i m = pE;
+        Vec2i prev(-1, -1);
 
-        int maxIter = (width + height) * 4;
+        int maxIter = (width * height);
         int i = 0;
 
-        while(true) {
+        while((!prev.equal(m)) && (i < maxIter)) {
             prev = m;
+
             if(m.equal(pS)) {
                 break;
             }
 
-            int index = (m[1] * width + m[0]) * 2;
-            Vec<2, int> t(pointers[index], pointers[index + 1]);
+            int index = (m[1] * width + m[0]);
+            int t_x = pointers[index] % width;
+            int t_y = pointers[index] / width;
+            Vec2i t(t_x, t_y);
 
             out.push_back(t);
             m = t;
 
-            if(prev.equal(m)) {
-                break;
-            }
-
             i++;
-
-            if(i > maxIter) {
-                break;
-            }
         }
 
+    }
+
+    /**
+     * @brief executeLiveWireSingle
+     * @param in
+     * @param pS
+     * @param pE
+     * @param out
+     */
+    static void executeLiveWireSingle(Image *in, Vec2i pS, Vec2i pE, std::vector< Vec2i > &out)
+    {
+        if(in != NULL) {
+            pic::LiveWire *lw = new pic::LiveWire(in);
+
+            lw->execute(pS, pE, out, true, false);
+
+            delete lw;
+        }
+    }
+
+    /**
+     * @brief executeLiveWireMultiple
+     * @param in
+     * @param controlPoint
+     * @param out
+     */
+    static void executeLiveWireMultiple(Image *in, std::vector< Vec2i > &controlPoints, std::vector< Vec2i > &out)
+    {
+        if(in != NULL) {
+            pic::LiveWire *lw = new pic::LiveWire(in);
+
+            for(auto i = 0; i < (controlPoints.size() - 1); i++) {
+                lw->execute(controlPoints.at(i), controlPoints.at(i + 1), out, true, true);
+            }
+
+            delete lw;
+        }
     }
 };
 

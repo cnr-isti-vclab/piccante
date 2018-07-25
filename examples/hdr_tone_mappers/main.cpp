@@ -19,20 +19,22 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
-
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
+    std::string img_str;
+
+    if(argc == 2) {
+        img_str = argv[1];
+    } else {
+        img_str = "../data/input/bottles.hdr";
+    }
 
     printf("Reading an HDR file...");
 
     pic::Image img;
-    img.Read("../data/input/bottles.hdr");
+    img.Read(img_str);
 
     printf("Ok\n");
 
@@ -41,13 +43,13 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         printf("Tone mapping using Reinhard et al.'s TMO...");
-        pic::Image *imgToneMapped_reinhard = pic::ReinhardTMO(&img);
+        pic::Image *img_tmo_reinhard = pic::ReinhardTMO(&img);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
           Note that pic::ReinhardTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bool bWritten = ImageWrite(imgToneMapped_reinhard, "../data/output/tone_mapping_reinhard.png", pic::LT_NOR_GAMMA);
+        bool bWritten = img_tmo_reinhard-Write("../data/output/img_tmo_reinhard.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -56,13 +58,13 @@ int main(int argc, char *argv[])
         }
 
         printf("Tone mapping using Durand and Dorsey's TMO...");
-        pic::Image *imgToneMapped_durand = pic::DurandTMO(&img);
+        pic::Image *img_tmo_durand = pic::DurandTMO(&img);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
           Note that pic::DurandTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bWritten = ImageWrite(imgToneMapped_durand, "../data/output/tone_mapping_durand.png", pic::LT_NOR_GAMMA);
+        bWritten = img_tmo_durand->Write("../data/output/img_tmo_durand.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -72,13 +74,13 @@ int main(int argc, char *argv[])
 
 
         printf("Tone mapping using Drago et al.'s TMO...");
-        pic::Image *imgToneMapped_drago = pic::DragoTMO(&img);
+        pic::Image *img_tmo_drago = pic::DragoTMO(&img);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
           Note that pic::DragoTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bWritten = ImageWrite(imgToneMapped_drago, "../data/output/tone_mapping_drago.png", pic::LT_NOR_GAMMA);
+        bWritten = img_tmo_drago->Write("../data/output/img_tmo_drago.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -88,13 +90,13 @@ int main(int argc, char *argv[])
 
 
         printf("Tone mapping using Ward Histogram Adjustment TMO...");
-        pic::Image *imgToneMapped_ward = pic::WardHistogramTMO(&img);
+        pic::Image *img_tmo_ward = pic::WardHistogramTMO(&img);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
           Note that pic::WardTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bWritten = ImageWrite(imgToneMapped_ward, "../data/output/tone_mapping_ward.png", pic::LT_NOR_GAMMA);
+        bWritten = img_tmo_ward->Write("../data/output/img_tmo_ward.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -103,13 +105,13 @@ int main(int argc, char *argv[])
         }
 
         printf("Tone mapping using Lischinski et al. 2006 automatic TMO...");
-        pic::Image *imgToneMapped_lischinski = pic::LischinskiTMO(&img, NULL);
+        pic::Image *img_tmo_lischinski = pic::LischinskiTMO(&img, NULL);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
           Note that pic::WardTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bWritten = ImageWrite(imgToneMapped_lischinski, "../data/output/tone_mapping_lischinski.png", pic::LT_NOR_GAMMA);
+        bWritten = img_tmo_lischinski->Write("../data/output/img_tmo_lischinski.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");

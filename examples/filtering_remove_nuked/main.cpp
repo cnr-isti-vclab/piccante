@@ -25,10 +25,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 int main(int argc, char *argv[])
 {
+    if(argc == 2) {
+        img0_str = argv[1];
+    } else {
+        img0_str = "../data/input/cornellbox_mat_pt.pfm";
+    }
     printf("Reading an HDR file...");
 
     pic::Image img;
-    img.Read("../data/input/cornellbox_mat_pt.pfm");
+    img.Read(img0_str);
 
     printf("Ok\n");
 

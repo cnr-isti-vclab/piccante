@@ -20,13 +20,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+#include "../base.hpp"
+
 /**
  * @brief computeSaturation
  * @param data
  * @param channels
  * @return
  */
-inline float computeSaturation(float *data, int channels = 3)
+PIC_INLINE float computeSaturation(float *data, int channels = 3)
 {
     if(channels == 1) {
         return 1.0f;
@@ -53,7 +55,6 @@ inline float computeSaturation(float *data, int channels = 3)
 
     return var;
 }
-
 
 } // end namespace pic
 

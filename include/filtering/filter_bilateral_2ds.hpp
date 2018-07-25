@@ -20,9 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <random>
 
-#include "filtering/filter.hpp"
-#include "util/precomputed_gaussian.hpp"
-#include "point_samplers/sampler_random_m.hpp"
+#include "../filtering/filter.hpp"
+#include "../util/precomputed_gaussian.hpp"
+#include "../point_samplers/sampler_random_m.hpp"
 
 namespace pic {
 
@@ -188,8 +188,9 @@ public:
      * @return
      */
     static Image *Execute(std::string nameIn,
-                             std::string nameOut,
-                             float sigma_s, float sigma_r, SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
+                          std::string nameOut,
+                          float sigma_s, float sigma_r,
+                          SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
     {
         //Load the image
         Image imgIn(nameIn);
@@ -218,9 +219,10 @@ public:
      * @return
      */
     static Image *Execute(std::string nameIn,
-                             std::string nameIn2,
-                             std::string nameOut,
-                             float sigma_s, float sigma_r, SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
+                          std::string nameIn2,
+                          std::string nameOut,
+                          float sigma_s, float sigma_r,
+                          SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
     {
         //Load the image
         Image imgIn(nameIn);

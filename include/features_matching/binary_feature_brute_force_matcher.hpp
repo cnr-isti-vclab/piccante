@@ -20,9 +20,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
-#include "features_matching/binary_feature_matcher.hpp"
+#include "../features_matching/binary_feature_matcher.hpp"
 
 namespace pic{
+
+#ifndef PIC_DISABLE_EIGEN
 
 /**
  * @brief The BinaryFeatureBruteForceMatcher class
@@ -72,6 +74,8 @@ public:
         return ((dist_1 * 100 > dist_2 * 105) && matched_j != -1);
     }
 };
+
+#endif
 
 }
 

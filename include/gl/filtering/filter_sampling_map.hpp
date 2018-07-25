@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_SAMPLING_MAP_HPP
 #define PIC_GL_FILTERING_FILTER_SAMPLING_MAP_HPP
 
-#include "gl/filtering/filter_npasses.hpp"
-#include "gl/filtering/filter_gradient.hpp"
-#include "gl/filtering/filter_sigmoid_tmo.hpp"
-#include "gl/filtering/filter_sampler_2d.hpp"
-#include "gl/filtering/filter_gaussian_2d.hpp"
+#include "../../gl/filtering/filter_npasses.hpp"
+#include "../../gl/filtering/filter_gradient.hpp"
+#include "../../gl/filtering/filter_sigmoid_tmo.hpp"
+#include "../../gl/filtering/filter_sampler_2d.hpp"
+#include "../../gl/filtering/filter_gaussian_2d.hpp"
 
 namespace pic {
 

@@ -18,8 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_CONVERT_RAW_TO_IMAGES_HPP
 #define PIC_UTIL_CONVERT_RAW_TO_IMAGES_HPP
 
-#include "util/string.hpp"
-#include "image.hpp"
+#include "../base.hpp"
+#include "../util/string.hpp"
+#include "../image.hpp"
 
 namespace pic {
 
@@ -30,7 +31,7 @@ namespace pic {
  * @param width
  * @param height
  */
-void ConvertRAWtoImages(std::string nameDirectory, std::string format,
+PIC_INLINE void ConvertRAWtoImages(std::string nameDirectory, std::string format,
                         int width, int height)
 {
     StringVec vec;
@@ -56,7 +57,7 @@ void ConvertRAWtoImages(std::string nameDirectory, std::string format,
  * @param width
  * @param height
  */
-void ConvertDetect(std::string nameDirectory, std::string format, int width,
+PIC_INLINE void ConvertDetect(std::string nameDirectory, std::string format, int width,
                    int height)
 {
 

@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_TONE_MAPPING_SEGMENTATION_TMO_APPROX_HPP
 #define PIC_GL_TONE_MAPPING_SEGMENTATION_TMO_APPROX_HPP
 
-#include "gl/filtering/filter_luminance.hpp"
-#include "gl/filtering/filter_remove_nuked.hpp"
-#include "gl/filtering/filter_iterative.hpp"
-#include "gl/filtering/filter_bilateral_2ds.hpp"
-#include "gl/filtering/filter_op.hpp"
+#include "../../gl/filtering/filter_luminance.hpp"
+#include "../../gl/filtering/filter_remove_nuked.hpp"
+#include "../../gl/filtering/filter_iterative.hpp"
+#include "../../gl/filtering/filter_bilateral_2ds.hpp"
+#include "../../gl/filtering/filter_op.hpp"
 
 namespace pic {
 
@@ -32,19 +32,19 @@ namespace pic {
 class SegmentationGL
 {
 protected:
-    FilterGLLuminance		*flt_lum;
-    FilterGLRemoveNuked		*flt_nuked;
-    FilterGLIterative		*flt_it;
-    FilterGLBilateral2DS	*flt_bil;
-    FilterGLOp				*flt_seg;
+    FilterGLLuminance       *flt_lum;
+    FilterGLRemoveNuked     *flt_nuked;
+    FilterGLIterative       *flt_it;
+    FilterGLBilateral2DS    *flt_bil;
+    FilterGLOp              *flt_seg;
     ImageGL                 *L, *imgIn_flt;
 
-    float					perCent, nLayer;
-    int						iterations;
+    float                   perCent, nLayer;
+    int                     iterations;
 
 public:
-    ImageGLVec              stack;
-    float					minVal, maxVal;
+    ImageGLVec stack;
+    float      minVal, maxVal;
 
     /**
      * @brief SegmentationGL
@@ -121,7 +121,7 @@ public:
             imgOut = new ImageGL(1, imgIn->width, imgIn->height, 1, IMG_GPU, GL_TEXTURE_2D);
         }
 
-        //Compute luminance
+        //compute luminance
         if(flt_lum == NULL) {
             flt_lum = new FilterGLLuminance();
         }
@@ -131,7 +131,7 @@ public:
         L->getMinVal(&minVal);
         L->getMaxVal(&maxVal);
 
-        //Iterative bilateral filtering
+        //iterative bilateral filtering
         if(flt_it == NULL) {
             flt_bil = new FilterGLBilateral2DS(1.0f, nLayer);
             flt_it  = new FilterGLIterative(flt_bil, iterations);
@@ -140,14 +140,14 @@ public:
         imgIn_flt = flt_it->Process(SingleGL(imgIn), imgIn_flt);
         L = flt_lum->Process(SingleGL(imgIn_flt), L);
 
-        //Thresholding
+        //threshold
         if(flt_seg == NULL) {
             flt_seg = FilterGLOp::CreateOpSegmentation(false, floor(log10f(minVal)));
         }
 
         flt_seg->Process(SingleGL(L), L);
 
-        //Removing nuked pixels
+        //remove nuked pixels
         if(flt_nuked == NULL) {
             flt_nuked = new FilterGLRemoveNuked(0.9f);
         }

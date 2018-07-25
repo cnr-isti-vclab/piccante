@@ -22,8 +22,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <set>
 #include <chrono>
 
-#include "util/array.hpp"
-#include "util/math.hpp"
+#include "../base.hpp"
+#include "../util/array.hpp"
+#include "../util/math.hpp"
 
 namespace pic{
 
@@ -36,13 +37,13 @@ namespace pic{
  * @return
  */
 template<class T>
-unsigned int kMeansAssignLabel( T* sample_j, int nDim,
-                                T* centers, int k)
+PIC_INLINE unsigned int kMeansAssignLabel( T* sample_j, int nDim,
+                                T* centers, unsigned int k)
 {
     T dist = Array<T>::distanceSq(sample_j, &centers[0], nDim);
     unsigned int label = 0;
 
-    for(unsigned int i = 1; i < k; i++) {
+    for(auto i = 1; i < k; i++) {
         T *center_i = &centers[i * nDim];
 
         T tmp_dist = Array<T>::distanceSq(sample_j, center_i, nDim);
@@ -65,7 +66,7 @@ unsigned int kMeansAssignLabel( T* sample_j, int nDim,
  * @return
  */
 template<class T>
-T* kMeansComputeMean(T *samples, T *out, int nDim, std::set<unsigned int> *cluster)
+PIC_INLINE T* kMeansComputeMean(T *samples, T *out, int nDim, std::set<unsigned int> *cluster)
 {
     Array<T>::set(out, nDim, T(0));
 
@@ -92,7 +93,7 @@ T* kMeansComputeMean(T *samples, T *out, int nDim, std::set<unsigned int> *clust
  * @return
  */
 template<class T>
-T* kMeanscomputeRandomCenters(T *samples, int nSamples, int nDim, int k, T* centers)
+PIC_INLINE T* kMeanscomputeRandomCenters(T *samples, int nSamples, int nDim, int k, T* centers)
 {
     if(centers != NULL) {
         delete[] centers;
@@ -137,7 +138,7 @@ T* kMeanscomputeRandomCenters(T *samples, int nSamples, int nDim, int k, T* cent
  * @param maxIter
  */
 template<class T>
-T* kMeans(T *samples, int nSamples, int nDim,
+PIC_INLINE T* kMeans(T *samples, int nSamples, int nDim,
           unsigned int k, T *centers,
           std::vector< std::set<unsigned int> *> &labels,
           unsigned int maxIter = 100)
@@ -218,7 +219,7 @@ T* kMeans(T *samples, int nSamples, int nDim,
  * @return
  */
 template<class T>
-T* kMeansSelect(T *samples, int nSamples, int nDim,
+PIC_INLINE  T* kMeansSelect(T *samples, int nSamples, int nDim,
                 unsigned int &k,
                 std::vector< std::set<unsigned int> *> &labels,
                 float threshold = 1e-2f,
@@ -265,9 +266,6 @@ T* kMeansSelect(T *samples, int nSamples, int nDim,
 
     return centers;
 }
-
-
-
 
 }
 

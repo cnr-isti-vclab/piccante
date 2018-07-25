@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_1D_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_1D_HPP
 
-#include "gl/filtering/filter_1d.hpp"
+#include "../../gl/filtering/filter_1d.hpp"
 
 namespace pic {
 
@@ -206,9 +206,9 @@ void FilterGLBilateral1D::SetUniformAux()
     int halfKernelSize = PrecomputedGaussian::getKernelSize(sigma_s) >> 1;
 
     technique.bind();
-    technique.setUniform("sigma_s2",	sigma_s2);
-    technique.setUniform("sigma_r2",	sigma_r2);
-    technique.setUniform("halfKernelSize", halfKernelSize);
+    technique.setUniform1f("sigma_s2",	sigma_s2);
+    technique.setUniform1f("sigma_r2",	sigma_r2);
+    technique.setUniform1i("halfKernelSize", halfKernelSize);
     technique.unbind();
 }
 

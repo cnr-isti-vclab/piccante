@@ -18,10 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_LISCHINSKI_TMO_HPP
 #define PIC_TONE_MAPPING_LISCHINSKI_TMO_HPP
 
-#ifndef PIC_DISABLE_EIGEN
-
-#include "tone_mapping/lischinski_minimization.hpp"
-#include "tone_mapping/input_estimates.hpp"
+#include "../base.hpp"
+#include "../tone_mapping/lischinski_minimization.hpp"
+#include "../tone_mapping/input_estimates.hpp"
 
 namespace pic {
 
@@ -32,7 +31,7 @@ namespace pic {
  * @param alpha
  * @return
  */
-Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
+PIC_INLINE Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
         float whitePoint = -1.0f)
 {
     if(imgIn == NULL) {
@@ -151,8 +150,6 @@ Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
 }
 
 } // end namespace pic
-
-#endif
 
 #endif /* PIC_TONE_MAPPING_LISCHINSKI_TMO_HPP */
 

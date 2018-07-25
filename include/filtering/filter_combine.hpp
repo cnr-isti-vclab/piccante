@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_COMBINE_HPP
 #define PIC_FILTERING_FILTER_COMBINE_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
 namespace pic {
 
@@ -121,7 +121,7 @@ public:
     }
 };
 
-Image *FilterCombine::SetupAux(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterCombine::SetupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         int channels = 0;
@@ -137,7 +137,7 @@ Image *FilterCombine::SetupAux(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-void FilterCombine::ProcessBBox(Image *dst, ImageVec src, BBox *box)
+PIC_INLINE void FilterCombine::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     for(int p = box->z0; p < box->z1; p++) {
         for(int j = box->y0; j < box->y1; j++) {

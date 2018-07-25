@@ -18,9 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_GUIDED_HPP
 #define PIC_FILTERING_FILTER_GUIDED_HPP
 
-#include "filtering/filter.hpp"
+#include "../filtering/filter.hpp"
 
-#include "util/math.hpp"
+#include "../util/math.hpp"
 
 namespace pic {
 
@@ -104,14 +104,14 @@ public:
     }
 };
 
-void FilterGuided::Update(int radius, float e_regularization)
+PIC_INLINE void FilterGuided::Update(int radius, float e_regularization)
 {
     this->radius = radius;
     this->e_regularization = e_regularization;
     nPixels = float(radius * radius * 4);
 }
 
-void FilterGuided::Process1Channel(Image *I, Image *p, Image *q,
+PIC_INLINE void FilterGuided::Process1Channel(Image *I, Image *p, Image *q,
                                    BBox *box)
 {
     float I_mean, I_var;

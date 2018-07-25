@@ -19,8 +19,20 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_MITSUNAGA_NAYAR_CRF_HPP
 #define PIC_ALGORITHMS_MITSUNAGA_NAYAR_CRF_HPP
 
+#include<algorithm>
+#include<limits>
+#include<vector>
+
+#include "../base.hpp"
+
 #ifndef PIC_DISABLE_EIGEN
-    #include "externals/Eigen/LU"
+
+#ifndef PIC_EIGEN_NOT_BUNDLED
+    #include "../externals/Eigen/LU"
+#else
+    #include <Eigen/LU>
+#endif
+
 #endif
 
 namespace pic {
@@ -37,7 +49,7 @@ namespace pic {
  * @param max_iterations    Maximum number of iterations.
  * @return The error as in the paper.
  */
-inline float MitsunagaNayarClassic(int *samples, const std::size_t nSamples, const std::vector<float> &exposures,
+PIC_INLINE float MitsunagaNayarClassic(int *samples, const std::size_t nSamples, const std::vector<float> &exposures,
                                    std::vector<float> &coefficients, const bool computeRatios, std::vector<float> &R,
                                    const float eps, const std::size_t max_iterations)
 {
@@ -229,7 +241,7 @@ inline float MitsunagaNayarClassic(int *samples, const std::size_t nSamples, con
  * @param max_iterations    Maximum number of iterations.
  * @return The error as in the paper.
  */
-inline float MitsunagaNayarFull(int *samples, const std::size_t nSamples, const std::vector<float> &exposures,
+PIC_INLINE float MitsunagaNayarFull(int *samples, const std::size_t nSamples, const std::vector<float> &exposures,
                                 std::vector<float> &coefficients, bool computeRatios, std::vector<std::vector<float>> &R,
                                 const float eps, const std::size_t max_iterations)
 {
