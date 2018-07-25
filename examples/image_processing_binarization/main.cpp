@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         bool bWritten;
-        std::string name = pic::removeLocalPath(pic::removeExtension(img_str));
+        std::string name = pic::getFileNameOnly(img_str);
 
         pic::Image *img_global_bin = pic::binarization(&img, false);
 
