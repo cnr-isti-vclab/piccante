@@ -108,10 +108,10 @@ public:
      * @param imgEdges
      * @return
      */
-    Image *execute(Image *img, Image *imgEdges)
+    Image *execute(Image *img, Image *imgOut)
     {
         if(img == NULL) {
-            return imgEdges;
+            return imgOut;
         }
 
         if(img->channels == 1) {
@@ -130,11 +130,11 @@ public:
         Image *grad = fltGrad.ProcessP(Single(lum_flt), NULL);
 
         //non-maximum suppression
-        if(imgEdges == NULL) {
-            imgEdges = lum->allocateSimilarOne();
+        if(imgOut == NULL) {
+            imgOut = lum->allocateSimilarOne();
         }
 
-        imgEdges->setZero();
+        imgOut->setZero();
 
         int dx0[] = {1, 1, 0, -1, 1};
         int dy0[] = {0, 1, 1,  1, 0};
@@ -179,26 +179,23 @@ public:
                            (tmp_grad[2] > (*grad)(j + 1, i - 1)[2]);
                 }*/
 
-                float *tmp_img_edges = (*imgEdges)(j, i);
+                float *imgOut_ji = (*imgOut)(j, i);
 
-                tmp_img_edges[0] = bMax ? tmp_grad[2] : 0.0f;
+                imgOut_ji[0] = bMax ? tmp_grad[2] : 0.0f;
             }
         }
 
         //double thresholding
-        for(int i = 0; i < imgEdges->height; i++) {
-            for(int j = 0; j < imgEdges->width; j++) {
-                float *tmp_imgEdges = (*imgEdges)(j, i);
+        for(int i = 0; i < imgOut->height; i++) {
+            for(int j = 0; j < imgOut->width; j++) {
+                float *imgOut_ji = (*imgOut)(j, i);
 
-                if(tmp_imgEdges[0] > threshold_2) {
-                    tmp_imgEdges[0] = 1.0f;     //strong edge
+                if(imgOut_ji[0] > threshold_2) {
+                    imgOut_ji[0] = 1.0f; //strong edge
                 } else {
-                    if(tmp_imgEdges[0] > threshold_1) {
-                        tmp_imgEdges[0] = 0.5f; //weak edge
-                    } else {
-                        tmp_imgEdges[0] = 0.0f; //no edge
-                    }
-
+                    //0.5f --> weak edge
+                    //0.0f --> no edge
+                    imgOut_ji[0] = imgOut_ji[0] > threshold_1 ? 0.5f : 0.0f;
                 }
             }
         }
@@ -208,26 +205,23 @@ public:
         int x[] = {1, 1, 0, -1, -1, -1,  0,  1};
         int y[] = {0, 1, 1,  1,  0, -1, -1, -1};
 
-        for(int i = 0; i < imgEdges->height; i++) {
-            for(int j = 0; j < imgEdges->width; j++) {
-                float *tmp_imgEdges = (*imgEdges)(j, i);
+        for(int i = 0; i < imgOut->height; i++) {
+            for(int j = 0; j < imgOut->width; j++) {
+                float *imgOut_ji = (*imgOut)(j, i);
 
-                if((tmp_imgEdges[0] > 0.4f) && (tmp_imgEdges[0] < 0.6f)) {
+                if((imgOut_ji[0] > 0.4f) && (imgOut_ji[0] < 0.6f)) {
                     bool bRemove = true;
 
                     for(int k = 0; k < 8; k++) {
-                        float *tmp_imgEdges_2 = (*imgEdges)(j + x[k], i + y[k]);
+                        float *imgOut_ji_xy = (*imgOut)(j + x[k], i + y[k]);
 
-                        if(tmp_imgEdges_2[0] > 0.9f){
+                        if(imgOut_ji_xy[0] > 0.9f) {
                             bRemove = false;
-                            tmp_imgEdges[0] = 1.0f;
                             break;
                         }
                     }
 
-                    if(bRemove) {
-                        tmp_imgEdges[0] = 0.0f;
-                    }
+                    imgOut_ji[0] = bRemove ? 0.0f : 1.0f;
                 }
             }
         }
@@ -235,7 +229,7 @@ public:
         delete lum_flt;
         delete grad;
 
-        return imgEdges;
+        return imgOut;
     }
 };
 

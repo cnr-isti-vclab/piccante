@@ -85,16 +85,16 @@ PIC_INLINE bool *computeColorClassification(Image *img, float *white_pixel, floa
     int width = opt->width;
     int height = opt->height;
     bool *tmp;
-    tmp = Mask::dilate(mask, NULL, width, height, 3);
-    Mask::dilate(tmp, mask, width, height, 3);
+    tmp = Mask::dilate(NULL, mask, width, height, 3);
     Mask::dilate(mask, tmp, width, height, 3);
     Mask::dilate(tmp, mask, width, height, 3);
+    Mask::dilate(mask, tmp, width, height, 3);
 
-    Mask::removeIsolatedPixels(mask, tmp, width, height);
+    Mask::removeIsolatedPixels(tmp, mask, width, height);
 
-    Mask::erode(tmp, mask, width, height, 3);
     Mask::erode(mask, tmp, width, height, 3);
     Mask::erode(tmp, mask, width, height, 3);
+    Mask::erode(mask, tmp, width, height, 3);
 
     #ifdef PIC_DEBUG
         opt->convertFromMask(mask, width, height);

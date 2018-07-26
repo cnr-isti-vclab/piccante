@@ -623,7 +623,7 @@ public:
      * @return
      */
     static T* transpose(T *bufferOut, T *bufferIn, int width, int height,
-                              int channels, int frames)
+                        int channels, int frames)
     {
         if(bufferIn == NULL) {
             return bufferOut;
@@ -658,7 +658,7 @@ public:
      * @return
      */
     static T* BGRtoRGB(T *buffer, int width, int height,
-                              int channels, int frames)
+                       int channels, int frames)
     {
         int size = width * height * channels * frames;
         for(int i = 0; i < size; i += channels) {

@@ -29,13 +29,13 @@ class Mask: public Buffer<bool>
 public:
     /**
      * @brief removeIsolatedPixels removes isolated pixels.
-     * @param dataIn
      * @param dataOut
+     * @param dataIn
      * @param width
      * @param height
      * @return
      */
-    static bool *removeIsolatedPixels(bool *dataIn, bool *dataOut,
+    static bool *removeIsolatedPixels(bool *dataOut, bool *dataIn,
             int width, int height)
     {
         if(dataIn == NULL) {
@@ -79,14 +79,14 @@ public:
 
     /**
      * @brief erode erodes a mask.
-     * @param dataIn
      * @param dataOut
+     * @param dataIn
      * @param width
      * @param height
      * @param kernelSize
      * @return
      */
-    static bool *erode(bool *dataIn, bool *dataOut, int width, int height,
+    static bool *erode(bool *dataOut, bool *dataIn, int width, int height,
                                int kernelSize = 3)
     {
         if(dataIn == NULL) {
@@ -127,14 +127,14 @@ public:
 
     /**
      * @brief MaskDilate dilates a mask.
-     * @param dataIn
      * @param dataOut
+     * @param dataIn
      * @param width
      * @param height
      * @param kernelSize
      * @return
      */
-    static bool *dilate(bool *dataIn, bool *dataOut, int width, int height,
+    static bool *dilate(bool *dataOut, bool *dataIn, int width, int height,
                                 int kernelSize = 3)
     {
         if(dataIn == NULL) {
@@ -201,51 +201,148 @@ public:
 
     /**
      * @brief thinning thins a mask.
+     * @param dataOut
      * @param dataIn
      * @param width
      * @param height
      */
-    static bool* thinning(bool *dataIn, int width, int height)
+    static bool* thinning(bool *dataOut, bool *dataIn, int width, int height)
     {
         if(dataIn == NULL) {
             return dataIn;
         }
 
-        bool *tmp  = clone(NULL, dataIn, width * height, 1);
+        dataOut = clone(dataOut, dataIn, width * height, 1);
 
         int n = (height * width);
 
         int P[9];
 
         //first-pass
+        std::vector< int > list;
         for(int i = 1; i < (height - 1); i++) {
             int tmp = i * width;
             for(int j = 1; j < (width - 1); j++) {
                 int index = tmp + j;
 
-                if(!dataIn[index]) {
+                if(!dataOut[index]) {
                     continue;
                 }
 
                 P[0] = index;
-                P[1] = index - width;
+                P[1] = index + 1;
                 P[2] = index - width + 1;
-                P[3] = index + 1;
-                P[4] = index + width + 1;
-                P[5] = index + width;
+                P[3] = index - width;
+                P[4] = index - width - 1;
+                P[5] = index - 1;
                 P[6] = index + width - 1;
-                P[7] = index - 1;
-                P[8] = index - width - 1;
+                P[7] = index + width;
+                P[8] = index + width + 1;
 
-                int N = 0;
-                for(int k = 1; k < 9; i++) {
-                    N = dataIn[P[k]] ? N + 1 : N;
+                int X_h = 0;
+                int n1 = 0;
+                int n2 = 0;
+                for(int k = 1; k <= 4; k++) {
+                    bool x_2km1 = dataOut[P[k * 2 - 1]];
+                    bool x_2k   = dataOut[P[k * 2]];
+                    bool x_2kp1 = dataOut[P[k * 2 + 1]];
+
+                    if( !x_2km1 && (x_2k || x_2kp1) ) {
+                        X_h++;
+                    }
+
+                    if(x_2km1 || x_2k) {
+                        n1++;
+                    }
+
+                    if(x_2k || x_2kp1) {
+                        n2++;
+                    }
+                }
+
+                int min_12 = MIN(n1, n2);
+
+                bool G1 = (X_h == 1);
+                bool G2 = (min_12 > 1) && (min_12 < 4);
+                bool G3 =  dataOut[P[1]] && (
+                           dataOut[P[2]] ||
+                           dataOut[P[3]] ||
+                          !dataOut[P[8]]);
+
+                if(G1 && G2 && G3) {
+                    list.push_back(index);
                 }
 
             }
         }
 
-//        return ;
+        for(unsigned int i = 0; i < list.size(); i++) {
+            dataOut[list[i]] = false;
+        }
+
+        list.clear();
+
+        for(int i = 1; i < (height - 1); i++) {
+            int tmp = i * width;
+            for(int j = 1; j < (width - 1); j++) {
+                int index = tmp + j;
+
+                if(!dataOut[index]) {
+                    continue;
+                }
+
+                P[0] = index;
+                P[1] = index + 1;
+                P[2] = index - width + 1;
+                P[3] = index - width;
+                P[4] = index - width - 1;
+                P[5] = index - 1;
+                P[6] = index + width - 1;
+                P[7] = index + width;
+                P[8] = index + width + 1;
+
+                int X_h = 0;
+                int n1 = 0;
+                int n2 = 0;
+                for(int k = 1; k <= 4; k++) {
+                    bool x_2km1 = dataOut[P[k * 2 - 1]];
+                    bool x_2k   = dataOut[P[k * 2]];
+                    bool x_2kp1 = dataOut[P[k * 2 + 1]];
+
+                    if( !x_2km1 && (x_2k || x_2kp1) ) {
+                        X_h++;
+                    }
+
+                    if(x_2km1 || x_2k) {
+                        n1++;
+                    }
+
+                    if(x_2k || x_2kp1) {
+                        n2++;
+                    }
+                }
+
+                int min_12 = MIN(n1, n2);
+
+                bool G1 = (X_h == 1);
+                bool G2 = (min_12 > 1) && (min_12 < 4);
+                bool G3 =  dataOut[P[5]] && (
+                           dataOut[P[6]] ||
+                           dataOut[P[7]] ||
+                          !dataOut[P[4]]);
+
+                if(G1 && G2 && G3) {
+                    list.push_back(index);
+                }
+
+            }
+        }
+
+        for(unsigned int i = 0; i < list.size(); i++) {
+            dataOut[list[i]] = false;
+        }
+
+        return dataOut;
     }
 };
 

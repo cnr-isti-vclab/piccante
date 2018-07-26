@@ -112,16 +112,6 @@ inline std::string whichPath(std::string path)
 }
 
 /**
- * @brief getFileNameOnly
- * @param name
- * @return
- */
-inline std::string getFileNameOnly(std::string name)
-{
-    return pic::removeLocalPath(pic::removeExtension(name));
-}
-
-/**
  * @brief RemoveExtension removes the extension of a string.
  * @param name
  * @return
@@ -163,6 +153,16 @@ inline std::string removeLocalPath(std::string name)
     }
 
     return name;
+}
+
+/**
+ * @brief getFileNameOnly
+ * @param name
+ * @return
+ */
+inline std::string getFileNameOnly(std::string name)
+{
+    return removeLocalPath(removeExtension(name));
 }
 
 /**
