@@ -1183,7 +1183,7 @@ PIC_INLINE float Image::getPercentileVal(float perCent = 0.5f)
     }
 
     int size = frames * width * height * channels;
-    return dataTMP[int(perCent * float(size))];
+    return dataTMP[int(perCent * float(size - 1))];
 }
 
 PIC_INLINE float Image::getMedVal()
