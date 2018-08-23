@@ -73,10 +73,11 @@ public:
      * @param imgOut
      * @param sigma_s
      * @param sigma_r
+     * @param maxIterations
      * @return
      */
     static Image *AnisotropicDiffusion(ImageVec imgIn, Image *imgOut,
-                                          float sigma_s, float sigma_r)
+                                          float sigma_s, float sigma_r, int maxIterations = -1)
     {
 
         if(sigma_s <= 0.0f) {
@@ -87,7 +88,13 @@ public:
             sigma_r = 0.05f;
         }
 
-        unsigned int iterations = 2;//int(ceilf(5.0f * sigma_s));
+        int iterations = 0;
+
+        if(maxIterations > 0) {
+            iterations = maxIterations;
+        } else {
+            iterations = int(ceilf(5.0f * sigma_s));
+        }
 
         FilterAnsiotropicDiffusion ansio_flt(sigma_r, 1);
         FilterIterative iter_flt(&ansio_flt, iterations);
@@ -117,7 +124,6 @@ PIC_INLINE FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
 PIC_INLINE void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
-    //Filtering
     Image *img = src[0];
     int channels = img->channels;
 
