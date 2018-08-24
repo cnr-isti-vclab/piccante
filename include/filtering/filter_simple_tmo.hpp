@@ -31,12 +31,17 @@ protected:
     float gamma, fstop, exposure;
 
     /**
-     * @brief ProcessBBox
-     * @param dst
-     * @param src
-     * @param box
+     * @brief f
+     * @param data
      */
-    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
+    void f(FilterFData *data)
+    {
+        float *dataIn = (*data->src[0])(data->x, data->y);
+
+        for(int k = 0; k < data->dst->channels; k++) {
+            data->out[k] = powf((dataIn[k] * exposure), gamma);
+        }
+    }
 
 public:
     /**
@@ -44,14 +49,22 @@ public:
      * @param gamma
      * @param fstop
      */
-    FilterSimpleTMO(float gamma, float fstop);
+    FilterSimpleTMO(float gamma, float fstop)
+    {
+        Update(gamma, fstop);
+    }
 
     /**
      * @brief Update
      * @param gamma
      * @param fstop
      */
-    void Update(float gamma, float fstop);
+    void Update(float gamma, float fstop)
+    {
+        this->gamma = 1.0f / gamma;
+        this->fstop = fstop;
+        exposure = powf(2.0f, fstop);
+    }
 
     /**
      * @brief Execute
@@ -81,43 +94,10 @@ public:
     {
         Image imgIn(nameIn);
         Image *imgOut = Execute(&imgIn, NULL, gamma, fstop);
-        imgOut->Write(nameOut);
+        imgOut->Write(nameOut, LT_NOR_GAMMA, 0);
         return imgOut;
     }
 };
-
-PIC_INLINE FilterSimpleTMO::FilterSimpleTMO(float gamma, float fstop)
-{
-    Update(gamma, fstop);
-}
-
-PIC_INLINE void FilterSimpleTMO::Update(float gamma, float fstop)
-{
-    this->gamma = 1.0f / gamma;
-    this->fstop = fstop;
-    exposure = powf(2.0f, fstop);
-}
-
-PIC_INLINE void FilterSimpleTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
-{
-
-    int width = dst->width;
-    int channels = dst->channels;
-
-    float *data = src[0]->data;  
-
-    for(int j = box->y0; j < box->y1; j++) {
-        int ind = j * width;
-
-        for(int i = box->x0; i < box->x1; i++) {
-            int c = (ind + i) * channels;
-
-            for(int k = 0; k < channels; k++) {
-                dst->data[c + k] = powf((data[c + k] * exposure), gamma);
-            }
-        }
-    }
-}
 
 } // end namespace pic
 

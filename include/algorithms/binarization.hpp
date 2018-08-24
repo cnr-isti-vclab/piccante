@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 
+#include "../image.hpp"
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_gaussian_2d.hpp"
 #include "../filtering/filter_threshold.hpp"

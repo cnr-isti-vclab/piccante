@@ -33,6 +33,15 @@ namespace pic {
 //This depends on the architecture!
 #define TILE_SIZE 64
 
+struct FilterFData
+{
+    int x, y;
+    float *out;
+
+    Image *dst;
+    ImageVec src;
+};
+
 /**
  * @brief The Filter class
  */
@@ -43,12 +52,37 @@ protected:
     std::vector< float > param_f;
 
     /**
+     * @brief f
+     * @param data
+     */
+    virtual void f(FilterFData *data)
+    {
+
+    }
+
+    /**
      * @brief ProcessBBox
      * @param dst
      * @param src
      * @param box
      */
-    virtual void ProcessBBox(Image *dst, ImageVec src, BBox *box) {}
+    virtual void ProcessBBox(Image *dst, ImageVec src, BBox *box)
+    {
+        FilterFData f_data;
+        f_data.src = src;
+        f_data.dst = dst;
+
+        for(int j = box->y0; j < box->y1; j++) {
+            f_data.y = j;
+
+            for(int i = box->x0; i < box->x1; i++) {
+                f_data.x = i;
+                f_data.out = (*dst)(i, j);
+
+                f(&f_data);
+            }
+        }
+    }
 
     /**
      * @brief SetupAux
@@ -207,7 +241,7 @@ PIC_INLINE Image *Filter::CachedProcess(ImageVec imgIn, Image *imgOut,
 {
     std::string outputName = GetOutPutName(nameIn);
 
-    //Check if it is chaced
+    //check if it is chaced
     Image *imgOut2 = new Image(outputName);
 
     printf("%s\n", outputName.c_str());
@@ -238,7 +272,7 @@ PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
 
     imgOut = SetupAux(imgIn, imgOut);
 
-    //Convolution
+    //convolve
     BBox tmpBox(imgOut->width, imgOut->height, imgOut->frames);
     ProcessBBox(imgOut, imgIn, &tmpBox);
 

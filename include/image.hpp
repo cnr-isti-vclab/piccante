@@ -88,7 +88,7 @@ public:
 
     int tstride, ystride, xstride;
 
-    float widthf, width1f, heightf, height1f, framesf, frames1f;
+    float widthf, width1f, heightf, height1f, channelsf, framesf, frames1f;
 
     std::string nameFile;
 
@@ -816,6 +816,7 @@ PIC_INLINE void Image::setNULL()
     depth = -1;
     channels = -1;
 
+    channelsf = -1.0f;
     widthf = -1.0f;
     heightf = -1.0f;
     width1f = -1.0f;
@@ -985,6 +986,7 @@ PIC_INLINE void Image::allocateAux()
     this->width1f  = float(width - 1);
     this->heightf  = float(height);
     this->height1f = float(height - 1);
+    this->channelsf = float(channels);
     this->framesf  = float(frames);
     this->frames1f = float(frames -1);
 

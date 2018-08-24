@@ -30,9 +30,9 @@ enum SIGMOID_MODE {SIG_TMO, SIG_TMO_WP, SIG_SDM};
 class FilterSigmoidTMO: public Filter
 {
 protected:
-    bool			temporal;
-    float			c, alpha, epsilon, wp, wp2;
-    SIGMOID_MODE	type;
+    bool temporal;
+    float c, alpha, epsilon, wp, wp2;
+    SIGMOID_MODE type;
 
     /**
      * @brief CalculateEpsilon
@@ -194,7 +194,7 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
             for(int i = box->x0; i < box->x1; i++) {
                 int c = js + i * src[0]->xstride; //index
 
-                float L		= 0.213f * data[c] + 0.715f * data[c + 1]	+ 0.072f * data[c + 2];
+                float L = 0.213f * data[c] + 0.715f * data[c + 1] + 0.072f * data[c + 2];
 
                 if(L > 0.0f) {
                     float L_flt	 = 0.213f * dataFlt[c] + 0.715f * dataFlt[c + 1] + 0.072f *
@@ -228,8 +228,8 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
 
                     switch(type) {
                     case SIG_TMO_WP: {
-                        Lm		=	(data   [ck] * alpha) / epsilon;
-                        Lm_Flt	=	(dataFlt[ck] * alpha) / epsilon;
+                        Lm = (data   [ck] * alpha) / epsilon;
+                        Lm_Flt = (dataFlt[ck] * alpha) / epsilon;
 
                         dataOut[ck] = Lm * (1.0f + Lm / wp2) / (1.0f + Lm_Flt);
                         //						dataOut[ck] = (val*(val/wp2+epsilon)/epsilon)/(valFlt+epsilon);
@@ -237,8 +237,8 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
                     break;
 
                     default: {
-                        Lm		=	data   [ck] * alpha;
-                        Lm_Flt	=	dataFlt[ck] * alpha;
+                        Lm = data[ck] * alpha;
+                        Lm_Flt = dataFlt[ck] * alpha;
 
                         dataOut[ck] = Lm / (Lm_Flt + epsilon);
                     }

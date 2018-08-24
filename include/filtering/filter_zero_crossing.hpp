@@ -30,11 +30,35 @@ class FilterZeroCrossing: public Filter
 protected:
 
     /**
+     * @brief f
+     * @param data
+     */
+    void f(FilterFData *data)
+    {
+
+        float value;
+
+        float *data_src = (*data->src[0])(data->x, data->y);
+        float *data_src0 = (*data->src[0])(data->x, data->y + 1);
+        float *data_src1 = (*data->src[0])(data->x + 1, data->y);
+
+        for(int k = 0; k < data->src[0]->channels; k++) {
+            value = (data_src[k] == 0.0f) ? 1.0f : 0.0f;
+            value = (data_src[k] > 0.0f && data_src0[k] < 0.0f) ? 1.0f : value;
+            value = (data_src[k] < 0.0f && data_src0[k] > 0.0f) ? 1.0f : value;
+            value = (data_src[k] > 0.0f && data_src1[k] < 0.0f) ? 1.0f : value;
+            value = (data_src[k] < 0.0f && data_src1[k] > 0.0f) ? 1.0f : value;
+            data->out[k] = value;
+        }
+    }
+
+    /**
      * @brief ProcessBBox
      * @param dst
      * @param src
      * @param box
      */
+    /*
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         Image *src_p = src[0];
@@ -63,6 +87,7 @@ protected:
             }
         }
     }
+    */
 
 public:
 
@@ -70,7 +95,7 @@ public:
      * @brief FilterZeroCrossing
      * @param type
      */
-    FilterZeroCrossing()
+    FilterZeroCrossing() : Filter()
     {
     }
 
