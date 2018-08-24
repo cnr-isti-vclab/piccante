@@ -88,11 +88,11 @@ public:
     void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(swh) {
-            width       = int(imgIn->widthf  * scaleX);
-            height      = int(imgIn->heightf * scaleY);
+            width = int(imgIn->widthf  * scaleX);
+            height = int(imgIn->heightf * scaleY);
         } else {
-            width       = this->width;
-            height      = this->height;
+            width = this->width;
+            height = this->height;
         }
 
         channels    = imgIn->channels;
