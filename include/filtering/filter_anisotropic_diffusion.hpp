@@ -37,8 +37,8 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    float			k, delta_t;
-    unsigned int	mode;
+    float k, delta_t;
+    unsigned int mode;
 
 public:
 
@@ -137,17 +137,17 @@ PIC_INLINE void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src
     for(int j = box->y0; j < box->y1; j++) {
         for(int i = box->x0; i < box->x1; i++) {
 
-            float *dst_data  = (*dst)(i  , j);
-            float *img_data  = (*img)(i  , j);
+            float *dst_data  = (*dst)(i, j);
+            float *img_data  = (*img)(i, j);
 
             for(int p = 0; p < channels; p++) {
                 dst_data[p] = img_data[p];
             }
 
-            float *img_dataN = (*img)(i + 1, j);
-            float *img_dataS = (*img)(i - 1, j);
-            float *img_dataW = (*img)(i  , j - 1);
-            float *img_dataE = (*img)(i  , j + 1);
+            float *img_dataN = (*img)(i + 1, j    );
+            float *img_dataS = (*img)(i - 1, j    );
+            float *img_dataW = (*img)(i    , j - 1);
+            float *img_dataE = (*img)(i    , j + 1);
 
             float cN = 0.0f;
             float cS = 0.0f;
@@ -181,7 +181,8 @@ PIC_INLINE void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src
             }
 
             for(int p = 0; p < channels; p++) {
-                dst_data[p] += delta_t *(cN * gN[p] + cS * gS[p] + cW * gW[p] + cE * gE[p]);
+                dst_data[p] += delta_t *
+                        (cN * gN[p] + cS * gS[p] + cW * gW[p] + cE * gE[p]);
             }
         }
     }

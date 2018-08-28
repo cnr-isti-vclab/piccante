@@ -35,7 +35,7 @@ namespace pic {
 
 struct FilterFData
 {
-    int x, y;
+    int x, y, z;
     float *out;
 
     Image *dst;
@@ -72,14 +72,18 @@ protected:
         f_data.src = src;
         f_data.dst = dst;
 
-        for(int j = box->y0; j < box->y1; j++) {
-            f_data.y = j;
+        for(int k = box->z0; k < box->z1; k++) {
+            f_data.z = k;
 
-            for(int i = box->x0; i < box->x1; i++) {
-                f_data.x = i;
-                f_data.out = (*dst)(i, j);
+            for(int j = box->y0; j < box->y1; j++) {
+                f_data.y = j;
 
-                f(&f_data);
+                for(int i = box->x0; i < box->x1; i++) {
+                    f_data.x = i;
+                    f_data.out = (*dst)(i, j);
+
+                    f(&f_data);
+                }
             }
         }
     }

@@ -31,8 +31,8 @@ class FilterGuided: public Filter
 {
 protected:
 
-    int		radius;
-    float	e_regularization, nPixels;
+    int radius;
+    float e_regularization, nPixels;
 
     /**
      * @brief Process1Channel

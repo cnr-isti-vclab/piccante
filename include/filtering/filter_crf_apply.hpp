@@ -31,38 +31,20 @@ class FilterCRFApply: public Filter
 {
 protected:
 
+    CameraResponseFunction *crf;
+
     /**
-     * @brief ProcessBBox
-     * @param dst
-     * @param src
-     * @param box
+     * @brief f
+     * @param data
      */
-    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
+    virtual void f(FilterFData *data)
     {
+        float *tmp_src = (*data->src[0])(data->x, data->y);
 
-        if(type == IL_LUT_8_BIT && crf->icrf.size() != src[0]->channels) {
-            #ifdef PIC_DEBUG
-                printf("Warning: img cannot be linearized.\n");
-            #endif
-            return;
-        }
-
-        int channels = dst->channels;
-
-        for(int i = box->y0; i < box->y1; i++) {
-           for(int j = box->x0; j < box->x1; j++) {
-
-                float *tmp_src = (*src[0])(j, i);
-                float *tmp_dst = (*dst   )(j, i);
-
-                for(int k = 0; k < channels; k++) {
-                     tmp_dst[k] = crf->Apply(tmp_src[k], k);
-                }
-            }
+        for(int k = 0; k < data->src[0]->channels; k++) {
+            data->out[k] = crf->Apply(tmp_src[k], k);
         }
     }
-
-    CameraResponseFunction *crf;
 
 public:
 
@@ -71,7 +53,11 @@ public:
      */
     FilterCRFApply(CameraResponseFunction *crf)
     {
-        this->crf = crf;
+        if(crf != NULL) {
+            this->crf = crf;
+        } else {
+            printf("FilterCRFApply: the crf is NULL!\n");
+        }
     }
 
     /**

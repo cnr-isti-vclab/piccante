@@ -41,6 +41,7 @@ protected:
     std::vector<ColorConvTransform> list;
     bool bDirection;
     unsigned int n;
+    bool bEven;
 
     /**
      * @brief ProcessBBox
@@ -60,8 +61,6 @@ protected:
         float *tmp[2];
 
         tmp[1] = tmpCol;
-
-        bool bEven = (n % 2) == 0;
 
         for(int j = box->y0; j < box->y1; j++) {
 
@@ -122,6 +121,7 @@ public:
         }
 
         n = int(list.size());
+        bEven = (n % 2) == 0;
     }
 
     /**
