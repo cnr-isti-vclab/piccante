@@ -32,12 +32,13 @@ namespace pic {
 class FilterBilateral2DS: public Filter
 {
 protected:
-    float					sigma_s, sigma_r;
-    PrecomputedGaussian		*pg;
+    float sigma_s, sigma_r;
+    double sigma_r_sq_2;
+    PrecomputedGaussian *pg;
+    MRSamplers<2> *ms;
+    int seed;
+    int nSamples;
 
-    MRSamplers<2>			*ms;
-
-    int                     seed;
     /**
      * @brief ProcessBBox
      * @param dst
@@ -47,7 +48,6 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
-    int nSamples;
 
     /**
      * @brief FilterBilateral2DS
@@ -106,15 +106,6 @@ public:
     std::string Signature()
     {
         return GenBilString("S", sigma_s, sigma_r);
-    }
-
-    /**
-     * @brief SetSigma_r
-     * @param sigma_r
-     */
-    void SetSigma_r(float sigma_r)
-    {
-        this->sigma_r = sigma_r;
     }
 
     /**
@@ -339,6 +330,8 @@ PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
     this->sigma_s = sigma_s;
     this->sigma_r = sigma_r;
 
+    sigma_r_sq_2 = double(sigma_r * sigma_r) * 2.0;
+
     //Precomputation of the Gaussian Kernel
     pg = new PrecomputedGaussian(sigma_s);//, sigma_r);
 
@@ -348,10 +341,11 @@ PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
     int nSamples = int(lround(float(pg->kernelSize)) * BilateralStoK(int(sigma_s))) * mult;
 
     nSamples = MIN(nSamples, nMaxSamples);
+    //	nSamples = MIN(	(pg->halfKernelSize*mult), nMaxSamples);
+
 #ifdef PIC_DEBUG
     printf("Nsamples: %d %f\n", nSamples, sigma_s);
 #endif
-//	nSamples = MIN(	(pg->halfKernelSize*mult),nMaxSamples);
 
     ms = new MRSamplers<2>(type, pg->halfKernelSize, nSamples, 1, 64);
 
@@ -361,10 +355,8 @@ PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
 PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
-    //Filtering
-    double Gauss1, Gauss2;
     double I_val[4], tmpC[4];
-    double  tmp, tmp2, tmp3, sum;
+    double sum;
 
     Image *edge, *base, *selector;
     selector = NULL;
@@ -400,7 +392,6 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
     int channels = dst->channels;
     int edgeChannels = edge->channels;
 
-    double sigma_r2 = sigma_r * sigma_r * 2.0;
     bool sumTest;
 
     RandomSampler<2> *ps;
@@ -437,67 +428,84 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
             nSamples = int(ps->samplesR.size());
 
             for(int k = 0; k < nSamples; k += 2) {
-                //Spatial Gaussian kernel
-                Gauss1 =	pg->coeff[ps->samplesR[k  ] + pg->halfKernelSize] *
+                //
+                //fetch the precomputed Spatial Gaussian kernel
+                //
+                double G1 = pg->coeff[ps->samplesR[k    ] + pg->halfKernelSize] *
                             pg->coeff[ps->samplesR[k + 1] + pg->halfKernelSize];
 
-                //Address
-                int ci = CLAMP(i + ps->samplesR[k  ], width);
+                //fetch addresses
+                int ci = CLAMP(i + ps->samplesR[k    ],  width);
                 int cj = CLAMP(j + ps->samplesR[k + 1], height);
 
                 float *edge_data = (*edge)(ci, cj);
 
-                //Range Gaussian Kernel
-                tmp = 0.0;
+                //
+                //compute the Range Gaussian kernel
+                //
+                double acc_delta_range_sq = 0.0;
 
                 for(int l = 0; l < edgeChannels; l++) {
-#ifdef PIC_SELECTOR
-
+                    double delta_range;
+                    #ifdef PIC_SELECTOR
                     if(selector != NULL) {
                         float t = MIN(MAX(selector->data[c2], 0.0f), 1.0f);
                         float val = t * base->data[c2 + l] + (1.0f - t) * edge->data[c2 + l];
-                        tmp3 = val - I_val[l];
-                    } else
-#endif
-                        tmp3 = edge_data[l] - I_val[l];
+                        delta_range = val - I_val[l];
+                    } else {
+                    #endif
+                        delta_range = edge_data[l] - I_val[l];
+                    #ifdef PIC_SELECTOR
+                    }
+                    #endif
 
-                    tmp += tmp3 * tmp3;
+                    acc_delta_range_sq += delta_range * delta_range;
                 }
 
-                Gauss2 = exp(-tmp / sigma_r2);
+                double G2 = exp(-acc_delta_range_sq / sigma_r_sq_2);
 
-                //Weight
-                tmp2 = Gauss1 * Gauss2;
-                sum += tmp2;
+                //
+                //compute the final weight
+                //
+                double weight = G1 * G2;
+                sum += weight;
 
                 float *base_data = (*base)(ci, cj);
 
-                //Filtering
+                //filter
                 for(int l = 0; l < channels; l++) {
-#ifdef PIC_SELECTOR
-
+                    #ifdef PIC_SELECTOR
                     if(selector != NULL) {
                         float t = MIN(MAX(selector->data[c2], 0.0f), 1.0f);
                         float val = t * base->data[c2 + l] + (1.0f - t) * edge->data[c2 + l];
-                        tmpC[l] += val * tmp2;
-                    } else
-#endif
-                        tmpC[l] += base_data[l] * tmp2;
+                        tmpC[l] += val * weight;
+                    } else {
+                    #endif
+
+                        tmpC[l] += base_data[l] * weight;
+
+                    #ifdef PIC_SELECTOR
+                    }
+                    #endif
                 }
             }
 
             //Normalization
             sumTest = sum > 0.0;
 
-            for(int l = 0; l < channels; l++)
-#ifdef PIC_SELECTOR
+            for(int l = 0; l < channels; l++) {
+                #ifdef PIC_SELECTOR
                 if(selector != NULL) {
                     float t = MIN(MAX(selector->data[c], 0.0f), 1.0f);
                     float val = t * base->data[c + l] + (1.0f - t) * edge->data[c + l];
                     dst->data[c + l] = sumTest ? tmpC[l] / sum : val;
-                } else
-#endif
+                } else {
+                #endif
                     dst_data[l] = sumTest ? float(tmpC[l] / sum) : base_data[l];
+                #ifdef PIC_SELECTOR
+                }
+                #endif
+            }
         }
     }
 }

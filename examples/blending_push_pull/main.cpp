@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     printf("Reading an HDR file...");
 
     pic::Image img;
-    ImageRead("../data/input/bottles.hdr", &img, pic::LT_NOR);
+    img.Read("../data/input/bottles.hdr");
 
     printf("Ok\n");
 
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
         printf("Writing recovered result using Push-Pull... ");
 
-        bool bWritten = ImageWrite(imgOut, "../data/output/pull_push_reconstruction.hdr");
+        bool bWritten = imgOut->Write("../data/output/pull_push_reconstruction.hdr");
 
         if(bWritten) {
             printf("Ok\n");
