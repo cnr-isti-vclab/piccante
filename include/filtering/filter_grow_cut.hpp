@@ -29,6 +29,8 @@ class FilterGrowCut: public Filter
 {
 protected:
 
+    int dx[8], dy[8];
+
     /**
      * @brief ProcessBBox
      * @param dst
@@ -42,9 +44,6 @@ protected:
         Image *img_max    = src[2];
 
         Image *state_next  = dst;
-
-        int dx[] = {-1, 0, 1, -1, 1, -1,  0,  1};
-        int dy[] = { 1, 1, 1,  0, 0, -1, -1, -1};
 
         int channels = img->channels;
 
@@ -90,8 +89,13 @@ public:
     /**
      * @brief FilterGrowCut
      */
-    FilterGrowCut()
+    FilterGrowCut() : Filter()
     {
+        int dx_t[8] = {-1, 0, 1, -1, 1, -1,  0,  1};
+        int dy_t[8] = { 1, 1, 1,  0, 0, -1, -1, -1};
+
+        memcpy(dx, dx_t, sizeof(int) * 8);
+        memcpy(dy, dy_t, sizeof(int) * 8);
     }
 
 };

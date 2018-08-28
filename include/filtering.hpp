@@ -68,6 +68,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_max.hpp"
 #include "filtering/filter_mean.hpp"
 #include "filtering/filter_med.hpp"
+#include "filtering/filter_med_vec.hpp"
 #include "filtering/filter_min.hpp"
 #include "filtering/filter_mosaic.hpp"
 #include "filtering/filter_demosaic.hpp"

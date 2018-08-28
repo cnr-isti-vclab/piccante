@@ -63,7 +63,7 @@ protected:
 
                         float *img_data_lk  = (*img)(i + l, j + k);
 
-                        //Accumulation
+                        //accumulation
                         float val_lk = 0.0f;
                         for(int c = 0; c < channels; c++) {
                             val_lk += img_data_lk[c];

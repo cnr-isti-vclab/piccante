@@ -40,7 +40,7 @@ public:
      * @brief FilterMean
      * @param size
      */
-    FilterMean(int size)
+    FilterMean(int size) : FilterNPasses()
     {
         data = NULL;
         this->size = -1;
@@ -61,8 +61,9 @@ public:
             delete filter;
         }
 
-        if( data != NULL)
+        if( data != NULL) {
             delete[] data;
+        }
     }
 
     /**
@@ -97,21 +98,6 @@ public:
     {
         FilterMean filter(size);
         return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param size
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut, int size)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, size);
-        imgOut->Write(nameOut);
-        return imgOut;
     }
 };
 
