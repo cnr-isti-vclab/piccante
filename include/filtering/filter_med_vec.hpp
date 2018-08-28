@@ -74,21 +74,15 @@ protected:
                 }
 
                 //compute the median
-                int best = 0;
-                int bestCount = -1;
+                int best = -1;
+                float distBest = FLT_MAX;
                 for(int k = 0; k < areaKernel; k++) {
-                    int count = 0;
 
-                    for(int l = 0; l < areaKernel; k++) {
-                        if(dists[k] <= dists[l]) {
-                            count++;
-                        }
-                    }
-
-                    if(count > bestCount) {
+                    if(dists[k] < distBest) {
+                        distBest = dists[k];
                         best = k;
-                        bestCount = count;
                     }
+
                 }
 
                 float *out = (*dst) (i, j);
