@@ -35,7 +35,26 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
+    {
+        for(int p = box->z0; p < box->z1; p++) {
+            for(int j = box->y0; j < box->y1; j++) {
+                for(int i = box->x0; i < box->x1; i++) {
+                    int c  = p * dst->tstride + j * dst->ystride + i * dst->xstride;
+                    int k2 = 0;
+
+                    for(unsigned int im = 0; im < src.size(); im++) {
+                        int c2 = p * src[im]->tstride + j * src[im]->ystride + i * src[im]->xstride;
+
+                        for(int k = 0; k < src[im]->channels; k++) {
+                            dst->data[c + k2] = src[im]->data[c2 + k];
+                            k2++;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * @brief SetupAux
@@ -43,14 +62,31 @@ protected:
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
+    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    {
+        if(imgOut == NULL) {
+            int channels = 0;
+
+            for(unsigned int i = 0; i < imgIn.size(); i++) {
+                channels += imgIn[i]->channels;
+            }
+
+            imgOut = new Image(imgIn[0]->frames, imgIn[0]->width, imgIn[0]->height,
+                                  channels);
+        }
+
+        return imgOut;
+    }
 
 public:
 
     /**
      * @brief FilterCombine
      */
-    FilterCombine() {}
+    FilterCombine()
+    {
+
+    }
 
     /**
      * @brief AddAlpha
@@ -61,11 +97,11 @@ public:
      */
     static Image *AddAlpha(Image *imgIn, Image *imgOut, float value)
     {
-        //Create an alpha channel
+        //create an alpha channel
         Image *alpha = new Image(imgIn->frames, imgIn->width, imgIn->height, 1);
         *alpha = value;
 
-        //Add the channel to the image
+        //add the channel to the image
         ImageVec src;
         src.push_back(imgIn);
         src.push_back(alpha);
@@ -95,18 +131,16 @@ public:
      * @param nameOut
      * @return
      */
-    static Image *ExecuteTest(std::string nameIn, std::string nameOut)
+    static Image *ExecuteTest(Image *imgIn, Image *imgOut)
     {
-        Image imgIn(nameIn);
-
         FilterChannel filter(0);
-        Image *outR = filter.Process(Single(&imgIn), NULL);
+        Image *outR = filter.Process(Single(imgIn), NULL);
 
         filter.setChannel(1);
-        Image *outG = filter.Process(Single(&imgIn), NULL);
+        Image *outG = filter.Process(Single(imgIn), NULL);
 
         filter.setChannel(2);
-        Image *outB = filter.Process(Single(&imgIn), NULL);
+        Image *outB = filter.Process(Single(imgIn), NULL);
 
         ImageVec src;
         src.push_back(outR);
@@ -114,49 +148,11 @@ public:
         src.push_back(outB);
 
         FilterCombine filterC;
-        Image *ret = filterC.Process(src, NULL);
+        imgOut = filterC.Process(src, NULL);
 
-        ret->Write(nameOut);
-        return ret;
+        return imgOut;
     }
 };
-
-PIC_INLINE Image *FilterCombine::SetupAux(ImageVec imgIn, Image *imgOut)
-{
-    if(imgOut == NULL) {
-        int channels = 0;
-
-        for(unsigned int i = 0; i < imgIn.size(); i++) {
-            channels += imgIn[i]->channels;
-        }
-
-        imgOut = new Image(imgIn[0]->frames, imgIn[0]->width, imgIn[0]->height,
-                              channels);
-    }
-
-    return imgOut;
-}
-
-PIC_INLINE void FilterCombine::ProcessBBox(Image *dst, ImageVec src, BBox *box)
-{
-    for(int p = box->z0; p < box->z1; p++) {
-        for(int j = box->y0; j < box->y1; j++) {
-            for(int i = box->x0; i < box->x1; i++) {
-                int c  = p * dst->tstride + j * dst->ystride + i * dst->xstride;
-                int k2 = 0;
-
-                for(unsigned int im = 0; im < src.size(); im++) {
-                    int c2 = p * src[im]->tstride + j * src[im]->ystride + i * src[im]->xstride;
-
-                    for(int k = 0; k < src[im]->channels; k++) {
-                        dst->data[c + k2] = src[im]->data[c2 + k];
-                        k2++;
-                    }
-                }
-            }
-        }
-    }
-}
 
 } // end namespace pic
 
