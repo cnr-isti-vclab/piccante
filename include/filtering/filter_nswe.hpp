@@ -29,14 +29,35 @@ class FilterNSWE: public Filter
 {
 protected:
     /**
+     * @brief f
+     * @param data
+     */
+    void f(FilterFData *data)
+    {
+        float *img_data  = (*data->src[0])(data->x    , data->y);
+        float *img_dataN = (*data->src[0])(data->x + 1, data->y);
+        float *img_dataS = (*data->src[0])(data->x - 1, data->y);
+        float *img_dataW = (*data->src[0])(data->x    , data->y - 1);
+        float *img_dataE = (*data->src[0])(data->x    , data->y + 1);
+
+        for(int k = 0; k < data->src[0]->channels; k++) {
+            int tmp = k * 4;
+            data->out[tmp    ] = img_dataN[k] - img_data[k];
+            data->out[tmp + 1] = img_dataS[k] - img_data[k];
+            data->out[tmp + 2] = img_dataW[k] - img_data[k];
+            data->out[tmp + 3] = img_dataE[k] - img_data[k];
+        }
+    }
+
+    /**
      * @brief ProcessBBox
      * @param dst
      * @param src
      * @param box
      */
+    /*
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        //Filtering
         Image *img = src[0];
         int channels = img->channels;
 
@@ -62,6 +83,7 @@ protected:
             }
         }
     }
+    */
 
     Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
