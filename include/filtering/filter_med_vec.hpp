@@ -41,7 +41,6 @@ protected:
     {
         Image *in = src[0];
         float *values = new float[areaKernel * in->channels];
-        float *dists = new float[areaKernel];
 
         for(int j = box->y0; j < box->y1; j++) {
             for(int i = box->x0; i < box->x1; i++) {
@@ -61,28 +60,23 @@ protected:
                 }
 
                 //compute distances
-                for(int k = 0; k < areaKernel; k++) {
-
-                    int index_k = k * in->channels;
-
-                    dists[k] = 0.0f;
-                    for(int l = 0; l < areaKernel; k++) {
-                        int index_l = l * in->channels;
-                        float d_sq = Array<float>::distanceSq(&values[index_k], &values[index_l], in->channels);
-                        dists[k] += sqrtf(d_sq);
-                    }
-                }
-
-                //compute the median
                 int best = -1;
                 float distBest = FLT_MAX;
-                for(int k = 0; k < areaKernel; k++) {
 
-                    if(dists[k] < distBest) {
-                        distBest = dists[k];
-                        best = k;
+                for(int k = 0; k < areaKernel; k++) {
+                    int index_k = k * in->channels;
+                    float dist = 0.0f;
+
+                    for(int l = 0; l < areaKernel; l++) {
+                        int index_l = l * in->channels;
+                        float d_sq = Array<float>::distanceSq(&values[index_k], &values[index_l], in->channels);
+                        dist += sqrtf(d_sq);
                     }
 
+                    if(dist < distBest) {
+                        distBest = dist;
+                        best = k;
+                    }
                 }
 
                 float *out = (*dst) (i, j);
@@ -94,7 +88,6 @@ protected:
         }
 
         delete[] values;
-        delete[] dists;
     }
 
 public:
@@ -114,7 +107,10 @@ public:
     void update(int size)
     {
         this->halfSize = checkHalfSize(size);
-        this->areaKernel = (halfSize * 2 + 1) * (halfSize * 2 + 1);
+
+        int kernelSize = halfSize * 2 + 1;
+        this->areaKernel = kernelSize * kernelSize;
+
         this->midValue = areaKernel >> 1;
     }
 

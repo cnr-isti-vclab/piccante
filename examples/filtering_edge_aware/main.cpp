@@ -55,10 +55,9 @@ int main(int argc, char *argv[])
         bool bWritten;
 
         //the median filter
-        printf("Filtering the image with the Median filter;\n");
-        printf("this has an radius of 9... ");
+        printf("Filtering the image with the Median filter (radius of 3);\n");
 
-        pic::FilterMed fltM(9);
+        pic::FilterMed fltM(7);
         output = fltM.ProcessP(input, output);
 
         printf("Ok!\n");
@@ -74,10 +73,9 @@ int main(int argc, char *argv[])
         }
 
         //the vector median filter
-        printf("Filtering the image with the Vector Median filter;\n");
-        printf("this has an radius of 9... ");
+        printf("Filtering the image with the Vector Median filter (radius of 3);\n");
 
-        pic::FilterMedVec fltMV(9);
+        pic::FilterMedVec fltMV(7);
         output = fltMV.ProcessP(input, output);
 
         printf("Ok!\n");
