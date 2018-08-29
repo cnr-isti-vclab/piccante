@@ -160,8 +160,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_PICCANTE_HPP
 #define PIC_PICCANTE_HPP
 
-#define PIC_DEPRECATED
-
 #ifdef _MSC_VER
 //we are using windows
     #define PIC_WIN32
