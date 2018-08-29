@@ -87,7 +87,7 @@ public:
      * @return
      */
     static bool *erode(bool *dataOut, bool *dataIn, int width, int height,
-                               int kernelSize = 3)
+                       int kernelSize = 3)
     {
         if(dataIn == NULL) {
             return dataOut;
@@ -135,7 +135,7 @@ public:
      * @return
      */
     static bool *dilate(bool *dataOut, bool *dataIn, int width, int height,
-                                int kernelSize = 3)
+                        int kernelSize = 3)
     {
         if(dataIn == NULL) {
             return dataOut;
@@ -216,7 +216,7 @@ public:
 
         int n = (height * width);
 
-        int P[9];
+        bool P[9];
 
         //first-pass
         std::vector< int > list;
@@ -229,23 +229,24 @@ public:
                     continue;
                 }
 
-                P[0] = index;
-                P[1] = index + 1;
-                P[2] = index - width + 1;
-                P[3] = index - width;
-                P[4] = index - width - 1;
-                P[5] = index - 1;
-                P[6] = index + width - 1;
-                P[7] = index + width;
-                P[8] = index + width + 1;
+                P[0] = dataOut[index];
+                P[1] = dataOut[index + 1];
+                P[2] = dataOut[index - width + 1];
+                P[3] = dataOut[index - width];
+                P[4] = dataOut[index - width - 1];
+                P[5] = dataOut[index - 1];
+                P[6] = dataOut[index + width - 1];
+                P[7] = dataOut[index + width];
+                P[8] = dataOut[index + width + 1];
 
                 int X_h = 0;
                 int n1 = 0;
                 int n2 = 0;
                 for(int k = 1; k <= 4; k++) {
-                    bool x_2km1 = dataOut[P[k * 2 - 1]];
-                    bool x_2k   = dataOut[P[k * 2]];
-                    bool x_2kp1 = dataOut[P[k * 2 + 1]];
+                    int k_2 = k << 1;
+                    bool x_2km1 = P[k_2 - 1];
+                    bool x_2k   = P[k_2    ];
+                    bool x_2kp1 = P[k_2 + 1];
 
                     if( !x_2km1 && (x_2k || x_2kp1) ) {
                         X_h++;
@@ -264,10 +265,7 @@ public:
 
                 bool G1 = (X_h == 1);
                 bool G2 = (min_12 > 1) && (min_12 < 4);
-                bool G3 =  dataOut[P[1]] && (
-                           dataOut[P[2]] ||
-                           dataOut[P[3]] ||
-                          !dataOut[P[8]]);
+                bool G3 = P[1] && ( P[2] || P[3] || !P[8]);
 
                 if(G1 && G2 && G3) {
                     list.push_back(index);
@@ -291,23 +289,24 @@ public:
                     continue;
                 }
 
-                P[0] = index;
-                P[1] = index + 1;
-                P[2] = index - width + 1;
-                P[3] = index - width;
-                P[4] = index - width - 1;
-                P[5] = index - 1;
-                P[6] = index + width - 1;
-                P[7] = index + width;
-                P[8] = index + width + 1;
+                P[0] = dataOut[index];
+                P[1] = dataOut[index + 1];
+                P[2] = dataOut[index - width + 1];
+                P[3] = dataOut[index - width];
+                P[4] = dataOut[index - width - 1];
+                P[5] = dataOut[index - 1];
+                P[6] = dataOut[index + width - 1];
+                P[7] = dataOut[index + width];
+                P[8] = dataOut[index + width + 1];
 
                 int X_h = 0;
                 int n1 = 0;
                 int n2 = 0;
                 for(int k = 1; k <= 4; k++) {
-                    bool x_2km1 = dataOut[P[k * 2 - 1]];
-                    bool x_2k   = dataOut[P[k * 2]];
-                    bool x_2kp1 = dataOut[P[k * 2 + 1]];
+                    int k_2 = k << 1;
+                    bool x_2km1 = P[k_2 - 1];
+                    bool x_2k   = P[k_2    ];
+                    bool x_2kp1 = P[k_2 + 1];
 
                     if( !x_2km1 && (x_2k || x_2kp1) ) {
                         X_h++;
@@ -326,10 +325,7 @@ public:
 
                 bool G1 = (X_h == 1);
                 bool G2 = (min_12 > 1) && (min_12 < 4);
-                bool G3 =  dataOut[P[5]] && (
-                           dataOut[P[6]] ||
-                           dataOut[P[7]] ||
-                          !dataOut[P[4]]);
+                bool G3 =  P[5] && (P[6] || P[7] || !P[4]);
 
                 if(G1 && G2 && G3) {
                     list.push_back(index);
