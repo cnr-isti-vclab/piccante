@@ -70,7 +70,7 @@ protected:
 
         quad = new pic::QuadGL(true);
 
-        //allcoate a new filter for simple tone mapping
+        //allocate a new filter for simple tone mapping
         tmo = new pic::FilterGLColorConv(new pic::ColorConvGLRGBtosRGB());
     }
 
@@ -144,7 +144,8 @@ public:
 
         layout->addWidget(window_gl);
         label = new QLabel(
-        "This example opens an HDR image and shows it using OpenGL.", this);
+                    "This example opens an HDR image and shows it using OpenGL.",
+                    this);
         label->setFixedWidth(912);
         label->setFixedHeight(64);
         label->setAlignment(Qt::AlignHCenter);
@@ -173,7 +174,7 @@ int main(int argc, char **argv)
     glFormat.setProfile( QGLFormat::CoreProfile );
     glFormat.setSampleBuffers( true );
 
-    //Creating a window with OpenGL 4.0 Core profile
+    //create a window with OpenGL 4.0 Core profile
     Window w( glFormat );
     w.show();
 
