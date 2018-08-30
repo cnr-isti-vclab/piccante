@@ -34,8 +34,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QVBoxLayout>
 #include <QLabel>
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
@@ -78,16 +76,16 @@ protected:
 
         quad = new pic::QuadGL(true);
 
-        //allocating a new filter for simple tone mapping
+        //allocate a new filter for simple tone mapping
         tmo = new pic::FilterGLColorConv(new pic::ColorConvGLRGBtosRGB());
 
-        //allocating Drago et al.'s TMO
+        //allocate Drago et al.'s TMO
         drago_tmo = new pic::DragoTMOGL();
 
-        //allocating Reinhard et al.'s TMO
+        //allocate Reinhard et al.'s TMO
         reinhard_tmo = new pic::ReinhardTMOGL();
 
-        //allocating Durand et al.'s TMO
+        //allocate Durand et al.'s TMO
         durand_tmo = new pic::DurandTMOGL();
     }
 
@@ -195,7 +193,8 @@ public:
         layout->addWidget(window_gl);
 
         label = new QLabel(
-        "Pease hit the space bar in order to switch to different tone mapping images.", this);
+                    "Please hit the space bar in order to switch to different tone mapping images.",
+                    this);
         label->setFixedWidth(912);
         label->setFixedHeight(64);
         label->setAlignment(Qt::AlignHCenter);
@@ -237,7 +236,7 @@ int main(int argc, char **argv)
     glFormat.setProfile( QGLFormat::CoreProfile );
     glFormat.setSampleBuffers( true );
 
-    //Creating a window with OpenGL 4.0 Core profile
+    //create a window with OpenGL 4.0 Core profile
     Window w( glFormat );
     w.show();
 

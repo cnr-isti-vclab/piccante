@@ -28,13 +28,13 @@ namespace pic {
  */
 inline GLuint glBeginTimeQuery()
 {
-    //Timing
-    GLuint ret;
+    GLuint ret = 0;
 #ifdef PIC_GL_TIMING
     glGenQueries(1, &ret);
     glFinish();
     glBeginQuery(GL_TIME_ELAPSED, ret);
 #endif
+
     return ret;
 }
 
@@ -46,11 +46,12 @@ inline GLuint glBeginTimeQuery()
 inline GLuint64 glEndTimeQuery(GLuint64 ret)
 {
     GLuint64 timeVal = 0;
-    //Timing
+
 #ifdef PIC_GL_TIMING
     glEndQuery(GL_TIME_ELAPSED);
     glGetQueryObjectui64v(ret, GL_QUERY_RESULT, &timeVal);
 #endif
+
     return timeVal;
 }
 

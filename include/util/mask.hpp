@@ -214,8 +214,6 @@ public:
 
         dataOut = clone(dataOut, dataIn, width * height, 1);
 
-        int n = (height * width);
-
         bool P[9];
 
         //first-pass
