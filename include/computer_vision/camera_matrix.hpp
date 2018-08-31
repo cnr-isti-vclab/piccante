@@ -262,7 +262,7 @@ PIC_INLINE void cameraRectify(Eigen::Matrix3d &K0, Eigen::Matrix3d &R0, Eigen::V
     //compute optical centers
 
     auto c0 = getCameraCenter(P0t);
-    auto c1 = getCameraCenter(P0t);
+    auto c1 = getCameraCenter(P1t);
 
     //compute new rotation matrix
     Eigen::Vector3d x_axis = c1 - c0;
