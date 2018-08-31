@@ -15,17 +15,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_FILTERING_FILTER_MED_HPP
-#define PIC_FILTERING_FILTER_MED_HPP
+#ifndef PIC_FILTERING_FILTER_MED_VEC_HPP
+#define PIC_FILTERING_FILTER_MED_VEC_HPP
 
 #include "../filtering/filter.hpp"
+#include "../util/array.hpp"
 
 namespace pic {
 
 /**
- * @brief The FilterMed class
+ * @brief The FilterMedVec class
  */
-class FilterMed: public Filter
+class FilterMedVec: public Filter
 {
 protected:
     int halfSize, areaKernel, midValue;
@@ -51,20 +52,37 @@ protected:
                         float *color = (*in)(i + l, j + k);
 
                         for(int ch = 0; ch < in->channels; ch++) {
-                            values[areaKernel * ch + c] = color[ch];
+                            values[c * in->channels + ch] = color[ch];
                         }
 
                         c++;
                     }
                 }
 
+                //compute distances
+                int best = -1;
+                float distBest = FLT_MAX;
+
+                for(int k = 0; k < areaKernel; k++) {
+                    int index_k = k * in->channels;
+                    float dist = 0.0f;
+
+                    for(int l = 0; l < areaKernel; l++) {
+                        int index_l = l * in->channels;
+                        float d_sq = Array<float>::distanceSq(&values[index_k], &values[index_l], in->channels);
+                        dist += sqrtf(d_sq);
+                    }
+
+                    if(dist < distBest) {
+                        distBest = dist;
+                        best = k;
+                    }
+                }
+
                 float *out = (*dst) (i, j);
 
                 for(int ch = 0; ch < in->channels; ch++) {
-                    float *tmp_v_ch = &values[areaKernel * ch];
-                    std::sort(tmp_v_ch, tmp_v_ch + areaKernel);
-
-                    out[ch] = tmp_v_ch[midValue];
+                    out[ch] = values[best * in->channels + ch];
                 }
             }
         }
@@ -74,10 +92,10 @@ protected:
 
 public:
     /**
-     * @brief FilterMed
+     * @brief FilterMedVec
      * @param size
      */
-    FilterMed(int size)
+    FilterMedVec(int size)
     {
         update(size);
     }
@@ -89,7 +107,10 @@ public:
     void update(int size)
     {
         this->halfSize = checkHalfSize(size);
-        this->areaKernel = (halfSize * 2 + 1) * (halfSize * 2 + 1);
+
+        int kernelSize = halfSize * 2 + 1;
+        this->areaKernel = kernelSize * kernelSize;
+
         this->midValue = areaKernel >> 1;
     }
 
@@ -102,27 +123,12 @@ public:
      */
     static Image *Execute(Image *imgIn, Image *imgOut, int size)
     {
-        FilterMed filter(size);
+        FilterMedVec filter(size);
         return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param size
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut, int size)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, size);
-        imgOut->Write(nameOut);
-        return imgOut;
     }
 };
 
 } // end namespace pic
 
-#endif /* PIC_FILTERING_FILTER_MED_HPP */
+#endif /* PIC_FILTERING_FILTER_MED_VEC_HPP */
 

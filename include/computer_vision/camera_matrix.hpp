@@ -108,38 +108,6 @@ PIC_INLINE Eigen::Matrix34d getCameraMatrixFromHomography(Eigen::Matrix3d &H, Ei
 }
 
 /**
- * @brief RectifyCameras
- * @param K0
- * @param R0
- * @param t0
- * @param K1
- * @param R1
- * @param t1
- * @param T0
- * @param T1
- */
-PIC_INLINE void RectifyCameras(Eigen::Matrix3d &K0, Eigen::Matrix3d &R0, Eigen::Vector3d &t0,
-                    Eigen::Matrix3d &K1, Eigen::Matrix3d &R1, Eigen::Vector3d &t1,
-                    Eigen::Matrix3d &T0, Eigen::Matrix3d &T1)
-{
-    Eigen::Matrix3d K0_inv = K0.inverse();
-    Eigen::Matrix3d K1_inv = K1.inverse();
-
-    Eigen::Matrix3d R0_t = Eigen::Transpose<Eigen::Matrix3d>(R0);
-    Eigen::Matrix3d R1_t = Eigen::Transpose<Eigen::Matrix3d>(R1);
-
-    Eigen::Vector3d c0 = -R0_t * K0_inv * t0;
-    Eigen::Vector3d c1 = -R1_t * K1_inv * t1;
-
-    Eigen::Vector3d v0 = c1 - c0;
-
-    Eigen::Vector3d R0_t_2 = Eigen::Vector3d(R0_t(2, 0), R0_t(2, 1), R0_t(2, 2));
-    Eigen::Vector3d v1 = R0_t_2.cross(v0);
-    Eigen::Vector3d v2 = v0.cross(v1);
-
-}
-
-/**
  * @brief getCameraMatrixIdentity
  * @param K
  * @return
@@ -250,6 +218,88 @@ PIC_INLINE Eigen::Vector2i cameraMatrixProjection(Eigen::Matrix34d &M, Eigen::Ve
     out[1] = int(proj[1]);
 
     return out;
+}
+
+/**
+ * @brief getCameraCenter
+ * @param P the camera matrix of a view
+ * @return it returns the camera center of P
+ */
+Eigen::Vector3d getCameraCenter(Eigen::Matrix34d &P)
+{
+    Eigen::Matrix3d Q = P.block<3, 3>(0, 0);
+    auto Q_inv = Q.inverse();
+    return - Q_inv * P.col(3);
+}
+
+/**
+ * @brief cameraRectify
+ * @param K0 intrisic matrix of view0
+ * @param R0 rotation matrix of view0
+ * @param t0 translation vector of view0
+ * @param K1 intrisic matrix of view1
+ * @param R1 rotation matrix of view1
+ * @param t1 translation vector of view1
+ * @param P0 new camera matrix of view0
+ * @param P1 new camera matrix of view1
+ * @param T0 transformation matrix for view0
+ * @param T1 transformation matrix for view1
+ */
+PIC_INLINE void cameraRectify(Eigen::Matrix3d &K0, Eigen::Matrix3d &R0, Eigen::Vector3d &t0,
+                              Eigen::Matrix3d &K1, Eigen::Matrix3d &R1, Eigen::Vector3d &t1,
+                              Eigen::Matrix34d &P0, Eigen::Matrix34d &P1,
+                              Eigen::Matrix3d &T0, Eigen::Matrix3d &T1)
+{
+    auto P0t = getCameraMatrix(K0, R0, t0);
+    auto P1t = getCameraMatrix(K1, R1, t1);
+
+    auto K0_i = K0.inverse();
+    auto K1_i = K1.inverse();
+
+    auto R0_t = Eigen::Transpose< Eigen::Matrix3d >(R0);
+    auto R1_t = Eigen::Transpose< Eigen::Matrix3d >(R1);
+
+    //compute optical centers
+
+    auto c0 = getCameraCenter(P0t);
+    auto c1 = getCameraCenter(P0t);
+
+    //compute new rotation matrix
+    Eigen::Vector3d x_axis = c1 - c0;
+    Eigen::Vector3d tmp = R1.row(2);
+    Eigen::Vector3d y_axis = tmp.cross(x_axis);
+    Eigen::Vector3d z_axis = x_axis.cross(y_axis);
+
+    x_axis.normalize();
+    y_axis.normalize();
+    z_axis.normalize();
+
+    Eigen::Matrix3d R;
+
+    R(0, 0) = x_axis[0];    R(1, 0) = x_axis[1];    R(2, 0) = x_axis[2];
+    R(1, 1) = y_axis[0];    R(1, 1) = y_axis[1];    R(2, 1) = y_axis[2];
+    R(0, 2) = z_axis[0];    R(1, 2) = z_axis[1];    R(2, 2) = z_axis[2];
+
+    //new camera matrices
+    Eigen::Vector3d t0n = -R * c0;
+    P0 = getCameraMatrix(K0, R, t0n);
+
+    Eigen::Vector3d t1n = -R * c1;
+    P1 = getCameraMatrix(K1, R, t1n);
+
+    //transformations
+    auto o0 = P0t.block<3, 3>(0, 0);
+    auto old0 = o0.inverse();
+
+    auto new0 = P0.block<3, 3>(0, 0);
+    T0 = new0 * old0;
+
+
+    auto o1 = P1t.block<3, 3>(0, 0);
+    auto old1 = o1.inverse();
+
+    auto new1 = P1.block<3, 3>(0, 0);
+    T1 = new1 * old1;
 }
 
 #endif // PIC_DISABLE_EIGEN

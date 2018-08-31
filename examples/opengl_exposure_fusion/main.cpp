@@ -22,11 +22,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
 #ifdef _MSC_VER
-    #define PIC_DISABLE_OPENGL_NON_CORE
-    #include "../opengl_common_code/gl_core_4_0.h"
+    #include "../common_code/gl_core_4_0.h"
 #endif
-
-#include "piccante.hpp"
 
 #include <QKeyEvent>
 #include <QtCore/QCoreApplication>
@@ -36,13 +33,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QVBoxLayout>
 #include <QLabel>
 
+#include "piccante.hpp"
+
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
 {
 protected:
     pic::QuadGL *quad;
-    pic::ExposureFusionGL  *ef;
+    pic::ExposureFusionGL *ef;
     pic::FilterGLSimpleTMO *tmo;
-    pic::ImageGL    img, *img_tmo;
+    pic::ImageGL img, *img_tmo;
     pic::ImageGLVec img_vec;
     pic::TechniqueGL technique;
 
@@ -63,24 +62,24 @@ protected:
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
-        //reading an input image
+        //read an input image
         img.Read("../data/input/bottles.hdr");
         img.generateTextureGL();
 
-        //creating a screen aligned quad
+        //create a screen aligned quad
         pic::QuadGL::getTechnique(technique,
                                 pic::QuadGL::getVertexProgramV3(),
                                 pic::QuadGL::getFragmentProgramForView());
 
         quad = new pic::QuadGL(true);
 
-        //allocating an exposure fusion instance
+        //allocate an exposure fusion instance
         ef = new pic::ExposureFusionGL();
 
-        //computing a stack of LDR images from an HDR image
+        //compute a stack of LDR images from an HDR image
         img_vec = pic::getAllExposuresImagesGL(&img);
 
-        //allocating a new filter for simple tone mapping
+        //allocate a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
     }
 
@@ -107,7 +106,7 @@ protected:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         if(method == 0) {
-            //computing exposure fusion for the stack (img_vec)
+            //compute exposure fusion for the stack (img_vec)
             img_tmo = ef->Process(img_vec, img_tmo, 0.2f, 1.0f, 0.2f);
         } else {
             //simple tone mapping: gamma + exposure correction
@@ -169,7 +168,8 @@ public:
         layout->addWidget(window_gl);
 
         label = new QLabel(
-        "Pease hit the space bar in order to switch from fused image to the original one.", this);
+                    "Please hit the space bar in order to switch from fused image to the original one.",
+                    this);
         label->setAlignment(Qt::AlignHCenter);
         label->setFixedWidth(912);
         label->setFixedHeight(64);
@@ -211,7 +211,7 @@ int main(int argc, char **argv)
     glFormat.setProfile( QGLFormat::CoreProfile );
     glFormat.setSampleBuffers( true );
 
-    //Creating a window with OpenGL 4.0 Core profile
+    //create a window with OpenGL 4.0 Core profile
     Window w( glFormat );
     w.show();
 

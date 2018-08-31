@@ -52,7 +52,45 @@ int main(int argc, char *argv[])
         pic::ImageVec input = pic::Single(&img);
         pic::Image *output = NULL;
 
-        //Filter using the bilateral filter
+        bool bWritten;
+
+        //the median filter
+        printf("Filtering the image with the Median filter (radius of 3);\n");
+
+        pic::FilterMed fltM(7);
+        output = fltM.ProcessP(input, output);
+
+        printf("Ok!\n");
+
+        printf("Writing the file to disk...");
+
+        bWritten = output->Write("../data/output/filtered_median.png");
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+
+        //the vector median filter
+        printf("Filtering the image with the Vector Median filter (radius of 3);\n");
+
+        pic::FilterMedVec fltMV(7);
+        output = fltMV.ProcessP(input, output);
+
+        printf("Ok!\n");
+
+        printf("Writing the file to disk...");
+
+        bWritten = output->Write("../data/output/filtered_median_vec.png");
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+
+        //the bilateral filter
         printf("Filtering the image with a Fast Bilateral filter;\n");
         printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
 
@@ -63,8 +101,6 @@ int main(int argc, char *argv[])
 
         printf("Writing the file to disk...");
 
-        bool bWritten;
-
         bWritten = output->Write("../data/output/filtered_bilateral.png");
 
         if(bWritten) {
@@ -73,7 +109,7 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
-        //Filter using the Anisotropic Diffusion
+        //the Anisotropic Diffusion
         printf("Filtering the image with the Anisotropic Diffusion;\n");
         printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
         output = pic::FilterAnsiotropicDiffusion::AnisotropicDiffusion(input, output, 8.0f, 0.05f);
@@ -88,7 +124,7 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
-        //Filter using the Guided Filter
+        //the Guided Filter
         printf("Filtering the image with the Guided filter...");
         pic::FilterGuided fltG;
         output = fltG.ProcessP(input, output);//filtering the image
@@ -102,7 +138,7 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
-        //filter using WLS
+        //WLS
         printf("Filtering the image with the WLS filter...");
         pic::FilterWLS fltWLS;//creating the filter
         output = fltWLS.ProcessP(input, output);
@@ -117,7 +153,7 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
-        //Filter using Kuwahara
+        //Kuwahara
         printf("Filtering the image with the Kuwahara filter...");
         pic::FilterKuwahara fltK(11);
         output = fltK.ProcessP(input, output);

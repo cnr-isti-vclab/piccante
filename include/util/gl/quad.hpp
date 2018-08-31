@@ -332,7 +332,7 @@ public:
         technique.unbind();
     }
 
-    #ifndef PIC_DEPRECATED
+    #ifdef PIC_DEPRECATED
     /**
      * @brief Draw: draw using compability mode (deprecated!)
      */

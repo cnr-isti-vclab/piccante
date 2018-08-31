@@ -26,10 +26,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
-#include "../common_code/image_qimage_interop.hpp"
-
-#include "piccante.hpp"
-
 #include <QKeyEvent>
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
@@ -37,6 +33,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QOpenGLFunctions>
 #include <QVBoxLayout>
 #include <QLabel>
+
+#include "piccante.hpp"
 
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
 {  
@@ -74,13 +72,13 @@ protected:
 
         img.generateTextureGL();
 
-        //creating a screen aligned quad
+        //create a screen aligned quad
         pic::QuadGL::getTechnique(technique,
                             pic::QuadGL::getVertexProgramV3(),
                             pic::QuadGL::getFragmentProgramForView());
         quad = new pic::QuadGL(true);
 
-        //allocating a new filter for simple tone mapping
+        //allocate a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
         pp = new pic::PushPullGL();
@@ -174,7 +172,9 @@ public:
         layout->addWidget(window_gl);
 
         label = new QLabel(
-        "Pease hit the space bar in order to switch from the original image (with a black hole) to the reconstructed one using Push-Pull.", this);
+                    "Please hit the space bar in order to switch from the original "
+                    "image (with a black hole) to the reconstructed one using Push-Pull.",
+                    this);
         label->setFixedWidth(912);
         label->setFixedHeight(64);
 

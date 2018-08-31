@@ -37,41 +37,25 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        int width = dst->width;
-        int height = dst->height;
         int channels = src[0]->channels;
-        float *data = src[0]->data;
 
-        float sum;
-        int tmp[4], cip1, cjp1, cim1, cjm1;
+        Image *in = src[0];
 
         for(int j = box->y0; j < box->y1; j++) {
-            int ind = j * width;
 
             for(int i = box->x0; i < box->x1; i++) {
-                int c = (ind + i) * channels;
+
+                float *cur = (*in)(i, j);
+                float *out = (*dst)(i, j);
 
                 //neighbors
-                tmp[0]  = CLAMP(i + 1, width);
-                cip1    = (ind + tmp[0]) * channels;
-
-                tmp[1]  = CLAMP(i - 1, width);
-                cim1    = (ind + tmp[1]) * channels;
-
-                tmp[2]  = CLAMP(j + 1, height);
-                cjp1    = (tmp[2] * width + i) * channels;
-
-                tmp[3]  = CLAMP(j - 1, height);
-                cjm1    = (tmp[3] * width + i) * channels;
+                float *N = (*in)(i    , j + 1);
+                float *S = (*in)(i    , j - 1);
+                float *E = (*in)(i + 1, j);
+                float *W = (*in)(i - 1, j);
 
                 for(int k = 0; k < channels; k++) {
-                    sum  = -4.0f * data[c + k];
-                    sum += data[cip1 + k];
-                    sum += data[cim1 + k];
-                    sum += data[cjp1 + k];
-                    sum += data[cjm1 + k];
-
-                    dst->data[c + k] = sum;
+                    out[k] = (-4.0f * cur[k]) + N[k] + S[k] + E[k] + W[k];
                 }
             }
         }

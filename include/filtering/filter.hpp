@@ -312,6 +312,10 @@ PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
 
     imgOut = SetupAux(imgIn, imgOut);
 
+    if(imgOut == NULL) {
+        return imgOut;
+    }
+
     if((imgOut->width < TILE_SIZE) &&
        (imgOut->height < TILE_SIZE)) {
         BBox box(imgOut->width, imgOut->height);
@@ -320,7 +324,7 @@ PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
         return imgOut;
     }
 
-    //Create threads
+    //create threads
     int numCores = std::thread::hardware_concurrency();
 
     std::thread **thrd = new std::thread*[numCores];
@@ -331,7 +335,7 @@ PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
             std::bind(&Filter::ProcessPAux, this, imgIn, imgOut, &lst));
     }
 
-    //Threads join
+    //join threads
     for(int i = 0; i < numCores; i++) {
         thrd[i]->join();
         delete thrd[i];

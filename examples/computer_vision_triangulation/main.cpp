@@ -125,11 +125,36 @@ int main(int argc, char *argv[])
         Eigen::Matrix34d M0 = pic::getCameraMatrixIdentity(K);
         Eigen::Matrix34d M1 = pic::getCameraMatrix(K, R, t);
         
+
+        Eigen::Matrix34d M0r, M1r;
+        Eigen::Matrix3d T0, T1;
+
+        Eigen::Matrix3d R0;
+        R0.setZero();
+        R0(0, 0) = 1.0;
+        R0(1, 1) = 1.0;
+        R0(2, 2) = 1.0;
+        Eigen::Vector3d t0;
+        t0.setZero();
+        pic::cameraRectify(K, R0, t0, K, R, t, M0r, M1r, T0, T1);
+
+        pic::printfMat(T0);
+        pic::printfMat(T1);
+
+        pic::FilterWarp2D warp0(pic::MatrixConvert(T0));
+        pic::Image *img0r = warp0.ProcessP(Single(&img0), NULL);
+        img0r->Write("../data/output/campo_s_stefano_l_rectified.png");
+
+        pic::FilterWarp2D warp1(pic::MatrixConvert(T1));
+        pic::Image *img1r = warp1.ProcessP(Single(&img1), NULL);
+        img1r->Write("../data/output/campo_s_stefano_r_rectified.png");
+
+
         pic::printfMat34d(M0);
         pic::printfMat34d(M1);
         
         pic::NelderMeadOptTriangulation nmTri(M0, M1);
-        for(auto i = 0; i < m0f.size(); i++) {
+        for(unsigned int i = 0; i < m0f.size(); i++) {
             //normalized coordinates
             Eigen::Vector3d p0 = Eigen::Vector3d(m0f[i][0], m0f[i][1], 1.0);
             Eigen::Vector3d p1 = Eigen::Vector3d(m1f[i][0], m1f[i][1], 1.0);

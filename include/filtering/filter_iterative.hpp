@@ -28,10 +28,10 @@ namespace pic {
 class FilterIterative: public Filter
 {
 protected:
-    Image	*imgTmp[2];
+    Image *imgTmp[2];
 
-    bool		parallel;
-    int			iterations;
+    bool parallel;
+    int iterations;
 
     /**
      * @brief Destroy
@@ -173,7 +173,7 @@ PIC_INLINE Image *FilterIterative::Process(ImageVec imgIn, Image *imgOut)
         return imgOut;
     }
 
-    //Allocate output
+    //allocate output
     imgOut = SetupAuxN(imgIn, imgOut);
 
     if(parallel) {

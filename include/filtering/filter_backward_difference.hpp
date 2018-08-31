@@ -28,12 +28,30 @@ namespace pic {
 class FilterBackwardDifference: public Filter
 {
 protected:
+
+    /**
+     * @brief f
+     * @param data
+     */
+    void f(FilterFData *data)
+    {
+        float *in   = (*data->src[0])(data->x,     data->y);
+        float *inXm = (*data->src[0])(data->x + 1, data->y);
+        float *inYm = (*data->src[0])(data->x,     data->y + 1);
+
+        for(int k = 0; k < data->dst->channels; k++) {
+            int tmp = k << 1;
+            data->out[tmp  ]   = inXm[k] - in[k];
+            data->out[tmp + 1] = inYm[k] - in[k];
+        }
+    }
+
     /**
      * @brief ProcessBBox
      * @param dst
      * @param src
      * @param box
-     */
+     *
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         //Filtering
@@ -51,13 +69,11 @@ protected:
                 float *img_dataYm = (*img)(i  , j + 1);
 
                 for(int k = 0; k < channels; k++) {
-                    int tmp = k * 2;
-                    dst_data[tmp  ]   = img_dataXm[k] - img_data[k];
-                    dst_data[tmp + 1] = img_dataYm[k] - img_data[k];
+
                 }
             }
         }
-    }
+    }*/
 
     /**
      * @brief SetupAux
@@ -67,9 +83,13 @@ protected:
      */
     Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
+        if(imgIn.empty()) {
+            return NULL;
+        }
+
         if(imgOut == NULL) {
             imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height,
-                                  2 * imgIn[0]->channels);
+                    2 * imgIn[0]->channels);
         }
 
         return imgOut;
