@@ -225,7 +225,7 @@ PIC_INLINE Eigen::Vector2i cameraMatrixProjection(Eigen::Matrix34d &M, Eigen::Ve
  * @param P the camera matrix of a view
  * @return it returns the camera center of P
  */
-Eigen::Vector3d getCameraCenter(Eigen::Matrix34d &P)
+PIC_INLINE Eigen::Vector3d getCameraCenter(Eigen::Matrix34d &P)
 {
     Eigen::Matrix3d Q = P.block<3, 3>(0, 0);
     auto Q_inv = Q.inverse();
