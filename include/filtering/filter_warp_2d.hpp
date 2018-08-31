@@ -31,10 +31,9 @@ namespace pic {
 class FilterWarp2D: public Filter
 {
 protected:
-    ImageSamplerBilinear    isb;
-    Matrix3x3               h, h_inv;
-
-    int                     bmin[2], bmax[2];
+    ImageSamplerBilinear isb;
+    Matrix3x3 h, h_inv;
+    int bmin[2], bmax[2];
 
     /**
      * @brief ProcessBBox

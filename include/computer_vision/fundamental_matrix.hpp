@@ -63,7 +63,7 @@ PIC_INLINE Eigen::Matrix3d estimateFundamental(std::vector< Eigen::Vector2f > &p
         return F;
     }
 
-    //shifting and scaling points for numerical stability
+    //shift and scale points for numerical stability
     Eigen::Vector3f transform_0 = ComputeNormalizationTransform(points0);
     Eigen::Vector3f transform_1 = ComputeNormalizationTransform(points1);
 
@@ -72,10 +72,10 @@ PIC_INLINE Eigen::Matrix3d estimateFundamental(std::vector< Eigen::Vector2f > &p
 
     Eigen::MatrixXd A(points0.size(), 9);
 
-    //setting up the linear system
+    //set up the linear system
     for(unsigned int i = 0; i < points0.size(); i++) {
 
-        //transforming coordinates for increasing stability of the system
+        //transform coordinates for increasing stability of the system
         Eigen::Vector2f p0 = points0[i];
         Eigen::Vector2f p1 = points1[i];
 
@@ -96,7 +96,7 @@ PIC_INLINE Eigen::Matrix3d estimateFundamental(std::vector< Eigen::Vector2f > &p
         A(i, 8) = 1.0;
     }
 
-    //Solving the linear system
+    //solve the linear system
     Eigen::JacobiSVD< Eigen::MatrixXd > svd(A, Eigen::ComputeFullV);
     Eigen::MatrixXd V = svd.matrixV();
 
@@ -114,11 +114,11 @@ PIC_INLINE Eigen::Matrix3d estimateFundamental(std::vector< Eigen::Vector2f > &p
     F(1, 2) = V(7, n);
     F(2, 2) = V(8, n);
 
-    //Computing final F matrix
+    //compute the final F matrix
     Eigen::Matrix3d mat_1_t = Eigen::Transpose< Eigen::Matrix3d >(mat_1);
     F = mat_1_t * F * mat_0;
 
-    //enforcing singularity
+    //enforce singularity
     Eigen::JacobiSVD< Eigen::MatrixXd > svdF(F, Eigen::ComputeThinU | Eigen::ComputeThinV);
     Eigen::Matrix3d Uf = svdF.matrixU();
     Eigen::Matrix3d Vf = svdF.matrixV();

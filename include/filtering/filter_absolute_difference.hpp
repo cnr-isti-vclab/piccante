@@ -30,31 +30,40 @@ class FilterAbsoluteDifference: public Filter
 protected:
 
     /**
-     * @brief ProcessBBox
-     * @param dst
-     * @param src
-     * @param box
+     * @brief f
+     * @param data
      */
-    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
+    void f(FilterFData *data)
     {
-        if(src.size()!=2) {
-            return;
+        float *dataIn0 = (*data->src[0])(data->x, data->y);
+        float *dataIn1 = (*data->src[1])(data->x, data->y);
+
+        for(int k = 0; k < data->dst->channels; k++) {
+            data->out[k] = fabsf(dataIn1[k] - dataIn0[k]);
+        }
+    }
+
+    /**
+     * @brief SetupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    {
+        if(imgIn.size() < 2) {
+            return NULL;
         }
 
-        int channels = dst->channels;
-
-        for(int i = box->y0; i < box->y1; i++) {
-           for(int j = box->x0; j < box->x1; j++) {
-
-                float *tmp_src0 = (*src[0])(j, i);
-                float *tmp_src1 = (*src[1])(j, i);
-                float *tmp_dst  = (*dst   )(j, i);
-
-                for(int k = 0; k < channels; k++) {
-                    tmp_dst[k] = fabsf(tmp_src0[k] - tmp_src1[k]);
-                }
+        if(imgOut == NULL) {
+            imgOut = imgIn[0]->allocateSimilarOne();
+        } else {
+            if(!imgIn[0]->isSimilarType(imgOut)) {
+                imgOut = imgIn[0]->allocateSimilarOne();
             }
         }
+
+        return imgOut;
     }
 
 public:
@@ -62,7 +71,10 @@ public:
     /**
      * @brief FilterAbsoluteDifference
      */
-    FilterAbsoluteDifference() {}
+    FilterAbsoluteDifference() : Filter()
+    {
+
+    }
 
     /**
      * @brief Execute

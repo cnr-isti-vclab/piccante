@@ -75,7 +75,7 @@ public:
      * @brief FilterChannel
      * @param channel
      */
-    FilterChannel(int channel)
+    FilterChannel(int channel) : Filter()
     {
         setChannel(channel);
     }
