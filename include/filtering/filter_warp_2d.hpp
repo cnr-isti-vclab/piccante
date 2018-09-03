@@ -33,7 +33,8 @@ class FilterWarp2D: public Filter
 protected:
     ImageSamplerBilinear isb;
     Matrix3x3 h, h_inv;
-    int bmin[2], bmax[2];
+    int bmin[2], bmax[2], mid[2];
+    bool bComputeBoundingBox;
 
     /**
      * @brief ProcessBBox
@@ -45,15 +46,7 @@ protected:
     {
         int channels = src[0]->channels;
 
-        float pos[2], mid[2], pos_out[2];
-
-        if(bCentroid) {
-            mid[0] = src[0]->widthf  * 0.5f;
-            mid[1] = src[0]->heightf * 0.5f;
-        } else {
-            mid[0] = 0.0f;
-            mid[1] = 0.0f;
-        }
+        float pos[2], pos_out[2];
 
         for(int j = box->y0; j < box->y1; j++) {
             pos[1] = float(j + bmin[1]) - mid[1];
@@ -80,8 +73,6 @@ protected:
         }
     }
 
-
-
     /**
      * @brief SetupAux
      * @param imgIn
@@ -94,8 +85,21 @@ protected:
             return imgOut;
         }
 
+        if(bCentroid) {
+            mid[0] = imgIn[0]->widthf  * 0.5f;
+            mid[1] = imgIn[0]->heightf * 0.5f;
+        } else {
+            mid[0] = 0.0f;
+            mid[1] = 0.0f;
+        }
+
         if(!bSameSize) {
-            ComputingBoundingBox(h, imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax, bCentroid);
+            if(this->bComputeBoundingBox) {
+                computeBoundingBox(imgIn[0]->widthf,
+                                   imgIn[0]->heightf,
+                                   bmin, bmax);
+            }
+
             imgOut = new Image(1, bmax[0] - bmin[0], bmax[1] - bmin[1], imgIn[0]->channels);
         } else {
             bmin[0] = 0;
@@ -117,8 +121,9 @@ public:
     /**
      * @brief FilterWarp2D
      */
-    FilterWarp2D()
+    FilterWarp2D() : Filter()
     {
+        this->bComputeBoundingBox = true;
         this->bCentroid = false;
         this->bSameSize = false;
 
@@ -138,13 +143,14 @@ public:
     }
 
     /**
-     * @brief ComputingBoundingBox calculates the bounding box of imgOut.
+     * @brief computeBoundingBox calculates the bounding box of imgOut.
      * @param width
      * @param height
      * @param bmin
      * @param bmax
+     * @param bCentroid
      */
-    static void ComputingBoundingBox(Matrix3x3 &h, float width, float height, int *bmin, int *bmax, bool bCentroid) {
+    void computeBoundingBox(float width, float height, int *bmin, int *bmax) {
         float bbox[4][2];
         float bbox_out[4][2];
 
@@ -170,7 +176,7 @@ public:
             mid[1] = 0.0f;
         }
 
-        //Computing the bounding box
+        //compute the bounding box
         bmin[0] = 1 << 30;
         bmin[1] = bmin[0];
 
@@ -210,6 +216,13 @@ public:
         }
     }
 
+    void SetBoundingBox(int *bmin, int *bmax)
+    {
+        memcpy(this->bmin, bmin, sizeof(int) * 2);
+        memcpy(this->bmax, bmax, sizeof(int) * 2);
+        bComputeBoundingBox = false;
+    }
+
     /**
      * @brief Update
      * @param h
@@ -218,6 +231,8 @@ public:
      */
     void Update(Matrix3x3 h, bool bSameSize, bool bCentroid = false)
     {
+        this->bComputeBoundingBox = true;
+
         this->bSameSize = bSameSize;
         this->bCentroid = bCentroid;
 
@@ -236,7 +251,12 @@ public:
     void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(!bSameSize) {
-            ComputingBoundingBox(h, imgIn->widthf, imgIn->heightf, bmin, bmax, bCentroid);
+            if(this->bComputeBoundingBox) {
+                computeBoundingBox(imgIn->widthf,
+                                   imgIn->heightf,
+                                   bmin, bmax);
+            }
+
 
             width  = bmax[0] - bmin[0];
             height = bmax[1] - bmin[1];
