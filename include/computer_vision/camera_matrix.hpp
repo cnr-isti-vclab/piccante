@@ -176,21 +176,18 @@ PIC_INLINE void decomposeCameraMatrix(Eigen::Matrix34d &P,
     Eigen::FullPivHouseholderQR<Eigen::Matrix3d> qr(matrix.rows(), matrix.cols());
     qr.compute(matrix);
 
-    /*
-    auto Q = qr.matrixQ();
+    Eigen::Matrix3d Q = qr.matrixQ();
+    auto Q_t = Eigen::Transpose< Eigen::Matrix3d >(Q);
 
     auto s = Q.determinant();
 
-    auto U = qr.matrixQR().triangularView<Eigen::Upper>();
+    Eigen::Matrix3d U = qr.matrixQR().triangularView<Eigen::Upper>();
 
-    auto Q_t = Eigen::Transpose< Eigen::Matrix3d >(Q);
     R = Q_t * s;
     t = s * U * Q.col(4);
 
     U /= U(3, 3);
     K = U.inverse();
-    */
-
 }
 
 /**
