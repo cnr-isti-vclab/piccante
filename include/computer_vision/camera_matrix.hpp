@@ -171,19 +171,33 @@ PIC_INLINE void decomposeCameraMatrix(Eigen::Matrix34d &P,
                                       Eigen::Matrix3d  &R,
                                       Eigen::Vector3d  &t)
 {
-    Eigen::Matrix3d matrix = P.block<3, 3>(0, 0);
+    Eigen::Matrix3d matrix = P.block<3, 3>(0, 0).inverse();
 
-    Eigen::FullPivHouseholderQR<Eigen::Matrix3d> qr(matrix.rows(), matrix.cols());
+
+    //QR decomposition
+    Eigen::HouseholderQR<Eigen::Matrix3d> qr(matrix.rows(), matrix.cols());
     qr.compute(matrix);
 
-    Eigen::Matrix3d Q = qr.matrixQ();
-    auto Q_t = Eigen::Transpose< Eigen::Matrix3d >(Q);
-
-    auto s = Q.determinant();
-
+    Eigen::Matrix3d Q = qr.householderQ();
     Eigen::Matrix3d U = qr.matrixQR().triangularView<Eigen::Upper>();
 
-    R = Q_t * s;
+    auto U_d = getDiagonalFromMatrix(U);
+    Eigen::Vector3d d = U_d;
+    for(int i = 0; i < 3; i++) {
+        if(d[i] != 0.0) {
+            d[i] = U_d[i] > 0.0 ? 1.0 : -1.0;
+        }
+    }
+    auto D = DiagonalMatrix(d);
+
+    Q = Q * D;
+    U = D * U;
+
+    //compute K, R, and t
+    auto Q_t = Eigen::Transpose< Eigen::Matrix3d >(Q);
+    auto s = Q.determinant();
+
+    R = s * Q_t;
     t = s * U * P.col(3);
 
     if(U(2, 2) > 0.0) {
@@ -365,6 +379,7 @@ PIC_INLINE void cameraRectify(Eigen::Matrix34d &P0_in, Eigen::Matrix34d &P1_in,
     Eigen::Vector3d t0, t1;
 
     decomposeCameraMatrix(P0_in, K0, R0, t0);
+
     decomposeCameraMatrix(P1_in, K1, R1, t1);
 
     cameraRectify(K0, R0, t0,

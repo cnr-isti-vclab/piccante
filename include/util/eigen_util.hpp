@@ -66,6 +66,22 @@ PIC_INLINE Eigen::Matrix3d DiagonalMatrix(Eigen::Vector3d D)
 }
 
 /**
+ * @brief getDiagonalFromMatrix
+ * @param mat
+ * @return
+ */
+PIC_INLINE Eigen::Vector3d getDiagonalFromMatrix(Eigen::Matrix3d &mat)
+{
+    Eigen::Vector3d D;
+
+    D[0] = mat(0, 0);
+    D[1] = mat(1, 1);
+    D[2] = mat(2, 2);
+
+    return D;
+}
+
+/**
  * @brief getSquareMatrix
  * @param mat
  * @return
