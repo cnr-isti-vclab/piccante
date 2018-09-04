@@ -33,10 +33,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../externals/Eigen/Dense"
     #include "../externals/Eigen/SVD"
     #include "../externals/Eigen/Geometry"
+    #include "../externals/Eigen/Geometry"
+    #include "../externals/Eigen/QR"
+
+
 #else
     #include <Eigen/Dense>
     #include <Eigen/SVD>
     #include <Eigen/Geometry>
+    #include <Eigen/QR>
 #endif
 
 #endif
@@ -155,6 +160,40 @@ PIC_INLINE Eigen::Matrix34d getCameraMatrix(Eigen::Matrix3d &K, Eigen::Matrix3d 
 }
 
 /**
+ * @brief decomposeCameraMatrix
+ * @param P
+ * @param K
+ * @param R
+ * @param t
+ */
+PIC_INLINE void decomposeCameraMatrix(Eigen::Matrix34d &P,
+                                      Eigen::Matrix3d  &K,
+                                      Eigen::Matrix3d  &R,
+                                      Eigen::Vector3d  &t)
+{
+    Eigen::Matrix3d matrix = P.block<3, 3>(0, 0);
+
+    Eigen::FullPivHouseholderQR<Eigen::Matrix3d> qr(matrix.rows(), matrix.cols());
+    qr.compute(matrix);
+
+    Eigen::Matrix3d Q = qr.matrixQ();
+    auto Q_t = Eigen::Transpose< Eigen::Matrix3d >(Q);
+
+    auto s = Q.determinant();
+
+    Eigen::Matrix3d U = qr.matrixQR().triangularView<Eigen::Upper>();
+
+    R = Q_t * s;
+    t = s * U * P.col(3);
+
+    if(U(2, 2) > 0.0) {
+        U /= U(2, 2);
+    }
+
+    K = U.inverse();
+}
+
+/**
  * @brief cameraMatrixProject projects a point, p, using the camera
  * matrix, M.
  * @param M
@@ -221,11 +260,11 @@ PIC_INLINE Eigen::Vector2i cameraMatrixProjection(Eigen::Matrix34d &M, Eigen::Ve
 }
 
 /**
- * @brief getCameraCenter
+ * @brief getOpticalCenter
  * @param P the camera matrix of a view
  * @return it returns the camera center of P
  */
-PIC_INLINE Eigen::Vector3d getCameraCenter(Eigen::Matrix34d &P)
+PIC_INLINE Eigen::Vector3d getOpticalCenter(Eigen::Matrix34d &P)
 {
     Eigen::Matrix3d Q = P.block<3, 3>(0, 0);
     auto Q_inv = Q.inverse();
@@ -247,22 +286,26 @@ PIC_INLINE Eigen::Vector3d getCameraCenter(Eigen::Matrix34d &P)
  */
 PIC_INLINE void cameraRectify(Eigen::Matrix3d &K0, Eigen::Matrix3d &R0, Eigen::Vector3d &t0,
                               Eigen::Matrix3d &K1, Eigen::Matrix3d &R1, Eigen::Vector3d &t1,
-                              Eigen::Matrix34d &P0, Eigen::Matrix34d &P1,
+                              Eigen::Matrix34d &P0_out, Eigen::Matrix34d &P1_out,
                               Eigen::Matrix3d &T0, Eigen::Matrix3d &T1)
 {
-    auto P0t = getCameraMatrix(K0, R0, t0);
-    auto P1t = getCameraMatrix(K1, R1, t1);
+    auto P0_in = getCameraMatrix(K0, R0, t0);
+    auto P1_in = getCameraMatrix(K1, R1, t1);
 
+    /*
     auto K0_i = K0.inverse();
     auto K1_i = K1.inverse();
 
     auto R0_t = Eigen::Transpose< Eigen::Matrix3d >(R0);
     auto R1_t = Eigen::Transpose< Eigen::Matrix3d >(R1);
+    auto c0 = -R0_t * K0_i * P0t.col(3);
+    auto c1 = -R1_t * K1_i * P1t.col(3);
+    */
 
     //compute optical centers
 
-    auto c0 = getCameraCenter(P0t);
-    auto c1 = getCameraCenter(P1t);
+    auto c0 = getOpticalCenter(P0_in);
+    auto c1 = getOpticalCenter(P1_in);
 
     //compute new rotation matrix
     Eigen::Vector3d x_axis = c1 - c0;
@@ -276,30 +319,58 @@ PIC_INLINE void cameraRectify(Eigen::Matrix3d &K0, Eigen::Matrix3d &R0, Eigen::V
 
     Eigen::Matrix3d R;
 
-    R(0, 0) = x_axis[0];    R(1, 0) = x_axis[1];    R(2, 0) = x_axis[2];
-    R(1, 1) = y_axis[0];    R(1, 1) = y_axis[1];    R(2, 1) = y_axis[2];
-    R(0, 2) = z_axis[0];    R(1, 2) = z_axis[1];    R(2, 2) = z_axis[2];
+    R(0, 0) = x_axis[0];
+    R(0, 1) = x_axis[1];
+    R(0, 2) = x_axis[2];
+
+    R(1, 0) = y_axis[0];
+    R(1, 1) = y_axis[1];
+    R(1, 2) = y_axis[2];
+
+    R(2, 0) = z_axis[0];
+    R(2, 1) = z_axis[1];
+    R(2, 2) = z_axis[2];
 
     //new camera matrices
     Eigen::Vector3d t0n = -R * c0;
-    P0 = getCameraMatrix(K0, R, t0n);
+    P0_out = getCameraMatrix(K0, R, t0n);
 
     Eigen::Vector3d t1n = -R * c1;
-    P1 = getCameraMatrix(K1, R, t1n);
+    P1_out = getCameraMatrix(K1, R, t1n);
 
     //transformations
-    auto o0 = P0t.block<3, 3>(0, 0);
-    auto old0 = o0.inverse();
+    auto Q0o = P0_in.block<3, 3>(0, 0);
+    auto Q0n = P0_out.block<3, 3>(0, 0);
+    T0 = Q0n * Q0o.inverse();
 
-    auto new0 = P0.block<3, 3>(0, 0);
-    T0 = new0 * old0;
+    auto Q1o = P1_in.block<3, 3>(0, 0);
+    auto Q1n = P1_out.block<3, 3>(0, 0);
+    T1 = Q1n * Q1o.inverse();
+}
 
+/**
+ * @brief cameraRectify
+ * @param P0_in
+ * @param P1_in
+ * @param P0_out
+ * @param P1_out
+ * @param T0
+ * @param T1
+ */
+PIC_INLINE void cameraRectify(Eigen::Matrix34d &P0_in, Eigen::Matrix34d &P1_in,
+                              Eigen::Matrix34d &P0_out, Eigen::Matrix34d &P1_out,
+                              Eigen::Matrix3d &T0, Eigen::Matrix3d &T1)
+{
+    Eigen::Matrix3d K0, K1, R0, R1;
+    Eigen::Vector3d t0, t1;
 
-    auto o1 = P1t.block<3, 3>(0, 0);
-    auto old1 = o1.inverse();
+    decomposeCameraMatrix(P0_in, K0, R0, t0);
+    decomposeCameraMatrix(P1_in, K1, R1, t1);
 
-    auto new1 = P1.block<3, 3>(0, 0);
-    T1 = new1 * old1;
+    cameraRectify(K0, R0, t0,
+                  K1, R1, t1,
+                  P0_out, P1_out,
+                  T0, T1);
 }
 
 #endif // PIC_DISABLE_EIGEN

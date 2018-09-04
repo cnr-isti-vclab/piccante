@@ -125,32 +125,14 @@ int main(int argc, char *argv[])
         Eigen::Matrix34d M0 = pic::getCameraMatrixIdentity(K);
         Eigen::Matrix34d M1 = pic::getCameraMatrix(K, R, t);
         
+        pic::ImageVec *out = pic::computeImageRectification(&img0, &img1, M0, M1, NULL);
 
-        Eigen::Matrix34d M0r, M1r;
-        Eigen::Matrix3d T0, T1;
+        out->at(0)->Write("../data/output/campo_s_stefano_l_rectified.png");
+        out->at(1)->Write("../data/output/campo_s_stefano_r_rectified.png");
 
-        Eigen::Matrix3d R0;
-        R0.setZero();
-        R0(0, 0) = 1.0;
-        R0(1, 1) = 1.0;
-        R0(2, 2) = 1.0;
-        Eigen::Vector3d t0;
-        t0.setZero();
-        pic::cameraRectify(K, R0, t0, K, R, t, M0r, M1r, T0, T1);
-
-        pic::printfMat(T0);
-        pic::printfMat(T1);
-
-        pic::FilterWarp2D warp0(pic::MatrixConvert(T0));
-        pic::Image *img0r = warp0.ProcessP(Single(&img0), NULL);
-        img0r->Write("../data/output/campo_s_stefano_l_rectified.png");
-
-        pic::FilterWarp2D warp1(pic::MatrixConvert(T1));
-        pic::Image *img1r = warp1.ProcessP(Single(&img1), NULL);
-        img1r->Write("../data/output/campo_s_stefano_r_rectified.png");
-
-
+        printf("Camera Matrix0:\n");
         pic::printfMat34d(M0);
+        printf("Camera Matrix1:\n");
         pic::printfMat34d(M1);
         
         pic::NelderMeadOptTriangulation nmTri(M0, M1);
