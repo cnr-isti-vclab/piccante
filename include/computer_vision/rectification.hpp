@@ -130,10 +130,10 @@ PIC_INLINE ImageVec *computeImageRectification(Image *img0,
         out = new ImageVec();
     }
 
-    Eigen::Matrix34d M0r, M1r;
+    Eigen::Matrix34d M0_r, M1_r;
     Eigen::Matrix3d T0, T1;
 
-    pic::cameraRectify(M0, M1, M0r, M1r, T0, T1);
+    pic::cameraRectify(M0, M1, M0_r, M1_r, T0, T1);
 
     out = computeImageRectificationWarp(img0, img1, T0, T1, out);
 

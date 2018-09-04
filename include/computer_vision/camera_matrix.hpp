@@ -184,9 +184,12 @@ PIC_INLINE void decomposeCameraMatrix(Eigen::Matrix34d &P,
     Eigen::Matrix3d U = qr.matrixQR().triangularView<Eigen::Upper>();
 
     R = Q_t * s;
-    t = s * U * Q.col(4);
+    t = s * U * P.col(3);
 
-    U /= U(3, 3);
+    if(U(2, 2) > 0.0) {
+        U /= U(2, 2);
+    }
+
     K = U.inverse();
 }
 
