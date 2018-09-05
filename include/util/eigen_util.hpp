@@ -77,12 +77,12 @@ PIC_INLINE Eigen::Matrix34d readMatrix34dFromFile(std::string nameFile)
 }
 
 /**
- * @brief writeMatrix34dFromFile
+ * @brief writeMatrix34dToFile
  * @param nameFile
  * @param mat
  * @return
  */
-PIC_INLINE bool writeMatrix34dFromFile(std::string nameFile, Eigen::Matrix34d &mat)
+PIC_INLINE bool writeMatrix34dToFile(std::string nameFile, Eigen::Matrix34d &mat)
 {
     FILE *file = fopen(nameFile.c_str(), "w");
 

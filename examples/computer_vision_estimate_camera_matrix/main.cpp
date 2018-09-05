@@ -102,6 +102,9 @@ int main(int argc, char *argv[])
 
         printf("Camera Matrix1:\n");
         pic::printfMat34d(M1);
+
+        pic::writeMatrix34dToFile("../data/output/" + pic::getFileNameOnly(name0) + "_cam.txt", M0);
+        pic::writeMatrix34dToFile("../data/output/" + pic::getFileNameOnly(name1) + "_cam.txt", M1);
     } else {
         printf("No there is at least an invalid file!\n");
     }

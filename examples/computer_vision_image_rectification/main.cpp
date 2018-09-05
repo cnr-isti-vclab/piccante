@@ -44,10 +44,10 @@ int main(int argc, char *argv[])
     std::string name0, name1;
 
     if(argc != 5) {
-        name0 = "../data/input/cherubino/IMG_0001.JPG";
-        name1 = "../data/input/cherubino/IMG_0002.JPG";
-        P0 = pic::readMatrix34dFromFile("../data/input/cherubino/IMG_0001.pm");
-        P1 = pic::readMatrix34dFromFile("../data/input/cherubino/IMG_0002.pm");
+        name0 = "../data/input/triangulation/campo_s_stefano_r.jpg";
+        name1 = "../data/input/triangulation/campo_s_stefano_l.jpg";
+        P0 = pic::readMatrix34dFromFile("../data/input/triangulation/campo_s_stefano_r_cam.txt");
+        P1 = pic::readMatrix34dFromFile("../data/input/triangulation/campo_s_stefano_l_cam.txt");
     } else {
         name0 = argv[1];
         name1 = argv[2];
@@ -66,8 +66,8 @@ int main(int argc, char *argv[])
         
         pic::ImageVec *out = pic::computeImageRectification(&img0, &img1, P0, P1, NULL, true);
 
-        name0 = pic::getFileName(name0);
-        name1 = pic::getFileName(name1);
+        name0 = pic::getFileNameOnly(name0);
+        name1 = pic::getFileNameOnly(name1);
 
         out->at(0)->Write("../data/output/" + name0 + "_rectified.png", pic::LT_NOR);
         out->at(1)->Write("../data/output/" + name1 + "_rectified.png", pic::LT_NOR);
