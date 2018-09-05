@@ -49,6 +49,63 @@ namespace pic {
 #ifndef PIC_DISABLE_EIGEN
 
 /**
+ * @brief readMatrix34dFromFile
+ * @param nameFile
+ * @return
+ */
+PIC_INLINE Eigen::Matrix34d readMatrix34dFromFile(std::string nameFile)
+{
+    Eigen::Matrix34d mat;
+
+    FILE *file = fopen(nameFile.c_str(), "r");
+
+    if(file == NULL) {
+        return mat;
+    }
+
+    for(int i = 0; i < 3; i++) {
+        for(int j = 0; j < 4; j++) {
+            float val;
+            fscanf(file, "%f", &val);
+            mat(i, j) = double(val);
+        }
+    }
+
+    fclose(file);
+
+    return mat;
+}
+
+/**
+ * @brief writeMatrix34dFromFile
+ * @param nameFile
+ * @param mat
+ * @return
+ */
+PIC_INLINE bool writeMatrix34dFromFile(std::string nameFile, Eigen::Matrix34d &mat)
+{
+    FILE *file = fopen(nameFile.c_str(), "w");
+
+    if(file == NULL) {
+        return false;
+    }
+
+    for(int i = 0; i < 3; i++) {
+        for(int j = 0; j < 4; j++) {
+            fprintf(file, "%f ", mat(i, j));
+        }
+
+        if(i < 2) {
+            fprintf(file, "\n");
+        }
+    }
+
+    fclose(file);
+
+    return true;
+}
+
+/**
  * @brief DiagonalMatrix creates a diagonal matrix.
  * @param D a vector of size 3.
  * @return It returns a diagonal matrix.

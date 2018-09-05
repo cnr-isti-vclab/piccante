@@ -61,7 +61,8 @@ PIC_INLINE ImageVec *computeImageRectificationWarp(Image *img0,
                                                    Image *img1,
                                                    Eigen::Matrix3d &T0,
                                                    Eigen::Matrix3d &T1,
-                                                   ImageVec *out)
+                                                   ImageVec *out,
+                                                   bool bPartial = true)
 {
     if(img0 == NULL || img1 == NULL) {
         return out;
@@ -78,11 +79,21 @@ PIC_INLINE ImageVec *computeImageRectificationWarp(Image *img0,
     warp0.computeBoundingBox(img0->widthf, img0->heightf, bmin0, bmax0);
     warp1.computeBoundingBox(img1->widthf, img1->heightf, bmin1, bmax1);
 
-    bmin0[1] = MIN(bmin0[1], bmin1[1]);
-    bmax0[1] = MAX(bmax0[1], bmax1[1]);
+    if(bPartial) {
+        bmin0[1] = MIN(bmin0[1], bmin1[1]);
+        bmax0[1] = MAX(bmax0[1], bmax1[1]);
 
-    bmin1[1] = bmin0[1];
-    bmax1[1] = bmax0[1];
+        bmin1[1] = bmin0[1];
+        bmax1[1] = bmax0[1];
+    } else {
+        for(int i = 0; i < 2; i++) {
+            bmin0[i] = MIN(bmin0[i], bmin1[i]);
+            bmin1[i] = bmin0[i];
+
+            bmax0[i] = MAX(bmax0[i], bmax1[i]);
+            bmax1[i] = bmax0[i];
+        }
+    }
 
     warp0.SetBoundingBox(bmin0, bmax0);
     warp1.SetBoundingBox(bmin1, bmax1);
@@ -119,7 +130,8 @@ PIC_INLINE ImageVec *computeImageRectification(Image *img0,
                                                Image *img1,
                                                Eigen::Matrix34d &M0,
                                                Eigen::Matrix34d &M1,
-                                               ImageVec *out = NULL)
+                                               ImageVec *out = NULL,
+                                               bool bPartial = true)
 {
     //NOTE: we should check that img0 and img1 are valid...
     if(img0 == NULL || img1 == NULL) {
@@ -135,7 +147,7 @@ PIC_INLINE ImageVec *computeImageRectification(Image *img0,
 
     pic::cameraRectify(M0, M1, M0_r, M1_r, T0, T1);
 
-    out = computeImageRectificationWarp(img0, img1, T0, T1, out);
+    out = computeImageRectificationWarp(img0, img1, T0, T1, out, bPartial);
 
     return out;
 }
@@ -161,7 +173,8 @@ PIC_INLINE ImageVec *computeImageRectification(Image *img0,
                                                Eigen::Matrix3d &K1,
                                                Eigen::Matrix3d &R1,
                                                Eigen::Vector3d &t1,
-                                               ImageVec *out = NULL)
+                                               ImageVec *out = NULL,
+                                               bool bPartial = true)
 {
     //NOTE: we should check that img0 and img1 are valid...
     if(img0 == NULL || img1 == NULL) {
@@ -177,7 +190,7 @@ PIC_INLINE ImageVec *computeImageRectification(Image *img0,
 
     pic::cameraRectify(K0, R0, t0, K1, R1, t1, M0_r, M1_r, T0, T1);
 
-    out = computeImageRectificationWarp(img0, img1, T0, T1, out);
+    out = computeImageRectificationWarp(img0, img1, T0, T1, out, bPartial);
 
     return out;
 }

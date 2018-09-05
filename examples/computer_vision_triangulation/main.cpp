@@ -51,58 +51,10 @@ int main(int argc, char *argv[])
     if(img0.isValid() && img1.isValid()) {
         printf("OK\n");
         
-        //output corners
-        std::vector< Eigen::Vector2f > corners_from_img0;
-        std::vector< Eigen::Vector2f > corners_from_img1;
-        
-        //compute the luminance images
-        pic::Image *L0 = pic::FilterLuminance::Execute(&img0, NULL, pic::LT_CIE_LUMINANCE);
-        pic::Image *L1 = pic::FilterLuminance::Execute(&img1, NULL, pic::LT_CIE_LUMINANCE);
-        
-        //get corners
-        printf("Extracting corners...\n");
-        pic::HarrisCornerDetector hcd(2.5f, 5);
-        hcd.execute(L0, &corners_from_img0);
-        hcd.execute(L1, &corners_from_img1);
-        
-        //compute ORB descriptors for each corner and image
-        //apply a gaussian filter to luminance images
-        pic::Image *L0_flt = pic::FilterGaussian2D::Execute(L0, NULL, 2.5f);
-        pic::Image *L1_flt = pic::FilterGaussian2D::Execute(L1, NULL, 2.5f);
-        
-        printf("Computing ORB descriptors...\n");
-        
-        pic::ORBDescriptor b_desc(31, 512);
-        
-        std::vector< unsigned int *> descs0;
-        b_desc.getAll(L0_flt, corners_from_img0, descs0);
-
-        std::vector< unsigned int *> descs1;
-        b_desc.getAll(L1_flt, corners_from_img1, descs1);
-
-        printf("Matching ORB descriptors...\n");
-        std::vector< Eigen::Vector3i > matches;
-        
-        int n = b_desc.getDescriptorSize();
-        
-        printf("Descriptor size: %d\n", n);
-        
-        //pic::BinaryFeatureBruteForceMatcher bffm_bin(&descs1, n);
-        pic::BinaryFeatureLSHMatcher bffm_bin(&descs1, n, 64);
-        
-        bffm_bin.getAllMatches(descs0, matches);
-        
-        printf("Matches:\n");
+        //compute fundamental matrix
         std::vector< Eigen::Vector2f > m0, m1;
-        pic::BinaryFeatureMatcher::filterMatches(corners_from_img0, corners_from_img1, matches, m0, m1);
-        printf("\n Total matches: (%zd | %zd)\n", m0.size(), m1.size());
-        
-        printf("\nEstimating the fundamental matrix F from the matches...");
-        
         std::vector< unsigned int > inliers;
-        Eigen::Matrix3d F = pic::estimateFundamentalWithNonLinearRefinement(m0, m1, inliers, 1000000, 0.5, 1, 10000, 1e-4f);
-                
-        printf("Ok.\n");
+        auto F = pic::estimateFundamentalFromImages(&img0, &img1, m0, m1, inliers);
         
         printf("\nFoundamental matrix: \n");
         pic::MatrixConvert(F).print();
@@ -125,11 +77,6 @@ int main(int argc, char *argv[])
         Eigen::Matrix34d M0 = pic::getCameraMatrixIdentity(K);
         Eigen::Matrix34d M1 = pic::getCameraMatrix(K, R, t);
         
-        pic::ImageVec *out = pic::computeImageRectification(&img0, &img1, M0, M1, NULL);
-
-        out->at(0)->Write("../data/output/campo_s_stefano_l_rectified.png");
-        out->at(1)->Write("../data/output/campo_s_stefano_r_rectified.png");
-
         printf("Camera Matrix0:\n");
         pic::printfMat34d(M0);
         printf("Camera Matrix1:\n");

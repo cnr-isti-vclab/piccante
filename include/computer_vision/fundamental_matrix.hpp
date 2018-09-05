@@ -24,6 +24,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 
+#include "../image.hpp"
+
+#include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_gaussian_2d.hpp"
+
 #include "../util/math.hpp"
 #include "../util/eigen_util.hpp"
 
@@ -313,6 +318,77 @@ PIC_INLINE Eigen::Matrix3d extractFundamentalMatrix(Eigen::Matrix34d &M0, Eigen:
 
     double norm = MAX(Df[0], MAX(Df[1], Df[2]));
     return F / norm;
+}
+
+/**
+ * @brief estimateFundamentalFromImages
+ * @param img0
+ * @param img1
+ * @return
+ */
+PIC_INLINE  Eigen::Matrix3d estimateFundamentalFromImages(Image *img0,
+                                                          Image *img1,
+                                                          std::vector< Eigen::Vector2f > &m0,
+                                                          std::vector< Eigen::Vector2f > &m1,
+                                                          std::vector< unsigned int > &inliers)
+{
+    Eigen::Matrix3d F;
+    if(img0 == NULL || img1 == NULL) {
+        return F;
+    }
+
+    m0.clear();
+    m1.clear();
+    inliers.clear();
+
+    //corners
+    std::vector< Eigen::Vector2f > corners_from_img0;
+    std::vector< Eigen::Vector2f > corners_from_img1;
+
+    //compute the luminance images
+    Image *L0 = FilterLuminance::Execute(img0, NULL, LT_CIE_LUMINANCE);
+    Image *L1 = FilterLuminance::Execute(img1, NULL, LT_CIE_LUMINANCE);
+
+    //extract corners
+    HarrisCornerDetector hcd(2.5f, 5);
+    hcd.execute(L0, &corners_from_img0);
+    hcd.execute(L1, &corners_from_img1);
+
+    //compute ORB descriptors for each corner and image
+
+    //apply a gaussian filter to luminance images
+    Image *L0_flt = FilterGaussian2D::Execute(L0, NULL, 2.5f);
+    Image *L1_flt = FilterGaussian2D::Execute(L1, NULL, 2.5f);
+
+    //compute ORB descriptor
+    ORBDescriptor b_desc(31, 512);
+
+    std::vector< unsigned int *> descs0;
+    b_desc.getAll(L0_flt, corners_from_img0, descs0);
+
+    std::vector< unsigned int *> descs1;
+    b_desc.getAll(L1_flt, corners_from_img1, descs1);
+
+    //match ORB descriptors
+    std::vector< Eigen::Vector3i > matches;
+    int n = b_desc.getDescriptorSize();
+
+    //BinaryFeatureBruteForceMatcher bffm_bin(&descs1, n);
+    BinaryFeatureLSHMatcher bffm_bin(&descs1, n, 64);
+    bffm_bin.getAllMatches(descs0, matches);
+
+    //get matches
+    BinaryFeatureMatcher::filterMatches(corners_from_img0, corners_from_img1, matches, m0, m1);
+
+    //estimate the fundamental matrix
+    F = estimateFundamentalWithNonLinearRefinement(m0, m1, inliers, 1000000, 0.5, 1, 10000, 1e-4f);
+
+    delete L0;
+    delete L1;
+    delete L0_flt;
+    delete L1_flt;
+
+    return F;
 }
     
 #endif // PIC_DISABLE_EIGEN
