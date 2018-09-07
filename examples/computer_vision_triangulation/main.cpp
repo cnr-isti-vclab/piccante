@@ -34,23 +34,44 @@ This program is free software: you can redistribute it and/or modify
 
 int main(int argc, char *argv[])
 {   
-    printf("Reading an LDR images...");
+    std::string name0, name1;
+    double focal_length;
+    double sensor_x_mm, sensor_y_mm;
     
     //estimating K matrix from camera
-    double fx = pic::getFocalLengthPixels(18.0, 22.3, 2592.0);
-    double fy = pic::getFocalLengthPixels(18.0, 14.9, 1728.0);
-    Eigen::Matrix3d K = pic::getIntrinsicsMatrix(fx, fy, 2592.0 / 2.0, 1728.0 / 2.0);
-    
+    if(argc == 3) {
+        name0 = argv[1];
+        name1 = argv[2];
+        focal_length = atof(argv[3]);
+        sensor_x_mm = atof(argv[4]);
+        sensor_y_mm = atof(argv[5]);
+    } else {
+        name0 = "../data/input/triangulation/campo_s_stefano_l.jpg";
+        name1 = "../data/input/triangulation/campo_s_stefano_r.jpg";
+        focal_length = 18.0;
+        sensor_x_mm = 22.3;
+        sensor_y_mm = 14.9;
+    }
+
+    printf("Reading an LDR images...");
     pic::Image img0, img1;
-    img0.Read("../data/input/triangulation/campo_s_stefano_l.jpg", pic::LT_NOR);
-    img1.Read("../data/input/triangulation/campo_s_stefano_r.jpg", pic::LT_NOR);
+    img0.Read(name0, pic::LT_NOR);
+    img1.Read(name1, pic::LT_NOR);
     
     printf("Ok\n");
     
     printf("Are they both valid? ");
-    if(img0.isValid() && img1.isValid()) {
+    if(img0.isValid() && img1.isValid()) {        
         printf("OK\n");
-        
+
+        auto fx0 = pic::getFocalLengthPixels(focal_length, sensor_x_mm, img0.widthf);
+        auto fy0 = pic::getFocalLengthPixels(focal_length, sensor_y_mm, img0.heightf);
+        Eigen::Matrix3d K0 = pic::getIntrinsicsMatrix(fx0, fy0, img0.widthf / 2.0, img0.heightf / 2.0);
+
+        auto fx1 = pic::getFocalLengthPixels(focal_length, sensor_x_mm, img1.widthf);
+        auto fy1 = pic::getFocalLengthPixels(focal_length, sensor_y_mm, img1.heightf);
+        Eigen::Matrix3d K1 = pic::getIntrinsicsMatrix(fx1, fy1, img1.widthf / 2.0, img1.heightf / 2.0);
+
         //compute fundamental matrix
         std::vector< Eigen::Vector2f > m0, m1;
         std::vector< unsigned int > inliers;
@@ -60,7 +81,7 @@ int main(int argc, char *argv[])
         pic::MatrixConvert(F).print();
         
         //compute essential matrix decomposition
-        Eigen::Matrix3d E = pic::computeEssentialMatrix(F, K);
+        Eigen::Matrix3d E = pic::computeEssentialMatrix(F, K0);
                 
         //decompose E into R and t
         std::vector< Eigen::Vector2f > m0f, m1f;
@@ -69,13 +90,13 @@ int main(int argc, char *argv[])
 
         Eigen::Matrix3d R;
         Eigen::Vector3d t;
-        pic::decomposeEssentialMatrixWithConfiguration(E, K, K, m0f, m1f, R, t);
+        pic::decomposeEssentialMatrixWithConfiguration(E, K0, K1, m0f, m1f, R, t);
         
         //triangulation        
         std::vector<Eigen::Vector3d> points_3d;
         
-        Eigen::Matrix34d M0 = pic::getCameraMatrixIdentity(K);
-        Eigen::Matrix34d M1 = pic::getCameraMatrix(K, R, t);
+        Eigen::Matrix34d M0 = pic::getCameraMatrixIdentity(K0);
+        Eigen::Matrix34d M1 = pic::getCameraMatrix(K1, R, t);
         
         printf("Camera Matrix0:\n");
         pic::printfMat34d(M0);
@@ -85,6 +106,8 @@ int main(int argc, char *argv[])
 
         std::vector< unsigned char> colors;
         pic::triangulationPoints(M0, M1, m0f, m1f, points_3d, colors, &img0, &img1, true);
+
+        pic::writeSimplePLY("../data/output/triangulation.ply", points_3d, colors);
 
         //compute distortion parameters
         pic::NelderMeadOptRadialDistortion nmRD(M0, M1, &m0f, &m1f, &points_3d);
@@ -101,11 +124,15 @@ int main(int argc, char *argv[])
         pic::Image imgOut1(1, img1.width, img1.height, 3);
         imgOut1.setZero();
 
-        double cx = 2592.0 / 2.0;
-        double cy = 1728.0 / 2.0;
+        double cx0 = img0.widthf / 2.0;
+        double cy0 = img0.heightf / 2.0;
+
+        double cx1 = img1.widthf / 2.0;
+        double cy1 = img1.heightf / 2.0;
+
         for(unsigned int i = 0; i < m0f.size(); i++) {
             //first image
-            Eigen::Vector2i proj0 = pic::cameraMatrixProjection(M0, points_3d[i], cx, cy, fx, fy, lambda_out);
+            Eigen::Vector2i proj0 = pic::cameraMatrixProjection(M0, points_3d[i], cx0, cy0, fx0, fy0, lambda_out);
             float *tmp;
             
             tmp = imgOut0(int(m0f[i][0]), int(m0f[i][1]));
@@ -115,7 +142,7 @@ int main(int argc, char *argv[])
             tmp[0] = 1.0f;
             
             //second image
-            Eigen::Vector2i proj1 = pic::cameraMatrixProjection(M1, points_3d[i], cx, cy, fx, fy, lambda_out);
+            Eigen::Vector2i proj1 = pic::cameraMatrixProjection(M1, points_3d[i], cx1, cy1, fx1, fy1, lambda_out);
             
             tmp = imgOut1(int(m1f[i][0]), int(m1f[i][1]));
             tmp[1] = 1.0f;
@@ -125,10 +152,8 @@ int main(int argc, char *argv[])
         }
         
         //write reprojection images
-        imgOut0.Write("../data/output/triangulation_reprojection_l.png");
-        imgOut1.Write("../data/output/triangulation_reprojection_r.png");
-
-        pic::writeSimplePLY("../data/output/triangulation.ply", points_3d, colors);
+        imgOut0.Write("../data/output/triangulation_reprojection_l.png", pic::LT_NOR);
+        imgOut1.Write("../data/output/triangulation_reprojection_r.png", pic::LT_NOR);
 
     } else {
         printf("No there is at least an invalid file!\n");

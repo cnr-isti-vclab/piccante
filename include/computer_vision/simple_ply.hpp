@@ -57,7 +57,7 @@ PIC_INLINE bool writeSimplePLY(std::string name,
         return false;
     }
 
-    bool bColor = colors.size() == points_3d.size();
+    bool bColor = colors.size() == (points_3d.size() * 3);
 
     fprintf(file,"ply\n");
     fprintf(file,"format ascii 1.0\n");
