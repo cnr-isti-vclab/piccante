@@ -208,6 +208,16 @@ PIC_INLINE Eigen::Vector4d addOne(Eigen::Vector3d &x)
 }
 
 /**
+ * @brief printfVet3d
+ * @param x
+ */
+PIC_INLINE void printfVet3d(Eigen::Vector3d &x)
+{
+    printf("%f %f %f\n", x[0], x[1], x[2]);
+}
+
+
+/**
  * @brief printf
  * @param mat
  */

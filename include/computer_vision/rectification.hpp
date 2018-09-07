@@ -19,7 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_COMPUTER_VISION_RECTIFICATION_HPP
 
 #include <vector>
-#include <random>
+#include <cmath>
 #include <stdlib.h>
 
 #include "../base.hpp"
@@ -76,6 +76,7 @@ PIC_INLINE ImageVec *computeImageRectificationWarp(Image *img0,
     FilterWarp2D warp1(MatrixConvert(T1));
 
     int bmin0[2], bmin1[2], bmax0[2], bmax1[2];
+
     warp0.computeBoundingBox(img0->widthf, img0->heightf, bmin0, bmax0);
     warp1.computeBoundingBox(img1->widthf, img1->heightf, bmin1, bmax1);
 
@@ -145,7 +146,33 @@ PIC_INLINE ImageVec *computeImageRectification(Image *img0,
     Eigen::Matrix34d M0_r, M1_r;
     Eigen::Matrix3d T0, T1;
 
-    pic::cameraRectify(M0, M1, M0_r, M1_r, T0, T1);
+    cameraRectify(M0, M1, M0_r, M1_r, T0, T1);
+
+    //check if the trasform is correct!
+    Eigen::Vector3d corners[4], corners_T0[4];
+    corners[0] = Eigen::Vector3d(0.0, 0.0, 1.0);
+    corners[1] = Eigen::Vector3d(img0->widthf, 0.0, 1.0);
+    corners[2] = Eigen::Vector3d(img0->widthf, img0->heightf, 1.0);
+    corners[3] = Eigen::Vector3d(img0->heightf, 0.0, 1.0);
+
+    for(int i = 0; i < 4; i ++) {
+        corners_T0[i] = T0 * corners[i];
+        corners_T0[i] /= corners_T0[i][2];
+    }
+
+    auto d_c   = corners[2] - corners[0];
+    auto d_c_T0 = corners_T0[2] - corners_T0[0];
+
+    bool b_x = std::signbit(d_c[0]) == std::signbit(d_c_T0[0]);
+    bool b_y = std::signbit(d_c[1]) == std::signbit(d_c_T0[1]);
+
+    double f_x = b_x ? 1.0 : -1.0;
+    double f_y = b_y ? 1.0 : -1.0;
+
+
+    auto H = DiagonalMatrix(Eigen::Vector3d(f_x, f_y, 1));
+    T0 = H * T0;
+    T1 = H * T1;
 
     out = computeImageRectificationWarp(img0, img1, T0, T1, out, bPartial);
 
@@ -188,7 +215,7 @@ PIC_INLINE ImageVec *computeImageRectification(Image *img0,
     Eigen::Matrix34d M0_r, M1_r;
     Eigen::Matrix3d T0, T1;
 
-    pic::cameraRectify(K0, R0, t0, K1, R1, t1, M0_r, M1_r, T0, T1);
+    cameraRectify(K0, R0, t0, K1, R1, t1, M0_r, M1_r, T0, T1);
 
     out = computeImageRectificationWarp(img0, img1, T0, T1, out, bPartial);
 

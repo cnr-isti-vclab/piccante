@@ -346,11 +346,19 @@ PIC_INLINE void cameraRectify(Eigen::Matrix3d &K0, Eigen::Matrix3d &R0, Eigen::V
     R(2, 2) = z_axis[2];
 
     //new camera matrices
+    Eigen::Matrix3d K;
+    K.setZero();
+    K(0, 0) = K0(0, 0);
+    K(1, 1) = K0(1, 1);
+    K(0, 2) = (K0(0, 2) + K1(0, 2)) * 0.5;
+    K(1, 2) = (K0(1, 2) + K1(1, 2)) * 0.5;
+    K(2, 2) = 1.0;
+
     Eigen::Vector3d t0n = -R * c0;
-    P0_out = getCameraMatrix(K0, R, t0n);
+    P0_out = getCameraMatrix(K, R, t0n);
 
     Eigen::Vector3d t1n = -R * c1;
-    P1_out = getCameraMatrix(K1, R, t1n);
+    P1_out = getCameraMatrix(K, R, t1n);
 
     //transformations
     auto Q0o = P0_in.block<3, 3>(0, 0);
