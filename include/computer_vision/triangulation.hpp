@@ -24,20 +24,20 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 
+#include "../Image.hpp"
+
 #include "../util/math.hpp"
 
 #include "../util/eigen_util.hpp"
+
+#include "../computer_vision/nelder_mead_opt_triangulation.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
 
 #ifndef PIC_EIGEN_NOT_BUNDLED
     #include "../externals/Eigen/Dense"
-    #include "../externals/Eigen/SVD"
-    #include "../externals/Eigen/Geometry"
 #else
     #include <Eigen/Dense>
-    #include <Eigen/SVD>
-    #include <Eigen/Geometry>
 #endif
 
 #endif
@@ -145,6 +145,63 @@ PIC_INLINE Eigen::Vector4d triangulationHartleySturm(Eigen::Vector3d &point_0, E
     #endif
 
     return x;
+}
+
+/**
+ * @brief triangulationPoints
+ * @param M0
+ * @param M1
+ * @param m0f
+ * @param m1f
+ * @param points_3d
+ * @param colors
+ * @param bColor
+ */
+PIC_INLINE void triangulationPoints(Eigen::Matrix34d &M0,
+                                    Eigen::Matrix34d &M1,
+                                    std::vector< Eigen::Vector2f > &m0f,
+                                    std::vector< Eigen::Vector2f > &m1f,
+                                    std::vector< Eigen::Vector3d > &points_3d,
+                                    std::vector< unsigned char > &colors,
+                                    Image *img0 = NULL,
+                                    Image *img1 = NULL,
+                                    bool bColor = false
+                                  )
+{
+    if(m0f.size() != m1f.size()) {
+        return;
+    }
+
+    NelderMeadOptTriangulation nmTri(M0, M1);
+    for(unsigned int i = 0; i < m0f.size(); i++) {
+        //normalized coordinates
+        Eigen::Vector3d p0 = Eigen::Vector3d(m0f[i][0], m0f[i][1], 1.0);
+        Eigen::Vector3d p1 = Eigen::Vector3d(m1f[i][0], m1f[i][1], 1.0);
+
+        //triangulation
+        Eigen::Vector4d point = triangulationHartleySturm(p0, p1, M0, M1);
+
+        //non-linear refinement
+        nmTri.update(m0f[i], m1f[i]);
+        double tmpp[] = {point[0], point[1], point[2]};
+        double out[3];
+        nmTri.run(tmpp, 3, 1e-9f, 10000, &out[0]);
+
+        //output
+        points_3d.push_back(Eigen::Vector3d(out[0], out[1], out[2]));
+
+        if(bColor) {
+            float *color0 = (*img0)(int(m0f[i][0]), int(m0f[i][1]));
+            float *color1 = (*img1)(int(m1f[i][0]), int(m1f[i][1]));
+
+            for(int j = 0; j < img0->channels; j++) {
+                float c_mean = (color0[j] + color1[j]) * 0.5f;
+                c_mean = CLAMPi(c_mean, 0.0f, 1.0f);
+                unsigned char c = int(c_mean * 255.0f);
+                colors.push_back(c);
+            }
+        }
+    }
 }
 
 #endif // PIC_DISABLE_EIGEN

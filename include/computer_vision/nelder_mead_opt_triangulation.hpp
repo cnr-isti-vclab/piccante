@@ -33,7 +33,7 @@ namespace pic {
 
 #ifndef PIC_DISABLE_EIGEN
 
-class NelderMeadOptTriangulation: public NelderMeadOptBase<float>
+class NelderMeadOptTriangulation: public NelderMeadOptBase<double>
 {
 public:
 
@@ -90,7 +90,7 @@ public:
      * @param n
      * @return
      */
-    float function(float *x, unsigned int n)
+    double function(double *x, unsigned int n)
     {
         Eigen::Vector4d point(x[0], x[1], x[2], 1.0);
 
@@ -107,7 +107,7 @@ public:
             err += (dx * dx) + (dy * dy);
         }
 
-        return float(err);
+        return err;
     }
 };
 

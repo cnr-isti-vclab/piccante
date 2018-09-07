@@ -81,25 +81,12 @@ int main(int argc, char *argv[])
         pic::printfMat34d(M0);
         printf("Camera Matrix1:\n");
         pic::printfMat34d(M1);
-        
-        pic::NelderMeadOptTriangulation nmTri(M0, M1);
-        for(unsigned int i = 0; i < m0f.size(); i++) {
-            //normalized coordinates
-            Eigen::Vector3d p0 = Eigen::Vector3d(m0f[i][0], m0f[i][1], 1.0);
-            Eigen::Vector3d p1 = Eigen::Vector3d(m1f[i][0], m1f[i][1], 1.0);
-            
-            //triangulation
-            Eigen::Vector4d point = pic::triangulationHartleySturm(p0, p1, M0, M1);
-            
-            //non-linear refinement
-            nmTri.update(m0f[i], m1f[i]);
-            float tmpp[] = {float(point[0]), float(point[1]), float(point[2])};
-            float out[3];
-            nmTri.run(tmpp, 3, 1e-9f, 10000, &out[0]);
-            
-            points_3d.push_back(Eigen::Vector3d(out[0], out[1], out[2]));
-        }
-        
+        printf("\n");
+
+        std::vector< unsigned char> colors;
+        pic::triangulationPoints(M0, M1, m0f, m1f, points_3d, colors, &img0, &img1, true);
+
+        //compute distortion parameters
         pic::NelderMeadOptRadialDistortion nmRD(M0, M1, &m0f, &m1f, &points_3d);
         
         float lambda = 0.0f;
@@ -140,41 +127,9 @@ int main(int argc, char *argv[])
         //write reprojection images
         imgOut0.Write("../data/output/triangulation_reprojection_l.png");
         imgOut1.Write("../data/output/triangulation_reprojection_r.png");
-        
-        //write a PLY file
-        FILE *file = fopen("../data/output/triangulation_mesh.ply","w");
-        
-        if (file == NULL) {
-            return 0;
-        }
-        
-        fprintf(file,"ply\n");
-        fprintf(file,"format ascii 1.0\n");
-        fprintf(file,"element vertex %d\n", int(m0f.size()));
-        
-        fprintf(file,"property float x\n");
-        fprintf(file,"property float y\n");
-        fprintf(file,"property float z\n");
-        
-        fprintf(file,"property uchar red\n");
-        fprintf(file,"property uchar green\n");
-        fprintf(file,"property uchar blue\n");
-        fprintf(file,"property uchar alpha\n");
-        fprintf(file,"end_header\n");
-        
-        for(unsigned int i = 0; i < m0f.size(); i++) {
-            fprintf(file, "%3.4f %3.4f %3.4f ", points_3d[i][0], points_3d[i][1], points_3d[i][2]);
-            
-            //write color information
-            unsigned char r, g, b;
-            float *color = img0(int(m0f[i][0]), int(m0f[i][1]));
-            r = int(color[0] * 255.0f);
-            g = int(color[1] * 255.0f);
-            b = int(color[2] * 255.0f);
-            fprintf(file, " %d %d %d 255\n", r, g, b);
-        }
-        
-        fclose(file);
+
+        pic::writeSimplePLY("../data/output/triangulation.ply", points_3d, colors);
+
     } else {
         printf("No there is at least an invalid file!\n");
     }
