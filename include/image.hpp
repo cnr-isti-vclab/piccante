@@ -627,11 +627,17 @@ public:
     }
 
     /**
-     * @brief AllocateSimilarOne creates an Image with similar size
+     * @brief allocateSimilarOne creates an Image with similar size
      * of the calling instance.
      * @return This returns an Image with the same size of the calling instance.
      */
     Image *allocateSimilarOne();
+
+    /**
+     * @brief allocateSimilarTo allocate an Image with similar size
+     * of the passed by.
+     */
+    void *allocateSimilarTo(Image *img);
 
     /**
      * @brief Clone creates a deep copy of the calling instance.
@@ -1941,6 +1947,15 @@ PIC_INLINE Image *Image::allocateSimilarOne()
     Image *ret = new Image(frames, width, height, channels);
     ret->flippedEXR = flippedEXR;
     return ret;
+}
+
+PIC_INLINE void *Image::allocateSimilarTo(Image *img)
+{
+    if(img != NULL) {
+        if(img->isValid()) {
+            allocate(img->width, img->height, img->channels, img->frames);
+        }
+    }
 }
 
 PIC_INLINE Image *Image::clone() const

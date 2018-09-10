@@ -15,8 +15,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_COMPUTER_VISION_TRIANGULATION_HPP
-#define PIC_COMPUTER_VISION_TRIANGULATION_HPP
+#ifndef PIC_COMPUTER_VISION_STEREO_HPP
+#define PIC_COMPUTER_VISION_STEREO_HPP
 
 #include <vector>
 #include <random>
@@ -31,6 +31,35 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../util/math.hpp"
 
 namespace pic {
+
+/**
+ * @brief checkDisparity
+ * @param disp_left
+ * @param disp_right
+ * @param threshold
+ */
+PIC_INLINE void checkDisparity(Image *disp_left, Image *disp_right, int threshold = 8)
+{
+    for(int i = 0; i < disp_left->height; i++) {
+
+        for(int j = 0; j < disp_left->width; j++) {
+
+            float *dL = (*disp_left)(j, i);
+            float *dR = (*disp_right)(j, i);
+
+            int d_L = int(dL[0]);
+            int d_R = int(dR[0]);
+
+            if(std::abs(d_L - d_R) > threshold) {
+                dL[0] = 0.0f;
+                dL[1] = -1.0f;
+
+                dR[0] = 0.0f;
+                dR[1] = -1.0f;
+            }
+        }
+    }
+}
 
 /**
  * @brief estimateStereo
@@ -58,8 +87,15 @@ PIC_INLINE void estimateStereo(Image *img_left, Image *img_right,
         disparity_cross_check = 16;
     }
 
+    pic::FilterDisparity fd(240, 5);
+
+    disp_left  = fd.ProcessP(pic::Double(img_left, img_right), disp_left);
+    disp_right = fd.ProcessP(pic::Double(img_right, img_left), disp_right);
+
+    checkDisparity(disp_left, disp_right, disparity_cross_check);
+    checkDisparity(disp_right, disp_left, disparity_cross_check);
 }
 
 } // end namespace pic
 
-#endif // PIC_COMPUTER_VISION_TRIANGULATION_HPP
+#endif // PIC_COMPUTER_VISION_STEREO_HPP

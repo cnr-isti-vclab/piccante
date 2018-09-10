@@ -89,10 +89,15 @@ protected:
         if(imgOut == NULL) {
             imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 2);
         } else {
-            if((imgIn[0]->width  != imgOut->width)  ||
-               (imgIn[0]->height != imgOut->height) ||
-               (imgOut->channels != 2)) {
-                imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 2);
+            if(imgOut->isValid()) {
+
+                if((imgIn[0]->width  != imgOut->width)  ||
+                   (imgIn[0]->height != imgOut->height) ||
+                   (imgOut->channels != 2)) {
+                    imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 2);
+                }
+            } else {
+                imgOut->allocateSimilarTo(imgIn[0]);
             }
         }
 
