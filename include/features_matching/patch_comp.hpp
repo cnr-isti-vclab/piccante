@@ -37,8 +37,8 @@ protected:
     int patchSize, halfPatchSize;
 
     //stereo
-    Image *lap0, *lap1;
-    float  gamma_c_2, gamma_l_2;
+    float  lambda;
+    float  gamma_c;
 
 public:
 
@@ -47,6 +47,7 @@ public:
      */
     PatchComp()
     {
+        lambda = 0.2f;
         VALUES_COS = NULL;
         VALUES_SIN = NULL;
         halfPatchSize = -1;
@@ -63,6 +64,9 @@ public:
         VALUES_COS = NULL;
         VALUES_SIN = NULL;
 
+        lambda = 0.2f;
+        gamma_c = 0.1f;
+
         init(img0, img1, patchSize);
     }
 
@@ -70,22 +74,21 @@ public:
      * @brief PatchComp
      * @param img0
      * @param img1
-     * @param lap0
-     * @param lap1
      * @param patchSize
      * @param gamma_c
-     * @param gamma_l
      */
-    PatchComp(Image *img0, Image *img1, Image *lap0, Image *lap1, int patchSize, float gamma_c, float gamma_l)
+    PatchComp(Image *img0, Image *img1,
+              int patchSize, float lambda, float gamma_c)
     {
         VALUES_COS = NULL;
         VALUES_SIN = NULL;
 
-        this->gamma_c_2 = gamma_c * gamma_c * 2.0f;
-        this->gamma_l_2 = gamma_l * gamma_l * 2.0f;
+        if(lambda < 0.0f) {
+            lambda = 0.2f;
+        }
 
-        this->lap0 = lap0;
-        this->lap1 = lap1;
+        this->lambda = lambda;
+        this->gamma_c = gamma_c;
 
         init(img0, img1, patchSize);
     }
@@ -146,17 +149,39 @@ public:
     /**
      * @brief improveStereo
      * @param x0
-     * @param y
+     * @param y0
      * @param x1
+     * @param prevL
+     * @param prevU
      * @param xb
      * @param db
      */
-    void improveStereo(int x0, int y, int x1, int &xb, float &db)
+    void improveStereo(int x0, int y0, int x1,
+                       float *prevL,
+                       float *prevU,
+                       float maxDisparity,
+                       int &xb, float &db)
     {
-        float dist = getSSDSmooth(x0, y, x1, y);
+        float dist = getSSDSmooth(x0, y0, x1, y0);
+
+        //regularization
+        float delta_x = float(x1 - x0);
+        float reg = 0.0f;
+
+        if(prevL[1] >= 0.0f) {
+            float deltaL = fabsf(prevL[0] - delta_x);
+            reg += deltaL / maxDisparity;
+        }
+
+        if(prevU[1] >= 0.0f) {
+            float deltaU = fabsf(prevU[0] - delta_x);
+            reg += deltaU / maxDisparity;
+        }
+
+        dist += lambda * reg;
 
         if(dist < db) {
-            xb = x0;
+            xb = x1;
             db = dist;
         }
     }
@@ -224,9 +249,7 @@ public:
     float getSSDSmooth(int x0, int y0, int x1, int y1)
     {
         float *tmp_img0 = (*img0)(x0, y0);
-        float *tmp_img1 = (*img1)(x1, y1);
-        float *tmp_lap0 = (*lap0)(x0, y0);
-        float *tmp_lap1 = (*lap1)(x1, y1);
+        //float *tmp_img1 = (*img1)(x1, y1);
 
         float E = 0.0f;
         float norm = 0.0f;
@@ -235,38 +258,27 @@ public:
             for(int j = -halfPatchSize; j <= halfPatchSize; j++) {
                 float *tmp_img0_ij = (*img0)(x0 + j, y0 + i);
                 float *tmp_img1_ij = (*img1)(x1 + j, y1 + i);
-                float *tmp_lap0_ij = (*lap0)(x0 + j, y0 + i);
-                float *tmp_lap1_ij = (*lap1)(x1 + j, y1 + i);
 
                 float e0 = 0.0f;
 
                 float dc0 = 0.0f;
                 float dc1 = 0.0f;
-                float dl0 = 0.0f;
-                float dl1 = 0.0f;
 
-                float tmp;
                 for(int k = 0; k < img0->channels; k++) {
-                    tmp = tmp_img0[k] - tmp_img0_ij[k];
-                    dc0 += tmp * tmp;
-
-                    tmp = tmp_img1[k] - tmp_img1_ij[k];
-                    dc1 += tmp * tmp;
-
-                    tmp = tmp_lap0[k] - tmp_lap0_ij[k];
-                    dl0 += tmp * tmp;
-
-                    tmp = tmp_lap1[k] - tmp_lap1_ij[k];
-                    dl1 += tmp * tmp;
+                    dc0 += fabsf(tmp_img0[k] - tmp_img0_ij[k]);
+                    //dc1 += fabsf(tmp_img1[k] - tmp_img1_ij[k]);
 
                     e0 += fabsf(tmp_img0_ij[k] - tmp_img1_ij[k]);
                 }
 
-                float w0 = expf( - (dc0 / gamma_c_2) - (dl0 / gamma_l_2));
-                float w1 = expf( - (dc1 / gamma_c_2) - (dl1 / gamma_l_2));
+                dc0 /= img0->channelsf;
+                dc1 /= img0->channelsf;
+                e0  /= img0->channelsf;
 
-                E += w0 * w1 * e0;
-                norm += w0 * w1;
+                float w = expf( - (dc0 / gamma_c) );// * expf( - (dc1 / gamma_c) );
+
+                E += w * e0;
+                norm += w;
             }
         }
 
