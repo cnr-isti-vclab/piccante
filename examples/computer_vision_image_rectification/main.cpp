@@ -44,10 +44,10 @@ int main(int argc, char *argv[])
     std::string name0, name1;
 
     if(argc != 5) {
-        name0 = "../data/input/triangulation/campo_s_stefano_r.jpg";
-        name1 = "../data/input/triangulation/campo_s_stefano_l.jpg";
-        P0 = pic::readMatrix34dFromFile("../data/input/triangulation/campo_s_stefano_r_cam.txt");
-        P1 = pic::readMatrix34dFromFile("../data/input/triangulation/campo_s_stefano_l_cam.txt");
+        name0 = "../data/input/triangulation/campo_s_stefano_l.jpg";
+        name1 = "../data/input/triangulation/campo_s_stefano_r.jpg";
+        P0 = pic::readMatrix34dFromFile("../data/input/triangulation/campo_s_stefano_l_cam.txt");
+        P1 = pic::readMatrix34dFromFile("../data/input/triangulation/campo_s_stefano_r_cam.txt");
     } else {
         name0 = argv[1];
         name1 = argv[2];

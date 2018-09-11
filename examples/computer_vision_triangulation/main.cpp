@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
         pic::MatrixConvert(F).print();
         
         //compute essential matrix decomposition
-        Eigen::Matrix3d E = pic::computeEssentialMatrix(F, K0);
+        Eigen::Matrix3d E = pic::computeEssentialMatrix(F, K0, K1);
                 
         //decompose E into R and t
         std::vector< Eigen::Vector2f > m0f, m1f;
@@ -100,6 +100,7 @@ int main(int argc, char *argv[])
         
         printf("Camera Matrix0:\n");
         pic::printfMat34d(M0);
+
         printf("Camera Matrix1:\n");
         pic::printfMat34d(M1);
         printf("\n");

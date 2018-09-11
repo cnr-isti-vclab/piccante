@@ -143,6 +143,15 @@ public:
     }
 
     /**
+     * @brief getBCentroid
+     * @return
+     */
+    bool getBCentroid()
+    {
+        return bCentroid;
+    }
+
+    /**
      * @brief computeBoundingBox
      * @param h
      * @param bCentroid
