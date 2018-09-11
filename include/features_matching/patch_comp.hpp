@@ -33,12 +33,15 @@ class PatchComp
 protected:
     float *VALUES_COS, *VALUES_SIN;
     ImageSamplerBilinear isb;
-    Image *img0, *img1;
+
+    Image *img0, *img1, *img0_g, *img1_g;
+
+    //patchsize
     int patchSize, halfPatchSize;
+    float patchSize_sq;
 
     //stereo
-    float  lambda;
-    float  gamma_c;
+    float  lambda, alpha;
 
 public:
 
@@ -47,10 +50,7 @@ public:
      */
     PatchComp()
     {
-        lambda = 0.2f;
-        VALUES_COS = NULL;
-        VALUES_SIN = NULL;
-        halfPatchSize = -1;
+        setNULL();
     }
 
     /**
@@ -61,13 +61,9 @@ public:
      */
     PatchComp(Image *img0, Image *img1, int patchSize)
     {
-        VALUES_COS = NULL;
-        VALUES_SIN = NULL;
+        setNULL();
 
-        lambda = 0.2f;
-        gamma_c = 0.1f;
-
-        init(img0, img1, patchSize);
+        initStereo(img0, img1, NULL, NULL, patchSize, 0.05f, 0.05f);
     }
 
     /**
@@ -75,22 +71,14 @@ public:
      * @param img0
      * @param img1
      * @param patchSize
-     * @param gamma_c
+     * @param alpha
      */
     PatchComp(Image *img0, Image *img1,
-              int patchSize, float lambda, float gamma_c)
+              Image *img0_g, Image *img1_g,
+              int patchSize, float lambda, float alpha)
     {
-        VALUES_COS = NULL;
-        VALUES_SIN = NULL;
-
-        if(lambda < 0.0f) {
-            lambda = 0.2f;
-        }
-
-        this->lambda = lambda;
-        this->gamma_c = gamma_c;
-
-        init(img0, img1, patchSize);
+        setNULL();
+        initStereo(img0, img1, img0_g, img1_g, patchSize, lambda, alpha);
     }
 
     ~PatchComp()
@@ -102,20 +90,62 @@ public:
         if(VALUES_SIN != NULL) {
             delete[] VALUES_SIN;
         }
+
+        setNULL();
     }
 
     /**
-     * @brief init
+     * @brief setNULL
+     */
+    void setNULL()
+    {
+        img0   = NULL;
+        img0_g = NULL;
+        img1   = NULL;
+        img1_g = NULL;
+
+        lambda = -1.0f;
+        alpha = -1.0f;
+
+        VALUES_COS = NULL;
+        VALUES_SIN = NULL;
+        patchSize = -1;
+        halfPatchSize = -1;
+    }
+
+    /**
+     * @brief initStereo
      * @param img0
      * @param img1
      * @param patchSize
      */
-    void init(Image *img0, Image *img1, int patchSize)
+    void initStereo(Image *img0,   Image *img1,
+                    Image *img0_g, Image *img1_g,
+                    int patchSize, float lambda, float alpha)
     {
+        if(patchSize < 1) {
+            return;
+        }
+
         this->img0 = img0;
         this->img1 = img1;
+        this->img0_g = img0_g;
+        this->img1_g = img1_g;
 
-        halfPatchSize = patchSize >> 1;
+        if(lambda < 0.0f) {
+            lambda = 0.2f;
+        }
+
+        this->lambda = lambda;
+
+        if(alpha < 0.0f || alpha > 1.0f) {
+            alpha = 0.05f;
+        }
+
+        this->alpha = alpha;
+
+        this->patchSize_sq = float(patchSize * patchSize);
+        this->halfPatchSize = patchSize >> 1;
         this->patchSize = (halfPatchSize << 1) + 1;
 
         VALUES_SIN = new float[this->patchSize];
@@ -162,19 +192,18 @@ public:
                        float maxDisparity,
                        int &xb, float &db)
     {
-        float dist = getSSDSmooth(x0, y0, x1, y0);
+        float dist = getSSDSmooth(x0, y0, x1, y0) / patchSize_sq;
 
         //regularization
-        float delta_x = float(x1 - x0);
-        float reg = 0.0f;
+        float reg = 0.0f;//float(x1 - x0);
 
         if(prevL[1] >= 0.0f) {
-            float deltaL = fabsf(prevL[0] - delta_x);
+            float deltaL = fabsf(prevL[0] - x1);
             reg += deltaL / maxDisparity;
         }
 
         if(prevU[1] >= 0.0f) {
-            float deltaU = fabsf(prevU[0] - delta_x);
+            float deltaU = fabsf(prevU[0] - x1);
             reg += deltaU / maxDisparity;
         }
 
@@ -248,45 +277,60 @@ public:
      */
     float getSSDSmooth(int x0, int y0, int x1, int y1)
     {
-        float *tmp_img0 = (*img0)(x0, y0);
+        //float *tmp_img0 = (*img0)(x0, y0);
         //float *tmp_img1 = (*img1)(x1, y1);
 
-        float E = 0.0f;
-        float norm = 0.0f;
+        float err = 0.0f;
+        //float norm = 0.0f;
+        float err_delta = 0.0f;
 
         for(int i = -halfPatchSize; i <= halfPatchSize; i++) {
             for(int j = -halfPatchSize; j <= halfPatchSize; j++) {
                 float *tmp_img0_ij = (*img0)(x0 + j, y0 + i);
                 float *tmp_img1_ij = (*img1)(x1 + j, y1 + i);
 
-                float e0 = 0.0f;
+                float *tmp_img0_g_ij = (*img0_g)(x0 + j, y0 + i);
+                float *tmp_img1_g_ij = (*img1_g)(x1 + j, y1 + i);
 
+                /*
+                float e0 = 0.0f;
                 float dc0 = 0.0f;
                 float dc1 = 0.0f;
+                */
 
                 for(int k = 0; k < img0->channels; k++) {
+                    /*
                     dc0 += fabsf(tmp_img0[k] - tmp_img0_ij[k]);
-                    //dc1 += fabsf(tmp_img1[k] - tmp_img1_ij[k]);
-
+                    dc1 += fabsf(tmp_img1[k] - tmp_img1_ij[k]);
                     e0 += fabsf(tmp_img0_ij[k] - tmp_img1_ij[k]);
+                    */
+                    auto tmp = tmp_img1_ij[k] - tmp_img0_ij[k];
+                    err += tmp * tmp;
+
+                    tmp = tmp_img0_g_ij[k] - tmp_img1_g_ij[k];
+                    err_delta += tmp * tmp;
                 }
 
+                /*
                 dc0 /= img0->channelsf;
                 dc1 /= img0->channelsf;
                 e0  /= img0->channelsf;
 
                 float w = expf( - (dc0 / gamma_c) );// * expf( - (dc1 / gamma_c) );
-
                 E += w * e0;
                 norm += w;
+                */
             }
         }
 
+        err /= img0->channelsf;
+        err_delta /= img0->channelsf;
+        /*
         if(norm > 0.0f) {
             E /= norm;
-        }
+        }*/
 
-        return E;
+        return err * (1.0f - alpha) + err_delta * alpha;
     }
 
     /**

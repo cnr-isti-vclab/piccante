@@ -137,7 +137,7 @@ ImageGL *FilterGLWarp2D::Process(ImageGLVec imgIn, ImageGL *imgOut)
 
     if(imgOut == NULL) {
         if(!bSameSize) {
-            FilterWarp2D::ComputingBoundingBox(h, imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax, bCentroid);
+            FilterWarp2D::computeBoundingBox(h, bCentroid, imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax);
             imgOut = new ImageGL(1, bmax[0] - bmin[0], bmax[1] - bmin[1], channels, IMG_GPU, GL_TEXTURE_2D);
         } else {
             bmin[0] = 0;

@@ -27,6 +27,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 
 #include "../filtering/filter_disparity.hpp"
+#include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_gradient.hpp"
 
 #include "../util/math.hpp"
 
@@ -45,18 +47,35 @@ PIC_INLINE void checkDisparity(Image *disp_left, Image *disp_right, int threshol
         for(int j = 0; j < disp_left->width; j++) {
 
             float *dL = (*disp_left)(j, i);
-            float *dR = (*disp_right)(j, i);
 
-            int d_L = int(dL[0]);
-            int d_R = int(dR[0]);
+            int j_forward = int(dL[0]);
+            float *dR = (*disp_right)(j_forward, i);
 
-            if(std::abs(d_L - d_R) > threshold) {
+            int j_e = int(dR[0]);
+
+            if(std::abs(i - j_e) > threshold) {
                 dL[0] = 0.0f;
                 dL[1] = -1.0f;
 
                 dR[0] = 0.0f;
                 dR[1] = -1.0f;
             }
+        }
+    }
+}
+
+/**
+  * @brief computeLocalDisparity
+  * @param disp_left
+  */
+PIC_INLINE void computeLocalDisparity(Image *disp)
+{
+    for(int i = 0; i < disp->height; i++) {
+
+        for(int j = 0; j < disp->width; j++) {
+            float *tmp = (*disp)(j, i);
+
+            tmp[0] -= float(j);
         }
     }
 }
@@ -87,13 +106,23 @@ PIC_INLINE void estimateStereo(Image *img_left, Image *img_right,
         disparity_cross_check = 16;
     }
 
-    pic::FilterDisparity fd(240, 5);
+    auto i_l_l = FilterLuminance::Execute(img_left, NULL);
+    auto i_r_l = FilterLuminance::Execute(img_right, NULL);
 
-    disp_left  = fd.ProcessP(pic::Double(img_left, img_right), disp_left);
-    disp_right = fd.ProcessP(pic::Double(img_right, img_left), disp_right);
+    auto i_l_g = FilterGradient::Execute(i_l_l, NULL);
+    auto i_r_g = FilterGradient::Execute(i_r_l, NULL);
+
+    FilterDisparity fd(240, 5);
+
+    disp_left  = fd.ProcessP(pic::Quad(img_left, img_right, i_l_g, i_r_g), disp_left);
+    disp_left  = fd.ProcessP(pic::Quad(img_right, img_left, i_r_g, i_l_g), disp_left);
 
     checkDisparity(disp_left, disp_right, disparity_cross_check);
     checkDisparity(disp_right, disp_left, disparity_cross_check);
+
+    computeLocalDisparity(disp_left);
+    computeLocalDisparity(disp_right);
+
 }
 
 } // end namespace pic

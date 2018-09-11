@@ -42,11 +42,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-
-        if(pc == NULL) {
-            return;
-        }
-
         for(int j = box->y0; j < box->y1; j++) {
 
             for(int i = box->x0; i < box->x1; i++) {
@@ -66,8 +61,8 @@ protected:
 
                 float *out = (*dst)(i, j);
 
-                out[0] = float(xB - i);
                 out[1] = dB;
+                out[0] = float(xB);
             }
         }
     }
@@ -80,8 +75,8 @@ protected:
      */
     Image *SetupAux(ImageVec imgIn, Image *imgOut)
     {
-        if(imgIn.size() == 2) {
-            pc = new PatchComp(imgIn[0], imgIn[1], patchSize, 0.1f, 1.0f);
+        if(imgIn.size() == 4) {
+            pc = new PatchComp(imgIn[0], imgIn[1], imgIn[2], imgIn[3], patchSize, 0.05f, 0.9f);
         } else {
             return NULL;
         }
