@@ -190,7 +190,9 @@ PIC_INLINE bool decomposeEssentialMatrixWithConfiguration(Eigen::Matrix3d &E, Ei
 
         }
 
-        printf("Front: %d %d\n",tmp_counter,j);
+        #ifdef PIC_DEBUG
+            printf("Front: %d %d\n",tmp_counter,j);
+        #endif
 
         if(tmp_counter > counter) {
             type = j;

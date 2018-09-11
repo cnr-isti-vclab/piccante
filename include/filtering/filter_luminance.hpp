@@ -43,18 +43,16 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        int width    = src[0]->width;
-        int channels = src[0]->channels;
-        float *data  = src[0]->data;
+        float *data = src[0]->data;
 
-        int transformChannels = MIN(channels, weights_size);
+        int transformChannels = MIN(src[0]->channels, weights_size);
 
         for(int j = box->y0; j < box->y1; j++) {
-            int c = j * width;
+            int c = j * src[0]->width;
 
             for(int i = box->x0; i < box->x1; i++) {
                 int indOut = c + i;
-                int ind = indOut * channels;
+                int ind = indOut * src[0]->channels;
 
                 float sum = 0.0f;
                 for(int k = 0; k < transformChannels; k++) {

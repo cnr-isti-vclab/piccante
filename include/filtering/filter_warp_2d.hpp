@@ -95,8 +95,8 @@ protected:
 
         if(!bSameSize) {
             if(this->bComputeBoundingBox) {
-                computeBoundingBox(imgIn[0]->widthf,
-                                   imgIn[0]->heightf,
+                computeBoundingBox(h, bCentroid,
+                                   imgIn[0]->widthf, imgIn[0]->heightf,
                                    bmin, bmax);
             }
 
@@ -143,14 +143,17 @@ public:
     }
 
     /**
-     * @brief computeBoundingBox calculates the bounding box of imgOut.
+     * @brief computeBoundingBox
+     * @param h
+     * @param bCentroid
      * @param width
      * @param height
      * @param bmin
      * @param bmax
-     * @param bCentroid
      */
-    void computeBoundingBox(float width, float height, int *bmin, int *bmax) {
+    static void computeBoundingBox(Matrix3x3 &h, bool bCentroid,
+                                   float width, float height,
+                                   int *bmin, int *bmax ) {
         float bbox[4][2];
         float bbox_out[4][2];
 
@@ -252,11 +255,10 @@ public:
     {
         if(!bSameSize) {
             if(this->bComputeBoundingBox) {
-                computeBoundingBox(imgIn->widthf,
-                                   imgIn->heightf,
+                computeBoundingBox(h, bCentroid,
+                                   imgIn->widthf, imgIn->heightf,
                                    bmin, bmax);
             }
-
 
             width  = bmax[0] - bmin[0];
             height = bmax[1] - bmin[1];

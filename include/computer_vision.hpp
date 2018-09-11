@@ -27,6 +27,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "computer_vision/rectification.hpp"
 
+#include "computer_vision/stereo.hpp"
+
 #include "computer_vision/nelder_mead_opt_homography.hpp"
 #include "computer_vision/nelder_mead_opt_fundamental.hpp"
 #include "computer_vision/nelder_mead_opt_triangulation.hpp"
@@ -36,6 +38,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "computer_vision/iterative_closest_point_2D.hpp"
 #include "computer_vision/nelder_mead_opt_ICP_2D.hpp"
 #include "computer_vision/find_checker_board.hpp"
+
+#include "computer_vision/simple_ply.hpp"
+
 
 #endif /* PIC_COMPUTER_VISION_HPP */
 

@@ -49,6 +49,63 @@ namespace pic {
 #ifndef PIC_DISABLE_EIGEN
 
 /**
+ * @brief readMatrix34dFromFile
+ * @param nameFile
+ * @return
+ */
+PIC_INLINE Eigen::Matrix34d readMatrix34dFromFile(std::string nameFile)
+{
+    Eigen::Matrix34d mat;
+
+    FILE *file = fopen(nameFile.c_str(), "r");
+
+    if(file == NULL) {
+        return mat;
+    }
+
+    for(int i = 0; i < 3; i++) {
+        for(int j = 0; j < 4; j++) {
+            float val;
+            fscanf(file, "%f", &val);
+            mat(i, j) = double(val);
+        }
+    }
+
+    fclose(file);
+
+    return mat;
+}
+
+/**
+ * @brief writeMatrix34dToFile
+ * @param nameFile
+ * @param mat
+ * @return
+ */
+PIC_INLINE bool writeMatrix34dToFile(std::string nameFile, Eigen::Matrix34d &mat)
+{
+    FILE *file = fopen(nameFile.c_str(), "w");
+
+    if(file == NULL) {
+        return false;
+    }
+
+    for(int i = 0; i < 3; i++) {
+        for(int j = 0; j < 4; j++) {
+            fprintf(file, "%f ", mat(i, j));
+        }
+
+        if(i < 2) {
+            fprintf(file, "\n");
+        }
+    }
+
+    fclose(file);
+
+    return true;
+}
+
+/**
  * @brief DiagonalMatrix creates a diagonal matrix.
  * @param D a vector of size 3.
  * @return It returns a diagonal matrix.
@@ -63,6 +120,22 @@ PIC_INLINE Eigen::Matrix3d DiagonalMatrix(Eigen::Vector3d D)
     ret(2, 2) = D[2];
 
     return ret;
+}
+
+/**
+ * @brief getDiagonalFromMatrix
+ * @param mat
+ * @return
+ */
+PIC_INLINE Eigen::Vector3d getDiagonalFromMatrix(Eigen::Matrix3d &mat)
+{
+    Eigen::Vector3d D;
+
+    D[0] = mat(0, 0);
+    D[1] = mat(1, 1);
+    D[2] = mat(2, 2);
+
+    return D;
 }
 
 /**
@@ -133,6 +206,16 @@ PIC_INLINE Eigen::Vector4d addOne(Eigen::Vector3d &x)
 {
     return Eigen::Vector4d(x[0], x[1], x[2], 1.0);
 }
+
+/**
+ * @brief printfVet3d
+ * @param x
+ */
+PIC_INLINE void printfVet3d(Eigen::Vector3d &x)
+{
+    printf("%f %f %f\n", x[0], x[1], x[2]);
+}
+
 
 /**
  * @brief printf

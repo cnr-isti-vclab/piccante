@@ -171,19 +171,33 @@ PIC_INLINE void decomposeCameraMatrix(Eigen::Matrix34d &P,
                                       Eigen::Matrix3d  &R,
                                       Eigen::Vector3d  &t)
 {
-    Eigen::Matrix3d matrix = P.block<3, 3>(0, 0);
+    Eigen::Matrix3d matrix = P.block<3, 3>(0, 0).inverse();
 
-    Eigen::FullPivHouseholderQR<Eigen::Matrix3d> qr(matrix.rows(), matrix.cols());
+
+    //QR decomposition
+    Eigen::HouseholderQR<Eigen::Matrix3d> qr(matrix.rows(), matrix.cols());
     qr.compute(matrix);
 
-    Eigen::Matrix3d Q = qr.matrixQ();
-    auto Q_t = Eigen::Transpose< Eigen::Matrix3d >(Q);
-
-    auto s = Q.determinant();
-
+    Eigen::Matrix3d Q = qr.householderQ();
     Eigen::Matrix3d U = qr.matrixQR().triangularView<Eigen::Upper>();
 
-    R = Q_t * s;
+    auto U_d = getDiagonalFromMatrix(U);
+    Eigen::Vector3d d = U_d;
+    for(int i = 0; i < 3; i++) {
+        if(d[i] != 0.0) {
+            d[i] = U_d[i] > 0.0 ? 1.0 : -1.0;
+        }
+    }
+    auto D = DiagonalMatrix(d);
+
+    Q = Q * D;
+    U = D * U;
+
+    //compute K, R, and t
+    auto Q_t = Eigen::Transpose< Eigen::Matrix3d >(Q);
+    auto s = Q.determinant();
+
+    R = s * Q_t;
     t = s * U * P.col(3);
 
     if(U(2, 2) > 0.0) {
@@ -332,11 +346,19 @@ PIC_INLINE void cameraRectify(Eigen::Matrix3d &K0, Eigen::Matrix3d &R0, Eigen::V
     R(2, 2) = z_axis[2];
 
     //new camera matrices
+    Eigen::Matrix3d K;
+    K.setZero();
+    K(0, 0) = K0(0, 0);
+    K(1, 1) = K0(1, 1);
+    K(0, 2) = (K0(0, 2) + K1(0, 2)) * 0.5;
+    K(1, 2) = (K0(1, 2) + K1(1, 2)) * 0.5;
+    K(2, 2) = 1.0;
+
     Eigen::Vector3d t0n = -R * c0;
-    P0_out = getCameraMatrix(K0, R, t0n);
+    P0_out = getCameraMatrix(K, R, t0n);
 
     Eigen::Vector3d t1n = -R * c1;
-    P1_out = getCameraMatrix(K1, R, t1n);
+    P1_out = getCameraMatrix(K, R, t1n);
 
     //transformations
     auto Q0o = P0_in.block<3, 3>(0, 0);
@@ -365,6 +387,7 @@ PIC_INLINE void cameraRectify(Eigen::Matrix34d &P0_in, Eigen::Matrix34d &P1_in,
     Eigen::Vector3d t0, t1;
 
     decomposeCameraMatrix(P0_in, K0, R0, t0);
+
     decomposeCameraMatrix(P1_in, K1, R1, t1);
 
     cameraRectify(K0, R0, t0,
