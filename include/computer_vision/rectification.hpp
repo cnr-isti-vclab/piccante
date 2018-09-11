@@ -72,13 +72,15 @@ PIC_INLINE ImageVec *computeImageRectificationWarp(Image *img0,
         out = new ImageVec();
     }
 
-    FilterWarp2D warp0(MatrixConvert(T0));
-    FilterWarp2D warp1(MatrixConvert(T1));
+    auto H0 = MatrixConvert(T0);
+    auto H1 = MatrixConvert(T1);
+    FilterWarp2D warp0(H0);
+    FilterWarp2D warp1(H1);
 
     int bmin0[2], bmin1[2], bmax0[2], bmax1[2];
 
-    warp0.computeBoundingBox(img0->widthf, img0->heightf, bmin0, bmax0);
-    warp1.computeBoundingBox(img1->widthf, img1->heightf, bmin1, bmax1);
+    FilterWarp2D::computeBoundingBox(H0, warp0.getBCentroid(), img0->widthf, img0->heightf, bmin0, bmax0);
+    FilterWarp2D::computeBoundingBox(H1, warp1.getBCentroid(), img1->widthf, img1->heightf, bmin1, bmax1);
 
     if(bPartial) {
         bmin0[1] = MIN(bmin0[1], bmin1[1]);
