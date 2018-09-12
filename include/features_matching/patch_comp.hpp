@@ -277,12 +277,9 @@ public:
      */
     float getSSDSmooth(int x0, int y0, int x1, int y1)
     {
-        //float *tmp_img0 = (*img0)(x0, y0);
-        //float *tmp_img1 = (*img1)(x1, y1);
+        float alpha_i = 1.0f - alpha;
 
         float err = 0.0f;
-        //float norm = 0.0f;
-        float err_delta = 0.0f;
 
         for(int i = -halfPatchSize; i <= halfPatchSize; i++) {
             for(int j = -halfPatchSize; j <= halfPatchSize; j++) {
@@ -292,45 +289,31 @@ public:
                 float *tmp_img0_g_ij = (*img0_g)(x0 + j, y0 + i);
                 float *tmp_img1_g_ij = (*img1_g)(x1 + j, y1 + i);
 
-                /*
-                float e0 = 0.0f;
-                float dc0 = 0.0f;
-                float dc1 = 0.0f;
-                */
 
+                //color term
+                float err_col = 0.0f;
                 for(int k = 0; k < img0->channels; k++) {
-                    /*
-                    dc0 += fabsf(tmp_img0[k] - tmp_img0_ij[k]);
-                    dc1 += fabsf(tmp_img1[k] - tmp_img1_ij[k]);
-                    e0 += fabsf(tmp_img0_ij[k] - tmp_img1_ij[k]);
-                    */
                     auto tmp = tmp_img1_ij[k] - tmp_img0_ij[k];
-                    err += tmp * tmp;
-
-                    tmp = tmp_img0_g_ij[k] - tmp_img1_g_ij[k];
-                    err_delta += tmp * tmp;
+                    err_col += tmp * tmp;
                 }
 
-                /*
-                dc0 /= img0->channelsf;
-                dc1 /= img0->channelsf;
-                e0  /= img0->channelsf;
+                err_col = sqrtf(err_col);
 
-                float w = expf( - (dc0 / gamma_c) );// * expf( - (dc1 / gamma_c) );
-                E += w * e0;
-                norm += w;
-                */
+                //gradient term
+                float err_grad = 0.0f;
+                for(int k = 0; k < 2; k++) {
+                    auto tmp = tmp_img0_g_ij[k] - tmp_img1_g_ij[k];
+                    err_grad += tmp * tmp;
+                }
+                err_grad = sqrtf(err_grad);
+
+                //err term
+                err += alpha_i * err_col + alpha * err_grad;
+
             }
         }
 
-        err /= img0->channelsf;
-        err_delta /= img0->channelsf;
-        /*
-        if(norm > 0.0f) {
-            E /= norm;
-        }*/
-
-        return err * (1.0f - alpha) + err_delta * alpha;
+        return err;
     }
 
     /**

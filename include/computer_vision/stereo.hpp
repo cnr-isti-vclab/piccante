@@ -48,17 +48,19 @@ PIC_INLINE void checkDisparity(Image *disp_left, Image *disp_right, int threshol
 
             float *dL = (*disp_left)(j, i);
 
-            int j_forward = int(dL[0]);
-            float *dR = (*disp_right)(j_forward, i);
+            if(dL[1] > 0.0f) { // if it is valid
 
-            int j_e = int(dR[0]);
+                int j_forward = int(dL[0]);
+                float *dR = (*disp_right)(j_forward, i);
 
-            if(std::abs(i - j_e) > threshold) {
-                dL[0] = 0.0f;
-                dL[1] = -1.0f;
+                if(dR[1] > 0.0f) { // if it is valid
+                    int j_e = int(dR[0]);
 
-                dR[0] = 0.0f;
-                dR[1] = -1.0f;
+                    if(std::abs(j - j_e) > threshold) {
+                        dL[0] = 0.0f;
+                        dL[1] = -1.0f;
+                    }
+                }
             }
         }
     }
@@ -90,6 +92,7 @@ PIC_INLINE void computeLocalDisparity(Image *disp)
  * @param disp_right
  */
 PIC_INLINE void estimateStereo(Image *img_left, Image *img_right,
+                               int kernel_size,
                                int max_disparity, int disparity_cross_check,
                                Image *disp_left, Image *disp_right)
 {
@@ -112,17 +115,16 @@ PIC_INLINE void estimateStereo(Image *img_left, Image *img_right,
     auto i_l_g = FilterGradient::Execute(i_l_l, NULL);
     auto i_r_g = FilterGradient::Execute(i_r_l, NULL);
 
-    FilterDisparity fd(240, 5);
+    FilterDisparity fd(max_disparity, kernel_size);
 
     disp_left  = fd.ProcessP(pic::Quad(img_left, img_right, i_l_g, i_r_g), disp_left);
-    disp_left  = fd.ProcessP(pic::Quad(img_right, img_left, i_r_g, i_l_g), disp_left);
+    disp_right = fd.ProcessP(pic::Quad(img_right, img_left, i_r_g, i_l_g), disp_right);
 
     checkDisparity(disp_left, disp_right, disparity_cross_check);
-    checkDisparity(disp_right, disp_left, disparity_cross_check);
+    //checkDisparity(disp_right, disp_left, disparity_cross_check);
 
     computeLocalDisparity(disp_left);
     computeLocalDisparity(disp_right);
-
 }
 
 } // end namespace pic
