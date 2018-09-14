@@ -121,7 +121,7 @@ PIC_INLINE void estimateStereo(Image *img_left, Image *img_right,
     disp_right = fd.ProcessP(pic::Quad(img_right, img_left, i_r_g, i_l_g), disp_right);
 
     checkDisparity(disp_left, disp_right, disparity_cross_check);
-    //checkDisparity(disp_right, disp_left, disparity_cross_check);
+    checkDisparity(disp_right, disp_left, disparity_cross_check);
 
     computeLocalDisparity(disp_left);
     computeLocalDisparity(disp_right);
