@@ -51,9 +51,13 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         pic::Image disp0, disp1;
-        pic::estimateStereo(&img0, &img1, 250, 8, &disp0, &disp1);
 
-        disp0.Write("../data/output/disp.pfm");
+        pic::Stereo stereo(5, 250, 4);
+
+        auto disp_maps = stereo.execute(&img0, &img1, NULL);
+
+        disp_maps->at(0)->Write("../data/output/disp0.pfm");
+        disp_maps->at(1)->Write("../data/output/disp1.pfm");
 
 
     } else {
