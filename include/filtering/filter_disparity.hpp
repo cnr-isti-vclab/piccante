@@ -105,6 +105,14 @@ public:
 
     /**
      * @brief FilterDisparity
+     */
+    FilterDisparity()
+    {
+        init(200, 7);
+    }
+
+    /**
+     * @brief FilterDisparity
      * @param type
      */
     FilterDisparity(int maxDisparity, int patchSize) : Filter()

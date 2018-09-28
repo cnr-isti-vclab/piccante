@@ -35,97 +35,169 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- * @brief checkDisparity
- * @param disp_left
- * @param disp_right
- * @param threshold
+ * @brief The Stereo class
  */
-PIC_INLINE void checkDisparity(Image *disp_left, Image *disp_right, int threshold = 8)
+class Stereo
 {
-    for(int i = 0; i < disp_left->height; i++) {
+protected:
+    FilterLuminance flt_lum;
+    FilterGradient  flt_grad;
+    FilterDisparity flt_disp;
 
-        for(int j = 0; j < disp_left->width; j++) {
+    int kernel_size, max_disparity, max_cross_check;
 
-            float *dL = (*disp_left)(j, i);
+public:
 
-            if(dL[1] > 0.0f) { // if it is valid
+    /**
+     * @brief Stereo
+     */
+    Stereo()
+    {
+        init(7, 200, 8);
+    }
 
-                int j_forward = int(dL[0]);
-                float *dR = (*disp_right)(j_forward, i);
+    /**
+     * @brief Stereo
+     */
+    Stereo(int kernel_size, int max_disparity, int max_cross_check)
+    {
+        init(kernel_size, max_disparity, max_cross_check);
+    }
 
-                if(dR[1] > 0.0f) { // if it is valid
-                    int j_e = int(dR[0]);
+    /**
+     * @brief init
+     * @param kernel_size
+     * @param max_disparity
+     * @param max_cross_check
+     */
+    void init(int kernel_size, int max_disparity, int max_cross_check)
+    {
+        this->kernel_size = kernel_size;
+        this->max_disparity = max_disparity;
+        this->max_cross_check = max_cross_check;
 
-                    if(std::abs(j - j_e) > threshold) {
-                        dL[0] = 0.0f;
-                        dL[1] = -1.0f;
+        if(kernel_size < 0) {
+            kernel_size = 7;
+        }
+
+        if(max_cross_check < 0) {
+            max_cross_check = 8;
+        }
+
+        flt_disp.init(max_disparity, kernel_size);
+    }
+
+    /**
+     * @brief crossCheck
+     * @param disp_left
+     * @param disp_right
+     */
+    void crossCheck(Image *disp_left, Image *disp_right)
+    {
+        for(int i = 0; i < disp_left->height; i++) {
+
+            for(int j = 0; j < disp_left->width; j++) {
+
+                float *dL = (*disp_left)(j, i);
+
+                if(dL[1] > 0.0f) { // if it is valid
+
+                    int j_forward = int(dL[0]);
+                    float *dR = (*disp_right)(j_forward, i);
+
+                    if(dR[1] > 0.0f) { // if it is valid
+                        int j_e = int(dR[0]);
+
+                        if(std::abs(j - j_e) > max_cross_check) {
+                            dL[0] = 0.0f;
+                            dL[1] = -1.0f;
+                        }
                     }
                 }
             }
         }
     }
-}
 
-/**
-  * @brief computeLocalDisparity
-  * @param disp_left
-  */
-PIC_INLINE void computeLocalDisparity(Image *disp)
-{
-    for(int i = 0; i < disp->height; i++) {
+    /**
+      * @brief computeLocalDisparity
+      * @param disp
+      */
+    static void computeLocalDisparity(Image *disp)
+    {
+        for(int i = 0; i < disp->height; i++) {
 
-        for(int j = 0; j < disp->width; j++) {
-            float *tmp = (*disp)(j, i);
+            for(int j = 0; j < disp->width; j++) {
+                float *tmp = (*disp)(j, i);
 
-            tmp[0] -= float(j);
+                tmp[0] -= float(j);
+            }
         }
     }
-}
 
-/**
- * @brief estimateStereo
- * @param img_left
- * @param img_right
- * @param max_disparity
- * @param disparity_cross_check
- * @param disp_left
- * @param disp_right
- */
-PIC_INLINE void estimateStereo(Image *img_left, Image *img_right,
-                               int kernel_size,
-                               int max_disparity, int disparity_cross_check,
-                               Image *disp_left, Image *disp_right)
-{
-    if(img_left  == NULL || img_right  == NULL ||
-       disp_left == NULL || disp_right == NULL) {
-        return;
+    /**
+     * @brief execute
+     * @param img_left
+     * @param img_right
+     * @param out
+     * @return
+     */
+    ImageVec *execute(Image *img_left, Image *img_right,
+                      ImageVec *out)
+    {
+        if(img_left  == NULL || img_right  == NULL) {
+            return out;
+        }
+
+        if(max_disparity < 0) {
+            max_disparity = MIN(img_left->width, img_right->width) >> 1;
+        }
+
+        auto i_l_l = flt_lum.ProcessP(Single(img_left), NULL);
+        auto i_r_l = flt_lum.ProcessP(Single(img_right), NULL);
+
+        auto i_l_g = flt_grad.ProcessP(Single(i_l_l), NULL);
+        auto i_r_g = flt_grad.ProcessP(Single(i_r_l), NULL);
+
+        Image *disp_left, *disp_right;
+
+        bool bAllocate = false;
+        if(out->size() > 1) {
+            if(out->at(0) != NULL) {
+                disp_left = out->at(0);
+            } else {
+                bAllocate = true;
+            }
+
+            if(out->at(1) != NULL) {
+                disp_right = out->at(1);
+            } else {
+                bAllocate = true;
+            }
+        }
+
+        if(bAllocate) {
+            out->clear();
+            disp_left = NULL;
+            disp_right = NULL;
+        }
+
+        disp_left  = flt_disp.ProcessP(pic::Quad(img_left, img_right, i_l_g, i_r_g), disp_left);
+        disp_right = flt_disp.ProcessP(pic::Quad(img_right, img_left, i_r_g, i_l_g), disp_right);
+
+        if(bAllocate) {
+            out->push_back(disp_left);
+            out->push_back(disp_right);
+        }
+
+        crossCheck(disp_left, disp_right);
+        crossCheck(disp_right, disp_left);
+
+        computeLocalDisparity(disp_left);
+        computeLocalDisparity(disp_right);
+
+        return out;
     }
-
-    if(max_disparity < 0) {
-        max_disparity = MIN(img_left->width, img_right->width) >> 1;
-    }
-
-    if(disparity_cross_check < 0) {
-        disparity_cross_check = 16;
-    }
-
-    auto i_l_l = FilterLuminance::Execute(img_left, NULL);
-    auto i_r_l = FilterLuminance::Execute(img_right, NULL);
-
-    auto i_l_g = FilterGradient::Execute(i_l_l, NULL);
-    auto i_r_g = FilterGradient::Execute(i_r_l, NULL);
-
-    FilterDisparity fd(max_disparity, kernel_size);
-
-    disp_left  = fd.ProcessP(pic::Quad(img_left, img_right, i_l_g, i_r_g), disp_left);
-    disp_right = fd.ProcessP(pic::Quad(img_right, img_left, i_r_g, i_l_g), disp_right);
-
-    checkDisparity(disp_left, disp_right, disparity_cross_check);
-    checkDisparity(disp_right, disp_left, disparity_cross_check);
-
-    computeLocalDisparity(disp_left);
-    computeLocalDisparity(disp_right);
-}
+};
 
 } // end namespace pic
 
