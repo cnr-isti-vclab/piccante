@@ -138,14 +138,15 @@ public:
      * @brief execute
      * @param img_left
      * @param img_right
-     * @param out
-     * @return
+     * @param disp_left
+     * @param disp_right
      */
-    ImageVec *execute(Image *img_left, Image *img_right,
-                      ImageVec *out)
+    void execute(Image *img_left, Image *img_right,
+                 Image *disp_left, Image *disp_right)
     {
-        if(img_left  == NULL || img_right  == NULL) {
-            return out;
+        if(img_left == NULL || img_right == NULL ||
+           disp_left == NULL || disp_right == NULL) {
+            return;
         }
 
         if(max_disparity < 0) {
@@ -158,44 +159,14 @@ public:
         auto i_l_g = flt_grad.ProcessP(Single(i_l_l), NULL);
         auto i_r_g = flt_grad.ProcessP(Single(i_r_l), NULL);
 
-        Image *disp_left, *disp_right;
-
-        bool bAllocate = false;
-        if(out->size() > 1) {
-            if(out->at(0) != NULL) {
-                disp_left = out->at(0);
-            } else {
-                bAllocate = true;
-            }
-
-            if(out->at(1) != NULL) {
-                disp_right = out->at(1);
-            } else {
-                bAllocate = true;
-            }
-        }
-
-        if(bAllocate) {
-            out->clear();
-            disp_left = NULL;
-            disp_right = NULL;
-        }
-
         disp_left  = flt_disp.ProcessP(pic::Quad(img_left, img_right, i_l_g, i_r_g), disp_left);
         disp_right = flt_disp.ProcessP(pic::Quad(img_right, img_left, i_r_g, i_l_g), disp_right);
-
-        if(bAllocate) {
-            out->push_back(disp_left);
-            out->push_back(disp_right);
-        }
 
         crossCheck(disp_left, disp_right);
         crossCheck(disp_right, disp_left);
 
         computeLocalDisparity(disp_left);
         computeLocalDisparity(disp_right);
-
-        return out;
     }
 };
 

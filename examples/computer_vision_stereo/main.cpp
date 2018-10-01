@@ -50,15 +50,14 @@ int main(int argc, char *argv[])
     if(img0.isValid() && img1.isValid()) {
         printf("OK\n");
 
-        pic::Image disp0, disp1;
-
         pic::Stereo stereo(5, 250, 4);
 
-        auto disp_maps = stereo.execute(&img0, &img1, NULL);
+        pic::Image disp0, disp1;
 
-        disp_maps->at(0)->Write("../data/output/disp0.pfm");
-        disp_maps->at(1)->Write("../data/output/disp1.pfm");
+        stereo.execute(&img0, &img1, &disp0, &disp1);
 
+        disp0.Write("../data/output/disp0.pfm");
+        disp1.Write("../data/output/disp1.pfm");
 
     } else {
         printf("No there is at least an invalid file!\n");
