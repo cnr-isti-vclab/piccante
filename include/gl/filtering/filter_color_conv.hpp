@@ -32,9 +32,9 @@ protected:
     ColorConvGL *color_conv;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
     /**
@@ -58,11 +58,11 @@ FilterGLColorConv::FilterGLColorConv(ColorConvGL *color_conv, bool direct = true
 {
     this->color_conv = color_conv;
 
-    InitShaders();
+    initShaders();
     setTransform(direct);
 }
 
-void FilterGLColorConv::InitShaders()
+void FilterGLColorConv::initShaders()
 {
     color_conv->generatePrograms(vertex_source);
 }

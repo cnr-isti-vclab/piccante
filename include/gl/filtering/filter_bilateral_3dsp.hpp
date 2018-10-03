@@ -28,10 +28,10 @@ namespace pic {
 class FilterGLBilateral3DSP: public FilterGLNPasses
 {
 protected:
-    FilterGLBilateral1D		*filterS;
-    FilterGLBilateral1D		*filterT;
+    FilterGLBilateral1D *filterS;
+    FilterGLBilateral1D *filterT;
 
-    void InitShaders() {}
+    void initShaders() {}
     void FragmentShader() {}
 
 public:

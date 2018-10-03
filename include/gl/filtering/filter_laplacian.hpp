@@ -29,9 +29,9 @@ class FilterGLLaplacian: public FilterGL
 {
 protected:
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -50,7 +50,7 @@ FilterGLLaplacian::FilterGLLaplacian(): FilterGL()
 {
     //protected values are assigned/computed
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLLaplacian::FragmentShader()
@@ -73,7 +73,7 @@ void FilterGLLaplacian::FragmentShader()
                       );
 }
 
-void FilterGLLaplacian::InitShaders()
+void FilterGLLaplacian::initShaders()
 {
     FragmentShader();
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLLaplacian");

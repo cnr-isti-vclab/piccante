@@ -41,7 +41,7 @@ protected:
     //Fragment Brush
     std::vector<std::string> fragment_sources;
 
-    void InitShaders();
+    void initShaders();
     void FragmentShader();
 
 public:
@@ -194,7 +194,7 @@ FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma_r,
     ms->generateTexture();
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 FilterGLBilateral2DS::~FilterGLBilateral2DS()
@@ -337,7 +337,7 @@ void FilterGLBilateral2DS::FragmentShader()
     fragment_sources.push_back(fragment_source_brush);
 }
 
-void FilterGLBilateral2DS::InitShaders()
+void FilterGLBilateral2DS::initShaders()
 {
 #ifdef PIC_DEBUG
     printf("Number of samples: %d\n", ms->nSamples);

@@ -26,9 +26,9 @@ namespace pic {
 class FilterGLGaussian3D: public FilterGLNPasses
 {
 protected:
-    FilterGLGaussian1D		*filter;
+    FilterGLGaussian1D *filter;
 
-    void InitShaders() {}
+    void initShaders() {}
     void FragmentShader() {}
 
 public:

@@ -29,9 +29,9 @@ class FilterGLIterative: public FilterGL
 {
 protected:
     ImageGL *imgTmp[2];
-    int			iterations;
+    int iterations;
 
-    void InitShaders() {}
+    void initShaders() {}
     void FragmentShader() {}
 
 public:

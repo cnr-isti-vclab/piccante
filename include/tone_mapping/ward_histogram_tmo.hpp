@@ -25,90 +25,117 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**
- * @brief WardHistogramTMO
- * @param imgIn
- * @param imgOut
- * @param nBin
- * @param LdMax
- * @param LdMin
- * @return
- */
-inline Image *WardHistogramTMO(Image *imgIn, Image *imgOut = NULL,
-                                  int nBin = 256, float LdMax = 100.0f, float LdMin = 1.0f)
+class WardHistogramTMO
 {
-    if(imgIn == NULL) {
-        return NULL;
-    }
-
-    if(imgOut == NULL) {
-        imgOut = imgIn->clone();
-    }
-
-    if(LdMax <= 0.0f) {
-        LdMax = 100.0f;
-    }
-
-    if(LdMin <= 0.0f) {
-        LdMin = 1.0f;
-    }
-
-    int maxCoord = MAX(imgIn->width, imgIn->height);
-
-    float maxCoordf       = 2.0f * float(maxCoord) * 0.75f;
-    float viewAngleWidth  = 2.0f * atanf(imgIn->width / maxCoordf);
-    float viewAngleHeight = 2.0f * atanf(imgIn->height / maxCoordf);
-
-    int fScaleX = int((2.0f * tanf(viewAngleWidth / 2.0f) / 0.01745f));
-    int fScaleY = int((2.0f * tanf(viewAngleHeight / 2.0f) / 0.01745f));
-
-    Image *L = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
-
+protected:
+    int nBin;
+    float LdMin, LdMax;
     ImageSamplerBilinear isb;
-    Image *Lscaled = FilterSampler2D::execute(L, NULL, fScaleX, fScaleY, &isb);
 
-    float LMin = Lscaled->getGT(0.0f);
-    float LMax = Lscaled->getMaxVal()[0];
-    float LlMax = logf(LMax);
-    float LlMin = logf(LMin);
+public:
 
-    float LldMax = logf(LdMax);
-    float LldMin = logf(LdMin);
-
-    Histogram h;
-    h.calculate(Lscaled, VS_LOG_E, nBin);
-    h.ceiling();
-
-    unsigned int *Pcum = NULL;
-    Pcum = Array<unsigned int>::cumsum(h.bin, Pcum, nBin);
-    float  maxPcumf = float(Pcum[nBin - 1]);
-    float *PcumNorm = new float[nBin];
-    float *x        = new float[nBin];
-
-    for(int i = 0; i < nBin; i++) {
-        PcumNorm[i] = float(Pcum[i]) / maxPcumf;
-        x[i] = (LlMax - LlMin) * float(i) / float(nBin - 1) + LlMin;
+    /**
+     * @brief WardHistogramTMO
+     * @param nBin
+     * @param LdMin
+     * @param LdMax
+     */
+    WardHistogramTMO(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f)
+    {
+        update(nBin, LdMin, LdMax);
     }
 
-    #pragma omp parallel for
-    for(int i = 0; i < L->size(); i++) {
-        float tmp_L =  L->data[i];
-        float LLog = logf(tmp_L);
-        float Ld = expf(LldMin + (LldMax - LldMin) * Array<float>::interp(x, PcumNorm, nBin, LLog));
-        float L_old = tmp_L;
-        L->data[i] = (Ld - LdMin) / ((LdMax - LdMin) * L_old);
+    /**
+     * @brief update
+     * @param nBin
+     * @param LdMin
+     * @param LdMax
+     */
+    void update(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f)
+    {
+        this->nBin = nBin > 1 ? nBin : 256;
+        this->LdMax = LdMax > 0.0f ? LdMax : 100.0f;
+        this->LdMin = LdMin > 0.0f ? LdMin : 1.0f;
+
+        if(this->LdMin > this->LdMax) {
+            LdMin = 1.0f;
+            LdMax = 100.0f;
+        }
+
     }
 
-    *imgOut *= *L;
-    imgOut->removeSpecials();
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *execute(Image *imgIn, Image *imgOut = NULL)
+    {
+        if(imgIn == NULL) {
+            return NULL;
+        }
 
-    delete L;
-    delete[] Pcum;
-    delete[] x;
-    delete[] PcumNorm;
+        if(imgOut == NULL) {
+            imgOut = imgIn->clone();
+        }
 
-    return imgOut;
-}
+        int maxCoord = MAX(imgIn->width, imgIn->height);
+
+        float maxCoordf       = 2.0f * float(maxCoord) * 0.75f;
+        float viewAngleWidth  = 2.0f * atanf(imgIn->width / maxCoordf);
+        float viewAngleHeight = 2.0f * atanf(imgIn->height / maxCoordf);
+
+        int fScaleX = int((2.0f * tanf(viewAngleWidth / 2.0f) / 0.01745f));
+        int fScaleY = int((2.0f * tanf(viewAngleHeight / 2.0f) / 0.01745f));
+
+        Image *L = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
+
+        Image *Lscaled = FilterSampler2D::execute(L, NULL, fScaleX, fScaleY, &isb);
+
+        float LMin = Lscaled->getGT(0.0f);
+        float LMax = Lscaled->getMaxVal()[0];
+        float LlMax = logf(LMax);
+        float LlMin = logf(LMin);
+
+        float LldMax = logf(LdMax);
+        float LldMin = logf(LdMin);
+
+        Histogram h;
+        h.calculate(Lscaled, VS_LOG_E, nBin);
+        h.ceiling();
+
+        unsigned int *Pcum = NULL;
+        Pcum = Array<unsigned int>::cumsum(h.bin, Pcum, nBin);
+        float  maxPcumf = float(Pcum[nBin - 1]);
+        float *PcumNorm = new float[nBin];
+        float *x        = new float[nBin];
+
+        for(int i = 0; i < nBin; i++) {
+            PcumNorm[i] = float(Pcum[i]) / maxPcumf;
+            x[i] = (LlMax - LlMin) * float(i) / float(nBin - 1) + LlMin;
+        }
+
+        #pragma omp parallel for
+        for(int i = 0; i < L->size(); i++) {
+            float tmp_L =  L->data[i];
+            float LLog = logf(tmp_L);
+            float Ld = expf(LldMin + (LldMax - LldMin) * Array<float>::interp(x, PcumNorm, nBin, LLog));
+            float L_old = tmp_L;
+            L->data[i] = (Ld - LdMin) / ((LdMax - LdMin) * L_old);
+        }
+
+        *imgOut *= *L;
+        imgOut->removeSpecials();
+
+        delete L;
+        delete[] Pcum;
+        delete[] x;
+        delete[] PcumNorm;
+
+        return imgOut;
+    }
+};
 
 } // end namespace pic
 

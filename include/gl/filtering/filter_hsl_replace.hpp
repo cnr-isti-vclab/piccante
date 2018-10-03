@@ -29,13 +29,12 @@ namespace pic {
 class FilterGLHSLReplace: public FilterGL
 {
 protected:
-    float delta_hue;
-    float delta_saturation;
+    float delta_hue, delta_saturation;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
     /**
@@ -61,10 +60,10 @@ FilterGLHSLReplace::FilterGLHSLReplace(float delta_hue,
 {
     this->delta_hue = delta_hue;
     this->delta_saturation = delta_saturation;
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLHSLReplace::InitShaders()
+void FilterGLHSLReplace::initShaders()
 {
     fragment_source = MAKE_STRING
                       (

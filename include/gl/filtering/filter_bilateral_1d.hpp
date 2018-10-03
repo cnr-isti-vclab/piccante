@@ -28,9 +28,9 @@ namespace pic {
 class FilterGLBilateral1D: public FilterGL1D
 {
 protected:
-    float	sigma_s, sigma_r;
+    float sigma_s, sigma_r;
 
-    void InitShaders();
+    void initShaders();
     void FragmentShader();
 
 public:
@@ -96,7 +96,7 @@ FilterGLBilateral1D::FilterGLBilateral1D(float sigma_s, float sigma_r,
     this->sigma_r = sigma_r;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLBilateral1D::FragmentShader()
@@ -190,7 +190,7 @@ void FilterGLBilateral1D::FragmentShader()
     }
 }
 
-void FilterGLBilateral1D::InitShaders()
+void FilterGLBilateral1D::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral1D");
 

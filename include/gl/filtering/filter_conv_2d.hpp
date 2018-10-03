@@ -45,9 +45,9 @@ public:
     FilterGLConv2D(GLenum target);
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief SetUniform
@@ -72,10 +72,10 @@ FilterGLConv2D::FilterGLConv2D(GLenum target): FilterGL()
     this->target = target;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLConv2D::InitShaders()
+void FilterGLConv2D::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLConv2D");
 

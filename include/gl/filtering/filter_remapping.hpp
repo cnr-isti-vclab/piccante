@@ -30,9 +30,9 @@ class FilterGLRemapping: public FilterGL
 protected:
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
     /**
@@ -43,10 +43,10 @@ public:
 
 FilterGLRemapping::FilterGLRemapping(): FilterGL()
 {
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLRemapping::InitShaders()
+void FilterGLRemapping::initShaders()
 {
     /*	0 ---> Drago et al. 2003
     	1 ---> Reinhard et al. 2002

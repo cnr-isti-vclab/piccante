@@ -29,9 +29,9 @@ class FilterGLBlend: public FilterGL
 {
 protected:
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -50,7 +50,7 @@ FilterGLBlend::FilterGLBlend(): FilterGL()
 {
     //protected values are assigned/computed
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLBlend::FragmentShader()
@@ -73,7 +73,7 @@ void FilterGLBlend::FragmentShader()
                       );
 }
 
-void FilterGLBlend::InitShaders()
+void FilterGLBlend::initShaders()
 {
     FragmentShader();
 

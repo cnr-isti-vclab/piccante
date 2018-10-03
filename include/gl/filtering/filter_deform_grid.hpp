@@ -37,9 +37,9 @@ protected:
     ImageGL *grid_diff_gl;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
     /**
@@ -81,10 +81,10 @@ FilterGLDeformGrid::FilterGLDeformGrid(Image *grid_move): FilterGL()
     grid_diff_gl->generateTextureGL();
     param.push_back(grid_diff_gl);
 
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLDeformGrid::InitShaders()
+void FilterGLDeformGrid::initShaders()
 {
     fragment_source  = GLSL_BICUBIC();
     fragment_source += GLSL_TEXTURE_BICUBIC();

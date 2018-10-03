@@ -33,9 +33,9 @@ protected:
     float sigma_s, sigma_r;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -113,7 +113,7 @@ FilterGLBilateral2DF::FilterGLBilateral2DF(float sigma_s,
     this->sigma_r = sigma_r;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLBilateral2DF::FragmentShader()
@@ -156,7 +156,7 @@ void FilterGLBilateral2DF::FragmentShader()
                       );
 }
 
-void FilterGLBilateral2DF::InitShaders()
+void FilterGLBilateral2DF::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral2DF");
 

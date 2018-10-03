@@ -29,9 +29,9 @@ class FilterGLExposureFusionWeights: public FilterGL
 {
 protected:
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -62,7 +62,7 @@ public:
         //protected values are assigned/computed
         FragmentShader();
 
-        InitShaders();
+        initShaders();
     }
 };
 
@@ -110,7 +110,7 @@ void FilterGLExposureFusionWeights::FragmentShader()
                       );
 }
 
-void FilterGLExposureFusionWeights::InitShaders()
+void FilterGLExposureFusionWeights::initShaders()
 {
     FragmentShader();
 

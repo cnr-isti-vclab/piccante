@@ -27,10 +27,10 @@ class FilterGLOp: public FilterGL
 {
 protected:
     std::string op;
-    float		c0[4], c1[4];
-    bool		bTexelFetch;
+    float c0[4], c1[4];
+    bool bTexelFetch;
 
-    void InitShaders();
+    void initShaders();
 
 public:
 
@@ -197,10 +197,10 @@ FilterGLOp::FilterGLOp(std::string op, bool bTexelFetch = false,
         vertex_source = QuadGL::getVertexProgramWithTexCoordinates();
     }
 
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLOp::InitShaders()
+void FilterGLOp::initShaders()
 {
     std::string strOp = "ret = ";
     strOp.append(op);

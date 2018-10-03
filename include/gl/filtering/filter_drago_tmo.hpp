@@ -34,14 +34,14 @@ protected:
     bool bGammaCorrection;
 
     /**
-     * @brief ComputeConstants
+     * @brief computeConstants
      */
-    void ComputeConstants();
+    void computeConstants();
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -85,7 +85,7 @@ FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()
     bGammaCorrection = false;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 FilterGLDragoTMO::FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
@@ -119,7 +119,7 @@ FilterGLDragoTMO::FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
     this->bGammaCorrection = bGammaCorrection;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLDragoTMO::FragmentShader()
@@ -153,7 +153,7 @@ void FilterGLDragoTMO::FragmentShader()
     fragment_source = GammaCorrection(fragment_source, bGammaCorrection);
 }
 
-void FilterGLDragoTMO::ComputeConstants()
+void FilterGLDragoTMO::computeConstants()
 {
     Lwa_scaled  = Lwa / powf(1.0f + b - 0.85f, 5.0f);
     LMax_scaled = LMax / Lwa_scaled;
@@ -161,7 +161,7 @@ void FilterGLDragoTMO::ComputeConstants()
     constant2   = (Ld_Max / 100.0f) / (log10(1 + LMax_scaled));
 }
 
-void FilterGLDragoTMO::InitShaders()
+void FilterGLDragoTMO::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLDragoTMO");
     update(Ld_Max, b, LMax, Lwa);
@@ -193,7 +193,7 @@ void FilterGLDragoTMO::update(float Ld_Max, float b, float LMax, float Lwa)
         this->Lwa = 1.0f;
     }
 
-    ComputeConstants();
+    computeConstants();
 
     technique.bind();
     technique.setUniform1i("u_tex", 0);

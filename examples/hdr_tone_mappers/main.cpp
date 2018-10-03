@@ -90,7 +90,8 @@ int main(int argc, char *argv[])
 
 
         printf("Tone mapping using Ward Histogram Adjustment TMO...");
-        pic::Image *img_tmo_ward = pic::WardHistogramTMO(&img);
+        pic::WardHistogramTMO wtmo;
+        pic::Image *img_tmo_ward = wtmo.execute(&img);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.

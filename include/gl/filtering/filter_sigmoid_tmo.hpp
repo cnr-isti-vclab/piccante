@@ -33,9 +33,9 @@ protected:
     bool  bGammaCorrection, bLocal;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -70,7 +70,7 @@ FilterGLSigmoidTMO::FilterGLSigmoidTMO(): FilterGL()
     bLocal = false;
     epsilon = 1.0f;
 
-    InitShaders();
+    initShaders();
 }
 
 FilterGLSigmoidTMO::FilterGLSigmoidTMO(float alpha, bool bLocal,
@@ -81,7 +81,7 @@ FilterGLSigmoidTMO::FilterGLSigmoidTMO(float alpha, bool bLocal,
     this->bGammaCorrection = bGammaCorrection;
     epsilon = 1.0f;
 
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLSigmoidTMO::FragmentShader()
@@ -133,7 +133,7 @@ void FilterGLSigmoidTMO::FragmentShader()
     fragment_source = GammaCorrection(fragment_source, bGammaCorrection);
 }
 
-void FilterGLSigmoidTMO::InitShaders()
+void FilterGLSigmoidTMO::initShaders()
 {
     FragmentShader();
 

@@ -30,9 +30,9 @@ class FilterGLChannel: public FilterGL
 {
 protected:
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     int channel;
 
@@ -121,10 +121,10 @@ FilterGLChannel::FilterGLChannel(int channel) : FilterGL()
 {
     setChannel(channel);
 
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLChannel::InitShaders()
+void FilterGLChannel::initShaders()
 {
     fragment_source = MAKE_STRING
                       (

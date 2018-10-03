@@ -32,9 +32,9 @@ class FilterGLAnaglyph: public FilterGL
 protected:
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
     /**
@@ -45,10 +45,10 @@ public:
 
 PIC_INLINE FilterGLAnaglyph::FilterGLAnaglyph(): FilterGL()
 {
-    InitShaders();
+    initShaders();
 }
 
-PIC_INLINE void FilterGLAnaglyph::InitShaders()
+PIC_INLINE void FilterGLAnaglyph::initShaders()
 {
     fragment_source = MAKE_STRING
                       (

@@ -35,10 +35,9 @@ protected:
 
     //Sampling map
     FilterGLSamplingMap *fGLsm;
+    ImageGL *imgTmp;
 
-    ImageGL			*imgTmp;
-
-    void InitShaders();
+    void initShaders();
     void FragmentShader();
 
 public:
@@ -169,7 +168,7 @@ FilterGLBilateral2DAS::FilterGLBilateral2DAS(float sigma_s,
     ms->generateLevelsRTexture();
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLBilateral2DAS::FragmentShader()
@@ -244,7 +243,7 @@ void FilterGLBilateral2DAS::FragmentShader()
                       );
 }
 
-void FilterGLBilateral2DAS::InitShaders()
+void FilterGLBilateral2DAS::initShaders()
 {
 #ifdef PIC_DEBUG
     printf("Number of samples: %d\n", ms->nSamples / 2);

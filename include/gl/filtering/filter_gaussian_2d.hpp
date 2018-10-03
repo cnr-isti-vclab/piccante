@@ -31,7 +31,7 @@ class FilterGLGaussian2D: public FilterGLNPasses
 protected:
     FilterGLGaussian1D		*filter;
 
-    void InitShaders() {}
+    void initShaders() {}
     void FragmentShader() {}
 
 public:

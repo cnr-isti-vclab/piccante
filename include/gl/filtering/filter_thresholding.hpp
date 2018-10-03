@@ -28,7 +28,7 @@ namespace pic {
 class FilterGLThresholding: public FilterGL
 {
 protected:
-    void InitShaders();
+    void initShaders();
 
     void FragmentShader();
 
@@ -67,7 +67,7 @@ FilterGLThresholding::FilterGLThresholding(): FilterGL()
 {
     //protected values are assigned/computed
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLThresholding::FragmentShader()
@@ -96,7 +96,7 @@ void FilterGLThresholding::FragmentShader()
                       );
 }
 
-void FilterGLThresholding::InitShaders()
+void FilterGLThresholding::initShaders()
 {
     FragmentShader();
 

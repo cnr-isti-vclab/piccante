@@ -36,9 +36,9 @@ protected:
     float sigma_r;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
 
@@ -92,10 +92,10 @@ FilterGLDisp::FilterGLDisp(): FilterGL()
     sigma = 2.0f;
     sigma_s = 2.0f;
     sigma_r = 0.05f;
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLDisp::InitShaders()
+void FilterGLDisp::initShaders()
 {
     fragment_source = MAKE_STRING
                       (

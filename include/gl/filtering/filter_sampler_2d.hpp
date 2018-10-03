@@ -31,9 +31,9 @@ protected:
     float scale;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
     /**
@@ -85,10 +85,10 @@ public:
 FilterGLSampler2D::FilterGLSampler2D(float scale): FilterGL()
 {
     this->scale = scale;
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLSampler2D::InitShaders()
+void FilterGLSampler2D::initShaders()
 {
     fragment_source = MAKE_STRING
                       (

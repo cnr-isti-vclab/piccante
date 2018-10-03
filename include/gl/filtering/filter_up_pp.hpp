@@ -32,9 +32,9 @@ protected:
     float threshold, *value;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
     /**
@@ -63,11 +63,11 @@ FilterGLUpPP::FilterGLUpPP(float *value, float threshold): FilterGL()
 {
     value = NULL;
 
-    InitShaders();
+    initShaders();
     update(value, threshold);
 }
 
-void FilterGLUpPP::InitShaders()
+void FilterGLUpPP::initShaders()
 {
     fragment_source = MAKE_STRING
                       (

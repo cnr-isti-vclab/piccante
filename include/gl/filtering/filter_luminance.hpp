@@ -34,9 +34,9 @@ protected:
     float weights[3];
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
     /**
@@ -99,17 +99,17 @@ FilterGLLuminance::FilterGLLuminance(): FilterGL()
 {
     this->type = LT_CIE_LUMINANCE;
 
-    InitShaders();
+    initShaders();
 }
 
 FilterGLLuminance::FilterGLLuminance(LUMINANCE_TYPE type): FilterGL()
 {
     this->type = type;
 
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLLuminance::InitShaders()
+void FilterGLLuminance::initShaders()
 {
     fragment_source = MAKE_STRING
                       (

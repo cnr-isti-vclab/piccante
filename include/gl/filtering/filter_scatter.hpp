@@ -31,9 +31,9 @@ class FilterGLScatter: public FilterGL
 {
 protected:
 
-    GLfloat		*vertex_array;
-    int			nVertex_array;
-    GLuint		vbo, vao;
+    GLfloat *vertex_array;
+    int nVertex_array;
+    GLuint vbo, vao;
 
     /**
      * @brief GenerateVA
@@ -43,9 +43,9 @@ protected:
     void GenerateVA(int width, int height);
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -91,7 +91,7 @@ FilterGLScatter::FilterGLScatter(float s_S, float s_R, int width, int height)
     GenerateVA(width, height);
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 FilterGLScatter::~FilterGLScatter()
@@ -207,7 +207,7 @@ void FilterGLScatter::FragmentShader()
                       );
 }
 
-void FilterGLScatter::InitShaders()
+void FilterGLScatter::initShaders()
 {
     technique.initStandard("410", vertex_source, fragment_source, geometry_source, "FilterGLScatter");
 

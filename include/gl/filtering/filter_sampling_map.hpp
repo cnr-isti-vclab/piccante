@@ -32,14 +32,14 @@ namespace pic {
 class FilterGLSamplingMap: public FilterGLNPasses
 {
 protected:
-    float					scale, sigma;
+    float scale, sigma;
 
-    FilterGLGradient		*filterG;
-    FilterGLSigmoidTMO		*filterS;
-    FilterGLSampler2D		*filterD;
-    FilterGLGaussian2D		*filterG2D;
+    FilterGLGradient *filterG;
+    FilterGLSigmoidTMO *filterS;
+    FilterGLSampler2D *filterD;
+    FilterGLGaussian2D *filterG2D;
 
-    void InitShaders() {}
+    void initShaders() {}
 
     void FragmentShader() {}
 

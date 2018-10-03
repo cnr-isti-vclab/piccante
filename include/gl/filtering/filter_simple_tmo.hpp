@@ -30,7 +30,7 @@ class FilterGLSimpleTMO: public FilterGL
 protected:
     float fstop, gamma;
 
-    void InitShaders();
+    void initShaders();
 
     void FragmentShader();
 
@@ -96,7 +96,7 @@ FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
     fstop = 0.0f;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 FilterGLSimpleTMO::FilterGLSimpleTMO(float gamma, float fstop): FilterGL()
@@ -110,7 +110,7 @@ FilterGLSimpleTMO::FilterGLSimpleTMO(float gamma, float fstop): FilterGL()
     this->fstop = fstop;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLSimpleTMO::FragmentShader()
@@ -132,7 +132,7 @@ void FilterGLSimpleTMO::FragmentShader()
                       );
 }
 
-void FilterGLSimpleTMO::InitShaders()
+void FilterGLSimpleTMO::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLSimpleTMO");
 

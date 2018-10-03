@@ -28,7 +28,7 @@ namespace pic {
 class FilterGLAnisotropicDiffusion: public FilterGL
 {
 protected:
-    void InitShaders();
+    void initShaders();
     void FragmentShader();
 
     float delta_t, k;
@@ -76,7 +76,7 @@ PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float k,
 
     //protected values are assigned/computed
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigma_r,
@@ -95,7 +95,7 @@ PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigm
 
     //protected values are assigned/computed
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 PIC_INLINE void FilterGLAnisotropicDiffusion::FragmentShader()
@@ -139,7 +139,7 @@ PIC_INLINE void FilterGLAnisotropicDiffusion::FragmentShader()
                       );
 }
 
-PIC_INLINE void FilterGLAnisotropicDiffusion::InitShaders()
+PIC_INLINE void FilterGLAnisotropicDiffusion::initShaders()
 {
     FragmentShader();
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLAnisotropicDiffusion");

@@ -75,7 +75,7 @@ FilterGLConv1D::FilterGLConv1D(ImageGL *weights, int direction,
     this->weights = weights;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLConv1D::FragmentShader()

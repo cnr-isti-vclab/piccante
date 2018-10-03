@@ -37,9 +37,9 @@ protected:
     ImageGL *imageRand;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -204,7 +204,7 @@ FilterGLBilateral2DSE::FilterGLBilateral2DSE(float sigma_s, float sigma_p, float
     ms->generateTexture();
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 FilterGLBilateral2DSE::~FilterGLBilateral2DSE()
@@ -272,7 +272,7 @@ void FilterGLBilateral2DSE::FragmentShader()
 
 }
 
-void FilterGLBilateral2DSE::InitShaders()
+void FilterGLBilateral2DSE::initShaders()
 {
 #ifdef PIC_DEBUG
     printf("Number of samples: %d\n", ms->nSamples);

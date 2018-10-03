@@ -41,7 +41,7 @@ protected:
     ImageGL			*imgFrame;
     ImageGL			*imgTmp;
 
-    void InitShaders();
+    void initShaders();
     void FragmentShader();
 
 public:
@@ -148,7 +148,7 @@ FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
     ms->generateLevelsRTexture();
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLBilateral3DAS::FragmentShader()
@@ -227,7 +227,7 @@ void FilterGLBilateral3DAS::FragmentShader()
                       );
 }
 
-void FilterGLBilateral3DAS::InitShaders()
+void FilterGLBilateral3DAS::initShaders()
 {
     printf("Number of samples: %d\n", ms->nSamples / 2);
 

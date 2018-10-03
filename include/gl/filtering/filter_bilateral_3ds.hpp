@@ -37,9 +37,9 @@ protected:
     ImageGL *imageRand;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -141,7 +141,7 @@ FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
 #endif
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLBilateral3DS::FragmentShader()
@@ -191,7 +191,7 @@ void FilterGLBilateral3DS::FragmentShader()
                       );
 }
 
-void FilterGLBilateral3DS::InitShaders()
+void FilterGLBilateral3DS::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral3DS");
 

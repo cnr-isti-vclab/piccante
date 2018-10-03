@@ -28,7 +28,7 @@ protected:
     ImageGL *imgAllocated;
     ImageGL *imgTmp[2];
 
-    void InitShaders() {}
+    void initShaders() {}
     void FragmentShader() {}
 
 public:

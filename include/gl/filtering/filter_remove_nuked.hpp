@@ -31,9 +31,9 @@ protected:
     float threshold;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -59,7 +59,7 @@ FilterGLRemoveNuked::FilterGLRemoveNuked(float threshold): FilterGL()
     this->threshold = threshold;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLRemoveNuked::FragmentShader()
@@ -109,7 +109,7 @@ void FilterGLRemoveNuked::FragmentShader()
                       );
 }
 
-void FilterGLRemoveNuked::InitShaders()
+void FilterGLRemoveNuked::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLRemoveNuked");
 

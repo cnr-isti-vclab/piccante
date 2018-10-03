@@ -39,7 +39,7 @@ protected:
     //Random numbers tile
     ImageGL *imageRand;
 
-    void InitShaders();
+    void initShaders();
     void FragmentShader();
 
 public:
@@ -111,7 +111,7 @@ FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, float phi = 
     ms->generateTexture();
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 FilterGLReinhardSinglePass::~FilterGLReinhardSinglePass()
@@ -185,7 +185,7 @@ void FilterGLReinhardSinglePass::FragmentShader()
 
 }
 
-void FilterGLReinhardSinglePass::InitShaders()
+void FilterGLReinhardSinglePass::initShaders()
 {
 #ifdef PIC_DEBUG
     printf("Number of samples: %d\n", ms->nSamples);

@@ -31,12 +31,12 @@ namespace pic {
 class FilterGLBilateral2DSP: public FilterGLNPasses
 {
 protected:
-    FilterGLBilateral1D		*filter;
+    FilterGLBilateral1D *filter;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders()
+    void initShaders()
     {
 
     }

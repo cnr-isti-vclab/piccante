@@ -29,9 +29,9 @@ class FilterGLGradient: public FilterGL
 {
 protected:
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -74,7 +74,7 @@ FilterGLGradient::FilterGLGradient(): FilterGL()
 {
     //protected values are assigned/computed
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLGradient::FragmentShader()
@@ -98,7 +98,7 @@ void FilterGLGradient::FragmentShader()
                       );
 }
 
-void FilterGLGradient::InitShaders()
+void FilterGLGradient::initShaders()
 {
     FragmentShader();
 

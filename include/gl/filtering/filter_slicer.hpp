@@ -29,7 +29,7 @@ class FilterGLSlicer: public FilterGL
 {
 protected:
 
-    void InitShaders();
+    void initShaders();
     void FragmentShader();
 
     float s_S, s_R, mul_E;
@@ -56,7 +56,7 @@ FilterGLSlicer::FilterGLSlicer(float s_S, float s_R): FilterGL()
     this->s_R = s_R;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLSlicer::FragmentShader()
@@ -91,7 +91,7 @@ void FilterGLSlicer::FragmentShader()
                       );
 }
 
-void FilterGLSlicer::InitShaders()
+void FilterGLSlicer::initShaders()
 {
     technique.initStandard("400", vertex_source, fragment_source, "FilterGLSlicer");
 

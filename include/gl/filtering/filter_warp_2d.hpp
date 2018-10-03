@@ -37,9 +37,9 @@ protected:
     bool bSameSize, bCentroid;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
 
@@ -70,7 +70,7 @@ public:
 
 FilterGLWarp2D::FilterGLWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false) : FilterGL()
 {
-    InitShaders();
+    initShaders();
 
     update(h, bSameSize, bCentroid);
 }
@@ -88,7 +88,7 @@ void FilterGLWarp2D::update(Matrix3x3 h, bool bSameSize = false, bool bCentroid 
     technique.unbind();
 }
 
-void FilterGLWarp2D::InitShaders()
+void FilterGLWarp2D::initShaders()
 {
     //fragment program
     fragment_source = MAKE_STRING

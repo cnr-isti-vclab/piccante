@@ -30,15 +30,14 @@ namespace pic {
 class FilterGL1D: public FilterGL
 {
 protected:
-    ImageGL	*weights;
+    ImageGL *weights;
 
-    int			dirs[3];
-    int			slice;
+    int dirs[3], slice;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -171,7 +170,7 @@ PIC_INLINE void FilterGL1D::SetUniform()
     technique.unbind();
 }
 
-PIC_INLINE void FilterGL1D::InitShaders()
+PIC_INLINE void FilterGL1D::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLConv1D");
 

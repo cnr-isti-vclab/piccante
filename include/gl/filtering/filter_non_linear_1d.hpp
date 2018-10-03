@@ -129,7 +129,7 @@ public:
         Setup(kernelSize);
 
         FragmentShader(NULL, 0, GL_TEXTURE_2D);
-        InitShaders();
+        initShaders();
     }
 
     ~FilterGLNonLinear1D()

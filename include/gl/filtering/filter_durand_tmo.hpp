@@ -33,9 +33,9 @@ protected:
     bool bGammaCorrection;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -74,7 +74,7 @@ FilterGLDurandTMO::FilterGLDurandTMO() : FilterGL()
     this->bGammaCorrection = false;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 FilterGLDurandTMO::FilterGLDurandTMO(float compression_factor, float log_absolute,
@@ -86,7 +86,7 @@ FilterGLDurandTMO::FilterGLDurandTMO(float compression_factor, float log_absolut
     this->bGammaCorrection = bGammaCorrection;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLDurandTMO::FragmentShader()
@@ -120,7 +120,7 @@ void FilterGLDurandTMO::FragmentShader()
     fragment_source = GammaCorrection(fragment_source, bGammaCorrection);
 }
 
-void FilterGLDurandTMO::InitShaders()
+void FilterGLDurandTMO::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLDurandTMO");
 
