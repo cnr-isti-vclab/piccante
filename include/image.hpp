@@ -1157,8 +1157,8 @@ PIC_INLINE void Image::applyFunction(float(*func)(float))
     }
 
     int size = width * height * channels;
-    #pragma omp parallel for
 
+    #pragma omp parallel for
     for(int i = 0; i < size; i++) {
         data[i] = (*func)(data[i]);
     }

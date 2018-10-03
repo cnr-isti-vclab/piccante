@@ -47,7 +47,7 @@ PIC_INLINE Image *computeGrowCut(Image *img, Image *seeds, Image *state_cur = NU
     Image *state_next = state_cur->allocateSimilarOne();
 
     //computing max
-    Image *img_max = FilterMax::Execute(img, NULL, 5);
+    Image *img_max = FilterMax::execute(img, NULL, 5);
 
     for(int i = 0; i < state_cur->nPixels(); i++) {
         //init state_cur

@@ -100,30 +100,30 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param kernelSize
      * @return
      */
-    static ImageGL *Execute(ImageGL *imgIn, ImageGL *imgOut, int kernelSize)
+    static ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut, int kernelSize)
     {
         FilterGLMean filter(kernelSize);
         return filter.Process(SingleGL(imgIn), imgOut);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param kernelSize
      * @return
      */
-    static Image *Execute(std::string nameIn, std::string nameOut, int kernelSize)
+    static Image *execute(std::string nameIn, std::string nameOut, int kernelSize)
     {
         ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-        ImageGL *imgOut = Execute(&imgIn, NULL, kernelSize);
+        ImageGL *imgOut = execute(&imgIn, NULL, kernelSize);
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
         return imgOut;

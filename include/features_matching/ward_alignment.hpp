@@ -115,7 +115,7 @@ public:
             bDelete = false;
             L = img;
         } else {
-            L = FilterLuminance::Execute(img, L, LT_WARD_LUMINANCE);
+            L = FilterLuminance::execute(img, L, LT_WARD_LUMINANCE);
         }
 
         int n = L->nPixels();
@@ -162,14 +162,14 @@ public:
         if(img1->channels == 1) {
             L1 = img1;
         } else {
-            L1 = FilterLuminance::Execute(img1, NULL, LT_WARD_LUMINANCE);
+            L1 = FilterLuminance::execute(img1, NULL, LT_WARD_LUMINANCE);
             luminance.push_back(L1);
         }
 
         if(img2->channels == 1) {
             L2 = img2;
         } else {
-            L2 = FilterLuminance::Execute(img2, NULL, LT_WARD_LUMINANCE);
+            L2 = FilterLuminance::execute(img2, NULL, LT_WARD_LUMINANCE);
             luminance.push_back(L2);
         }
 
@@ -187,8 +187,8 @@ public:
         Image *tmp_1 = L1;
         Image *tmp_2 = L2;
         for(int i=0; i< shift_bits; i++) {
-            Image* sml_img1 = FilterDownSampler2D::Execute(tmp_1, NULL, 0.5f);
-            Image* sml_img2 = FilterDownSampler2D::Execute(tmp_2, NULL, 0.5f);
+            Image* sml_img1 = FilterDownSampler2D::execute(tmp_1, NULL, 0.5f);
+            Image* sml_img2 = FilterDownSampler2D::execute(tmp_2, NULL, 0.5f);
 
             img1_v.push_back(sml_img1);
             img2_v.push_back(sml_img2);

@@ -94,13 +94,13 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param threshold_nuked
      * @return
      */
-    static Image* Execute(Image *imgIn, Image *imgOut, float threshold_nuked = 1e4)
+    static Image* execute(Image *imgIn, Image *imgOut, float threshold_nuked = 1e4)
     {
         FilterRemoveNuked filter(threshold_nuked);
         imgOut = filter.ProcessP(Single(imgIn), imgOut);
@@ -108,16 +108,16 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameFileIn
      * @param nameFileOut
      * @param threshold_nuked
      * @return
      */
-    static Image* Execute(std::string nameFileIn, std::string nameFileOut, float threshold_nuked = 1e4)
+    static Image* execute(std::string nameFileIn, std::string nameFileOut, float threshold_nuked = 1e4)
     {
         Image imgIn(nameFileIn);
-        Image *imgOut = Execute(&imgIn, NULL, threshold_nuked);
+        Image *imgOut = execute(&imgIn, NULL, threshold_nuked);
         imgOut->Write(nameFileOut);
 
         return imgOut;

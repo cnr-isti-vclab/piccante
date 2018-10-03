@@ -77,13 +77,13 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param colorChannel
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut = NULL, int colorChannel = 0)
+    static Image *execute(Image *imgIn, Image *imgOut = NULL, int colorChannel = 0)
     {
         FilterGradientHarrisOPT filter(colorChannel);
         return filter.ProcessP(Single(imgIn), imgOut);

@@ -141,7 +141,7 @@ public:
         }
 
         //Compute luminance
-        FilterLuminance::Execute(imgIn, imgOut, LT_CIE_LUMINANCE);
+        FilterLuminance::execute(imgIn, imgOut, LT_CIE_LUMINANCE);
 
         //Get min and max value
         maxVal = imgOut->getMaxVal()[0];

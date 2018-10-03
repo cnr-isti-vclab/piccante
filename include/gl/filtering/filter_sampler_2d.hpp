@@ -51,13 +51,13 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param scale
      * @return
      */
-    static ImageGL *Execute(std::string nameIn, std::string nameOut, float scale)
+    static ImageGL *execute(std::string nameIn, std::string nameOut, float scale)
     {
         ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(GL_TEXTURE_2D, false);

@@ -67,14 +67,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param gamma
      * @param fstop
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float gamma,
+    static Image *execute(Image *imgIn, Image *imgOut, float gamma,
                              float fstop)
     {
         FilterSimpleTMO filter(gamma, fstop);
@@ -82,18 +82,18 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param gamma
      * @param fstop
      * @return
      */
-    static Image *Execute(std::string nameIn, std::string nameOut, float gamma,
+    static Image *execute(std::string nameIn, std::string nameOut, float gamma,
                              float fstop)
     {
         Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, gamma, fstop);
+        Image *imgOut = execute(&imgIn, NULL, gamma, fstop);
         imgOut->Write(nameOut, LT_NOR_GAMMA, 0);
         return imgOut;
     }

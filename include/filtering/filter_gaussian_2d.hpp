@@ -38,7 +38,6 @@ public:
      */
     FilterGaussian2D(float sigma)
     {
-        //Gaussian filter
         gaussianFilter = new FilterGaussian1D(sigma);
 
         InsertFilter(gaussianFilter);
@@ -55,29 +54,29 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma)
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma)
     {
         FilterGaussian2D filter(sigma);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma
      * @return
      */
-    static Image *Execute(std::string nameIn, std::string nameOut, float sigma)
+    static Image *execute(std::string nameIn, std::string nameOut, float sigma)
     {
         Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, sigma);
+        Image *imgOut = execute(&imgIn, NULL, sigma);
         imgOut->Write(nameOut);
         return imgOut;
     }

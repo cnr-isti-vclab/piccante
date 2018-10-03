@@ -39,7 +39,6 @@ public:
      */
     FilterBilateral2DSP(float sigma_s, float sigma_r)
     {
-        //Bilatearl 1D Filter
         bilateralFilter = new FilterBilateral1D(sigma_s, sigma_r);
 
         InsertFilter(bilateralFilter);
@@ -71,14 +70,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma_s,
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma_s,
                              float sigma_r)
     {
         FilterBilateral2DSP filter(sigma_s, sigma_r);
@@ -86,18 +85,18 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static Image *Execute(std::string nameIn, std::string nameOut, float sigma_s,
+    static Image *execute(std::string nameIn, std::string nameOut, float sigma_s,
                              float sigma_r)
     {
         Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, sigma_s, sigma_r);
+        Image *imgOut = execute(&imgIn, NULL, sigma_s, sigma_r);
         imgOut->Write(nameOut);
         return imgOut;
     }

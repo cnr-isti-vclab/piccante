@@ -123,13 +123,13 @@ public:
     bool Read(std::string filename);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static Image *Execute(Image *imgIn,
+    static Image *execute(Image *imgIn,
                              float sigma_s, float sigma_r)
     {
         //Filtering
@@ -142,14 +142,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgEdge
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgEdge,
+    static Image *execute(Image *imgIn, Image *imgEdge,
                              float sigma_s, float sigma_r)
     {
         //Filtering
@@ -169,7 +169,7 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma_s
@@ -178,7 +178,7 @@ public:
      * @param mult
      * @return
      */
-    static Image *Execute(std::string nameIn,
+    static Image *execute(std::string nameIn,
                           std::string nameOut,
                           float sigma_s, float sigma_r,
                           SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
@@ -199,7 +199,7 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameIn2
      * @param nameOut
@@ -209,7 +209,7 @@ public:
      * @param mult
      * @return
      */
-    static Image *Execute(std::string nameIn,
+    static Image *execute(std::string nameIn,
                           std::string nameIn2,
                           std::string nameOut,
                           float sigma_s, float sigma_r,

@@ -93,14 +93,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma_1
      * @param sigma_2
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma_1,
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma_1,
                              float sigma_2)
     {
         FilterDiffGauss filter(sigma_1, sigma_2);
@@ -108,18 +108,18 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma_1
      * @param sigma_2
      * @return
      */
-    static Image *Execute(std::string nameIn, std::string nameOut, float sigma_1,
+    static Image *execute(std::string nameIn, std::string nameOut, float sigma_1,
                              float sigma_2)
     {
         Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, sigma_1, sigma_2);
+        Image *imgOut = execute(&imgIn, NULL, sigma_1, sigma_2);
         imgOut->Write(nameOut);
         return imgOut;
     }

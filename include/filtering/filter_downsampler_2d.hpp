@@ -39,7 +39,7 @@ protected:
     int width, height;
 
 
-    void Allocate()
+    void allocate()
     {
         flt[X_DIRECTION] = NULL;
         flt[Y_DIRECTION] = NULL;
@@ -79,14 +79,14 @@ public:
     void PreProcess(ImageVec imgIn, Image *imgOut);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param width
      * @param height
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, int width,
+    static Image *execute(Image *imgIn, Image *imgOut, int width,
                              int height)
     {
         FilterDownSampler2D flt(width, height);
@@ -94,14 +94,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param scaleX
      * @param scaleY
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float scaleX,
+    static Image *execute(Image *imgIn, Image *imgOut, float scaleX,
                              float scaleY)
     {
         FilterDownSampler2D flt(scaleX, scaleY);
@@ -109,13 +109,13 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param scaleXY
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float scaleXY)
+    static Image *execute(Image *imgIn, Image *imgOut, float scaleXY)
     {
         FilterDownSampler2D flt(scaleXY, scaleXY);
         return flt.ProcessP(Single(imgIn), imgOut);
@@ -140,7 +140,7 @@ PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(float scaleX, float scaleY =
     width  = -1;
     height = -1;
 
-    Allocate();
+    allocate();
 
     swh = true;
 }
@@ -158,7 +158,7 @@ PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(int width, int height) : Fil
         this->height = height;
     }
 
-    Allocate();
+    allocate();
 
     swh = (width < 1 ||  height < 1);
 }

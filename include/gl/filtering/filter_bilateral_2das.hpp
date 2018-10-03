@@ -54,9 +54,9 @@ public:
     //Processing
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
-    //Execute
-    //Execute
-    static ImageGL *Execute(ImageGL *imgIn, float sigma_s, float sigma_r)
+    //execute
+    //execute
+    static ImageGL *execute(ImageGL *imgIn, float sigma_s, float sigma_r)
     {
         FilterGLBilateral2DAS *filter = new FilterGLBilateral2DAS(sigma_s, sigma_r);
 
@@ -71,7 +71,7 @@ public:
         return imgOut;
     }
 
-    static ImageGL *Execute(std::string nameFile, std::string nameOut,
+    static ImageGL *execute(std::string nameFile, std::string nameOut,
                                float sigma_s, float sigma_r, int testing)
     {
         ImageGL imgIn(nameFile);

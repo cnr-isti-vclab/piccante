@@ -28,8 +28,7 @@ namespace pic {
 class FilterColorDistance: public Filter
 {
 protected:
-    float	*refColor;
-    float	sigma;
+    float *refColor, sigma;
 
     /**
      * @brief ProcessBBox
@@ -87,14 +86,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param color
      * @param sigma
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float *color,
+    static Image *execute(Image *imgIn, Image *imgOut, float *color,
                              float sigma)
     {
         FilterColorDistance fltColDst(color, sigma);
@@ -102,18 +101,18 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param fileInput
      * @param fileOutput
      * @param color
      * @param sigma
      * @return
      */
-    static Image *Execute(std::string fileInput, std::string fileOutput,
+    static Image *execute(std::string fileInput, std::string fileOutput,
                              float *color, float sigma)
     {
         Image imgIn(fileInput);
-        Image *out = FilterColorDistance::Execute(&imgIn, NULL, color, sigma);
+        Image *out = FilterColorDistance::execute(&imgIn, NULL, color, sigma);
         out->Write(fileOutput);
         return out;
     }

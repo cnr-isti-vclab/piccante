@@ -29,10 +29,9 @@ namespace pic {
 class FilterDiffGauss1D: public FilterConv1D
 {
 protected:
-    float               sigma1, sigma2;
+    float sigma1, sigma2;
     PrecomputedDiffOfGaussians *pdog;
-    bool                bpdogOwned;
-    int                 dirs[3];
+    bool bpdogOwned;
 
 public:
 
@@ -52,7 +51,7 @@ public:
 
     ~FilterDiffGauss1D();
 
-    static Image *Execute(Image *imgIn, Image *imgOut,
+    static Image *execute(Image *imgIn, Image *imgOut,
                           float sigma1, float sigma2,
                           int direction)
     {

@@ -46,12 +46,12 @@ PIC_INLINE Image *computeDivergence(Image *img, Image *div = NULL)
     float kernelDiv[] = { -1.0f, 1.0f, 0.0f};
 
     //compute the gradient of img
-    Image *img_dx = FilterConv1D::Execute(img, NULL, kernelGrad, 3, true);
-    Image *img_dy = FilterConv1D::Execute(img, NULL, kernelGrad, 3, false);
+    Image *img_dx = FilterConv1D::execute(img, NULL, kernelGrad, 3, true);
+    Image *img_dy = FilterConv1D::execute(img, NULL, kernelGrad, 3, false);
 
     //compute the divergence using backward differences
-    img_dx2 = FilterConv1D::Execute(img_dx, div ,   kernelDiv, 3, true);
-    img_dy2 = FilterConv1D::Execute(img_dy, img_dx, kernelDiv, 3, false);
+    img_dx2 = FilterConv1D::execute(img_dx, div ,   kernelDiv, 3, true);
+    img_dy2 = FilterConv1D::execute(img_dy, img_dx, kernelDiv, 3, false);
 
     *div += *img_dy2;
 

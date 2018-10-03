@@ -58,13 +58,13 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static ImageGL *Execute(ImageGL *imgIn, float sigma_s, float sigma_r)
+    static ImageGL *execute(ImageGL *imgIn, float sigma_s, float sigma_r)
     {
         FilterGLBilateral2DG *filter = new FilterGLBilateral2DG(sigma_s, sigma_r);
         GLuint testTQ1 = glBeginTimeQuery();
@@ -77,7 +77,7 @@ public:
         return imgOut;
     }
 
-    static ImageGL *Execute(std::string nameIn, std::string nameOut,
+    static ImageGL *execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r, int testing = 1)
     {
         Image tmp_imgIn(nameIn);

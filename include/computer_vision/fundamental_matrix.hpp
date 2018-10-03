@@ -346,8 +346,8 @@ PIC_INLINE  Eigen::Matrix3d estimateFundamentalFromImages(Image *img0,
     std::vector< Eigen::Vector2f > corners_from_img1;
 
     //compute the luminance images
-    Image *L0 = FilterLuminance::Execute(img0, NULL, LT_CIE_LUMINANCE);
-    Image *L1 = FilterLuminance::Execute(img1, NULL, LT_CIE_LUMINANCE);
+    Image *L0 = FilterLuminance::execute(img0, NULL, LT_CIE_LUMINANCE);
+    Image *L1 = FilterLuminance::execute(img1, NULL, LT_CIE_LUMINANCE);
 
     //extract corners
     HarrisCornerDetector hcd(2.5f, 5);
@@ -357,8 +357,8 @@ PIC_INLINE  Eigen::Matrix3d estimateFundamentalFromImages(Image *img0,
     //compute ORB descriptors for each corner and image
 
     //apply a gaussian filter to luminance images
-    Image *L0_flt = FilterGaussian2D::Execute(L0, NULL, 2.5f);
-    Image *L1_flt = FilterGaussian2D::Execute(L1, NULL, 2.5f);
+    Image *L0_flt = FilterGaussian2D::execute(L0, NULL, 2.5f);
+    Image *L1_flt = FilterGaussian2D::execute(L1, NULL, 2.5f);
 
     //compute ORB descriptor
     ORBDescriptor b_desc(31, 512);

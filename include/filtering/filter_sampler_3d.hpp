@@ -56,13 +56,13 @@ public:
     FilterSampler3D(float scale, ImageSampler *isb);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param in
      * @param isb
      * @param scale
      * @return
      */
-    static Image *Execute(Image *in, ImageSampler *isb, float scale)
+    static Image *execute(Image *in, ImageSampler *isb, float scale)
     {
         FilterSampler3D filterUp(scale, isb);
         Image *out = filterUp.Process(Single(in), NULL);

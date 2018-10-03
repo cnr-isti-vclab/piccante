@@ -87,25 +87,25 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param img
      * @param conv
      * @param imgOut
      * @return
      */
-    static Image *Execute(Image *img, Image *conv, Image *imgOut)
+    static Image *execute(Image *img, Image *conv, Image *imgOut)
     {
         FilterConv2D flt;
         return flt.ProcessP(Double(img, conv), imgOut);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameImg
      * @param nameConv
      * @param nameOut
      */
-    static void Execute(std::string nameImg, std::string nameConv,
+    static void execute(std::string nameImg, std::string nameConv,
                         std::string nameOut)
     {
         Image img(nameImg, LT_NOR_GAMMA);
@@ -114,7 +114,7 @@ public:
         float *sumVal = conv.getSumVal(NULL, NULL);
         conv /= sumVal[0];
 
-        Image *imgOut = Execute(&img, &conv, NULL);
+        Image *imgOut = execute(&img, &conv, NULL);
 
         imgOut->Write(nameOut);
     }

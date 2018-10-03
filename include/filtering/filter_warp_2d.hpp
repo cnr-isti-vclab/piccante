@@ -281,7 +281,7 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param img
      * @param imgOut
      * @param h
@@ -289,7 +289,7 @@ public:
      * @param bCentroid
      * @return
      */
-    static Image *Execute(Image *img, Image *imgOut, Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
+    static Image *execute(Image *img, Image *imgOut, Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
     {
         FilterWarp2D flt(h, bSameSize, bCentroid);
         imgOut = flt.ProcessP(Single(img), imgOut);

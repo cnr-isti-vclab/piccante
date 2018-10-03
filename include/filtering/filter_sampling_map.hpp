@@ -75,14 +75,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma
      * @param scale
      * @return
      */
-    static Image *Execute(std::string nameIn, std::string nameOut, float sigma,
+    static Image *execute(std::string nameIn, std::string nameOut, float sigma,
                              float scale)
     {
         Image imgIn(nameIn);

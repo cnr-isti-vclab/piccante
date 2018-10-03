@@ -114,24 +114,24 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static Image *Execute(ImageVec imgIn, Image *imgOut)
+    static Image *execute(ImageVec imgIn, Image *imgOut)
     {
         FilterCombine filterC;
         return filterC.Process(imgIn, imgOut);
     }
 
     /**
-     * @brief ExecuteTest
+     * @brief executeTest
      * @param nameIn
      * @param nameOut
      * @return
      */
-    static Image *ExecuteTest(Image *imgIn, Image *imgOut)
+    static Image *executeTest(Image *imgIn, Image *imgOut)
     {
         FilterChannel filter(0);
         Image *outR = filter.Process(Single(imgIn), NULL);

@@ -63,7 +63,7 @@ PIC_INLINE Image *computePoissonImageEditing(Image *source, Image *target, bool 
         printf("Init matrix...");
     #endif
 
-    Image *lap_source = FilterLaplacian::Execute(source, NULL);
+    Image *lap_source = FilterLaplacian::execute(source, NULL);
 
     std::vector< Eigen::Triplet< double > > tL;
 

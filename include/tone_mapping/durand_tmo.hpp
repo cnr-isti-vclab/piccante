@@ -51,7 +51,7 @@ PIC_INLINE Image *DurandTMO(Image *imgIn, Image *imgOut = NULL, float target_con
     }
 
     //luminance image
-    Image *lum = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);
+    Image *lum = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);
 
     //bilateral filter seperation
     ImageVec *sep = bilateralSeparation(lum);

@@ -29,9 +29,9 @@ namespace pic {
 class FilterCrop: public Filter
 {
 protected:
-    bool	flag;
-    Vec4i	maxi, mini;
-    Vec3f	maxf, minf;
+    bool flag;
+    Vec4i mini, maxi;
+    Vec3f minf, maxf;
 
     /**
      * @brief ProcessBBox
@@ -80,14 +80,14 @@ public:
     Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param min
      * @param max
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, Vec4i min,
+    static Image *execute(Image *imgIn, Image *imgOut, Vec4i min,
                              Vec4i max)
     {
         FilterCrop fltCrop(min, max);
@@ -95,14 +95,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param min
      * @param max
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, Vec2i min,
+    static Image *execute(Image *imgIn, Image *imgOut, Vec2i min,
                              Vec2i max)
     {
         FilterCrop fltCrop(min, max);
@@ -110,18 +110,18 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param fileInput
      * @param fileOutput
      * @param min
      * @param max
      * @return
      */
-    static Image *Execute(std::string fileInput, std::string fileOutput,
+    static Image *execute(std::string fileInput, std::string fileOutput,
                              Vec2i min, Vec2i max)
     {
         Image imgIn(fileInput);
-        Image *out = FilterCrop::Execute(&imgIn, NULL, min, max);
+        Image *out = FilterCrop::execute(&imgIn, NULL, min, max);
         out->Write(fileOutput);
         return out;
     }

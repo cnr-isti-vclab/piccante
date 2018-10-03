@@ -82,7 +82,7 @@ public:
     void ChangePass(int x, int y, int z);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param data
@@ -90,7 +90,7 @@ public:
      * @param XorY
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float *data, int n,
+    static Image *execute(Image *imgIn, Image *imgOut, float *data, int n,
                              bool XorY = true)
     {
         FilterConv1D filter(data, n, 0);

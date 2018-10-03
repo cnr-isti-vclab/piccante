@@ -90,13 +90,13 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param channel
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, int channel = 0)
+    static Image *execute(Image *imgIn, Image *imgOut, int channel = 0)
     {
         FilterChannel fltCh(channel);
         return fltCh.ProcessP(Single(imgIn), imgOut);

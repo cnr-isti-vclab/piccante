@@ -39,7 +39,7 @@ PIC_INLINE Image *edgeEnhancement(Image *imgIn, float sigma_s = 4.0f,
         sigma_r = 0.05f;
     }
 
-    Image *imgBase = FilterBilateral2DS::Execute(imgIn, sigma_s, sigma_r);
+    Image *imgBase = FilterBilateral2DS::execute(imgIn, sigma_s, sigma_r);
     Image *detail = imgIn->clone();
 
     *detail /= *imgBase;

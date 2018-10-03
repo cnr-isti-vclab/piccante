@@ -41,14 +41,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma_1
      * @param sigma_2
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma)
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma)
     {
         FilterLoG2D filter(sigma);
         return filter.ProcessP(Single(imgIn), imgOut);

@@ -87,14 +87,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param type
      * @param colorChannel
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut = NULL,
+    static Image *execute(Image *imgIn, Image *imgOut = NULL,
                              GRADIENT_TYPE type = G_SOBEL, int colorChannel = 0)
     {
         FilterGradient filter(colorChannel, type);
@@ -102,15 +102,15 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param fileInput
      * @param fileOutput
      * @return
      */
-    static Image *Execute(std::string fileInput, std::string fileOutput)
+    static Image *execute(std::string fileInput, std::string fileOutput)
     {
         Image imgIn(fileInput);
-        Image *out = FilterGradient::Execute(&imgIn, NULL);
+        Image *out = FilterGradient::execute(&imgIn, NULL);
         out->Write(fileOutput);
         return out;
     }

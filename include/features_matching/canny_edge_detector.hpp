@@ -119,7 +119,7 @@ public:
             lum = img;
         } else {
             bLum = true;
-            lum = FilterLuminance::Execute(img, lum, LT_CIE_LUMINANCE);
+            lum = FilterLuminance::execute(img, lum, LT_CIE_LUMINANCE);
         }
 
         //filter the image

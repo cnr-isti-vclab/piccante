@@ -434,23 +434,27 @@ public:
     }
 
     /**
-     * @brief getBestInterval computes the best interval center.
+     * @brief getBestExposure computes the best interval center.
      * @param nBits is the number of bits in the budget for the output image.
      * @return It returns the exposure, in f-stops, for setting the image
      * with the best exposure at given dynamic range.
      */
-    float getBestInterval(int nBits)
+    float getBestExposure(int nBits, float overlap = 0.5f)
     {
+        if(overlap < 0.0f) {
+            overlap = 0.5f;
+        }
+
         float nBits_f = float(nBits);
         if((type != VS_LOG_2) && (nBits_f > deltaMaxMin) && (nBits < 1)){
             return 0.0f;
         }
 
         float n_values_f = float(1 << nBits);
-        float delta_inv = nBinf / deltaMaxMin;
-        int range_size_hist = int(float(nBits) / (delta_inv / n_values_f) + 0.5f);
+        float delta_inv = deltaMaxMin / nBinf;
+        int range_size_hist = int(float(nBits) / (1.0f / (n_values_f * delta_inv)) + overlap);
 
-        range_size_hist = range_size_hist < 1 ? 1 : range_size_hist;
+        range_size_hist = range_size_hist < 1 ? 2 : range_size_hist;
 
         #ifdef PIC_DEBUG
             printf("Histogram [%f %f] %d\n", fMin, fMax, range_size_hist);
@@ -472,19 +476,10 @@ public:
             }
         }
 
-        float mid = float(range_size_hist) / 2.0f;
-        return (float(index + mid) / delta_inv) + fMin;
-    }
+        int mid = range_size_hist >> 1;
 
-    /**
-     * @brief getBestExposure computes the best exposure given
-     * a budget dynamig range.
-     * @param range is the input dynamic range.
-     * @return It returns the exposure value in f-stops.
-     */
-    float getBestExposure(int range = 8)
-    {
-        return -getBestInterval(range);
+        float fstop_index = (float(index + mid) * delta_inv) + fMin;
+        return -fstop_index - 1.0f;
     }
 };
 

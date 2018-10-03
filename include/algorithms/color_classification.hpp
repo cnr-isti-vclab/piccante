@@ -75,7 +75,7 @@ PIC_INLINE bool *computeColorClassification(Image *img, float *white_pixel, floa
 
     img_wb_rbf->clamp(0.0f, 1.0f);
 
-    Image *img_L = FilterLuminance::Execute(img, NULL);
+    Image *img_L = FilterLuminance::execute(img, NULL);
 
     Image *opt = LischinskiMinimization(img_L, img_wb_rbf);
 

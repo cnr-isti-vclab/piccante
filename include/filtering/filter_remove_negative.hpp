@@ -30,11 +30,19 @@ class FilterRemoveNegative: public Filter
 protected:
 
     /**
-     * @brief ProcessBBox
-     * @param dst
-     * @param src
-     * @param box
+     * @brief f
+     * @param data
      */
+    void f(FilterFData *data)
+    {
+        float *data_src = (*data->src[0])(data->x, data->y);
+
+        for(int k = 0; k < data->src[0]->channels; k++) {
+            data->out[k] = data_src[k] > 0.0f ? data_src[k] : 0.0f;
+        }
+    }
+
+    /*
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int channels = dst->channels;
@@ -51,25 +59,25 @@ protected:
             }
         }
     }
-     
+    */
 
 public:
     /**
      * @brief FilterRemoveNegative
      */
-    FilterRemoveNegative()
+    FilterRemoveNegative() : Filter()
     {
         this->threshold_nuked = threshold_nuked;
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param threshold_nuked
      * @return
      */
-    static Image* Execute(Image *imgIn, Image *imgOut)
+    static Image* execute(Image *imgIn, Image *imgOut)
     {
         FilterRemoveNegative filter;
         imgOut = filter.ProcessP(Single(imgIn), imgOut);
@@ -77,15 +85,15 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameFileIn
      * @param nameFileOut
      * @return
      */
-    static Image* Execute(std::string nameFileIn, std::string nameFileOut)
+    static Image* execute(std::string nameFileIn, std::string nameFileOut)
     {
         Image imgIn(nameFileIn);
-        Image *imgOut = Execute(&imgIn, NULL);
+        Image *imgOut = execute(&imgIn, NULL);
         imgOut->Write(nameFileOut);
 
         return imgOut;

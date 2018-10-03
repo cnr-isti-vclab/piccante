@@ -69,7 +69,7 @@ public:
     void Update(float sigma_s,  float sigma_r, float sigma_t);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma_s
@@ -77,7 +77,7 @@ public:
      * @param sigma_t
      * @return
      */
-    static ImageGL *Execute(std::string nameIn, std::string nameOut,
+    static ImageGL *execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r, float sigma_t)
     {
         return NULL;

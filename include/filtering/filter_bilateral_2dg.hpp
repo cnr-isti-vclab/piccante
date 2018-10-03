@@ -32,13 +32,13 @@ namespace pic {
 class FilterBilateral2DG: public Filter
 {
 protected:
-    ImageSamplerBilinear    isb;
-    FilterGaussian3D        *fltG;
-    int                     width, height, range;
-    float                   sigma_s, sigma_r;
+    ImageSamplerBilinear isb;
+    FilterGaussian3D *fltG;
+    int width, height, range;
+    float sigma_s, sigma_r;
 
-    Image	            *grid, *gridBlur;
-    bool		            parallel;
+    Image *grid, *gridBlur;
+    bool parallel;
 
 public:
     float s_S, s_R, mul_E;
@@ -96,14 +96,14 @@ public:
     Image *ProcessP(ImageVec imgIn, Image *imgOut);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma_s,
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma_s,
                              float sigma_r)
     {
         FilterBilateral2DG filter(sigma_s, sigma_r);
@@ -117,14 +117,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static Image *Execute(std::string nameIn,
+    static Image *execute(std::string nameIn,
                              std::string nameOut,
                              float sigma_s, float sigma_r)
     {
@@ -132,7 +132,7 @@ public:
         Image imgIn(nameIn, LT_NOR_GAMMA);
 
         //Filtering
-        Image *imgOut =  FilterBilateral2DG::Execute(&imgIn, NULL, sigma_s, sigma_r);
+        Image *imgOut =  FilterBilateral2DG::execute(&imgIn, NULL, sigma_s, sigma_r);
 
         //Write image out
         imgOut->Write(nameOut);
@@ -141,7 +141,7 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameBase
      * @param nameEdge
      * @param nameOut
@@ -149,7 +149,7 @@ public:
      * @param sigma_r
      * @return
      */
-    static Image *Execute(std::string nameBase,
+    static Image *execute(std::string nameBase,
                              std::string nameEdge,
                              std::string nameOut,
                              float sigma_s, float sigma_r)

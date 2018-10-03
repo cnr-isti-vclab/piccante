@@ -88,13 +88,13 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param size
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, int size)
+    static Image *execute(Image *imgIn, Image *imgOut, int size)
     {
         FilterMean filter(size);
         return filter.ProcessP(Single(imgIn), imgOut);

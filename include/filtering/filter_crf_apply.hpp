@@ -61,12 +61,12 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn1
      * @param imgIn2
      * @return
      */
-    static Image *Execute(Image *imgIn, CameraResponseFunction *crf)
+    static Image *execute(Image *imgIn, CameraResponseFunction *crf)
     {
         FilterCRFApply filter(crf);
         return filter.Process(Single(imgIn), NULL);

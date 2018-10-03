@@ -34,13 +34,18 @@ namespace pic {
 class FilterBilateral2DAS: public Filter
 {
 protected:
-    float					sigma_s, sigma_r;
-    PrecomputedGaussian		*pg;
-    int                     seed;
+    float sigma_s, sigma_r;
+    PrecomputedGaussian *pg;
+    int seed;
 
-    MRSamplers<2>			*ms;
+    MRSamplers<2> *ms;
 
-    //Process in a box
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
@@ -70,14 +75,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma_s, float sigma_r)
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma_s, float sigma_r)
     {
         FilterSamplingMap fsm(sigma_s);
         Image *samplingMap = fsm.ProcessP(Single(imgIn), NULL);
@@ -92,20 +97,20 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static Image *Execute(std::string nameIn, std::string nameOut, float sigma_s,
+    static Image *execute(std::string nameIn, std::string nameOut, float sigma_s,
                              float sigma_r)
     {
         Image imgIn(nameIn);
         
         long t0 = timeGetTime();
-        Image *imgOut = Execute(&imgIn, NULL, sigma_s, sigma_r);
+        Image *imgOut = execute(&imgIn, NULL, sigma_s, sigma_r);
         long t1 = timeGetTime();
         printf("Stochastic Adaptive Bilateral Filter time: %ld\n", t1 - t0);
 
@@ -161,7 +166,7 @@ PIC_INLINE void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox 
     int height = dst->height;
     int channels = dst->channels;
 
-    //Filtering
+    //filter
     float Gauss1, Gauss2;
     float  tmp, tmp2, tmp3, sum;
     int c2, ci, cj;
@@ -194,7 +199,7 @@ PIC_INLINE void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox 
 
         for(int j = box->y0; j < box->y1; j++) {
 
-            //Convolution kernel
+            //convolve with the kernel
             float *tmp_dst  = (*dst)(j, i);
             float *tmp_base = (*base)(j, i);
             float *tmp_edge = (*edge)(j, i);
@@ -205,7 +210,7 @@ PIC_INLINE void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox 
 
             ps = ms->getSampler(&m);
 
-            //Calculating the number of samples
+            //calculate the number of samples
             float y = float(j) / float(height);
             isb.SampleImage(samplingMap, x, y, valOut);
 
@@ -233,8 +238,8 @@ PIC_INLINE void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox 
 
             for(int k = 0; k < nSamples; k += 2) {
                 //Spatial Gaussian kernel
-                Gauss1 =	pg->coeff[ps->samplesR[k    ] + pg->halfKernelSize] *
-                            pg->coeff[ps->samplesR[k + 1] + pg->halfKernelSize];
+                Gauss1 = pg->coeff[ps->samplesR[k    ] + pg->halfKernelSize] *
+                         pg->coeff[ps->samplesR[k + 1] + pg->halfKernelSize];
 
                 //Address
                 ci = CLAMP(i + ps->samplesR[k    ], width);
@@ -255,13 +260,13 @@ PIC_INLINE void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox 
                 tmp2 = Gauss1 * Gauss2;
                 sum += tmp2;
 
-                //Filtering
+                //filter
                 for(int l = 0; l < channels; l++) {
                     tmp_dst[l] += base->data[c2 + l] * tmp2;
                 }
             }
 
-            //Normalization
+            //normalize
             sumTest = sum > 0.0f;
 
             for(int l = 0; l < channels; l++) {

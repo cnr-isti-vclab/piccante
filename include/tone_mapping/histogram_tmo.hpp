@@ -38,7 +38,7 @@ PIC_INLINE Image *HistogramTMO(Image *imgOut, Image *imgIn)
         imgOut = imgIn->clone();
     }
 
-    Image *lum    = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
+    Image *lum    = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
     Image *lumOld = lum->clone();
     lum->sort();
 

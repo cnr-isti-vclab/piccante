@@ -69,7 +69,7 @@ PIC_INLINE Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = 
     }
 
     //luminance image
-    Image *lum = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);
+    Image *lum = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);
 
     float LMax = lum->getMaxVal()[0];
     float LMin = lum->getMinVal()[0];
@@ -91,7 +91,7 @@ PIC_INLINE Image *ReinhardTMO(Image *imgIn, Image *imgOut = NULL, float alpha = 
 
     float sigma_r = powf(2.0f, phi) * alpha / (s_max * s_max);
 
-    Image *filteredLum = FilterBilateral2DS::Execute(lum, NULL, sigma_s,
+    Image *filteredLum = FilterBilateral2DS::execute(lum, NULL, sigma_s,
                             sigma_r);
 
     lum->applyFunction(&SigmoidInv);

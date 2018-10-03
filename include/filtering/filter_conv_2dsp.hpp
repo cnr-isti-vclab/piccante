@@ -78,17 +78,17 @@ public:
         conv1DFltY = NULL;
     }
 
-    static Image *Execute(Image *imgIn, Image *imgOut, float *data, int n)
+    static Image *execute(Image *imgIn, Image *imgOut, float *data, int n)
     {
         FilterConv2DSP filter(data, n);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    static Image *Execute(std::string nameIn, std::string nameOut, float *data,
+    static Image *execute(std::string nameIn, std::string nameOut, float *data,
                              int n)
     {
         Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, data, n);
+        Image *imgOut = execute(&imgIn, NULL, data, n);
         imgOut->Write(nameOut);
         return imgOut;
     }

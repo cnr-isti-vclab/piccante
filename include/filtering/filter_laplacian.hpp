@@ -71,26 +71,26 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut)
+    static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterLaplacian filter;
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      */
-    static void Execute(std::string nameIn, std::string nameOut)
+    static void execute(std::string nameIn, std::string nameOut)
     {
         Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL);
+        Image *imgOut = execute(&imgIn, NULL);
         imgOut->Write(nameOut);
     }
 };

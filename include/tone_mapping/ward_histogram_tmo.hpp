@@ -62,10 +62,10 @@ inline Image *WardHistogramTMO(Image *imgIn, Image *imgOut = NULL,
     int fScaleX = int((2.0f * tanf(viewAngleWidth / 2.0f) / 0.01745f));
     int fScaleY = int((2.0f * tanf(viewAngleHeight / 2.0f) / 0.01745f));
 
-    Image *L = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
+    Image *L = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
 
     ImageSamplerBilinear isb;
-    Image *Lscaled = FilterSampler2D::Execute(L, NULL, fScaleX, fScaleY, &isb);
+    Image *Lscaled = FilterSampler2D::execute(L, NULL, fScaleX, fScaleY, &isb);
 
     float LMin = Lscaled->getGT(0.0f);
     float LMax = Lscaled->getMaxVal()[0];

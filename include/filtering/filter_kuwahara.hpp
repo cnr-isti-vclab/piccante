@@ -205,13 +205,13 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param kernelSize
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, int kernelSize)
+    static Image *execute(Image *imgIn, Image *imgOut, int kernelSize)
     {
         FilterKuwahara filter(kernelSize);
         return filter.ProcessP(Single(imgIn), imgOut);

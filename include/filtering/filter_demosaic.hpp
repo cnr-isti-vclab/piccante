@@ -309,12 +309,12 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut)
+    static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterDemosaic flt;
         return flt.Process(Single(imgIn), imgOut);

@@ -32,10 +32,10 @@ namespace pic {
 class FilterSampler2D: public Filter
 {
 protected:
-    ImageSampler	*isb;
-    float			scaleX, scaleY;
-    int				width, height;
-    bool			swh;
+    ImageSampler *isb;
+    float scaleX, scaleY;
+    int width, height;
+    bool swh;
 
     /**
      * @brief ProcessBBox
@@ -100,14 +100,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param scale
      * @param isb
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float scale,
+    static Image *execute(Image *imgIn, Image *imgOut, float scale,
                              ImageSampler *isb)
     {
         FilterSampler2D filter(scale, isb);
@@ -115,7 +115,7 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param scaleX
@@ -123,7 +123,7 @@ public:
      * @param isb
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float scaleX,
+    static Image *execute(Image *imgIn, Image *imgOut, float scaleX,
                              float scaleY, ImageSampler *isb)
     {
         FilterSampler2D filter(scaleX, scaleY, isb);
@@ -131,7 +131,7 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param width
@@ -139,7 +139,7 @@ public:
      * @param isb
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, int width,
+    static Image *execute(Image *imgIn, Image *imgOut, int width,
                              int height, ImageSampler *isb)
     {
         FilterSampler2D filter(width, height, isb);
@@ -147,17 +147,17 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param scale
      * @param isb
      */
-    static void Execute(std::string nameIn, std::string nameOut, float scale,
+    static void execute(std::string nameIn, std::string nameOut, float scale,
                         ImageSampler *isb)
     {
         Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, scale, isb);
+        Image *imgOut = execute(&imgIn, NULL, scale, isb);
         imgOut->Write(nameOut);
     }
 };

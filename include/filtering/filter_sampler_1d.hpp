@@ -36,10 +36,10 @@ namespace pic {
 class FilterSampler1D: public Filter
 {
 protected:
-    ImageSampler	*isb;
-    int             dirs[3];
-    int				size;
-    bool			swh;
+    ImageSampler *isb;
+    int dirs[3];
+    int size;
+    bool swh;
 
     /**
      * @brief ProcessBBox
@@ -128,7 +128,7 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param scale
@@ -136,7 +136,7 @@ public:
      * @param isb
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float scale,
+    static Image *execute(Image *imgIn, Image *imgOut, float scale,
                              int direction, ImageSampler *isb)
     {
         FilterSampler1D filter(scale, direction, isb);

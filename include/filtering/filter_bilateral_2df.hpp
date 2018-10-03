@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FILTERING_FILTER_BILATERAL_2DF_HPP
 
 #include "../filtering/filter.hpp"
+#include "../util/precomputed_gaussian.hpp"
 
 namespace pic {
 
@@ -63,14 +64,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut,
+    static Image *execute(Image *imgIn, Image *imgOut,
                              float sigma_s, float sigma_r)
     {
         //filter
@@ -83,14 +84,14 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static Image *Execute(std::string nameIn,
+    static Image *execute(std::string nameIn,
                              std::string nameOut,
                              float sigma_s, float sigma_r)
     {
@@ -98,7 +99,7 @@ public:
         Image imgIn(nameIn);
 
         //Filter
-        Image *imgOut = FilterBilateral2DF::Execute(&imgIn, NULL, sigma_s, sigma_r);
+        Image *imgOut = FilterBilateral2DF::execute(&imgIn, NULL, sigma_s, sigma_r);
 
         //Write image out
         imgOut->Write(nameOut);

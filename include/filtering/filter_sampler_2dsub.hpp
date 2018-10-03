@@ -29,8 +29,8 @@ namespace pic {
 class FilterSampler2DSub: public Filter
 {
 protected:
-    bool            bIsb;
-    ImageSampler	*isb;
+    bool bIsb;
+    ImageSampler *isb;
 
     /**
      * @brief ProcessBBox
@@ -57,28 +57,28 @@ public:
     void Update(ImageSampler *isb);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param isb
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, ImageSampler *isb)
+    static Image *execute(Image *imgIn, Image *imgOut, ImageSampler *isb)
     {
         FilterSampler2DSub filter(isb);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param isb
      */
-    static void Execute(std::string nameIn, std::string nameOut, ImageSampler *isb)
+    static void execute(std::string nameIn, std::string nameOut, ImageSampler *isb)
     {
         Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, isb);
+        Image *imgOut = execute(&imgIn, NULL, isb);
         imgOut->Write(nameOut);
     }
 };

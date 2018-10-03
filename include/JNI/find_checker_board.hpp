@@ -69,7 +69,7 @@ PIC_INLINE std::vector<int> extractCheckerBoardJNI(std::string imageInPath, std:
             printf("Down scale factor: %f\n", scale);
 #endif
 
-            work = FilterDownSampler2D::Execute(&in, NULL, scale);
+            work = FilterDownSampler2D::execute(&in, NULL, scale);
 
             bScale = true;
         } else {

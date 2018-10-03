@@ -367,7 +367,7 @@ public:
             if(filteringSize > 0) {
                 Image toBeFiltered(1, 256, 1, 1, ret_c);
 
-                Image *filtered = FilterMean::Execute(&toBeFiltered, NULL, filteringSize);
+                Image *filtered = FilterMean::execute(&toBeFiltered, NULL, filteringSize);
                 
                 icrf.push_back(filtered->data);
 

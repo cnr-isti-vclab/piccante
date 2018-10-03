@@ -39,12 +39,12 @@ public:
     FilterGLThresholding();
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @return
      */
-    static ImageGL *Execute(std::string nameIn, std::string nameOut)
+    static ImageGL *execute(std::string nameIn, std::string nameOut)
     {
         ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);

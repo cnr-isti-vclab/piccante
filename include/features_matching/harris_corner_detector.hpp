@@ -164,7 +164,7 @@ public:
         if(img->channels == 1) {
             lum = img->clone();
         } else {
-            lum = FilterLuminance::Execute(img, lum, LT_CIE_LUMINANCE);
+            lum = FilterLuminance::execute(img, lum, LT_CIE_LUMINANCE);
         }
 
         float maxL = lum->getMaxVal(NULL, NULL)[0];
@@ -180,7 +180,7 @@ public:
         std::vector< Eigen::Vector3f > corners_w_quality;
 
         //compute gradients
-        I_grad = FilterGradientHarrisOPT::Execute(lum, I_grad, 0);
+        I_grad = FilterGradientHarrisOPT::execute(lum, I_grad, 0);
 
         float eps = 2.2204e-16f;
 
@@ -208,7 +208,7 @@ public:
         }
 
         //non-maximal supression
-        lum = FilterMax::Execute(ret, lum, radius * 2 + 1);
+        lum = FilterMax::execute(ret, lum, radius * 2 + 1);
         Image* ret_flt = lum;
 
         float w = 1.0f;

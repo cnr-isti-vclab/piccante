@@ -40,7 +40,7 @@ PIC_INLINE Image *binarization(Image *imgIn, bool bAdaptive = false)
     }
 
     Image *ret = NULL;
-    Image *imgIn_lum = FilterLuminance::Execute(imgIn, NULL);
+    Image *imgIn_lum = FilterLuminance::execute(imgIn, NULL);
 
     if(bAdaptive) {
         FilterThreshold flt_thr(0.0f, true);

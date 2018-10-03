@@ -64,12 +64,12 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static ImageGL *Execute(ImageGL *imgIn, ImageGL *imgOut)
+    static ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut)
     {
         FilterGLLuminance filter(LT_CIE_LUMINANCE);
         imgOut = filter.Process(SingleGL(imgIn), imgOut);
@@ -77,17 +77,17 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @return
      */
-    static ImageGL *Execute(std::string nameIn, std::string nameOut)
+    static ImageGL *execute(std::string nameIn, std::string nameOut)
     {
         ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
 
-        ImageGL *imgOut = Execute(&imgIn, NULL);
+        ImageGL *imgOut = execute(&imgIn, NULL);
 
         imgOut->loadToMemory();
         imgOut->Write(nameOut);

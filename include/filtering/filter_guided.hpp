@@ -88,7 +88,7 @@ public:
     void Update(int radius, float e_regularization);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param guide
      * @param imgOut
@@ -96,7 +96,7 @@ public:
      * @param e_regularization
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *guide, Image *imgOut,
+    static Image *execute(Image *imgIn, Image *guide, Image *imgOut,
                              int radius, float e_regularization)
     {
         FilterGuided filter(radius, e_regularization);

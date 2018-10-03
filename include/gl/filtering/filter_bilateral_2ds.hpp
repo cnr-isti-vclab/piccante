@@ -71,13 +71,13 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 \
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static ImageGL *Execute(ImageGL *imgIn, float sigma_s, float sigma_r)
+    static ImageGL *execute(ImageGL *imgIn, float sigma_s, float sigma_r)
     {
         FilterGLBilateral2DS *filter = new FilterGLBilateral2DS(sigma_s, sigma_r,
                 BF_CLASSIC);
@@ -94,7 +94,7 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameFile
      * @param nameOut
      * @param sigma_s
@@ -102,7 +102,7 @@ public:
      * @param testing
      * @return
      */
-    static ImageGL *Execute(std::string nameFile, std::string nameOut,
+    static ImageGL *execute(std::string nameFile, std::string nameOut,
                                float sigma_s, float sigma_r, int testing = 1)
     {
         ImageGL imgIn(nameFile);

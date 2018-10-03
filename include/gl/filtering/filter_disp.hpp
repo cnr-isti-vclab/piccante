@@ -58,14 +58,14 @@ public:
     void Update(float sigma, float sigma_s, float sigma_r, bool bUse, bool bLeft);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameLeft
      * @param nameRight
      * @param nameDisp
      * @param nameOut
      * @return
      */
-    static ImageGL *Execute(std::string nameLeft,
+    static ImageGL *execute(std::string nameLeft,
                                std::string nameRight,
                                std::string nameDisp,
                                std::string nameOut)

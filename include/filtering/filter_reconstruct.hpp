@@ -86,13 +86,13 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param ann
      * @param imgOut
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *ann, Image *imgOut = NULL)
+    static Image *execute(Image *imgIn, Image *ann, Image *imgOut = NULL)
     {
         FilterReconstruct fltRec;
         return fltRec.ProcessP(Double(imgIn, ann), imgOut);

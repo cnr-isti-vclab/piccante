@@ -55,14 +55,14 @@ public:
     void Update(float gamma, float fstop);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param gamma
      * @param fstop
      * @return
      */
-    ImageGL *Execute(std::string nameIn, std::string nameOut, float gamma,
+    ImageGL *execute(std::string nameIn, std::string nameOut, float gamma,
                         float fstop)
     {
         ImageGL imgIn(nameIn);

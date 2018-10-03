@@ -72,13 +72,13 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param channel
      * @return
      */
-    static Image *Execute(ImageGL *imgIn, ImageGL *imgOut, int channel = 0)
+    static Image *execute(ImageGL *imgIn, ImageGL *imgOut, int channel = 0)
     {
         FilterGLChannel flt(channel);
         return flt.Process(SingleGL(imgIn), imgOut);

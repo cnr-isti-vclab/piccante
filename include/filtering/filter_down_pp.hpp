@@ -178,28 +178,28 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param type
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut)
+    static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterDownPP flt(NULL, 1e-3f);
         return flt.ProcessP(Single(imgIn), imgOut);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param fileInput
      * @param fileOutput
      * @return
      */
-    static Image *Execute(std::string fileInput, std::string fileOutput)
+    static Image *execute(std::string fileInput, std::string fileOutput)
     {
         Image imgIn(fileInput);
-        Image *out = FilterDownPP::Execute(&imgIn, NULL);
+        Image *out = FilterDownPP::execute(&imgIn, NULL);
         out->Write(fileOutput);
         return out;
     }

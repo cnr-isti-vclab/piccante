@@ -50,8 +50,10 @@ public:
     /**
      * @brief DragoTMOGL
      */
-    DragoTMOGL(bool bStatisticsRecompute = true)
+    DragoTMOGL(float Ld_Max = 100.0f, float bias = 0.85f, bool bStatisticsRecompute = true)
     {
+        update(Ld_Max, bias);
+
         flt_lum = NULL;
         flt_tmo = NULL;
         img_lum = NULL;

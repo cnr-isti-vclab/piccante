@@ -54,13 +54,13 @@ public:
     void Update(float sigma);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma
      * @return
      */
-    static ImageGL *Execute(std::string nameIn, std::string nameOut, float sigma)
+    static ImageGL *execute(std::string nameIn, std::string nameOut, float sigma)
     {
         ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(GL_TEXTURE_2D, false);

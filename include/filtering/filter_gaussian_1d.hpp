@@ -56,7 +56,7 @@ public:
 
     ~FilterGaussian1D();
 
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma,
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma,
                              int direction)
     {
         FilterGaussian1D filter(sigma, direction);

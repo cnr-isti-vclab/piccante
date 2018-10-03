@@ -227,14 +227,14 @@ public:
             return NULL;
         }
 
-        L = FilterLuminance::Execute(img, L, LT_CIE_LUMINANCE);
+        L = FilterLuminance::execute(img, L, LT_CIE_LUMINANCE);
         float maxVal = L->getMaxVal()[0];
         *L /= maxVal;
 
-        grad = FilterGradient::Execute(gauss, grad);
+        grad = FilterGradient::execute(gauss, grad);
 
-        gX = FilterChannel::Execute(grad, gX, 0);
-        gY = FilterChannel::Execute(grad, gY, 1);
+        gX = FilterChannel::execute(grad, gX, 0);
+        gY = FilterChannel::execute(grad, gY, 1);
 
         float sX = 0.0f;
         float sY = 0.0f;
@@ -293,7 +293,7 @@ public:
         }
 
         //Convolution of the orientations using a low-pass filter
-        I_orientation_flt = FilterConv2DSP::Execute(I_orientation, I_orientation_flt,
+        I_orientation_flt = FilterConv2DSP::execute(I_orientation, I_orientation_flt,
                             GenKernel(patch_size, num_bins), patch_size);
 
         //Final dense sift

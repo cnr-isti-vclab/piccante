@@ -88,13 +88,13 @@ public:
             return 0;
         }
 
-        Execute(argv[1], float(atof(argv[2])), float(atof(argv[3])), float(atof(argv[4])), float(atof(argv[5])));
+        execute(argv[1], float(atof(argv[2])), float(atof(argv[3])), float(atof(argv[4])), float(atof(argv[5])));
 
         return 0;
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param sigma_s
      * @param sigma_p
@@ -103,7 +103,7 @@ public:
      * @param testing
      * @return
      */
-    static ImageGL *Execute( std::string nameIn, 
+    static ImageGL *execute( std::string nameIn,
                                 float sigma_s, float sigma_p, float sigma_n, float sigma_a, int testing = 1)
     {
 

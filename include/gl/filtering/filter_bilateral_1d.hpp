@@ -58,14 +58,14 @@ public:
     void Update(float sigma_s, float sigma_r);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static ImageGL *Execute(std::string nameIn, std::string nameOut,
+    static ImageGL *execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r)
     {
         GLuint testTQ = glBeginTimeQuery();

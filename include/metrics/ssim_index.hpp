@@ -68,16 +68,16 @@ PIC_INLINE Image* SSIMIndex(Image *ori, Image *cmp, float &ssim_index, Image *ss
         #endif
 
         if(f > 1.0f) {
-            ori_d = FilterDownSampler2D::Execute(ori, NULL, f);
-            cmp_d = FilterDownSampler2D::Execute(cmp, NULL, f);
+            ori_d = FilterDownSampler2D::execute(ori, NULL, f);
+            cmp_d = FilterDownSampler2D::execute(cmp, NULL, f);
 
             ori = ori_d;
             cmp = cmp_d;
         }
     }
 
-    Image *L_ori = FilterLuminance::Execute(ori, NULL);
-    Image *L_cmp = FilterLuminance::Execute(cmp, NULL);
+    Image *L_ori = FilterLuminance::execute(ori, NULL);
+    Image *L_cmp = FilterLuminance::execute(cmp, NULL);
 
     if(dynamic_range < 0.0f) {
         float min_val, max_val;
@@ -103,17 +103,17 @@ PIC_INLINE Image* SSIMIndex(Image *ori, Image *cmp, float &ssim_index, Image *ss
     float C1 = K1 * dynamic_range;
     C1 = C1 * C1;
 
-    Image *img_mu1 = FilterGaussian2D::Execute(L_ori, NULL, sigma_window);
-    Image *img_mu2 = FilterGaussian2D::Execute(L_cmp, NULL, sigma_window);
+    Image *img_mu1 = FilterGaussian2D::execute(L_ori, NULL, sigma_window);
+    Image *img_mu2 = FilterGaussian2D::execute(L_cmp, NULL, sigma_window);
 
     Image img_ori_cmp = (*L_ori) * (*L_cmp);
 
     (*L_ori) *= (*L_ori);
     (*L_cmp) *= (*L_cmp);
 
-    Image *img_sigma1_sq = FilterGaussian2D::Execute(L_ori, NULL, sigma_window);
-    Image *img_sigma2_sq = FilterGaussian2D::Execute(L_cmp, NULL, sigma_window);
-    Image *img_sigma1_sigma2 = FilterGaussian2D::Execute(&img_ori_cmp, NULL, sigma_window);
+    Image *img_sigma1_sq = FilterGaussian2D::execute(L_ori, NULL, sigma_window);
+    Image *img_sigma2_sq = FilterGaussian2D::execute(L_cmp, NULL, sigma_window);
+    Image *img_sigma1_sigma2 = FilterGaussian2D::execute(&img_ori_cmp, NULL, sigma_window);
 
     if(C0 > 0.0f && C1 > 0.0f) {
         FilterSSIM flt_ssim(C0, C1);

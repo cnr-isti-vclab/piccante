@@ -90,13 +90,13 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param threshold_nuked
      * @return
      */
-    static Image* Execute(Image *imgIn, Image *imgOut)
+    static Image* execute(Image *imgIn, Image *imgOut)
     {
         FilterRemoveInfNaN filter;
         imgOut = filter.ProcessP(Single(imgIn), imgOut);
@@ -104,15 +104,15 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameFileIn
      * @param nameFileOut
      * @return
      */
-    static Image* Execute(std::string nameFileIn, std::string nameFileOut)
+    static Image* execute(std::string nameFileIn, std::string nameFileOut)
     {
         Image imgIn(nameFileIn);
-        Image *imgOut = Execute(&imgIn, NULL);
+        Image *imgOut = execute(&imgIn, NULL);
         imgOut->Write(nameFileOut);
 
         return imgOut;

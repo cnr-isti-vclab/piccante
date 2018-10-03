@@ -135,13 +135,13 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param img
      * @param conv
      * @param imgOut
      * @return
      */
-    static Image *Execute(Image *img, Image *imgOut, int kernelSize = 3)
+    static Image *execute(Image *img, Image *imgOut, int kernelSize = 3)
     {
         FilterLocalExtrema flt(kernelSize);
         return flt.ProcessP(Single(img), imgOut);

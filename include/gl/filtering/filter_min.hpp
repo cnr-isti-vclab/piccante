@@ -58,30 +58,30 @@ public:
 
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param size
      * @return
      */
-    static ImageGL *Execute(ImageGL *imgIn, ImageGL *imgOut, int size)
+    static ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut, int size)
     {
         FilterGLMin filter(size);
         return filter.Process(SingleGL(imgIn), imgOut);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param size
      * @return
      */
-    static Image *Execute(std::string nameIn, std::string nameOut, int size)
+    static Image *execute(std::string nameIn, std::string nameOut, int size)
     {
         ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-        ImageGL *imgOut = Execute(&imgIn, NULL, size);
+        ImageGL *imgOut = execute(&imgIn, NULL, size);
         imgOut->loadToMemory();
         imgOut->Write(nameOut);
         return imgOut;

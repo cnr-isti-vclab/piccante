@@ -61,7 +61,7 @@ PIC_INLINE ImageVec* bilateralSeparation(Image *imgIn, float sigma_s = -1.0f, fl
 
     img_tmp->applyFunction(log10fPlusEpsilon);
 
-    Image *img_flt = FilterBilateral2DS::Execute(img_tmp, NULL, sigma_s, sigma_r);
+    Image *img_flt = FilterBilateral2DS::execute(img_tmp, NULL, sigma_s, sigma_r);
 
     img_flt->applyFunction(powf10fe);
 

@@ -169,15 +169,15 @@ public:
     {
         release();
 
-        Image *img_L = FilterLuminance::Execute(img, NULL);
+        Image *img_L = FilterLuminance::execute(img, NULL);
 
         //compute fG
-        img_G = FilterGradient::Execute(img_L, img_G);
+        img_G = FilterGradient::execute(img_L, img_G);
         fG_min = img_G->getMinVal(NULL, NULL);
         fG_max = img_G->getMaxVal(NULL, NULL);
 
         //compute fZ
-        fZ = FilterLoG2DOpt::Execute(img_L, fZ, 1.0f);
+        fZ = FilterLoG2DOpt::execute(img_L, fZ, 1.0f);
         fZ->applyFunction(f1minusx);
 
         //aux buffers

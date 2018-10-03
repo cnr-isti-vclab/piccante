@@ -78,29 +78,29 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param size
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, int size)
+    static Image *execute(Image *imgIn, Image *imgOut, int size)
     {
         FilterMed filter(size);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param size
      * @return
      */
-    static Image *Execute(std::string nameIn, std::string nameOut, int size)
+    static Image *execute(std::string nameIn, std::string nameOut, int size)
     {
         Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, size);
+        Image *imgOut = execute(&imgIn, NULL, size);
         imgOut->Write(nameOut);
         return imgOut;
     }

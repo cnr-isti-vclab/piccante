@@ -61,13 +61,13 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma)
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma)
     {
         FilterGaussian3D filter(sigma);
         Image *ret = filter.Process(Single(imgIn), imgOut);
@@ -75,16 +75,16 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma
      * @return
      */
-    static Image *Execute(std::string nameIn, std::string nameOut, float sigma)
+    static Image *execute(std::string nameIn, std::string nameOut, float sigma)
     {
         Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, sigma);
+        Image *imgOut = execute(&imgIn, NULL, sigma);
         imgOut->Write(nameOut);
         return imgOut;
     }
