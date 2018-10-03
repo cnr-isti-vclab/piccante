@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         //we estimate the best exposure for this HDR image
         float fstop = pic::findBestExposureHistogram(&img);
 
-        printf("The best exposure value is: %f f-stops\n", fstop);
+        printf("The best exposure value (histogram-based) is: %f f-stops\n", fstop);
 
         pic::FilterSimpleTMO fltSimpleTMO(2.2f, fstop);
 
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
         //we estimate the best exposure for this HDR image
         fstop = pic::findBestExposureMean(&img);
 
-        printf("The best exposure value is: %f f-stops\n", fstop);
+        printf("The best exposure value (mean-based) is: %f f-stops\n", fstop);
 
         fltSimpleTMO.Update(2.2f, fstop);
 

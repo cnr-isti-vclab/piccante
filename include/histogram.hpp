@@ -401,7 +401,7 @@ public:
             return ret;
         }
 
-        //assuming 8-bit images
+        //NOTE: this code assumes to extract 8-bit images
         float halfnBits = float( nBits >> 1 );
 
         float dMM = deltaMaxMin / nBinf;
@@ -421,11 +421,12 @@ public:
             int indMin = MAX(ind - removingBins, 0);
             int indMax = MIN(ind + removingBins, nBin);
 
-            for(int i=indMin; i<indMax; i++) {
+            for(int i = indMin; i < indMax; i++) {
                 bin_work[i] = 0;
             }
 
-            float fstop = - (float(ind) * dMM + fMin) - 1.0f;
+            float fstop_ind = float(ind) * dMM + fMin;
+            float fstop = -fstop_ind - 1.0f;
 
             ret.push_back(fstop);
         }
@@ -451,8 +452,8 @@ public:
         }
 
         float n_values_f = float(1 << nBits);
-        float delta_inv = deltaMaxMin / nBinf;
-        int range_size_hist = int(float(nBits) / (1.0f / (n_values_f * delta_inv)) + overlap);
+        float dMM = deltaMaxMin / nBinf;
+        int range_size_hist = int(float(nBits) / (1.0f / (n_values_f * dMM)) + overlap);
 
         range_size_hist = range_size_hist < 1 ? 2 : range_size_hist;
 
@@ -478,7 +479,7 @@ public:
 
         int mid = range_size_hist >> 1;
 
-        float fstop_index = (float(index + mid) * delta_inv) + fMin;
+        float fstop_index = (float(index + mid) * dMM) + fMin;
         return -fstop_index - 1.0f;
     }
 };

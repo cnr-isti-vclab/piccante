@@ -86,26 +86,25 @@ PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
  * @return It returns an array of exposure values encoding the
  */
 PIC_INLINE std::vector<float> getAllExposures(Image *imgIn) {
-    std::vector<float> exposures;
+    std::vector<float> fstops;
 
     if(imgIn == NULL) {
-        return exposures;
+        return fstops;
     }
 
     if(!imgIn->isValid()) {
-        return exposures;
+        return fstops;
     }
 
     Image *lum = FilterLuminance::execute(imgIn, NULL);
 
     Histogram m(lum, VS_LOG_2, 1024);
-    exposures = m.exposureCovering();
+    fstops = m.exposureCovering();
 
     delete lum;
 
-    return exposures;
+    return fstops;
 }
-
 
 /**
  * @brief getAllExposuresImages converts an image into a stack of images.
