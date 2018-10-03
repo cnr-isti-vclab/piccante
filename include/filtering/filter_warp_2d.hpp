@@ -139,7 +139,7 @@ public:
      */
     FilterWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
     {
-        Update(h, bSameSize, bCentroid);
+        update(h, bSameSize, bCentroid);
     }
 
     /**
@@ -236,12 +236,12 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param h
      * @param bSameSize
      * @param bCentroid
      */
-    void Update(Matrix3x3 h, bool bSameSize, bool bCentroid = false)
+    void update(Matrix3x3 h, bool bSameSize, bool bCentroid = false)
     {
         this->bComputeBoundingBox = true;
 

@@ -48,10 +48,10 @@ public:
     FilterGLGaussian2D(float sigma);
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma
      */
-    void Update(float sigma);
+    void update(float sigma);
 
     /**
      * @brief execute
@@ -112,9 +112,9 @@ FilterGLGaussian2D::~FilterGLGaussian2D()
     }
 }
 
-void FilterGLGaussian2D::Update(float sigma)
+void FilterGLGaussian2D::update(float sigma)
 {
-    filter->Update(sigma);
+    filter->update(sigma);
 }
 
 } // end namespace pic

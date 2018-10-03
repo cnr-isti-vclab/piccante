@@ -48,7 +48,7 @@ PIC_INLINE ImageGLVec getAllExposuresImagesGL(ImageGL *imgIn)
     ImageGLVec input = SingleGL(imgIn);
 
     for(unsigned int i = 0; i < exposures.size(); i++) {
-        flt.Update(2.2f, exposures[i]);
+        flt.update(2.2f, exposures[i]);
 
         #ifdef PIC_DEBUG
             printf("Exposure: %f\n", exposures[i]);

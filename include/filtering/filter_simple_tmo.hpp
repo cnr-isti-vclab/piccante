@@ -49,17 +49,17 @@ public:
      * @param gamma
      * @param fstop
      */
-    FilterSimpleTMO(float gamma, float fstop)
+    FilterSimpleTMO(float gamma, float fstop) : Filter()
     {
-        Update(gamma, fstop);
+        update(gamma, fstop);
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param gamma
      * @param fstop
      */
-    void Update(float gamma, float fstop)
+    void update(float gamma, float fstop)
     {
         this->gamma = 1.0f / gamma;
         this->fstop = fstop;

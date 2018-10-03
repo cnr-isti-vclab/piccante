@@ -44,11 +44,11 @@ public:
     FilterGLUpPP(float *value, float threshold);
 
     /**
-     * @brief Update
+     * @brief update
      * @param value
      * @param threshold
      */
-    void Update(float *value, float threshold);
+    void update(float *value, float threshold);
 
     /**
      * @brief Process
@@ -64,7 +64,7 @@ FilterGLUpPP::FilterGLUpPP(float *value, float threshold): FilterGL()
     value = NULL;
 
     InitShaders();
-    Update(value, threshold);
+    update(value, threshold);
 }
 
 void FilterGLUpPP::InitShaders()
@@ -97,11 +97,11 @@ void FilterGLUpPP::InitShaders()
 }
 
 /**
- * @brief Update
+ * @brief update
  * @param value
  * @param threshold
  */
-void FilterGLUpPP::Update(float *value, float threshold)
+void FilterGLUpPP::update(float *value, float threshold)
 {
     if(value == NULL) {
         this->value = new float[4];

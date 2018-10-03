@@ -122,7 +122,7 @@ PIC_INLINE ImageVec getAllExposuresImages(Image *imgIn, std::vector<float> &fsto
     ImageVec input = Single(imgIn);
 
     for(unsigned int i = 0; i < fstops.size(); i++) {
-        flt.Update(gamma, fstops[i]);
+        flt.update(gamma, fstops[i]);
         Image *expo = flt.ProcessP(input, NULL);
 
         expo->exposure = powf(2.0f, fstops[i]);

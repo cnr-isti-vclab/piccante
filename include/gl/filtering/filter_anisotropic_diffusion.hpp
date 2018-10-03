@@ -41,7 +41,7 @@ public:
     FilterGLAnisotropicDiffusion(float sigma_r, float sigma_s);
 
     //Updating k
-    void Update(float k);
+    void update(float k);
 
     //Processing
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
@@ -143,10 +143,10 @@ PIC_INLINE void FilterGLAnisotropicDiffusion::InitShaders()
 {
     FragmentShader();
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLAnisotropicDiffusion");
-    Update(k);
+    update(k);
 }
 
-PIC_INLINE void FilterGLAnisotropicDiffusion::Update(float k)
+PIC_INLINE void FilterGLAnisotropicDiffusion::update(float k)
 {
     if(k > 0.0f) {
         this->k = k;

@@ -52,12 +52,12 @@ public:
     FilterGLWarp2D(Matrix3x3 h, bool bSameSize, bool bCentroid);
 
     /**
-     * @brief Update
+     * @brief update
      * @param h
      * @param bSameSize
      * @param bCentroid
      */
-    void Update(Matrix3x3 h, bool bSameSize, bool bCentroid);
+    void update(Matrix3x3 h, bool bSameSize, bool bCentroid);
 
     /**
      * @brief Process
@@ -72,10 +72,10 @@ FilterGLWarp2D::FilterGLWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentro
 {
     InitShaders();
 
-    Update(h, bSameSize, bCentroid);
+    update(h, bSameSize, bCentroid);
 }
 
-void FilterGLWarp2D::Update(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
+void FilterGLWarp2D::update(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
 {
     this->bSameSize = bSameSize;
     this->bCentroid = bCentroid;

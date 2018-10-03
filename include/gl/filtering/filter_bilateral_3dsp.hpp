@@ -61,12 +61,12 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      * @param sigma_t
      */
-    void Update(float sigma_s,  float sigma_r, float sigma_t);
+    void update(float sigma_s,  float sigma_r, float sigma_t);
 
     /**
      * @brief execute
@@ -108,10 +108,10 @@ FilterGLBilateral3DSP::FilterGLBilateral3DSP(float sigma_s, float sigma_r,
     InsertFilter(filterT);
 }
 
-void FilterGLBilateral3DSP::Update(float sigma_s, float sigma_r, float sigma_t)
+void FilterGLBilateral3DSP::update(float sigma_s, float sigma_r, float sigma_t)
 {
-    filterS->Update(sigma_s, sigma_r);
-    filterT->Update(sigma_t, sigma_r);
+    filterS->update(sigma_s, sigma_r);
+    filterT->update(sigma_t, sigma_r);
 }
 
 } // end namespace pic

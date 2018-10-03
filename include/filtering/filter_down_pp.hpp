@@ -112,7 +112,7 @@ public:
      */
     FilterDownPP(float *value, float threshold)
     {
-        Update(value, threshold);
+        update(value, threshold);
     }
 
     ~FilterDownPP()
@@ -138,11 +138,11 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param value
      * @param threshold
      */
-    void Update(float *value, float threshold)
+    void update(float *value, float threshold)
     {
         if(value == NULL) {
             this->value = new float[3];

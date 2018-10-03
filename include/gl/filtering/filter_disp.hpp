@@ -48,14 +48,14 @@ public:
     FilterGLDisp();
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma
      * @param sigma_s
      * @param sigma_r
      * @param bUse
      * @param bLeft
      */
-    void Update(float sigma, float sigma_s, float sigma_r, bool bUse, bool bLeft);
+    void update(float sigma, float sigma_s, float sigma_r, bool bUse, bool bLeft);
 
     /**
      * @brief execute
@@ -203,7 +203,7 @@ void FilterGLDisp::InitShaders()
     technique.unbind();
 }
 
-void FilterGLDisp::Update(float sigma, float sigma_s, float sigma_r, bool bUse,
+void FilterGLDisp::update(float sigma, float sigma_s, float sigma_r, bool bUse,
                           bool bLeft)
 {
     this->sigma = sigma;

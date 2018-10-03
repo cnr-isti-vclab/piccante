@@ -58,10 +58,10 @@ public:
     FilterGLChannel(int channel);
 
     /**
-     * @brief Update
+     * @brief update
      * @param channel
      */
-    void Update(int channel);
+    void update(int channel);
 
     /**
      * @brief Process
@@ -102,10 +102,10 @@ public:
         FilterGLChannel filter(0);
         ImageGL *outR = filter.Process(SingleGL(&imgIn), NULL);
 
-        filter.Update(1);
+        filter.update(1);
         ImageGL *outG = filter.Process(SingleGL(&imgIn), NULL);
 
-        filter.Update(2);
+        filter.update(2);
         ImageGL *outB = filter.Process(SingleGL(&imgIn), NULL);
 
         outR->loadToMemory();
@@ -144,10 +144,10 @@ void FilterGLChannel::InitShaders()
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLChannel");
 
-    Update(channel);
+    update(channel);
 }
 
-void FilterGLChannel::Update(int channel)
+void FilterGLChannel::update(int channel)
 {
     setChannel(channel);
 

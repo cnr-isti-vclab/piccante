@@ -51,10 +51,10 @@ public:
     ~FilterSampler2DSub();
 
     /**
-     * @brief Update
+     * @brief update
      * @param isb
      */
-    void Update(ImageSampler *isb);
+    void update(ImageSampler *isb);
 
     /**
      * @brief execute
@@ -83,7 +83,7 @@ public:
     }
 };
 
-PIC_INLINE FilterSampler2DSub::FilterSampler2DSub(ImageSampler *isb)
+PIC_INLINE FilterSampler2DSub::FilterSampler2DSub(ImageSampler *isb) : Filter()
 {
     if(isb != NULL) {
         bIsb = false;
@@ -101,7 +101,7 @@ PIC_INLINE FilterSampler2DSub::~FilterSampler2DSub()
     }
 }
 
-PIC_INLINE void FilterSampler2DSub::Update(ImageSampler *isb)
+PIC_INLINE void FilterSampler2DSub::update(ImageSampler *isb)
 {
     if((this->isb != NULL) && (bIsb)) {
         delete this->isb;

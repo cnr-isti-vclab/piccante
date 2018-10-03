@@ -66,13 +66,13 @@ public:
                      bool bGammaCorrection);
 
     /**
-     * @brief Update
+     * @brief update
      * @param Ld_Max
      * @param b
      * @param LMax
      * @param Lwa
      */
-    void Update(float Ld_Max, float b, float LMax, float Lwa);
+    void update(float Ld_Max, float b, float LMax, float Lwa);
 };
 
 FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()
@@ -164,10 +164,10 @@ void FilterGLDragoTMO::ComputeConstants()
 void FilterGLDragoTMO::InitShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLDragoTMO");
-    Update(Ld_Max, b, LMax, Lwa);
+    update(Ld_Max, b, LMax, Lwa);
 }
 
-void FilterGLDragoTMO::Update(float Ld_Max, float b, float LMax, float Lwa)
+void FilterGLDragoTMO::update(float Ld_Max, float b, float LMax, float Lwa)
 {
     if(Ld_Max > 0.0f) {
         this->Ld_Max = Ld_Max;

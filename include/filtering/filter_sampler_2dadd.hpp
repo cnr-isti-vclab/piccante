@@ -51,10 +51,10 @@ public:
     ~FilterSampler2DAdd();
 
     /**
-     * @brief Update
+     * @brief update
      * @param isb
      */
-    void Update(ImageSampler *isb);
+    void update(ImageSampler *isb);
 
     /**
      * @brief execute
@@ -101,7 +101,7 @@ PIC_INLINE FilterSampler2DAdd::~FilterSampler2DAdd()
     }
 }
 
-PIC_INLINE void FilterSampler2DAdd::Update(ImageSampler *isb)
+PIC_INLINE void FilterSampler2DAdd::update(ImageSampler *isb)
 {
     if((this->isb != NULL) && (bIsb)) {
         delete this->isb;

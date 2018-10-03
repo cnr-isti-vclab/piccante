@@ -111,7 +111,7 @@ public:
             img_lum->getLogMeanVal(&Lwa);
         }
 
-        flt_tmo->Update(Ld_Max, bias, LMax, Lwa);
+        flt_tmo->update(Ld_Max, bias, LMax, Lwa);
         imgOut = flt_tmo->Process(DoubleGL(imgIn, img_lum), imgOut);
 
         return imgOut;

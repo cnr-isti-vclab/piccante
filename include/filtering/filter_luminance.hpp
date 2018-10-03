@@ -119,7 +119,7 @@ public:
         weights = NULL;
         weights_size = -1;
 
-        Update(type);
+        update(type);
     }
 
     ~FilterLuminance()
@@ -130,10 +130,10 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param type
      */
-    void Update(LUMINANCE_TYPE type = LT_CIE_LUMINANCE)
+    void update(LUMINANCE_TYPE type = LT_CIE_LUMINANCE)
     {
         this->type = type;
 

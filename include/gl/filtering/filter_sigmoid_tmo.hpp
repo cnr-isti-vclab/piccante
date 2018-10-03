@@ -57,10 +57,10 @@ public:
     FilterGLSigmoidTMO(float alpha, bool bLocal, bool bGammaCorrection);
 
     /**
-     * @brief Update
+     * @brief update
      * @param alpha
      */
-    void Update(float alpha);
+    void update(float alpha);
 };
 
 FilterGLSigmoidTMO::FilterGLSigmoidTMO(): FilterGL()
@@ -139,10 +139,10 @@ void FilterGLSigmoidTMO::InitShaders()
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLSigmoidTMO");
 
-    Update(alpha);
+    update(alpha);
 }
 
-void FilterGLSigmoidTMO::Update(float alpha)
+void FilterGLSigmoidTMO::update(float alpha)
 {
     if(alpha > 0.0f) {
         this->alpha = alpha;

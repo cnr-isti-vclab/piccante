@@ -68,11 +68,11 @@ public:
     ~FilterGLScatter();
 
     /**
-     * @brief Update
+     * @brief update
      * @param s_S
      * @param s_R
      */
-    void Update(float s_S, float s_R);
+    void update(float s_S, float s_R);
 
     /**
      * @brief Process
@@ -211,10 +211,10 @@ void FilterGLScatter::InitShaders()
 {
     technique.initStandard("410", vertex_source, fragment_source, geometry_source, "FilterGLScatter");
 
-    Update(s_S, s_R);
+    update(s_S, s_R);
 }
 
-void FilterGLScatter::Update(float s_S, float s_R)
+void FilterGLScatter::update(float s_S, float s_R)
 {
     this->s_S = s_S;
     this->s_R = s_R;

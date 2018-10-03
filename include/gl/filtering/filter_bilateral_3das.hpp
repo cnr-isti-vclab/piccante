@@ -62,12 +62,12 @@ public:
     ~FilterGLBilateral3DAS();
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      * @param sigma_t
      */
-    void Update(float sigma_s, float sigma_r, float sigma_t);
+    void update(float sigma_s, float sigma_r, float sigma_t);
 
     /**
      * @brief setFrame
@@ -76,7 +76,7 @@ public:
     void setFrame(int frame)
     {
         this->frame = frame;
-        Update(-1.0f, -1.0f, -1.0f);
+        update(-1.0f, -1.0f, -1.0f);
     }
 
     /**
@@ -233,11 +233,11 @@ void FilterGLBilateral3DAS::InitShaders()
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral3DAS");
 
-    Update(-1.0f, -1.0f, -1.0f);
+    update(-1.0f, -1.0f, -1.0f);
 }
 
 //Change parameters
-void FilterGLBilateral3DAS::Update(float sigma_s, float sigma_r, float sigma_t)
+void FilterGLBilateral3DAS::update(float sigma_s, float sigma_r, float sigma_t)
 {
 
     bool flag = false;

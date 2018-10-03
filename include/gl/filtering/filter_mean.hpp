@@ -48,7 +48,7 @@ public:
         weights = NULL;
         this->kernelSize = -1;
 
-        Update(kernelSize);
+        update(kernelSize);
 
         filter = new FilterGLConv1D(weights, 0, GL_TEXTURE_2D);
 
@@ -70,10 +70,10 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param size
      */
-    void Update(int kernelSize)
+    void update(int kernelSize)
     {
         if(kernelSize < 1)
         {

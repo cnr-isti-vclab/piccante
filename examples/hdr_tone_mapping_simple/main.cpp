@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 
         printf("The best exposure value (mean-based) is: %f f-stops\n", fstop);
 
-        fltSimpleTMO.Update(2.2f, fstop);
+        fltSimpleTMO.update(2.2f, fstop);
 
         pic::Image *img_mean_tmo = fltSimpleTMO.Process(Single(&img), NULL);
 

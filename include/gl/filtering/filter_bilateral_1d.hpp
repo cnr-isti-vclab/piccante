@@ -51,11 +51,11 @@ public:
     void SetUniformAux();
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      */
-    void Update(float sigma_s, float sigma_r);
+    void update(float sigma_s, float sigma_r);
 
     /**
      * @brief execute
@@ -194,7 +194,7 @@ void FilterGLBilateral1D::InitShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral1D");
 
-    Update(sigma_s, sigma_r);
+    update(sigma_s, sigma_r);
 }
 
 void FilterGLBilateral1D::SetUniformAux()
@@ -212,7 +212,7 @@ void FilterGLBilateral1D::SetUniformAux()
     technique.unbind();
 }
 
-void FilterGLBilateral1D::Update(float sigma_s, float sigma_r)
+void FilterGLBilateral1D::update(float sigma_s, float sigma_r)
 {
     this->sigma_s = sigma_s;
     this->sigma_r = sigma_r;

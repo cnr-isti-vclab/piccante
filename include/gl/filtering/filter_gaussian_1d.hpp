@@ -43,10 +43,10 @@ public:
     ~FilterGLGaussian1D();
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma
      */
-    void Update(float sigma);
+    void update(float sigma);
 
     /**
      * @brief execute
@@ -81,7 +81,7 @@ FilterGLGaussian1D::FilterGLGaussian1D(float sigma, int direction = 0,
 
     this->sigma = -1.0f;
 
-    Update(sigma);
+    update(sigma);
 }
 
 FilterGLGaussian1D::~FilterGLGaussian1D()
@@ -96,7 +96,7 @@ FilterGLGaussian1D::~FilterGLGaussian1D()
     }
 }
 
-void FilterGLGaussian1D::Update(float sigma)
+void FilterGLGaussian1D::update(float sigma)
 {
     bool bChanges = false;
 

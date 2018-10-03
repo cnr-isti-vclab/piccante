@@ -64,28 +64,28 @@ public:
     FilterDragoTMO(float Ld_Max, float b, float Lw_Max, float Lwa);
 
     /**
-     * @brief Update
+     * @brief update
      * @param Ld_Max
      * @param b
      * @param Lw_Max
      * @param Lwa
      */
-    void Update(float Ld_Max, float b, float Lw_Max, float Lwa);
+    void update(float Ld_Max, float b, float Lw_Max, float Lwa);
 };
 
 PIC_INLINE FilterDragoTMO::FilterDragoTMO()
 {
-    Update(100.0f, 0.95f, 1e6f, 0.5f);
+    update(100.0f, 0.95f, 1e6f, 0.5f);
 }
 
 
 PIC_INLINE FilterDragoTMO::FilterDragoTMO(float Ld_Max, float b, float Lw_Max,
                                float Lw_a)
 {
-    Update(Ld_Max, b, Lw_Max, Lw_a);
+    update(Ld_Max, b, Lw_Max, Lw_a);
 }
 
-PIC_INLINE void FilterDragoTMO::Update(float Ld_Max, float b, float Lw_Max,
+PIC_INLINE void FilterDragoTMO::update(float Ld_Max, float b, float Lw_Max,
                             float Lw_a)
 {
     //protected values are assigned/computed

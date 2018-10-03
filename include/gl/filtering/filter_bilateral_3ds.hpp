@@ -57,17 +57,17 @@ public:
     FilterGLBilateral3DS(float sigma_s, float sigma_r, float sigma_t);
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      * @param sigma_t
      */
-    void Update(float sigma_s, float sigma_r, float sigma_t);
+    void update(float sigma_s, float sigma_r, float sigma_t);
 
     /**
-     * @brief UpdateUniform
+     * @brief updateUniform
      */
-    void UpdateUniform();
+    void updateUniform();
 
     /**
      * @brief setFrame
@@ -198,10 +198,10 @@ void FilterGLBilateral3DS::InitShaders()
     sigmas2 = 2.0f * sigma_s * sigma_s;
     sigmat2 = 2.0f * sigma_t * sigma_t;
     sigmar2 = 2.0f * sigma_r * sigma_r;
-    UpdateUniform();
+    updateUniform();
 }
 
-void FilterGLBilateral3DS::Update(float sigma_s, float sigma_r, float sigma_t)
+void FilterGLBilateral3DS::update(float sigma_s, float sigma_r, float sigma_t)
 {
 
     bool flag = false;
@@ -233,10 +233,10 @@ void FilterGLBilateral3DS::Update(float sigma_s, float sigma_r, float sigma_t)
     sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
     sigmat2 = 2.0f * this->sigma_t *this->sigma_t;
     sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
-    UpdateUniform();
+    updateUniform();
 }
 
-void FilterGLBilateral3DS::UpdateUniform()
+void FilterGLBilateral3DS::updateUniform()
 {
     technique.bind();
     technique.setUniform1i("u_tex",      0);

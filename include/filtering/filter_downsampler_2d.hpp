@@ -184,19 +184,19 @@ PIC_INLINE void FilterDownSampler2D::PreProcess(ImageVec imgIn,
         scaleY = float(height) / imgIn[0]->heightf;
     }
 
-    isg[X_DIRECTION]->Update(1.0f / (5.0f * scaleX), X_DIRECTION);
-    isg[Y_DIRECTION]->Update(1.0f / (5.0f * scaleY), Y_DIRECTION);
+    isg[X_DIRECTION]->update(1.0f / (5.0f * scaleX), X_DIRECTION);
+    isg[Y_DIRECTION]->update(1.0f / (5.0f * scaleY), Y_DIRECTION);
 
     if(flt[X_DIRECTION] == NULL) {
         flt[X_DIRECTION] = new FilterSampler1D(scaleX, X_DIRECTION, isg[X_DIRECTION]);
     } else {
-        flt[X_DIRECTION]->Update(scaleX, X_DIRECTION, isg[X_DIRECTION]);
+        flt[X_DIRECTION]->update(scaleX, X_DIRECTION, isg[X_DIRECTION]);
     }
 
     if(flt[Y_DIRECTION] == NULL) {
         flt[Y_DIRECTION] = new FilterSampler1D(scaleY, Y_DIRECTION, isg[Y_DIRECTION]);
     } else {
-        flt[Y_DIRECTION]->Update(scaleY, Y_DIRECTION, isg[Y_DIRECTION]);
+        flt[Y_DIRECTION]->update(scaleY, Y_DIRECTION, isg[Y_DIRECTION]);
     }
 
     InsertFilter(flt[X_DIRECTION]);

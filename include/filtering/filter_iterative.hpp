@@ -63,11 +63,11 @@ public:
     virtual Image *SetupAuxN(ImageVec imgIn, Image *imgOut);
 
     /**
-     * @brief Update
+     * @brief update
      * @param flt
      * @param iterations
      */
-    void Update(Filter *flt, int iterations);
+    void update(Filter *flt, int iterations);
 
     /**
      * @brief Process
@@ -102,7 +102,7 @@ PIC_INLINE FilterIterative::FilterIterative(Filter *flt, int iterations)
         imgTmp[i] = NULL;
     }
 
-    Update(flt, iterations);
+    update(flt, iterations);
 }
 
 PIC_INLINE FilterIterative::~FilterIterative()
@@ -127,7 +127,7 @@ PIC_INLINE void FilterIterative::Destroy()
     }
 }
 
-PIC_INLINE void FilterIterative::Update(Filter *flt, int iterations)
+PIC_INLINE void FilterIterative::update(Filter *flt, int iterations)
 {
     if(iterations > 0) {
         this->iterations = iterations;

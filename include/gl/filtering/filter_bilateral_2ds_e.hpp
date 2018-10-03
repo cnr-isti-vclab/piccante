@@ -59,13 +59,13 @@ public:
     ~FilterGLBilateral2DSE();
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_p
      * @param sigma_n
      * @param sigma_a
      */
-    void Update(float sigma_s, float sigma_p, float sigma_n, float sigma_a);
+    void update(float sigma_s, float sigma_p, float sigma_n, float sigma_a);
 
     /**
      * @brief Process
@@ -280,10 +280,10 @@ void FilterGLBilateral2DSE::InitShaders()
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral2DSE");
 
-    Update(-1.0f, -1.0f, -1.0f, -1.0f);
+    update(-1.0f, -1.0f, -1.0f, -1.0f);
 }
 
-void FilterGLBilateral2DSE::Update(float sigma_s, float sigma_p, float sigma_n, float sigma_a)
+void FilterGLBilateral2DSE::update(float sigma_s, float sigma_p, float sigma_n, float sigma_a)
 {
 
     bool flag = false;

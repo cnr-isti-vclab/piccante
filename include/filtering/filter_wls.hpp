@@ -291,9 +291,9 @@ public:
     /**
      * @brief FilterWLS
      */
-    FilterWLS()
+    FilterWLS() : Filter()
     {
-        Update(1.2f, 1.0f);
+        update(1.2f, 1.0f);
     }
 
     /**
@@ -303,15 +303,15 @@ public:
      */
     FilterWLS(float alpha, float lambda)
     {
-        Update(alpha, lambda);
+        update(alpha, lambda);
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param alpha
      * @param lambda
      */
-    void Update(float alpha, float lambda)
+    void update(float alpha, float lambda)
     {
         epsilon = 0.0001f;
 

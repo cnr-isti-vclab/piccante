@@ -82,7 +82,7 @@ protected:
             img_lum->getLogMeanVal(&Lwa);
         }
 
-        flt_tmo_global->Update(alpha / Lwa);
+        flt_tmo_global->update(alpha / Lwa);
         imgOut = flt_tmo_global->Process(DoubleGL(imgIn, img_lum), imgOut);
 
         return imgOut;
@@ -115,7 +115,7 @@ protected:
 
         if(bStatisticsRecompute || (Lwa < 0.0f)) {
             img_lum->getLogMeanVal(&Lwa);
-            fTMO->Update(-1.0f, -1.0f, Lwa);
+            fTMO->update(-1.0f, -1.0f, Lwa);
         }
 
         imgOut = fTMO->Process(DoubleGL(imgIn, img_lum), imgOut);

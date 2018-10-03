@@ -45,7 +45,7 @@ public:
         data = NULL;
         this->size = -1;
 
-        Update(size);
+        update(size);
 
         filter = new FilterConv1D(data, size);
 
@@ -67,10 +67,10 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param size
      */
-    void Update(int size)
+    void update(int size)
     {
         if(size < 1)
         {

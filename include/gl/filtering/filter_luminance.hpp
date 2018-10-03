@@ -50,10 +50,10 @@ public:
     FilterGLLuminance(LUMINANCE_TYPE type);
 
     /**
-     * @brief Update
+     * @brief update
      * @param type
      */
-    void Update(LUMINANCE_TYPE type);
+    void update(LUMINANCE_TYPE type);
 
     /**
      * @brief Process
@@ -129,10 +129,10 @@ void FilterGLLuminance::InitShaders()
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLLuminance");
 
-    Update(type);
+    update(type);
 }
 
-void FilterGLLuminance::Update(LUMINANCE_TYPE type)
+void FilterGLLuminance::update(LUMINANCE_TYPE type)
 {
     this->type = type;
 

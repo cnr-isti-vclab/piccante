@@ -48,10 +48,10 @@ public:
     FilterGLDeformGrid(Image *grid_move);
 
     /**
-     * @brief Update
+     * @brief update
      * @param type
      */
-    void Update(Image *grid_move);
+    void update(Image *grid_move);
 
     /**
      * @brief getCoordinatesAfterTransform
@@ -107,10 +107,10 @@ void FilterGLDeformGrid::InitShaders()
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLDeformGrid");
 
-    Update(NULL);
+    update(NULL);
 }
 
-void FilterGLDeformGrid::Update(Image *grid_move)
+void FilterGLDeformGrid::update(Image *grid_move)
 {
     if(grid_move != NULL) {
 

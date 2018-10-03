@@ -43,11 +43,11 @@ public:
     FilterGLSlicer(float s_S, float s_R);
 
     /**
-     * @brief Update
+     * @brief update
      * @param s_S
      * @param s_R
      */
-    void Update(float s_S, float s_R);
+    void update(float s_S, float s_R);
 };
 
 FilterGLSlicer::FilterGLSlicer(float s_S, float s_R): FilterGL()
@@ -95,10 +95,10 @@ void FilterGLSlicer::InitShaders()
 {
     technique.initStandard("400", vertex_source, fragment_source, "FilterGLSlicer");
 
-    Update(s_S, s_R);
+    update(s_S, s_R);
 }
 
-void FilterGLSlicer::Update(float s_S, float s_R)
+void FilterGLSlicer::update(float s_S, float s_R)
 {
     this->s_S = s_S;
     this->s_R = s_R;

@@ -48,11 +48,11 @@ public:
     FilterGLSimpleTMO(float gamma, float fstop);
 
     /**
-     * @brief Update
+     * @brief update
      * @param fstop
      * @param gamma
      */
-    void Update(float gamma, float fstop);
+    void update(float gamma, float fstop);
 
     /**
      * @brief execute
@@ -136,10 +136,10 @@ void FilterGLSimpleTMO::InitShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLSimpleTMO");
 
-    Update(gamma, fstop);
+    update(gamma, fstop);
 }
 
-void FilterGLSimpleTMO::Update(float gamma, float fstop)
+void FilterGLSimpleTMO::update(float gamma, float fstop)
 {
     this->gamma = gamma;
     this->fstop = fstop;

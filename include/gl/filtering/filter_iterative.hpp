@@ -57,11 +57,11 @@ public:
     virtual ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
-     * @brief Update
+     * @brief update
      * @param flt
      * @param iterations
      */
-    void Update(FilterGL *flt, int iterations);
+    void update(FilterGL *flt, int iterations);
 
     /**
      * @brief getFbo
@@ -93,10 +93,10 @@ FilterGLIterative::FilterGLIterative(FilterGL *flt, int iterations): FilterGL()
     imgTmp[0] = imgTmp[1] = NULL;
     target = GL_TEXTURE_2D;
 
-    Update(flt, iterations);
+    update(flt, iterations);
 }
 
-void FilterGLIterative::Update(FilterGL *flt, int iterations)
+void FilterGLIterative::update(FilterGL *flt, int iterations)
 {
     if(iterations > 0) {
         this->iterations = iterations;

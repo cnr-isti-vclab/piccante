@@ -49,7 +49,7 @@ public:
     FilterGLBilateral2DAS(float sigma_s, float sigma_r);
 
     //Change parameters
-    void Update(float sigma_s, float sigma_r);
+    void update(float sigma_s, float sigma_r);
 
     //Processing
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
@@ -252,11 +252,11 @@ void FilterGLBilateral2DAS::InitShaders()
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral2DAS");
 
-    Update(-1.0f, -1.0f);
+    update(-1.0f, -1.0f);
 }
 
 //Change parameters
-void FilterGLBilateral2DAS::Update(float sigma_s, float sigma_r)
+void FilterGLBilateral2DAS::update(float sigma_s, float sigma_r)
 {
     bool flag = false;
 

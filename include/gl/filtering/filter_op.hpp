@@ -44,11 +44,11 @@ public:
     FilterGLOp(std::string op, bool bTexelFetch, float *c0, float *c1);
 
     /**
-     * @brief Update
+     * @brief update
      * @param c0
      * @param c1
      */
-    void Update(float *c0, float *c1);
+    void update(float *c0, float *c1);
 
     /**
      * @brief CreateOpSetZero
@@ -319,7 +319,7 @@ void FilterGLOp::InitShaders()
     technique.unbind();
 }
 
-void FilterGLOp::Update(float *c0, float *c1)
+void FilterGLOp::update(float *c0, float *c1)
 {
     if(c0 != NULL) {
         for(int i = 0; i < 4; i++) {

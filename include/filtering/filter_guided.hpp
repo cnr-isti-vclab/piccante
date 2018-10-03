@@ -67,7 +67,7 @@ public:
      */
     FilterGuided()
     {
-        Update(3, 0.1f);
+        update(3, 0.1f);
     }
 
     /**
@@ -77,15 +77,15 @@ public:
      */
     FilterGuided(int radius, float e_regularization)
     {
-        Update(radius, e_regularization);
+        update(radius, e_regularization);
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param radius
      * @param e_regularization
      */
-    void Update(int radius, float e_regularization);
+    void update(int radius, float e_regularization);
 
     /**
      * @brief execute
@@ -104,7 +104,7 @@ public:
     }
 };
 
-PIC_INLINE void FilterGuided::Update(int radius, float e_regularization)
+PIC_INLINE void FilterGuided::update(int radius, float e_regularization)
 {
     this->radius = radius;
     this->e_regularization = e_regularization;

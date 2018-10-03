@@ -187,14 +187,14 @@ public:
      */
     FilterKuwahara(int kernelSize = 3)
     {
-        Update(kernelSize);
+        update(kernelSize);
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param kernelSize
      */
-    void Update(int kernelSize)
+    void update(int kernelSize)
     {
         if(kernelSize < 3) {
             kernelSize = 3;

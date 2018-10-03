@@ -59,10 +59,10 @@ public:
     FilterNormal(int colorChannel);
 
     /**
-     * @brief Update
+     * @brief update
      * @param colorChannel
      */
-    void Update(int colorChannel); 
+    void update(int colorChannel);
 
     /**
      * @brief OutputSize
@@ -83,15 +83,15 @@ public:
 
 PIC_INLINE FilterNormal::FilterNormal()
 {
-    Update(0);
+    update(0);
 }
 
 PIC_INLINE FilterNormal::FilterNormal(int colorChannel)
 {
-    Update(colorChannel);
+    update(colorChannel);
 }
 
-PIC_INLINE void FilterNormal::Update(int colorChannel)
+PIC_INLINE void FilterNormal::update(int colorChannel)
 {
     if(colorChannel<0) {
         colorChannel = 0;

@@ -44,11 +44,11 @@ public:
     FilterGLDownPP(float *value, float threshold);
 
     /**
-     * @brief Update
+     * @brief update
      * @param value
      * @param threshold
      */
-    void Update(float *value, float threshold);
+    void update(float *value, float threshold);
 
     /**
      * @brief Process
@@ -64,7 +64,7 @@ FilterGLDownPP::FilterGLDownPP(float *value, float threshold): FilterGL()
     value = NULL;
 
     InitShaders();
-    Update(value, threshold);
+    update(value, threshold);
 }
 
 void FilterGLDownPP::InitShaders()
@@ -118,11 +118,11 @@ void FilterGLDownPP::InitShaders()
 }
 
 /**
- * @brief Update
+ * @brief update
  * @param value
  * @param threshold
  */
-void FilterGLDownPP::Update(float *value, float threshold)
+void FilterGLDownPP::update(float *value, float threshold)
 {
     if(value == NULL) {
         this->value = new float[4];

@@ -57,11 +57,11 @@ public:
     FilterGLBilateral2DF(float sigma_s, float sigma_r);
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      */
-    void Update(float sigma_s, float sigma_r);
+    void update(float sigma_s, float sigma_r);
 
     /**
      * @brief Process
@@ -160,10 +160,10 @@ void FilterGLBilateral2DF::InitShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral2DF");
 
-    Update(-1.0f, -1.0f);
+    update(-1.0f, -1.0f);
 }
 
-void FilterGLBilateral2DF::Update(float sigma_s, float sigma_r)
+void FilterGLBilateral2DF::update(float sigma_s, float sigma_r)
 {
     if(sigma_s > 0.0f) {
         this->sigma_s = sigma_s;

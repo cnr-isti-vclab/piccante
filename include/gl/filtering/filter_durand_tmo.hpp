@@ -59,11 +59,11 @@ public:
                      bool bGammaCorrection);
 
     /**
-     * @brief Update
+     * @brief update
      * @param compression_factor
      * @param log_absolute
      */
-    void Update(float compression_factor, float log_absolute);
+    void update(float compression_factor, float log_absolute);
 };
 
 FilterGLDurandTMO::FilterGLDurandTMO() : FilterGL()
@@ -124,10 +124,10 @@ void FilterGLDurandTMO::InitShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLDurandTMO");
 
-    Update(compression_factor, log_absolute);
+    update(compression_factor, log_absolute);
 }
 
-void FilterGLDurandTMO::Update(float compression_factor, float log_absolute)
+void FilterGLDurandTMO::update(float compression_factor, float log_absolute)
 {
     this->compression_factor = compression_factor;
     this->log_absolute = log_absolute;

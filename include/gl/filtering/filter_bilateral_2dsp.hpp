@@ -63,11 +63,11 @@ public:
     FilterGLBilateral2DSP(float sigma_s, float sigma_r);
 
     /**
-    * @brief Update
+    * @brief update
     * @param sigma_s
     * @param sigma_r
     */
-    void Update(float sigma_s, float sigma_r);
+    void update(float sigma_s, float sigma_r);
 
     /**
      * @brief execute
@@ -141,9 +141,9 @@ FilterGLBilateral2DSP::FilterGLBilateral2DSP(float sigma_s,
     InsertFilter(filter);
 }
 
-void FilterGLBilateral2DSP::Update(float sigma_s, float sigma_r)
+void FilterGLBilateral2DSP::update(float sigma_s, float sigma_r)
 {
-    filter->Update(sigma_s, sigma_r);
+    filter->update(sigma_s, sigma_r);
 }
 
 } // end namespace pic

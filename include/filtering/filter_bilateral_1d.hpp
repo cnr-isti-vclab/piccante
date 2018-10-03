@@ -50,11 +50,11 @@ public:
     FilterBilateral1D(float sigma_s, float sigma_r);
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      */
-    void Update(float sigma_s, float sigma_r);
+    void update(float sigma_s, float sigma_r);
 
     /**
      * @brief Signature
@@ -76,10 +76,10 @@ public:
 PIC_INLINE FilterBilateral1D::FilterBilateral1D(float sigma_s, float sigma_r)
 {
     pg = NULL;
-    Update(sigma_s, sigma_r);
+    update(sigma_s, sigma_r);
 }
 
-PIC_INLINE void FilterBilateral1D::Update(float sigma_s, float sigma_r)
+PIC_INLINE void FilterBilateral1D::update(float sigma_s, float sigma_r)
 {
     //protected values are assigned/computed
     this->sigma_s = sigma_s;

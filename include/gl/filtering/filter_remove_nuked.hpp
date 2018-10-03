@@ -48,10 +48,10 @@ public:
     FilterGLRemoveNuked(float threshold);
 
     /**
-     * @brief Update
+     * @brief update
      * @param threshold
      */
-    void Update(float threshold);
+    void update(float threshold);
 };
 
 FilterGLRemoveNuked::FilterGLRemoveNuked(float threshold): FilterGL()
@@ -113,10 +113,10 @@ void FilterGLRemoveNuked::InitShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLRemoveNuked");
 
-    Update(-1.0f);
+    update(-1.0f);
 }
 
-void FilterGLRemoveNuked::Update(float threshold)
+void FilterGLRemoveNuked::update(float threshold)
 {
     if(threshold > 0.0f) {
         this->threshold = threshold;

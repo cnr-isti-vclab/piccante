@@ -44,10 +44,10 @@ public:
     FilterGLGaussian3D(float sigma);
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma
      */
-    void Update(float sigma);
+    void update(float sigma);
 };
 
 FilterGLGaussian3D::FilterGLGaussian3D(): FilterGLNPasses()
@@ -65,9 +65,9 @@ FilterGLGaussian3D::FilterGLGaussian3D(float sigma): FilterGLNPasses()
     InsertFilter(filter);
 }
 
-void FilterGLGaussian3D::Update(float sigma)
+void FilterGLGaussian3D::update(float sigma)
 {
-    filter->Update(sigma);
+    filter->update(sigma);
 }
 
 } // end namespace pic

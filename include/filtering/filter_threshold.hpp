@@ -99,17 +99,17 @@ public:
      * @param threshold
      * @param bAdaptive
      */
-    FilterThreshold(float threshold = 0.5f, bool bAdaptive = false)
+    FilterThreshold(float threshold = 0.5f, bool bAdaptive = false) : Filter()
     {
-        Update(threshold, bAdaptive);
+        update(threshold, bAdaptive);
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param threshold
      * @param bAdaptive
      */
-    void Update(float threshold, bool bAdaptive)
+    void update(float threshold, bool bAdaptive)
     {
         this->threshold = threshold;
         this->bAdaptive = bAdaptive;

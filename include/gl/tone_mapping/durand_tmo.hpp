@@ -152,7 +152,7 @@ public:
         float compression_factor = log10fPlusEpsilon(target_contrast) / (max_log_base - min_log_base);
         float log_absoulte = compression_factor * max_log_base;
 
-        flt_durand->Update(compression_factor, log_absoulte);
+        flt_durand->update(compression_factor, log_absoulte);
 
         return flt_durand->Process(TripleGL(imgIn, img_lum, img_lum_base), imgOut);
     }

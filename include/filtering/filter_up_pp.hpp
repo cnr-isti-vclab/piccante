@@ -80,9 +80,9 @@ public:
      * @param value
      * @param threshold
      */
-    FilterUpPP(float *value, float threshold)
+    FilterUpPP(float *value, float threshold) : Filter()
     {
-        Update(value, threshold);
+        update(value, threshold);
     }
 
     ~FilterUpPP()
@@ -90,11 +90,11 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param value
      * @param threshold
      */
-    void Update(float *value, float threshold)
+    void update(float *value, float threshold)
     {
         if(value == NULL) {
             this->value = new float[3];

@@ -55,11 +55,11 @@ public:
     ~FilterGLReinhardSinglePass();
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      */
-    void Update(float sigma_s, float sigma_r, float Lwa);
+    void update(float sigma_s, float sigma_r, float Lwa);
 
     /**
      * @brief Process
@@ -193,10 +193,10 @@ void FilterGLReinhardSinglePass::InitShaders()
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLReinhardSinglePass");
 
-    Update(-1.0f, -1.0f, 1.0f);
+    update(-1.0f, -1.0f, 1.0f);
 }
 
-void FilterGLReinhardSinglePass::Update(float sigma_s, float sigma_r, float Lwa)
+void FilterGLReinhardSinglePass::update(float sigma_s, float sigma_r, float Lwa)
 {
     bool flag = false;
 

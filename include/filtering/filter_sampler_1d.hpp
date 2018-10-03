@@ -87,20 +87,20 @@ public:
     FilterSampler1D(int size, int direction, ImageSampler *isb);
 
     /**
-     * @brief Update
+     * @brief update
      * @param scale
      * @param direction
      * @param isb
      */
-    void Update(float scale, int direction, ImageSampler *isb);
+    void update(float scale, int direction, ImageSampler *isb);
 
     /**
-     * @brief Update
+     * @brief update
      * @param size
      * @param direction
      * @param isb
      */
-    void Update(int size, int direction, ImageSampler *isb);
+    void update(int size, int direction, ImageSampler *isb);
 
     /**
      * @brief OutputSize
@@ -148,17 +148,17 @@ PIC_INLINE FilterSampler1D::FilterSampler1D(float scale, int direction = 0,
         ImageSampler *isb = NULL)
 {
     this->isb = NULL;
-    Update(scale, direction, isb);
+    update(scale, direction, isb);
 }
 
 PIC_INLINE FilterSampler1D::FilterSampler1D(int size, int direction = 0,
         ImageSampler *isb = NULL)
 {
     this->isb = NULL;
-    Update(size, direction, isb);
+    update(size, direction, isb);
 }
 
-PIC_INLINE void FilterSampler1D::Update(float scale, int direction,
+PIC_INLINE void FilterSampler1D::update(float scale, int direction,
                                         ImageSampler *isb)
 {
     this->scale = scale;
@@ -168,7 +168,7 @@ PIC_INLINE void FilterSampler1D::Update(float scale, int direction,
     SetImageSampler(isb);
 }
 
-PIC_INLINE void FilterSampler1D::Update(int size, int direction,
+PIC_INLINE void FilterSampler1D::update(int size, int direction,
                                         ImageSampler *isb)
 {
     this->size = size;

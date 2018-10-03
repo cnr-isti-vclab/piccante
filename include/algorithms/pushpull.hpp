@@ -86,13 +86,13 @@ public:
         if(flt_down == NULL) {
             flt_down = new FilterDownPP(value, threshold);
         } else {
-            flt_down->Update(value, threshold);
+            flt_down->update(value, threshold);
         }
 
         if(flt_up == NULL) {
             flt_up = new FilterUpPP(value, threshold);
         } else {
-            flt_up->Update(value, threshold);
+            flt_up->update(value, threshold);
         }
 
         Image *work = imgOut;
