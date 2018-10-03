@@ -637,7 +637,7 @@ public:
      * @brief allocateSimilarTo allocate an Image with similar size
      * of the passed by.
      */
-    void *allocateSimilarTo(Image *img);
+    void allocateSimilarTo(Image *img);
 
     /**
      * @brief Clone creates a deep copy of the calling instance.
@@ -1949,7 +1949,7 @@ PIC_INLINE Image *Image::allocateSimilarOne()
     return ret;
 }
 
-PIC_INLINE void *Image::allocateSimilarTo(Image *img)
+PIC_INLINE void Image::allocateSimilarTo(Image *img)
 {
     if(img != NULL) {
         if(img->isValid()) {
