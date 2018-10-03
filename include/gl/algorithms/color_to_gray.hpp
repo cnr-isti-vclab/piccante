@@ -98,10 +98,10 @@ public:
         }
 
         if(ef == NULL) {
-            ef = new ExposureFusionGL();
+            ef = new ExposureFusionGL(1.0f, 1.0f, 0.0f);
         }
 
-        imgOut = ef->Process(img_vec, imgOut, 1.0f, 1.0f, 0.0f);
+        imgOut = ef->execute(img_vec, imgOut);
 
         return imgOut;
     }

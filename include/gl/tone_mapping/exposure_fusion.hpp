@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_TONE_MAPPING_EXPOSURE_FUSION_TMO_HPP
 #define PIC_GL_TONE_MAPPING_EXPOSURE_FUSION_TMO_HPP
 
+#include "../../util/math.hpp"
+
 #include "../../gl/filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter_exposure_fusion_weights.hpp"
 #include "../../gl/filtering/filter_op.hpp"
@@ -32,14 +34,15 @@ class ExposureFusionGL
 protected:
     FilterGLLuminance  *flt_lum;
     FilterGLExposureFusionWeights *flt_weights;
-    FilterGLOp         *remove_negative, *convert_zero_to_one;
-    ImageGL            *lum, *acc, *weights;
-    PyramidGL          *pW, *pI, *pOut;
+    FilterGLOp *remove_negative, *convert_zero_to_one;
+    ImageGL *lum, *acc, *weights;
+    PyramidGL *pW, *pI, *pOut;
+    float wC, wS, wE;
 
     /**
-     * @brief AllocateFilters
+     * @brief allocateFilters
      */
-    void AllocateFilters()
+    void allocateFilters()
     {
         flt_lum = new FilterGLLuminance();
         remove_negative = new FilterGLOp("max(I0, vec4(0.0))", true, NULL, NULL);
@@ -50,8 +53,10 @@ public:
     /**
      * @brief ExposureFusionGL
      */
-    ExposureFusionGL()
+    ExposureFusionGL(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
     {
+        update(wC, wE, wS);
+
         flt_lum =  NULL;
         flt_weights = NULL;
         convert_zero_to_one = NULL;
@@ -119,17 +124,20 @@ public:
         }
     }
 
+    void update(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
+    {
+        this->wC = CLAMPi(wC, 0.0f, 1.0f);
+        this->wE = CLAMPi(wE, 0.0f, 1.0f);
+        this->wS = CLAMPi(wS, 0.0f, 1.0f);
+    }
+
     /**
-     * @brief Process
+     * @brief execute
      * @param imgIn
      * @param imgOut
-     * @param wC
-     * @param wE
-     * @param wS
      * @return
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut = NULL,
-                     float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
+    ImageGL *execute(ImageGLVec imgIn, ImageGL *imgOut = NULL)
     {
         int n = int(imgIn.size());
 
@@ -153,7 +161,7 @@ public:
         }
 
         if(flt_lum == NULL) {
-            AllocateFilters();
+            allocateFilters();
         }
 
         for(int j = 0; j < n; j++) {
@@ -170,7 +178,7 @@ public:
 
         convert_zero_to_one->Process(SingleGL(acc), acc);
 
-        //Accumulation Pyramid
+        //accumulate on a pyramid
         #ifdef PIC_DEBUG
             printf("Blending...");
         #endif

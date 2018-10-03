@@ -114,22 +114,22 @@ protected:
         switch(method) {
         case 0:
             //apply Reinhard et al.'s TMO (local version)
-            img_tmo = reinhard_tmo->ProcessLocal(&img, img_tmo, 0.18f, 8.0f, NULL);
+            img_tmo = reinhard_tmo->execute(&img, img_tmo, false);
             break;
 
         case 1:
             //apply Reinhard et al.'s TMO (global version)
-            img_tmo = reinhard_tmo->ProcessGlobal(&img, img_tmo, 0.18f);
+            img_tmo = reinhard_tmo->execute(&img, img_tmo, true);
             break;
 
         case 2:
             //apply Drago et al.'s TMO
-            img_tmo = drago_tmo->Process(&img, img_tmo, 100.0f, 0.95f);
+            img_tmo = drago_tmo->execute(&img, img_tmo);
             break;
 
         case 3:
             //apply Durand et al.'s TMO
-            img_tmo = durand_tmo->Process(&img, img_tmo, 5.0f);
+            img_tmo = durand_tmo->execute(&img, img_tmo);
             break;
         }
 

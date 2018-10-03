@@ -113,14 +113,14 @@ public:
             AllocateFilters();
         }
 
-        //Compute segmentation map
+        //compute segmentation map
 #ifdef PIC_DEBUG
         float ms, tot_ms;
         GLuint testTQ1 = glBeginTimeQuery();
 #endif
 
-        //Compute segmentation map
-        seg_map = seg.Compute(imgIn, seg_map);
+        //compute segmentation map
+        seg_map = seg.execute(imgIn, seg_map);
 
 
 #ifdef PIC_DEBUG
@@ -156,23 +156,23 @@ public:
 
         switch(value) {
         case 0: {
-            imgOut = flt_drago->Process(imgIn, imgOut, Ld_Max, b);
+            imgOut = flt_drago->execute(imgIn, imgOut);
         }
         break;
 
         case 1: {
-            imgOut = flt_reinhard->ProcessLocal(imgIn, imgOut, 0.18f, 8.0f, NULL);
+            imgOut = flt_reinhard->execute(imgIn, imgOut, false);
         }
         break;
 
         case 10: {
             //Drago TMO
-            imgDrago = flt_drago->Process(imgIn, imgDrago, Ld_Max, b);
+            imgDrago = flt_drago->execute(imgIn, imgDrago);
             imgDrago->loadToMemory();
             imgDrago->Write("tmp.pfm");
 
             //Reinhard TMO
-            imgReinhard = flt_reinhard->ProcessLocal(imgIn, imgReinhard, 0.18f, 8.0f, NULL);
+            imgReinhard = flt_reinhard->execute(imgIn, imgReinhard);
 
             //Genarating/updating pryamids
             if(pyrA == NULL) {

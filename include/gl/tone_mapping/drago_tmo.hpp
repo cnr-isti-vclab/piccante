@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_TONE_MAPPING_DRAGO_TMO_HPP
 #define PIC_GL_TONE_MAPPING_DRAGO_TMO_HPP
 
+#include "../../util/math.hpp"
 #include "../../gl/filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter_drago_tmo.hpp"
 
@@ -34,13 +35,12 @@ protected:
     FilterGLDragoTMO  *flt_tmo;
 
     ImageGL           *img_lum;
-
-    float              LMax, Lwa;
+    float              LMax, Lwa, Ld_Max, bias;
     bool               bStatisticsRecompute;
     /**
-     * @brief AllocateFilters
+     * @brief allocateFilters
      */
-    void AllocateFilters()
+    void allocateFilters()
     {
         flt_lum = new FilterGLLuminance();
         flt_tmo = new FilterGLDragoTMO();
@@ -80,23 +80,26 @@ public:
         }
     }
 
+    void update(float Ld_Max = 100.0f, float bias = 0.95f)
+    {
+        this->Ld_Max = Ld_Max > 0.0f ? Ld_Max : 100.0f;
+        this->bias = CLAMPi(bias, 0.0f, 1.0f);
+    }
+
     /**
-     * @brief Process
+     * @brief execute
      * @param imgIn
      * @param imgOut
-     * @param Ld_Max
-     * @param bias
      * @return
      */
-    ImageGL *Process(ImageGL *imgIn, ImageGL *imgOut = NULL,
-                     float Ld_Max = 100.0f, float bias = 0.95f)
+    ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut = NULL)
     {
         if(imgIn == NULL) {
             return imgOut;
         }
 
         if(flt_lum == NULL) {
-            AllocateFilters();
+            allocateFilters();
         }
 
         img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);

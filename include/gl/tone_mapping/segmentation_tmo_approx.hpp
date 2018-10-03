@@ -88,10 +88,10 @@ public:
     }
 
     /**
-     * @brief ComputeStatistics
+     * @brief computeStatistics
      * @param imgIn
      */
-    void ComputeStatistics(Image *imgIn)
+    void computeStatistics(Image *imgIn)
     {
         float nLevels, area;
 
@@ -102,12 +102,12 @@ public:
     }
 
     /**
-     * @brief Compute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL *Compute(ImageGL *imgIn, ImageGL *imgOut)
+    ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut)
     {
         if(imgIn == NULL) {
             return imgOut;

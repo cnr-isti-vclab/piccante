@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_TONE_MAPPING_REINHARD_TMO_HPP
 #define PIC_GL_TONE_MAPPING_REINHARD_TMO_HPP
 
+#include "../../util/math.hpp"
+
 #include "../../gl/filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter_sigmoid_tmo.hpp"
 #include "../../gl/filtering/filter_bilateral_2ds.hpp"
@@ -40,16 +42,15 @@ protected:
     FilterGLOp         *simple_sigmoid, *simple_sigmoid_inv;
     ImageGL            *img_lum, *img_lum_adapt;
 
-    float              Lwa;
+    float              Lwa, alpha, phi;
     bool               bStatisticsRecompute;
-    bool               bDomainChange;
 
     FilterGLReinhardSinglePass *fTMO;
 
     /**
-     * @brief AllocateFilters
+     * @brief allocateFilters
      */
-    void AllocateFilters()
+    void allocateFilters()
     {
         flt_lum = new FilterGLLuminance();
         flt_tmo_global = new FilterGLSigmoidTMO(0.18f, false, false);
@@ -59,11 +60,70 @@ protected:
         simple_sigmoid_inv = new FilterGLOp("I0 / (1.0 - I0)", true, NULL, NULL);
     }
 
-public:
     /**
-     * @brief ReinhardTMOGL
+     * @brief executeGlobal
+     * @param imgIn
+     * @param imgOut
+     * @return
      */
-    ReinhardTMOGL(bool bStatisticsRecompute = true)
+    ImageGL *executeGlobal(ImageGL *imgIn, ImageGL *imgOut = NULL)
+    {
+        if(imgIn == NULL) {
+            return imgOut;
+        }
+
+        if(flt_lum == NULL) {
+            allocateFilters();
+        }
+
+        img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
+
+        if(bStatisticsRecompute || (Lwa < 0.0f)) {
+            img_lum->getLogMeanVal(&Lwa);
+        }
+
+        flt_tmo_global->Update(alpha / Lwa);
+        imgOut = flt_tmo_global->Process(DoubleGL(imgIn, img_lum), imgOut);
+
+        return imgOut;
+    }
+
+    /**
+     * @brief executeLocal
+     * @param imgIn
+     * @param imgOut
+     * @param alpha
+     * @param phi
+     * @param filter
+     * @return
+     */
+    ImageGL *executeLocal(ImageGL *imgIn, ImageGL *imgOut = NULL)
+    {
+        if(imgIn == NULL) {
+            return imgOut;
+        }
+
+        if(flt_lum == NULL) {
+            allocateFilters();
+        }
+
+        if(fTMO == NULL) {
+            fTMO = new FilterGLReinhardSinglePass(alpha, phi);
+        }
+
+        img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
+
+        if(bStatisticsRecompute || (Lwa < 0.0f)) {
+            img_lum->getLogMeanVal(&Lwa);
+            fTMO->Update(-1.0f, -1.0f, Lwa);
+        }
+
+        imgOut = fTMO->Process(DoubleGL(imgIn, img_lum), imgOut);
+
+        return imgOut;
+    }
+
+    void setNULL()
     {
         flt_lum = NULL;
         flt_tmo_global = NULL;
@@ -79,9 +139,19 @@ public:
 
         Lwa = -1.0f;
 
-        bDomainChange = true;
-
         fTMO = NULL;
+    }
+
+public:
+
+    /**
+     * @brief ReinhardTMOGL
+     */
+    ReinhardTMOGL(float alpha = 0.15f, float phi = 8.0f, bool bStatisticsRecompute = true)
+    {
+        update(alpha, phi);
+
+        setNULL();
 
         this->bStatisticsRecompute = bStatisticsRecompute;
     }
@@ -92,12 +162,6 @@ public:
             delete flt_lum;
             flt_lum = NULL;
         }
-
-        /*
-        if(flt_tmo != NULL) {
-            delete flt_tmo;
-            flt_tmo = NULL;
-        }*/
 
         if(img_lum != NULL) {
             delete img_lum;
@@ -121,100 +185,33 @@ public:
     }
 
     /**
-     * @brief ProcessGlobal
-     * @param imgIn
-     * @param imgOut
+     * @brief update
      * @param alpha
-     * @return
+     * @param phi
      */
-    ImageGL *ProcessGlobal(ImageGL *imgIn, ImageGL *imgOut = NULL, float alpha = 0.18f)
+    void update(float alpha, float phi)
     {
-        if(imgIn == NULL) {
-            return imgOut;
-        }
-
-        if(flt_lum == NULL) {
-            AllocateFilters();
-        }
-
-        img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
-
-        if(bStatisticsRecompute || (Lwa < 0.0f)) {
-            img_lum->getLogMeanVal(&Lwa);
-        }
-
-        flt_tmo_global->Update(alpha / Lwa);
-        imgOut = flt_tmo_global->Process(DoubleGL(imgIn, img_lum), imgOut);
-
-        return imgOut;
+        this->alpha = alpha > 0.0f ? alpha : 0.15f;
+        this->phi = phi > 0.0f ? phi : 8.0f;
     }
 
     /**
-     * @brief ProcessLocal
+     * @brief execute
      * @param imgIn
      * @param imgOut
-     * @param alpha
-     * @param phi
-     * @param filter
+     * @param bGlobal
      * @return
      */
-    ImageGL *ProcessLocal(ImageGL *imgIn, ImageGL *imgOut = NULL,
-                          float alpha = 0.18f, float phi = 8.0f, FilterGL *filter = NULL)
+    ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut = NULL, bool bGlobal = true)
     {
-        if(imgIn == NULL) {
-            return imgOut;
-        }
-
-        if(flt_lum == NULL) {
-            AllocateFilters();
-        }
-
-        /*
-        if(filter == NULL) {
-            if(this->filter == NULL) {
-
-                float epsilon = 0.05f;
-                float s_max = 8.0f;
-                float sigma_s = 0.56f * powf(1.6f, s_max);
-
-                float sigma_r = (powf(2.0f, phi) * alpha / (s_max * s_max)) * epsilon;
-
-                this->filter = new FilterGLBilateral2DS(sigma_s, sigma_r);
-            }
-
-            filter = this->filter;
-        }
-        */
-
-        if(fTMO == NULL) {
-            fTMO = new FilterGLReinhardSinglePass(alpha, phi);
-        }
-
-        img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
-
-        if(bStatisticsRecompute || (Lwa < 0.0f)) {
-            img_lum->getLogMeanVal(&Lwa);
-            fTMO->Update(-1.0f, -1.0f, Lwa);
-        }
-
-        /*
-
-        if(bDomainChange) {
-            img_lum_adapt = simple_sigmoid->Process(SingleGL(img_lum), img_lum_adapt);
-            img_lum = filter->Process(SingleGL(img_lum_adapt), img_lum);
-            img_lum_adapt = simple_sigmoid_inv->Process(SingleGL(img_lum), img_lum_adapt);
+        if(bGlobal) {
+            return executeGlobal(imgIn, imgOut);
         } else {
-            img_lum_adapt = filter->Process(SingleGL(img_lum), img_lum_adapt);
+            return executeLocal(imgIn, imgOut);
         }
-
-        flt_tmo_local->Update(alpha / Lwa);
-        imgOut = flt_tmo_local->Process(DoubleGL(imgIn, img_lum_adapt), imgOut);
-        */
-
-        imgOut = fTMO->Process(DoubleGL(imgIn, img_lum), imgOut);
-
-        return imgOut;
     }
+
+
 };
 
 } // end namespace pic
