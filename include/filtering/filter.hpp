@@ -30,7 +30,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-//This depends on the architecture!
+//NOTE: This depends on the architecture!
 #define TILE_SIZE 64
 
 struct FilterFData
@@ -350,13 +350,6 @@ PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
 #else
     return Process(imgIn, imgOut);
 #endif
-}
-
-PIC_INLINE std::string GenBilString(std::string type, float sigma_s,
-                                    float sigma_r)
-{
-    std::string ret = type + "_Ss_" + fromNumberToString(sigma_s) + "_Sr_" + fromNumberToString(sigma_r);
-    return ret;
 }
 
 } // end namespace pic

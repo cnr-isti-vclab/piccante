@@ -361,6 +361,20 @@ inline void parseStringToStdVector(std::string str, char delim,
     }
 }
 
+/**
+ * @brief GenBilString
+ * @param type
+ * @param sigma_s
+ * @param sigma_r
+ * @return
+ */
+inline std::string GenBilString(std::string type, float sigma_s,
+                                    float sigma_r)
+{
+    std::string ret = type + "_Ss_" + fromNumberToString(sigma_s) + "_Sr_" + fromNumberToString(sigma_r);
+    return ret;
+}
+
 } // end namespace pic
 
 #endif /* PIC_UTIL_STRING_HPP */
