@@ -33,22 +33,6 @@ class FilterGLBilateral2DSP: public FilterGLNPasses
 protected:
     FilterGLBilateral1D *filter;
 
-    /**
-     * @brief initShaders
-     */
-    void initShaders()
-    {
-
-    }
-
-    /**
-     * @brief FragmentShader
-     */
-    void FragmentShader()
-    {
-
-    }
-
 public:
     /**
      * @brief FilterGLBilateral2DSP
@@ -61,6 +45,8 @@ public:
      * @param sigma_r
      */
     FilterGLBilateral2DSP(float sigma_s, float sigma_r);
+
+    ~FilterGLBilateral2DSP();
 
     /**
     * @brief update
@@ -126,12 +112,16 @@ public:
     }
 };
 
-FilterGLBilateral2DSP::FilterGLBilateral2DSP(): FilterGLNPasses()
+PIC_INLINE FilterGLBilateral2DSP::FilterGLBilateral2DSP(): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
+
+    filter = new FilterGLBilateral1D(1.0f, 0.01f, 0, GL_TEXTURE_2D);
+    insertFilter(filter);
+    insertFilter(filter);
 }
 
-FilterGLBilateral2DSP::FilterGLBilateral2DSP(float sigma_s,
+PIC_INLINE FilterGLBilateral2DSP::FilterGLBilateral2DSP(float sigma_s,
         float sigma_r): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
@@ -141,7 +131,15 @@ FilterGLBilateral2DSP::FilterGLBilateral2DSP(float sigma_s,
     insertFilter(filter);
 }
 
-void FilterGLBilateral2DSP::update(float sigma_s, float sigma_r)
+PIC_INLINE FilterGLBilateral2DSP::~FilterGLBilateral2DSP()
+{
+    if(filter != NULL) {
+        delete filter;
+        filter = NULL;
+    }
+}
+
+PIC_INLINE void FilterGLBilateral2DSP::update(float sigma_s, float sigma_r)
 {
     filter->update(sigma_s, sigma_r);
 }

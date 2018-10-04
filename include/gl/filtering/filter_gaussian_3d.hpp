@@ -47,12 +47,12 @@ public:
     void update(float sigma);
 };
 
-FilterGLGaussian3D::FilterGLGaussian3D(): FilterGLNPasses()
+PIC_INLINE FilterGLGaussian3D::FilterGLGaussian3D(): FilterGLNPasses()
 {
     target = GL_TEXTURE_3D;
 }
 
-FilterGLGaussian3D::FilterGLGaussian3D(float sigma): FilterGLNPasses()
+PIC_INLINE FilterGLGaussian3D::FilterGLGaussian3D(float sigma): FilterGLNPasses()
 {
     filter = new FilterGLGaussian1D(sigma, 0, GL_TEXTURE_3D);
     target = GL_TEXTURE_3D;
@@ -62,7 +62,7 @@ FilterGLGaussian3D::FilterGLGaussian3D(float sigma): FilterGLNPasses()
     insertFilter(filter);
 }
 
-void FilterGLGaussian3D::update(float sigma)
+PIC_INLINE void FilterGLGaussian3D::update(float sigma)
 {
     filter->update(sigma);
 }

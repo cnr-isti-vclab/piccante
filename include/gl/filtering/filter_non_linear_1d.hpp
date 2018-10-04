@@ -138,9 +138,9 @@ public:
     }
 
     /**
-     * @brief SetUniformAux
+     * @brief setUniformAux
      */
-    void SetUniformAux()
+    void setUniformAux()
     {
         technique.setUniform1i("halfKernelSize", halfKernelSize);
         technique.setUniform1i("kernelSize", kernelSize);

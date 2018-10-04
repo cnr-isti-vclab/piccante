@@ -36,6 +36,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QVBoxLayout>
 #include <QLabel>
 
+#define PIC_DEBUG
+
 #include "piccante.hpp"
 
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
@@ -46,6 +48,7 @@ protected:
     pic::FilterGLBilateral2DG *fltBilG;
     pic::FilterGLBilateral2DSP *fltBilSP;
     pic::FilterGLBilateral2DS *fltBilS;
+    pic::FilterGLGaussian2D *fltGauss;
 
     pic::ImageGL *img, *img_flt, *img_flt_tmo;
     pic::TechniqueGL technique;
@@ -82,14 +85,19 @@ protected:
         //allocate a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        //allocate a new bilateral filter
-        fltBilG = new pic::FilterGLBilateral2DG(4.0f, 0.1f);
+        float sigma_s = 8.0f;
+        float sigma_r = 0.2f;
+
+        fltGauss = new pic::FilterGLGaussian2D(sigma_s);
 
         //allocate a new bilateral filter
-        fltBilSP = new pic::FilterGLBilateral2DSP(4.0f, 0.1f);
+        fltBilG = new pic::FilterGLBilateral2DG(sigma_s, sigma_r);
 
         //allocate a new bilateral filter
-        fltBilS = new pic::FilterGLBilateral2DS(4.0f, 0.1f);
+        fltBilSP = new pic::FilterGLBilateral2DSP(sigma_s, sigma_r);
+
+        //allocate a new bilateral filter
+        fltBilS = new pic::FilterGLBilateral2DS(sigma_s, sigma_r);
 
         img_flt_tmo = NULL;
         img_flt = NULL;
@@ -127,17 +135,23 @@ protected:
 
             case 1:
                 //apply the bilateral grid filter
-                img_flt = fltBilG->Process(SingleGL(img), img_flt);
+                img_flt = fltGauss->Process(SingleGL(img), img_flt);
                 img_out = img_flt;
             break;
 
             case 2:
+                //apply the bilateral grid filter
+                img_flt = fltBilG->Process(SingleGL(img), img_flt);
+                img_out = img_flt;
+            break;
+
+            case 3:
                 //apply the separate bilateral filter
                 img_flt = fltBilSP->Process(SingleGL(img), img_flt);
                 img_out = img_flt;
             break;
 
-            case 3:
+            case 4:
                 //apply the sampling bilateral filter
                 img_flt = fltBilS->Process(SingleGL(img), img_flt);
                 img_out = img_flt;
@@ -178,7 +192,7 @@ public:
      */
     void update()
     {
-        method = (method + 1) % 4;
+        method = (method + 1) % 5;
     }
 };
 

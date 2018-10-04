@@ -30,7 +30,6 @@ class FilterGLBilateral1D: public FilterGL1D
 protected:
     float sigma_s, sigma_r;
 
-    void initShaders();
     void FragmentShader();
 
 public:
@@ -46,9 +45,9 @@ public:
                         GLenum target);
 
     /**
-     * @brief SetUniformAux
+     * @brief setUniformAux
      */
-    void SetUniformAux();
+    void setUniformAux();
 
     /**
      * @brief update
@@ -190,26 +189,17 @@ void FilterGLBilateral1D::FragmentShader()
     }
 }
 
-void FilterGLBilateral1D::initShaders()
+void FilterGLBilateral1D::setUniformAux()
 {
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral1D");
-
-    update(sigma_s, sigma_r);
-}
-
-void FilterGLBilateral1D::SetUniformAux()
-{
-    float sigma_s2 = 2.0f * sigma_s * sigma_s;
-    float sigma_r2 = 2.0f * sigma_r * sigma_r;
+    float sigma_s_sq2 = 2.0f * sigma_s * sigma_s;
+    float sigma_r_sq2 = 2.0f * sigma_r * sigma_r;
 
     //Precomputation of the Gaussian Kernel
-    int halfKernelSize = PrecomputedGaussian::getKernelSize(sigma_s) >> 1;
+    int halfKernelSize = PrecomputedGaussian::getKernelSize(MAX(sigma_s, sigma_r)) >> 1;
 
-    technique.bind();
-    technique.setUniform1f("sigma_s2",	sigma_s2);
-    technique.setUniform1f("sigma_r2",	sigma_r2);
+    technique.setUniform1f("sigma_s2",	sigma_s_sq2);
+    technique.setUniform1f("sigma_r2",	sigma_r_sq2);
     technique.setUniform1i("halfKernelSize", halfKernelSize);
-    technique.unbind();
 }
 
 void FilterGLBilateral1D::update(float sigma_s, float sigma_r)

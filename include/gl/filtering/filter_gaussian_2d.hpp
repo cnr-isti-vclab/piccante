@@ -31,9 +31,6 @@ class FilterGLGaussian2D: public FilterGLNPasses
 protected:
     FilterGLGaussian1D *filter;
 
-    void initShaders() {}
-    void FragmentShader() {}
-
 public:
     /**
      * @brief FilterGLGaussian2D
@@ -86,7 +83,7 @@ public:
     }
 };
 
-FilterGLGaussian2D::FilterGLGaussian2D(): FilterGLNPasses()
+PIC_INLINE FilterGLGaussian2D::FilterGLGaussian2D(): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
 
@@ -95,7 +92,7 @@ FilterGLGaussian2D::FilterGLGaussian2D(): FilterGLNPasses()
     insertFilter(filter);
 }
 
-FilterGLGaussian2D::FilterGLGaussian2D(float sigma): FilterGLNPasses()
+PIC_INLINE FilterGLGaussian2D::FilterGLGaussian2D(float sigma): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
 
@@ -104,15 +101,15 @@ FilterGLGaussian2D::FilterGLGaussian2D(float sigma): FilterGLNPasses()
     insertFilter(filter);
 }
 
-FilterGLGaussian2D::~FilterGLGaussian2D()
+PIC_INLINE FilterGLGaussian2D::~FilterGLGaussian2D()
 {
     if(filter != NULL) {
-       delete filter;
+        delete filter;
         filter = NULL;
     }
 }
 
-void FilterGLGaussian2D::update(float sigma)
+PIC_INLINE void FilterGLGaussian2D::update(float sigma)
 {
     filter->update(sigma);
 }

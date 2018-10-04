@@ -37,7 +37,7 @@ protected:
     /**
      * @brief initShaders
      */
-    void initShaders();
+    virtual void initShaders();
 
     /**
      * @brief FragmentShader
