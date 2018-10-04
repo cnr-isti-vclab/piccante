@@ -32,7 +32,7 @@ protected:
 
 protected:
     FilterGLNonLinear1D *filter;
-    int                 kernelSize;
+    int kernelSize;
 
 public:
 
@@ -44,8 +44,8 @@ public:
     {
         filter = new FilterGLNonLinear1D(kernelSize, "max");
 
-        InsertFilter(filter);
-        InsertFilter(filter);
+        insertFilter(filter);
+        insertFilter(filter);
     }
 
     ~FilterGLMax()

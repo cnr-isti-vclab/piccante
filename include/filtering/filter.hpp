@@ -114,11 +114,11 @@ public:
     }
 
     /**
-     * @brief ChangePass changes the pass direction.
+     * @brief changePass changes the pass direction.
      * @param pass
      * @param tPass
      */
-    virtual void ChangePass(int pass, int tPass) {}
+    virtual void changePass(int pass, int tPass) {}
 
     /**
      * @brief Signature returns the signature for the filter.

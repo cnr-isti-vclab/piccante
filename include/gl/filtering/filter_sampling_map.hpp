@@ -141,10 +141,10 @@ void FilterGLSamplingMap::Setup(float sigma, float scale)
     //	filterG2D = new FilterGLGaussian2D(sigma*scale);
     filterD = new FilterGLSampler2D(scale);
 
-    InsertFilter(filterD);
-    InsertFilter(filterS);
-    InsertFilter(filterG);
-    InsertFilter(filterG2D);
+    insertFilter(filterD);
+    insertFilter(filterS);
+    insertFilter(filterG);
+    insertFilter(filterG2D);
 }
 
 FilterGLSamplingMap::~FilterGLSamplingMap()

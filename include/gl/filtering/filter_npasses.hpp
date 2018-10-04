@@ -41,10 +41,10 @@ public:
     virtual ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
-     * @brief InsertFilter
+     * @brief insertFilter
      * @param flt
      */
-    void InsertFilter(FilterGL *flt);
+    void insertFilter(FilterGL *flt);
 
     /**
      * @brief getFbo
@@ -78,7 +78,7 @@ FilterGLNPasses::~FilterGLNPasses()
         imgAllocated = NULL;
     }
 }
-void FilterGLNPasses::InsertFilter(FilterGL *flt)
+void FilterGLNPasses::insertFilter(FilterGL *flt)
 {
     if(flt == NULL) {
         return;
@@ -86,7 +86,7 @@ void FilterGLNPasses::InsertFilter(FilterGL *flt)
 
     if(flt->filters.size() > 0) {
         for(unsigned int i = 0; i < flt->filters.size(); i++) {
-            InsertFilter(flt->filters[i]);
+            insertFilter(flt->filters[i]);
         }
     } else {
 
@@ -139,14 +139,14 @@ ImageGL *FilterGLNPasses::Process(ImageGLVec imgIn, ImageGL *imgOut)
         return imgOut;
     }
 
-    //Allocate FBOs
+    //allocate FBOs
     imgOut = SetupAuxN(imgIn, imgOut);
 
-    filters[0]->ChangePass(0, int(filters.size()));
+    filters[0]->changePass(0, int(filters.size()));
     filters[0]->Process(imgIn, imgTmp[0]);
 
     for(auto i = 1; i < filters.size(); i++) {
-        filters[i]->ChangePass(i, int(filters.size()));
+        filters[i]->changePass(i, int(filters.size()));
         imgIn[0] = imgTmp[(i + 1) % 2];
         filters[i]->Process(imgIn, imgTmp[i % 2]);
     }

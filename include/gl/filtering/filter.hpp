@@ -104,11 +104,11 @@ public:
     }
 
     /**
-     * @brief ChangePass
+     * @brief changePass
      * @param pass
      * @param tPass
      */
-    virtual void ChangePass(int pass, int tPass)
+    virtual void changePass(int pass, int tPass)
     {
     }
 
@@ -121,12 +121,12 @@ public:
     virtual ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
-     * @brief GammaCorrection
+     * @brief gammaCorrection
      * @param fragment_source
      * @param bGammaCorrection
      * @return
      */
-    static std::string GammaCorrection(std::string fragment_source,
+    static std::string gammaCorrection(std::string fragment_source,
                                        bool bGammaCorrection)
     {
         size_t processing_found = fragment_source.find("__GAMMA__CORRECTION__");
@@ -134,7 +134,7 @@ public:
         if(processing_found != std::string::npos) {
             if(bGammaCorrection) {
                 fragment_source.replace(processing_found, 21,
-                                        " color = pow(color,vec3(1.0/2.2)); ");
+                                        " color = pow(color, vec3(1.0 / 2.2)); ");
             } else {
                 fragment_source.replace(processing_found, 21, " ");
             }

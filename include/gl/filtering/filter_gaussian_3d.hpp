@@ -60,9 +60,9 @@ FilterGLGaussian3D::FilterGLGaussian3D(float sigma): FilterGLNPasses()
     filter = new FilterGLGaussian1D(sigma, 0, GL_TEXTURE_3D);
     target = GL_TEXTURE_3D;
 
-    InsertFilter(filter);
-    InsertFilter(filter);
-    InsertFilter(filter);
+    insertFilter(filter);
+    insertFilter(filter);
+    insertFilter(filter);
 }
 
 void FilterGLGaussian3D::update(float sigma)

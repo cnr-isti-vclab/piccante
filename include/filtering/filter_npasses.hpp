@@ -28,8 +28,8 @@ namespace pic {
 class FilterNPasses: public Filter
 {
 protected:
-    Image   *imgAllocated;
-    Image	*imgTmpSame[2];
+    Image *imgAllocated;
+    Image *imgTmpSame[2];
     ImageVec imgTmp;
 
     bool CheckSame(ImageVec imgIn);
@@ -90,10 +90,10 @@ public:
     Image *ProcessSame(ImageVec imgIn, Image *imgOut, bool parallel);
 
     /**
-     * @brief InsertFilter
+     * @brief insertFilter
      * @param flt
      */
-    void InsertFilter(Filter *flt);
+    void insertFilter(Filter *flt);
 
     /**
      * @brief Process
@@ -161,7 +161,7 @@ PIC_INLINE bool FilterNPasses::CheckSame(ImageVec imgIn)
     return true;
 }
 
-PIC_INLINE void FilterNPasses::InsertFilter(Filter *flt)
+PIC_INLINE void FilterNPasses::insertFilter(Filter *flt)
 {
     if(flt == NULL) {
         return;
@@ -169,7 +169,7 @@ PIC_INLINE void FilterNPasses::InsertFilter(Filter *flt)
 
     if(flt->filters.size() > 0) {
         for(unsigned int i = 0; i < flt->filters.size(); i++) {
-            InsertFilter(flt->filters[i]);
+            insertFilter(flt->filters[i]);
         }
     } else {
         filters.push_back(flt);
@@ -225,7 +225,7 @@ PIC_INLINE Image *FilterNPasses::ProcessGen(ImageVec imgIn, Image *imgOut,
     int n =  int(filters.size()) - 1;
     
     for(int i = 0; i < n; i++) {
-        filters[i]->ChangePass(i, imgIn[0]->frames);
+        filters[i]->changePass(i, imgIn[0]->frames);
         
         if(parallel) {
             imgTmp[i] = filters[i]->ProcessP(imgIn, imgTmp[i]);
@@ -236,7 +236,7 @@ PIC_INLINE Image *FilterNPasses::ProcessGen(ImageVec imgIn, Image *imgOut,
         imgIn[0] = imgTmp[i];
     }
 
-    filters[n]->ChangePass(n, imgIn[0]->frames);
+    filters[n]->changePass(n, imgIn[0]->frames);
     imgOut = filters[n]->Process(imgIn, imgOut);
 
     return imgOut;
@@ -253,7 +253,7 @@ PIC_INLINE Image *FilterNPasses::ProcessSame(ImageVec imgIn, Image *imgOut,
     imgOut = SetupAuxNSame(imgIn, imgOut);
 
     //Pass 0
-    filters[0]->ChangePass(0, imgIn[0]->frames);
+    filters[0]->changePass(0, imgIn[0]->frames);
 
     if(parallel) {
         filters[0]->ProcessP(imgIn, imgTmpSame[0]);
@@ -262,7 +262,7 @@ PIC_INLINE Image *FilterNPasses::ProcessSame(ImageVec imgIn, Image *imgOut,
     }
 
     for(unsigned int i = 1; i < filters.size(); i++) {
-        filters[i]->ChangePass(i, imgIn[0]->frames);
+        filters[i]->changePass(i, imgIn[0]->frames);
 
         imgIn[0] = imgTmpSame[(i + 1) % 2];
 

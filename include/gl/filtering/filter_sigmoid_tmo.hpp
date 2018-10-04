@@ -130,7 +130,7 @@ void FilterGLSigmoidTMO::FragmentShader()
                                 " float Lscale = Lw * alpha;\n float Ld = Lscale / (Lscale + epsilon); ");
     }
 
-    fragment_source = GammaCorrection(fragment_source, bGammaCorrection);
+    fragment_source = gammaCorrection(fragment_source, bGammaCorrection);
 }
 
 void FilterGLSigmoidTMO::initShaders()

@@ -41,8 +41,8 @@ public:
     {
         conv1DFltX = new FilterConv1D(data, n);
 
-        InsertFilter(conv1DFltX);
-        InsertFilter(conv1DFltX);
+        insertFilter(conv1DFltX);
+        insertFilter(conv1DFltX);
     }
 
     /**
@@ -55,10 +55,10 @@ public:
     FilterConv2DSP(float *dataX, int nX, float *dataY, int nY)
     {
         conv1DFltX = new FilterConv1D(dataX, nX);
-        InsertFilter(conv1DFltX);
+        insertFilter(conv1DFltX);
 
         conv1DFltY = new FilterConv1D(dataY, nY);
-        InsertFilter(conv1DFltY);
+        insertFilter(conv1DFltY);
     }
 
     ~FilterConv2DSP()

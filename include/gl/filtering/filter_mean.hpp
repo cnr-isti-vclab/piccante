@@ -31,10 +31,10 @@ class FilterGLMean: public FilterGLNPasses
 protected:
 
 protected:
-    FilterGLConv1D  *filter;
-    ImageGL      *weights;
-    float           *data;
-    int             kernelSize;
+    FilterGLConv1D *filter;
+    ImageGL *weights;
+    float *data;
+    int kernelSize;
 
 public:
 
@@ -52,8 +52,8 @@ public:
 
         filter = new FilterGLConv1D(weights, 0, GL_TEXTURE_2D);
 
-        InsertFilter(filter);
-        InsertFilter(filter);
+        insertFilter(filter);
+        insertFilter(filter);
     }
 
     ~FilterGLMean()

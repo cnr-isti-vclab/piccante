@@ -147,11 +147,11 @@ PIC_INLINE void FilterSamplingMap::Setup(float sigma, float scale)
     fltG = new FilterGradient();
     fltG2D = new FilterGaussian2D(sigma);
 
-    InsertFilter(fltL);     //Luminance
-    InsertFilter(fltD);     //Downsampling
-    InsertFilter(fltS);     //Sigmoid TMO
-    InsertFilter(fltG);     //Gradient
-    InsertFilter(fltG2D);   //Gaussian
+    insertFilter(fltL);     //Luminance
+    insertFilter(fltD);     //Downsampling
+    insertFilter(fltS);     //Sigmoid TMO
+    insertFilter(fltG);     //Gradient
+    insertFilter(fltG2D);   //Gaussian
 }
 
 } // end namespace pic

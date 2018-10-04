@@ -42,8 +42,8 @@ public:
         //DCT 1D filter
         fltDCT1D = new FilterDCT1D(nCoeff, bForward);
 
-        InsertFilter(fltDCT1D);
-        InsertFilter(fltDCT1D);
+        insertFilter(fltDCT1D);
+        insertFilter(fltDCT1D);
     }
 
     ~FilterDCT2D()
@@ -60,40 +60,40 @@ public:
     /**
      * @brief SetForward
      */
-    void SetForward()
+    void setForward()
     {
-        fltDCT1D->SetForward();
+        fltDCT1D->setForward();
     }
 
     /**
-     * @brief SetInverse
+     * @brief setInverse
      */
-    void SetInverse()
+    void setInverse()
     {
-        fltDCT1D->SetInverse();
+        fltDCT1D->setInverse();
     }
 
     /**
-     * @brief Transform
+     * @brief transform
      * @param imgIn
      * @param imgOut
      * @param nCoeff
      * @return
      */
-    static Image *Transform(Image *imgIn, Image *imgOut, int nCoeff)
+    static Image *transform(Image *imgIn, Image *imgOut, int nCoeff)
     {
         FilterDCT2D filter(nCoeff, true);
         return filter.Process(Single(imgIn), imgOut);
     }
 
     /**
-     * @brief Inverse
+     * @brief inverse
      * @param imgIn
      * @param imgOut
      * @param nCoeff
      * @return
      */
-    static Image *Inverse(Image *imgIn, Image *imgOut, int nCoeff)
+    static Image *inverse(Image *imgIn, Image *imgOut, int nCoeff)
     {
         FilterDCT2D filter(nCoeff, false);
         return filter.ProcessP(Single(imgIn), imgOut);

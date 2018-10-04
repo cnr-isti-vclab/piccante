@@ -150,7 +150,7 @@ void FilterGLDragoTMO::FragmentShader()
     }\n
                       );
 
-    fragment_source = GammaCorrection(fragment_source, bGammaCorrection);
+    fragment_source = gammaCorrection(fragment_source, bGammaCorrection);
 }
 
 void FilterGLDragoTMO::computeConstants()

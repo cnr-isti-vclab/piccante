@@ -117,7 +117,7 @@ void FilterGLDurandTMO::FragmentShader()
     }\n
                       );
 
-    fragment_source = GammaCorrection(fragment_source, bGammaCorrection);
+    fragment_source = gammaCorrection(fragment_source, bGammaCorrection);
 }
 
 void FilterGLDurandTMO::initShaders()

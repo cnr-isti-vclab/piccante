@@ -44,8 +44,8 @@ public:
     {
         filter = new FilterGLNonLinear1D(kernelSize, "min");
 
-        InsertFilter(filter);
-        InsertFilter(filter);
+        insertFilter(filter);
+        insertFilter(filter);
     }
 
     ~FilterGLMin()

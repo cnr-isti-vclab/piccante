@@ -48,9 +48,9 @@ public:
         //Gaussian filter
         gaussianFilter = new FilterGaussian1D(sigma);
 
-        InsertFilter((Filter *)gaussianFilter);
-        InsertFilter((Filter *)gaussianFilter);
-        InsertFilter((Filter *)gaussianFilter);
+        insertFilter((Filter *)gaussianFilter);
+        insertFilter((Filter *)gaussianFilter);
+        insertFilter((Filter *)gaussianFilter);
     }
 
     ~FilterGaussian3D()

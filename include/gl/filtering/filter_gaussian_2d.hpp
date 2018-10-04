@@ -29,7 +29,7 @@ namespace pic {
 class FilterGLGaussian2D: public FilterGLNPasses
 {
 protected:
-    FilterGLGaussian1D		*filter;
+    FilterGLGaussian1D *filter;
 
     void initShaders() {}
     void FragmentShader() {}
@@ -91,8 +91,8 @@ FilterGLGaussian2D::FilterGLGaussian2D(): FilterGLNPasses()
     target = GL_TEXTURE_2D;
 
     filter = new FilterGLGaussian1D(1.0f, 0, target);
-    InsertFilter(filter);
-    InsertFilter(filter);
+    insertFilter(filter);
+    insertFilter(filter);
 }
 
 FilterGLGaussian2D::FilterGLGaussian2D(float sigma): FilterGLNPasses()
@@ -100,8 +100,8 @@ FilterGLGaussian2D::FilterGLGaussian2D(float sigma): FilterGLNPasses()
     target = GL_TEXTURE_2D;
 
     filter = new FilterGLGaussian1D(sigma, 0, target);
-    InsertFilter(filter);
-    InsertFilter(filter);
+    insertFilter(filter);
+    insertFilter(filter);
 }
 
 FilterGLGaussian2D::~FilterGLGaussian2D()

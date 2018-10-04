@@ -137,8 +137,8 @@ FilterGLBilateral2DSP::FilterGLBilateral2DSP(float sigma_s,
     target = GL_TEXTURE_2D;
 
     filter = new FilterGLBilateral1D(sigma_s, sigma_r, 0, GL_TEXTURE_2D);
-    InsertFilter(filter);
-    InsertFilter(filter);
+    insertFilter(filter);
+    insertFilter(filter);
 }
 
 void FilterGLBilateral2DSP::update(float sigma_s, float sigma_r)

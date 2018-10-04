@@ -103,9 +103,9 @@ FilterGLBilateral3DSP::FilterGLBilateral3DSP(float sigma_s, float sigma_r,
     filterS = new FilterGLBilateral1D(sigma_s, sigma_r, 0, target);
     filterT = new FilterGLBilateral1D(sigma_t, sigma_r, 0, target);
 
-    InsertFilter(filterS);
-    InsertFilter(filterS);
-    InsertFilter(filterT);
+    insertFilter(filterS);
+    insertFilter(filterS);
+    insertFilter(filterT);
 }
 
 void FilterGLBilateral3DSP::update(float sigma_s, float sigma_r, float sigma_t)

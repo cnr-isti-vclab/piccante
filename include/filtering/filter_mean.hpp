@@ -49,8 +49,8 @@ public:
 
         filter = new FilterConv1D(data, size);
 
-        InsertFilter(filter);
-        InsertFilter(filter);
+        insertFilter(filter);
+        insertFilter(filter);
     }
 
     ~FilterMean()

@@ -40,8 +40,8 @@ public:
     {
         gaussianFilter = new FilterGaussian1D(sigma);
 
-        InsertFilter(gaussianFilter);
-        InsertFilter(gaussianFilter);
+        insertFilter(gaussianFilter);
+        insertFilter(gaussianFilter);
     }
 
     ~FilterGaussian2D()

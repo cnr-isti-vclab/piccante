@@ -199,8 +199,8 @@ PIC_INLINE void FilterDownSampler2D::PreProcess(ImageVec imgIn,
         flt[Y_DIRECTION]->update(scaleY, Y_DIRECTION, isg[Y_DIRECTION]);
     }
 
-    InsertFilter(flt[X_DIRECTION]);
-    InsertFilter(flt[Y_DIRECTION]);
+    insertFilter(flt[X_DIRECTION]);
+    insertFilter(flt[Y_DIRECTION]);
 }
 
 } // end namespace pic

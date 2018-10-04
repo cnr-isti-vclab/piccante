@@ -41,8 +41,8 @@ public:
     {
         bilateralFilter = new FilterBilateral1D(sigma_s, sigma_r);
 
-        InsertFilter(bilateralFilter);
-        InsertFilter(bilateralFilter);
+        insertFilter(bilateralFilter);
+        insertFilter(bilateralFilter);
     }
 
     ~FilterBilateral2DSP()
