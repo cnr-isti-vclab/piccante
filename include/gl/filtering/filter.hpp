@@ -89,7 +89,7 @@ public:
      * @brief getFbo
      * @return
      */
-    virtual Fbo  *getFbo()
+    virtual Fbo *getFbo()
     {
         return fbo;
     }

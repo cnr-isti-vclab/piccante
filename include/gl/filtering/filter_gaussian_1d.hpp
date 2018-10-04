@@ -90,6 +90,7 @@ FilterGLGaussian1D::~FilterGLGaussian1D()
         delete weights;
         weights = NULL;
     }
+
     if(pg != NULL) {
         delete pg;
         pg = NULL;
@@ -107,9 +108,12 @@ void FilterGLGaussian1D::update(float sigma)
 
     if(pg != NULL) {
         delete pg;
+        pg = NULL;
     }
 
-    pg = new PrecomputedGaussian(this->sigma);
+    if(pg == NULL) {
+        pg = new PrecomputedGaussian(this->sigma);
+    }
 
     if(bChanges || weights == NULL) {
         if(weights != NULL) {
@@ -120,7 +124,7 @@ void FilterGLGaussian1D::update(float sigma)
         weights->generateTextureGL();
     }
 
-    SetUniform();
+    setUniform();
 }
 
 } // end namespace pic

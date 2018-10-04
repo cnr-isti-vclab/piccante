@@ -44,6 +44,8 @@ protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
     pic::FilterGLBilateral2DG *fltBilG;
+    pic::FilterGLBilateral2DSP *fltBilSP;
+    pic::FilterGLBilateral2DS *fltBilS;
 
     pic::ImageGL *img, *img_flt, *img_flt_tmo;
     pic::TechniqueGL technique;
@@ -65,23 +67,32 @@ protected:
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
-        //reading an input image
+        //read an input image
         img = new pic::ImageGL();
         img->Read("../data/input/yellow_flowers.png");
         img->generateTextureGL();
 
-        //creating a screen aligned quad
+        //create a screen aligned quad
         pic::QuadGL::getTechnique(technique,
                                 pic::QuadGL::getVertexProgramV3(),
                                 pic::QuadGL::getFragmentProgramForView());
 
         quad = new pic::QuadGL(true);
 
-        //allocating a new filter for simple tone mapping
+        //allocate a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        //allocating a new bilateral filter
+        //allocate a new bilateral filter
         fltBilG = new pic::FilterGLBilateral2DG(4.0f, 0.1f);
+
+        //allocate a new bilateral filter
+        fltBilSP = new pic::FilterGLBilateral2DSP(4.0f, 0.1f);
+
+        //allocate a new bilateral filter
+        fltBilS = new pic::FilterGLBilateral2DS(4.0f, 0.1f);
+
+        img_flt_tmo = NULL;
+        img_flt = NULL;
     }
 
     /**
@@ -106,16 +117,39 @@ protected:
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        if(method == 0) {
-            //applying the bilateral filter
-            img_flt = fltBilG->Process(SingleGL(img), img_flt);
+        pic::ImageGL *img_out = NULL;
+        switch(method)
+        {
+            case 0:
+                //input image
+                img_out = img;
+            break;
 
-            //simple tone mapping: gamma + exposure correction
-            img_flt_tmo = tmo->Process(SingleGL(img_flt), img_flt_tmo);
-        } else {
-            //simple tone mapping: gamma + exposure correction
-            img_flt_tmo = tmo->Process(SingleGL(img), img_flt_tmo);
+            case 1:
+                //apply the bilateral grid filter
+                img_flt = fltBilG->Process(SingleGL(img), img_flt);
+                img_out = img_flt;
+            break;
+
+            case 2:
+                //apply the separate bilateral filter
+                img_flt = fltBilSP->Process(SingleGL(img), img_flt);
+                img_out = img_flt;
+            break;
+
+            case 3:
+                //apply the sampling bilateral filter
+                img_flt = fltBilS->Process(SingleGL(img), img_flt);
+                img_out = img_flt;
+            break;
+
+        default:
+            img_out = img;
+            break;
         }
+
+        //simple tone mapping: gamma + exposure correction
+        img_flt_tmo = tmo->Process(SingleGL(img_out), img_flt_tmo);
 
         //visualization
         quad->Render(technique, img_flt_tmo->getTexture());
@@ -144,7 +178,7 @@ public:
      */
     void update()
     {
-        method = (method + 1) % 2;
+        method = (method + 1) % 4;
     }
 };
 

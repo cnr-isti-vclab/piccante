@@ -28,16 +28,20 @@ protected:
     ImageGL *imgAllocated;
     ImageGL *imgTmp[2];
 
-    void initShaders() {}
-    void FragmentShader() {}
-
 public:
     /**
      * @brief FilterGLNPasses
      */
     FilterGLNPasses();
+
     ~FilterGLNPasses();
 
+    /**
+     * @brief setupAuxN
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     virtual ImageGL *setupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
@@ -50,7 +54,7 @@ public:
      * @brief getFbo
      * @return
      */
-    Fbo  *getFbo()
+    Fbo *getFbo()
     {
         return filters.back()->getFbo();
     }

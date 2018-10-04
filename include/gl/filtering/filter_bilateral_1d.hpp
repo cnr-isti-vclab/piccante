@@ -217,7 +217,7 @@ void FilterGLBilateral1D::update(float sigma_s, float sigma_r)
     this->sigma_s = sigma_s;
     this->sigma_r = sigma_r;
 
-    SetUniform();
+    setUniform();
 }
 
 } // end namespace pic

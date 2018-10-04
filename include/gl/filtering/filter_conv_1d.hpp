@@ -50,10 +50,10 @@ public:
     FilterGLConv1D(ImageGL *weights, int direction, GLenum target);
 
     /**
-     * @brief SetUniformAux
+     * @brief setUniformAux
      * @return
      */
-    void SetUniformAux()
+    void setUniformAux()
     {
         int kernelSize = 0;
         int halfKernelSize = 0;

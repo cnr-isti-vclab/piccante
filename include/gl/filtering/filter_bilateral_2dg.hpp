@@ -31,7 +31,7 @@ namespace pic {
 class FilterGLBilateral2DG: public FilterGL
 {
 protected:
-    float               sigma_s, sigma_r, s_S, s_R;
+    float sigma_s, sigma_r, s_S, s_R;
 
     FilterGLScatter     *scatter;
     FilterGLGaussian3D  *gauss3D;

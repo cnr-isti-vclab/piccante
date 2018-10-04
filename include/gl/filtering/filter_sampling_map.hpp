@@ -44,11 +44,11 @@ protected:
     void FragmentShader() {}
 
     /**
-     * @brief Setup
+     * @brief update
      * @param sigma
      * @param scale
      */
-    void Setup(float sigma, float scale);
+    void update(float sigma, float scale);
 
     /**
      * @brief setupAuxN
@@ -120,17 +120,17 @@ FilterGLSamplingMap::FilterGLSamplingMap(float sigma): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
     float rateScale = 2.0f;
-    Setup(rateScale, rateScale / sigma);
+    update(rateScale, rateScale / sigma);
 }
 
 FilterGLSamplingMap::FilterGLSamplingMap(float sigma,
         float scale): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
-    Setup(sigma * scale, scale);
+    update(sigma * scale, scale);
 }
 
-void FilterGLSamplingMap::Setup(float sigma, float scale)
+void FilterGLSamplingMap::update(float sigma, float scale)
 {
     this->sigma = sigma;
     this->scale = scale;

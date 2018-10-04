@@ -36,11 +36,11 @@ protected:
     GLuint vbo, vao;
 
     /**
-     * @brief GenerateVA
+     * @brief generateVertexArray
      * @param width
      * @param height
      */
-    void GenerateVA(int width, int height);
+    void generateVertexArray(int width, int height);
 
     /**
      * @brief initShaders
@@ -88,7 +88,7 @@ FilterGLScatter::FilterGLScatter(float s_S, float s_R, int width, int height)
     this->s_S = s_S;
     this->s_R = s_R;
 
-    GenerateVA(width, height);
+    generateVertexArray(width, height);
 
     FragmentShader();
     initShaders();
@@ -112,7 +112,7 @@ FilterGLScatter::~FilterGLScatter()
     }
 }
 
-void FilterGLScatter::GenerateVA(int width, int height)
+void FilterGLScatter::generateVertexArray(int width, int height)
 {
     vertex_array = new GLfloat[2 * width * height];
     nVertex_array = width * height;
