@@ -38,7 +38,7 @@ public:
     FilterGLNPasses();
     ~FilterGLNPasses();
 
-    virtual ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
+    virtual ImageGL *setupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief insertFilter
@@ -97,7 +97,7 @@ void FilterGLNPasses::insertFilter(FilterGL *flt)
     }
 }
 
-ImageGL *FilterGLNPasses::SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
+ImageGL *FilterGLNPasses::setupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->allocateSimilarOneGL();
@@ -140,7 +140,7 @@ ImageGL *FilterGLNPasses::Process(ImageGLVec imgIn, ImageGL *imgOut)
     }
 
     //allocate FBOs
-    imgOut = SetupAuxN(imgIn, imgOut);
+    imgOut = setupAuxN(imgIn, imgOut);
 
     filters[0]->changePass(0, int(filters.size()));
     filters[0]->Process(imgIn, imgTmp[0]);

@@ -49,12 +49,12 @@ public:
     FilterGLIterative(FilterGL *flt, int iterations);
 
     /**
-     * @brief SetupAuxN
+     * @brief setupAuxN
      * @param imgIn
      * @param imgOut
      * @return
      */
-    virtual ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
+    virtual ImageGL *setupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
      * @brief update
@@ -113,7 +113,7 @@ void FilterGLIterative::update(FilterGL *flt, int iterations)
     filters.push_back(flt);
 }
 
-ImageGL *FilterGLIterative::SetupAuxN(ImageGLVec imgIn,
+ImageGL *FilterGLIterative::setupAuxN(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgOut == NULL) {
@@ -151,7 +151,7 @@ ImageGL *FilterGLIterative::Process(ImageGLVec imgIn, ImageGL *imgOut)
     }
 
     //Allocate FBOs
-    imgOut = SetupAuxN(imgIn, imgOut);
+    imgOut = setupAuxN(imgIn, imgOut);
 
     filters[0]->Process(imgIn, imgTmp[0]);
 

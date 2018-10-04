@@ -51,12 +51,12 @@ protected:
     void Setup(float sigma, float scale);
 
     /**
-     * @brief SetupAuxN
+     * @brief setupAuxN
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
+    ImageGL *setupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
 
 public:
     /**
@@ -164,7 +164,7 @@ Fbo *FilterGLSamplingMap::getFbo()
     return filters[filters.size() - 1]->getFbo();
 }
 
-ImageGL *FilterGLSamplingMap::SetupAuxN(ImageGLVec imgIn,
+ImageGL *FilterGLSamplingMap::setupAuxN(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgOut == NULL) {

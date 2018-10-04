@@ -56,20 +56,20 @@ public:
     virtual void PreProcess(ImageVec imgIn, Image *imgOut){}
 
     /**
-     * @brief SetupAuxNGen
+     * @brief setupAuxNGen
      * @param imgIn
      * @param imgOut
      * @return
      */
-    virtual Image *SetupAuxNGen(ImageVec imgIn, Image *imgOut);
+    virtual Image *setupAuxNGen(ImageVec imgIn, Image *imgOut);
 
     /**
-     * @brief SetupAuxNSame
+     * @brief setupAuxNSame
      * @param imgIn
      * @param imgOut
      * @return
      */
-    virtual Image *SetupAuxNSame(ImageVec imgIn, Image *imgOut);
+    virtual Image *setupAuxNSame(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief ProcessGen
@@ -176,7 +176,7 @@ PIC_INLINE void FilterNPasses::insertFilter(Filter *flt)
     }
 }
 
-PIC_INLINE Image *FilterNPasses::SetupAuxNGen(ImageVec imgIn,
+PIC_INLINE Image *FilterNPasses::setupAuxNGen(ImageVec imgIn,
         Image *imgOut)
 {   
     if(imgTmp.size() == 0 ) {
@@ -188,7 +188,7 @@ PIC_INLINE Image *FilterNPasses::SetupAuxNGen(ImageVec imgIn,
     return imgOut;
 }
 
-PIC_INLINE Image *FilterNPasses::SetupAuxNSame(ImageVec imgIn,
+PIC_INLINE Image *FilterNPasses::setupAuxNSame(ImageVec imgIn,
         Image *imgOut)
 {
     if(imgOut == NULL) {
@@ -220,7 +220,7 @@ PIC_INLINE Image *FilterNPasses::ProcessGen(ImageVec imgIn, Image *imgOut,
         return NULL;
     }
 
-    SetupAuxNGen(imgIn, NULL);
+    setupAuxNGen(imgIn, NULL);
 
     int n =  int(filters.size()) - 1;
     
@@ -250,7 +250,7 @@ PIC_INLINE Image *FilterNPasses::ProcessSame(ImageVec imgIn, Image *imgOut,
     }
 
     //Setup
-    imgOut = SetupAuxNSame(imgIn, imgOut);
+    imgOut = setupAuxNSame(imgIn, imgOut);
 
     //Pass 0
     filters[0]->changePass(0, imgIn[0]->frames);
