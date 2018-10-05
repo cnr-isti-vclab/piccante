@@ -38,32 +38,38 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        int width = dst->width;
         int channels = dst->channels;
-
-        float *data = src[0]->data;
+        float *minVal = new float[channels];
 
         for(int j = box->y0; j < box->y1; j++) {
             for(int i = box->x0; i < box->x1; i++) {
-                int c = (j * width + i) * channels;
 
-                for(int ch = 0; ch < channels; ch++) {
-                    float minVal = FLT_MAX;
+                float *dst_data = (*dst)(i, j);
+                float *src_data = (*src[0])(i, j);
 
-                    for(int k = -halfSize; k <= halfSize; k++) {
-                        int ci = CLAMP((i + k), dst->width);
+                for(int k = 0; k < channels; k++) {
+                    minVal[k] = src_data[k];
+                }
 
-                        for(int l = -halfSize; l <= halfSize; l++) {
-                            int cj = CLAMP((j + l), dst->height);
-                            float tmp = data[(cj * width + ci) * channels + ch];
-                            minVal = minVal > tmp ? tmp : minVal;
+                for(int k = -halfSize; k <= halfSize; k++) {
+                    for(int l = -halfSize; l <= halfSize; l++) {
+
+                        src_data = (*src[0])(i + l, j + k);
+
+                        for(int ch = 0; ch < channels; ch++) {
+                            maxVal[ch] = maxVal[ch] < src_data[ch] ?
+                                         maxVal[ch] : src_data[ch];
                         }
                     }
+                }
 
-                    dst->data[c + ch] = minVal;
+                for(int k = 0; k < channels; k++) {
+                    dst_data[k] = maxVal[k];
                 }
             }
         }
+
+        delete[] minVal;
     }
 
 public:
@@ -86,7 +92,7 @@ public:
      */
     static Image *execute(Image *imgIn, Image *imgOut, int size)
     {
-        FilterMed filter(size);
+        FilterMin filter(size);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
