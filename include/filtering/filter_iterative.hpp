@@ -34,9 +34,9 @@ protected:
     int iterations;
 
     /**
-     * @brief Destroy
+     * @brief destroy
      */
-    void Destroy();
+    void destroy();
 
 public:
 
@@ -55,12 +55,12 @@ public:
     ~FilterIterative();
 
     /**
-     * @brief SetupAuxN
+     * @brief setupAuxN
      * @param imgIn
      * @param imgOut
      * @return
      */
-    virtual Image *SetupAuxN(ImageVec imgIn, Image *imgOut);
+    virtual Image *setupAuxN(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief update
@@ -86,7 +86,7 @@ public:
     Image *ProcessP(ImageVec imgIn, Image *imgOut);
 };
 
-PIC_INLINE FilterIterative::FilterIterative()
+PIC_INLINE FilterIterative::FilterIterative() : Filter()
 {
     parallel = false;
     iterations = 0;
@@ -96,7 +96,7 @@ PIC_INLINE FilterIterative::FilterIterative()
     }
 }
 
-PIC_INLINE FilterIterative::FilterIterative(Filter *flt, int iterations)
+PIC_INLINE FilterIterative::FilterIterative(Filter *flt, int iterations) : Filter()
 {
     for(int i = 0; i < 2; i++) {
         imgTmp[i] = NULL;
@@ -107,10 +107,10 @@ PIC_INLINE FilterIterative::FilterIterative(Filter *flt, int iterations)
 
 PIC_INLINE FilterIterative::~FilterIterative()
 {
-    Destroy();
+    destroy();
 }
 
-PIC_INLINE void FilterIterative::Destroy()
+PIC_INLINE void FilterIterative::destroy()
 {
     if((iterations % 2) == 0) {
         if(imgTmp[0] != NULL) {
@@ -144,7 +144,7 @@ PIC_INLINE void FilterIterative::update(Filter *flt, int iterations)
     filters.push_back(flt);
 }
 
-PIC_INLINE Image *FilterIterative::SetupAuxN(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterIterative::setupAuxN(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->allocateSimilarOne();
@@ -174,7 +174,7 @@ PIC_INLINE Image *FilterIterative::Process(ImageVec imgIn, Image *imgOut)
     }
 
     //allocate output
-    imgOut = SetupAuxN(imgIn, imgOut);
+    imgOut = setupAuxN(imgIn, imgOut);
 
     if(parallel) {
         filters[0]->ProcessP(imgIn, imgTmp[0]);

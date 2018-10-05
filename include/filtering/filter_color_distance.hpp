@@ -28,7 +28,24 @@ namespace pic {
 class FilterColorDistance: public Filter
 {
 protected:
-    float *refColor, sigma;
+    float *color, sigma, sigma_sq_2;
+
+    /**
+     * @brief f
+     * @param data
+     */
+    void f(FilterFData *data)
+    {
+        float *in = (*data->src[0])(data->x, data->y);
+
+        float sum = 0.0f;
+        for(int k = 0; k < data->dst->channels; k++) {
+            float tmp = in[k] - color[k];
+            sum += tmp * tmp;
+        }
+
+        data->out[0] = expf(- sum / sigma_sq_2);
+    }
 
     /**
      * @brief ProcessBBox
@@ -36,13 +53,12 @@ protected:
      * @param src
      * @param box
      */
+    /*
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;
         int channels = src[0]->channels;
         float *data = src[0]->data;
-
-        float sigma2 = sigma * sigma * 2.0f;
 
         for(int j = box->y0; j < box->y1; j++) {
             int c = j * width;
@@ -53,17 +69,18 @@ protected:
 
                 float sum = 0.0f;
 
-                for(int i = 0; i < channels; i++) {
-                    float tmp = data[c2 + i] - refColor[i];
+                for(int k = 0; k < channels; k++) {
+                    float tmp = data[c2 + k] - color[k];
                     sum += tmp * tmp;
                 }
 
-                dst->data[c1] = expf(-sum / sigma2);
+                dst->data[c1] = expf(-sum / sigma_sq_2);
             }
         }
     }
+    */
 
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut == NULL) {
             imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
@@ -79,10 +96,19 @@ public:
      * @param color
      * @param sigma
      */
-    FilterColorDistance(float *color, float sigma)
+    FilterColorDistance(float *color, float sigma) : Filter()
     {
-        refColor    = color;
+    }
+
+    void setup(float *color, float sigma)
+    {
+        if(color != NULL) {
+            this->color = color;
+        }
+
+        sigma = sigma > 0.0f ? sigma : 1.0f;
         this->sigma = sigma;
+        sigma_sq_2 = sigma * sigma * 2.0f;
     }
 
     /**

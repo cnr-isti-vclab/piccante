@@ -31,12 +31,12 @@ protected:
     int colorChannel;
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
+    Image *setupAux(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief ProcessBBox
@@ -81,12 +81,12 @@ public:
     }
 };
 
-PIC_INLINE FilterNormal::FilterNormal()
+PIC_INLINE FilterNormal::FilterNormal() : Filter()
 {
     update(0);
 }
 
-PIC_INLINE FilterNormal::FilterNormal(int colorChannel)
+PIC_INLINE FilterNormal::FilterNormal(int colorChannel) : Filter()
 {
     update(colorChannel);
 }
@@ -100,7 +100,7 @@ PIC_INLINE void FilterNormal::update(int colorChannel)
     this->colorChannel = colorChannel;
 }
 
-PIC_INLINE Image *FilterNormal::SetupAux(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterNormal::setupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);

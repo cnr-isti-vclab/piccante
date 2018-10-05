@@ -68,12 +68,12 @@ protected:
     }
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() == 4) {
             pc = new PatchComp(imgIn[0], imgIn[1], imgIn[2], imgIn[3], patchSize, 0.05f, 0.9f);
@@ -108,7 +108,7 @@ public:
      */
     FilterDisparity()
     {
-        init(200, 7);
+        setup(200, 7);
     }
 
     /**
@@ -117,7 +117,7 @@ public:
      */
     FilterDisparity(int maxDisparity, int patchSize) : Filter()
     {
-        init(maxDisparity, patchSize);
+        setup(maxDisparity, patchSize);
     }
 
     ~FilterDisparity()
@@ -128,10 +128,10 @@ public:
     }
 
     /**
-     * @brief init
+     * @brief setup
      * @param maxDisparity
      */
-    void init(int maxDisparity, int patchSize)
+    void setup(int maxDisparity, int patchSize)
     {
         this->maxDisparity = maxDisparity;
         this->halfMaxDisparity = maxDisparity >> 1;

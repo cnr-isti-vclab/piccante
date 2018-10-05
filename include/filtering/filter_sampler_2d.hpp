@@ -46,12 +46,12 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
+    Image *setupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     /**
@@ -208,7 +208,7 @@ PIC_INLINE FilterSampler2D::FilterSampler2D(int width, int height,
     }
 }
 
-PIC_INLINE Image *FilterSampler2D::SetupAux(ImageVec imgIn,
+PIC_INLINE Image *FilterSampler2D::setupAux(ImageVec imgIn,
         Image *imgOut)
 {
     if(imgOut == NULL) {

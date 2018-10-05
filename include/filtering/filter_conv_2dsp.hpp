@@ -52,7 +52,7 @@ public:
      * @param dataY
      * @param nY
      */
-    FilterConv2DSP(float *dataX, int nX, float *dataY, int nY)
+    FilterConv2DSP(float *dataX, int nX, float *dataY, int nY) : FilterNPasses()
     {
         conv1DFltX = new FilterConv1D(dataX, nX);
         insertFilter(conv1DFltX);
@@ -63,7 +63,7 @@ public:
 
     ~FilterConv2DSP()
     {
-        Destroy();
+        destroy();
 
         if(conv1DFltX != NULL) {
             delete conv1DFltX;

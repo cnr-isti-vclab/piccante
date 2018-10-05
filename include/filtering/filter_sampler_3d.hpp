@@ -40,12 +40,12 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
+    Image *setupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     /**
@@ -76,7 +76,7 @@ PIC_INLINE FilterSampler3D::FilterSampler3D(float scale, ImageSampler *isb)
     this->isb = isb;
 }
 
-PIC_INLINE Image *FilterSampler3D::SetupAux(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterSampler3D::setupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = new Image( int(imgIn[0]->framesf * scale),

@@ -43,12 +43,12 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
+    Image *setupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     /**
@@ -64,11 +64,11 @@ public:
     FilterGradient(int colorChannel, GRADIENT_TYPE type);
 
     /**
-     * @brief Setup
+     * @brief setup
      * @param colorChannel
      * @param type
      */
-    void Setup(int colorChannel, GRADIENT_TYPE type);
+    void setup(int colorChannel, GRADIENT_TYPE type);
 
     /**
      * @brief OutputSize
@@ -116,18 +116,18 @@ public:
     }
 };
 
-PIC_INLINE FilterGradient::FilterGradient()
+PIC_INLINE FilterGradient::FilterGradient() : Filter()
 {
-    Setup(0, G_NORMAL);
+    setup(0, G_NORMAL);
 }
 
 PIC_INLINE FilterGradient::FilterGradient(int colorChannel,
-        GRADIENT_TYPE type = G_NORMAL)
+        GRADIENT_TYPE type = G_NORMAL) : Filter()
 {
-    Setup(colorChannel, type);
+    setup(colorChannel, type);
 }
 
-PIC_INLINE void FilterGradient::Setup(int colorChannel,
+PIC_INLINE void FilterGradient::setup(int colorChannel,
                                            GRADIENT_TYPE type = G_NORMAL)
 {
     this->colorChannel = colorChannel;
@@ -158,7 +158,7 @@ PIC_INLINE void FilterGradient::Setup(int colorChannel,
     }
 }
 
-PIC_INLINE Image *FilterGradient::SetupAux(ImageVec imgIn,
+PIC_INLINE Image *FilterGradient::setupAux(ImageVec imgIn,
         Image *imgOut)
 {
     if(imgOut == NULL) {

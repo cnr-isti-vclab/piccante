@@ -74,12 +74,12 @@ protected:
     }
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut != NULL) {
             return imgOut;

@@ -343,7 +343,7 @@ public:
             return imgOut;
         }
 
-        imgOut = SetupAux(imgIn, imgOut);
+        imgOut = setupAux(imgIn, imgOut);
 
         //Convolution
         if(imgIn[0]->channels == 1) {

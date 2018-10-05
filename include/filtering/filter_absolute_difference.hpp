@@ -44,12 +44,12 @@ protected:
     }
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() < 2) {
             return NULL;
@@ -86,24 +86,6 @@ public:
     {
         FilterAbsoluteDifference filter;
         return filter.Process(Double(imgIn1, imgIn2), NULL);
-    }
-
-    /**
-     * @brief execute
-     * @param name1
-     * @param name2
-     * @param nameOut
-     * @return
-     */
-    static Image *execute(std::string name1, std::string name2,
-                             std::string nameOut)
-    {
-        Image imgIn1(name1);
-        Image imgIn2(name2);
-
-        Image *out = execute(&imgIn1, &imgIn2);
-        out->Write(nameOut);
-        return out;
     }
 };
 

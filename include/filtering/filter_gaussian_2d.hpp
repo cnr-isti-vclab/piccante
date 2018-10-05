@@ -46,7 +46,7 @@ public:
 
     ~FilterGaussian2D()
     {
-        Destroy();
+        destroy();
 
         if(gaussianFilter != NULL) {
             delete gaussianFilter;

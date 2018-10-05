@@ -31,9 +31,6 @@ protected:
     ImageGL *imgTmp[2];
     int iterations;
 
-    void initShaders() {}
-    void FragmentShader() {}
-
 public:
 
     /**

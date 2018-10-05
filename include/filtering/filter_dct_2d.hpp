@@ -48,7 +48,7 @@ public:
 
     ~FilterDCT2D()
     {
-        Destroy();
+        destroy();
 
         if(fltDCT1D != NULL) {
             delete fltDCT1D;

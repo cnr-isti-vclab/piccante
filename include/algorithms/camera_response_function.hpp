@@ -116,9 +116,9 @@ protected:
     }
 
     /**
-     * @brief Destroy frees memory.
+     * @brief destroy frees memory.
      */
-    void Destroy()
+    void destroy()
     {
         stackOut.release();
 
@@ -140,9 +140,9 @@ protected:
     }
 
     /**
-     * @brief CreateTabledICRF
+     * @brief createTabledICRF
      */
-    void CreateTabledICRF()
+    void createTabledICRF()
     {
         if(type_linearization != IL_POLYNOMIAL) {
             return;
@@ -190,16 +190,16 @@ public:
 
     ~CameraResponseFunction()
     {
-        Destroy();
+        destroy();
     }
 
     /**
-     * @brief Remove linearizes a camera value using the inverse CRF.
+     * @brief remove linearizes a camera value using the inverse CRF.
      * @param x is an intensity value in [0,1].
      * @param channel
      * @return It returns x in the linear domain.
      */
-    inline float Remove(float x, int channel)
+    inline float remove(float x, int channel)
     {
         switch(type_linearization) {
             case IL_LIN: {
@@ -231,12 +231,12 @@ public:
     }
 
     /**
-     * @brief Apply
+     * @brief apply
      * @param x a value in [0, 1]
      * @param channel
      * @return
      */
-    inline float Apply(float x, int channel)
+    inline float apply(float x, int channel)
     {
         switch(type_linearization) {
             case IL_LIN: {
@@ -300,7 +300,7 @@ public:
      * @param img_jpg is a JPEG compressed image.
      * @param filteringSize
      */
-    void FromRAWJPEG(Image *img_raw, Image *img_jpg, int filteringSize = 11)
+    void fromRAWJPEG(Image *img_raw, Image *img_jpg, int filteringSize = 11)
     {
         if((img_raw == NULL) || (img_jpg == NULL))
             return;
@@ -338,7 +338,7 @@ public:
             }
         }
        
-        //computing the result
+        //compute the result
         std::vector< int > coords;
 
         for(int k=0;k<channels;k++) {
@@ -358,7 +358,7 @@ public:
 
                 }
 
-                if(!coords.empty()) {//getting the median value
+                if(!coords.empty()) {//get the median value
                     std::sort (coords.begin(), coords.end());  
                     ret_c[j] = float(coords[coords.size() >> 1]) / 255.0f;
                 }
@@ -388,7 +388,7 @@ public:
      */
     void DebevecMalik(ImageVec stack, CRF_WEIGHT type = CW_DEB97, int nSamples = 256, float lambda = 20.0f)
     {
-        Destroy();
+        destroy();
 
         if(!ImageVecCheckSimilarType(stack)) {
             return;
@@ -400,16 +400,16 @@ public:
 
         this->type_linearization = IL_LUT_8_BIT;
 
-        //Subsampling the image stack
+        //subsample the image stack
         stackOut.execute(stack, nSamples);
 
         int *samples = stackOut.get();
         nSamples = stackOut.getNSamples();
         
-        //Computing CRF using Debevec and Malik
+        //compute CRF using Debevec and Malik
         int channels = stack[0]->channels;
 
-        //pre-computing the weight function
+        //pre-compute the weight function
         for(int i = 0; i < 256; i++) {
             w[i] = weightFunction(float(i) / 255.0f, type);
         }
@@ -449,7 +449,7 @@ public:
                         const float alpha = 0.04f, const bool computeRatios = false, const float eps = 0.0001f,
                         const std::size_t max_iterations = 100)
     {
-        Destroy();
+        destroy();
 
         if(!ImageVecCheckSimilarType(stack)) {
             return false;
@@ -523,7 +523,7 @@ public:
         bool bOk = error < std::numeric_limits<float>::infinity();
 
         if(bOk) {
-            CreateTabledICRF();
+            createTabledICRF();
         }
 
         return bOk;
@@ -537,7 +537,7 @@ public:
      */
     void Robertson(ImageVec &stack, const size_t maxIterations = 50)
     {
-        Destroy();
+        destroy();
 
         if(!ImageVecCheckSimilarType(stack)) {
             return;

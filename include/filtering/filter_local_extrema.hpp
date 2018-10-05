@@ -95,12 +95,12 @@ protected:
     int kernelSize, halfKernelSize;
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut == NULL) {
             imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
@@ -120,7 +120,7 @@ public:
     /**
      * @brief FilterLocalExtrema
      */
-    FilterLocalExtrema(int kernelSize = 3)
+    FilterLocalExtrema(int kernelSize = 3) : Filter()
     {
         if(kernelSize < 2) {
             kernelSize = 3;

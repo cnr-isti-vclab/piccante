@@ -53,12 +53,12 @@ protected:
     }
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut == NULL) {
             imgOut = new Image(imgIn[0]->frames, imgIn[0]->width, imgIn[0]->height, 1);

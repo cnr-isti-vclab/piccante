@@ -107,7 +107,7 @@ protected:
                     }
 
                     for(int k = 0; k < channels; k++) {
-                        float x_lin = crf->Remove(src[l]->data[c + k], k);
+                        float x_lin = crf->remove(src[l]->data[c + k], k);
 
                         //merge HDR pixels
                         switch(domain) {

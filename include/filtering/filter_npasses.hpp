@@ -34,6 +34,11 @@ protected:
 
     bool CheckSame(ImageVec imgIn);
 
+    /**
+     * @brief destroy
+     */
+    void destroy();
+
 public:
 
     /**
@@ -42,11 +47,6 @@ public:
     FilterNPasses();
 
     ~FilterNPasses();
-
-    /**
-     * @brief Destroy
-     */
-    void Destroy();
 
     /**
      * @brief PreProcess
@@ -113,7 +113,7 @@ public:
     Image *ProcessP(ImageVec imgIn, Image *imgOut);
 };
 
-PIC_INLINE FilterNPasses::FilterNPasses()
+PIC_INLINE FilterNPasses::FilterNPasses() : Filter()
 {
     imgAllocated = NULL;
 
@@ -124,10 +124,10 @@ PIC_INLINE FilterNPasses::FilterNPasses()
 
 PIC_INLINE FilterNPasses::~FilterNPasses()
 {
-    Destroy();
+    destroy();
 }
 
-PIC_INLINE void FilterNPasses::Destroy()
+PIC_INLINE void FilterNPasses::destroy()
 {
     if(imgAllocated != NULL) {
         delete imgAllocated;

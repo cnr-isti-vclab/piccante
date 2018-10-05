@@ -41,12 +41,12 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
+    Image *setupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     /**
@@ -73,14 +73,13 @@ public:
     void update(float Ld_Max, float b, float Lw_Max, float Lwa);
 };
 
-PIC_INLINE FilterDragoTMO::FilterDragoTMO()
+PIC_INLINE FilterDragoTMO::FilterDragoTMO() : Filter()
 {
     update(100.0f, 0.95f, 1e6f, 0.5f);
 }
 
-
 PIC_INLINE FilterDragoTMO::FilterDragoTMO(float Ld_Max, float b, float Lw_Max,
-                               float Lw_a)
+                               float Lw_a) : Filter()
 {
     update(Ld_Max, b, Lw_Max, Lw_a);
 }
@@ -121,11 +120,11 @@ PIC_INLINE void FilterDragoTMO::update(float Ld_Max, float b, float Lw_Max,
     constant2 = (Ld_Max / 100.0f) / (log10f(1.0f + Lw_Max_scaled));
 }
 
-PIC_INLINE Image *FilterDragoTMO::SetupAux(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterDragoTMO::setupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgIn.size() < 2) {
         #ifdef PIC_DEBUG
-            printf("ERROR: FilterDragoTMO::SetupAux");
+            printf("ERROR: FilterDragoTMO::setupAux");
         #endif
         return imgOut;
     }

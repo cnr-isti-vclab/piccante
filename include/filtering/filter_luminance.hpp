@@ -65,12 +65,12 @@ protected:
     }
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut == NULL) {
             imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
@@ -114,7 +114,7 @@ public:
      * @brief FilterLuminance
      * @param type
      */
-    FilterLuminance(LUMINANCE_TYPE type = LT_CIE_LUMINANCE)
+    FilterLuminance(LUMINANCE_TYPE type = LT_CIE_LUMINANCE) : Filter()
     {
         weights = NULL;
         weights_size = -1;

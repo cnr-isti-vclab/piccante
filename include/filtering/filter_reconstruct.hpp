@@ -58,12 +58,12 @@ protected:
     }
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() < 2) {
             return imgOut;
@@ -81,7 +81,7 @@ public:
     /**
      * @brief FilterReconstruct
      */
-    FilterReconstruct()
+    FilterReconstruct() : Filter()
     {
     }
 

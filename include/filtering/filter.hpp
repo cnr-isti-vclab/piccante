@@ -89,12 +89,12 @@ protected:
     }
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    virtual Image *SetupAux(ImageVec imgIn, Image *imgOut);
+    virtual Image *setupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     bool cachedOnly;
@@ -121,10 +121,10 @@ public:
     virtual void changePass(int pass, int tPass) {}
 
     /**
-     * @brief Signature returns the signature for the filter.
+     * @brief signature returns the signature for the filter.
      * @return
      */
-    virtual std::string Signature()
+    virtual std::string signature()
     {
         return "FLT";
     }
@@ -144,11 +144,11 @@ public:
     }
 
     /**
-     * @brief GetOutPutName
+     * @brief getOutPutName
      * @param nameIn
      * @return
      */
-    std::string GetOutPutName(std::string nameIn);
+    std::string getOutPutName(std::string nameIn);
 
     /**
      * @brief CachedProcess
@@ -157,7 +157,7 @@ public:
      * @param nameIn
      * @return
      */
-    Image *CachedProcess(ImageVec imgIn, Image *imgOut,
+    Image *cachedProcess(ImageVec imgIn, Image *imgOut,
                             std::string nameIn);
 
     /**
@@ -177,10 +177,10 @@ public:
     }
 
     /**
-     * @brief SetFloatParameters sets float parameters.
+     * @brief setFloatParameters sets float parameters.
      * @param param_f
      */
-    void SetFloatParameters(std::vector< float > param_f)
+    void setFloatParameters(std::vector< float > param_f)
     {
         this->param_f.insert(this->param_f.begin(), param_f.begin(), param_f.end());
     }
@@ -211,7 +211,7 @@ public:
     virtual Image *ProcessP(ImageVec imgIn, Image *imgOut);
 };
 
-PIC_INLINE Image *Filter::SetupAux(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *Filter::setupAux(ImageVec imgIn, Image *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->allocateSimilarOne();
@@ -228,7 +228,7 @@ PIC_INLINE Image *Filter::SetupAux(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-PIC_INLINE std::string Filter::GetOutPutName(std::string nameIn)
+PIC_INLINE std::string Filter::getOutPutName(std::string nameIn)
 {
     std::string outputName = nameIn;
 
@@ -239,15 +239,15 @@ PIC_INLINE std::string Filter::GetOutPutName(std::string nameIn)
     }
 
     outputName += "_filtered_";
-    outputName += Signature().c_str();
+    outputName += signature().c_str();
     outputName += ".pfm";
     return outputName;
 }
 
-PIC_INLINE Image *Filter::CachedProcess(ImageVec imgIn, Image *imgOut,
+PIC_INLINE Image *Filter::cachedProcess(ImageVec imgIn, Image *imgOut,
         std::string nameIn)
 {
-    std::string outputName = GetOutPutName(nameIn);
+    std::string outputName = getOutPutName(nameIn);
 
     //check if it is chaced
     Image *imgOut2 = new Image(outputName);
@@ -278,7 +278,7 @@ PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
         return NULL;
     }
 
-    imgOut = SetupAux(imgIn, imgOut);
+    imgOut = setupAux(imgIn, imgOut);
 
     //convolve
     BBox tmpBox(imgOut->width, imgOut->height, imgOut->frames);
@@ -314,7 +314,7 @@ PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
         return NULL;
     }
 
-    imgOut = SetupAux(imgIn, imgOut);
+    imgOut = setupAux(imgIn, imgOut);
 
     if(imgOut == NULL) {
         return imgOut;

@@ -52,14 +52,14 @@ public:
             return imgOut;
         }
 
-        imgOut = SetupAux(imgIn, imgOut);
+        imgOut = setupAux(imgIn, imgOut);
 
         int width = imgIn[0]->width;
         int height = imgIn[0]->height;
         int channels = imgIn[0]->channels;
 
         //set up the first pixel (0,0)
-        for(int k=0; k<channels; k++) {
+        for(int k = 0; k < channels; k++) {
             imgOut->data[k] = imgIn[0]->data[k];
         }
 
@@ -73,7 +73,7 @@ public:
             }
         }
 
-        //setting up the first column
+        //set up the first column
         int c1 = width * channels;
         for(int i=1; i<height; i++){
             int ind1 = i * c1;

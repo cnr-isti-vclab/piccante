@@ -85,7 +85,7 @@ protected:
     }
     */
 
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut == NULL) {
             imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height,
@@ -99,7 +99,10 @@ public:
     /**
      * @brief FilterNSWE
      */
-    FilterNSWE() {}
+    FilterNSWE() : Filter()
+    {
+
+    }
 
     /**
      * @brief OutputSize

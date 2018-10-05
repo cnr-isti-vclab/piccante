@@ -30,12 +30,12 @@ class FilterDemosaic: public Filter
 protected:
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgOut == NULL) {
             imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
@@ -44,7 +44,11 @@ protected:
         return imgOut;
     }
 
-    //Linear upsampling of green channel with gradient correction
+    /**
+     * @brief LinearUpSamplingGCGreen this upsamples the green channel with gradient correction
+     * @param imgIn
+     * @param imgOut
+     */
     void LinearUpSamplingGCGreen(Image *imgIn, Image *imgOut)
     {
         int height = imgIn->height;
@@ -53,7 +57,7 @@ protected:
         float *dataIn = imgIn->data;
         float *dataOut = imgOut->data;
 
-        //Copying the original Green pixels into the U16RGB buffer
+        //copy the original Green pixels into the U16RGB buffer
         for(int j = 0; j < height; j++) {
             int tmp = j * width;
             for(int i = ((j + 1) % 2); i < width; i += 2) {
@@ -62,7 +66,7 @@ protected:
             }
         }
 
-        //Edge-aware interpolation for the missing Green pixels
+        //edge-aware interpolation for the missing Green pixels
         //#pragma omp parallel for
         for(int k = 0; k < 2; k++) {
             for(int j = k; j < (height); j += 2) {
@@ -99,7 +103,13 @@ protected:
         }
     }
 
-    //Linear UpSampling with gradients: Red and Blue channels
+    /**
+     * @brief LinearUpSamplingGCRB this linearly upsamples Red and Blue channels
+     * @param imgIn
+     * @param imgOut
+     * @param sx
+     * @param sy
+     */
     void LinearUpSamplingGCRB(Image *imgIn, Image *imgOut, int sx,
                                          int sy)
     {
@@ -287,7 +297,7 @@ public:
             return imgOut;
         }
 
-        imgOut = SetupAux(imgIn, imgOut);
+        imgOut = setupAux(imgIn, imgOut);
 
 
         LinearUpSamplingGCGreen(imgIn[0], imgOut);

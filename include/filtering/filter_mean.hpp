@@ -55,7 +55,7 @@ public:
 
     ~FilterMean()
     {
-        Destroy();
+        destroy();
 
         if(filter != NULL) {
             delete filter;

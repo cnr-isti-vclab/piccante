@@ -26,8 +26,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../common_code/gl_core_4_0.h"
 #endif
 
-//#define PIC_DISABLE_TINY_EXR
-
 #include <QKeyEvent>
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>

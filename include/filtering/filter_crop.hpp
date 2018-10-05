@@ -72,12 +72,12 @@ public:
     FilterCrop(Vec3f min, Vec3f max);
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
+    Image *setupAux(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief execute
@@ -142,7 +142,7 @@ public:
     }
 };
 
-PIC_INLINE FilterCrop::FilterCrop(Vec2i min, Vec2i max)
+PIC_INLINE FilterCrop::FilterCrop(Vec2i min, Vec2i max) : Filter()
 {
     maxi[0] = max[0];
     maxi[1] = max[1];
@@ -157,7 +157,7 @@ PIC_INLINE FilterCrop::FilterCrop(Vec2i min, Vec2i max)
     flag = false;
 }
 
-PIC_INLINE FilterCrop::FilterCrop(Vec3i min, Vec3i max)
+PIC_INLINE FilterCrop::FilterCrop(Vec3i min, Vec3i max) : Filter()
 {
     for(int i = 0; i < 3; i++) {
         this->maxi[i] = max[i];
@@ -170,7 +170,7 @@ PIC_INLINE FilterCrop::FilterCrop(Vec3i min, Vec3i max)
     flag = false;
 }
 
-PIC_INLINE FilterCrop::FilterCrop(Vec4i min, Vec4i max)
+PIC_INLINE FilterCrop::FilterCrop(Vec4i min, Vec4i max) : Filter()
 {
     this->maxi = max;
     this->mini = min;
@@ -178,7 +178,7 @@ PIC_INLINE FilterCrop::FilterCrop(Vec4i min, Vec4i max)
     flag = false;
 }
 
-PIC_INLINE FilterCrop::FilterCrop(Vec3f min, Vec3f max)
+PIC_INLINE FilterCrop::FilterCrop(Vec3f min, Vec3f max) : Filter()
 {
     this->maxf = max;
     this->minf = min;
@@ -186,7 +186,7 @@ PIC_INLINE FilterCrop::FilterCrop(Vec3f min, Vec3f max)
     flag = true;
 }
 
-PIC_INLINE Image *FilterCrop::SetupAux(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *FilterCrop::setupAux(ImageVec imgIn, Image *imgOut)
 {
     if(flag) {
         maxi[0] = int(maxf[0] * imgIn[0]->widthf);
