@@ -45,6 +45,7 @@ class GLWidget : public QGLWidget, protected QOpenGLFunctions
 protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
+    pic::FilterGLBilateral2DF *fltBilF;
     pic::FilterGLBilateral2DG *fltBilG;
     pic::FilterGLBilateral2DSP *fltBilSP;
     pic::FilterGLBilateral2DS *fltBilS;
@@ -85,8 +86,8 @@ protected:
         //allocate a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        float sigma_s = 8.0f;
-        float sigma_r = 0.2f;
+        float sigma_s = 16.0f;
+        float sigma_r = 0.1f;
 
         fltGauss = new pic::FilterGLGaussian2D(sigma_s);
 
@@ -98,6 +99,9 @@ protected:
 
         //allocate a new bilateral filter
         fltBilS = new pic::FilterGLBilateral2DS(sigma_s, sigma_r);
+
+        //allocate a new bilateral filter
+        fltBilF = new pic::FilterGLBilateral2DF(sigma_s, sigma_r);
 
         img_flt_tmo = NULL;
         img_flt = NULL;
@@ -131,30 +135,48 @@ protected:
             case 0:
                 //input image
                 img_out = img;
+                window_ext->setWindowTitle(tr("Filtering Example: Original Image"));
+
             break;
 
             case 1:
-                //apply the bilateral grid filter
+                //apply the gaussian filter
                 img_flt = fltGauss->Process(SingleGL(img), img_flt);
                 img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Guassian Filter"));
+
             break;
 
             case 2:
-                //apply the bilateral grid filter
-                img_flt = fltBilG->Process(SingleGL(img), img_flt);
+                //apply the sampling bilateral filter
+                img_flt = fltBilF->Process(SingleGL(img), img_flt);
                 img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Full Bilateral"));
+
             break;
 
             case 3:
-                //apply the separate bilateral filter
-                img_flt = fltBilSP->Process(SingleGL(img), img_flt);
+                //apply the bilateral grid filter
+                img_flt = fltBilG->Process(SingleGL(img), img_flt);
                 img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Bilateral Grid"));
+
             break;
 
             case 4:
+                //apply the separate bilateral filter
+                img_flt = fltBilSP->Process(SingleGL(img), img_flt);
+                img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Separate Bilateral"));
+
+            break;
+
+            case 5:
                 //apply the sampling bilateral filter
                 img_flt = fltBilS->Process(SingleGL(img), img_flt);
                 img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Sub-Sampled Bilateral"));
+
             break;
 
         default:
@@ -170,6 +192,8 @@ protected:
     }
 
 public:
+
+    QWidget *window_ext;
 
     /**
      * @brief GLWidget
@@ -192,7 +216,7 @@ public:
      */
     void update()
     {
-        method = (method + 1) % 5;
+        method = (method + 1) % 6;
     }
 };
 
@@ -214,13 +238,14 @@ public:
         resize(800, 533 + 64);
 
         window_gl = new GLWidget(format, this);
+        window_gl->window_ext = this;
 
         layout = new QVBoxLayout();
 
         layout->addWidget(window_gl);
 
         label = new QLabel(
-        "Pease hit the space bar in order to switch from the filtered image to the original one.", this);
+        "Pease hit the space bar in order to switch from the original one to the filtered one using different filters.", this);
         label->setAlignment(Qt::AlignHCenter);
         label->setFixedWidth(800);
         label->setFixedHeight(64);
