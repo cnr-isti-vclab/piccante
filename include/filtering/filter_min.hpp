@@ -57,14 +57,14 @@ protected:
                         src_data = (*src[0])(i + l, j + k);
 
                         for(int ch = 0; ch < channels; ch++) {
-                            maxVal[ch] = maxVal[ch] < src_data[ch] ?
-                                         maxVal[ch] : src_data[ch];
+                            minVal[ch] = minVal[ch] < src_data[ch] ?
+                                         minVal[ch] : src_data[ch];
                         }
                     }
                 }
 
                 for(int k = 0; k < channels; k++) {
-                    dst_data[k] = maxVal[k];
+                    dst_data[k] = minVal[k];
                 }
             }
         }

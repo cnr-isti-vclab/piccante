@@ -91,10 +91,10 @@ public:
     void attachColorBuffer2(GLuint tex, GLenum target, int slice);
 
     /**
-     * @brief destroy
+     * @brief release
      * @return
      */
-    bool destroy();
+    bool release();
 
     /**
      * @brief bind
@@ -177,7 +177,7 @@ PIC_INLINE Fbo::Fbo()
     width = height = frames = 0;
 }
 
-PIC_INLINE bool Fbo::destroy()
+PIC_INLINE bool Fbo::release()
 {
     if(tex != 0) {
         glDeleteTextures(1, &tex);

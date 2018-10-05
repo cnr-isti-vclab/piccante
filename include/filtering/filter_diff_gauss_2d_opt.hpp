@@ -49,7 +49,7 @@ public:
 
     ~FilterDiffGaussOpt()
     {
-        destroy();
+        release();
 
         if(flt_dog_1d != NULL) {
             delete flt_dog_1d;

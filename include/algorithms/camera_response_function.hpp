@@ -116,9 +116,9 @@ protected:
     }
 
     /**
-     * @brief destroy frees memory.
+     * @brief release frees memory.
      */
-    void destroy()
+    void release()
     {
         stackOut.release();
 
@@ -190,7 +190,7 @@ public:
 
     ~CameraResponseFunction()
     {
-        destroy();
+        release();
     }
 
     /**
@@ -388,7 +388,7 @@ public:
      */
     void DebevecMalik(ImageVec stack, CRF_WEIGHT type = CW_DEB97, int nSamples = 256, float lambda = 20.0f)
     {
-        destroy();
+        release();
 
         if(!ImageVecCheckSimilarType(stack)) {
             return;
@@ -449,7 +449,7 @@ public:
                         const float alpha = 0.04f, const bool computeRatios = false, const float eps = 0.0001f,
                         const std::size_t max_iterations = 100)
     {
-        destroy();
+        release();
 
         if(!ImageVecCheckSimilarType(stack)) {
             return false;
@@ -537,7 +537,7 @@ public:
      */
     void Robertson(ImageVec &stack, const size_t maxIterations = 50)
     {
-        destroy();
+        release();
 
         if(!ImageVecCheckSimilarType(stack)) {
             return;

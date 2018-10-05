@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FILTERING_FILTER_MEAN_HPP
 
 #include "../filtering/filter_npasses.hpp"
+#include "../filtering/filter_conv_1d.hpp"
 
 namespace pic {
 
@@ -55,7 +56,7 @@ public:
 
     ~FilterMean()
     {
-        destroy();
+        release();
 
         if(filter != NULL) {
             delete filter;

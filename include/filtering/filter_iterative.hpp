@@ -34,9 +34,9 @@ protected:
     int iterations;
 
     /**
-     * @brief destroy
+     * @brief release
      */
-    void destroy();
+    void release();
 
 public:
 
@@ -107,10 +107,10 @@ PIC_INLINE FilterIterative::FilterIterative(Filter *flt, int iterations) : Filte
 
 PIC_INLINE FilterIterative::~FilterIterative()
 {
-    destroy();
+    release();
 }
 
-PIC_INLINE void FilterIterative::destroy()
+PIC_INLINE void FilterIterative::release()
 {
     if((iterations % 2) == 0) {
         if(imgTmp[0] != NULL) {

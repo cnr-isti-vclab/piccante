@@ -63,7 +63,7 @@ public:
 
     ~FilterConv2DSP()
     {
-        destroy();
+        release();
 
         if(conv1DFltX != NULL) {
             delete conv1DFltX;

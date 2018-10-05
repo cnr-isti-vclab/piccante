@@ -52,9 +52,9 @@ protected:
     std::vector<GLuint> stack;
 
     /**
-     * @brief destroyGL
+     * @brief releaseGL
      */
-    void destroyGL();
+    void releaseGL();
 
     /**
      * @brief assignGL assigns an (r, g, b, a) value to an image using glClearColor.
@@ -687,8 +687,8 @@ PIC_INLINE ImageGL::ImageGL(int frames, int width, int height, int channels,
 
 PIC_INLINE ImageGL::~ImageGL()
 {   
-    destroyGL();
-    Destroy();
+    releaseGL();
+    release();
 }
 
 /**
@@ -766,7 +766,7 @@ PIC_INLINE ImageGL *ImageGL::cloneGL()
     return new ImageGL(tmp, target, false, true);
 }
 
-PIC_INLINE void ImageGL::destroyGL()
+PIC_INLINE void ImageGL::releaseGL()
 {
     if(notOwnedGL) {
         return;

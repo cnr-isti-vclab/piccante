@@ -38,7 +38,9 @@ protected:
     float scaleX, scaleY;
     int width, height;
 
-
+    /**
+     * @brief allocate
+     */
     void allocate()
     {
         flt[X_DIRECTION] = NULL;
@@ -67,9 +69,9 @@ public:
     ~FilterDownSampler2D();
 
     /**
-     * @brief Destroy
+     * @brief release
      */
-    void Destroy();
+    void release();
     
     /**
      * @brief PreProcess

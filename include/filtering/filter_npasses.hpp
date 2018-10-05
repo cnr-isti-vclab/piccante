@@ -35,9 +35,9 @@ protected:
     bool CheckSame(ImageVec imgIn);
 
     /**
-     * @brief destroy
+     * @brief release
      */
-    void destroy();
+    void release();
 
 public:
 
@@ -124,10 +124,10 @@ PIC_INLINE FilterNPasses::FilterNPasses() : Filter()
 
 PIC_INLINE FilterNPasses::~FilterNPasses()
 {
-    destroy();
+    release();
 }
 
-PIC_INLINE void FilterNPasses::destroy()
+PIC_INLINE void FilterNPasses::release()
 {
     if(imgAllocated != NULL) {
         delete imgAllocated;

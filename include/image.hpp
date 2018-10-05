@@ -58,9 +58,9 @@ class Image
 protected:
 
     /**
-     * @brief Destroy makes allocated buffers free.
+     * @brief release makes allocated buffers free.
      */
-    void Destroy();
+    void release();
 
     /**
      * @brief allocateAux computes extra information after allocation;
@@ -923,12 +923,12 @@ PIC_INLINE Image::Image(float *color, int channels)
 
 PIC_INLINE Image::~Image()
 {
-    Destroy();
+    release();
 }
 
-PIC_INLINE void Image::Destroy()
+PIC_INLINE void Image::release()
 {
-    //Destroy the allocated resources
+    //release all allocated resources
     if(data != NULL && (!notOwned)) {
         delete[] data;
     }
@@ -1006,7 +1006,7 @@ PIC_INLINE void Image::assign(const Image *imgIn)
     }
 
     if(!isSimilarType(imgIn)) {
-        Destroy();
+        release();
         allocate(imgIn->width, imgIn->height, imgIn->channels, imgIn->frames);
     }
 

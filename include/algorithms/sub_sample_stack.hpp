@@ -34,10 +34,10 @@ class SubSampleStack
 protected:
 
     /**
-    * \brief This function creates a low resolution version of the stack using Grossberg and Nayar sampling.
+    * \brief sampleGrossberg creates a low resolution version of the stack using Grossberg and Nayar sampling.
     * \param stack is a stack of Image* at different exposures
     */
-    void Grossberg(ImageVec &stack)
+    void sampleGrossberg(ImageVec &stack)
     {
         #ifdef PIC_DEBUG
             printf("Computing histograms...");
@@ -94,11 +94,11 @@ protected:
     }
 
     /**
-     * @brief spatial creates a low resolution version of the stack.
+     * @brief sampleSpatial creates a low resolution version of the stack.
      * @param stack is a stack of Image* at different exposures
      * @param sub_type
      */
-    void spatial(ImageVec &stack, SAMPLER_TYPE sub_type = ST_MONTECARLO_S)
+    void sampleSpatial(ImageVec &stack, SAMPLER_TYPE sub_type = ST_MONTECARLO_S)
     {
         int width    = stack[0]->width;
         int height   = stack[0]->height;
@@ -166,7 +166,7 @@ public:
     }
 
     /**
-     * @brief Destroy
+     * @brief release
      */
     void release()
     {
@@ -200,9 +200,9 @@ public:
         this->exposures = int(stack.size());
 
         if(bSpatial) {
-            spatial(stack, sub_type);
+            sampleSpatial(stack, sub_type);
         } else {
-            Grossberg(stack);
+            sampleGrossberg(stack);
         }
 
         if (alpha < 0.f || alpha > 1.f)
