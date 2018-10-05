@@ -40,20 +40,50 @@ public:
     }
 
     /**
+     * @brief genValue
+     * @param value
+     * @param n
+     * @param ret
+     * @return
+     */
+    static T* genValue(T value, int n, T *ret)
+    {
+        if(n < 1) {
+            return ret;
+        }
+
+        if(ret == NULL) {
+            ret = new T[n];
+        }
+
+        for(int i = 0; i < n; i++) {
+            ret[i] = value;
+        }
+
+        return ret;
+    }
+
+    /**
      * @brief genRange
      * @param minVal
      * @param step
      * @param maxVal
      * @param ret
      */
-    static void genRange(T minVal, T step, T maxVal, std::vector<T> &ret)
+    static T *genRange(T minVal, T step, T maxVal, T *ret, int &n)
     {
-        int n = int((maxVal - minVal) / step) + 1;
+        n = int((maxVal - minVal) / step) + 1;
 
-        for(int i = 0; i < n; i++) {
-            T val = minVal + T(i) * step;
-            ret.push_back(val);
+        if(ret == NULL) {
+            ret = new T[n];
         }
+
+        ret[0] = minVal;
+        for(int i = 1; i < n; i++) {
+            ret[i] = ret[i - 1] + step;
+        }
+
+        return ret;
     }
 
     /**
@@ -64,28 +94,12 @@ public:
      * @param ret
      * @return
      */
-    static std::vector<T> *linspace(T minVal, T maxVal, int n, std::vector<T> &ret)
+    static T *linspace(T minVal, T maxVal, int n, T *ret)
     {
         T step = (maxVal - minVal) / (n - 1);
-        genRangeArray(minVal, step, maxVal, ret);
-    }
+        int tmp = n;
 
-    /**
-     * @brief norm
-     * @param data
-     * @param n
-     * @return
-     */
-    static inline float norm(float *data, int n)
-    {
-        float norm = 0.0f;
-
-        for(int k = 0; k < n; k++) {
-            float tmp = data[k];
-            norm += tmp * tmp;
-        }
-
-        return sqrtf(norm);
+        return genRange(minVal, step, maxVal, ret, tmp);
     }
 
     /**
@@ -105,6 +119,42 @@ public:
         }
 
         return distSq;
+    }
+
+    /**
+     * @brief norm_sq
+     * @param data
+     * @param n
+     * @return
+     */
+    static inline T norm_sq(float *data, int n)
+    {
+        T n_sq = T(0);
+
+        for(int k = 0; k < n; k++) {
+            T tmp = data[k];
+            n_sq += tmp * tmp;
+        }
+
+        return n_sq;
+    }
+
+    /**
+     * @brief norm
+     * @param data
+     * @param n
+     * @return
+     */
+    static inline float norm(float *data, int n)
+    {
+        float norm = 0.0f;
+
+        for(int k = 0; k < n; k++) {
+            float tmp = data[k];
+            norm += tmp * tmp;
+        }
+
+        return sqrtf(norm);
     }
 
     /**
@@ -263,6 +313,13 @@ public:
         return ret;
     }
 
+    /**
+     * @brief assign
+     * @param a
+     * @param ret
+     * @param size
+     * @return
+     */
     static inline T* assign (T* a, T* ret, int size)
     {
         memcpy(ret, a, sizeof(T) * size);

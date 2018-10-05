@@ -24,72 +24,139 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter_laplacian.hpp"
 #include "../filtering/filter_max.hpp"
 #include "../filtering/filter_grow_cut.hpp"
+#include "../filtering/filter_channel.hpp"
 
 namespace pic {
 
-/**
- * @brief computeGrowCut
- * @param img
- * @param seeds
- * @param state_cur
- * @return
- */
-PIC_INLINE Image *computeGrowCut(Image *img, Image *seeds, Image *state_cur = NULL)
+class GrowCut
 {
-    if(img == NULL || seeds == NULL) {
-        return NULL;
-    }
-
-    if(state_cur == NULL) {
-        state_cur = new Image(img->width, img->height, 2);
-    }
-
-    Image *state_next = state_cur->allocateSimilarOne();
-
-    //compute max
-    Image *img_max = FilterMax::execute(img, NULL, 5);
-
-    for(int i = 0; i < state_cur->nPixels(); i++) {
-        //init state_cur
-        int j  = i * state_cur->channels;
-        int j2 = i * seeds->channels;
-        state_cur->data[j] = seeds->data[j2];
-        state_cur->data[j + 1] = seeds->data[j2] > 0.0f ? 1.0f : 0.0f;
-
-        //fix max
-        j = i * img_max->channels;
-        float C = img_max->data[j] * img_max->data[j];
-        for(int c = 1; c < img_max->channels; c++) {
-            float tmp = img_max->data[j + c];
-            C += tmp * tmp;
-        }
-        img_max->data[j] = C;
-    }
-
-    //iterative filtering...
-    int iterations = int(sqrtf(img->widthf * img->widthf + img->heightf * img->heightf));
-    if((iterations % 2) == 1) {
-        iterations++;
-    }
-
+protected:
     FilterGrowCut flt;
-    ImageVec input = Triple(state_cur, img, img_max);
-    Image *output = state_next;
 
-    for(int i = 0; i < iterations; i++) {
+public:
 
-        output = flt.ProcessP(input, output);
+    /**
+     * @brief GrowCut
+     */
+    GrowCut()
+    {
 
-        Image *tmp = input[0];
-        input[0] = output;
-        output = tmp;
     }
 
-    delete output;
-    delete img_max;
+    /**
+     * @brief fromStrokeImageToSeeds
+     * @param strokes
+     * @param out
+     * @return
+     */
+    static Image *fromStrokeImageToSeeds(Image *strokes, Image *out)
+    {
+        if(strokes->channels < 3) {
+            return out;
+        }
 
-    return input[0];
-}
+        if(out == NULL) {
+            out = new Image(1, strokes->width, strokes->height, 1);
+        }
+
+        //red  --> +1
+        //blue --> -1
+        float red[] = {1.0f, 0.0f, 0.0f};
+        float blue[] = {0.0f, 0.0f, 1.0f};
+
+        for(int i = 0; i < strokes->nPixels(); i++) {
+            int ind = i * strokes->channels;
+
+            float d_red  = sqrtf(Array<float>::distanceSq(red,  &strokes->data[ind], 3));
+            float d_blue = sqrtf(Array<float>::distanceSq(blue, &strokes->data[ind], 3));
+
+            out->data[i] = 0.0f;
+
+            out->data[i] = d_red  < 0.5f ?  1.0f : out->data[i];
+            out->data[i] = d_blue < 0.5f ? -1.0f : out->data[i];
+        }
+
+        return out;
+    }
+
+    /**
+     * @brief getMaskAsImage
+     * @param state
+     * @return
+     */
+    static Image* getMaskAsImage(Image *state, Image *out)
+    {
+        if(state == NULL) {
+            return out;
+        }
+
+        if(out == NULL) {
+            out = new Image(1, state->width, state->height, 1);
+        }
+
+        return FilterChannel::execute(state, out, 0);
+    }
+
+    /**
+     * @brief execute
+     * @param img
+     * @param seeds
+     * @param state_cur
+     * @return
+     */
+    Image *execute(Image *img, Image *seeds, Image *state_cur = NULL)
+    {
+        if(img == NULL || seeds == NULL) {
+            return NULL;
+        }
+
+        if(state_cur == NULL) {
+            state_cur = new Image(img->width, img->height, 2);
+        }
+
+        Image *state_next = state_cur->allocateSimilarOne();
+
+        //compute max
+        Image *img_max = FilterMax::execute(img, NULL, 5);
+
+        for(int i = 0; i < state_cur->nPixels(); i++) {
+            //init state_cur
+            int j  = i * state_cur->channels;
+            int j2 = i * seeds->channels;
+            state_cur->data[j] = seeds->data[j2];
+            state_cur->data[j + 1] = fabsf(seeds->data[j2]) > 0.0f ? 1.0f : 0.0f;
+
+            //fix max
+            j = i * img_max->channels;
+            img_max->data[j] = Array<float>::norm_sq(&img_max->data[j], img_max->channels);
+        }
+
+        //iterative filtering...
+        int iterations = int(sqrtf(img->widthf * img->widthf +
+                                   img->heightf * img->heightf));
+
+        if((iterations % 2) == 1) {
+            iterations++;
+        }
+
+        ImageVec input = Triple(state_cur, img, img_max);
+        Image *output = state_next;
+
+        for(int i = 0; i < iterations; i++) {
+            output = flt.ProcessP(input, output);
+
+            Image *tmp = input[0];
+            input[0] = output;
+            output = tmp;
+        }
+
+        delete output;
+        delete img_max;
+
+        return input[0];
+    }
+
+};
 
 } // end namespace pic
 

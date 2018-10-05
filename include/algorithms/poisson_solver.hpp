@@ -50,7 +50,7 @@ PIC_INLINE Image *computePoissonSolver(Image *f, Image *ret = NULL)
         return NULL;
     }
 
-    //Allocating the output
+    //allocate the output
     if(ret == NULL) {
         ret = f->allocateSimilarOne();
     }
@@ -91,7 +91,7 @@ PIC_INLINE Image *computePoissonSolver(Image *f, Image *ret = NULL)
         printf("Ok\n");
     #endif
 
-    //Solving the system for each color channel
+    //solve the linear system for each color channel
     Eigen::SparseMatrix<double> A = Eigen::SparseMatrix<double>(tot, tot);
     A.setFromTriplets(tL.begin(), tL.end());
     Eigen::SimplicialCholesky<Eigen::SparseMatrix<double> > solver(A);
@@ -101,7 +101,7 @@ PIC_INLINE Image *computePoissonSolver(Image *f, Image *ret = NULL)
         Eigen::VectorXd b, x;
         b = Eigen::VectorXd::Zero(tot);
 
-        //copying values from f to b
+        //copy values from f to b
         for(int i = 0; i < height; i++) {
             int tmpI = i * width;
             for(int j = 0; j < width; j++) {

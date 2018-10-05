@@ -64,7 +64,12 @@ PIC_INLINE double mPSNR(Image *ori, Image *cmp, MULTI_EXPOSURE_TYPE type, int mi
                 getMinMaxFstops(ori, minFstop, maxFstop);
             }
 
-            Array<float>::genRange(float(minFstop), 1.0f, float(maxFstop), exposures);
+            int nExposures_v = 0;
+            float *exposures_v = NULL;
+            Array<float>::genRange(float(minFstop), 1.0f, float(maxFstop), exposures_v, nExposures_v);
+
+            exposures.insert(exposures.begin(), exposures_v, exposures_v + nExposures_v);
+
         } break;
     }
 

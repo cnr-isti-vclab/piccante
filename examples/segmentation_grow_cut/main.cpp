@@ -26,8 +26,18 @@ int main(int argc, char *argv[])
 
     pic::Image img, strokes;
 
-    img.Read("../data/input/yellow_flowers.png");
-    strokes.Read("../data/input/yellow_flowers_segmentation_strokes.png");
+    std::string img_str, strokes_str;
+
+    if(argc == 3) {
+        img_str = argv[1];
+        strokes_str = argv[2];
+    } else {
+        img_str = "../data/input/yellow_flowers.png";
+        strokes_str = "../data/input/yellow_flowers_segmentation_strokes.png";
+    }
+
+    img.Read(img_str);
+    strokes.Read(strokes_str);
 
     printf("OK\n");
 
@@ -35,11 +45,21 @@ int main(int argc, char *argv[])
     if(img.isValid() && strokes.isValid()) {
         printf("OK\n");
 
-        pic::Image *gc = pic::computeGrowCut(&img, &strokes);
+        pic::GrowCut gc;
 
-        gc->Write("../data/output/s_grow_cut.pfm");
+        pic::Image *seeds = pic::GrowCut::fromStrokeImageToSeeds(&strokes, NULL);
 
+        if(seeds != NULL) {
+            pic::Image *gc_seg = gc.execute(&img, seeds);
 
+            std::string name = pic::getFileNameOnly(img_str);
+
+            gc_seg->Write("../data/output/" + name + "_status.pfm");
+
+            pic::Image *gc_mask = pic::GrowCut::getMaskAsImage(gc_seg, NULL);
+
+            gc_mask->Write("../data/output/" + name + "_mask.png");
+        }
     } else {
         printf("No, the file is not valid!\n");
     }
