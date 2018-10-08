@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_DURAND_TMO_HPP
 #define PIC_GL_FILTERING_FILTER_DURAND_TMO_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../gl/filtering/filter_luminance.hpp"
 
@@ -66,7 +68,7 @@ public:
     void update(float compression_factor, float log_absolute);
 };
 
-FilterGLDurandTMO::FilterGLDurandTMO() : FilterGL()
+PIC_INLINE FilterGLDurandTMO::FilterGLDurandTMO() : FilterGL()
 {
     this->compression_factor = log10fPlusEpsilon(5.0f);
     this->log_absolute = this->compression_factor * 6.0f;
@@ -77,7 +79,7 @@ FilterGLDurandTMO::FilterGLDurandTMO() : FilterGL()
     initShaders();
 }
 
-FilterGLDurandTMO::FilterGLDurandTMO(float compression_factor, float log_absolute,
+PIC_INLINE FilterGLDurandTMO::FilterGLDurandTMO(float compression_factor, float log_absolute,
                                    bool bGammaCorrection = false): FilterGL()
 {
     this->compression_factor = compression_factor;
@@ -89,7 +91,7 @@ FilterGLDurandTMO::FilterGLDurandTMO(float compression_factor, float log_absolut
     initShaders();
 }
 
-void FilterGLDurandTMO::FragmentShader()
+PIC_INLINE void FilterGLDurandTMO::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -120,14 +122,14 @@ void FilterGLDurandTMO::FragmentShader()
     fragment_source = gammaCorrection(fragment_source, bGammaCorrection);
 }
 
-void FilterGLDurandTMO::initShaders()
+PIC_INLINE void FilterGLDurandTMO::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLDurandTMO");
 
     update(compression_factor, log_absolute);
 }
 
-void FilterGLDurandTMO::update(float compression_factor, float log_absolute)
+PIC_INLINE void FilterGLDurandTMO::update(float compression_factor, float log_absolute)
 {
     this->compression_factor = compression_factor;
     this->log_absolute = log_absolute;

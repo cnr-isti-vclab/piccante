@@ -61,12 +61,12 @@ public:
      * @brief execute
      * @param imgIn
      * @param imgOut
-     * @param size
+     * @param kernelSize
      * @return
      */
-    static ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut, int size)
+    static ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut, int kernelSize)
     {
-        FilterGLMin filter(size);
+        FilterGLMin filter(kernelSize);
         return filter.Process(SingleGL(imgIn), imgOut);
     }
 };

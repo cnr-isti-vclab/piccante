@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_EXPOSURE_FUSION_WEIGHTS_HPP
 #define PIC_GL_FILTERING_FILTER_EXPOSURE_FUSION_WEIGHTS_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -38,7 +40,7 @@ protected:
      */
     void FragmentShader();
 
-    float sigma2, mu;
+    float sigma_sq_2, mu;
     float wC, wE, wS;
 
 public:
@@ -53,7 +55,7 @@ public:
     {
         float sigma = 0.2f;
         mu = 0.5f;
-        sigma2 = 2.0f * sigma * sigma;
+        sigma_sq_2 = 2.0f * sigma * sigma;
 
         this->wC = wC >= 0.0f ? wC : 1.0f;
         this->wE = wE >= 0.0f ? wE : 1.0f;
@@ -66,7 +68,7 @@ public:
     }
 };
 
-void FilterGLExposureFusionWeights::FragmentShader()
+PIC_INLINE void FilterGLExposureFusionWeights::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -75,7 +77,7 @@ void FilterGLExposureFusionWeights::FragmentShader()
                           uniform float wC;   \n
                           uniform float wE;   \n
                           uniform float wS;   \n
-                          uniform float sigma2; \n
+                          uniform float sigma_sq_2; \n
                           uniform float mu; \n
                           out vec4      f_color;	\n
 
@@ -93,7 +95,7 @@ void FilterGLExposureFusionWeights::FragmentShader()
         //well-exposedness weight
         float L = texelFetch(u_tex_lum, coords, 0).x;\n
         float tmp = (L - mu);\n
-        float pExp = exp(-(tmp * tmp) / sigma2);\n
+        float pExp = exp(-(tmp * tmp) / sigma_sq_2);\n
         pExp = pow(pExp, wE);\n
 
         //contrast weight
@@ -110,7 +112,7 @@ void FilterGLExposureFusionWeights::FragmentShader()
                       );
 }
 
-void FilterGLExposureFusionWeights::initShaders()
+PIC_INLINE void FilterGLExposureFusionWeights::initShaders()
 {
     FragmentShader();
 
@@ -123,7 +125,7 @@ void FilterGLExposureFusionWeights::initShaders()
     technique.setUniform1f("wE", wE);
     technique.setUniform1f("wS", wS);
     technique.setUniform1f("mu", mu);
-    technique.setUniform1f("sigma2", sigma2);
+    technique.setUniform1f("sigma_sq_2", sigma_sq_2);
     technique.unbind();
 }
 

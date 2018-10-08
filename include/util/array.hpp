@@ -327,6 +327,21 @@ public:
     }
 
     /**
+     * @brief assign
+     * @param a
+     * @param ret
+     * @param size
+     * @return
+     */
+    static inline T* assign (T a, T* ret, int size)
+    {
+        for(int i = 0; i < size; i++) {
+            ret[i] = a;
+        }
+        return ret;
+    }
+
+    /**
      * @brief apply
      * @param vec
      * @param ret
