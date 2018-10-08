@@ -43,7 +43,7 @@ protected:
 
     float delta_t, k;
     unsigned int iterations;
-    FilterGLIterative	*flt;
+    FilterGLIterative *flt;
 
 public:
     /**
@@ -107,9 +107,7 @@ PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float k,
 PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigma_s,
         float sigma_r): FilterGL()
 {
-    if(sigma_r <= 0.0f) {
-        sigma_r = 0.11f;
-    }
+    sigma_r = sigma_r <= 0.0f ? 0.11f : sigma_r;
 
     flt = NULL;
 
@@ -128,7 +126,7 @@ PIC_INLINE void FilterGLAnisotropicDiffusion::FragmentShader()
     fragment_source = MAKE_STRING
                       (
                           uniform sampler2D u_tex; \n
-                          uniform float	  k2; \n
+                          uniform float	  k_sq; \n
                           uniform float	  delta_t; \n
                           out     vec4      f_color; \n
 
@@ -156,7 +154,7 @@ PIC_INLINE void FilterGLAnisotropicDiffusion::FragmentShader()
         \n
         vec4 c = vec4(dot(gN, gN), dot(gS, gS), dot(gW, gW), dot(gE, gE));
         \n
-        c = exp(-c / vec4(k2));
+        c = exp(-c / vec4(k_sq));
         \n
         f_color = vec4(cB + delta_t *(c.x * gN + c.y * gS + c.z * gW + c.w * gE), 1.0);
         \n
@@ -173,15 +171,12 @@ PIC_INLINE void FilterGLAnisotropicDiffusion::initShaders()
 
 PIC_INLINE void FilterGLAnisotropicDiffusion::update(float k)
 {
-    if(k > 0.0f) {
-        this->k = k;
-    }
-
-    float k2 = this->k * this->k;
+    this->k = k > 0.0f ? k : this->k;
+    float k_sq = this->k * this->k;
 
     technique.bind();
     technique.setUniform1i("u_tex", 0);
-    technique.setUniform1f("k2", k2);
+    technique.setUniform1f("k_sq", k_sq);
     technique.setUniform1f("delta_t", delta_t);
     technique.unbind();
 }
