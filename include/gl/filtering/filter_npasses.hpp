@@ -18,6 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_NPASSES_HPP
 #define PIC_GL_FILTERING_FILTER_NPASSES_HPP
 
+#include "../../base.hpp"
+
+#include "../../util/gl/fbo.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -68,21 +72,22 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-FilterGLNPasses::FilterGLNPasses(): FilterGL()
+PIC_INLINE FilterGLNPasses::FilterGLNPasses(): FilterGL()
 {
     imgAllocated = NULL;
     imgTmp[0] = imgTmp[1] = NULL;
     target = GL_TEXTURE_2D;
 }
 
-FilterGLNPasses::~FilterGLNPasses()
+PIC_INLINE FilterGLNPasses::~FilterGLNPasses()
 {
     if(imgAllocated != NULL) {
         delete imgAllocated;
         imgAllocated = NULL;
     }
 }
-void FilterGLNPasses::insertFilter(FilterGL *flt)
+
+PIC_INLINE void FilterGLNPasses::insertFilter(FilterGL *flt)
 {
     if(flt == NULL) {
         return;
@@ -101,7 +106,7 @@ void FilterGLNPasses::insertFilter(FilterGL *flt)
     }
 }
 
-ImageGL *FilterGLNPasses::setupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
+PIC_INLINE ImageGL *FilterGLNPasses::setupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->allocateSimilarOneGL();
@@ -137,7 +142,7 @@ ImageGL *FilterGLNPasses::setupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
     return imgOut;
 }
 
-ImageGL *FilterGLNPasses::Process(ImageGLVec imgIn, ImageGL *imgOut)
+PIC_INLINE ImageGL *FilterGLNPasses::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.size() < 1 || imgIn[0] == NULL) {
         return imgOut;

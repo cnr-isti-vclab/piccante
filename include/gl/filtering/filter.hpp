@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_HPP
 #define PIC_GL_FILTERING_FILTER_HPP
 
+#include "../../gl/image.hpp"
 #include "../../gl/image_vec.hpp"
 #include "../../util/gl/technique.hpp"
 #include "../../util/gl/quad.hpp"
@@ -42,6 +43,7 @@ protected:
     GLenum target;
 
     ImageGLVec param;
+
 public:
 
     std::vector<FilterGL *> filters;
@@ -179,11 +181,15 @@ PIC_INLINE ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
 
     imgOut = setupAux(imgIn, imgOut);
 
+    if(imgOut == NULL) {
+        return NULL;
+    }
+
+    //create an FBO
     if(fbo == NULL) {
         fbo = new Fbo();
     }
 
-    //create an FBO
     fbo->create(imgOut->width, imgOut->height, imgOut->frames, false, imgOut->getTexture());
 
     //bind the FBO

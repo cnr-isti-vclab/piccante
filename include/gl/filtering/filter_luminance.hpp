@@ -79,13 +79,18 @@ public:
     {
         int w = imgIn[0]->width;
         int h = imgIn[0]->height;
+        int f = imgIn[0]->frames;
+        int c = 1;
 
         if(imgOut == NULL) {
-            imgOut = new ImageGL(1, w, h, 1, IMG_GPU, imgIn[0]->getTarget());
+            imgOut = new ImageGL(f, w, h, 1, IMG_GPU, imgIn[0]->getTarget());
         } else {
-            if(!imgIn[0]->isSimilarType(imgOut)) {
+            if((imgOut->width != w) &&
+               (imgOut->height != h) &&
+               (imgOut->channels != c) &&
+               (imgOut->frames != f)) {
                 delete imgOut;
-                imgOut = new ImageGL(1, w, h, 1, IMG_GPU, imgIn[0]->getTarget());
+                imgOut = new ImageGL(f, w, h, 1, IMG_GPU, imgIn[0]->getTarget());
             }
         }
 

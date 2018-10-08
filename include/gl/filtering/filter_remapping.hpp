@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_REMAPPING_HPP
 #define PIC_GL_FILTERING_FILTER_REMAPPING_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -41,12 +43,12 @@ public:
     FilterGLRemapping();
 };
 
-FilterGLRemapping::FilterGLRemapping(): FilterGL()
+PIC_INLINE FilterGLRemapping::FilterGLRemapping(): FilterGL()
 {
     initShaders();
 }
 
-void FilterGLRemapping::initShaders()
+PIC_INLINE void FilterGLRemapping::initShaders()
 {
     /*	0 ---> Drago et al. 2003
     	1 ---> Reinhard et al. 2002

@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_SIMPLE_TMO_HPP
 #define PIC_GL_FILTERING_FILTER_SIMPLE_TMO_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -90,7 +92,7 @@ public:
     }
 };
 
-FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
+PIC_INLINE FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
 {
     gamma = 2.2f;
     fstop = 0.0f;
@@ -99,7 +101,7 @@ FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
     initShaders();
 }
 
-FilterGLSimpleTMO::FilterGLSimpleTMO(float gamma, float fstop): FilterGL()
+PIC_INLINE FilterGLSimpleTMO::FilterGLSimpleTMO(float gamma, float fstop): FilterGL()
 {
     //protected values are assigned/computed
     if(gamma <= 0.0f) {
@@ -113,7 +115,7 @@ FilterGLSimpleTMO::FilterGLSimpleTMO(float gamma, float fstop): FilterGL()
     initShaders();
 }
 
-void FilterGLSimpleTMO::FragmentShader()
+PIC_INLINE void FilterGLSimpleTMO::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -132,14 +134,14 @@ void FilterGLSimpleTMO::FragmentShader()
                       );
 }
 
-void FilterGLSimpleTMO::initShaders()
+PIC_INLINE void FilterGLSimpleTMO::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLSimpleTMO");
 
     update(gamma, fstop);
 }
 
-void FilterGLSimpleTMO::update(float gamma, float fstop)
+PIC_INLINE void FilterGLSimpleTMO::update(float gamma, float fstop)
 {
     this->gamma = gamma;
     this->fstop = fstop;

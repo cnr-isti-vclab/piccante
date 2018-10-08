@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_SIGMOID_TMO_HPP
 #define PIC_GL_FILTERING_FILTER_SIGMOID_TMO_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../gl/filtering/filter_luminance.hpp"
 
@@ -63,7 +65,7 @@ public:
     void update(float alpha);
 };
 
-FilterGLSigmoidTMO::FilterGLSigmoidTMO(): FilterGL()
+PIC_INLINE FilterGLSigmoidTMO::FilterGLSigmoidTMO(): FilterGL()
 {
     alpha = 0.15f;
     bGammaCorrection = false;
@@ -73,7 +75,7 @@ FilterGLSigmoidTMO::FilterGLSigmoidTMO(): FilterGL()
     initShaders();
 }
 
-FilterGLSigmoidTMO::FilterGLSigmoidTMO(float alpha, bool bLocal,
+PIC_INLINE FilterGLSigmoidTMO::FilterGLSigmoidTMO(float alpha, bool bLocal,
                                        bool bGammaCorrection): FilterGL()
 {
     this->alpha = alpha;
@@ -84,7 +86,7 @@ FilterGLSigmoidTMO::FilterGLSigmoidTMO(float alpha, bool bLocal,
     initShaders();
 }
 
-void FilterGLSigmoidTMO::FragmentShader()
+PIC_INLINE void FilterGLSigmoidTMO::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -133,7 +135,7 @@ void FilterGLSigmoidTMO::FragmentShader()
     fragment_source = gammaCorrection(fragment_source, bGammaCorrection);
 }
 
-void FilterGLSigmoidTMO::initShaders()
+PIC_INLINE void FilterGLSigmoidTMO::initShaders()
 {
     FragmentShader();
 
@@ -142,7 +144,7 @@ void FilterGLSigmoidTMO::initShaders()
     update(alpha);
 }
 
-void FilterGLSigmoidTMO::update(float alpha)
+PIC_INLINE void FilterGLSigmoidTMO::update(float alpha)
 {
     if(alpha > 0.0f) {
         this->alpha = alpha;

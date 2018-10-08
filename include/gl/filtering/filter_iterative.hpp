@@ -18,6 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_ITERATIVE_HPP
 #define PIC_GL_FILTERING_FILTER_ITERATIVE_HPP
 
+#include "../../base.hpp"
+
+#include "../../util/gl/fbo.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -78,14 +82,14 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-FilterGLIterative::FilterGLIterative(): FilterGL()
+PIC_INLINE FilterGLIterative::FilterGLIterative(): FilterGL()
 {
     imgTmp[0] = imgTmp[1] = NULL;
     iterations = 0;
     target = GL_TEXTURE_2D;
 }
 
-FilterGLIterative::FilterGLIterative(FilterGL *flt, int iterations): FilterGL()
+PIC_INLINE FilterGLIterative::FilterGLIterative(FilterGL *flt, int iterations): FilterGL()
 {
     imgTmp[0] = imgTmp[1] = NULL;
     target = GL_TEXTURE_2D;
@@ -93,7 +97,7 @@ FilterGLIterative::FilterGLIterative(FilterGL *flt, int iterations): FilterGL()
     update(flt, iterations);
 }
 
-void FilterGLIterative::update(FilterGL *flt, int iterations)
+PIC_INLINE void FilterGLIterative::update(FilterGL *flt, int iterations)
 {
     if(iterations > 0) {
         this->iterations = iterations;
@@ -110,7 +114,7 @@ void FilterGLIterative::update(FilterGL *flt, int iterations)
     filters.push_back(flt);
 }
 
-ImageGL *FilterGLIterative::setupAuxN(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLIterative::setupAuxN(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgOut == NULL) {
@@ -141,13 +145,13 @@ ImageGL *FilterGLIterative::setupAuxN(ImageGLVec imgIn,
     return imgOut;
 }
 
-ImageGL *FilterGLIterative::Process(ImageGLVec imgIn, ImageGL *imgOut)
+PIC_INLINE ImageGL *FilterGLIterative::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.size() < 1 || imgIn[0] == NULL) {
         return imgOut;
     }
 
-    //Allocate FBOs
+    //allocate FBOs
     imgOut = setupAuxN(imgIn, imgOut);
 
     filters[0]->Process(imgIn, imgTmp[0]);

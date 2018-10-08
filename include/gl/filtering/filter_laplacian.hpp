@@ -31,53 +31,47 @@ protected:
     /**
      * @brief initShaders
      */
-    void initShaders();
+    void initShaders()
+    {
+        FragmentShader();
+        technique.initStandard("330", vertex_source, fragment_source, "FilterGLLaplacian");
+    }
 
     /**
      * @brief FragmentShader
      */
-    void FragmentShader();
+    void FragmentShader()
+    {
+        fragment_source = MAKE_STRING
+                          (
+                              uniform sampler2D u_tex; \n
+                              out vec4      f_color;	\n
+
+        void main(void) {
+            \n
+            ivec2 coords = ivec2(gl_FragCoord.xy);\n
+            vec3  color = -4.0 * texelFetch(u_tex, coords, 0).xyz;\n
+            color += texelFetch(u_tex, coords + ivec2(1, 0), 0).xyz;\n
+            color += texelFetch(u_tex, coords - ivec2(1, 0), 0).xyz;\n
+            color += texelFetch(u_tex, coords + ivec2(0, 1), 0).xyz;\n
+            color += texelFetch(u_tex, coords - ivec2(0, 1), 0).xyz;\n
+            f_color = vec4(color, 1.0); //Magnitude
+        }\n
+                          );
+    }
 
 public:
 
     /**
      * @brief FilterGLLaplacian
      */
-    FilterGLLaplacian();
+    FilterGLLaplacian()
+    {
+        //protected values are assigned/computed
+        FragmentShader();
+        initShaders();
+    }
 };
-
-FilterGLLaplacian::FilterGLLaplacian(): FilterGL()
-{
-    //protected values are assigned/computed
-    FragmentShader();
-    initShaders();
-}
-
-void FilterGLLaplacian::FragmentShader()
-{
-    fragment_source = MAKE_STRING
-                      (
-                          uniform sampler2D u_tex; \n
-                          out vec4      f_color;	\n
-
-    void main(void) {
-        \n
-        ivec2 coords = ivec2(gl_FragCoord.xy);\n
-        vec3  color = -4.0 * texelFetch(u_tex, coords, 0).xyz;\n
-        color += texelFetch(u_tex, coords + ivec2(1, 0), 0).xyz;\n
-        color += texelFetch(u_tex, coords - ivec2(1, 0), 0).xyz;\n
-        color += texelFetch(u_tex, coords + ivec2(0, 1), 0).xyz;\n
-        color += texelFetch(u_tex, coords - ivec2(0, 1), 0).xyz;\n
-        f_color = vec4(color, 1.0); //Magnitude
-    }\n
-                      );
-}
-
-void FilterGLLaplacian::initShaders()
-{
-    FragmentShader();
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGLLaplacian");
-}
 
 } // end namespace pic
 

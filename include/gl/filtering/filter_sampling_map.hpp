@@ -18,6 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_SAMPLING_MAP_HPP
 #define PIC_GL_FILTERING_FILTER_SAMPLING_MAP_HPP
 
+#include "../../base.hpp"
+
+#include "../../util/gl/fbo.hpp"
+
 #include "../../gl/filtering/filter_npasses.hpp"
 #include "../../gl/filtering/filter_gradient.hpp"
 #include "../../gl/filtering/filter_sigmoid_tmo.hpp"
@@ -116,21 +120,21 @@ public:
     }
 };
 
-FilterGLSamplingMap::FilterGLSamplingMap(float sigma): FilterGLNPasses()
+PIC_INLINE FilterGLSamplingMap::FilterGLSamplingMap(float sigma): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
     float rateScale = 2.0f;
     update(rateScale, rateScale / sigma);
 }
 
-FilterGLSamplingMap::FilterGLSamplingMap(float sigma,
+PIC_INLINE FilterGLSamplingMap::FilterGLSamplingMap(float sigma,
         float scale): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
     update(sigma * scale, scale);
 }
 
-void FilterGLSamplingMap::update(float sigma, float scale)
+PIC_INLINE void FilterGLSamplingMap::update(float sigma, float scale)
 {
     this->sigma = sigma;
     this->scale = scale;
@@ -147,7 +151,7 @@ void FilterGLSamplingMap::update(float sigma, float scale)
     insertFilter(filterG2D);
 }
 
-FilterGLSamplingMap::~FilterGLSamplingMap()
+PIC_INLINE FilterGLSamplingMap::~FilterGLSamplingMap()
 {
     delete filterG;
     delete filterS;
@@ -155,7 +159,7 @@ FilterGLSamplingMap::~FilterGLSamplingMap()
     delete filterG2D;
 }
 
-Fbo *FilterGLSamplingMap::getFbo()
+PIC_INLINE Fbo *FilterGLSamplingMap::getFbo()
 {
     if(filters.size() <= 0) {
         return NULL;
@@ -164,7 +168,7 @@ Fbo *FilterGLSamplingMap::getFbo()
     return filters[filters.size() - 1]->getFbo();
 }
 
-ImageGL *FilterGLSamplingMap::setupAuxN(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLSamplingMap::setupAuxN(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgOut == NULL) {

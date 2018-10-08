@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_THRESHOLDING_HPP
 #define PIC_GL_FILTERING_FILTER_THRESHOLDING_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -63,14 +65,14 @@ public:
     }
 };
 
-FilterGLThresholding::FilterGLThresholding(): FilterGL()
+PIC_INLINE FilterGLThresholding::FilterGLThresholding(): FilterGL()
 {
     //protected values are assigned/computed
     FragmentShader();
     initShaders();
 }
 
-void FilterGLThresholding::FragmentShader()
+PIC_INLINE void FilterGLThresholding::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -96,7 +98,7 @@ void FilterGLThresholding::FragmentShader()
                       );
 }
 
-void FilterGLThresholding::initShaders()
+PIC_INLINE void FilterGLThresholding::initShaders()
 {
     FragmentShader();
 

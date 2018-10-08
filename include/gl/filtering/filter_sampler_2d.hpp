@@ -43,52 +43,64 @@ public:
     FilterGLSampler2D(float scale);
 
     /**
-     * @brief Process
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
+    ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
+    {
+        int w = int(imgIn[0]->widthf  * scale);
+        int h = int(imgIn[0]->heightf * scale);
+        int f = imgIn[0]->frames;
+        int c = imgIn[0]->channels;
+
+        if(imgOut == NULL) {
+            imgOut = new ImageGL(f, w, h, c, IMG_GPU, imgIn[0]->getTarget());
+        } else {
+            if((imgOut->width != w) &&
+               (imgOut->height != h) &&
+               (imgOut->channels != c) &&
+               (imgOut->frames != f)) {
+                delete imgOut;
+                imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+            }
+
+            if(!imgIn[0]->isSimilarType(imgOut)) {
+                delete imgOut;
+                imgOut = new ImageGL(f, w, h, c, IMG_GPU, imgIn[0]->getTarget());
+            }
+        }
+
+        return imgOut;
+    }
 
     /**
      * @brief execute
-     * @param nameIn
-     * @param nameOut
+     * @param imgIn
+     * @param imgOut
      * @param scale
      * @return
      */
-    static ImageGL *execute(std::string nameIn, std::string nameOut, float scale)
+    static ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut, float scale)
     {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(GL_TEXTURE_2D, false);
+        imgIn->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         FilterGLSampler2D filter(scale);
-        ImageGL *imgOut = new ImageGL( imgIn.frames,
-                                       int(imgIn.widthf  * scale),
-                                       int(imgIn.heightf * scale),
-                                       imgIn.channels, IMG_GPU_CPU, GL_TEXTURE_2D);
 
-        GLuint testTQ1 = glBeginTimeQuery();
-        filter.Process(SingleGL(&imgIn), imgOut);
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-
-        printf("DownSampling Filter on GPU time: %f ms\n",
-               double(timeVal) / 100000000.0);
-
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
+        imgOut = filter.Process(SingleGL(imgIn), imgOut);
 
         return imgOut;
     }
 };
 
-FilterGLSampler2D::FilterGLSampler2D(float scale): FilterGL()
+PIC_INLINE FilterGLSampler2D::FilterGLSampler2D(float scale): FilterGL()
 {
     this->scale = scale;
     initShaders();
 }
 
-void FilterGLSampler2D::initShaders()
+PIC_INLINE void FilterGLSampler2D::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
@@ -109,58 +121,6 @@ void FilterGLSampler2D::initShaders()
     technique.setUniform1i("u_tex", 0);
     technique.setUniform1f("scale", scale);
     technique.unbind();
-}
-
-ImageGL *FilterGLSampler2D::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return NULL;
-    }
-
-    if(imgIn.size() != 1) {
-        return imgOut;
-    }
-
-    int w = int(imgIn[0]->widthf  * scale);
-    int h = int(imgIn[0]->heightf * scale);
-    int f = imgIn[0]->frames;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
-    }
-
-    //Fbo
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, f, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    technique.bind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    technique.unbind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

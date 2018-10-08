@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_REINHARD_TMO_SINGLE_PASS_HPP
 #define PIC_GL_FILTERING_REINHARD_TMO_SINGLE_PASS_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../util/file_lister.hpp"
 #include "../../gl/point_samplers/sampler_random_m.hpp"
@@ -72,7 +74,7 @@ public:
 
 };
 
-FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, float phi = 8.0f): FilterGL()
+PIC_INLINE FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, float phi = 8.0f): FilterGL()
 {
     this->alpha = alpha;
 
@@ -114,7 +116,7 @@ FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, float phi = 
     initShaders();
 }
 
-FilterGLReinhardSinglePass::~FilterGLReinhardSinglePass()
+PIC_INLINE FilterGLReinhardSinglePass::~FilterGLReinhardSinglePass()
 {
     delete imageRand;
     delete ms;
@@ -122,7 +124,7 @@ FilterGLReinhardSinglePass::~FilterGLReinhardSinglePass()
     //free shader etc...
 }
 
-void FilterGLReinhardSinglePass::FragmentShader()
+PIC_INLINE void FilterGLReinhardSinglePass::FragmentShader()
 {
     fragment_source = MAKE_STRING
                                           (
@@ -185,7 +187,7 @@ void FilterGLReinhardSinglePass::FragmentShader()
 
 }
 
-void FilterGLReinhardSinglePass::initShaders()
+PIC_INLINE void FilterGLReinhardSinglePass::initShaders()
 {
 #ifdef PIC_DEBUG
     printf("Number of samples: %d\n", ms->nSamples);
@@ -196,7 +198,7 @@ void FilterGLReinhardSinglePass::initShaders()
     update(-1.0f, -1.0f, 1.0f);
 }
 
-void FilterGLReinhardSinglePass::update(float sigma_s, float sigma_r, float Lwa)
+PIC_INLINE void FilterGLReinhardSinglePass::update(float sigma_s, float sigma_r, float Lwa)
 {
     bool flag = false;
 
@@ -242,8 +244,7 @@ void FilterGLReinhardSinglePass::update(float sigma_s, float sigma_r, float Lwa)
     technique.unbind();
 }
 
-//Processing
-ImageGL *FilterGLReinhardSinglePass::Process(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLReinhardSinglePass::Process(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {

@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_GAUSSIAN_3D_HPP
 #define PIC_GL_FILTERING_FILTER_GAUSSIAN_3D_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter_npasses.hpp"
 #include "../../gl/filtering/filter_gaussian_1d.hpp"
 

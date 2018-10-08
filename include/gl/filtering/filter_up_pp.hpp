@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_UP_PP_HPP
 #define PIC_GL_FILTERING_FILTER_UP_PP_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -51,15 +53,36 @@ public:
     void update(float *value, float threshold);
 
     /**
-     * @brief Process
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
+    ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
+    {
+        int w = imgIn[0]->width  << 1;
+        int h = imgIn[0]->height << 1;
+        int f = imgIn[0]->frames;
+
+        if(imgOut == NULL) {
+            imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+        } else {
+            if((imgOut->width != w) &&
+               (imgOut->height != h) &&
+               (imgOut->channels != imgIn[0]->channels) &&
+               (imgOut->frames != imgIn[0]->frames)) {
+                delete imgOut;
+                imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+            }
+        }
+
+        return imgOut;
+    }
+
+   // ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-FilterGLUpPP::FilterGLUpPP(float *value, float threshold): FilterGL()
+PIC_INLINE FilterGLUpPP::FilterGLUpPP(float *value, float threshold): FilterGL()
 {
     value = NULL;
 
@@ -67,7 +90,7 @@ FilterGLUpPP::FilterGLUpPP(float *value, float threshold): FilterGL()
     update(value, threshold);
 }
 
-void FilterGLUpPP::initShaders()
+PIC_INLINE void FilterGLUpPP::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
@@ -101,7 +124,7 @@ void FilterGLUpPP::initShaders()
  * @param value
  * @param threshold
  */
-void FilterGLUpPP::update(float *value, float threshold)
+PIC_INLINE void FilterGLUpPP::update(float *value, float threshold)
 {
     if(value == NULL) {
         this->value = new float[4];
@@ -127,7 +150,8 @@ void FilterGLUpPP::update(float *value, float threshold)
     technique.unbind();
 }
 
-ImageGL *FilterGLUpPP::Process(ImageGLVec imgIn, ImageGL *imgOut)
+/*
+PIC_INLINE ImageGL *FilterGLUpPP::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
         return NULL;
@@ -184,7 +208,7 @@ ImageGL *FilterGLUpPP::Process(ImageGLVec imgIn, ImageGL *imgOut)
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return imgOut;
-}
+}*/
 
 } // end namespace pic
 

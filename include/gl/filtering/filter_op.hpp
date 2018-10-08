@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_OP_HPP
 #define PIC_GL_FILTERING_FILTER_OP_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../util/string.hpp"
 
@@ -165,7 +167,7 @@ public:
     }
 };
 
-FilterGLOp::FilterGLOp(std::string op, bool bTexelFetch = false,
+PIC_INLINE FilterGLOp::FilterGLOp(std::string op, bool bTexelFetch = false,
                        float *c0 = NULL, float *c1 = NULL): FilterGL()
 {
     if(c0 != NULL) {
@@ -200,7 +202,7 @@ FilterGLOp::FilterGLOp(std::string op, bool bTexelFetch = false,
     initShaders();
 }
 
-void FilterGLOp::initShaders()
+PIC_INLINE void FilterGLOp::initShaders()
 {
     std::string strOp = "ret = ";
     strOp.append(op);
@@ -319,7 +321,7 @@ void FilterGLOp::initShaders()
     technique.unbind();
 }
 
-void FilterGLOp::update(float *c0, float *c1)
+PIC_INLINE void FilterGLOp::update(float *c0, float *c1)
 {
     if(c0 != NULL) {
         for(int i = 0; i < 4; i++) {
