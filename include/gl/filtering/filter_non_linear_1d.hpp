@@ -122,11 +122,11 @@ public:
     /**
      * @brief FilterGLNonLinear1D
      */
-    FilterGLNonLinear1D(int kernelSize, std::string acc_operator) : FilterGL1D(0, GL_TEXTURE_2D)
+    FilterGLNonLinear1D(int kernelSize, std::string acc_operator, GLenum target) : FilterGL1D(0, target)
     {
         this->acc_operator = acc_operator;
 
-        Setup(kernelSize);
+        setup(kernelSize);
 
         FragmentShader(NULL, 0, GL_TEXTURE_2D);
         initShaders();
@@ -147,10 +147,10 @@ public:
     }
 
     /**
-     * @brief Setup
+     * @brief setup
      * @param kernelSize
      */
-    void Setup(int kernelSize)
+    void setup(int kernelSize)
     {
         if(kernelSize < 1) {
             kernelSize = 3;

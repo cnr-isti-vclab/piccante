@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_LUMINANCE_HPP
 #define PIC_GL_FILTERING_FILTER_LUMINANCE_HPP
 
+#include "../../base.hpp"
 #include "../../filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter.hpp"
 
@@ -56,14 +57,6 @@ public:
     void update(LUMINANCE_TYPE type);
 
     /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
-
-    /**
      * @brief execute
      * @param imgIn
      * @param imgOut
@@ -77,39 +70,44 @@ public:
     }
 
     /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
+     * @brief setupAux
+     * @param imgIn
+     * @param imgOut
      * @return
      */
-    static ImageGL *execute(std::string nameIn, std::string nameOut)
+    ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
     {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
+        int w = imgIn[0]->width;
+        int h = imgIn[0]->height;
 
-        ImageGL *imgOut = execute(&imgIn, NULL);
+        if(imgOut == NULL) {
+            imgOut = new ImageGL(1, w, h, 1, IMG_GPU, imgIn[0]->getTarget());
+        } else {
+            if(!imgIn[0]->isSimilarType(imgOut)) {
+                delete imgOut;
+                imgOut = new ImageGL(1, w, h, 1, IMG_GPU, imgIn[0]->getTarget());
+            }
+        }
 
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
         return imgOut;
     }
 };
 
-FilterGLLuminance::FilterGLLuminance(): FilterGL()
+PIC_INLINE FilterGLLuminance::FilterGLLuminance(): FilterGL()
 {
     this->type = LT_CIE_LUMINANCE;
 
     initShaders();
 }
 
-FilterGLLuminance::FilterGLLuminance(LUMINANCE_TYPE type): FilterGL()
+PIC_INLINE FilterGLLuminance::FilterGLLuminance(LUMINANCE_TYPE type): FilterGL()
 {
     this->type = type;
 
     initShaders();
 }
 
-void FilterGLLuminance::initShaders()
+PIC_INLINE void FilterGLLuminance::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
@@ -132,7 +130,7 @@ void FilterGLLuminance::initShaders()
     update(type);
 }
 
-void FilterGLLuminance::update(LUMINANCE_TYPE type)
+PIC_INLINE void FilterGLLuminance::update(LUMINANCE_TYPE type)
 {
     this->type = type;
 
@@ -173,56 +171,6 @@ void FilterGLLuminance::update(LUMINANCE_TYPE type)
     technique.setUniform1i("u_tex", 0);
     technique.setUniform3f("weights", weights[0], weights[1], weights[2]);
     technique.unbind();
-}
-
-ImageGL *FilterGLLuminance::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn.empty()) {
-        return imgOut;
-    }
-
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(1, w, h, 1, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, 1, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    technique.bind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    technique.unbind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

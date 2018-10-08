@@ -15,31 +15,59 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_ALGORITHMS_GROW_CUT_HPP
-#define PIC_ALGORITHMS_GROW_CUT_HPP
+#ifndef PIC_GL_ALGORITHMS_GROW_CUT_HPP
+#define PIC_GL_ALGORITHMS_GROW_CUT_HPP
 
-#include "../base.hpp"
+#include "../../base.hpp"
 
-#include "../image.hpp"
-#include "../filtering/filter_max.hpp"
-#include "../filtering/filter_grow_cut.hpp"
-#include "../filtering/filter_channel.hpp"
+#include "../../gl/image.hpp"
+#include "../../gl/filtering/filter_max.hpp"
+#include "../../gl/filtering/filter_grow_cut.hpp"
+#include "../../gl/filtering/filter_channel.hpp"
 
 namespace pic {
 
-class GrowCut
+class GrowCutGL
 {
 protected:
-    FilterGrowCut flt;
+    FilterGLGrowCut *flt;
+    FilterGLMax *fltMax;
+    ImageGL *img_max, *state_next;
 
 public:
 
     /**
-     * @brief GrowCut
+     * @brief GrowCutGL
      */
-    GrowCut()
+    GrowCutGL()
     {
+        flt = NULL;
+        fltMax = NULL;
+        img_max = NULL;
+        state_next = NULL;
+    }
 
+    ~GrowCutGL()
+    {
+        if(flt != NULL) {
+            delete flt;
+            flt = NULL;
+        }
+
+        if(fltMax != NULL) {
+            delete fltMax;
+            fltMax = NULL;
+        }
+
+        if(img_max != NULL) {
+            delete img_max;
+            img_max = NULL;
+        }
+
+        if(state_next != NULL) {
+            delete state_next;
+            state_next = NULL;
+        }
     }
 
     /**
@@ -103,20 +131,28 @@ public:
      * @param state_cur
      * @return
      */
-    Image *execute(Image *img, Image *seeds, Image *state_cur = NULL)
+    ImageGL *execute(ImageGL *img, ImageGL *seeds, ImageGL *state_cur = NULL)
     {
         if(img == NULL || seeds == NULL) {
             return NULL;
         }
 
         if(state_cur == NULL) {
-            state_cur = new Image(img->width, img->height, 2);
+            state_cur = new ImageGL(1, img->width, img->height, 2, IMG_GPU, GL_TEXTURE_2D);
         }
 
-        Image *state_next = state_cur->allocateSimilarOne();
+        if(fltMax == NULL) {
+            fltMax = new FilterGLMax(5);
+        }
+
+        if(flt == NULL) {
+            flt = new FilterGLGrowCut();
+        }
+
+        ImageGL *state_next = state_cur->allocateSimilarOneGL();
 
         //compute max
-        Image *img_max = FilterMax::execute(img, NULL, 5);
+        img_max = fltMax->Process(SingleGL(img), img_max);
 
         for(int i = 0; i < state_cur->nPixels(); i++) {
             //init state_cur
@@ -124,10 +160,6 @@ public:
             int j2 = i * seeds->channels;
             state_cur->data[j] = seeds->data[j2];
             state_cur->data[j + 1] = fabsf(seeds->data[j2]) > 0.0f ? 1.0f : 0.0f;
-
-            //fix max
-            j = i * img_max->channels;
-            img_max->data[j] = Array<float>::norm_sq(&img_max->data[j], img_max->channels);
         }
 
         //iterative filtering...
@@ -137,19 +169,16 @@ public:
             iterations++;
         }
 
-        ImageVec input = Triple(state_cur, img, img_max);
-        Image *output = state_next;
+        ImageGLVec input = TripleGL(state_cur, img, img_max);
+        ImageGL *output = state_next;
 
         for(int i = 0; i < iterations; i++) {
-            output = flt.ProcessP(input, output);
+            output = flt->Process(input, output);
 
-            Image *tmp = input[0];
+            ImageGL *tmp = input[0];
             input[0] = output;
             output = tmp;
         }
-
-        delete output;
-        delete img_max;
 
         return input[0];
     }
@@ -158,5 +187,5 @@ public:
 
 } // end namespace pic
 
-#endif /* PIC_ALGORITHMS_GROW_CUT_HPP */
+#endif /* PIC_GL_ALGORITHMS_GROW_CUT_HPP */
 

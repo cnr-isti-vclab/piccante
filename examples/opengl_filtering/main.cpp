@@ -48,6 +48,7 @@ protected:
     pic::FilterGLBilateral2DSP *fltBilSP;
     pic::FilterGLBilateral2DS *fltBilS;
     pic::FilterGLGaussian2D *fltGauss;
+    pic::FilterGLAnisotropicDiffusion *fltAD;
 
     pic::ImageGL *img, *img_flt, *img_flt_tmo;
     pic::TechniqueGL technique;
@@ -100,6 +101,9 @@ protected:
 
         //allocate a new bilateral filter
         fltBilF = new pic::FilterGLBilateral2DF(sigma_s, sigma_r);
+
+        //allocate a new anisotropic diffusion filter
+        fltAD = new pic::FilterGLAnisotropicDiffusion(sigma_s, sigma_r);
 
         img_flt_tmo = NULL;
         img_flt = NULL;
@@ -175,6 +179,12 @@ protected:
                 img_out = img_flt;
                 window_ext->setWindowTitle(tr("Filtering Example: Sub-Sampled Bilateral"));
 
+            case 6:
+                //apply the anisotropic diffusion filter
+                img_flt = fltAD->AnisotropicDiffusion(SingleGL(img), img_flt);
+                img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Anisotropic Diffusion"));
+
             break;
 
         default:
@@ -214,7 +224,7 @@ public:
      */
     void update()
     {
-        method = (method + 1) % 6;
+        method = (method + 1) % 7;
     }
 };
 

@@ -25,10 +25,20 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterGLAnisotropicDiffusion class
+ */
 class FilterGLAnisotropicDiffusion: public FilterGL
 {
 protected:
+    /**
+     * @brief initShaders
+     */
     void initShaders();
+
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
     float delta_t, k;
@@ -36,17 +46,32 @@ protected:
     FilterGLIterative	*flt;
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLAnisotropicDiffusion
+     * @param k
+     * @param iterations
+     */
     FilterGLAnisotropicDiffusion(float k, unsigned int iterations);
-    FilterGLAnisotropicDiffusion(float sigma_r, float sigma_s);
 
-    //Updating k
+    /**
+     * @brief FilterGLAnisotropicDiffusion
+     * @param sigma_s
+     * @param sigma_r
+     */
+    FilterGLAnisotropicDiffusion(float sigma_s, float sigma_r);
+
+    /**
+     * @brief update
+     * @param k
+     */
     void update(float k);
 
-    //Processing
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
-
-    //Anisotropic Diffusion
+    /**
+     * @brief AnisotropicDiffusion
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageGL *AnisotropicDiffusion(ImageGLVec imgIn, ImageGL *imgOut)
     {
         if(flt == NULL) {
@@ -79,8 +104,8 @@ PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float k,
     initShaders();
 }
 
-PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigma_r,
-        float sigma_s): FilterGL()
+PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigma_s,
+        float sigma_r): FilterGL()
 {
     if(sigma_r <= 0.0f) {
         sigma_r = 0.11f;
@@ -159,51 +184,6 @@ PIC_INLINE void FilterGLAnisotropicDiffusion::update(float k)
     technique.setUniform1f("k2", k2);
     technique.setUniform1f("delta_t", delta_t);
     technique.unbind();
-}
-
-PIC_INLINE ImageGL *FilterGLAnisotropicDiffusion::Process(ImageGLVec imgIn,
-        ImageGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
-
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //bind shaders
-    technique.bind();
-
-    //bind Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //render an aligned quad
-    quad->Render();
-
-    //unbind the FBO
-    fbo->unbind();
-
-    //unbind shaders
-    technique.unbind();
-
-    //unbind textures
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

@@ -42,6 +42,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/algorithms/pushpull.hpp"
 #include "gl/algorithms/color_to_gray.hpp"
 #include "gl/algorithms/richardson_lucy_deconvolution.hpp"
+#include "gl/algorithms/grow_cut.hpp"
 
 #include "util/gl/buffer_op.hpp"
 #include "util/gl/buffer_ops.hpp"

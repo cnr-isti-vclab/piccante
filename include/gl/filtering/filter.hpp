@@ -142,6 +142,26 @@ public:
 
         return fragment_source;
     }
+
+    /**
+     * @brief setupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    virtual ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
+    {
+        if(imgOut == NULL) {
+            imgOut = imgIn[0]->allocateSimilarOneGL();
+        } else {
+            if(!imgIn[0]->isSimilarType(imgOut)) {
+                delete imgOut;
+                imgOut = imgIn[0]->allocateSimilarOneGL();
+            }
+        }
+
+        return imgOut;
+    }
 };
 
 PIC_INLINE ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
@@ -157,16 +177,14 @@ PIC_INLINE ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
     int width = imgIn[0]->width;
     int height = imgIn[0]->height;
 
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(imgIn[0]->frames, width, height, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
-    }
+    imgOut = setupAux(imgIn, imgOut);
 
     if(fbo == NULL) {
         fbo = new Fbo();
     }
 
     //create an FBO
-    fbo->create(width, height, imgIn[0]->frames, false, imgOut->getTexture());
+    fbo->create(imgOut->width, imgOut->height, imgOut->frames, false, imgOut->getTexture());
 
     //bind the FBO
     fbo->bind();

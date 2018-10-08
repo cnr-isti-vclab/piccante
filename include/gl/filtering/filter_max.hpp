@@ -40,9 +40,9 @@ public:
      * @brief FilterMax
      * @param kernelSize
      */
-    FilterGLMax(int kernelSize)
+    FilterGLMax(int kernelSize) : FilterGLNPasses()
     {
-        filter = new FilterGLNonLinear1D(kernelSize, "max");
+        filter = new FilterGLNonLinear1D(kernelSize, "max", GL_TEXTURE_2D);
 
         insertFilter(filter);
         insertFilter(filter);
@@ -56,7 +56,6 @@ public:
         }
     }
 
-
     /**
      * @brief execute
      * @param imgIn
@@ -68,23 +67,6 @@ public:
     {
         FilterGLMax filter(size);
         return filter.Process(SingleGL(imgIn), imgOut);
-    }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param size
-     * @return
-     */
-    static Image *execute(std::string nameIn, std::string nameOut, int size)
-    {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-        ImageGL *imgOut = execute(&imgIn, NULL, size);
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
     }
 };
 

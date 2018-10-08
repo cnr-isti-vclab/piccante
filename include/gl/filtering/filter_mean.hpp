@@ -42,7 +42,7 @@ public:
      * @brief FilterMean
      * @param kernelSize
      */
-    FilterGLMean(int kernelSize)
+    FilterGLMean(int kernelSize) : FilterGLNPasses()
     {
         data = NULL;
         weights = NULL;
@@ -75,10 +75,7 @@ public:
      */
     void update(int kernelSize)
     {
-        if(kernelSize < 1)
-        {
-            kernelSize = 3;
-        }
+        kernelSize = kernelSize > 0 ? kernelSize : 3;
 
         if(this->kernelSize != kernelSize)
         {
@@ -96,7 +93,7 @@ public:
         }
 
         weights = new ImageGL(1, kernelSize, 1, 1, data);
-        weights->generateTextureGL(false, GL_TEXTURE_2D);
+        weights->generateTextureGL(false, GL_TEXTURE_2D, false);
     }
 
     /**
@@ -110,23 +107,6 @@ public:
     {
         FilterGLMean filter(kernelSize);
         return filter.Process(SingleGL(imgIn), imgOut);
-    }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param kernelSize
-     * @return
-     */
-    static Image *execute(std::string nameIn, std::string nameOut, int kernelSize)
-    {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-        ImageGL *imgOut = execute(&imgIn, NULL, kernelSize);
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
     }
 };
 

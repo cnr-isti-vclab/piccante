@@ -218,7 +218,8 @@ PIC_INLINE Image *Filter::setupAux(ImageVec imgIn, Image *imgOut)
     } else {
         if(!imgIn[0]->isSimilarType(imgOut)) {
             if(!imgOut->isValid()) {
-                imgOut->allocateSimilarTo(imgIn[0]);
+                delete imgOut;
+                imgOut = imgIn[0]->allocateSimilarOne();
             } else {
                 imgOut = imgIn[0]->allocateSimilarOne();
             }

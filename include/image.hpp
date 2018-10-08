@@ -252,6 +252,15 @@ public:
     }
 
     /**
+     * @brief getDiagonalSize
+     * @return
+     */
+    float getDiagonalSize()
+    {
+        return sqrtf(widthf * widthf + heightf * heightf);
+    }
+
+    /**
      * @brief setZero sets data to 0.0f.
      */
     void setZero();
