@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_2DG_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_2DG_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../gl/filtering/filter_slicer.hpp"
 #include "../../gl/filtering/filter_scatter.hpp"
@@ -134,7 +136,7 @@ public:
     }
 };
 
-FilterGLBilateral2DG::FilterGLBilateral2DG(float sigma_s, float sigma_r): FilterGL()
+PIC_INLINE FilterGLBilateral2DG::FilterGLBilateral2DG(float sigma_s, float sigma_r): FilterGL()
 {
     this->sigma_s = sigma_s;
     this->sigma_r = sigma_r;
@@ -150,7 +152,7 @@ FilterGLBilateral2DG::FilterGLBilateral2DG(float sigma_s, float sigma_r): Filter
     slicer  = new FilterGLSlicer(s_S, s_R);
 }
 
-ImageGL *FilterGLBilateral2DG::Process(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLBilateral2DG::Process(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgIn[0] == NULL || imgIn.size() > 1) {

@@ -37,87 +37,68 @@ protected:
     FilterGLSamplingMap *fGLsm;
     ImageGL *imgTmp;
 
+    /**
+     * @brief initShaders
+     */
     void initShaders();
+
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
 public:
-    //Basic constructors
+
+    /**
+     * @brief FilterGLBilateral2DAS
+     */
     FilterGLBilateral2DAS();
+
     ~FilterGLBilateral2DAS();
-    //Init constructors
+
+    /**
+     * @brief FilterGLBilateral2DAS
+     * @param sigma_s
+     * @param sigma_r
+     */
     FilterGLBilateral2DAS(float sigma_s, float sigma_r);
 
-    //Change parameters
+    /**
+     * @brief update
+     * @param sigma_s
+     * @param sigma_r
+     */
     void update(float sigma_s, float sigma_r);
 
-    //Processing
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
-    //execute
-    //execute
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param sigma_s
+     * @param sigma_r
+     * @return
+     */
     static ImageGL *execute(ImageGL *imgIn, float sigma_s, float sigma_r)
     {
         FilterGLBilateral2DAS *filter = new FilterGLBilateral2DAS(sigma_s, sigma_r);
 
-        GLuint testTQ1 = glBeginTimeQuery();
         ImageGL *imgOut = filter->Process(SingleGL(imgIn), NULL);
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-
-        printf("Bilateral 2DS Filter on GPU time: %f ms\n",
-               double(timeVal) / 1000000.0);
 
         delete filter;
         return imgOut;
     }
 
-    static ImageGL *execute(std::string nameFile, std::string nameOut,
-                               float sigma_s, float sigma_r, int testing)
-    {
-        ImageGL imgIn(nameFile);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-
-        FilterGLBilateral2DAS filter(sigma_s, sigma_r);
-
-        ImageGL *imgRet = new ImageGL(1, imgIn.width, imgIn.height, 3, IMG_GPU, GL_TEXTURE_2D);
-        GLuint testTQ1;
-
-        if(testing > 1) {
-            filter.Process(SingleGL(&imgIn), imgRet);
-
-            testTQ1 = glBeginTimeQuery();
-
-            for(int i = 0; i < testing; i++) {
-                filter.Process(SingleGL(&imgIn), imgRet);
-            }
-        } else {
-            testTQ1 = glBeginTimeQuery();
-            filter.Process(SingleGL(&imgIn), imgRet);
-        }
-
-     //   GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-   //     double ms = double(timeVal) / (double(testing) * 1000000.0);
-     //   printf("Adaptive Stochastic Bilateral Filter on GPU time: %f ms\n", ms);
-
-        /*
-        std::string nameTime = FileLister::FileNumber(GenBilString("AS", sigma_s,
-                               sigma_r), "txt");
-
-        FILE *file = fopen(nameTime.c_str(), "w");
-
-        if(file != NULL) {
-            fprintf(file, "%f", ms);
-            fclose(file);
-        }*/
-
-        //Read from the GPU
-        imgRet->loadToMemory();
-        imgRet->Write(nameOut);
-        return imgRet;
-    }
 };
 
-//Basic constructor
-FilterGLBilateral2DAS::FilterGLBilateral2DAS(): FilterGL()
+PIC_INLINE FilterGLBilateral2DAS::FilterGLBilateral2DAS(): FilterGL()
 {
     ms = NULL;
     imageRand = NULL;
@@ -125,7 +106,7 @@ FilterGLBilateral2DAS::FilterGLBilateral2DAS(): FilterGL()
     imgTmp = NULL;
 }
 
-FilterGLBilateral2DAS::~FilterGLBilateral2DAS()
+PIC_INLINE FilterGLBilateral2DAS::~FilterGLBilateral2DAS()
 {
     delete ms;
     delete imageRand;
@@ -133,8 +114,7 @@ FilterGLBilateral2DAS::~FilterGLBilateral2DAS()
     delete imgTmp;
 }
 
-//Init constructors
-FilterGLBilateral2DAS::FilterGLBilateral2DAS(float sigma_s,
+PIC_INLINE FilterGLBilateral2DAS::FilterGLBilateral2DAS(float sigma_s,
         float sigma_r): FilterGL()
 {
     //protected values are assigned/computed
@@ -171,7 +151,7 @@ FilterGLBilateral2DAS::FilterGLBilateral2DAS(float sigma_s,
     initShaders();
 }
 
-void FilterGLBilateral2DAS::FragmentShader()
+PIC_INLINE void FilterGLBilateral2DAS::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -243,7 +223,7 @@ void FilterGLBilateral2DAS::FragmentShader()
                       );
 }
 
-void FilterGLBilateral2DAS::initShaders()
+PIC_INLINE void FilterGLBilateral2DAS::initShaders()
 {
 #ifdef PIC_DEBUG
     printf("Number of samples: %d\n", ms->nSamples / 2);
@@ -254,8 +234,7 @@ void FilterGLBilateral2DAS::initShaders()
     update(-1.0f, -1.0f);
 }
 
-//Change parameters
-void FilterGLBilateral2DAS::update(float sigma_s, float sigma_r)
+PIC_INLINE void FilterGLBilateral2DAS::update(float sigma_s, float sigma_r)
 {
     bool flag = false;
 
@@ -294,8 +273,7 @@ void FilterGLBilateral2DAS::update(float sigma_s, float sigma_r)
     technique.unbind();
 }
 
-//Processing
-ImageGL *FilterGLBilateral2DAS::Process(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLBilateral2DAS::Process(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
@@ -316,7 +294,7 @@ ImageGL *FilterGLBilateral2DAS::Process(ImageGLVec imgIn,
 
     if(imgTmp == NULL) {
         float scale = fGLsm->getScale();
-        imgTmp = new ImageGL(    1, 
+        imgTmp = new ImageGL(    1,
                                     int(imgIn[0]->widthf  * scale),
                                     int(imgIn[0]->heightf * scale),
                                     1, IMG_GPU, GL_TEXTURE_2D);

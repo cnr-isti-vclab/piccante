@@ -61,14 +61,6 @@ public:
      * @param sigma_r
      */
     void update(float sigma_s, float sigma_r);
-
-    /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 \
     /**
      * @brief execute
@@ -82,12 +74,7 @@ public:
         FilterGLBilateral2DS *filter = new FilterGLBilateral2DS(sigma_s, sigma_r,
                 BF_CLASSIC);
 
-        GLuint testTQ1 = glBeginTimeQuery();
         ImageGL *imgOut = filter->Process(SingleGL(imgIn), NULL);
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-
-        printf("Bilateral 2DS Filter on GPU time: %f ms\n",
-               double(timeVal) / 1000000.0);
 
         delete filter;
         return imgOut;
@@ -150,6 +137,28 @@ public:
         return imgOut;
     }
 
+    /**
+     * @brief setupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
+    {
+        if(imgOut == NULL) {
+            imgOut = imgIn[0]->allocateSimilarOneGL();
+        } else {
+            if(!imgIn[0]->isSimilarType(imgOut)) {
+                delete imgOut;
+                imgOut = imgIn[0]->allocateSimilarOneGL();
+            }
+        }
+
+        param.push_back(ms->getImage());
+        param.push_back(imageRand);
+
+        return imgOut;
+    }
 };
 
 PIC_INLINE FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma_r,
@@ -193,6 +202,8 @@ PIC_INLINE FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma
                              nSamplers);
     ms->generateTexture();
 
+
+
     FragmentShader();
     initShaders();
 }
@@ -213,8 +224,8 @@ PIC_INLINE void FilterGLBilateral2DS::FragmentShader()
                                                   uniform isampler2D u_poisson;
                                                   uniform sampler2D  u_rand;
                                                   uniform int   nSamples;
-                                                  uniform float sigmas2;
-                                                  uniform float sigmar2;
+                                                  uniform float sigma_s_sq_2;
+                                                  uniform float sigma_r_sq_2;
                                                   uniform int kernelSize;
                                                   uniform float kernelSizef;
                                                   out     vec4  f_color;
@@ -238,7 +249,7 @@ PIC_INLINE void FilterGLBilateral2DS::FragmentShader()
             vec3 tmpCol2 = tmpCol - colRef;
             float dstR = dot(tmpCol2.xyz, tmpCol2.xyz);
             int coordsz = coords.x * coords.x + coords.y * coords.y;
-            float tmp = exp(-dstR / sigmar2 - float(coordsz) / sigmas2);
+            float tmp = exp(-dstR / sigma_r_sq_2 - float(coordsz) / sigma_s_sq_2);
             color.xyz += tmpCol * tmp;
             weight += tmp;
         }
@@ -254,8 +265,8 @@ PIC_INLINE void FilterGLBilateral2DS::FragmentShader()
                                             uniform isampler2D	u_poisson;
                                             uniform sampler2D	u_rand;
                                             uniform int			nSamples;
-                                            uniform float		sigmas2;
-                                            uniform float		sigmar2;
+                                            uniform float		sigma_s_sq_2;
+                                            uniform float		sigma_r_sq_2;
                                             out     vec4		f_color;
 
     void main(void) {
@@ -276,7 +287,7 @@ PIC_INLINE void FilterGLBilateral2DS::FragmentShader()
             vec3 tmpEdge = texelFetch(u_edge, coordsFrag.xy + coords.xy, 0).xyz;
             vec3 tmpEdge2 = tmpEdge - edgeRef;
             float dstR = dot(tmpEdge2.xyz, tmpEdge2.xyz);
-            float tmp = exp(-dstR / sigmar2 - float(coords.z) / sigmas2);
+            float tmp = exp(-dstR / sigma_r_sq_2 - float(coords.z) / sigma_s_sq_2);
 
             //Texture Fetch
             vec3 tmpCol = texelFetch(u_tex, coordsFrag.xy + coords.xy, 0).xyz;
@@ -295,8 +306,8 @@ PIC_INLINE void FilterGLBilateral2DS::FragmentShader()
                                             uniform sampler2D  u_rand;
                                             uniform sampler2D  u_mask;
                                             uniform int   nSamples;
-                                            uniform float sigmas2;
-                                            uniform float sigmar2;
+                                            uniform float sigma_s_sq_2;
+                                            uniform float sigma_r_sq_2;
                                             out     vec4      f_color;
 
     void main(void) {
@@ -319,7 +330,7 @@ PIC_INLINE void FilterGLBilateral2DS::FragmentShader()
                 tmpCol = texelFetch(u_tex, coordsFrag.xy + coords.xy, 0).xyz;
                 vec3 tmpCol2 = tmpCol - colRef;
                 float dstR = dot(tmpCol2.xyz, tmpCol2.xyz);
-                float tmp = exp(-dstR / sigmar2 - float(coords.z) / sigmas2);
+                float tmp = exp(-dstR / sigma_r_sq_2 - float(coords.z) / sigma_s_sq_2);
                 color.xyz += tmpCol * tmp;
                 weight += tmp;
             }
@@ -386,110 +397,29 @@ PIC_INLINE void FilterGLBilateral2DS::update(float sigma_s, float sigma_r)
     }
 
     //shader update
-    float sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
-    float sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
+    float sigma_s_sq_2 = 2.0f * this->sigma_s * this->sigma_s;
+    float sigma_r_sq_2 = 2.0f * this->sigma_r * this->sigma_r;
 
     technique.bind();
-    technique.setUniform1i("u_tex",       0);
-    technique.setUniform1i("u_poisson",   1);
-    technique.setUniform1i("u_rand",      2);
-    technique.setUniform1i("u_mask",      3);
+    technique.setUniform1i("u_tex", 0);
 
     if(type == BF_CROSS) {
-        technique.setUniform1i("u_edge",  4);
-    }
-
-    technique.setUniform1f("sigmas2",         sigmas2);
-    technique.setUniform1f("sigmar2",         sigmar2);
-    technique.setUniform1i("kernelSize",      kernelSize);
-    technique.setUniform1f("kernelSizef",     float(kernelSize));
-    technique.setUniform1i("nSamples",        ms->nSamples >> 1);
-    technique.unbind();
-}
-
-PIC_INLINE ImageGL *FilterGLBilateral2DS::Process(ImageGLVec imgIn,
-        ImageGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    //TODO: check if other have height and frames swapped
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
-
-    ImageGL *edge, *base, *mask;
-
-    if(imgIn.size() == 2) {
-        //Joint/Cross Bilateral Filtering
-        base = imgIn[0];
-        edge = imgIn[1];
-        mask = imgIn[1];
+        technique.setUniform1i("u_edge", 1);
+        technique.setUniform1i("u_poisson", 2);
+        technique.setUniform1i("u_rand", 3);
+        technique.setUniform1i("u_mask", 4);
     } else {
-        base = imgIn[0];
-        edge = imgIn[0];
-        mask = imgIn[0];
+        technique.setUniform1i("u_poisson", 1);
+        technique.setUniform1i("u_rand", 2);
+        technique.setUniform1i("u_mask", 3);
     }
 
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    technique.bind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, edge->getTexture());
-
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, mask->getTexture());
-
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, imageRand->getTexture());
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, ms->getTexture());
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, base->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
+    technique.setUniform1f("sigma_s_sq_2", sigma_s_sq_2);
+    technique.setUniform1f("sigma_r_sq_2", sigma_r_sq_2);
+    technique.setUniform1i("kernelSize", kernelSize);
+    technique.setUniform1f("kernelSizef", float(kernelSize));
+    technique.setUniform1i("nSamples", ms->nSamples >> 1);
     technique.unbind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

@@ -88,8 +88,7 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-//Basic constructor
-FilterGLBilateral3DAS::FilterGLBilateral3DAS(): FilterGL()
+PIC_INLINE FilterGLBilateral3DAS::FilterGLBilateral3DAS(): FilterGL()
 {
     ms = NULL;
     imageRand = NULL;
@@ -97,7 +96,7 @@ FilterGLBilateral3DAS::FilterGLBilateral3DAS(): FilterGL()
     imgTmp = NULL;
 }
 
-FilterGLBilateral3DAS::~FilterGLBilateral3DAS()
+PIC_INLINE FilterGLBilateral3DAS::~FilterGLBilateral3DAS()
 {
     delete ms;
     delete imageRand;
@@ -105,8 +104,7 @@ FilterGLBilateral3DAS::~FilterGLBilateral3DAS()
     delete imgTmp;
 }
 
-//Init constructors
-FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
+PIC_INLINE FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
         float sigma_t): FilterGL()
 {
     //protected values are assigned/computed
@@ -151,7 +149,7 @@ FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
     initShaders();
 }
 
-void FilterGLBilateral3DAS::FragmentShader()
+PIC_INLINE void FilterGLBilateral3DAS::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -227,7 +225,7 @@ void FilterGLBilateral3DAS::FragmentShader()
                       );
 }
 
-void FilterGLBilateral3DAS::initShaders()
+PIC_INLINE void FilterGLBilateral3DAS::initShaders()
 {
     printf("Number of samples: %d\n", ms->nSamples / 2);
 
@@ -236,8 +234,7 @@ void FilterGLBilateral3DAS::initShaders()
     update(-1.0f, -1.0f, -1.0f);
 }
 
-//Change parameters
-void FilterGLBilateral3DAS::update(float sigma_s, float sigma_r, float sigma_t)
+PIC_INLINE void FilterGLBilateral3DAS::update(float sigma_s, float sigma_r, float sigma_t)
 {
 
     bool flag = false;
@@ -285,7 +282,7 @@ void FilterGLBilateral3DAS::update(float sigma_s, float sigma_r, float sigma_t)
     technique.unbind();
 }
 
-ImageGL *FilterGLBilateral3DAS::Process(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLBilateral3DAS::Process(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {

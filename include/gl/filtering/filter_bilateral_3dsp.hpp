@@ -84,19 +84,19 @@ public:
     }
 };
 
-FilterGLBilateral3DSP::FilterGLBilateral3DSP(): FilterGLNPasses()
+PIC_INLINE FilterGLBilateral3DSP::FilterGLBilateral3DSP(): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D_ARRAY;
     filterS = filterT = NULL;
 }
 
-FilterGLBilateral3DSP::~FilterGLBilateral3DSP()
+PIC_INLINE FilterGLBilateral3DSP::~FilterGLBilateral3DSP()
 {
     delete filterS;
     delete filterT;
 }
 
-FilterGLBilateral3DSP::FilterGLBilateral3DSP(float sigma_s, float sigma_r,
+PIC_INLINE FilterGLBilateral3DSP::FilterGLBilateral3DSP(float sigma_s, float sigma_r,
         float sigma_t): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D_ARRAY;
@@ -108,7 +108,7 @@ FilterGLBilateral3DSP::FilterGLBilateral3DSP(float sigma_s, float sigma_r,
     insertFilter(filterT);
 }
 
-void FilterGLBilateral3DSP::update(float sigma_s, float sigma_r, float sigma_t)
+PIC_INLINE void FilterGLBilateral3DSP::update(float sigma_s, float sigma_r, float sigma_t)
 {
     filterS->update(sigma_s, sigma_r);
     filterT->update(sigma_t, sigma_r);

@@ -65,9 +65,9 @@ public:
     void update(float sigma_s, float sigma_r, float sigma_t);
 
     /**
-     * @brief updateUniform
+     * @brief setUniform
      */
-    void updateUniform();
+    void setUniform();
 
     /**
      * @brief setFrame
@@ -104,7 +104,7 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
+PIC_INLINE FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
         float sigma_t): FilterGL()
 {
     //protected values are assigned/computed
@@ -144,7 +144,7 @@ FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
     initShaders();
 }
 
-void FilterGLBilateral3DS::FragmentShader()
+PIC_INLINE void FilterGLBilateral3DS::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -191,17 +191,17 @@ void FilterGLBilateral3DS::FragmentShader()
                       );
 }
 
-void FilterGLBilateral3DS::initShaders()
+PIC_INLINE void FilterGLBilateral3DS::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral3DS");
 
     sigmas2 = 2.0f * sigma_s * sigma_s;
     sigmat2 = 2.0f * sigma_t * sigma_t;
     sigmar2 = 2.0f * sigma_r * sigma_r;
-    updateUniform();
+    setUniform();
 }
 
-void FilterGLBilateral3DS::update(float sigma_s, float sigma_r, float sigma_t)
+PIC_INLINE void FilterGLBilateral3DS::update(float sigma_s, float sigma_r, float sigma_t)
 {
 
     bool flag = false;
@@ -233,10 +233,11 @@ void FilterGLBilateral3DS::update(float sigma_s, float sigma_r, float sigma_t)
     sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
     sigmat2 = 2.0f * this->sigma_t *this->sigma_t;
     sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
-    updateUniform();
+
+    setUniform();
 }
 
-void FilterGLBilateral3DS::updateUniform()
+PIC_INLINE void FilterGLBilateral3DS::setUniform()
 {
     technique.bind();
     technique.setUniform1i("u_tex",      0);
@@ -252,7 +253,7 @@ void FilterGLBilateral3DS::updateUniform()
     technique.unbind();
 }
 
-ImageGL *FilterGLBilateral3DS::Process(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLBilateral3DS::Process(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
@@ -263,7 +264,7 @@ ImageGL *FilterGLBilateral3DS::Process(ImageGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageGL(w, h, 1, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {
