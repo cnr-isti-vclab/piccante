@@ -46,14 +46,14 @@ public:
     FilterGLBlend();
 };
 
-FilterGLBlend::FilterGLBlend(): FilterGL()
+PIC_INLINE FilterGLBlend::FilterGLBlend(): FilterGL()
 {
     //protected values are assigned/computed
     FragmentShader();
     initShaders();
 }
 
-void FilterGLBlend::FragmentShader()
+PIC_INLINE void FilterGLBlend::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -73,7 +73,7 @@ void FilterGLBlend::FragmentShader()
                       );
 }
 
-void FilterGLBlend::initShaders()
+PIC_INLINE void FilterGLBlend::initShaders()
 {
     FragmentShader();
 

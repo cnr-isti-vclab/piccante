@@ -54,7 +54,7 @@ public:
 
 };
 
-FilterGLColorConv::FilterGLColorConv(ColorConvGL *color_conv, bool direct = true): FilterGL()
+PIC_INLINE FilterGLColorConv::FilterGLColorConv(ColorConvGL *color_conv, bool direct = true): FilterGL()
 {
     this->color_conv = color_conv;
 
@@ -62,18 +62,18 @@ FilterGLColorConv::FilterGLColorConv(ColorConvGL *color_conv, bool direct = true
     setTransform(direct);
 }
 
-void FilterGLColorConv::initShaders()
+PIC_INLINE void FilterGLColorConv::initShaders()
 {
     color_conv->generatePrograms(vertex_source);
 }
 
-void FilterGLColorConv::setTransform(bool direct)
+PIC_INLINE void FilterGLColorConv::setTransform(bool direct)
 {
     color_conv->setTransform(direct);
     color_conv->setUniforms();
 }
 
-ImageGL *FilterGLColorConv::Process(ImageGLVec imgIn, ImageGL *imgOut)
+PIC_INLINE ImageGL *FilterGLColorConv::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.empty()) {
         return imgOut;
@@ -92,16 +92,17 @@ ImageGL *FilterGLColorConv::Process(ImageGLVec imgIn, ImageGL *imgOut)
 
     int w = imgIn[0]->width;
     int h = imgIn[0]->height;
+    int f = imgIn[0]->frames;
 
     if(imgOut == NULL) {
-        imgOut = new ImageGL(1, w, h, 3, IMG_GPU, GL_TEXTURE_2D);
+        imgOut = new ImageGL(f, w, h, 3, IMG_GPU, GL_TEXTURE_2D);
     }
 
     if(fbo == NULL) {
         fbo = new Fbo();
     }
 
-    fbo->create(w, h, 1, false, imgOut->getTexture());
+    fbo->create(w, h, f, false, imgOut->getTexture());
 
     //Rendering
     fbo->bind();
