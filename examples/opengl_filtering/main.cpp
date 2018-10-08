@@ -107,6 +107,12 @@ protected:
 
         img_flt_tmo = NULL;
         img_flt = NULL;
+
+        auto out = pic::FilterGLChannel::execute(img, NULL, 1);
+        out->loadToMemory();
+        out->Write("test.png");
+
+        pic::FilterGLChannel::Test();
     }
 
     /**
@@ -178,6 +184,7 @@ protected:
                 img_flt = fltBilS->Process(SingleGL(img), img_flt);
                 img_out = img_flt;
                 window_ext->setWindowTitle(tr("Filtering Example: Sub-Sampled Bilateral"));
+            break;
 
             case 6:
                 //apply the anisotropic diffusion filter

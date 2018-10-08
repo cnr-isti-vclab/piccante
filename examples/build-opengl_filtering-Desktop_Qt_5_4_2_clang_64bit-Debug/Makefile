@@ -151,6 +151,7 @@ DIST          = ../../../../Qt/5.4/clang_64/mkspecs/features/spec_pre.prf \
 		../../../../Qt/5.4/clang_64/mkspecs/features/qt_config.prf \
 		../../../../Qt/5.4/clang_64/mkspecs/macx-clang/qmake.conf \
 		../../../../Qt/5.4/clang_64/mkspecs/features/spec_post.prf \
+		../opengl_filtering/.qmake.stash \
 		../../../../Qt/5.4/clang_64/mkspecs/features/exclusive_builds.prf \
 		../../../../Qt/5.4/clang_64/mkspecs/features/default_pre.prf \
 		../../../../Qt/5.4/clang_64/mkspecs/features/mac/default_pre.prf \
@@ -317,6 +318,7 @@ Makefile: ../opengl_filtering/opengl_filtering.pro ../../../../Qt/5.4/clang_64/m
 		../../../../Qt/5.4/clang_64/mkspecs/features/qt_config.prf \
 		../../../../Qt/5.4/clang_64/mkspecs/macx-clang/qmake.conf \
 		../../../../Qt/5.4/clang_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		../../../../Qt/5.4/clang_64/mkspecs/features/exclusive_builds.prf \
 		../../../../Qt/5.4/clang_64/mkspecs/features/default_pre.prf \
 		../../../../Qt/5.4/clang_64/mkspecs/features/mac/default_pre.prf \
@@ -446,6 +448,7 @@ Makefile: ../opengl_filtering/opengl_filtering.pro ../../../../Qt/5.4/clang_64/m
 ../../../../Qt/5.4/clang_64/mkspecs/features/qt_config.prf:
 ../../../../Qt/5.4/clang_64/mkspecs/macx-clang/qmake.conf:
 ../../../../Qt/5.4/clang_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 ../../../../Qt/5.4/clang_64/mkspecs/features/exclusive_builds.prf:
 ../../../../Qt/5.4/clang_64/mkspecs/features/default_pre.prf:
 ../../../../Qt/5.4/clang_64/mkspecs/features/mac/default_pre.prf:
@@ -1041,6 +1044,10 @@ main.o: ../opengl_filtering/main.cpp ../common_code/gl_core_4_0.h \
 		../../include/gl/filtering/filter_exposure_fusion_weights.hpp \
 		../../include/gl/algorithms/richardson_lucy_deconvolution.hpp \
 		../../include/gl/filtering/filter_conv_2d.hpp \
+		../../include/gl/algorithms/grow_cut.hpp \
+		../../include/gl/filtering/filter_max.hpp \
+		../../include/gl/filtering/filter_non_linear_1d.hpp \
+		../../include/gl/filtering/filter_grow_cut.hpp \
 		../../include/gl/colors/color_conv.hpp \
 		../../include/gl/colors/color_conv_rgb_to_xyz.hpp \
 		../../include/gl/colors/color_conv_rgb_to_srgb.hpp \
@@ -1071,10 +1078,8 @@ main.o: ../opengl_filtering/main.cpp ../common_code/gl_core_4_0.h \
 		../../include/gl/filtering/filter_bilateral_3dsp.hpp \
 		../../include/gl/filtering/filter_disp.hpp \
 		../../include/gl/filtering/filter_drago_tmo.hpp \
-		../../include/gl/filtering/filter_non_linear_1d.hpp \
 		../../include/gl/filtering/filter_mean.hpp \
 		../../include/gl/filtering/filter_min.hpp \
-		../../include/gl/filtering/filter_max.hpp \
 		../../include/gl/filtering/filter_laplacian.hpp \
 		../../include/gl/filtering/filter_hsl_replace.hpp \
 		../../include/gl/filtering/filter_remapping.hpp \
