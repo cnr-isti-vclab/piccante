@@ -63,14 +63,15 @@ public:
         int w = imgIn[0]->width  << 1;
         int h = imgIn[0]->height << 1;
         int f = imgIn[0]->frames;
+        int c = imgIn[0]->channels;
 
         if(imgOut == NULL) {
             imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
         } else {
             if((imgOut->width != w) &&
                (imgOut->height != h) &&
-               (imgOut->channels != imgIn[0]->channels) &&
-               (imgOut->frames != imgIn[0]->frames)) {
+               (imgOut->channels != c) &&
+               (imgOut->frames != f)) {
                 delete imgOut;
                 imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
             }

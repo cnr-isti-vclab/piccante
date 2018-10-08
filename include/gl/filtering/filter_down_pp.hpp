@@ -51,15 +51,35 @@ public:
     void update(float *value, float threshold);
 
     /**
-     * @brief Process
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
+    ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
+    {
+        int w = imgIn[0]->width  >> 1;
+        int h = imgIn[0]->height >> 1;
+        int f = imgIn[0]->frames;
+        int c = imgIn[0]->channels;
+
+        if(imgOut == NULL) {
+            imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+        } else {
+            if((imgOut->width != w) &&
+               (imgOut->height != h) &&
+               (imgOut->channels != c) &&
+               (imgOut->frames != f)) {
+                delete imgOut;
+                imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+            }
+        }
+
+        return imgOut;
+    }
 };
 
-FilterGLDownPP::FilterGLDownPP(float *value, float threshold): FilterGL()
+PIC_INLINE FilterGLDownPP::FilterGLDownPP(float *value, float threshold): FilterGL()
 {
     value = NULL;
 
@@ -67,7 +87,7 @@ FilterGLDownPP::FilterGLDownPP(float *value, float threshold): FilterGL()
     update(value, threshold);
 }
 
-void FilterGLDownPP::initShaders()
+PIC_INLINE void FilterGLDownPP::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
@@ -122,7 +142,7 @@ void FilterGLDownPP::initShaders()
  * @param value
  * @param threshold
  */
-void FilterGLDownPP::update(float *value, float threshold)
+PIC_INLINE void FilterGLDownPP::update(float *value, float threshold)
 {
     if(value == NULL) {
         this->value = new float[4];
@@ -145,58 +165,6 @@ void FilterGLDownPP::update(float *value, float threshold)
     technique.setUniform1f("threshold", this->threshold);
     technique.setUniform4fv("value", this->value);
     technique.unbind();
-}
-
-ImageGL *FilterGLDownPP::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return NULL;
-    }
-
-    if(imgIn.size() != 1) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width  >> 1;
-    int h = imgIn[0]->height >> 1;
-    int f = imgIn[0]->frames;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
-    }
-
-    //Fbo
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, f, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    technique.bind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    technique.unbind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic
