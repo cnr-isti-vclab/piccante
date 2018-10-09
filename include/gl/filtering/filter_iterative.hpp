@@ -32,7 +32,14 @@ namespace pic {
 class FilterGLIterative: public FilterGL
 {
 protected:
+    bool bSameImageSize;
+
+    //same size image
     ImageGL *imgTmp[2];
+
+    //different size image
+    ImageGLVec imgTmpVec;
+
     int iterations;
 
 public:
@@ -112,33 +119,58 @@ PIC_INLINE void FilterGLIterative::update(FilterGL *flt, int iterations)
     }
 
     filters.push_back(flt);
+
+    //check if the filters keep the same image size
+    bSameImageSize = true;
+    for(unsigned int i = 1; i < 3; i++) {
+        if(scale_dim[0] != scale_dim[i]) {
+            bSameImageSize = false;
+            break;
+        }
+    }
 }
 
 PIC_INLINE ImageGL *FilterGLIterative::setupAuxN(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
-    if(imgOut == NULL) {
-        imgOut = imgIn[0]->allocateSimilarOneGL();
-    }
+    if(bSameImageSize) {
+        if(imgOut == NULL) {
+            imgOut = imgIn[0]->allocateSimilarOneGL();
+        }
 
-    /*
-    if(fbo==NULL)
-    	fbo = new Fbo();
+        /*
+        if(fbo==NULL)
+            fbo = new Fbo();
 
-    fbo->create(imgOut->width,imgOut->height,imgOut->frames, false, imgOut->getTexture());
-    filters[0]->setFbo(fbo);*/
+        fbo->create(imgOut->width,imgOut->height,imgOut->frames, false, imgOut->getTexture());
+        filters[0]->setFbo(fbo);*/
 
-    if((iterations % 2) == 0) {
-        imgTmp[1] = imgOut;
+        if((iterations % 2) == 0) {
+            imgTmp[1] = imgOut;
 
-        if(imgTmp[0] == NULL) {
-            imgTmp[0] = imgOut->allocateSimilarOneGL();
+            if(imgTmp[0] == NULL) {
+                imgTmp[0] = imgOut->allocateSimilarOneGL();
+            }
+        } else {
+            imgTmp[0] = imgOut;
+
+            if(imgTmp[1] == NULL) {
+                imgTmp[1] = imgOut->allocateSimilarOneGL();
+            }
         }
     } else {
-        imgTmp[0] = imgOut;
+        if(imgOut == NULL) {
+            int w = imgIn[0]->width;
+            int h = imgIn[0]->height;
+            int f = imgIn[0]->frames;
 
-        if(imgTmp[1] == NULL) {
-            imgTmp[1] = imgOut->allocateSimilarOneGL();
+            for(unsigned int i = 0; i < iterations; i++) {
+                w = int(float(w) * filters[0]->scale_dim[0]);
+                h = int(float(h) * filters[0]->scale_dim[1]);
+                f = int(float(f) * filters[0]->scale_dim[2]);
+            }
+
+            imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
         }
     }
 
@@ -147,18 +179,35 @@ PIC_INLINE ImageGL *FilterGLIterative::setupAuxN(ImageGLVec imgIn,
 
 PIC_INLINE ImageGL *FilterGLIterative::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
-    if(imgIn.size() < 1 || imgIn[0] == NULL) {
+    if(imgIn.size() < 1 || imgIn[0] == NULL || iterations < 1) {
         return imgOut;
     }
 
     //allocate FBOs
     imgOut = setupAuxN(imgIn, imgOut);
 
-    filters[0]->Process(imgIn, imgTmp[0]);
+    if(bSameImageSize) {
+        filters[0]->Process(imgIn, imgTmp[0]);
 
-    for(int i = 1; i < iterations; i++) {
-        imgIn[0] = imgTmp[(i + 1) % 2];
-        filters[0]->Process(imgIn, imgTmp[i % 2]);
+        for(int i = 1; i < iterations; i++) {
+            imgIn[0] = imgTmp[(i + 1) % 2];
+            filters[0]->Process(imgIn, imgTmp[i % 2]);
+        }
+    } else {
+        if(imgTmpVec.empty()) {
+            for(unsigned int i = 0; i < (filters.size() - 1); i++) {
+                imgTmpVec.push_back(NULL);
+            }
+
+            imgTmpVec.push_back(imgOut);
+        }
+
+        imgTmpVec[0] = filters[0]->Process(imgIn, imgTmpVec[0]);
+
+        for(unsigned int i = 1; i < filters.size(); i++) {
+            imgIn[0] = imgTmpVec[i - 1];
+            imgTmpVec[i] = filters[0]->Process(imgIn, imgTmpVec[i]);
+        }
     }
 
     return imgOut;

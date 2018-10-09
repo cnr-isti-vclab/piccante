@@ -149,7 +149,6 @@ PIC_INLINE ImageGL *FilterGLNPasses::setupAuxN(ImageGLVec imgIn, ImageGL *imgOut
             }
         }
     } else {
-
         if(imgOut == NULL) {
             int w = imgIn[0]->width;
             int h = imgIn[0]->height;
