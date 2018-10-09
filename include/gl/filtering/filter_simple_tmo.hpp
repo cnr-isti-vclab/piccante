@@ -68,7 +68,7 @@ public:
                         float fstop)
     {
         ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
+        imgIn.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         FilterGLSimpleTMO filter(gamma, fstop);
 
@@ -143,6 +143,8 @@ PIC_INLINE void FilterGLSimpleTMO::initShaders()
 
 PIC_INLINE void FilterGLSimpleTMO::update(float gamma, float fstop)
 {
+    gamma = gamma > 0.0f ? gamma : 2.2f;
+
     this->gamma = gamma;
     this->fstop = fstop;
 

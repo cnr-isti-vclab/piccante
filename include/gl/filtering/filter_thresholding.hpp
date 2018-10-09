@@ -49,7 +49,7 @@ public:
     static ImageGL *execute(std::string nameIn, std::string nameOut)
     {
         ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
+        imgIn.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         FilterGLThresholding filter;
 

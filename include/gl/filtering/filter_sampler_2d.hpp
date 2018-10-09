@@ -76,6 +76,12 @@ public:
     }
 
     /**
+     * @brief update
+     * @param scale
+     */
+    void update(float scale);
+
+    /**
      * @brief execute
      * @param imgIn
      * @param imgOut
@@ -96,8 +102,22 @@ public:
 
 PIC_INLINE FilterGLSampler2D::FilterGLSampler2D(float scale): FilterGL()
 {
-    this->scale = scale;
+    update(scale);
+
     initShaders();
+}
+
+PIC_INLINE void FilterGLSampler2D::update(float scale)
+{
+    this->scale = scale;
+
+    scale_dim[0] = scale;
+    scale_dim[1] = scale;
+    scale_dim[2] = 1.0f;
+
+    technique.bind();
+    technique.setUniform1f("scale", scale);
+    technique.unbind();
 }
 
 PIC_INLINE void FilterGLSampler2D::initShaders()

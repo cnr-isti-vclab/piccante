@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_DOWN_PP_HPP
 #define PIC_FILTERING_FILTER_DOWN_PP_HPP
 
+#include "../util/array.hpp"
+
 #include "../filtering/filter.hpp"
 
 namespace pic {
@@ -92,7 +94,7 @@ protected:
         if(imgOut == NULL) {
             imgOut = new Image(1, imgIn[0]->width >> 1, imgIn[0]->height >> 1, imgIn[0]->channels);
         } else {
-            if(((imgIn[0]->width >> 1)  != imgOut->width )  ||
+            if(((imgIn[0]->width  >> 1) != imgOut->width )  ||
                ((imgIn[0]->height >> 1) != imgOut->height) ) {
                 imgOut = new Image(1, imgIn[0]->width >> 1, imgIn[0]->height >> 1, imgIn[0]->channels);
             }
@@ -147,9 +149,7 @@ public:
         if(value == NULL) {
             this->value = new float[3];
 
-            for(int i = 0; i < 3; i++) {
-                this->value[i] = 0.0f;
-            }
+            Array<float>::assign(0.0f, this->value, 3);
         } else {
             this->value = value;
         }

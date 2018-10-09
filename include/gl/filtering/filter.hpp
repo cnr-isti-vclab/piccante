@@ -18,8 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_HPP
 #define PIC_GL_FILTERING_FILTER_HPP
 
+#include "../../util/array.hpp"
 #include "../../gl/image.hpp"
 #include "../../gl/image_vec.hpp"
+#include "../../util/array.hpp"
 #include "../../util/gl/technique.hpp"
 #include "../../util/gl/quad.hpp"
 
@@ -46,6 +48,7 @@ protected:
 
 public:
 
+    float scale_dim[3];
     std::vector<FilterGL *> filters;
 
     std::string vertex_source, geometry_source, fragment_source;
@@ -55,6 +58,8 @@ public:
      */
     FilterGL()
     {
+        Array<float>::assign(1.0f, scale_dim, 3);
+
         fbo = NULL;
 
         quad = NULL;

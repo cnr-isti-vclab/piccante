@@ -105,10 +105,6 @@ protected:
         //allocate a new anisotropic diffusion filter
         fltAD = new pic::FilterGLAnisotropicDiffusion(sigma_s, sigma_r);
 
-        auto tmp = pic::FilterGLSampler2D::execute(img, NULL, 0.5f);
-        tmp->loadToMemory();
-        tmp->Write("tmp2.png");
-
         img_flt_tmo = NULL;
         img_flt = NULL;
     }

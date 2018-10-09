@@ -115,7 +115,7 @@ PIC_INLINE FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma
     int nRand = 32;
     imageRand = new ImageGL(1, 256, 256, 1, IMG_CPU, GL_TEXTURE_2D);
     imageRand->setRand();
-    imageRand->generateTextureGL(false, GL_TEXTURE_2D);
+    imageRand->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
     *imageRand *= float(nRand - 1);
 
     //Precomputation of the Gaussian Kernel

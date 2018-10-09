@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_UP_PP_HPP
 #define PIC_FILTERING_FILTER_UP_PP_HPP
 
+#include "../util/array.hpp"
+
 #include "../filtering/filter.hpp"
 #include "../filtering/filter_down_pp.hpp"
 #include "../image_samplers/image_sampler_bilinear.hpp"
@@ -98,10 +100,7 @@ public:
     {
         if(value == NULL) {
             this->value = new float[3];
-
-            for(int i = 0; i < 3; i++) {
-                this->value[i] = 0.0f;
-            }
+            Array<float>::assign(0.0f, this->value, 3);
         } else {
             this->value = value;
         }

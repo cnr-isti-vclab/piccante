@@ -54,14 +54,6 @@ protected:
      */
     void update(float sigma, float scale);
 
-    /**
-     * @brief setupAuxN
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageGL *setupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
-
 public:
     /**
      * @brief FilterGLSamplingMap
@@ -95,28 +87,18 @@ public:
 
     /**
      * @brief execute
-     * @param nameIn
-     * @param nameOut
+     * @param imgIn
+     * @param imgOut
      * @param sigma
      * @return
      */
-    static ImageGL *execute(std::string nameIn, std::string nameOut, float sigma)
+    static ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut, float sigma)
     {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-
         FilterGLSamplingMap filter(sigma);
 
-        GLuint testTQ1 = glBeginTimeQuery();
-        ImageGL *imgRet = filter.Process(SingleGL(&imgIn), NULL);
+        imgOut = filter.Process(SingleGL(imgIn), imgOut);
 
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        printf("Sampling Map Filter on GPU time: %f ms\n", (timeVal) / 100000000.0f);
-
-        imgRet->loadToMemory();
-        imgRet->Write(nameOut);
-
-        return imgRet;
+        return imgOut;
     }
 };
 
@@ -138,12 +120,11 @@ PIC_INLINE void FilterGLSamplingMap::update(float sigma, float scale)
 {
     this->sigma = sigma;
     this->scale = scale;
+
+    filterD = new FilterGLSampler2D(scale);
     filterS = new FilterGLSigmoidTMO();
     filterG = new FilterGLGradient();
     filterG2D = new FilterGLGaussian2D(sigma);
-
-    //	filterG2D = new FilterGLGaussian2D(sigma*scale);
-    filterD = new FilterGLSampler2D(scale);
 
     insertFilter(filterD);
     insertFilter(filterS);
@@ -153,9 +134,9 @@ PIC_INLINE void FilterGLSamplingMap::update(float sigma, float scale)
 
 PIC_INLINE FilterGLSamplingMap::~FilterGLSamplingMap()
 {
-    delete filterG;
-    delete filterS;
     delete filterD;
+    delete filterS;
+    delete filterG;
     delete filterG2D;
 }
 
@@ -166,25 +147,6 @@ PIC_INLINE Fbo *FilterGLSamplingMap::getFbo()
     }
 
     return filters[filters.size() - 1]->getFbo();
-}
-
-PIC_INLINE ImageGL *FilterGLSamplingMap::setupAuxN(ImageGLVec imgIn,
-        ImageGL *imgOut)
-{
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(    imgIn[0]->frames,
-                                    int(imgIn[0]->widthf  * scale),
-                                    int(imgIn[0]->heightf * scale),
-                                    imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    /*if(fbo==NULL)
-    	fbo = new Fbo();
-    fbo->create(imgIn[0]->width*scale,imgIn[0]->height*scale,imgIn[0]->frames, false, imgOut->getTexture());
-    for(int i=0;i<filters.size();i++)
-    	filters[i]->setFbo(fbo);*/
-
-    return imgOut;
 }
 
 } // end namespace pic

@@ -303,7 +303,7 @@ PIC_INLINE ImageGL *FilterGLBilateral3DAS::Process(ImageGLVec imgIn,
 
     if(imgTmp == NULL) {
         float scale = fGLsm->getScale();
-        imgFrame->generateTextureGL(false, GL_TEXTURE_2D);
+        imgFrame->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         imgTmp = new ImageGL(    1,
                                     int(imgIn[0]->widthf  * scale),

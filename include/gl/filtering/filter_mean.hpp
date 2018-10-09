@@ -93,7 +93,7 @@ public:
         }
 
         weights = new ImageGL(1, kernelSize, 1, 1, data);
-        weights->generateTextureGL(false, GL_TEXTURE_2D, false);
+        weights->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
     }
 
     /**

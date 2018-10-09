@@ -74,9 +74,9 @@ public:
         ImageGL imgR(nameRight);
         ImageGL imgD(nameDisp);
 
-        imgL.generateTextureGL(false, GL_TEXTURE_2D);
-        imgR.generateTextureGL(false, GL_TEXTURE_2D);
-        imgD.generateTextureGL(false, GL_TEXTURE_2D);
+        imgL.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
+        imgR.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
+        imgD.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         FilterGLDisp filter;
 

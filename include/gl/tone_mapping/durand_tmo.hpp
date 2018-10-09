@@ -40,8 +40,10 @@ protected:
     FilterGLDurandTMO       *flt_durand;
     ImageGL                 *img_lum, *img_lum_base;
 
-    bool                    bStatisticsRecompute;
-    float                   min_log_base, max_log_base, target_contrast;
+    bool bStatisticsRecompute;
+    float min_log_base, max_log_base, target_contrast;
+
+    float sigma_s, sigma_r;
 
     /**
      * @brief allocateFilters
@@ -51,6 +53,7 @@ protected:
         flt_lum = new FilterGLLuminance();
         flt_log10 = new FilterGLOp("log(I0) * " + fromNumberToString(1.0f / logf(10.0f)), true, NULL, NULL);
         flt_durand = new FilterGLDurandTMO();
+        flt_bil = new FilterGLBilateral2DS(sigma_s, sigma_r);
     }
 
 public:
@@ -60,6 +63,8 @@ public:
      */
     DurandTMOGL(float target_contrast = 5.0f, bool bStatisticsRecompute = true)
     {
+        this->sigma_r = 0.4f;
+
         update(target_contrast);
 
         flt_lum = NULL;
@@ -132,9 +137,7 @@ public:
         }
 
         if(flt_bil == NULL) {
-            float sigma_s = MAX(imgIn->widthf, imgIn->heightf) * 0.02f;
-            float sigma_r = 0.4f;
-            flt_bil = new FilterGLBilateral2DS(sigma_s, sigma_r);
+            this->sigma_s = MAX(imgIn->widthf, imgIn->heightf) * 0.02f;
             allocateFilters();
         }
 

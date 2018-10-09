@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_DRAGO_TMO_HPP
 #define PIC_FILTERING_FILTER_DRAGO_TMO_HPP
 
+#include "../util/array.hpp"
 #include "../filtering/filter.hpp"
 #include "../filtering/filter_luminance.hpp"
 
@@ -151,16 +152,14 @@ PIC_INLINE void FilterDragoTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
             if(dataLum[0] > 0.0f) {
                 float L_scaled = dataLum[0] / Lw_a_scaled;
 
-                float tmp	= powf((L_scaled / Lw_Max_scaled), constant1);
-                float Ld	= constant2 * logf(1.0f + L_scaled) / logf(2.0f + 8.0f * tmp);
+                float tmp = powf((L_scaled / Lw_Max_scaled), constant1);
+                float Ld = constant2 * logf(1.0f + L_scaled) / logf(2.0f + 8.0f * tmp);
 
                 for(int k = 0; k < channels; k++) {
                     dataOut[k] = (dataIn[k] * Ld) / dataLum[0];
                 }
             } else {
-                for(int k = 0; k < src[0]->channels; k++) {
-                    dataOut[k] = 0.0f;
-                }
+                Array<float>::assign(0.0f, dataOut, src[0]->channels);
             }
         }
     }

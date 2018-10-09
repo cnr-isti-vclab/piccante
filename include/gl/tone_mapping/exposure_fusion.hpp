@@ -32,11 +32,16 @@ namespace pic {
 class ExposureFusionGL
 {
 protected:
+    std::vector<FilterGL *> filters;
+
     FilterGLLuminance  *flt_lum;
     FilterGLExposureFusionWeights *flt_weights;
-    FilterGLOp *remove_negative, *convert_zero_to_one;
+    FilterGLOp *remove_negative, *convert_zero_to_one;    
+
     ImageGL *lum, *acc, *weights;
+
     PyramidGL *pW, *pI, *pOut;
+
     float wC, wS, wE;
 
     /**
@@ -45,8 +50,16 @@ protected:
     void allocateFilters()
     {
         flt_lum = new FilterGLLuminance();
+        filters.push_back(flt_lum);
+
         remove_negative = new FilterGLOp("max(I0, vec4(0.0))", true, NULL, NULL);
+        filters.push_back(remove_negative);
+
         convert_zero_to_one = new FilterGLOp("I0.x > 0.0 ? I0 : vec4(1.0)", true, NULL, NULL);
+        filters.push_back(convert_zero_to_one);
+
+        flt_weights = new FilterGLExposureFusionWeights(wC, wE, wS);
+        filters.push_back(flt_weights);
     }
 
 public:
@@ -103,27 +116,20 @@ public:
             pOut = NULL;
         }
 
-        if(flt_lum != NULL) {
-            delete flt_lum;
-            flt_lum = NULL;
-        }
-
-        if(flt_weights != NULL) {
-            delete flt_weights;
-            flt_weights = NULL;
-        }
-
-        if(remove_negative != NULL) {
-            delete remove_negative;
-            remove_negative = NULL;
-        }
-
-        if(convert_zero_to_one != NULL) {
-            delete convert_zero_to_one;
-            convert_zero_to_one = NULL;
+        for(unsigned int i = 0; i < filters.size(); i++) {
+            if(filters[i] != NULL) {
+                delete filters[i];
+                filters[i] = NULL;
+            }
         }
     }
 
+    /**
+     * @brief update
+     * @param wC weight for preserving contrast
+     * @param wE weight for preserving exposure
+     * @param wS weight for preserving saturation
+     */
     void update(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
     {
         this->wC = CLAMPi(wC, 0.0f, 1.0f);
@@ -145,7 +151,7 @@ public:
             return imgOut;
         }
 
-        //Computing weights values
+        //compute weights values
         int width = imgIn[0]->width;
         int height = imgIn[0]->height;
         int channels = imgIn[0]->channels;
@@ -155,10 +161,6 @@ public:
         }
 
         *acc = 0.0f;
-
-        if(flt_weights == NULL) {
-            flt_weights = new FilterGLExposureFusionWeights(wC, wE, wS);
-        }
 
         if(flt_lum == NULL) {
             allocateFilters();

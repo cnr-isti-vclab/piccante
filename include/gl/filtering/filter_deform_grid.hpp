@@ -70,7 +70,7 @@ public:
     }
 };
 
-FilterGLDeformGrid::FilterGLDeformGrid(Image *grid_move): FilterGL()
+PIC_INLINE FilterGLDeformGrid::FilterGLDeformGrid(Image *grid_move): FilterGL()
 {
     this->grid_rest = FilterDeformGrid::getUniformGrid(grid_move->width, grid_move->height);
     this->grid_move = grid_move;
@@ -84,7 +84,7 @@ FilterGLDeformGrid::FilterGLDeformGrid(Image *grid_move): FilterGL()
     initShaders();
 }
 
-void FilterGLDeformGrid::initShaders()
+PIC_INLINE void FilterGLDeformGrid::initShaders()
 {
     fragment_source  = GLSL_BICUBIC();
     fragment_source += GLSL_TEXTURE_BICUBIC();
@@ -110,7 +110,7 @@ void FilterGLDeformGrid::initShaders()
     update(NULL);
 }
 
-void FilterGLDeformGrid::update(Image *grid_move)
+PIC_INLINE void FilterGLDeformGrid::update(Image *grid_move)
 {
     if(grid_move != NULL) {
 

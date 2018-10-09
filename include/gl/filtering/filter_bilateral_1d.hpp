@@ -71,7 +71,7 @@ public:
         glEndTimeQuery(testTQ);
 
         ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
+        imgIn.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         FilterGLBilateral1D filter(sigma_s, sigma_r, true, GL_TEXTURE_2D);
 
