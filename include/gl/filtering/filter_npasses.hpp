@@ -94,6 +94,10 @@ PIC_INLINE FilterGLNPasses::~FilterGLNPasses()
         delete imgAllocated;
         imgAllocated = NULL;
     }
+
+    if(!imgTmpVec.empty()) {
+        imgTmpVec.clear();
+    }
 }
 
 PIC_INLINE void FilterGLNPasses::insertFilter(FilterGL *flt)
@@ -113,55 +117,39 @@ PIC_INLINE void FilterGLNPasses::insertFilter(FilterGL *flt)
 #endif
         filters.push_back(flt);
     }
-
-    //check if the filters keep the same image size
-    for(unsigned int i = 1; i < filters.size(); i++) {
-        float tmp = Array<float>::distanceSq(filters[0]->scale_dim, filters[i]->scale_dim, 3);
-        if(tmp > 1e-6f) {
-            bSameImageSize = false;
-            break;
-        }
-    }
 }
 
 PIC_INLINE ImageGL *FilterGLNPasses::setupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(bSameImageSize) {
+        //output
         if(imgOut == NULL) {
             imgOut = imgIn[0]->allocateSimilarOneGL();
+        } else {
+            if(!imgOut->isSimilarType(imgIn[0])) {
+                imgOut = imgIn[0]->allocateSimilarOneGL();
+            }
         }
 
+        //temporary buffer
         if(imgAllocated == NULL) {
             imgAllocated = imgOut->allocateSimilarOneGL();
+        } else {
+            if(!imgAllocated->isSimilarType(imgIn[0])) {
+                delete imgAllocated;
+                imgAllocated = imgOut->allocateSimilarOneGL();
+            }
         }
 
+        //temporary + output
         if((filters.size() % 2) == 0) {
+            imgTmp[0] = imgAllocated;
             imgTmp[1] = imgOut;
-
-            if(imgTmp[0] == NULL) {
-                imgTmp[0] = imgAllocated;
-            }
         } else {
             imgTmp[0] = imgOut;
-
-            if(imgTmp[1] == NULL) {
-                imgTmp[1] = imgAllocated;
-            }
+            imgTmp[1] = imgAllocated;
         }
-    } else {
-        if(imgOut == NULL) {
-            int w = imgIn[0]->width;
-            int h = imgIn[0]->height;
-            int f = imgIn[0]->frames;
-
-            for(unsigned int i = 0; i < filters.size(); i++) {
-                w = int(float(w) * filters[i]->scale_dim[0]);
-                h = int(float(h) * filters[i]->scale_dim[1]);
-                f = int(float(f) * filters[i]->scale_dim[2]);
-            }
-
-            imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
-        }
+    } else {        
     }
 
     /*

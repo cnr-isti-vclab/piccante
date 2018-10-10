@@ -122,12 +122,6 @@ PIC_INLINE void FilterGLIterative::update(FilterGL *flt, int iterations)
 
     //check if the filters keep the same image size
     bSameImageSize = true;
-    for(unsigned int i = 1; i < 3; i++) {
-        if(scale_dim[0] != scale_dim[i]) {
-            bSameImageSize = false;
-            break;
-        }
-    }
 }
 
 PIC_INLINE ImageGL *FilterGLIterative::setupAuxN(ImageGLVec imgIn,
@@ -160,17 +154,6 @@ PIC_INLINE ImageGL *FilterGLIterative::setupAuxN(ImageGLVec imgIn,
         }
     } else {
         if(imgOut == NULL) {
-            int w = imgIn[0]->width;
-            int h = imgIn[0]->height;
-            int f = imgIn[0]->frames;
-
-            for(unsigned int i = 0; i < iterations; i++) {
-                w = int(float(w) * filters[0]->scale_dim[0]);
-                h = int(float(h) * filters[0]->scale_dim[1]);
-                f = int(float(f) * filters[0]->scale_dim[2]);
-            }
-
-            imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
         }
     }
 

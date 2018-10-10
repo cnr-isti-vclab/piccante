@@ -44,20 +44,6 @@ protected:
     bool ProcessAbstract(ImageVec imgIn, int &width, int &height, int &frames, int &channels);
 
     /**
-     * @brief release
-     */
-    void release();
-
-public:
-
-    /**
-     * @brief FilterNPasses
-     */
-    FilterNPasses();
-
-    ~FilterNPasses();
-
-    /**
      * @brief PreProcess
      * @param imgIn
      * @param imgOut
@@ -70,7 +56,7 @@ public:
      * @param imgOut
      * @return
      */
-    virtual Image *setupAuxNGen(ImageVec imgIn, Image *imgOut);
+    Image *setupAuxNGen(ImageVec imgIn, Image *imgOut);
 
     /**
      * @brief setupAuxNSame
@@ -78,7 +64,34 @@ public:
      * @param imgOut
      * @return
      */
-    virtual Image *setupAuxNSame(ImageVec imgIn, Image *imgOut);
+    Image *setupAuxNSame(ImageVec imgIn, Image *imgOut);
+
+    /**
+     * @brief getFilter
+     * @param i
+     * @return
+     */
+    virtual Filter* getFilter(int i);
+
+    /**
+     * @brief getIterations
+     * @return
+     */
+    virtual int getIterations();
+
+    /**
+     * @brief release
+     */
+    void release();
+
+public:
+
+    /**
+     * @brief FilterNPasses
+     */
+    FilterNPasses();
+
+    ~FilterNPasses();
 
     /**
      * @brief ProcessGen
@@ -142,7 +155,7 @@ PIC_INLINE void FilterNPasses::release()
         delete imgAllocated;
         imgAllocated = NULL;
     }
-    
+
     imgTmpSame[0] = NULL;
     imgTmpSame[1] = NULL;
 
@@ -153,6 +166,17 @@ PIC_INLINE void FilterNPasses::release()
     imgTmp.clear();
 }
 
+PIC_INLINE Filter* FilterNPasses::getFilter(int i)
+{
+    int j = i % filters.size();
+    return filters[j];
+}
+
+PIC_INLINE int FilterNPasses::getIterations()
+{
+    return int(filters.size());
+}
+
 PIC_INLINE bool FilterNPasses::ProcessAbstract(ImageVec imgIn, int &width, int &height, int &frames, int &channels)
 {
     Image *imgIn0 = new Image(imgIn[0], false);
@@ -161,9 +185,12 @@ PIC_INLINE bool FilterNPasses::ProcessAbstract(ImageVec imgIn, int &width, int &
     imgIn[0] = imgIn0;
 
     bool bSame = true;
-    for(unsigned int i = 0; i < filters.size(); i++) {
-        filters[i]->changePass(i, filters.size());
-        filters[i]->OutputSize(imgIn, width, height, channels, frames);
+    int n = getIterations();
+
+    for(int i = 0; i < n; i++) {
+        auto flt_i = getFilter(i);
+        flt_i->changePass(i, n);
+        flt_i->OutputSize(imgIn, width, height, channels, frames);
 
         if( (tmp->width != width) ||
           (tmp->height != height) ||
@@ -191,7 +218,7 @@ PIC_INLINE void FilterNPasses::insertFilter(Filter *flt)
         return;
     }
 
-    if(flt->filters.size() > 0) {
+    if(!flt->filters.empty()) {
         for(unsigned int i = 0; i < flt->filters.size(); i++) {
             insertFilter(flt->filters[i]);
         }
@@ -206,8 +233,11 @@ PIC_INLINE Image *FilterNPasses::setupAuxNGen(ImageVec imgIn,
     int width, height, frames, channels;
     ProcessAbstract(imgIn, width, height, frames, channels);
 
+    int n = getIterations();
+
     if(imgTmp.empty()) {
-        for(unsigned int i = 0; i < filters.size(); i++) {
+
+        for(unsigned int i = 0; i < n; i++) {
             imgTmp.push_back(NULL);
         }
     } else {
@@ -221,7 +251,7 @@ PIC_INLINE Image *FilterNPasses::setupAuxNGen(ImageVec imgIn,
            tc != imgTmp[0]->channels) {
             imgTmp.clear();
 
-            for(unsigned int i = 0; i < filters.size(); i++) {
+            for(unsigned int i = 0; i < n; i++) {
                 imgTmp.push_back(NULL);
             }
         }
@@ -262,7 +292,7 @@ PIC_INLINE Image *FilterNPasses::setupAuxNSame(ImageVec imgIn,
         }
     }
 
-    if((filters.size() % 2) == 0) {
+    if((getIterations() % 2) == 0) {
         imgTmpSame[0] = imgAllocated;
         imgTmpSame[1] = imgOut;
     } else {
@@ -282,22 +312,25 @@ PIC_INLINE Image *FilterNPasses::ProcessGen(ImageVec imgIn, Image *imgOut,
 
     imgOut = setupAuxNGen(imgIn, imgOut);
 
-    int n =  int(filters.size()) - 1;
+    int n = getIterations();
+    int n2 = n - 1;
     
-    for(int i = 0; i < n; i++) {
-        filters[i]->changePass(i, filters.size());
+    for(int i = 0; i < n2; i++) {
+        auto flt_i = getFilter(i);
+        flt_i->changePass(i, n);
         
         if(parallel) {
-            imgTmp[i] = filters[i]->ProcessP(imgIn, imgTmp[i]);
+            imgTmp[i] = flt_i->ProcessP(imgIn, imgTmp[i]);
         } else {
-            imgTmp[i] = filters[i]->Process(imgIn, imgTmp[i]);
+            imgTmp[i] = flt_i->Process(imgIn, imgTmp[i]);
         }
 
         imgIn[0] = imgTmp[i];
     }
 
-    filters[n]->changePass(n, filters.size());
-    imgOut = filters[n]->Process(imgIn, imgOut);
+    auto flt_n = getFilter(n2);
+    flt_n->changePass(n2, n);
+    imgOut = filters[n2]->Process(imgIn, imgOut);
 
     return imgOut;
 }
@@ -309,27 +342,29 @@ PIC_INLINE Image *FilterNPasses::ProcessSame(ImageVec imgIn, Image *imgOut,
         return imgOut;
     }
 
-    //Setup
+    //setup
     imgOut = setupAuxNSame(imgIn, imgOut);
 
-    int n = filters.size();
-    filters[0]->changePass(0, n);
+    int n = getIterations();
+    auto flt_0 = getFilter(0);
+    flt_0->changePass(0, n);
 
     if(parallel) {
-        filters[0]->ProcessP(imgIn, imgTmpSame[0]);
+        flt_0->ProcessP(imgIn, imgTmpSame[0]);
     } else {
-        filters[0]->Process(imgIn, imgTmpSame[0]);
+        flt_0->Process(imgIn, imgTmpSame[0]);
     }
 
     for(unsigned int i = 1; i < n; i++) {
-        filters[i]->changePass(i, n);
+        auto flt_i = getFilter(0);
+        flt_i->changePass(i, n);
 
         imgIn[0] = imgTmpSame[(i + 1) % 2];
 
         if(parallel) {
-            filters[i]->ProcessP(imgIn, imgTmpSame[i % 2]);
+            flt_i->ProcessP(imgIn, imgTmpSame[i % 2]);
         } else {
-            filters[i]->Process(imgIn, imgTmpSame[i % 2]);
+            flt_i->Process(imgIn, imgTmpSame[i % 2]);
         }
     }
 

@@ -48,7 +48,6 @@ protected:
 
 public:
 
-    float scale_dim[3];
     std::vector<FilterGL *> filters;
 
     std::string vertex_source, geometry_source, fragment_source;
@@ -58,8 +57,6 @@ public:
      */
     FilterGL()
     {
-        Array<float>::assign(1.0f, scale_dim, 3);
-
         fbo = NULL;
 
         quad = NULL;
@@ -99,6 +96,22 @@ public:
     virtual Fbo *getFbo()
     {
         return fbo;
+    }
+
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    virtual void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width       = imgIn->width;
+        height      = imgIn->height;
+        channels    = imgIn->channels;
+        frames      = imgIn->frames;
     }
 
     /**

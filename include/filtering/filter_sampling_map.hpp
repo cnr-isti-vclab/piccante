@@ -89,10 +89,6 @@ public:
         FilterSamplingMap filter(sigma);
         imgOut = filter.Process(Single(imgIn), NULL);
 
-       imgOut = filter.Process(Single(imgIn), NULL);
-
-        imgOut = filter.Process(Single(imgIn), imgOut);
-
         return imgOut;
     }
 };

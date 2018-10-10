@@ -18,32 +18,33 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_ITERATIVE_HPP
 #define PIC_FILTERING_FILTER_ITERATIVE_HPP
 
-#include "../filtering/filter.hpp"
+#include "../filtering/filter_npasses.hpp"
 
 namespace pic {
 
 /**
  * @brief The FilterIterative class
  */
-class FilterIterative: public Filter
+class FilterIterative: public FilterNPasses
 {
 protected:
-    Image *imgTmp[2];
-
-    bool parallel;
     int iterations;
 
     /**
-     * @brief release
+     * @brief getFilter
+     * @param i
+     * @return
      */
-    void release();
-
-public:
+    Filter* getFilter(int i);
 
     /**
-     * @brief FilterIterative
+     * @brief getFilter
+     * @param i
+     * @return
      */
-    FilterIterative();
+    int getIterations();
+
+public:
 
     /**
      * @brief FilterIterative
@@ -52,16 +53,6 @@ public:
      */
     FilterIterative(Filter *flt, int iterations);
 
-    ~FilterIterative();
-
-    /**
-     * @brief setupAuxN
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    virtual Image *setupAuxN(ImageVec imgIn, Image *imgOut);
-
     /**
      * @brief update
      * @param flt
@@ -69,62 +60,12 @@ public:
      */
     void update(Filter *flt, int iterations);
 
-    /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *Process(ImageVec imgIn, Image *imgOut);
-
-    /**
-     * @brief ProcessP
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *ProcessP(ImageVec imgIn, Image *imgOut);
 };
 
-PIC_INLINE FilterIterative::FilterIterative() : Filter()
+PIC_INLINE FilterIterative::FilterIterative(Filter *flt, int iterations) : FilterNPasses()
 {
-    parallel = false;
-    iterations = 0;
-
-    for(int i = 0; i < 2; i++) {
-        imgTmp[i] = NULL;
-    }
-}
-
-PIC_INLINE FilterIterative::FilterIterative(Filter *flt, int iterations) : Filter()
-{
-    for(int i = 0; i < 2; i++) {
-        imgTmp[i] = NULL;
-    }
-
+    printf("\n\n%d\n\n", iterations);
     update(flt, iterations);
-}
-
-PIC_INLINE FilterIterative::~FilterIterative()
-{
-    release();
-}
-
-PIC_INLINE void FilterIterative::release()
-{
-    if((iterations % 2) == 0) {
-        if(imgTmp[0] != NULL) {
-            delete imgTmp[0];
-        }
-    } else {
-        if(imgTmp[1] != NULL) {
-            delete imgTmp[1];
-        }
-    }
-
-    for(int i = 0; i < 2; i++) {
-        imgTmp[i] = NULL;
-    }
 }
 
 PIC_INLINE void FilterIterative::update(Filter *flt, int iterations)
@@ -137,69 +78,21 @@ PIC_INLINE void FilterIterative::update(Filter *flt, int iterations)
         return;
     }
 
-    if(filters.size() > 0) {
+    if(!filters.empty()) {
         filters.clear();
     }
 
     filters.push_back(flt);
 }
 
-PIC_INLINE Image *FilterIterative::setupAuxN(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Filter* FilterIterative::getFilter(int i)
 {
-    if(imgOut == NULL) {
-        imgOut = imgIn[0]->allocateSimilarOne();
-    }
-
-    if((iterations % 2) == 0) {
-        imgTmp[1] = imgOut;
-
-        if(imgTmp[0] == NULL) {
-            imgTmp[0] = imgOut->allocateSimilarOne();
-        }
-    } else {
-        imgTmp[0] = imgOut;
-
-        if(imgTmp[1] == NULL) {
-            imgTmp[1] = imgOut->allocateSimilarOne();
-        }
-    }
-
-    return imgOut;
+    return filters[0];
 }
 
-PIC_INLINE Image *FilterIterative::Process(ImageVec imgIn, Image *imgOut)
+PIC_INLINE int FilterIterative::getIterations()
 {
-    if(imgIn.size() < 1 || imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    //allocate output
-    imgOut = setupAuxN(imgIn, imgOut);
-
-    if(parallel) {
-        filters[0]->ProcessP(imgIn, imgTmp[0]);
-    } else {
-        filters[0]->Process(imgIn, imgTmp[0]);
-    }
-
-    for(int i = 1; i < iterations; i++) {
-        imgIn[0] = imgTmp[(i + 1) % 2];
-
-        if(parallel) {
-            filters[0]->ProcessP(imgIn, imgTmp[i % 2]);
-        } else {
-            filters[0]->Process(imgIn, imgTmp[i % 2]);
-        }
-    }
-
-    parallel = false;
-    return imgOut;
-}
-
-PIC_INLINE Image *FilterIterative::ProcessP(ImageVec imgIn, Image *imgOut)
-{
-    parallel = true;
-    return Process(imgIn, imgOut);
+    return iterations;
 }
 
 } // end namespace pic

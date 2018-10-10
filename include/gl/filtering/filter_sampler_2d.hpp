@@ -111,10 +111,6 @@ PIC_INLINE void FilterGLSampler2D::update(float scale)
 {
     this->scale = scale;
 
-    scale_dim[0] = scale;
-    scale_dim[1] = scale;
-    scale_dim[2] = 1.0f;
-
     technique.bind();
     technique.setUniform1f("scale", scale);
     technique.unbind();

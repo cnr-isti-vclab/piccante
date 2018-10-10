@@ -73,13 +73,9 @@ public:
      */
     void update(int size)
     {
-        if(size < 1)
-        {
-            size = 3;
-        }
+        size = size > 0 ? size : 3;
 
-        if(this->size != size)
-        {
+        if(this->size != size) {
             this->size = size;
             if( data != NULL)
                 delete[] data;
