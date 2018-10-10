@@ -260,24 +260,24 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(!bSameSize) {
             if(this->bComputeBoundingBox) {
                 computeBoundingBox(h, bCentroid,
-                                   imgIn->widthf, imgIn->heightf,
+                                   imgIn[0]->widthf, imgIn[0]->heightf,
                                    bmin, bmax);
             }
 
             width  = bmax[0] - bmin[0];
             height = bmax[1] - bmin[1];
         } else {
-            width  = imgIn->width;
-            height = imgIn->height;
+            width  = imgIn[0]->width;
+            height = imgIn[0]->height;
         }
 \
-        frames   = imgIn->frames;
-        channels = imgIn->channels;
+        frames   = imgIn[0]->frames;
+        channels = imgIn[0]->channels;
     }
 
     /**

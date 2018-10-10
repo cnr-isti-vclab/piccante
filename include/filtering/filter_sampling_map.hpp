@@ -24,6 +24,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter_sigmoid_tmo.hpp"
 #include "../filtering/filter_sampler_2d.hpp"
 #include "../filtering/filter_gaussian_2d.hpp"
+#include "../filtering/filter_channel.hpp"
 
 namespace pic {
 
@@ -41,13 +42,14 @@ protected:
     FilterSigmoidTMO *fltS;
     FilterSampler2D *fltD;
     FilterGaussian2D *fltG2D;
+    FilterChannel *fltC;
 
     /**
      * @brief Setup
      * @param sigma
      * @param scale
      */
-    void Setup(float sigma, float scale);
+    void setup(float sigma, float scale);
 
 public:
     /**
@@ -76,21 +78,21 @@ public:
 
     /**
      * @brief execute
-     * @param nameIn
-     * @param nameOut
+     * @param imgIn
+     * @param imgOut
      * @param sigma
      * @param scale
      * @return
      */
-    static Image *execute(std::string nameIn, std::string nameOut, float sigma,
-                             float scale)
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma)
     {
-        Image imgIn(nameIn);
+        FilterSamplingMap filter(sigma);
+        imgOut = filter.Process(Single(imgIn), NULL);
 
-        FilterSamplingMap filter(sigma, scale);
-        Image *imgOut = filter.Process(Single(&imgIn), NULL);
+       imgOut = filter.Process(Single(imgIn), NULL);
 
-        imgOut->Write(nameOut);
+        imgOut = filter.Process(Single(imgIn), imgOut);
+
         return imgOut;
     }
 };
@@ -102,14 +104,21 @@ PIC_INLINE FilterSamplingMap::FilterSamplingMap(float sigma) : FilterNPasses()
     fltS = NULL;
     fltG = NULL;
     fltG2D = NULL;
+    fltC = NULL;
 
     float rateScale = 2.0f;
-    Setup(rateScale, rateScale / sigma);
+    setup(rateScale, rateScale / sigma);
 }
 
 PIC_INLINE FilterSamplingMap::FilterSamplingMap(float sigma, float scale) : FilterNPasses()
 {
-    Setup(sigma * scale, scale);
+    fltL = NULL;
+    fltD = NULL;
+    fltS = NULL;
+    fltG = NULL;
+    fltG2D = NULL;
+
+    setup(sigma * scale, scale);
 }
 
 PIC_INLINE FilterSamplingMap::~FilterSamplingMap()
@@ -126,6 +135,10 @@ PIC_INLINE FilterSamplingMap::~FilterSamplingMap()
         delete fltS;
     }
 
+    if(fltC != NULL) {
+        delete fltC;
+    }
+
     if(fltG != NULL) {
         delete fltG;
     }
@@ -136,21 +149,23 @@ PIC_INLINE FilterSamplingMap::~FilterSamplingMap()
 
 }
 
-PIC_INLINE void FilterSamplingMap::Setup(float sigma, float scale)
+PIC_INLINE void FilterSamplingMap::setup(float sigma, float scale)
 {
     this->scale = scale;
 
-    //Allocate filters
+    //allocate filters
     fltL = new FilterLuminance(LT_CIE_LUMINANCE);
     fltD = new FilterSampler2D(scale, &isb);
     fltS = new FilterSigmoidTMO();
     fltG = new FilterGradient();
+    fltC = new FilterChannel(2);
     fltG2D = new FilterGaussian2D(sigma);
 
     insertFilter(fltL);     //Luminance
     insertFilter(fltD);     //Downsampling
     insertFilter(fltS);     //Sigmoid TMO
     insertFilter(fltG);     //Gradient
+    insertFilter(fltC);     //Gradient
     insertFilter(fltG2D);   //Gaussian
 }
 

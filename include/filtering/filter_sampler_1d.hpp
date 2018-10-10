@@ -110,21 +110,21 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(swh) {
             float scaleX = (dirs[X_DIRECTION] == 1) ? scale : 1.0f;
             float scaleY = (dirs[Y_DIRECTION] == 1) ? scale : 1.0f;
 
-            width  = int(imgIn->width  * scaleX);
-            height = int(imgIn->height * scaleY);
+            width  = int(imgIn[0]->width  * scaleX);
+            height = int(imgIn[0]->height * scaleY);
         } else {
-            width  = (dirs[X_DIRECTION] == 1) ? size : imgIn->width;
-            height = (dirs[Y_DIRECTION] == 1) ? size : imgIn->height;
+            width  = (dirs[X_DIRECTION] == 1) ? size : imgIn[0]->width;
+            height = (dirs[Y_DIRECTION] == 1) ? size : imgIn[0]->height;
         }
 
-        channels = imgIn->channels;
-        frames   = imgIn->frames;
+        channels = imgIn[0]->channels;
+        frames   = imgIn[0]->frames;
     }
 
     /**

@@ -286,7 +286,7 @@ public:
      * @return This function returns true if the two images are similar,
      * otherwise false.
      */
-    bool isSimilarType(const Image *img);
+    bool isSimilarType(const Image *img);    
 
     /**
      * @brief assign
@@ -875,6 +875,12 @@ PIC_INLINE Image::Image(Image *imgIn, bool deepCopy = true)
         height = imgIn->height;
         channels = imgIn->channels;
         frames = imgIn->frames;
+
+        widthf = imgIn->widthf;
+        heightf = imgIn->heightf;
+        channelsf = imgIn->channelsf;
+        framesf = imgIn->framesf;
+
         data = imgIn->data;
 
         notOwned = true;

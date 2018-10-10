@@ -85,18 +85,18 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(swh) {
-            width = int(imgIn->widthf  * scaleX);
-            height = int(imgIn->heightf * scaleY);
+            width = int(imgIn[0]->widthf * scaleX);
+            height = int(imgIn[0]->heightf * scaleY);
         } else {
             width = this->width;
             height = this->height;
         }
 
-        channels    = imgIn->channels;
-        frames      = imgIn->frames;
+        channels = imgIn[0]->channels;
+        frames = imgIn[0]->frames;
     }
 
     /**
@@ -108,7 +108,7 @@ public:
      * @return
      */
     static Image *execute(Image *imgIn, Image *imgOut, float scale,
-                             ImageSampler *isb)
+                             ImageSampler *isb = NULL)
     {
         FilterSampler2D filter(scale, isb);
         return filter.ProcessP(Single(imgIn), imgOut);
@@ -124,7 +124,7 @@ public:
      * @return
      */
     static Image *execute(Image *imgIn, Image *imgOut, float scaleX,
-                             float scaleY, ImageSampler *isb)
+                             float scaleY, ImageSampler *isb = NULL)
     {
         FilterSampler2D filter(scaleX, scaleY, isb);
         return filter.ProcessP(Single(imgIn), imgOut);
@@ -140,26 +140,12 @@ public:
      * @return
      */
     static Image *execute(Image *imgIn, Image *imgOut, int width,
-                             int height, ImageSampler *isb)
+                             int height, ImageSampler *isb = NULL)
     {
         FilterSampler2D filter(width, height, isb);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
 
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param scale
-     * @param isb
-     */
-    static void execute(std::string nameIn, std::string nameOut, float scale,
-                        ImageSampler *isb)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = execute(&imgIn, NULL, scale, isb);
-        imgOut->Write(nameOut);
-    }
 };
 
 PIC_INLINE FilterSampler2D::FilterSampler2D(float scale,

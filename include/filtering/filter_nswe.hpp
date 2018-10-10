@@ -112,12 +112,12 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn->width;
-        height      = imgIn->height;
-        channels    = imgIn->channels * 4;
-        frames      = imgIn->frames;
+        width    = imgIn[0]->width;
+        height   = imgIn[0]->height;
+        channels = imgIn[0]->channels * 4;
+        frames   = imgIn[0]->frames;
     }
 
     /**

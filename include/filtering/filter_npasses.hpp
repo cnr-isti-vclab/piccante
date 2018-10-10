@@ -32,7 +32,16 @@ protected:
     Image *imgTmpSame[2];
     ImageVec imgTmp;
 
-    bool CheckSame(ImageVec imgIn);
+    /**
+     * @brief ProcessAbstract
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param frames
+     * @param channels
+     * @return
+     */
+    bool ProcessAbstract(ImageVec imgIn, int &width, int &height, int &frames, int &channels);
 
     /**
      * @brief release
@@ -137,28 +146,43 @@ PIC_INLINE void FilterNPasses::release()
     imgTmpSame[0] = NULL;
     imgTmpSame[1] = NULL;
 
-    for(unsigned int i=0; i<imgTmp.size(); i++) {
+    for(unsigned int i = 0; i < imgTmp.size(); i++) {
         delete imgTmp[i];
     }
 
     imgTmp.clear();
 }
 
-PIC_INLINE bool FilterNPasses::CheckSame(ImageVec imgIn)
+PIC_INLINE bool FilterNPasses::ProcessAbstract(ImageVec imgIn, int &width, int &height, int &frames, int &channels)
 {
-    Image *tmp = imgIn[0];
+    Image *imgIn0 = new Image(imgIn[0], false);
 
+    auto *tmp = imgIn[0];
+    imgIn[0] = imgIn0;
+
+    bool bSame = true;
     for(unsigned int i = 0; i < filters.size(); i++) {
-        int width, height, channels, frames; 
+        filters[i]->changePass(i, filters.size());
+        filters[i]->OutputSize(imgIn, width, height, channels, frames);
 
-        filters[i]->OutputSize(tmp, width, height, channels, frames);
-
-        if( (tmp->width != width) || (tmp->height != height) ||
-            (tmp->channels != channels) || (tmp->frames != frames) ) {
-                return false;
+        if( (tmp->width != width) ||
+          (tmp->height != height) ||
+          (tmp->channels != channels) ||
+          (tmp->frames != frames) ) {
+            bSame = false;
         }
+
+        imgIn0->width = width;
+        imgIn0->height = height;
+        imgIn0->channels = channels;
+        imgIn0->frames = frames;
     }
-    return true;
+
+    imgIn[0] = tmp;
+
+    delete imgIn0;
+
+    return bSame;
 }
 
 PIC_INLINE void FilterNPasses::insertFilter(Filter *flt)
@@ -179,9 +203,39 @@ PIC_INLINE void FilterNPasses::insertFilter(Filter *flt)
 PIC_INLINE Image *FilterNPasses::setupAuxNGen(ImageVec imgIn,
         Image *imgOut)
 {   
-    if(imgTmp.size() == 0 ) {
-        for( unsigned int i=0; i<filters.size(); i++) {
+    int width, height, frames, channels;
+    ProcessAbstract(imgIn, width, height, frames, channels);
+
+    if(imgTmp.empty()) {
+        for(unsigned int i = 0; i < filters.size(); i++) {
             imgTmp.push_back(NULL);
+        }
+    } else {
+        int tw, th, tf, tc;
+
+        filters[0]->OutputSize(imgIn, tw, th, tf, tc);
+
+        if(tw != imgTmp[0]->width ||
+           th != imgTmp[0]->height ||
+           tf != imgTmp[0]->frames ||
+           tc != imgTmp[0]->channels) {
+            imgTmp.clear();
+
+            for(unsigned int i = 0; i < filters.size(); i++) {
+                imgTmp.push_back(NULL);
+            }
+        }
+    }
+
+    //output
+    if(imgOut == NULL) {
+        imgOut = new Image(frames, width, height, channels);
+    } else {
+        if(imgOut->height != height ||
+           imgOut->width != width ||
+           imgOut->channels != channels ||
+           imgOut->frames != frames) {
+            imgOut = new Image(frames, width, height, channels);
         }
     }
 
@@ -193,18 +247,24 @@ PIC_INLINE Image *FilterNPasses::setupAuxNSame(ImageVec imgIn,
 {
     if(imgOut == NULL) {
         imgOut = imgIn[0]->allocateSimilarOne();
+    } else {
+        if(!imgOut->isSimilarType(imgIn[0])) {
+            imgOut = imgIn[0]->allocateSimilarOne();
+        }
     }
 
-    if(imgAllocated != NULL) {
-        delete imgAllocated;
+    if(imgAllocated == NULL) {
+        imgAllocated = imgIn[0]->allocateSimilarOne();
+    } else {
+        if(!imgAllocated->isSimilarType(imgIn[0])) {
+            delete imgAllocated;
+            imgAllocated = imgIn[0]->allocateSimilarOne();
+        }
     }
 
-    imgAllocated = imgOut->allocateSimilarOne();
-
-    //Bug:
     if((filters.size() % 2) == 0) {
-        imgTmpSame[1] = imgOut;
         imgTmpSame[0] = imgAllocated;
+        imgTmpSame[1] = imgOut;
     } else {
         imgTmpSame[0] = imgOut;
         imgTmpSame[1] = imgAllocated;
@@ -217,15 +277,15 @@ PIC_INLINE Image *FilterNPasses::ProcessGen(ImageVec imgIn, Image *imgOut,
         bool parallel = false)
 {
     if(imgIn.empty() || filters.empty()) {
-        return NULL;
+        return imgOut;
     }
 
-    setupAuxNGen(imgIn, NULL);
+    imgOut = setupAuxNGen(imgIn, imgOut);
 
     int n =  int(filters.size()) - 1;
     
     for(int i = 0; i < n; i++) {
-        filters[i]->changePass(i, imgIn[0]->frames);
+        filters[i]->changePass(i, filters.size());
         
         if(parallel) {
             imgTmp[i] = filters[i]->ProcessP(imgIn, imgTmp[i]);
@@ -236,7 +296,7 @@ PIC_INLINE Image *FilterNPasses::ProcessGen(ImageVec imgIn, Image *imgOut,
         imgIn[0] = imgTmp[i];
     }
 
-    filters[n]->changePass(n, imgIn[0]->frames);
+    filters[n]->changePass(n, filters.size());
     imgOut = filters[n]->Process(imgIn, imgOut);
 
     return imgOut;
@@ -246,14 +306,14 @@ PIC_INLINE Image *FilterNPasses::ProcessSame(ImageVec imgIn, Image *imgOut,
         bool parallel = false)
 {
     if((imgIn.size() <= 0) || (filters.size() < 1)) {
-        return NULL;
+        return imgOut;
     }
 
     //Setup
     imgOut = setupAuxNSame(imgIn, imgOut);
 
-    //Pass 0
-    filters[0]->changePass(0, imgIn[0]->frames);
+    int n = filters.size();
+    filters[0]->changePass(0, n);
 
     if(parallel) {
         filters[0]->ProcessP(imgIn, imgTmpSame[0]);
@@ -261,8 +321,8 @@ PIC_INLINE Image *FilterNPasses::ProcessSame(ImageVec imgIn, Image *imgOut,
         filters[0]->Process(imgIn, imgTmpSame[0]);
     }
 
-    for(unsigned int i = 1; i < filters.size(); i++) {
-        filters[i]->changePass(i, imgIn[0]->frames);
+    for(unsigned int i = 1; i < n; i++) {
+        filters[i]->changePass(i, n);
 
         imgIn[0] = imgTmpSame[(i + 1) % 2];
 
@@ -281,17 +341,24 @@ PIC_INLINE Image *FilterNPasses::Process(ImageVec imgIn,
 {
     PreProcess(imgIn, imgOut);
 
-    if(CheckSame(imgIn)) {
-        return ProcessSame(imgIn, imgOut, parallel);
+    int width, height, frames, channels;
+    bool bSame = ProcessAbstract(imgIn, width, height, frames, channels);
+
+    if(bSame) {
+        imgOut = ProcessSame(imgIn, imgOut, parallel);
     } else {
-        return ProcessGen(imgIn, imgOut, parallel);
+        imgOut = ProcessGen(imgIn, imgOut, parallel);
     }
+
+    return imgOut;
 }
  
 PIC_INLINE Image *FilterNPasses::ProcessP(ImageVec imgIn,
         Image *imgOut)
 {
-    return Process(imgIn, imgOut, true);
+    imgOut = Process(imgIn, imgOut, true);
+
+    return imgOut;
 }
 
 } // end namespace pic

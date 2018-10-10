@@ -113,6 +113,22 @@ public:
     }
 
     /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width       = imgIn[0]->width << 1;
+        height      = imgIn[0]->height << 1;
+        channels    = imgIn[0]->frames;
+        frames      = imgIn[0]->frames;
+    }
+
+    /**
      * @brief execute
      * @param imgIn
      * @param imgOut

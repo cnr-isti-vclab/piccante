@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_LUMINANCE_HPP
 #define PIC_FILTERING_FILTER_LUMINANCE_HPP
 
+#include "../util/array.hpp"
+
 #include "../filtering/filter.hpp"
 
 namespace pic {
@@ -43,23 +45,19 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        float *data = src[0]->data;
-
         int transformChannels = MIN(src[0]->channels, weights_size);
 
         for(int j = box->y0; j < box->y1; j++) {
-            int c = j * src[0]->width;
 
             for(int i = box->x0; i < box->x1; i++) {
-                int indOut = c + i;
-                int ind = indOut * src[0]->channels;
 
-                float sum = 0.0f;
+                float *data_src = (*src[0])(i, j);
+                float *data_dst = (*dst)(i, j);
+
+                data_dst[0] = 0.0f;
                 for(int k = 0; k < transformChannels; k++) {
-                    sum += data[ind + k] * weights[k];
+                    data_dst[0] += data_src[k] * weights[k];
                 }
-
-                dst->data[indOut] = sum;
             }
         }
     }
@@ -92,10 +90,7 @@ protected:
             }
 
             weights = new float [weights_size];
-
-            for(int i=0; i<imgIn[0]->channels; i++) {
-                weights[i] = 1.0f / float( imgIn[0]->channels );
-            }
+            Array<float>::assign(1.0f / imgIn[0]->channelsf, weights, imgIn[0]->channels);
         } else {
             if(bChannels) {
                 weights = new float [1];
@@ -189,12 +184,12 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn->width;
-        height      = imgIn->height;
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
         channels    = 1;
-        frames      = imgIn->frames;
+        frames      = imgIn[0]->frames;
     }
 
     /**

@@ -59,19 +59,19 @@ public:
     ~FilterConv1D();
 
     /**
-     * @brief Init
+     * @brief setup
      * @param data
      * @param n
      * @param direction
      */
-    void Init(float *data, int n, int direction);
+    void setup(float *data, int n, int direction);
 
     /**
-     * @brief ChangePass
+     * @brief changePass
      * @param pass
      * @param tPass
      */
-    void ChangePass(int pass, int tPass);
+    void changePass(int pass, int tPass);
 
     /**
      * @brief ChangePass
@@ -79,7 +79,7 @@ public:
      * @param y
      * @param z
      */
-    void ChangePass(int x, int y, int z);
+    void changePass(int x, int y, int z);
 
     /**
      * @brief execute
@@ -96,9 +96,9 @@ public:
         FilterConv1D filter(data, n, 0);
 
         if(XorY) {
-            filter.ChangePass(1, 0, 0);
+            filter.changePass(1, 0, 0);
         } else {
-            filter.ChangePass(0, 1, 0);
+            filter.changePass(0, 1, 0);
         }
 
         return filter.ProcessP(Single(imgIn), imgOut);
@@ -143,10 +143,10 @@ PIC_INLINE FilterConv1D::FilterConv1D()
 
 PIC_INLINE FilterConv1D::FilterConv1D(float *data, int n, int direction = 0)
 {
-    Init(data, n, direction);
+    setup(data, n, direction);
 }
 
-PIC_INLINE void FilterConv1D::Init(float *data, int n, int direction)
+PIC_INLINE void FilterConv1D::setup(float *data, int n, int direction)
 {
     if(data == NULL || n < 0) {
         return;
@@ -166,7 +166,7 @@ PIC_INLINE FilterConv1D::~FilterConv1D()
     n = -1;
 }
 
-PIC_INLINE void FilterConv1D::ChangePass(int pass, int tPass)
+PIC_INLINE void FilterConv1D::changePass(int pass, int tPass)
 {
     int tMod;
 
@@ -192,7 +192,7 @@ PIC_INLINE void FilterConv1D::ChangePass(int pass, int tPass)
     #endif
 }
 
-PIC_INLINE void FilterConv1D::ChangePass(int x, int y, int z)
+PIC_INLINE void FilterConv1D::changePass(int x, int y, int z)
 {
     dirs[0] = y;
     dirs[1] = x;

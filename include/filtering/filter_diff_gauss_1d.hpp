@@ -67,7 +67,7 @@ PIC_INLINE FilterDiffGauss1D::FilterDiffGauss1D(float sigma1, float sigma2, int 
     pdog = new PrecomputedDiffOfGaussians(sigma1, sigma2);
 
     bpdogOwned = true;
-    Init(pdog->coeff, pdog->kernelSize, direction);
+    setup(pdog->coeff, pdog->kernelSize, direction);
 }
 
 PIC_INLINE FilterDiffGauss1D::FilterDiffGauss1D(PrecomputedDiffOfGaussians *pdog, int direction = 0)
@@ -81,7 +81,7 @@ PIC_INLINE FilterDiffGauss1D::FilterDiffGauss1D(PrecomputedDiffOfGaussians *pdog
 
     bpdogOwned = false;
 
-    Init(pdog->coeff, pdog->kernelSize, direction);
+    setup(pdog->coeff, pdog->kernelSize, direction);
 }
 
 PIC_INLINE FilterDiffGauss1D::~FilterDiffGauss1D()
