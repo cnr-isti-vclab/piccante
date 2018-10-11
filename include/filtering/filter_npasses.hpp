@@ -330,7 +330,11 @@ PIC_INLINE Image *FilterNPasses::ProcessGen(ImageVec imgIn, Image *imgOut,
 
     auto flt_n = getFilter(n2);
     flt_n->changePass(n2, n);
-    imgOut = filters[n2]->Process(imgIn, imgOut);
+    if(parallel) {
+        imgOut = filters[n2]->ProcessP(imgIn, imgOut);
+    } else {
+        imgOut = filters[n2]->Process(imgIn, imgOut);
+    }
 
     return imgOut;
 }

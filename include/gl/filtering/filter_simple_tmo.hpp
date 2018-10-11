@@ -55,41 +55,6 @@ public:
      * @param gamma
      */
     void update(float gamma, float fstop);
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param gamma
-     * @param fstop
-     * @return
-     */
-    ImageGL *execute(std::string nameIn, std::string nameOut, float gamma,
-                        float fstop)
-    {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
-
-        FilterGLSimpleTMO filter(gamma, fstop);
-
-        GLuint testTQ1 = glBeginTimeQuery();
-        ImageGL *imgOut = new ImageGL(1, imgIn.width, imgIn.height, 4,
-                                            IMG_GPU_CPU, GL_TEXTURE_2D);
-
-        int n = 100;
-
-        for(int i = 0; i < n; i++) {
-            filter.Process(SingleGL(&imgIn), imgOut);
-        }
-
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        printf("Full Bilateral Filter on GPU time: %f ms\n",
-               double(timeVal) / (double(n) * 1000000.0));
-
-        imgOut->readFromFBO(filter.getFbo());
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
 };
 
 PIC_INLINE FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()

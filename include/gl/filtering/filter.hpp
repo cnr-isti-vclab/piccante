@@ -71,6 +71,11 @@ public:
 
     ~FilterGL()
     {
+        release();
+    }
+
+    void release()
+    {
         if(quad != NULL) {
             delete quad;
         }
@@ -106,12 +111,12 @@ public:
      * @param channels
      * @param frames
      */
-    virtual void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    virtual void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn->width;
-        height      = imgIn->height;
-        channels    = imgIn->channels;
-        frames      = imgIn->frames;
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
+        channels    = imgIn[0]->channels;
+        frames      = imgIn[0]->frames;
     }
 
     /**

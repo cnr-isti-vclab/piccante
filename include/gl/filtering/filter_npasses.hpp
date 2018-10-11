@@ -28,39 +28,76 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterGLNPasses class
+ */
 class FilterGLNPasses: public FilterGL
 {
 protected:
-    bool bSameImageSize;
-
-    //same size image
     ImageGL *imgAllocated;
-    ImageGL *imgTmp[2];
+    ImageGL *imgTmpSame[2];
+    ImageGLVec imgTmp;
 
-    //different size image
-    ImageGLVec imgTmpVec;
+    /**
+     * @brief ProcessAbstract
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param frames
+     * @param channels
+     * @return
+     */
+    bool ProcessAbstract(ImageGLVec imgIn, int &width, int &height, int &frames, int &channels);
+
+    /**
+     * @brief PreProcess
+     * @param imgIn
+     * @param imgOut
+     */
+    virtual void PreProcess(ImageGLVec imgIn, ImageGL *imgOut){}
+
+    /**
+     * @brief setupAuxNGen
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *setupAuxNGen(ImageGLVec imgIn, ImageGL *imgOut);
+
+    /**
+     * @brief setupAuxNSame
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *setupAuxNSame(ImageGLVec imgIn, ImageGL *imgOut);
+
+    /**
+     * @brief getFilter
+     * @param i
+     * @return
+     */
+    virtual FilterGL* getFilter(int i);
+
+    /**
+     * @brief getIterations
+     * @return
+     */
+    virtual int getIterations();
+
+    /**
+     * @brief release
+     */
+    void release();
 
 public:
+
     /**
      * @brief FilterGLNPasses
      */
     FilterGLNPasses();
 
     ~FilterGLNPasses();
-
-    /**
-     * @brief setupAuxN
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    virtual ImageGL *setupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
-
-    /**
-     * @brief insertFilter
-     * @param flt
-     */
-    void insertFilter(FilterGL *flt);
 
     /**
      * @brief getFbo
@@ -72,6 +109,28 @@ public:
     }
 
     /**
+     * @brief ProcessGen
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *ProcessGen(ImageGLVec imgIn, ImageGL *imgOut);
+
+    /**
+     * @brief ProcessSame
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *ProcessSame(ImageGLVec imgIn, ImageGL *imgOut);
+
+    /**
+     * @brief insertFilter
+     * @param flt
+     */
+    void insertFilter(FilterGL *flt);
+
+    /**
      * @brief Process
      * @param imgIn
      * @param imgOut
@@ -80,24 +139,86 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-PIC_INLINE FilterGLNPasses::FilterGLNPasses(): FilterGL()
+PIC_INLINE FilterGLNPasses::FilterGLNPasses() : FilterGL()
 {
-    bSameImageSize = true;
     imgAllocated = NULL;
-    imgTmp[0] = imgTmp[1] = NULL;
+
+    for(int i = 0; i < 2; i++) {
+        imgTmpSame[i] = NULL;
+    }
+
     target = GL_TEXTURE_2D;
 }
 
 PIC_INLINE FilterGLNPasses::~FilterGLNPasses()
+{
+    release();
+}
+
+PIC_INLINE void FilterGLNPasses::release()
 {
     if(imgAllocated != NULL) {
         delete imgAllocated;
         imgAllocated = NULL;
     }
 
-    if(!imgTmpVec.empty()) {
-        imgTmpVec.clear();
+    imgTmpSame[0] = NULL;
+    imgTmpSame[1] = NULL;
+
+    for(unsigned int i = 0; i < imgTmp.size(); i++) {
+        delete imgTmp[i];
     }
+
+    imgTmp.clear();
+
+    filters.clear();
+}
+
+PIC_INLINE FilterGL* FilterGLNPasses::getFilter(int i)
+{
+    int j = i % filters.size();
+    return filters[j];
+}
+
+PIC_INLINE int FilterGLNPasses::getIterations()
+{
+    return int(filters.size());
+}
+
+PIC_INLINE bool FilterGLNPasses::ProcessAbstract(ImageGLVec imgIn, int &width, int &height, int &frames, int &channels)
+{
+    ImageGL *imgIn0 = new ImageGL(imgIn[0], false);
+
+    auto *tmp = imgIn[0];
+    imgIn[0] = imgIn0;
+
+    bool bSame = true;
+    int n = getIterations();
+
+    for(int i = 0; i < n; i++) {
+        auto flt_i = getFilter(i);
+        flt_i->changePass(i, n);
+        flt_i->OutputSize(imgIn, width, height, channels, frames);
+
+        if( (tmp->width != width) ||
+          (tmp->height != height) ||
+          (tmp->channels != channels) ||
+          (tmp->frames != frames) ) {
+            bSame = false;
+        }
+
+        imgIn0->width = width;
+        imgIn0->height = height;
+        imgIn0->channels = channels;
+        imgIn0->frames = frames;
+        imgIn0->allocateAux();
+    }
+
+    imgIn[0] = tmp;
+
+    delete imgIn0;
+
+    return bSame;
 }
 
 PIC_INLINE void FilterGLNPasses::insertFilter(FilterGL *flt)
@@ -106,104 +227,168 @@ PIC_INLINE void FilterGLNPasses::insertFilter(FilterGL *flt)
         return;
     }
 
-    if(flt->filters.size() > 0) {
+    if(!flt->filters.empty()) {
+        printf("\naaaa\n");
         for(unsigned int i = 0; i < flt->filters.size(); i++) {
             insertFilter(flt->filters[i]);
         }
     } else {
-
-#ifdef PIC_DEBUG
-        printf("Add Single Filter\n");
-#endif
         filters.push_back(flt);
     }
 }
 
-PIC_INLINE ImageGL *FilterGLNPasses::setupAuxN(ImageGLVec imgIn, ImageGL *imgOut)
+PIC_INLINE ImageGL *FilterGLNPasses::setupAuxNGen(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
-    if(bSameImageSize) {
-        //output
-        if(imgOut == NULL) {
-            imgOut = imgIn[0]->allocateSimilarOneGL();
-        } else {
-            if(!imgOut->isSimilarType(imgIn[0])) {
-                imgOut = imgIn[0]->allocateSimilarOneGL();
+    int width, height, frames, channels;
+    ProcessAbstract(imgIn, width, height, frames, channels);
+
+    int n = getIterations();
+
+    if(imgTmp.empty()) {
+
+        for(unsigned int i = 0; i < n; i++) {
+            imgTmp.push_back(NULL);
+        }
+    } else {
+        int tw, th, tf, tc;
+
+        filters[0]->OutputSize(imgIn, tw, th, tf, tc);
+
+        if(tw != imgTmp[0]->width ||
+           th != imgTmp[0]->height ||
+           tf != imgTmp[0]->frames ||
+           tc != imgTmp[0]->channels) {
+            imgTmp.clear();
+
+            for(unsigned int i = 0; i < n; i++) {
+                imgTmp.push_back(NULL);
             }
         }
-
-        //temporary buffer
-        if(imgAllocated == NULL) {
-            imgAllocated = imgOut->allocateSimilarOneGL();
-        } else {
-            if(!imgAllocated->isSimilarType(imgIn[0])) {
-                delete imgAllocated;
-                imgAllocated = imgOut->allocateSimilarOneGL();
-            }
-        }
-
-        //temporary + output
-        if((filters.size() % 2) == 0) {
-            imgTmp[0] = imgAllocated;
-            imgTmp[1] = imgOut;
-        } else {
-            imgTmp[0] = imgOut;
-            imgTmp[1] = imgAllocated;
-        }
-    } else {        
     }
 
-    /*
-    if(fbo==NULL)
-    	fbo = new Fbo();
-
-    fbo->create(imgOut->width,imgOut->height,imgOut->frames, false, imgOut->getTexture());
-
-    for(unsigned int i=0;i<filters.size();i++)
-    	filters[i]->setFbo(fbo);*/
+    //output
+    if(imgOut == NULL) {
+        imgOut = new ImageGL(frames, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
+    } else {
+        if(imgOut->height != height ||
+           imgOut->width != width ||
+           imgOut->channels != channels ||
+           imgOut->frames != frames) {
+            imgOut = new ImageGL(frames, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
+        }
+    }
 
     return imgOut;
 }
 
-PIC_INLINE ImageGL *FilterGLNPasses::Process(ImageGLVec imgIn, ImageGL *imgOut)
+PIC_INLINE ImageGL *FilterGLNPasses::setupAuxNSame(ImageGLVec imgIn,
+        ImageGL *imgOut)
 {
-    if(imgIn.size() < 1 || imgIn[0] == NULL || filters.empty()) {
+    if(imgOut == NULL) {
+        imgOut = imgIn[0]->allocateSimilarOneGL();
+    } else {
+        if(!imgOut->isSimilarType(imgIn[0])) {
+            imgOut = imgIn[0]->allocateSimilarOneGL();
+        }
+    }
+
+    if(imgAllocated == NULL) {
+        imgAllocated = imgIn[0]->allocateSimilarOneGL();
+    } else {
+        if(!imgAllocated->isSimilarType(imgIn[0])) {
+            delete imgAllocated;
+            imgAllocated = imgIn[0]->allocateSimilarOneGL();
+        }
+    }
+
+    if((getIterations() % 2) == 0) {
+        imgTmpSame[0] = imgAllocated;
+        imgTmpSame[1] = imgOut;
+    } else {
+        imgTmpSame[0] = imgOut;
+        imgTmpSame[1] = imgAllocated;
+    }
+
+    return imgOut;
+}
+
+PIC_INLINE ImageGL *FilterGLNPasses::ProcessGen(ImageGLVec imgIn, ImageGL *imgOut)
+{
+    if(imgIn.empty() || filters.empty()) {
         return imgOut;
     }
 
-    //allocate FBOs
-    imgOut = setupAuxN(imgIn, imgOut);
+    imgOut = setupAuxNGen(imgIn, imgOut);
 
-    if(bSameImageSize) {
-        filters[0]->changePass(0, int(filters.size()));
-        filters[0]->Process(imgIn, imgTmp[0]);
+    int n = getIterations();
+    int n2 = n - 1;
 
-        for(unsigned int i = 1; i < filters.size(); i++) {
-            filters[i]->changePass(i, int(filters.size()));
-            imgIn[0] = imgTmp[(i + 1) % 2];
-            filters[i]->Process(imgIn, imgTmp[i % 2]);
-        }
-    } else {
-        if(imgTmpVec.empty()) {
-            for(unsigned int i = 0; i < (filters.size() - 1); i++) {
-                imgTmpVec.push_back(NULL);
-            }
+    for(int i = 0; i < n2; i++) {
+        auto flt_i = getFilter(i);
+        flt_i->changePass(i, n);
+        imgTmp[i] = flt_i->Process(imgIn, imgTmp[i]);
 
-            imgTmpVec.push_back(imgOut);
-        }
+        imgIn[0] = imgTmp[i];
+    }
 
-        filters[0]->changePass(0, int(filters.size()));
-        imgTmpVec[0] = filters[0]->Process(imgIn, imgTmpVec[0]);
+    auto flt_n = getFilter(n2);
+    flt_n->changePass(n2, n);
+    imgOut = filters[n2]->Process(imgIn, imgOut);
 
-        for(unsigned int i = 1; i < filters.size(); i++) {
-            filters[i]->changePass(i, int(filters.size()));
+    return imgOut;
+}
 
-            imgIn[0] = imgTmpVec[i - 1];
-            imgTmpVec[i] = filters[i]->Process(imgIn, imgTmpVec[i]);
-        }
+PIC_INLINE ImageGL *FilterGLNPasses::ProcessSame(ImageGLVec imgIn, ImageGL *imgOut)
+{
+    if((imgIn.size() <= 0) || (filters.size() < 1)) {
+        return imgOut;
+    }
+
+    //setup
+    imgOut = setupAuxNSame(imgIn, imgOut);
+
+    int n = getIterations();
+    auto flt_0 = getFilter(0);
+    flt_0->changePass(0, n);
+    flt_0->Process(imgIn, imgTmpSame[0]);
+
+    for(unsigned int i = 1; i < n; i++) {
+        auto flt_i = getFilter(0);
+        flt_i->changePass(i, n);
+
+        imgIn[0] = imgTmpSame[(i + 1) % 2];
+        flt_i->Process(imgIn, imgTmpSame[i % 2]);
     }
 
     return imgOut;
 }
+
+PIC_INLINE ImageGL *FilterGLNPasses::Process(ImageGLVec imgIn,
+        ImageGL *imgOut)
+{
+    PreProcess(imgIn, imgOut);
+
+    int width, height, frames, channels;
+    bool bSame = ProcessAbstract(imgIn, width, height, frames, channels);
+
+    if(bSame) {
+        imgOut = ProcessSame(imgIn, imgOut);
+    } else {
+        imgOut = ProcessGen(imgIn, imgOut);
+    }
+
+    return imgOut;
+}
+
+/*
+if(fbo==NULL)
+    fbo = new Fbo();
+
+fbo->create(imgOut->width,imgOut->height,imgOut->frames, false, imgOut->getTexture());
+
+for(unsigned int i=0;i<filters.size();i++)
+    filters[i]->setFbo(fbo);*/
 
 } // end namespace pic
 

@@ -63,14 +63,15 @@ public:
      */
     void update(Matrix3x3 h, bool bSameSize, bool bCentroid);
 
-
     /**
-     * @brief setupAux
+     * @brief OutputSize
      * @param imgIn
-     * @param imgOut
-     * @return
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
      */
-    ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
+    void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(!bSameSize) {
             FilterWarp2D::computeBoundingBox(h, bCentroid, imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax);
@@ -82,10 +83,22 @@ public:
             bmax[1] = imgIn[0]->height;
         }
 
-        int w = bmax[0] - bmin[0];
-        int h = bmax[1] - bmin[1];
-        int f = imgIn[0]->frames;
-        int c = imgIn[0]->channels;
+        width = bmax[0] - bmin[0];
+        height = bmax[1] - bmin[1];
+        channels = imgIn[0]->channels;
+        frames = imgIn[0]->frames;
+    }
+
+    /**
+     * @brief setupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
+    {       
+        int w, h, c, f;
+        OutputSize(imgIn, w, h, c, f);
 
         if(imgOut == NULL) {
             imgOut = new ImageGL(f, w, h, 1, IMG_GPU, imgIn[0]->getTarget());

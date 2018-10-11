@@ -44,30 +44,6 @@ public:
      * @brief FilterGLGradient
      */
     FilterGLGradient();
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @return
-     */
-    static ImageGL *execute(std::string nameIn, std::string nameOut)
-    {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
-
-        FilterGLGradient filter;
-
-        GLuint testTQ1 = glBeginTimeQuery();
-        ImageGL *imgOut = filter.Process(SingleGL(&imgIn), NULL);
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        printf("Gradient Filter on GPU time: %g ms\n", double(timeVal) / 100000000.0);
-
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-
-        return imgOut;
-    }
 };
 
 FilterGLGradient::FilterGLGradient(): FilterGL()

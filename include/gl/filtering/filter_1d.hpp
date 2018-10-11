@@ -136,12 +136,12 @@ PIC_INLINE void FilterGL1D::changePass(int pass, int tPass)
 {
 
     if(target == GL_TEXTURE_2D) {
-        dirs[  pass % 2 ] = 1;
+        dirs[ pass % 2 ] = 1;
         dirs[(pass + 1) % 2 ] = 0;
     }
 
     if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY) {
-        dirs[  pass % 3 ] = 1;
+        dirs[ pass % 3 ] = 1;
         dirs[(pass + 1) % 3 ] = 0;
         dirs[(pass + 2) % 3 ] = 0;
     }

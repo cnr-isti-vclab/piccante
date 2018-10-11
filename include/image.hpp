@@ -63,12 +63,6 @@ protected:
     void release();
 
     /**
-     * @brief allocateAux computes extra information after allocation;
-     * e.g. strides.
-     */
-    void allocateAux();
-
-    /**
      * @brief setNULL sets buffers values to NULL.
      */
     void setNULL();
@@ -183,6 +177,12 @@ public:
      * @param frames is the number of temporal pixels.
      */
     void allocate(int width, int height, int channels, int frames);
+
+    /**
+     * @brief allocateAux computes extra information after allocation;
+     * e.g. strides.
+     */
+    void allocateAux();
 
     /**
      * @brief copySubImage copies imgIn in the current image.

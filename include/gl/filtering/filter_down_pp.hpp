@@ -41,7 +41,7 @@ public:
      * @brief FilterGLDownPP
      * @param scale
      */
-    FilterGLDownPP(float *value, float threshold);
+    FilterGLDownPP(float *value, float threshold);    
 
     /**
      * @brief update
@@ -51,6 +51,22 @@ public:
     void update(float *value, float threshold);
 
     /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width       = imgIn[0]->width >> 1;
+        height      = imgIn[0]->height >> 1;
+        channels    = imgIn[0]->channels;
+        frames      = imgIn[0]->frames;
+    }
+
+    /**
      * @brief setupAux
      * @param imgIn
      * @param imgOut
@@ -58,10 +74,8 @@ public:
      */
     ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
     {
-        int w = imgIn[0]->width  >> 1;
-        int h = imgIn[0]->height >> 1;
-        int f = imgIn[0]->frames;
-        int c = imgIn[0]->channels;
+        int w, h, c, f;
+        OutputSize(imgIn, w, h, c, f);
 
         if(imgOut == NULL) {
             imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());

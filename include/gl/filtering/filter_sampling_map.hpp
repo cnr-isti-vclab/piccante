@@ -134,6 +134,8 @@ PIC_INLINE void FilterGLSamplingMap::update(float sigma, float scale)
 
 PIC_INLINE FilterGLSamplingMap::~FilterGLSamplingMap()
 {
+    release();
+
     delete filterD;
     delete filterS;
     delete filterG;

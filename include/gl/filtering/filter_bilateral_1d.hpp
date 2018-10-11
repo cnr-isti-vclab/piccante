@@ -55,36 +55,6 @@ public:
      * @param sigma_r
      */
     void update(float sigma_s, float sigma_r);
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma_s
-     * @param sigma_r
-     * @return
-     */
-    static ImageGL *execute(std::string nameIn, std::string nameOut,
-                               float sigma_s, float sigma_r)
-    {
-        GLuint testTQ = glBeginTimeQuery();
-        glEndTimeQuery(testTQ);
-
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
-
-        FilterGLBilateral1D filter(sigma_s, sigma_r, true, GL_TEXTURE_2D);
-
-        GLuint testTQ1 = glBeginTimeQuery();
-        ImageGL *imgOut = filter.Process(SingleGL(&imgIn), NULL);
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        printf("Gaussian 1D Filter on GPU time: %g ms\n",
-               double(timeVal) / 100000000.0);
-
-        imgOut->readFromFBO(filter.getFbo());
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
 };
 
 FilterGLBilateral1D::FilterGLBilateral1D(float sigma_s, float sigma_r,

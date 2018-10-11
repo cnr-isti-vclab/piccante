@@ -70,6 +70,22 @@ public:
     }
 
     /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
+        channels    = 1;
+        frames      = imgIn[0]->frames;
+    }
+
+    /**
      * @brief setupAux
      * @param imgIn
      * @param imgOut
@@ -77,10 +93,8 @@ public:
      */
     ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
     {
-        int w = imgIn[0]->width;
-        int h = imgIn[0]->height;
-        int f = imgIn[0]->frames;
-        int c = 1;
+        int w, h, c, f;
+        OutputSize(imgIn, w, h, c, f);
 
         if(imgOut == NULL) {
             imgOut = new ImageGL(f, w, h, 1, IMG_GPU, imgIn[0]->getTarget());

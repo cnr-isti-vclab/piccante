@@ -33,6 +33,12 @@ class FilterGLGaussian2D: public FilterGLNPasses
 protected:
     FilterGLGaussian1D *filter;
 
+    /**
+     * @brief init
+     * @param sigma
+     */
+    void init(float sigma);
+
 public:
     /**
      * @brief FilterGLGaussian2D
@@ -87,14 +93,15 @@ public:
 
 PIC_INLINE FilterGLGaussian2D::FilterGLGaussian2D(): FilterGLNPasses()
 {
-    target = GL_TEXTURE_2D;
-
-    filter = new FilterGLGaussian1D(1.0f, 0, target);
-    insertFilter(filter);
-    insertFilter(filter);
+    init(1.0f);
 }
 
 PIC_INLINE FilterGLGaussian2D::FilterGLGaussian2D(float sigma): FilterGLNPasses()
+{
+    init(sigma);
+}
+
+PIC_INLINE void FilterGLGaussian2D::init(float sigma)
 {
     target = GL_TEXTURE_2D;
 
@@ -109,6 +116,8 @@ PIC_INLINE FilterGLGaussian2D::~FilterGLGaussian2D()
         delete filter;
         filter = NULL;
     }
+
+    release();
 }
 
 PIC_INLINE void FilterGLGaussian2D::update(float sigma)

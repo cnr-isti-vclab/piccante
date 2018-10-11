@@ -604,7 +604,7 @@ PIC_INLINE ImageGL::ImageGL(Image *img, GLenum target, bool mipmap, bool transfe
     channels = img->channels;
     data     = img->data;
 
-    calculateStrides();
+    allocateAux();
 
     texture = 0;
 
@@ -632,7 +632,7 @@ PIC_INLINE ImageGL::ImageGL(Image *img, bool transferOwnership = false) : Image(
     channels = img->channels;
     data     = img->data;
 
-    calculateStrides();
+    allocateAux();
 
     texture = 0;
 

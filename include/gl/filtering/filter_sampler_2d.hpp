@@ -43,6 +43,22 @@ public:
     FilterGLSampler2D(float scale);
 
     /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width = int(imgIn[0]->widthf  * scale);
+        height = int(imgIn[0]->heightf * scale);
+        channels = imgIn[0]->channels;
+        frames = imgIn[0]->frames;
+    }
+
+    /**
      * @brief setupAux
      * @param imgIn
      * @param imgOut
@@ -50,10 +66,8 @@ public:
      */
     ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
     {
-        int w = int(imgIn[0]->widthf  * scale);
-        int h = int(imgIn[0]->heightf * scale);
-        int f = imgIn[0]->frames;
-        int c = imgIn[0]->channels;
+        int w, h, f, c;
+        OutputSize(imgIn, w, h, c, f);
 
         if(imgOut == NULL) {
             imgOut = new ImageGL(f, w, h, c, IMG_GPU, imgIn[0]->getTarget());
