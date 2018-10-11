@@ -228,7 +228,6 @@ PIC_INLINE void FilterGLNPasses::insertFilter(FilterGL *flt)
     }
 
     if(!flt->filters.empty()) {
-        printf("\naaaa\n");
         for(unsigned int i = 0; i < flt->filters.size(); i++) {
             insertFilter(flt->filters[i]);
         }

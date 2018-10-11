@@ -34,8 +34,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QVBoxLayout>
 #include <QLabel>
 
-#define PIC_DEBUG
-
 #include "piccante.hpp"
 
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
@@ -104,6 +102,10 @@ protected:
 
         //allocate a new anisotropic diffusion filter
         fltAD = new pic::FilterGLAnisotropicDiffusion(sigma_s, sigma_r);
+
+        auto *out = pic::FilterGLSamplingMap::execute(img, NULL, 16.0f);
+        out->loadToMemory();
+        out->Write("testSampling.png");
 
         img_flt_tmo = NULL;
         img_flt = NULL;
