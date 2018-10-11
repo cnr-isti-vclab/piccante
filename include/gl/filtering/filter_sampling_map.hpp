@@ -144,7 +144,7 @@ PIC_INLINE FilterGLSamplingMap::~FilterGLSamplingMap()
 
 PIC_INLINE Fbo *FilterGLSamplingMap::getFbo()
 {
-    if(filters.size() <= 0) {
+    if(filters.empty()) {
         return NULL;
     }
 
