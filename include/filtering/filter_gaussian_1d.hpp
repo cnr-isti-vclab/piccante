@@ -98,6 +98,8 @@ PIC_INLINE FilterGaussian1D::FilterGaussian1D(PrecomputedGaussian *pg, int direc
 
 PIC_INLINE FilterGaussian1D::~FilterGaussian1D()
 {
+    release();
+
     if(pg != NULL && bPgOwned) {
         delete pg;
         pg = NULL;

@@ -40,6 +40,7 @@ struct FilterFData
 
     Image *dst;
     ImageVec src;
+    unsigned int nSrc;
 };
 
 /**
@@ -71,6 +72,7 @@ protected:
         FilterFData f_data;
         f_data.src = src;
         f_data.dst = dst;
+        f_data.nSrc = src.size();
 
         for(int k = box->z0; k < box->z1; k++) {
             f_data.z = k;
@@ -111,6 +113,15 @@ public:
 
     ~Filter()
     {
+        release();
+    }
+
+    /**
+     * @brief release
+     */
+    virtual void release()
+    {
+
     }
 
     /**
@@ -213,11 +224,19 @@ public:
 
 PIC_INLINE Image *Filter::setupAux(ImageVec imgIn, Image *imgOut)
 {
+    int w, h, c, f;
+    OutputSize(imgIn, w, h, c, f);
+
     if(imgOut == NULL) {
-        imgOut = imgIn[0]->allocateSimilarOne();
+        imgOut = new Image(f, w, h, c);
     } else {
-        if(!imgIn[0]->isSimilarType(imgOut)) {
-            imgOut = imgIn[0]->allocateSimilarOne();
+        bool bSame = imgOut->width == w &&
+                     imgOut->height == h &&
+                     imgOut->channels == c &&
+                     imgOut->frames == f;
+
+        if(!bSame) {
+            imgOut = new Image(f, w, h, c);
         }
     }
 
@@ -270,8 +289,12 @@ PIC_INLINE Image *Filter::cachedProcess(ImageVec imgIn, Image *imgOut,
 
 PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
 {
+    if(imgIn.empty()) {
+        return imgOut;
+    }
+
     if(imgIn[0] == NULL) {
-        return NULL;
+        return imgOut;
     }
 
     imgOut = setupAux(imgIn, imgOut);
@@ -306,8 +329,12 @@ PIC_INLINE void Filter::ProcessPAux(ImageVec imgIn, Image *imgOut,
 PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
 {
 #ifndef PIC_DISABLE_THREAD
+    if(imgIn.empty()) {
+        return imgOut;
+    }
+
     if(imgIn[0] == NULL) {
-        return NULL;
+        return imgOut;
     }
 
     imgOut = setupAux(imgIn, imgOut);

@@ -40,12 +40,12 @@ class FilterWLS: public Filter
 {
 protected:
     /**
-     * @brief SingleChannel applies WLS smoothing filter for gray-scale images.
+     * @brief singleChannel applies WLS smoothing filter for gray-scale images.
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SingleChannel(ImageVec imgIn, Image *imgOut)
+    Image *singleChannel(ImageVec imgIn, Image *imgOut)
     {
         Image *L = imgIn[0];
 
@@ -143,12 +143,12 @@ protected:
     }
 
     /**
-     * @brief MultiChannel applies WLS filter for color images.
+     * @brief multiChannel applies WLS filter for color images.
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *MultiChannel(ImageVec imgIn, Image *imgOut)
+    Image *multiChannel(ImageVec imgIn, Image *imgOut)
     {
         Image *img = imgIn[0];
 
@@ -301,7 +301,7 @@ public:
      * @param alpha
      * @param lambda
      */
-    FilterWLS(float alpha, float lambda)
+    FilterWLS(float alpha, float lambda) : Filter()
     {
         update(alpha, lambda);
     }
@@ -345,11 +345,11 @@ public:
 
         imgOut = setupAux(imgIn, imgOut);
 
-        //Convolution
+        //convolution
         if(imgIn[0]->channels == 1) {
-            return SingleChannel(imgIn, imgOut);
+            return singleChannel(imgIn, imgOut);
         } else {
-            return MultiChannel(imgIn, imgOut);
+            return multiChannel(imgIn, imgOut);
         }
     }
 

@@ -30,7 +30,7 @@ class FilterConv1D: public Filter
 {
 protected:
     int dirs[3];
-    float *data;
+    float *data; //NOTE: this an external pointer; NEVER release it!
     int n;
 
     /**

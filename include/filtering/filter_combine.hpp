@@ -30,11 +30,30 @@ class FilterCombine: public Filter
 protected:
 
     /**
+     * @brief f
+     * @param data
+     */
+    virtual void f(FilterFData *data)
+    {
+        int k2 = 0;
+
+        for(unsigned int i = 0; i < data->nSrc; i++) {
+            float *tmp_src = (*data->src[i])(data->x, data->y);
+
+            for(int k = 0; k < data->src[i]->channels; k++) {
+                data->out[k2] = tmp_src[k];
+                k2++;
+            }
+        }
+    }
+
+    /**
      * @brief ProcessBBox
      * @param dst
      * @param src
      * @param box
      */
+    /*
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         for(int p = box->z0; p < box->z1; p++) {
@@ -54,7 +73,7 @@ protected:
                 }
             }
         }
-    }
+    }*/
 
     /**
      * @brief setupAux
@@ -64,15 +83,30 @@ protected:
      */
     Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
-        if(imgOut == NULL) {
-            int channels = 0;
+        int channels = imgIn[0]->channels;
+        for(unsigned int i = 1; i < imgIn.size(); i++) {
+            channels += imgIn[i]->channels;
 
-            for(unsigned int i = 0; i < imgIn.size(); i++) {
-                channels += imgIn[i]->channels;
+            if(!imgIn[0]->isSimilarType(imgIn[i])) {
+                return NULL;
             }
+        }
 
+        if(imgOut == NULL) {
             imgOut = new Image(imgIn[0]->frames, imgIn[0]->width, imgIn[0]->height,
                                   channels);
+        } else {
+            bool bAllocate = false;
+            if(!imgOut->isValid()) {
+                bAllocate = true;
+            } else {
+                bAllocate = imgOut->channels != channels;
+            }
+
+            if(bAllocate) {
+                imgOut = new Image(imgIn[0]->frames, imgIn[0]->width, imgIn[0]->height,
+                        channels);
+            }
         }
 
         return imgOut;
@@ -89,13 +123,13 @@ public:
     }
 
     /**
-     * @brief AddAlpha
+     * @brief addAlpha
      * @param imgIn
      * @param imgOut
      * @param value
      * @return
      */
-    static Image *AddAlpha(Image *imgIn, Image *imgOut, float value)
+    static Image *addAlpha(Image *imgIn, Image *imgOut, float value)
     {
         //create an alpha channel
         Image *alpha = new Image(imgIn->frames, imgIn->width, imgIn->height, 1);

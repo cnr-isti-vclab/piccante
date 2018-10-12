@@ -98,8 +98,8 @@ PIC_INLINE ImageVec *computeImageRectificationWarp(Image *img0,
         }
     }
 
-    warp0.SetBoundingBox(bmin0, bmax0);
-    warp1.SetBoundingBox(bmin1, bmax1);
+    warp0.setBoundingBox(bmin0, bmax0);
+    warp1.setBoundingBox(bmin1, bmax1);
 
     Image *img0_r = NULL;
     Image *img1_r = NULL;

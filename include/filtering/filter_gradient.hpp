@@ -42,14 +42,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *setupAux(ImageVec imgIn, Image *imgOut);
-
 public:
     /**
      * @brief FilterGradient
@@ -100,20 +92,6 @@ public:
         FilterGradient filter(colorChannel, type);
         return filter.ProcessP(Single(imgIn), imgOut);
     }
-
-    /**
-     * @brief execute
-     * @param fileInput
-     * @param fileOutput
-     * @return
-     */
-    static Image *execute(std::string fileInput, std::string fileOutput)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterGradient::execute(&imgIn, NULL);
-        out->Write(fileOutput);
-        return out;
-    }
 };
 
 PIC_INLINE FilterGradient::FilterGradient() : Filter()
@@ -156,16 +134,6 @@ PIC_INLINE void FilterGradient::setup(int colorChannel,
     break;
 
     }
-}
-
-PIC_INLINE Image *FilterGradient::setupAux(ImageVec imgIn,
-        Image *imgOut)
-{
-    if(imgOut == NULL) {
-        imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
-    }
-
-    return imgOut;
 }
 
 PIC_INLINE void FilterGradient::ProcessBBox(Image *dst, ImageVec src,

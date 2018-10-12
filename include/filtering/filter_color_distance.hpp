@@ -82,8 +82,15 @@ protected:
 
     Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
+        int w, h, c, f;
+        OutputSize(imgIn, w, h, c, f);
+
         if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
+            imgOut = new Image(f, w, h, c);
+        } else {
+            if(!imgOut->isSimilarType(imgIn[0])) {
+                imgOut = new Image(f, w, h, c);
+            }
         }
 
         return imgOut;
@@ -98,9 +105,15 @@ public:
      */
     FilterColorDistance(float *color, float sigma) : Filter()
     {
+        update(color, sigma);
     }
 
-    void setup(float *color, float sigma)
+    /**
+     * @brief update
+     * @param color
+     * @param sigma
+     */
+    void update(float *color, float sigma)
     {
         if(color != NULL) {
             this->color = color;
@@ -109,6 +122,22 @@ public:
         sigma = sigma > 0.0f ? sigma : 1.0f;
         this->sigma = sigma;
         sigma_sq_2 = sigma * sigma * 2.0f;
+    }
+
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width = imgIn[0]->width;
+        height = imgIn[0]->height;
+        channels = 1;
+        frames = imgIn[0]->frames;
     }
 
     /**
@@ -124,23 +153,6 @@ public:
     {
         FilterColorDistance fltColDst(color, sigma);
         return fltColDst.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief execute
-     * @param fileInput
-     * @param fileOutput
-     * @param color
-     * @param sigma
-     * @return
-     */
-    static Image *execute(std::string fileInput, std::string fileOutput,
-                             float *color, float sigma)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterColorDistance::execute(&imgIn, NULL, color, sigma);
-        out->Write(fileOutput);
-        return out;
     }
 };
 

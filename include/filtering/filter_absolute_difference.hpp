@@ -43,29 +43,6 @@ protected:
         }
     }
 
-    /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *setupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgIn.size() < 2) {
-            return NULL;
-        }
-
-        if(imgOut == NULL) {
-            imgOut = imgIn[0]->allocateSimilarOne();
-        } else {
-            if(!imgIn[0]->isSimilarType(imgOut)) {
-                imgOut = imgIn[0]->allocateSimilarOne();
-            }
-        }
-
-        return imgOut;
-    }
-
 public:
 
     /**

@@ -35,11 +35,11 @@ protected:
     SIGMOID_MODE type;
 
     /**
-     * @brief CalculateEpsilon
+     * @brief calculateEpsilon
      * @param imgIn
      * @return
      */
-    float CalculateEpsilon(ImageVec imgIn);
+    float calculateEpsilon(ImageVec imgIn);
 
     /**
      * @brief ProcessBBox
@@ -48,14 +48,6 @@ protected:
      * @param box
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
-
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
 
 public:
     /**
@@ -75,6 +67,26 @@ public:
                      bool temporal);
 
     /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        if(epsilon <= 0.0f || temporal) {
+            epsilon = calculateEpsilon(imgIn);
+        }
+
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
+        channels    = imgIn[0]->channels;
+        frames      = imgIn[0]->frames;
+    }
+
+    /**
      * @brief execute
      * @param imgIn
      * @param imgOut
@@ -85,23 +97,9 @@ public:
         FilterSigmoidTMO filter;
         return filter.ProcessP(Single(imgIn), imgOut);
     }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @return
-     */
-    static Image *execute(std::string nameIn, std::string nameOut)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = execute(&imgIn, NULL);
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
 };
 
-PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO()
+PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO() : Filter()
 {
     type = SIG_TMO;
     alpha = 0.18f;
@@ -112,7 +110,7 @@ PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO()
 }
 
 PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO(SIGMOID_MODE type, float alpha,
-                                   float wp = 1e9f, float epsilon = -1.0f, bool temporal = false)
+                                   float wp = 1e9f, float epsilon = -1.0f, bool temporal = false) : Filter()
 {
     this->type = type;
     this->alpha = alpha;
@@ -123,7 +121,7 @@ PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO(SIGMOID_MODE type, float alpha,
     this->temporal = temporal;
 }
 
-PIC_INLINE float FilterSigmoidTMO::CalculateEpsilon(ImageVec imgIn)
+PIC_INLINE float FilterSigmoidTMO::calculateEpsilon(ImageVec imgIn)
 {
     float tmpEpsilon, retEpsilon;
 
@@ -155,19 +153,6 @@ PIC_INLINE float FilterSigmoidTMO::CalculateEpsilon(ImageVec imgIn)
     }
 
     return retEpsilon;
-}
-
-PIC_INLINE Image *FilterSigmoidTMO::SetupAux(ImageVec imgIn, Image *imgOut)
-{
-    if(epsilon <= 0.0f || temporal) {
-        epsilon = CalculateEpsilon(imgIn);
-    }
-
-    if(imgOut == NULL) {
-        imgOut = imgIn[0]->allocateSimilarOne();
-    }
-
-    return imgOut;
 }
 
 PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)

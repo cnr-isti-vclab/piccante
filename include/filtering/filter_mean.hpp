@@ -31,9 +31,9 @@ class FilterMean: public FilterNPasses
 protected:
 
 protected:
-    FilterConv1D    *filter;
-    float           *data;
-    int             size;    
+    FilterConv1D *filter;
+    float *data; //NOTE: we own this; so it can be deleted!
+    int size;
 
 public:
 
@@ -77,8 +77,11 @@ public:
 
         if(this->size != size) {
             this->size = size;
-            if( data != NULL)
+
+            if( data != NULL) {
                 delete[] data;
+                data = NULL;
+            }
 
             data = FilterConv1D::getKernelMean(size);
         }        

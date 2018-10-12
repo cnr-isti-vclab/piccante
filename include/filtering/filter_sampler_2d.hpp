@@ -45,14 +45,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *setupAux(ImageVec imgIn, Image *imgOut);
-
 public:
     /**
      * @brief FilterSampler2D
@@ -88,7 +80,7 @@ public:
     void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(swh) {
-            width = int(imgIn[0]->widthf * scaleX);
+            width  = int(imgIn[0]->widthf  * scaleX);
             height = int(imgIn[0]->heightf * scaleY);
         } else {
             width = this->width;
@@ -192,28 +184,6 @@ PIC_INLINE FilterSampler2D::FilterSampler2D(int width, int height,
     } else {
         this->isb = isb;
     }
-}
-
-PIC_INLINE Image *FilterSampler2D::setupAux(ImageVec imgIn,
-        Image *imgOut)
-{
-    if(imgOut == NULL) {
-        if(swh) {
-            imgOut = new Image(  imgIn[0]->frames, 
-                                 int(imgIn[0]->widthf  * scaleX),
-                                 int(imgIn[0]->heightf * scaleY),
-                                 imgIn[0]->channels);
-        } else {
-            imgOut = new Image(imgIn[0]->frames, width, height, imgIn[0]->channels);
-        }
-    }
-
-    if(!swh) {
-        scaleX = float(width)  / imgIn[0]->widthf;
-        scaleY = float(height) / imgIn[0]->heightf;
-    }
-
-    return imgOut;
 }
 
 PIC_INLINE void FilterSampler2D::ProcessBBox(Image *dst, ImageVec src,

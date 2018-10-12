@@ -83,26 +83,6 @@ protected:
         }
     }
 
-    /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *setupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width >> 1, imgIn[0]->height >> 1, imgIn[0]->channels);
-        } else {
-            if(((imgIn[0]->width  >> 1) != imgOut->width )  ||
-               ((imgIn[0]->height >> 1) != imgOut->height) ) {
-                imgOut = new Image(1, imgIn[0]->width >> 1, imgIn[0]->height >> 1, imgIn[0]->channels);
-            }
-        }
-
-        return imgOut;
-    }
-
     float *value, threshold;
 
 public:
@@ -188,20 +168,6 @@ public:
     {
         FilterDownPP flt(NULL, 1e-3f);
         return flt.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief execute
-     * @param fileInput
-     * @param fileOutput
-     * @return
-     */
-    static Image *execute(std::string fileInput, std::string fileOutput)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterDownPP::execute(&imgIn, NULL);
-        out->Write(fileOutput);
-        return out;
     }
 };
 

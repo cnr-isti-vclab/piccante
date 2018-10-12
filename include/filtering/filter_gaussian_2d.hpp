@@ -50,6 +50,7 @@ public:
 
         if(gaussianFilter != NULL) {
             delete gaussianFilter;
+            gaussianFilter = NULL;
         }
     }
 

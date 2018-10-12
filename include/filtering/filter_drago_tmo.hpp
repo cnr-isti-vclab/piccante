@@ -41,14 +41,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *setupAux(ImageVec imgIn, Image *imgOut);
-
 public:
     /**
      * @brief FilterDragoTMO
@@ -119,22 +111,6 @@ PIC_INLINE void FilterDragoTMO::update(float Ld_Max, float b, float Lw_Max,
 
     constant1 = logf(b) / logf(0.5f);
     constant2 = (Ld_Max / 100.0f) / (log10f(1.0f + Lw_Max_scaled));
-}
-
-PIC_INLINE Image *FilterDragoTMO::setupAux(ImageVec imgIn, Image *imgOut)
-{
-    if(imgIn.size() < 2) {
-        #ifdef PIC_DEBUG
-            printf("ERROR: FilterDragoTMO::setupAux");
-        #endif
-        return imgOut;
-    }
-
-    if(imgOut == NULL) {
-        imgOut = imgIn[0]->allocateSimilarOne();
-    }
-
-    return imgOut;
 }
 
 PIC_INLINE void FilterDragoTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)

@@ -31,14 +31,6 @@ protected:
     int colorChannel;
 
     /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *setupAux(ImageVec imgIn, Image *imgOut);
-
-    /**
      * @brief ProcessBBox
      * @param dst
      * @param src
@@ -98,15 +90,6 @@ PIC_INLINE void FilterNormal::update(int colorChannel)
     }
 
     this->colorChannel = colorChannel;
-}
-
-PIC_INLINE Image *FilterNormal::setupAux(ImageVec imgIn, Image *imgOut)
-{
-    if(imgOut == NULL) {
-        imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
-    }
-
-    return imgOut;
 }
 
 PIC_INLINE void FilterNormal::ProcessBBox(Image *dst, ImageVec src, BBox *box)

@@ -160,7 +160,6 @@ PIC_INLINE void FilterNPasses::release()
     imgTmpSame[0] = NULL;
     imgTmpSame[1] = NULL;
 
-    stdVectorClear<Filter>(filters);
     stdVectorClear<Image>(imgTmp);
 }
 

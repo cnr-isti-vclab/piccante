@@ -30,21 +30,6 @@ class FilterDemosaic: public Filter
 protected:
 
     /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *setupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
-        }
-
-        return imgOut;
-    }
-
-    /**
      * @brief LinearUpSamplingGCGreen this upsamples the green channel with gradient correction
      * @param imgIn
      * @param imgOut
@@ -297,7 +282,6 @@ public:
         }
 
         imgOut = setupAux(imgIn, imgOut);
-
 
         LinearUpSamplingGCGreen(imgIn[0], imgOut);
         LinearUpSamplingGCRB(imgIn[0], imgOut, 0, 0);

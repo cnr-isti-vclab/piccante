@@ -72,12 +72,14 @@ public:
     FilterCrop(Vec3f min, Vec3f max);
 
     /**
-     * @brief setupAux
+     * @brief OutputSize
      * @param imgIn
-     * @param imgOut
-     * @return
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
      */
-    Image *setupAux(ImageVec imgIn, Image *imgOut);
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames);
 
     /**
      * @brief execute
@@ -110,23 +112,6 @@ public:
     }
 
     /**
-     * @brief execute
-     * @param fileInput
-     * @param fileOutput
-     * @param min
-     * @param max
-     * @return
-     */
-    static Image *execute(std::string fileInput, std::string fileOutput,
-                             Vec2i min, Vec2i max)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterCrop::execute(&imgIn, NULL, min, max);
-        out->Write(fileOutput);
-        return out;
-    }
-
-    /**
      * @brief test
      */
     static void test()
@@ -138,21 +123,21 @@ public:
 
         Image *out = flt.Process(Single(&img), NULL);
 
-        out->Write("test_crop_2d_output.pfm");
+        out->Write("test_crop_2d_output.png");
     }
 };
 
 PIC_INLINE FilterCrop::FilterCrop(Vec2i min, Vec2i max) : Filter()
 {
-    maxi[0] = max[0];
-    maxi[1] = max[1];
-    maxi[2] = 1;
-    maxi[3] = INT_MAX;
-
     mini[0] = min[0];
     mini[1] = min[1];
     mini[2] = 0;
     mini[3] = 0;
+
+    maxi[0] = max[0];
+    maxi[1] = max[1];
+    maxi[2] = 1;
+    maxi[3] = INT_MAX;
 
     flag = false;
 }
@@ -160,20 +145,20 @@ PIC_INLINE FilterCrop::FilterCrop(Vec2i min, Vec2i max) : Filter()
 PIC_INLINE FilterCrop::FilterCrop(Vec3i min, Vec3i max) : Filter()
 {
     for(int i = 0; i < 3; i++) {
-        this->maxi[i] = max[i];
         this->mini[i] = min[i];
+        this->maxi[i] = max[i];
     }
 
-    maxi[3] = INT_MAX;
     mini[3] = 0;
+    maxi[3] = INT_MAX;
 
     flag = false;
 }
 
 PIC_INLINE FilterCrop::FilterCrop(Vec4i min, Vec4i max) : Filter()
 {
-    this->maxi = max;
     this->mini = min;
+    this->maxi = max;
 
     flag = false;
 }
@@ -186,53 +171,50 @@ PIC_INLINE FilterCrop::FilterCrop(Vec3f min, Vec3f max) : Filter()
     flag = true;
 }
 
-PIC_INLINE Image *FilterCrop::setupAux(ImageVec imgIn, Image *imgOut)
+PIC_INLINE void FilterCrop::OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
 {
     if(flag) {
-        maxi[0] = int(maxf[0] * imgIn[0]->widthf);
-        maxi[1] = int(maxf[1] * imgIn[0]->heightf);
-        maxi[2] = int(maxf[2] * imgIn[0]->framesf);
-
         mini[0] = int(minf[0] * imgIn[0]->widthf);
         mini[1] = int(minf[1] * imgIn[0]->heightf);
         mini[2] = int(minf[2] * imgIn[0]->framesf);
+
+        maxi[0] = int(maxf[0] * imgIn[0]->widthf);
+        maxi[1] = int(maxf[1] * imgIn[0]->heightf);
+        maxi[2] = int(maxf[2] * imgIn[0]->framesf);
     }
 
-    if(imgOut == NULL) {
-        int channels = MIN(imgIn[0]->channels, maxi[3]) - mini[3];
+    channels = MIN(imgIn[0]->channels, maxi[3]) - mini[3];
 
-        if(mini[3] > 0) {
-            channels++;
-        }
-
-        int delta[3];
-
-        for(int i = 0; i < 3; i++) {
-            delta[i] = maxi[i] - mini[i];
-        }
-
-        if(delta[0] <= 0) {
-            delta[0] = imgIn[0]->width;
-            maxi[0]  = imgIn[0]->width;
-            mini[0]  = 0;
-        }
-
-        if(delta[1] <= 0) {
-            delta[1] = imgIn[0]->height;
-            maxi[1]  = imgIn[0]->height;
-            mini[1]  = 0;
-        }
-
-        if(delta[2] <= 0) {
-            delta[2] = imgIn[0]->frames;
-            maxi[2]  = imgIn[0]->frames;
-            mini[2]  = 0;
-        }
-
-        imgOut = new Image(delta[2], delta[0], delta[1], channels);
+    if(mini[3] > 0) {
+        channels++;
     }
 
-    return imgOut;
+    int delta[3];
+    for(int i = 0; i < 3; i++) {
+        delta[i] = maxi[i] - mini[i];
+    }
+
+    if(delta[0] <= 0) {
+        delta[0] = imgIn[0]->width;
+        mini[0]  = 0;
+        maxi[0]  = imgIn[0]->width;
+    }
+
+    if(delta[1] <= 0) {
+        delta[1] = imgIn[0]->height;
+        mini[1]  = 0;
+        maxi[1]  = imgIn[0]->height;
+    }
+
+    if(delta[2] <= 0) {
+        delta[2] = imgIn[0]->frames;
+        mini[2]  = 0;
+        maxi[2]  = imgIn[0]->frames;
+    }
+
+    width = delta[0];
+    height = delta[1];
+    frames = delta[2];
 }
 
 PIC_INLINE void FilterCrop::ProcessBBox(Image *dst, ImageVec src, BBox *box)

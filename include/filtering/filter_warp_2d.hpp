@@ -73,47 +73,6 @@ protected:
         }
     }
 
-    /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *setupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut != NULL) {
-            return imgOut;
-        }
-
-        if(bCentroid) {
-            mid[0] = imgIn[0]->widthf  * 0.5f;
-            mid[1] = imgIn[0]->heightf * 0.5f;
-        } else {
-            mid[0] = 0.0f;
-            mid[1] = 0.0f;
-        }
-
-        if(!bSameSize) {
-            if(this->bComputeBoundingBox) {
-                computeBoundingBox(h, bCentroid,
-                                   imgIn[0]->widthf, imgIn[0]->heightf,
-                                   bmin, bmax);
-            }
-
-            imgOut = new Image(1, bmax[0] - bmin[0], bmax[1] - bmin[1], imgIn[0]->channels);
-        } else {
-            bmin[0] = 0;
-            bmin[1] = 0;
-
-            bmax[0] = imgIn[0]->width;
-            bmax[1] = imgIn[0]->height;
-
-            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, imgIn[0]->channels);
-        }
-
-        return imgOut;
-    }    
-
     bool bSameSize, bCentroid;
 
 public:
@@ -228,7 +187,7 @@ public:
         }
     }
 
-    void SetBoundingBox(int *bmin, int *bmax)
+    void setBoundingBox(int *bmin, int *bmax)
     {
         memcpy(this->bmin, bmin, sizeof(int) * 2);
         memcpy(this->bmax, bmax, sizeof(int) * 2);
@@ -262,6 +221,14 @@ public:
      */
     void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
+        if(bCentroid) {
+            mid[0] = imgIn[0]->widthf  * 0.5f;
+            mid[1] = imgIn[0]->heightf * 0.5f;
+        } else {
+            mid[0] = 0.0f;
+            mid[1] = 0.0f;
+        }
+
         if(!bSameSize) {
             if(this->bComputeBoundingBox) {
                 computeBoundingBox(h, bCentroid,
@@ -275,7 +242,7 @@ public:
             width  = imgIn[0]->width;
             height = imgIn[0]->height;
         }
-\
+
         frames   = imgIn[0]->frames;
         channels = imgIn[0]->channels;
     }

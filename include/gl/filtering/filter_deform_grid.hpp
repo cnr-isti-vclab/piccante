@@ -47,6 +47,13 @@ public:
      */
     FilterGLDeformGrid(Image *grid_move);
 
+    ~FilterGLDeformGrid();
+
+    /**
+     * @brief releaseAux
+     */
+    void releaseAux();
+
     /**
      * @brief update
      * @param type
@@ -82,6 +89,24 @@ PIC_INLINE FilterGLDeformGrid::FilterGLDeformGrid(Image *grid_move): FilterGL()
     param.push_back(grid_diff_gl);
 
     initShaders();
+}
+
+PIC_INLINE FilterGLDeformGrid::~FilterGLDeformGrid()
+{
+    release();
+}
+
+PIC_INLINE void FilterGLDeformGrid::releaseAux()
+{
+    if(grid_rest != NULL) {
+        delete grid_rest;
+        grid_rest = NULL;
+    }
+
+    if(grid_diff_gl != NULL) {
+        delete grid_diff_gl;
+        grid_diff_gl = NULL;
+    }
 }
 
 PIC_INLINE void FilterGLDeformGrid::initShaders()

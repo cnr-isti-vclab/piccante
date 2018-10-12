@@ -38,14 +38,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *setupAux(ImageVec imgIn, Image *imgOut);
-
 public:
 
     /**
@@ -98,16 +90,6 @@ PIC_INLINE FilterGradientHarrisOPT::FilterGradientHarrisOPT(int colorChannel) : 
 PIC_INLINE void FilterGradientHarrisOPT::setup(int colorChannel)
 {
     this->colorChannel = colorChannel;
-}
-
-PIC_INLINE Image *FilterGradientHarrisOPT::setupAux(ImageVec imgIn,
-        Image *imgOut)
-{
-    if(imgOut == NULL) {
-        imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
-    }
-
-    return imgOut;
 }
 
 PIC_INLINE void FilterGradientHarrisOPT::ProcessBBox(Image *dst, ImageVec src,

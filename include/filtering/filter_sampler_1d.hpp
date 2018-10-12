@@ -50,24 +50,16 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *setupAux(ImageVec imgIn, Image *imgOut);
-
-    /**
      * @brief SetDirection
      * @param direction
      */
     void SetDirection(int direction);
 
     /**
-     * @brief SetImageSampler
+     * @brief setImageSampler
      * @param isb
      */
-    void SetImageSampler(ImageSampler *isb);
+    void setImageSampler(ImageSampler *isb);
 
 public:
     /**
@@ -165,7 +157,7 @@ PIC_INLINE void FilterSampler1D::update(float scale, int direction,
     this->swh   = true;
 
     SetDirection(direction);
-    SetImageSampler(isb);
+    setImageSampler(isb);
 }
 
 PIC_INLINE void FilterSampler1D::update(int size, int direction,
@@ -175,7 +167,7 @@ PIC_INLINE void FilterSampler1D::update(int size, int direction,
     this->swh  = false;
 
     SetDirection(direction);
-    SetImageSampler(isb);
+    setImageSampler(isb);
 }
 
 PIC_INLINE void FilterSampler1D::SetDirection(int direction = 0)
@@ -185,7 +177,7 @@ PIC_INLINE void FilterSampler1D::SetDirection(int direction = 0)
     dirs[(direction + 2) % 3] = 0;
 }
 
-PIC_INLINE void FilterSampler1D::SetImageSampler(ImageSampler *isb)
+PIC_INLINE void FilterSampler1D::setImageSampler(ImageSampler *isb)
 {
     if(isb == NULL) {
         if(this->isb == NULL) {
@@ -194,29 +186,6 @@ PIC_INLINE void FilterSampler1D::SetImageSampler(ImageSampler *isb)
     } else {
         this->isb = isb;
     }
-}
-
-PIC_INLINE Image *FilterSampler1D::setupAux(ImageVec imgIn,
-        Image *imgOut)
-{
-    if(imgOut == NULL) {
-        if(swh) {
-            float scaleX = (dirs[X_DIRECTION] == 1) ? scale : 1.0f;
-            float scaleY = (dirs[Y_DIRECTION] == 1) ? scale : 1.0f;
-
-            imgOut = new Image(  imgIn[0]->frames,
-                                 int(imgIn[0]->widthf  * scaleX),
-                                 int(imgIn[0]->heightf * scaleY),
-                                 imgIn[0]->channels);
-        } else {
-            int nWidth  = (dirs[X_DIRECTION] == 1) ? size : imgIn[0]->width;
-            int nHeight = (dirs[Y_DIRECTION] == 1) ? size : imgIn[0]->height;
-
-            imgOut = new Image(imgIn[0]->frames, nWidth, nHeight, imgIn[0]->channels);
-        }
-    }
-
-    return imgOut;
 }
 
 PIC_INLINE void FilterSampler1D::ProcessBBox(Image *dst, ImageVec src,

@@ -62,47 +62,6 @@ protected:
         }
     }
 
-    /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *setupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
-        } else {
-            if((imgIn[0]->width  != imgOut->width)  ||
-               (imgIn[0]->height != imgOut->height) ||
-               (imgOut->channels != 1)) {
-                imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
-            }
-        }
-
-        bool bChannels = (weights_size != imgIn[0]->channels);
-        if( bChannels && (type == LT_MEAN) )
-        {
-            weights_size = imgIn[0]->channels;
-
-            if(weights != NULL) {
-                delete[] weights;
-            }
-
-            weights = new float [weights_size];
-            Array<float>::assign(1.0f / imgIn[0]->channelsf, weights, imgIn[0]->channels);
-        } else {
-            if(bChannels) {
-                weights = new float [1];
-                weights[0] = 1.0f;
-
-                type = LT_PASS_THROUGH;
-            }
-        }
-
-        return imgOut;
-    }
-
 public:
 
     /**
@@ -190,6 +149,25 @@ public:
         height      = imgIn[0]->height;
         channels    = 1;
         frames      = imgIn[0]->frames;
+
+        bool bChannels = (weights_size != imgIn[0]->channels);
+        if( bChannels && (type == LT_MEAN) ) {
+            weights_size = imgIn[0]->channels;
+
+            if(weights != NULL) {
+                delete[] weights;
+            }
+
+            weights = new float [weights_size];
+            Array<float>::assign(1.0f / imgIn[0]->channelsf, weights, imgIn[0]->channels);
+        } else {
+            if(bChannels) {
+                weights = new float [1];
+                weights[0] = 1.0f;
+
+                type = LT_PASS_THROUGH;
+            }
+        }
     }
 
     /**

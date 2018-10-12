@@ -57,26 +57,6 @@ protected:
         }
     }
 
-    /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *setupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgIn.size() < 2) {
-            return imgOut;
-        }
-
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[1]->width, imgIn[1]->height, imgIn[0]->channels);
-        }
-
-        return imgOut;
-    }
-
-
 public:
     /**
      * @brief FilterReconstruct
