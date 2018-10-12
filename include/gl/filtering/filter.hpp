@@ -74,15 +74,30 @@ public:
         release();
     }
 
+    /**
+     * @brief release
+     */
     void release()
     {
         if(quad != NULL) {
             delete quad;
+            quad = NULL;
         }
 
         if(fbo != NULL) {
             delete fbo;
+            fbo = NULL;
         }
+
+        releaseAux();
+    }
+
+    /**
+     * @brief releaseAux
+     */
+    virtual void releaseAux()
+    {
+
     }
 
     /**

@@ -42,6 +42,38 @@ inline void filterInliers(std::vector< T > &vec, std::vector< unsigned int > &in
     }
 }
 
+/**
+ * @brief stdVectorClear
+ * @param vec
+ */
+template<class T>
+inline void stdVectorClear(std::vector<T *> &vec)
+{
+    for(unsigned int i = 0; i < vec.size(); i++) {
+        T *tmp = vec[i];
+        delete tmp;
+    }
+
+    vec.clear();
+}
+
+/**
+ * @brief setToANullVector
+ * @param vec
+ * @param n
+ */
+template<class T>
+inline void setToANullVector(std::vector< T* > &vec, unsigned int n)
+{
+    if(!vec.empty()) {
+        return;
+    }
+
+    for(unsigned int i = 0; i < n; i++) {
+        vec.push_back(NULL);
+    }
+}
+
 } // end namespace pic
 
 #endif // PIC_UTIL_STD_UTIL_HPP

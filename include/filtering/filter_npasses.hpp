@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_NPASSES_HPP
 #define PIC_FILTERING_FILTER_NPASSES_HPP
 
+#include "../util/std_util.hpp"
+
 #include "../filtering/filter.hpp"
 
 namespace pic {
@@ -158,11 +160,8 @@ PIC_INLINE void FilterNPasses::release()
     imgTmpSame[0] = NULL;
     imgTmpSame[1] = NULL;
 
-    for(unsigned int i = 0; i < imgTmp.size(); i++) {
-        delete imgTmp[i];
-    }
-
-    imgTmp.clear();
+    stdVectorClear<Filter>(filters);
+    stdVectorClear<Image>(imgTmp);
 }
 
 PIC_INLINE Filter* FilterNPasses::getFilter(int i)
@@ -225,10 +224,7 @@ PIC_INLINE Image *FilterNPasses::setupAuxNGen(ImageVec imgIn,
     int n = getIterations();
 
     if(imgTmp.empty()) {
-
-        for(unsigned int i = 0; i < n; i++) {
-            imgTmp.push_back(NULL);
-        }
+        setToANullVector<Image>(imgTmp, n);
     } else {
         int tw, th, tf, tc;
 
@@ -238,11 +234,10 @@ PIC_INLINE Image *FilterNPasses::setupAuxNGen(ImageVec imgIn,
            th != imgTmp[0]->height ||
            tf != imgTmp[0]->frames ||
            tc != imgTmp[0]->channels) {
-            imgTmp.clear();
 
-            for(unsigned int i = 0; i < n; i++) {
-                imgTmp.push_back(NULL);
-            }
+            stdVectorClear<Image>(imgTmp);
+
+            setToANullVector<Image>(imgTmp, n);
         }
     }
 
@@ -254,7 +249,7 @@ PIC_INLINE Image *FilterNPasses::setupAuxNGen(ImageVec imgIn,
            imgOut->width != width ||
            imgOut->channels != channels ||
            imgOut->frames != frames) {
-            imgOut = new Image(frames, width, height, channels);
+           imgOut = new Image(frames, width, height, channels);
         }
     }
 

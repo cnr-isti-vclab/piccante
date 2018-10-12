@@ -57,6 +57,8 @@ public:
      */
     FilterGLIterative(FilterGL *flt, int iterations);
 
+    ~FilterGLIterative();
+
     /**
      * @brief update
      * @param flt
@@ -68,6 +70,11 @@ public:
 PIC_INLINE FilterGLIterative::FilterGLIterative(FilterGL *flt, int iterations) : FilterGLNPasses()
 {
     update(flt, iterations);
+}
+
+PIC_INLINE FilterGLIterative::~FilterGLIterative()
+{
+    release();
 }
 
 PIC_INLINE void FilterGLIterative::update(FilterGL *flt, int iterations)

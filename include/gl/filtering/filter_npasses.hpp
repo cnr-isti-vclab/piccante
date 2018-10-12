@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../base.hpp"
 
+#include "../../util/std_util.hpp"
+
 #include "../../util/array.hpp"
 
 #include "../../util/gl/fbo.hpp"
@@ -75,9 +77,9 @@ protected:
     virtual int getIterations();
 
     /**
-     * @brief release
+     * @brief releaseAux
      */
-    void release();
+    void releaseAux();
 
     /**
      * @brief ProcessGen
@@ -154,7 +156,7 @@ PIC_INLINE FilterGLNPasses::~FilterGLNPasses()
     release();
 }
 
-PIC_INLINE void FilterGLNPasses::release()
+PIC_INLINE void FilterGLNPasses::releaseAux()
 {
     if(imgAllocated != NULL) {
         delete imgAllocated;
@@ -164,13 +166,7 @@ PIC_INLINE void FilterGLNPasses::release()
     imgTmpSame[0] = NULL;
     imgTmpSame[1] = NULL;
 
-    for(unsigned int i = 0; i < imgTmp.size(); i++) {
-        delete imgTmp[i];
-    }
-
-    imgTmp.clear();
-
-    filters.clear();
+    stdVectorClear<ImageGL>(imgTmp);
 }
 
 PIC_INLINE FilterGL* FilterGLNPasses::getFilter(int i)
@@ -234,10 +230,7 @@ PIC_INLINE ImageGL *FilterGLNPasses::setupAuxNGen(ImageGLVec imgIn,
     int n = getIterations();
 
     if(imgTmp.empty()) {
-
-        for(unsigned int i = 0; i < n; i++) {
-            imgTmp.push_back(NULL);
-        }
+        setToANullVector<ImageGL>(imgTmp, n);
     } else {
         int tw, th, tf, tc;
 
@@ -247,11 +240,9 @@ PIC_INLINE ImageGL *FilterGLNPasses::setupAuxNGen(ImageGLVec imgIn,
            th != imgTmp[0]->height ||
            tf != imgTmp[0]->frames ||
            tc != imgTmp[0]->channels) {
-            imgTmp.clear();
+            stdVectorClear<ImageGL>(imgTmp);
 
-            for(unsigned int i = 0; i < n; i++) {
-                imgTmp.push_back(NULL);
-            }
+            setToANullVector<ImageGL>(imgTmp, n);
         }
     }
 

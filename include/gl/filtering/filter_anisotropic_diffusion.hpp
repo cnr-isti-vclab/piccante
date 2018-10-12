@@ -60,6 +60,8 @@ public:
      */
     FilterGLAnisotropicDiffusion(float sigma_s, float sigma_r);
 
+    ~FilterGLAnisotropicDiffusion();
+
     /**
      * @brief update
      * @param k
@@ -119,6 +121,16 @@ PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigm
     //protected values are assigned/computed
     FragmentShader();
     initShaders();
+}
+
+PIC_INLINE FilterGLAnisotropicDiffusion::~FilterGLAnisotropicDiffusion()
+{
+    release();
+
+    if(flt != NULL) {
+        delete flt;
+        flt = NULL;
+    }
 }
 
 PIC_INLINE void FilterGLAnisotropicDiffusion::FragmentShader()

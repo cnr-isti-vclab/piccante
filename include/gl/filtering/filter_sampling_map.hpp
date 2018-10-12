@@ -136,10 +136,21 @@ PIC_INLINE FilterGLSamplingMap::~FilterGLSamplingMap()
 {
     release();
 
-    delete filterD;
-    delete filterS;
-    delete filterG;
-    delete filterG2D;
+    if(filterD != NULL) {
+        delete filterD;
+    }
+
+    if(filterS != NULL) {
+        delete filterS;
+    }
+
+    if(filterG != NULL) {
+        delete filterG;
+    }
+
+    if(filterG2D != NULL) {
+        delete filterG2D;
+    }
 }
 
 PIC_INLINE Fbo *FilterGLSamplingMap::getFbo()
