@@ -167,12 +167,17 @@ PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(int width, int height) : Fil
 
 PIC_INLINE FilterDownSampler2D::~FilterDownSampler2D()
 {
-    for(int i = 0; i < 2; i++) {
-        if(flt[i] != NULL) {
+    release();
+}
+
+PIC_INLINE void FilterDownSampler2D::release()
+{
+    for (int i = 0; i < 2; i++) {
+        if (flt[i] != NULL) {
             delete flt[i];
         }
 
-        if(isg[i] != NULL) {
+        if (isg[i] != NULL) {
             delete isg[i];
         }
     }
