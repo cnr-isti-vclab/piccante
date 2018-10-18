@@ -191,11 +191,26 @@ public:
      */
     virtual ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
     {
+        return allocateOutputMemory(imgIn, imgOut, false);
+    }
+
+    /**
+     * @brief allocateOutputMemory
+     * @param imgIn
+     * @param imgOut
+     * @param bDelete
+     * @return
+     */
+    static ImageGL *allocateOutputMemory(ImageGLVec imgIn, ImageGL *imgOut, bool bDelete)
+    {
         if(imgOut == NULL) {
             imgOut = imgIn[0]->allocateSimilarOneGL();
         } else {
             if(!imgIn[0]->isSimilarType(imgOut)) {
-                delete imgOut;
+                if(bDelete) {
+                    delete imgOut;
+                }
+
                 imgOut = imgIn[0]->allocateSimilarOneGL();
             }
         }

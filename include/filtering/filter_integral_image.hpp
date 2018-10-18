@@ -44,7 +44,7 @@ public:
      */
     Image *Process(ImageVec imgIn, Image *imgOut)
     {
-        if(imgIn.size() < 1){
+        if(imgIn.empty()){
             return imgOut;
         }
 
