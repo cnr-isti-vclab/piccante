@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 
         printf("Assembling the different exposure images... ");
         pic::FilterAssembleHDR merger(&crf, pic::CW_DEB97, pic::HRD_LOG);
-        pic::Image *imgOut = merger.ProcessP(stack, NULL);
+        pic::Image *imgOut = merger.Process(stack, NULL);
 
         printf("Ok\n");
 

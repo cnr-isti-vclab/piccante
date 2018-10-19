@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
         printf("Filtering the image with the Median filter (radius of 3);\n");
 
         pic::FilterMed fltM(7);
-        output = fltM.ProcessP(input, output);
+        output = fltM.Process(input, output);
 
         printf("Ok!\n");
 
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
         printf("Filtering the image with the Vector Median filter (radius of 3);\n");
 
         pic::FilterMedVec fltMV(7);
-        output = fltMV.ProcessP(input, output);
+        output = fltMV.Process(input, output);
 
         printf("Ok!\n");
 
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
         printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
 
         pic::FilterBilateral2DS flt(8.0f, 0.05f);
-        output = flt.ProcessP(input, output);
+        output = flt.Process(input, output);
 
         printf("Ok!\n");
 
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
         //the Guided Filter
         printf("Filtering the image with the Guided filter...");
         pic::FilterGuided fltG;
-        output = fltG.ProcessP(input, output);//filtering the image
+        output = fltG.Process(input, output);//filtering the image
 
         printf("Writing the file to disk...");
         bWritten = output->Write("../data/output/filtered_guided.png");
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
         //WLS
         printf("Filtering the image with the WLS filter...");
         pic::FilterWLS fltWLS;//creating the filter
-        output = fltWLS.ProcessP(input, output);
+        output = fltWLS.Process(input, output);
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
         //Kuwahara
         printf("Filtering the image with the Kuwahara filter...");
         pic::FilterKuwahara fltK(11);
-        output = fltK.ProcessP(input, output);
+        output = fltK.Process(input, output);
 
         printf("Writing the file to disk...");
         bWritten = output->Write("../data/output/filtered_kuwahara.png");

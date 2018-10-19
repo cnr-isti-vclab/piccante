@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
         printf("Assembling the different exposure images... ");
         pic::FilterAssembleHDR merger(&crf, pic::CW_DEB97, pic::HRD_LOG);
-        pic::Image *imgOut = merger.ProcessP(stack_vec, NULL);
+        pic::Image *imgOut = merger.Process(stack_vec, NULL);
 
         printf("Ok\n");
 
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
             printf("Assembling the different exposure images... ");
             fflush(stdout);
             pic::FilterAssembleHDR mergerPoly(&crf, pic::CW_DEB97, pic::HRD_LOG);
-            imgOut = mergerPoly.ProcessP(stack_vec, NULL);
+            imgOut = mergerPoly.Process(stack_vec, NULL);
 
             printf("Ok\n");
 
