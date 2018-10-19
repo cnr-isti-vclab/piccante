@@ -66,6 +66,8 @@ public:
         if(nIterations < 1) {
             nIterations = 16;
         }
+
+        this->nIterations = nIterations;
     }
 
     /**
