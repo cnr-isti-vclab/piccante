@@ -56,13 +56,13 @@ int main(int argc, char *argv[])
         //normalization of the PSF
         psf /= psf.getSumVal(NULL, NULL)[0];
 
-        pic::Image *conv = pic::FilterConv2D::Execute(&img, &psf, NULL);
+        pic::Image *conv = pic::FilterConv2D::execute(&img, &psf, NULL);
         conv->Write("../data/output/image_conv_kernel_psf.png");
 
         printf("Ok!\n");
 
         printf("Deconvolving the image with the PSF read from file...");
-        pic::Image *deconv = pic::computeRichardsonLucyDeconvolution(conv, &psf, 1000, NULL);
+        pic::Image *deconv = pic::FilterDeconvolution::execute(conv, &psf, NULL, 1000);
 
         printf("Ok!\n");
 

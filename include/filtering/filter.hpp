@@ -274,8 +274,6 @@ PIC_INLINE Image *Filter::cachedProcess(ImageVec imgIn, Image *imgOut,
     //check if it is chaced
     Image *imgOut2 = new Image(outputName);
 
-    printf("%s\n", outputName.c_str());
-
     if(imgOut2->data == NULL) {
         if(!cachedOnly) {
             imgOut = Process(imgIn, imgOut);

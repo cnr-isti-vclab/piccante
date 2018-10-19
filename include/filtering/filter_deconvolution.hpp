@@ -31,43 +31,91 @@ namespace pic {
 class FilterDeconvolution: public Filter
 {
 protected:
+    Image *psf_hat;
+    Image *img_est_conv;
+    Image *img_err;
+    Image *img_rel_blur;
+    FilterConv2D *flt_conv;
+
+    int nIterations;
 
 public:
 
     /**
      * @brief FilterDeconvolution
-     * @param channel
+     * @param nIterations
      */
-    FilterDeconvolution(int channel) : Filter()
+    FilterDeconvolution(int nIterations) : Filter()
     {
-        setChannel(channel);
+        psf_hat = NULL;
+        img_est_conv = NULL;
+        img_err = NULL;
+        img_rel_blur = NULL;
+        flt_conv = new FilterConv2D();
+
+        this->nIterations = 0;
+        setup(nIterations);
     }
 
-    PIC_INLINE Image *ProcessP(Image *imgIn, Image *psf, int nIterations = 10, Image *imgOut = NULL)
+    /**
+     * @brief setup
+     * @param nIterations
+     */
+    void setup(int nIterations)
     {
-        if((imgIn == NULL) || (psf == NULL)) {
+        if(nIterations < 1) {
+            nIterations = 16;
+        }
+    }
+
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *Process(ImageVec imgIn, Image *imgOut)
+    {
+        if(imgIn.size() < 2) {
             return imgOut;
         }
 
+        for(int i = 0; i < 2; i ++) {
+            if(imgIn[i] == NULL) {
+                return imgOut;
+            } else {
+                if(!imgIn[i]->isValid()) {
+                    return imgOut;
+                }
+            }
+        }
+
+        imgOut = setupAux(imgIn, imgOut);
+
         if(imgOut == NULL) {
-            imgOut = imgIn->allocateSimilarOne();
+            return imgOut;
         }
 
-        if(nIterations < 1) {
-            nIterations = 10;
+        //
+        //
+        //
+
+        Image *psf = imgIn[1];
+
+        if(psf_hat == NULL) {
+            psf_hat = psf->clone();
+        } else {
+            psf_hat->assign(psf);
         }
 
-        Image *psf_hat = psf->clone();
         psf_hat->flipHV();
 
         *imgOut = 0.5f;
 
-        Image *img_rel_blur = imgIn->allocateSimilarOne();
+        img_rel_blur = allocateOutputMemory(imgIn, img_rel_blur, true);
+        img_est_conv = allocateOutputMemory(imgIn, img_est_conv, true);
+        img_err = allocateOutputMemory(imgIn, img_err, true);
 
-        Image *img_est_conv = NULL;
-        Image *img_err = NULL;
-
-        FilterConv2D flt_conv;
         ImageVec vec = Double(imgOut, psf);
         ImageVec vec_err = Double(img_rel_blur, psf_hat);
 
@@ -77,24 +125,28 @@ public:
                 printf("%d\n", i);
             #endif
 
-            img_est_conv = flt_conv.ProcessP(vec, img_est_conv);
+            img_est_conv = flt_conv->Process(vec, img_est_conv);
 
-            img_rel_blur->assign(imgIn);
+            img_rel_blur->assign(imgIn[0]);
             *img_rel_blur /= *img_est_conv;
 
-            img_err = flt_conv.ProcessP(vec_err, img_err);
+            img_err = flt_conv->Process(vec_err, img_err);
 
             *imgOut *= *img_err;
         }
 
-        delete img_est_conv;
-        delete img_err;
-
         return imgOut;
     }
 
-//    Image *ProcessP(ImageVec imgIn, Image *imgOut);
 
+    /**
+     * @brief execute
+     */
+    static Image *execute(Image *imgIn, Image *psf, Image *imgOut, int nIterations)
+    {
+        FilterDeconvolution flt(nIterations);
+        return flt.Process(Double(imgIn, psf), imgOut);
+    }
 };
 
 }
