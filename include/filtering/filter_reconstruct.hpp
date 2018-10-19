@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_RECONSTRUCT_HPP
 #define PIC_FILTERING_FILTER_RECONSTRUCT_HPP
 
+#include "../util/array.hpp"
+
 #include "../filtering/filter.hpp"
 
 namespace pic {
@@ -34,10 +36,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        if(src.size() < 2) {
-            return;
-        }
-
         int channels = src[0]->channels;
 
         for(int j = box->y0; j < box->y1; j++) {
@@ -50,9 +48,7 @@ protected:
                 float *tmp_dst = (*dst)(i, j);
                 float *tmp_src = (*src[0])(x, y);
 
-                for(int k = 0; k < channels; k++) {
-                    tmp_dst[k] = tmp_src[k];
-                }
+                Array<float>::assign(tmp_src, tmp_dst, channels);
             }
         }
     }
@@ -63,6 +59,23 @@ public:
      */
     FilterReconstruct() : Filter()
     {
+        minInputImages = 2;
+    }
+
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    virtual void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width       = imgIn[1]->width;
+        height      = imgIn[1]->height;
+        channels    = imgIn[1]->channels;
+        frames      = imgIn[1]->frames;
     }
 
     /**
