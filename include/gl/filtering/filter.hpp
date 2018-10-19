@@ -128,10 +128,10 @@ public:
      */
     virtual void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn[0]->width;
-        height      = imgIn[0]->height;
-        channels    = imgIn[0]->channels;
-        frames      = imgIn[0]->frames;
+        width    = imgIn[0]->width;
+        height   = imgIn[0]->height;
+        channels = imgIn[0]->channels;
+        frames   = imgIn[0]->frames;
     }
 
     /**
@@ -207,7 +207,7 @@ public:
         OutputSize(imgIn, w, h, c, f);
 
         if(imgOut == NULL) {
-            imgOut = new ImageGL(w, h, c, f, IMG_GPU, imgIn[0]->getTarget());
+            imgOut = new ImageGL(f, w, h, c, IMG_GPU, imgIn[0]->getTarget());
         } else {
             bool bSame = imgOut->width == w &&
                          imgOut->height == h &&
@@ -219,7 +219,7 @@ public:
                     delete imgOut;
                 }
 
-                imgOut = new ImageGL(w, h, c, f, IMG_GPU, imgIn[0]->getTarget());
+                imgOut = new ImageGL(f, w, h, c, IMG_GPU, imgIn[0]->getTarget());
             }
         }
 

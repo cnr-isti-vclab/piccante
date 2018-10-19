@@ -34,6 +34,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QVBoxLayout>
 #include <QLabel>
 
+#define PIC_DEBUG
+
 #include "piccante.hpp"
 
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
@@ -70,8 +72,12 @@ protected:
 
         //read an input image
         img = new pic::ImageGL();
-        img->Read("../data/input/yellow_flowers.png");
-        img->generateTextureGL();
+        bool bRead = img->Read("../data/input/yellow_flowers.png", pic::LT_NOR_GAMMA);
+        img->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
+
+        #ifdef PIC_DEBUG
+            printf("Image is read: %d\n", bRead);
+        #endif
 
         //create a screen aligned quad
         pic::QuadGL::getTechnique(technique,
