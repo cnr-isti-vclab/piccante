@@ -108,7 +108,7 @@ public:
      */
     FilterDisparity()
     {
-        setup(200, 7);
+        update(200, 7);
     }
 
     /**
@@ -117,7 +117,7 @@ public:
      */
     FilterDisparity(int maxDisparity, int patchSize) : Filter()
     {
-        setup(maxDisparity, patchSize);
+        update(maxDisparity, patchSize);
     }
 
     ~FilterDisparity()
@@ -128,10 +128,10 @@ public:
     }
 
     /**
-     * @brief setup
+     * @brief update
      * @param maxDisparity
      */
-    void setup(int maxDisparity, int patchSize)
+    void update(int maxDisparity, int patchSize)
     {
         this->maxDisparity = maxDisparity;
         this->halfMaxDisparity = maxDisparity >> 1;

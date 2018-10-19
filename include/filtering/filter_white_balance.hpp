@@ -100,6 +100,12 @@ public:
         nWhite = -1;
     }
 
+    /**
+     * @brief getScalingFactors
+     * @param white
+     * @param nWhite
+     * @return
+     */
     static float *getScalingFactors(float *white, int nWhite)
     {
         if(white == NULL || nWhite < 1) {

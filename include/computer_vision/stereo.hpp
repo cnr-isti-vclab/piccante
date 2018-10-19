@@ -84,7 +84,7 @@ public:
             max_cross_check = 8;
         }
 
-        flt_disp.setup(max_disparity, kernel_size);
+        flt_disp.update(max_disparity, kernel_size);
     }
 
     /**

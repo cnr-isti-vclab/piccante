@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_SIGMOID_TMO_HPP
 #define PIC_FILTERING_FILTER_SIGMOID_TMO_HPP
 
+#include "../util/array.hpp"
+
 #include "../filtering/filter.hpp"
 
 namespace pic {
@@ -31,7 +33,7 @@ class FilterSigmoidTMO: public Filter
 {
 protected:
     bool temporal;
-    float c, alpha, epsilon, wp, wp2;
+    float c, alpha, epsilon, wp, wp_sq;
     SIGMOID_MODE type;
 
     /**
@@ -104,7 +106,7 @@ PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO() : Filter()
     type = SIG_TMO;
     alpha = 0.18f;
     wp = 1e9f;
-    wp2 = wp * wp;
+    wp_sq = wp * wp;
     epsilon = -1.0f;
     temporal = false;
 }
@@ -115,7 +117,7 @@ PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO(SIGMOID_MODE type, float alpha,
     this->type = type;
     this->alpha = alpha;
     this->wp = wp;
-    this->wp2 = wp * wp;
+    this->wp_sq = wp * wp;
 
     this->epsilon = epsilon;
     this->temporal = temporal;
@@ -171,6 +173,8 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
     float *dataOut = dst->data;
 
     if(src[0]->channels == 3) {
+        float lum_weights[] = {0.213f, 0.715f, 0.072f};
+
         float alpha_over_epsilon = alpha / epsilon;
 
         for(int j = box->y0; j < box->y1; j++) {
@@ -179,13 +183,14 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
             for(int i = box->x0; i < box->x1; i++) {
                 int c = js + i * src[0]->xstride; //index
 
-                float L = 0.213f * data[c] + 0.715f * data[c + 1] + 0.072f * data[c + 2];
+                float L = Array<float>::dot(data, lum_weights, 3);
 
                 if(L > 0.0f) {
-                    float L_flt	 = 0.213f * dataFlt[c] + 0.715f * dataFlt[c + 1] + 0.072f *
-                                   dataFlt[c + 2];
+
+                    float L_flt = Array<float>::dot(dataFlt, lum_weights, 3);
                     float Lm	 = L     * alpha_over_epsilon;
                     float Lm_flt = L_flt * alpha_over_epsilon;
+
                     float Ld = Lm / (1.0f + Lm_flt);
 
                     for(int k = 0; k < src[0]->channels; k++) {
@@ -193,9 +198,7 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
                         dataOut[ck] = (data[ck] * Ld) / L;
                     }
                 } else {
-                    for(int k = 0; k < src[0]->channels; k++) {
-                        dataOut[c + k] = 0.0f;
-                    }
+                    Array<float>::assign(0.0f, dataOut, src[0]->channels);
                 }
             }
         }
@@ -212,12 +215,12 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
                     int ck = c + k;
 
                     switch(type) {
+
                     case SIG_TMO_WP: {
-                        Lm = (data   [ck] * alpha) / epsilon;
+                        Lm =     (data[ck]    * alpha) / epsilon;
                         Lm_Flt = (dataFlt[ck] * alpha) / epsilon;
 
-                        dataOut[ck] = Lm * (1.0f + Lm / wp2) / (1.0f + Lm_Flt);
-                        //						dataOut[ck] = (val*(val/wp2+epsilon)/epsilon)/(valFlt+epsilon);
+                        dataOut[ck] = Lm * (1.0f + Lm / wp_sq) / (1.0f + Lm_Flt);
                     }
                     break;
 

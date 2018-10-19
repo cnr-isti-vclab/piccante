@@ -65,7 +65,7 @@ public:
     /**
      * @brief FilterLaplacian
      */
-    FilterLaplacian()
+    FilterLaplacian() : Filter()
     {
 
     }
@@ -80,18 +80,6 @@ public:
     {
         FilterLaplacian filter;
         return filter.Process(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     */
-    static void execute(std::string nameIn, std::string nameOut)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = execute(&imgIn, NULL);
-        imgOut->Write(nameOut);
     }
 };
 

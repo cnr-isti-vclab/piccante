@@ -96,7 +96,7 @@ public:
      * @param bSameSize
      * @param bCentroid
      */
-    FilterWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
+    FilterWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false) : Filter()
     {
         update(h, bSameSize, bCentroid);
     }
@@ -187,6 +187,11 @@ public:
         }
     }
 
+    /**
+     * @brief setBoundingBox
+     * @param bmin
+     * @param bmax
+     */
     void setBoundingBox(int *bmin, int *bmax)
     {
         memcpy(this->bmin, bmin, sizeof(int) * 2);

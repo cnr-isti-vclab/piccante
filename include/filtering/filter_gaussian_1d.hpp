@@ -70,7 +70,7 @@ PIC_INLINE FilterGaussian1D::FilterGaussian1D()
     pg = new PrecomputedGaussian(sigma);
 
     bPgOwned = true;
-    setup(pg->coeff, pg->kernelSize, 0);
+    update(pg->coeff, pg->kernelSize, 0);
 }
 
 PIC_INLINE FilterGaussian1D::FilterGaussian1D(float sigma, int direction = 0)
@@ -79,7 +79,7 @@ PIC_INLINE FilterGaussian1D::FilterGaussian1D(float sigma, int direction = 0)
     pg = new PrecomputedGaussian(sigma);
 
     bPgOwned = true;
-    setup(pg->coeff, pg->kernelSize, direction);
+    update(pg->coeff, pg->kernelSize, direction);
 }
 
 PIC_INLINE FilterGaussian1D::FilterGaussian1D(PrecomputedGaussian *pg, int direction = 0)
@@ -93,7 +93,7 @@ PIC_INLINE FilterGaussian1D::FilterGaussian1D(PrecomputedGaussian *pg, int direc
 
     bPgOwned = false;
 
-    setup(pg->coeff, pg->kernelSize, direction);
+    update(pg->coeff, pg->kernelSize, direction);
 }
 
 PIC_INLINE FilterGaussian1D::~FilterGaussian1D()

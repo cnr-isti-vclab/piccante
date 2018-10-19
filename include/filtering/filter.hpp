@@ -52,6 +52,8 @@ protected:
     float scale;
     std::vector< float > param_f;
 
+    int minInputImages;
+
     /**
      * @brief f
      * @param data
@@ -107,6 +109,7 @@ public:
      */
     Filter()
     {
+        minInputImages = 1;
         cachedOnly = false;
         scale = 1.0f;
     }
@@ -313,12 +316,18 @@ PIC_INLINE void Filter::ProcessAux(ImageVec imgIn, Image *imgOut,
 
 PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
 {
-    if(imgIn.empty()) {
+    if(imgIn.size() < minInputImages) {
         return imgOut;
     }
 
-    if(imgIn[0] == NULL) {
-        return imgOut;
+    for(int i = 0; i < minInputImages; i ++) {
+        if(imgIn[i] == NULL) {
+            return imgOut;
+        } else {
+            if(!imgIn[i]->isValid()) {
+                return imgOut;
+            }
+        }
     }
 
     imgOut = setupAux(imgIn, imgOut);

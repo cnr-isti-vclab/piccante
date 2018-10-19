@@ -48,6 +48,7 @@ protected:
 
                 float mu1_sq = src[0]->data[ind];
                 mu1_sq *= mu1_sq;
+
                 float mu2_sq = src[1]->data[ind];
                 mu2_sq *= mu2_sq;
 
@@ -77,7 +78,17 @@ public:
      * @brief FilterSSIM
      * @param type
      */
-    FilterSSIM(float C0, float C1)
+    FilterSSIM(float C0, float C1) : Filter()
+    {
+        update(C0, C1);
+    }
+
+    /**
+     * @brief update
+     * @param C0
+     * @param C1
+     */
+    void update(float C0, float C1)
     {
         this->C0 = C0;
         this->C1 = C1;

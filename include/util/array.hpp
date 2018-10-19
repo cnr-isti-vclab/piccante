@@ -183,6 +183,24 @@ public:
     }
 
     /**
+     * @brief normalize
+     * @param data
+     * @param n
+     * @param norm
+     * @return
+     */
+    static inline T dot(T *data0, T *data1, int n)
+    {
+        T out = data0[0] * data1[0];
+
+        for(int k = 1; k < n; k++) {
+            out += data0[k] * data1[k];
+        }
+
+        return out;
+    }
+
+    /**
      * @brief mul
      * @param vec
      * @param size

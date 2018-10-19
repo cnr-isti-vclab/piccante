@@ -44,13 +44,6 @@ protected:
     FilterGaussian2D *fltG2D;
     FilterChannel *fltC;
 
-    /**
-     * @brief Setup
-     * @param sigma
-     * @param scale
-     */
-    void setup(float sigma, float scale);
-
 public:
     /**
      * @brief FilterSamplingMap
@@ -66,6 +59,13 @@ public:
     FilterSamplingMap(float sigma, float scale);
 
     ~FilterSamplingMap();
+
+    /**
+     * @brief update
+     * @param sigma
+     * @param scale
+     */
+    void update(float sigma, float scale);
 
     /**
      * @brief getScale
@@ -103,7 +103,7 @@ PIC_INLINE FilterSamplingMap::FilterSamplingMap(float sigma) : FilterNPasses()
     fltC = NULL;
 
     float rateScale = 2.0f;
-    setup(rateScale, rateScale / sigma);
+    update(rateScale, rateScale / sigma);
 }
 
 PIC_INLINE FilterSamplingMap::FilterSamplingMap(float sigma, float scale) : FilterNPasses()
@@ -114,7 +114,7 @@ PIC_INLINE FilterSamplingMap::FilterSamplingMap(float sigma, float scale) : Filt
     fltG = NULL;
     fltG2D = NULL;
 
-    setup(sigma * scale, scale);
+    update(sigma * scale, scale);
 }
 
 PIC_INLINE FilterSamplingMap::~FilterSamplingMap()
@@ -145,7 +145,7 @@ PIC_INLINE FilterSamplingMap::~FilterSamplingMap()
 
 }
 
-PIC_INLINE void FilterSamplingMap::setup(float sigma, float scale)
+PIC_INLINE void FilterSamplingMap::update(float sigma, float scale)
 {
     this->scale = scale;
 

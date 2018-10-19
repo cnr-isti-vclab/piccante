@@ -38,7 +38,7 @@ protected:
 
         float value;
 
-        float *data_src = (*data->src[0])(data->x, data->y);
+        float *data_src  = (*data->src[0])(data->x, data->y);
         float *data_src0 = (*data->src[0])(data->x, data->y + 1);
         float *data_src1 = (*data->src[0])(data->x + 1, data->y);
 

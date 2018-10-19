@@ -59,12 +59,12 @@ public:
     ~FilterConv1D();
 
     /**
-     * @brief setup
+     * @brief update
      * @param data
      * @param n
      * @param direction
      */
-    void setup(float *data, int n, int direction);
+    void update(float *data, int n, int direction);
 
     /**
      * @brief changePass
@@ -143,10 +143,10 @@ PIC_INLINE FilterConv1D::FilterConv1D()
 
 PIC_INLINE FilterConv1D::FilterConv1D(float *data, int n, int direction = 0)
 {
-    setup(data, n, direction);
+    update(data, n, direction);
 }
 
-PIC_INLINE void FilterConv1D::setup(float *data, int n, int direction)
+PIC_INLINE void FilterConv1D::update(float *data, int n, int direction)
 {
     if(data == NULL || n < 0) {
         return;

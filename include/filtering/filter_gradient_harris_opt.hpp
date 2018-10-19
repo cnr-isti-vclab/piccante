@@ -47,10 +47,10 @@ public:
     FilterGradientHarrisOPT(int colorChannel);
 
     /**
-     * @brief setup
+     * @brief update
      * @param colorChannel
      */
-    void setup(int colorChannel);
+    void update(int colorChannel);
 
     /**
      * @brief OutputSize
@@ -84,12 +84,15 @@ public:
 
 PIC_INLINE FilterGradientHarrisOPT::FilterGradientHarrisOPT(int colorChannel) : Filter()
 {
-    setup(colorChannel);
+    this->colorChannel = 0;
+    update(colorChannel);
 }
 
-PIC_INLINE void FilterGradientHarrisOPT::setup(int colorChannel)
+PIC_INLINE void FilterGradientHarrisOPT::update(int colorChannel)
 {
-    this->colorChannel = colorChannel;
+    if(colorChannel > -1) {
+        this->colorChannel = colorChannel;
+    }
 }
 
 PIC_INLINE void FilterGradientHarrisOPT::ProcessBBox(Image *dst, ImageVec src,

@@ -335,7 +335,7 @@ public:
      */
     Image *Process(ImageVec imgIn, Image *imgOut)
     {
-        if(imgIn.size() < 1){
+        if(imgIn.empty()){
             return imgOut;
         }
 
@@ -345,23 +345,16 @@ public:
 
         imgOut = setupAux(imgIn, imgOut);
 
+        if(imgOut == NULL) {
+            return imgOut;
+        }
+
         //convolution
         if(imgIn[0]->channels == 1) {
             return singleChannel(imgIn, imgOut);
         } else {
             return multiChannel(imgIn, imgOut);
         }
-    }
-
-    /**
-     * @brief ProcessP
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *ProcessP(ImageVec imgIn, Image *imgOut)
-    {
-        return Process(imgIn, imgOut);
     }
 
     /**
