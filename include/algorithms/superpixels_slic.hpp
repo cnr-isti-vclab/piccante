@@ -331,7 +331,7 @@ public:
         channels = img->channels;
 
         FilterLaplacian lap;
-        lap_img = lap.ProcessP(Single(img), lap_img);
+        lap_img = lap.Process(Single(img), lap_img);
 
         for(int i = 0; i < nSuperPixels; i++) {
             mPixel[i] = 0.35f * 0.35f;    //10.0f*10.0f;

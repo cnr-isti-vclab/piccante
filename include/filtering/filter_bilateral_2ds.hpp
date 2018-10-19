@@ -135,7 +135,7 @@ public:
         //Filtering
         FilterBilateral2DS filter(sigma_s, sigma_r, 1);
         //long t0 = timeGetTime();
-        Image *imgOut = filter.ProcessP(Single(imgIn), NULL);
+        Image *imgOut = filter.Process(Single(imgIn), NULL);
         //long t1 = timeGetTime();
         //printf("Stochastic Bilateral Filter time: %ld\n",t1-t0);
         return imgOut;
@@ -158,9 +158,9 @@ public:
         Image *imgOut;
 
         if(imgEdge == NULL) {
-            imgOut = filter.ProcessP(Single(imgIn), NULL);
+            imgOut = filter.Process(Single(imgIn), NULL);
         } else {
-            imgOut = filter.ProcessP(Double(imgIn, imgEdge), NULL);
+            imgOut = filter.Process(Double(imgIn, imgEdge), NULL);
         }
 
         //long t1 = timeGetTime();
@@ -189,7 +189,7 @@ public:
         //Filtering
         FilterBilateral2DS filter(type, sigma_s, sigma_r, mult);
         //long t0 = timeGetTime();
-        Image *imgOut = filter.ProcessP(Single(&imgIn), NULL);
+        Image *imgOut = filter.Process(Single(&imgIn), NULL);
         //long t1 = timeGetTime();
         //printf("Stochastic Bilateral Filter time: %ld\n",t1-t0);
 
@@ -222,7 +222,7 @@ public:
         //Filtering
         FilterBilateral2DS filter(type, sigma_s, sigma_r, mult);
         //long t0 = timeGetTime();
-        Image *imgOut = filter.ProcessP(Double(&imgIn, &imgIn2), NULL);
+        Image *imgOut = filter.Process(Double(&imgIn, &imgIn2), NULL);
         //long t1 = timeGetTime();
         //printf("Stochastic Bilateral Filter time: %ld\n",t1-t0);
 

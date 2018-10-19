@@ -85,7 +85,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut, float sigma_s, float sigma_r)
     {
         FilterSamplingMap fsm(sigma_s);
-        Image *samplingMap = fsm.ProcessP(Single(imgIn), NULL);
+        Image *samplingMap = fsm.Process(Single(imgIn), NULL);
         *samplingMap /= samplingMap->getMaxVal(NULL, NULL)[0];
 
         FilterBilateral2DAS fltBil2DAS(ST_DARTTHROWING, sigma_s, sigma_r, 1);

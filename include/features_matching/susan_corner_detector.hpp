@@ -142,7 +142,7 @@ public:
 
         //filter the input image
         FilterGaussian2D flt(sigma);
-        lum_flt = flt.ProcessP(Single(lum), NULL);
+        lum_flt = flt.Process(Single(lum), NULL);
 
         //"rasterizing" a circle
         std::vector< int > x, y;

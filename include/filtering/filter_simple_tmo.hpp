@@ -78,24 +78,7 @@ public:
                              float fstop)
     {
         FilterSimpleTMO filter(gamma, fstop);
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param gamma
-     * @param fstop
-     * @return
-     */
-    static Image *execute(std::string nameIn, std::string nameOut, float gamma,
-                             float fstop)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = execute(&imgIn, NULL, gamma, fstop);
-        imgOut->Write(nameOut, LT_NOR_GAMMA, 0);
-        return imgOut;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

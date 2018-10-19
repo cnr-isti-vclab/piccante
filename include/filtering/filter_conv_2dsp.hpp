@@ -81,7 +81,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut, float *data, int n)
     {
         FilterConv2DSP filter(data, n);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 
     static Image *execute(std::string nameIn, std::string nameOut, float *data,

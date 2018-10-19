@@ -68,27 +68,11 @@ public:
      */
     Image *Process(ImageVec imgIn, Image *imgOut)
     {
-        imgOut = filter_1->Process(imgIn, imgOut, false);
+        imgOut = filter_1->Process(imgIn, imgOut);
 
         //MEMORY-LEAK: to check
-        tmp = filter_2->Process(imgIn, tmp, false);
+        tmp = filter_2->Process(imgIn, tmp);
         *imgOut -= *tmp;
-        return imgOut;
-    }
-
-    /**
-     * @brief ProcessP
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *ProcessP(ImageVec imgIn, Image *imgOut)
-    {
-        imgOut = filter_1->ProcessP(imgIn, imgOut);
-
-        //MEMORY-LEAK: to check
-        tmp = filter_2->ProcessP(imgIn, tmp);
-        *imgOut = *imgOut - *tmp;
         return imgOut;
     }
 
@@ -104,24 +88,7 @@ public:
                              float sigma_2)
     {
         FilterDiffGauss filter(sigma_1, sigma_2);
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma_1
-     * @param sigma_2
-     * @return
-     */
-    static Image *execute(std::string nameIn, std::string nameOut, float sigma_1,
-                             float sigma_2)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = execute(&imgIn, NULL, sigma_1, sigma_2);
-        imgOut->Write(nameOut);
-        return imgOut;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

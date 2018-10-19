@@ -201,17 +201,25 @@ public:
      * @param bDelete
      * @return
      */
-    static ImageGL *allocateOutputMemory(ImageGLVec imgIn, ImageGL *imgOut, bool bDelete)
+    ImageGL *allocateOutputMemory(ImageGLVec imgIn, ImageGL *imgOut, bool bDelete)
     {
+        int w, h, c, f;
+        OutputSize(imgIn, w, h, c, f);
+
         if(imgOut == NULL) {
-            imgOut = imgIn[0]->allocateSimilarOneGL();
+            imgOut = new ImageGL(w, h, c, f, IMG_GPU, imgIn[0]->getTarget());
         } else {
-            if(!imgIn[0]->isSimilarType(imgOut)) {
+            bool bSame = imgOut->width == w &&
+                         imgOut->height == h &&
+                         imgOut->channels == c &&
+                         imgOut->frames == f;
+
+            if(!bSame) {
                 if(bDelete) {
                     delete imgOut;
                 }
 
-                imgOut = imgIn[0]->allocateSimilarOneGL();
+                imgOut = new ImageGL(w, h, c, f, IMG_GPU, imgIn[0]->getTarget());
             }
         }
 

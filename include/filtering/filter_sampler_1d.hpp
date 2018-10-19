@@ -132,7 +132,7 @@ public:
                              int direction, ImageSampler *isb)
     {
         FilterSampler1D filter(scale, direction, isb);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

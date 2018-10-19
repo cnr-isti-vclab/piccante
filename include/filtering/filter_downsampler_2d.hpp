@@ -92,7 +92,7 @@ public:
                              int height)
     {
         FilterDownSampler2D flt(width, height);
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 
     /**
@@ -107,7 +107,7 @@ public:
                              float scaleY)
     {
         FilterDownSampler2D flt(scaleX, scaleY);
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 
     /**
@@ -120,7 +120,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut, float scaleXY)
     {
         FilterDownSampler2D flt(scaleXY, scaleXY);
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 };
 

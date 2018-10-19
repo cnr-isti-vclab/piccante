@@ -153,14 +153,14 @@ public:
             max_disparity = MIN(img_left->width, img_right->width) >> 1;
         }
 
-        auto i_l_l = flt_lum.ProcessP(Single(img_left), NULL);
-        auto i_r_l = flt_lum.ProcessP(Single(img_right), NULL);
+        auto i_l_l = flt_lum.Process(Single(img_left), NULL);
+        auto i_r_l = flt_lum.Process(Single(img_right), NULL);
 
-        auto i_l_g = flt_grad.ProcessP(Single(i_l_l), NULL);
-        auto i_r_g = flt_grad.ProcessP(Single(i_r_l), NULL);
+        auto i_l_g = flt_grad.Process(Single(i_l_l), NULL);
+        auto i_r_g = flt_grad.Process(Single(i_r_l), NULL);
 
-        disp_left  = flt_disp.ProcessP(pic::Quad(img_left, img_right, i_l_g, i_r_g), disp_left);
-        disp_right = flt_disp.ProcessP(pic::Quad(img_right, img_left, i_r_g, i_l_g), disp_right);
+        disp_left  = flt_disp.Process(pic::Quad(img_left, img_right, i_l_g, i_r_g), disp_left);
+        disp_right = flt_disp.Process(pic::Quad(img_right, img_left, i_r_g, i_l_g), disp_right);
 
         crossCheck(disp_left, disp_right);
         crossCheck(disp_right, disp_left);

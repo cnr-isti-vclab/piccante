@@ -77,7 +77,7 @@ public:
         //filter
         FilterBilateral2DF filter(sigma_s, sigma_r);
         long t0 = timeGetTime();
-        Image *out = filter.ProcessP(Single(imgIn), imgOut);
+        Image *out = filter.Process(Single(imgIn), imgOut);
         long t1 = timeGetTime();
         printf("Full Bilateral Filter time: %ld\n", t1 - t0);
         return out;

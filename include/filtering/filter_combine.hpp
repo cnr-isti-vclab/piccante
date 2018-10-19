@@ -160,20 +160,20 @@ public:
     }
 
     /**
-     * @brief executeTest
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @return
      */
-    static Image *executeTest(Image *imgIn, Image *imgOut)
+    static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterChannel filter(0);
         Image *outR = filter.Process(Single(imgIn), NULL);
 
-        filter.setChannel(1);
+        filter.update(1);
         Image *outG = filter.Process(Single(imgIn), NULL);
 
-        filter.setChannel(2);
+        filter.update(2);
         Image *outB = filter.Process(Single(imgIn), NULL);
 
         ImageVec src;

@@ -146,7 +146,7 @@ public:
 
         flt.getRGB2XYZMatrix();
 
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 
     /**
@@ -161,7 +161,7 @@ public:
 
         flt.getXYZ2RGBMatrix();
 
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 
 };

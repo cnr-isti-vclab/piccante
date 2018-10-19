@@ -121,7 +121,7 @@ public:
         int n = int(stack.size()) - 2;
 
         for(int i = n; i >= 0; i--) {
-            flt_up->ProcessP(Single(stack[i + 1]), stack[i]);
+            flt_up->Process(Single(stack[i + 1]), stack[i]);
         }
 
         return imgOut;

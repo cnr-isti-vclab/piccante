@@ -108,7 +108,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterMosaic flt;
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 
     /**

@@ -56,7 +56,7 @@ public:
                           int direction)
     {
         FilterDiffGauss1D filter(sigma1, sigma2, direction);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

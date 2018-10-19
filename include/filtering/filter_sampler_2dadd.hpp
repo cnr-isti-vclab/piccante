@@ -66,20 +66,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut, ImageSampler *isb)
     {
         FilterSampler2DAdd filter(isb);
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param isb
-     */
-    static void execute(std::string nameIn, std::string nameOut, ImageSampler *isb)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = execute(&imgIn, NULL, isb);
-        imgOut->Write(nameOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

@@ -44,7 +44,7 @@ PIC_INLINE Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL, float alpha 
 
     //extract luminance
     FilterLuminance fltLum;
-    Image *lum = fltLum.ProcessP(Single(imgIn), NULL);
+    Image *lum = fltLum.Process(Single(imgIn), NULL);
 
     float maxL = lum->getMaxVal()[0];
     float minL = lum->getMinVal()[0];

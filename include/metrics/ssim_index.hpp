@@ -125,7 +125,7 @@ PIC_INLINE Image* SSIMIndex(Image *ori, Image *cmp, float &ssim_index, Image *ss
         src.push_back(img_sigma2_sq);
         src.push_back(img_sigma1_sigma2);
 
-        ssim_map = flt_ssim.ProcessP(src, ssim_map);
+        ssim_map = flt_ssim.Process(src, ssim_map);
     } else {
 
     }

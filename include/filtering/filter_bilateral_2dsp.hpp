@@ -81,7 +81,7 @@ public:
                              float sigma_r)
     {
         FilterBilateral2DSP filter(sigma_s, sigma_r);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 
     /**

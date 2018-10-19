@@ -78,7 +78,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut = NULL, int colorChannel = 0)
     {
         FilterGradientHarrisOPT filter(colorChannel);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

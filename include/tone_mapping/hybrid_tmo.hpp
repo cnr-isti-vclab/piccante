@@ -31,13 +31,13 @@ namespace pic {
 class HybridTMO
 {
 protected:
-    Segmentation        seg;
-    FilterDragoTMO		fltDragoTMO;
-    FilterSigmoidTMO	fltReinhardTMO;
-    Pyramid				*pyrA, *pyrB, *pyrWeight;
-    float				Ld_Max, b;
+    Segmentation seg;
+    FilterDragoTMO fltDragoTMO;
+    FilterSigmoidTMO fltReinhardTMO;
+    Pyramid *pyrA, *pyrB, *pyrWeight;
+    float Ld_Max, b;
 
-    Image               *imgDrago, *imgReinhard, *seg_map;
+    Image *imgDrago, *imgReinhard, *seg_map;
 
 public:
     /**
@@ -63,8 +63,8 @@ public:
      */
     void ReinhardApprox(float &alpha1, float &alpha2)
     {
-        alpha2		= powf(1.6f, 9.0f);			//sigma_r
-        alpha1		= 1.0f / (2.0f * sqrtf(2.0f));	//sigma_s
+        alpha2 = powf(1.6f, 9.0f); //sigma_r
+        alpha1 = 1.0f / (2.0f * sqrtf(2.0f));	//sigma_s
     }
 
     /**
@@ -88,7 +88,7 @@ public:
         }
 
         //Compute segmentation map
-        seg_map = seg.Compute(imgIn, seg_map);
+        seg_map = seg.execute(imgIn, seg_map);
 
         /*	0 ---> Drago et al. 2003
         	1 ---> Reinhard et al. 2002
@@ -132,18 +132,18 @@ public:
 
         switch(value) {
         case 0: {
-            fltDragoTMO.ProcessP(Single(imgIn), imgOut);
+            fltDragoTMO.Process(Single(imgIn), imgOut);
         }
         break;
 
         case 1: {
-            fltReinhardTMO.ProcessP(Single(imgIn), imgOut);
+            fltReinhardTMO.Process(Single(imgIn), imgOut);
         }
         break;
 
         case 10: {
             //Drago TMO
-            imgDrago = fltDragoTMO.ProcessP(Single(imgIn), imgDrago);
+            imgDrago = fltDragoTMO.Process(Single(imgIn), imgDrago);
 
             if(pyrA == NULL) {
                 pyrA = new Pyramid(imgDrago, true);

@@ -109,7 +109,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterBackwardDifference filter;
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

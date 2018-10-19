@@ -152,7 +152,7 @@ public:
                              float sigma)
     {
         FilterColorDistance fltColDst(color, sigma);
-        return fltColDst.ProcessP(Single(imgIn), imgOut);
+        return fltColDst.Process(Single(imgIn), imgOut);
     }
 };
 

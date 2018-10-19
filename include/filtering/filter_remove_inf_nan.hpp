@@ -99,22 +99,7 @@ public:
     static Image* execute(Image *imgIn, Image *imgOut)
     {
         FilterRemoveInfNaN filter;
-        imgOut = filter.ProcessP(Single(imgIn), imgOut);
-        return imgOut;
-    }
-
-    /**
-     * @brief execute
-     * @param nameFileIn
-     * @param nameFileOut
-     * @return
-     */
-    static Image* execute(std::string nameFileIn, std::string nameFileOut)
-    {
-        Image imgIn(nameFileIn);
-        Image *imgOut = execute(&imgIn, NULL);
-        imgOut->Write(nameFileOut);
-
+        imgOut = filter.Process(Single(imgIn), imgOut);
         return imgOut;
     }
 };

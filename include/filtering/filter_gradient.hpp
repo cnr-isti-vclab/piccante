@@ -56,11 +56,11 @@ public:
     FilterGradient(int colorChannel, GRADIENT_TYPE type);
 
     /**
-     * @brief setup
+     * @brief update
      * @param colorChannel
      * @param type
      */
-    void setup(int colorChannel, GRADIENT_TYPE type);
+    void update(int colorChannel, GRADIENT_TYPE type);
 
     /**
      * @brief OutputSize
@@ -90,22 +90,22 @@ public:
                              GRADIENT_TYPE type = G_SOBEL, int colorChannel = 0)
     {
         FilterGradient filter(colorChannel, type);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 
 PIC_INLINE FilterGradient::FilterGradient() : Filter()
 {
-    setup(0, G_NORMAL);
+    update(0, G_NORMAL);
 }
 
 PIC_INLINE FilterGradient::FilterGradient(int colorChannel,
         GRADIENT_TYPE type = G_NORMAL) : Filter()
 {
-    setup(colorChannel, type);
+    update(colorChannel, type);
 }
 
-PIC_INLINE void FilterGradient::setup(int colorChannel,
+PIC_INLINE void FilterGradient::update(int colorChannel,
                                            GRADIENT_TYPE type = G_NORMAL)
 {
     this->colorChannel = colorChannel;

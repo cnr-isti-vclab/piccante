@@ -62,14 +62,14 @@ public:
      */
     FilterChannel(int channel) : Filter()
     {
-        setChannel(channel);
+        update(channel);
     }
 
     /**
-     * @brief setChannel
+     * @brief update
      * @param channel
      */
-    void setChannel(int channel)
+    void update(int channel)
     {
         this->channel = channel;
     }
@@ -100,13 +100,13 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut, int channel = 0)
     {
         FilterChannel fltCh(channel);
-        return fltCh.ProcessP(Single(imgIn), imgOut);
+        return fltCh.Process(Single(imgIn), imgOut);
     }
 
     /**
-     * @brief Test
+     * @brief test
      */
-    static void Test()
+    static void test()
     {
         Image imgIn(1, 512, 512, 3);
         imgIn = 1.0f;
@@ -114,10 +114,10 @@ public:
         FilterChannel filter(0);
         Image *outR = filter.Process(Single(&imgIn), NULL);
 
-        filter.setChannel(1);
+        filter.update(1);
         Image *outG = filter.Process(Single(&imgIn), NULL);
 
-        filter.setChannel(2);
+        filter.update(2);
         Image *outB = filter.Process(Single(&imgIn), NULL);
 
         outR->Write("channel_R.pfm");

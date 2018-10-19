@@ -259,7 +259,7 @@ public:
     static Image *execute(Image *img, Image *imgOut, Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
     {
         FilterWarp2D flt(h, bSameSize, bCentroid);
-        imgOut = flt.ProcessP(Single(img), imgOut);
+        imgOut = flt.Process(Single(img), imgOut);
         return imgOut;
     }
 };

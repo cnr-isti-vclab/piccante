@@ -139,7 +139,7 @@ public:
     static Image *execute(Image *img, Image *imgOut, int kernelSize = 3)
     {
         FilterLocalExtrema flt(kernelSize);
-        return flt.ProcessP(Single(img), imgOut);
+        return flt.Process(Single(img), imgOut);
     }
 };
 

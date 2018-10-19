@@ -36,7 +36,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "algorithms/superpixels_slic.hpp"
 #include "algorithms/color_to_gray.hpp"
 #include "algorithms/histogram_matching.hpp"
-#include "algorithms/richardson_lucy_deconvolution.hpp"
 #include "algorithms/bilateral_separation.hpp"
 #include "algorithms/grow_cut.hpp"
 #include "algorithms/live_wire.hpp"

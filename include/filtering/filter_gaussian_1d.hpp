@@ -60,7 +60,7 @@ public:
                              int direction)
     {
         FilterGaussian1D filter(sigma, direction);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

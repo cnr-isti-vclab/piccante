@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_CONV_2D_HPP
 #define PIC_FILTERING_FILTER_CONV_2D_HPP
 
+#include "../util/array.hpp"
+
 #include "../filtering/filter.hpp"
 
 namespace pic {
@@ -56,9 +58,7 @@ protected:
             for(int i = box->x0; i < box->x1; i++) {
                 float *dst_data = (*dst)(i, j);
 
-                for(int c = 0; c < channels; c++) {
-                    dst_data[c] = 0.0f;
-                }
+                Array<float>::assign(0.0f, dst_data, channels);
 
                 for(int k = -c_height_h; k <= c_height_h; k++) {
                     for(int l = -c_width_h; l <= c_width_h; l++) {
@@ -81,7 +81,7 @@ public:
     /**
      * @brief FilterConv2D
      */
-    FilterConv2D()
+    FilterConv2D() : Filter()
     {
 
     }
@@ -96,27 +96,7 @@ public:
     static Image *execute(Image *img, Image *conv, Image *imgOut)
     {
         FilterConv2D flt;
-        return flt.ProcessP(Double(img, conv), imgOut);
-    }
-
-    /**
-     * @brief execute
-     * @param nameImg
-     * @param nameConv
-     * @param nameOut
-     */
-    static void execute(std::string nameImg, std::string nameConv,
-                        std::string nameOut)
-    {
-        Image img(nameImg, LT_NOR_GAMMA);
-        Image conv(nameConv, LT_NOR_GAMMA);
-
-        float *sumVal = conv.getSumVal(NULL, NULL);
-        conv /= sumVal[0];
-
-        Image *imgOut = execute(&img, &conv, NULL);
-
-        imgOut->Write(nameOut);
+        return flt.Process(Double(img, conv), imgOut);
     }
 };
 

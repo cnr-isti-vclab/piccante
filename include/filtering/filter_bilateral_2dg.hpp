@@ -88,14 +88,6 @@ public:
     Image *Process(ImageVec imgIn, Image *imgOut);
 
     /**
-     * @brief ProcessP
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *ProcessP(ImageVec imgIn, Image *imgOut);
-
-    /**
      * @brief execute
      * @param imgIn
      * @param imgOut
@@ -374,19 +366,14 @@ PIC_INLINE Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
     mul_E = s_R / float(imgIn[0]->channels);
 #endif
 
-    //For each R,G,B, color channel
     for(int i = 0; i < n; i++) {
-        //Splatting
+        //splat
         Splat(base, edge, i);
 
-        //Blurring
-        if(parallel) {
-            fltG->Process(Single(grid), gridBlur);
-        } else {
-            fltG->ProcessP(Single(grid), gridBlur);
-        }
+        //blur
+        fltG->Process(Single(grid), gridBlur);
 
-        //Slicing
+        //slice
         Slice(imgOut, base, edge, i);
     }
 
@@ -395,12 +382,6 @@ PIC_INLINE Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
     parallel = false;
 
     return imgOut;
-}
-
-PIC_INLINE Image *FilterBilateral2DG::ProcessP(ImageVec imgIn, Image *imgOut)
-{
-    parallel = true;
-    return Process(imgIn, imgOut);
 }
 
 } // end namespace pic

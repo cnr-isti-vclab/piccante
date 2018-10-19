@@ -47,15 +47,16 @@ PIC_INLINE Image *colorToGray(Image *imgIn, Image *imgOut)
     FilterChannel flt(0);
     int channels = imgIn->channels;
     for(int i = 0; i < channels; i++) {
-        img_vec.push_back(flt.ProcessP(input, NULL));
-        flt.setChannel(i + 1);
+        img_vec.push_back(flt.Process(input, NULL));
+        flt.update(i + 1);
     }
 
     imgOut = ExposureFusion(img_vec, 1.0f, 1.0f, 0.0f, imgOut);
 
-    for(int i=0; i<channels; i++) {
+    for(int i = 0; i<channels; i++) {
         delete img_vec[i];
     }
+
     return imgOut;
 }
 

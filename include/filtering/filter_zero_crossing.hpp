@@ -112,7 +112,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterZeroCrossing flt;
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 };
 

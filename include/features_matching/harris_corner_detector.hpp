@@ -186,7 +186,7 @@ public:
 
         //filter gradient values
         FilterGaussian2D flt(sigma);
-        I_grad_flt = flt.ProcessP(Single(I_grad), I_grad_flt);
+        I_grad_flt = flt.Process(Single(I_grad), I_grad_flt);
 
         if(ret == NULL) {
             ret = lum->allocateSimilarOne();

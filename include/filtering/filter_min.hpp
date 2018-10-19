@@ -93,22 +93,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut, int size)
     {
         FilterMin filter(size);
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param size
-     * @return
-     */
-    static Image *execute(std::string nameIn, std::string nameOut, int size)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = execute(&imgIn, NULL, size);
-        imgOut->Write(nameOut);
-        return imgOut;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

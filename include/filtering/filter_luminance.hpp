@@ -180,7 +180,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut, LUMINANCE_TYPE type = LT_CIE_LUMINANCE)
     {
         FilterLuminance fltLum(type);
-        return fltLum.ProcessP(Single(imgIn), imgOut);
+        return fltLum.Process(Single(imgIn), imgOut);
     }
 
     /**

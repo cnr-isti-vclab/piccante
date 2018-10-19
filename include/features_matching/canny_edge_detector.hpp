@@ -124,10 +124,10 @@ public:
 
         //filter the image
         FilterGaussian2D flt(sigma);
-        Image *lum_flt = flt.ProcessP(Single(lum), NULL);
+        Image *lum_flt = flt.Process(Single(lum), NULL);
 
         FilterGradient fltGrad(0, G_SOBEL);
-        Image *grad = fltGrad.ProcessP(Single(lum_flt), NULL);
+        Image *grad = fltGrad.Process(Single(lum_flt), NULL);
 
         //non-maximum suppression
         if(imgOut == NULL) {

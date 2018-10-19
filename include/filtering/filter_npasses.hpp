@@ -122,18 +122,9 @@ public:
      * @brief Process
      * @param imgIn
      * @param imgOut
-     * @param parallel
      * @return
      */
-    Image *Process(ImageVec imgIn, Image *imgOut, bool parallel);
-
-    /**
-     * @brief ProcessP
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *ProcessP(ImageVec imgIn, Image *imgOut);
+    Image *Process(ImageVec imgIn, Image *imgOut);
 };
 
 PIC_INLINE FilterNPasses::FilterNPasses() : Filter()
@@ -297,23 +288,16 @@ PIC_INLINE Image *FilterNPasses::ProcessGen(ImageVec imgIn, Image *imgOut,
     for(int i = 0; i < n2; i++) {
         auto flt_i = getFilter(i);
         flt_i->changePass(i, n);
-        
-        if(parallel) {
-            imgTmp[i] = flt_i->ProcessP(imgIn, imgTmp[i]);
-        } else {
-            imgTmp[i] = flt_i->Process(imgIn, imgTmp[i]);
-        }
+
+        imgTmp[i] = flt_i->Process(imgIn, imgTmp[i]);
 
         imgIn[0] = imgTmp[i];
     }
 
     auto flt_n = getFilter(n2);
     flt_n->changePass(n2, n);
-    if(parallel) {
-        imgOut = filters[n2]->ProcessP(imgIn, imgOut);
-    } else {
-        imgOut = filters[n2]->Process(imgIn, imgOut);
-    }
+
+    imgOut = filters[n2]->Process(imgIn, imgOut);
 
     return imgOut;
 }
@@ -328,11 +312,7 @@ PIC_INLINE Image *FilterNPasses::ProcessSame(ImageVec imgIn, Image *imgOut,
     auto flt_0 = getFilter(0);
     flt_0->changePass(0, n);
 
-    if(parallel) {
-        flt_0->ProcessP(imgIn, imgTmpSame[0]);
-    } else {
-        flt_0->Process(imgIn, imgTmpSame[0]);
-    }
+    flt_0->Process(imgIn, imgTmpSame[0]);
 
     for(unsigned int i = 1; i < n; i++) {
         auto flt_i = getFilter(0);
@@ -340,18 +320,14 @@ PIC_INLINE Image *FilterNPasses::ProcessSame(ImageVec imgIn, Image *imgOut,
 
         imgIn[0] = imgTmpSame[(i + 1) % 2];
 
-        if(parallel) {
-            flt_i->ProcessP(imgIn, imgTmpSame[i % 2]);
-        } else {
-            flt_i->Process(imgIn, imgTmpSame[i % 2]);
-        }
+        flt_i->Process(imgIn, imgTmpSame[i % 2]);
     }
 
     return imgOut;
 }
 
 PIC_INLINE Image *FilterNPasses::Process(ImageVec imgIn, 
-        Image *imgOut, bool parallel = false)
+        Image *imgOut)
 {
     if(imgIn.empty() || filters.empty()) {
         return imgOut;
@@ -368,18 +344,10 @@ PIC_INLINE Image *FilterNPasses::Process(ImageVec imgIn,
                  (imgIn[0]->channels == channels);
 
     if(bSame) {
-        imgOut = ProcessSame(imgIn, imgOut, parallel);
+        imgOut = ProcessSame(imgIn, imgOut);
     } else {
-        imgOut = ProcessGen(imgIn, imgOut, parallel);
+        imgOut = ProcessGen(imgIn, imgOut);
     }
-
-    return imgOut;
-}
- 
-PIC_INLINE Image *FilterNPasses::ProcessP(ImageVec imgIn,
-        Image *imgOut)
-{
-    imgOut = Process(imgIn, imgOut, true);
 
     return imgOut;
 }

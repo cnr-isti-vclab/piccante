@@ -51,7 +51,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut, float sigma)
     {
         FilterLoG2D filter(sigma);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

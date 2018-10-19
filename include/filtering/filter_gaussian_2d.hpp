@@ -64,22 +64,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut, float sigma)
     {
         FilterGaussian2D filter(sigma);
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma
-     * @return
-     */
-    static Image *execute(std::string nameIn, std::string nameOut, float sigma)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = execute(&imgIn, NULL, sigma);
-        imgOut->Write(nameOut);
-        return imgOut;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

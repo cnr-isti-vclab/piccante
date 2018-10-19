@@ -96,7 +96,7 @@ public:
     static Image *inverse(Image *imgIn, Image *imgOut, int nCoeff)
     {
         FilterDCT2D filter(nCoeff, false);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

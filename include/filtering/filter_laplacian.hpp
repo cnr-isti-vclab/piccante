@@ -79,7 +79,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterLaplacian filter;
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 
     /**

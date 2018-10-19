@@ -188,6 +188,34 @@ public:
     }
 
     /**
+     * @brief allocateOutputMemory
+     * @param imgIn
+     * @param imgOut
+     * @param bDelete
+     * @return
+     */
+    Image *allocateOutputMemory(ImageVec imgIn, Image *imgOut, bool bDelete)
+    {
+        int w, h, c, f;
+        OutputSize(imgIn, w, h, c, f);
+
+        if(imgOut == NULL) {
+            imgOut = new Image(f, w, h, c);
+        } else {
+            bool bSame = imgOut->width == w &&
+                         imgOut->height == h &&
+                         imgOut->channels == c &&
+                         imgOut->frames == f;
+
+            if(!bSame) {
+                imgOut = new Image(f, w, h, c);
+            }
+        }
+
+        return imgOut;
+    }
+
+    /**
      * @brief setFloatParameters sets float parameters.
      * @param param_f
      */
@@ -197,50 +225,26 @@ public:
     }
 
     /**
+     * @brief ProcessAux
+     * @param imgIn
+     * @param imgOut
+     * @param tiles
+     */
+    virtual void ProcessAux(ImageVec imgIn, Image *imgOut,
+                             TileList *tiles);
+
+    /**
      * @brief Process
      * @param imgIn
      * @param imgOut
      * @return
      */
     virtual Image *Process(ImageVec imgIn, Image *imgOut);
-
-    /**
-     * @brief ProcessPAux
-     * @param imgIn
-     * @param imgOut
-     * @param tiles
-     */
-    virtual void ProcessPAux(ImageVec imgIn, Image *imgOut,
-                             TileList *tiles);
-
-    /**
-     * @brief ProcessP
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    virtual Image *ProcessP(ImageVec imgIn, Image *imgOut);
 };
 
 PIC_INLINE Image *Filter::setupAux(ImageVec imgIn, Image *imgOut)
 {
-    int w, h, c, f;
-    OutputSize(imgIn, w, h, c, f);
-
-    if(imgOut == NULL) {
-        imgOut = new Image(f, w, h, c);
-    } else {
-        bool bSame = imgOut->width == w &&
-                     imgOut->height == h &&
-                     imgOut->channels == c &&
-                     imgOut->frames == f;
-
-        if(!bSame) {
-            imgOut = new Image(f, w, h, c);
-        }
-    }
-
-    return imgOut;
+    return allocateOutputMemory(imgIn, imgOut, false);
 }
 
 PIC_INLINE std::string Filter::getOutPutName(std::string nameIn)
@@ -271,7 +275,7 @@ PIC_INLINE Image *Filter::cachedProcess(ImageVec imgIn, Image *imgOut,
 
     if(imgOut2->data == NULL) {
         if(!cachedOnly) {
-            imgOut = ProcessP(imgIn, imgOut);
+            imgOut = Process(imgIn, imgOut);
             imgOut->Write(outputName);
             return imgOut;
         } else {
@@ -287,26 +291,7 @@ PIC_INLINE Image *Filter::cachedProcess(ImageVec imgIn, Image *imgOut,
     }
 }
 
-PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
-{
-    if(imgIn.empty()) {
-        return imgOut;
-    }
-
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    imgOut = setupAux(imgIn, imgOut);
-
-    //convolve
-    BBox tmpBox(imgOut->width, imgOut->height, imgOut->frames);
-    ProcessBBox(imgOut, imgIn, &tmpBox);
-
-    return imgOut;
-}
-
-PIC_INLINE void Filter::ProcessPAux(ImageVec imgIn, Image *imgOut,
+PIC_INLINE void Filter::ProcessAux(ImageVec imgIn, Image *imgOut,
                                     TileList *tiles)
 {
     bool state = true;
@@ -326,9 +311,8 @@ PIC_INLINE void Filter::ProcessPAux(ImageVec imgIn, Image *imgOut,
     }
 }
 
-PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
 {
-#ifndef PIC_DISABLE_THREAD
     if(imgIn.empty()) {
         return imgOut;
     }
@@ -343,9 +327,9 @@ PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
         return imgOut;
     }
 
-    if((imgOut->width < TILE_SIZE) &&
+    if((imgOut->width  < TILE_SIZE) &&
        (imgOut->height < TILE_SIZE)) {
-        BBox box(imgOut->width, imgOut->height);
+        BBox box(imgOut->width, imgOut->height, imgOut->frames);
 
         ProcessBBox(imgOut, imgIn, &box);
         return imgOut;
@@ -359,7 +343,7 @@ PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
 
     for(int i = 0; i < numCores; i++) {
         thrd[i] = new std::thread(
-            std::bind(&Filter::ProcessPAux, this, imgIn, imgOut, &lst));
+            std::bind(&Filter::ProcessAux, this, imgIn, imgOut, &lst));
     }
 
     //join threads
@@ -367,12 +351,10 @@ PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
         thrd[i]->join();
         delete thrd[i];
     }
+
     delete[] thrd;
 
     return imgOut;
-#else
-    return Process(imgIn, imgOut);
-#endif
 }
 
 } // end namespace pic

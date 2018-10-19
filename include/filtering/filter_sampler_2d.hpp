@@ -103,7 +103,7 @@ public:
                              ImageSampler *isb = NULL)
     {
         FilterSampler2D filter(scale, isb);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 
     /**
@@ -119,7 +119,7 @@ public:
                              float scaleY, ImageSampler *isb = NULL)
     {
         FilterSampler2D filter(scaleX, scaleY, isb);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 
     /**
@@ -135,7 +135,7 @@ public:
                              int height, ImageSampler *isb = NULL)
     {
         FilterSampler2D filter(width, height, isb);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 
 };

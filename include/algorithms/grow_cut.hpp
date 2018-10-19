@@ -141,7 +141,7 @@ public:
         Image *output = state_next;
 
         for(int i = 0; i < iterations; i++) {
-            output = flt.ProcessP(input, output);
+            output = flt.Process(input, output);
 
             Image *tmp = input[0];
             input[0] = output;

@@ -71,7 +71,7 @@ PIC_INLINE bool *computeColorClassification(Image *img, float *white_pixel, floa
         img_wb->Write("../data/output/s_input_wb.bmp");
     #endif
 
-    Image *img_wb_rbf = flt_rbf.ProcessP(Single(img_wb), NULL);
+    Image *img_wb_rbf = flt_rbf.Process(Single(img_wb), NULL);
 
     img_wb_rbf->clamp(0.0f, 1.0f);
 

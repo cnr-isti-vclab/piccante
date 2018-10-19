@@ -39,14 +39,14 @@ PIC_INLINE Image *DragoTMO(Image *imgIn, float Ld_Max = 100.0f, float b = 0.95f,
 {
     //compute luminance and its statistics
     FilterLuminance filterLum;
-    Image *imgLum = filterLum.ProcessP(Single(imgIn), NULL);
+    Image *imgLum = filterLum.Process(Single(imgIn), NULL);
 
     float Lw_Max = imgLum->getMaxVal()[0];
     float Lw_a = imgLum->getMaxVal()[0];
 
     //tone map
     FilterDragoTMO flt_drago(Ld_Max, b, Lw_Max, Lw_a);
-    imgOut = flt_drago.ProcessP(Double(imgIn, imgLum), imgOut);
+    imgOut = flt_drago.Process(Double(imgIn, imgLum), imgOut);
 
     delete imgLum;
 

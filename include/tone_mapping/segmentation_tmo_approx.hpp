@@ -30,15 +30,15 @@ namespace pic {
 class Segmentation
 {
 protected:
-    FilterIterative			*fltIt;
-    FilterBilateral2DS		*fltBil;
-    Image                   *L, *imgIn_flt;
+    FilterIterative *fltIt;
+    FilterBilateral2DS *fltBil;
+    Image *L, *imgIn_flt;
 
-    int						iterations;
-    float					perCent, nLayer;
+    int	 iterations;
+    float perCent, nLayer;
 
 public:
-    float					minVal, maxVal;
+    float minVal, maxVal;
 
     /**
      * @brief Segmentation
@@ -51,8 +51,8 @@ public:
         fltBil = NULL;
         fltIt  = NULL;
 
-        L			= NULL;
-        imgIn_flt	= NULL;
+        L = NULL;
+        imgIn_flt = NULL;
 
         maxVal = FLT_MAX;
         minVal = 0.0f;
@@ -80,10 +80,10 @@ public:
     }
 
     /**
-     * @brief ComputeStatistics
+     * @brief computeStatistics
      * @param imgIn
      */
-    void ComputeStatistics(Image *imgIn)
+    void computeStatistics(Image *imgIn)
     {
         float nLevels, area;
 
@@ -94,13 +94,13 @@ public:
     }
 
     /**
-     * @brief SegmentationBilatearal
+     * @brief executeSegmentationBilatearal
      * @param imgIn
      * @return
      */
-    Image *SegmentationBilatearal(Image *imgIn)
+    Image *executeSegmentationBilatearal(Image *imgIn)
     {
-        ComputeStatistics(imgIn);
+        computeStatistics(imgIn);
 
         //Create filters
         if(fltIt == NULL) {
@@ -112,13 +112,19 @@ public:
         printf("Layer: %f iterations: %d\n", nLayer, iterations);
 #endif
         //Iterative bilateral filtering
-        Image *imgOut = fltIt->ProcessP(Single(imgIn), imgIn_flt);
+        Image *imgOut = fltIt->Process(Single(imgIn), imgIn_flt);
 
         //imgOut->Write("filtered.pfm");
         return imgOut;
     }
 
-    Image *SegmentationSuperPixels(Image *imgIn, int nSuperPixels = 4096)
+    /**
+     * @brief executeSuperPixels
+     * @param imgIn
+     * @param nSuperPixels
+     * @return
+     */
+    Image *executeSuperPixels(Image *imgIn, int nSuperPixels = 4096)
     {
         Slic sp;
         sp.execute(imgIn, nSuperPixels);
@@ -126,7 +132,13 @@ public:
         return imgOut;
     }
 
-    Image *Compute(Image *imgIn, Image *imgOut)
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *execute(Image *imgIn, Image *imgOut)
     {
         if(imgIn == NULL) {
             return NULL;
@@ -140,16 +152,16 @@ public:
             imgOut = new Image(1, imgIn->width, imgIn->height, 1);
         }
 
-        //Compute luminance
+        //compute luminance
         FilterLuminance::execute(imgIn, imgOut, LT_CIE_LUMINANCE);
 
-        //Get min and max value
+        //get min and max value
         maxVal = imgOut->getMaxVal()[0];
         minVal = imgOut->getMinVal()[0] + 1e-9f;
 
-        Image *imgIn_flt = SegmentationBilatearal(imgIn);
+        Image *imgIn_flt = executeSegmentationBilatearal(imgIn);
 
-        //Thresholding
+        //threshold
         float minShift = floorf(log10f(minVal));
         float *data = imgIn_flt->data;
 
@@ -165,7 +177,9 @@ public:
             }
         }
 
-        //imgOut->Write("Segmentation.pfm");
+        #ifdef PIC_DEBUG
+            imgOut->Write("Segmentation.pfm");
+        #endif
 
         return imgOut;
     }

@@ -167,7 +167,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterDownPP flt(NULL, 1e-3f);
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 };
 

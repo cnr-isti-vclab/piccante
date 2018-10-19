@@ -100,7 +100,7 @@ public:
                              int radius, float e_regularization)
     {
         FilterGuided filter(radius, e_regularization);
-        return filter.ProcessP(Double(imgIn, guide), imgOut);
+        return filter.Process(Double(imgIn, guide), imgOut);
     }
 };
 

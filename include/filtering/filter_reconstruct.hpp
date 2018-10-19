@@ -75,7 +75,7 @@ public:
     static Image *execute(Image *imgIn, Image *ann, Image *imgOut = NULL)
     {
         FilterReconstruct fltRec;
-        return fltRec.ProcessP(Double(imgIn, ann), imgOut);
+        return fltRec.Process(Double(imgIn, ann), imgOut);
     }
 };
 

@@ -64,9 +64,9 @@ PIC_INLINE Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0
             printf("Processing image %d\n", j);
         #endif
 
-        lum = flt_lum.ProcessP(Single(imgIn[j]), lum);
+        lum = flt_lum.Process(Single(imgIn[j]), lum);
 
-        weights = flt_weights.ProcessP(Double(lum, imgIn[j]), weights);
+        weights = flt_weights.Process(Double(lum, imgIn[j]), weights);
 
         *acc += *weights;
     }
@@ -87,8 +87,8 @@ PIC_INLINE Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0
     pOut->setValue(0.0f);
 
     for(int j = 0; j < n; j++) {
-        lum = flt_lum.ProcessP(Single(imgIn[j]), lum);
-        weights = flt_weights.ProcessP(Double(lum, imgIn[j]), weights);
+        lum = flt_lum.Process(Single(imgIn[j]), lum);
+        weights = flt_weights.Process(Double(lum, imgIn[j]), weights);
 
         //normalization
         *weights /= *acc;

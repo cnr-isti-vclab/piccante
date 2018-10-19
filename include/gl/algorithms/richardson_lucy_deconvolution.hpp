@@ -103,10 +103,12 @@ public:
         }
 
         auto imgIn_vec = SingleGL(imgIn);
+        /*
         imgOut = FilterGL::allocateOutputMemory(imgIn_vec, imgOut, false);
         img_est_conv = FilterGL::allocateOutputMemory(imgIn_vec, img_est_conv, true);
         img_err = FilterGL::allocateOutputMemory(imgIn_vec, img_err, true);
         img_rel_blur = FilterGL::allocateOutputMemory(imgIn_vec, img_rel_blur, true);
+        */
 
 
         ImageGLVec vec = DoubleGL(imgOut, psf);
@@ -120,10 +122,9 @@ public:
                 printf("%d\n", i);
             #endif
 
+            img_rel_blur = imgIn;
+
             img_est_conv = flt_conv->Process(vec, img_est_conv);
-
-            //img_rel_blur->assignGL(imgIn);
-
             *img_rel_blur /= *img_est_conv;
 
             img_err = flt_conv->Process(vec_err, img_err);

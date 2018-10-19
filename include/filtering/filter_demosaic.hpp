@@ -291,17 +291,6 @@ public:
     }
 
     /**
-     * @brief ProcessP
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *ProcessP(ImageVec imgIn, Image *imgOut)
-    {
-        return Process(imgIn, imgOut);
-    }
-
-    /**
      * @brief execute
      * @param imgIn
      * @param imgOut

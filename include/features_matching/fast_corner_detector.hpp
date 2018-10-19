@@ -131,7 +131,7 @@ public:
 
         //filter the input image
         FilterGaussian2D flt(sigma);
-        lum_flt = flt.ProcessP(Single(lum), lum_flt);
+        lum_flt = flt.Process(Single(lum), lum_flt);
 
         int x[] = {0, 1, 2, 3, 3,  3,  2,  1,  0, -1, -2, -3, -3, -3, -2, -1};
         int y[] = {3, 3, 2, 1, 0, -1, -2, -3, -3, -3, -2, -1,  0,  1,  2,  3};

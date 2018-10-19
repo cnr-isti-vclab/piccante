@@ -247,8 +247,8 @@ public:
         *gX *= (2.0f / sX);
         *gY *= (2.0f / sY);
 
-        L_X = fltConv.ProcessP(Double(L, gX), L_X);
-        L_Y = fltConv.ProcessP(Double(L, gY), L_Y);
+        L_X = fltConv.Process(Double(L, gX), L_X);
+        L_Y = fltConv.Process(Double(L, gY), L_Y);
 
         if(I_mag == NULL) {
             I_mag = gX;

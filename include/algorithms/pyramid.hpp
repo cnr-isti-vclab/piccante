@@ -268,12 +268,12 @@ PIC_INLINE void Pyramid::create(Image *img, int width, int height, int channels,
 
     for(int i = 0; i < levels; i++) {
 
-        tmpG = flt_gauss->ProcessP(Single(tmpImg), NULL);
+        tmpG = flt_gauss->Process(Single(tmpImg), NULL);
 
-        tmpD = flt_sampler->ProcessP(Single(tmpG), NULL);
+        tmpD = flt_sampler->Process(Single(tmpG), NULL);
 
         if(lapGauss) {	//Laplacian Pyramid
-            flt_sub->ProcessP(Double(tmpImg, tmpD), tmpG);
+            flt_sub->Process(Double(tmpImg, tmpD), tmpG);
             stack.push_back(tmpG);
         } else {			//Gaussian Pyramid
             tmpG->assign(tmpImg);
@@ -320,16 +320,16 @@ PIC_INLINE void Pyramid::update(Image *img)
 
     for(unsigned int i = 0; i < levels; i++) {
 
-        tmpG = flt_gauss->ProcessP(Single(tmpImg), stack[i]);
+        tmpG = flt_gauss->Process(Single(tmpImg), stack[i]);
 
         if(i == (levels - 1)) {
-            tmpD = flt_sampler->ProcessP(Single(tmpG), stack[i + 1]);
+            tmpD = flt_sampler->Process(Single(tmpG), stack[i + 1]);
         } else {
-            tmpD = flt_sampler->ProcessP(Single(tmpG), trackerUp[i]);
+            tmpD = flt_sampler->Process(Single(tmpG), trackerUp[i]);
         }
 
         if(lapGauss) {	//Laplacian Pyramid
-            flt_sub->ProcessP(Double(tmpImg, tmpD), tmpG);
+            flt_sub->Process(Double(tmpImg, tmpD), tmpG);
         } else {		//Gaussian Pyramid
             tmpG->assign(tmpImg);
         }
@@ -349,7 +349,7 @@ PIC_INLINE Image *Pyramid::reconstruct(Image *imgOut = NULL)
 
     if(trackerRec.empty()) {
         for(int i = n; i >= 2; i--) {
-            Image *tmp2 = flt_add->ProcessP(Double(stack[i - 1], tmp), NULL);
+            Image *tmp2 = flt_add->Process(Double(stack[i - 1], tmp), NULL);
             trackerRec.push_back(tmp2);
             tmp = tmp2;
         }
@@ -357,13 +357,13 @@ PIC_INLINE Image *Pyramid::reconstruct(Image *imgOut = NULL)
         int c = 0;
 
         for(int i = n; i >= 2; i--) {
-            flt_add->ProcessP(Double(stack[i - 1], tmp), trackerRec[c]);
+            flt_add->Process(Double(stack[i - 1], tmp), trackerRec[c]);
             tmp = trackerRec[c];
             c++;
         }
     }    
 
-    imgOut = flt_add->ProcessP(Double(stack[0], tmp), imgOut);
+    imgOut = flt_add->Process(Double(stack[0], tmp), imgOut);
 
     return imgOut;
 }

@@ -101,7 +101,7 @@ public:
             filter.changePass(0, 1, 0);
         }
 
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 
     /**

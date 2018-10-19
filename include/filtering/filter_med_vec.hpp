@@ -108,7 +108,7 @@ public:
     {
         this->halfSize = checkHalfSize(size);
 
-        int kernelSize = halfSize * 2 + 1;
+        int kernelSize = (halfSize << 1) + 1;
         this->areaKernel = kernelSize * kernelSize;
 
         this->midValue = areaKernel >> 1;
@@ -124,7 +124,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut, int size)
     {
         FilterMedVec filter(size);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 
