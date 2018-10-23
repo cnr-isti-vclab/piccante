@@ -807,21 +807,6 @@ public:
     }
 };
 
-/**
- * @brief estimateAverageLuminance
- * @param shutter_speed
- * @param aperture_value
- * @param iso_value
- * @param K_value
- * @return
- */
-PIC_INLINE float estimateAverageLuminance(float shutter_speed, float aperture_value = 1.0f, float iso_value = 1.0f, float K_value = 12.5f)
-{
-    K_value = CLAMPi(K_value, 10.6f, 13.4f);
-
-    return (iso_value * shutter_speed) / (K_value * aperture_value * aperture_value);
-}
-
 } // end namespace pic
 
 #endif /* PIC_ALGORITHMS_CAMERA_RESPONSE_FUNCTION_HPP */

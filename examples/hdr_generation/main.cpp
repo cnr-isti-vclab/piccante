@@ -26,12 +26,11 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
+
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    //exposure time in seconds: exposureTime[0] ==> img[0], etc.
-    float exposure_time_vec[] = {2.0f, 1.0f / 2.0f, 1.0f / 8.0f, 1.0f / 30.0f, 1.0f / 125.0f, 1.0f / 1000.0f, 1.0f / 4000.0f};
 
     printf("Reading a stack of LDR images...");
     bool valid = true;
@@ -40,12 +39,11 @@ int main(int argc, char *argv[])
     for(int i = 0; i < 7; i++) {
         pic::Image *img = new pic::Image();
         std::string name = "../data/input/stack/stack_room_exp_" + pic::fromNumberToString(i) + ".jpg";
+
         printf("\n%s", name.c_str());
         img->Read(name, pic::LT_NOR);
 
         valid = valid && img->isValid();
-
-        img->exposure = pic::estimateAverageLuminance(exposure_time_vec[i], 4.5f, 200.0f);
 
         stack_vec.push_back(img);
     }
