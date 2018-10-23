@@ -38,7 +38,7 @@ unsigned int twoByteToValue(unsigned char data[2], bool bMotorola)
     if(bMotorola) {
         return  (data[0] << 8) + (data[1]);
     } else {
-        return  (data[0] << 8) + (data[1]);
+        return  (data[1] << 8) + (data[0]);
     }
 }
 
@@ -76,7 +76,7 @@ bool checkTag(unsigned char tag[2], unsigned short tag_r, bool bMotorola)
     if(bMotorola) {
         bRet = (tag[0] == tag_ref[0]) && (tag[1] == tag_ref[1]);
     } else {
-        bRet = (tag[1] == tag_ref[0]) && (tag[1] == tag_ref[0]);
+        bRet = (tag[1] == tag_ref[0]) && (tag[0] == tag_ref[1]);
     }
 
     return bRet;
@@ -468,6 +468,8 @@ bool readEXIF(std::string name, EXIFInfo &info)
 
             }
         }
+
+        printf("%f %f %f\n", info.iso, info.exposureTime, info.fNumber);
 
         fclose(file);
 
