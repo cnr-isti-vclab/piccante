@@ -174,6 +174,23 @@ int getBytesForComponents(int value)
 }
 
 /**
+ * @brief readString
+ * @param file
+ * @param length
+ * @return
+ */
+std::string readString(FILE *file, int length)
+{
+    char *tmp = new char[length];
+    fread(tmp, 1, length, file);
+    std::string str(tmp);
+
+    delete[] tmp;
+
+    return str;
+}
+
+/**
  * @brief readUnsignedRational
  * @param file
  * @param bMotorola
@@ -208,7 +225,7 @@ bool readEXIF(std::string name, EXIFInfo &info)
         unsigned char buf[2];
         fread(buf, 1, 2, file);
 
-        if(buf[0] != 0xff || buf[1] != 0xD8) {
+        if(!checkTag(buf, 0xffd8, true)) {
             return false;
         }
 
@@ -226,7 +243,7 @@ bool readEXIF(std::string name, EXIFInfo &info)
             //printf("LEN: %x %x\n", len[0], len[1]);
             length =  (len[0] << 8) + (len[1]);
 
-            if((buf2[0] == 0xff && buf2[1] == 0xe1)) {
+            if(checkTag(buf2, 0xffe1, true)) {
                 bFound = true;
                 break;
             }
@@ -262,13 +279,7 @@ bool readEXIF(std::string name, EXIFInfo &info)
         fread(buf2, 1, 2, file);
         bool bCheck = false;
 
-        if(bMotorola) {
-            bCheck = (buf2[0] == 0x00) && (buf2[1] == 0x2a);
-        } else {
-            bCheck = (buf2[0] == 0x2a) && (buf2[1] == 0x00);
-        }
-
-        if(!bCheck) {
+        if(!checkTag(buf2, 0x002a, bMotorola)) {
             fclose(file);
             return false;
         }
@@ -292,13 +303,8 @@ bool readEXIF(std::string name, EXIFInfo &info)
         //IFD0: Image file directory
         fread(buf2, 1, 2, file);
 
-        int nIFD = 0;
+        int nIFD = twoByteToValue(buf2, bMotorola);
 
-        if(bMotorola) {
-            nIFD = (buf2[0] << 8) + (buf2[1]);
-        } else {
-            nIFD = (buf2[0]) + (buf2[1] << 8);
-        }
         //printf("nIFD: %d\n", nIFD);
 
         unsigned int offset;
@@ -315,9 +321,8 @@ bool readEXIF(std::string name, EXIFInfo &info)
             unsigned char data[4];
             fread(data, 1, 4, file); //data or offset to data
 
-
             //maker
-            if(tag[0] == 0x01 && tag[1] == 0x0f) {
+            if(checkTag(tag, 0x010f, bMotorola)) {
 
                 int df = twoByteToValue(data_format, bMotorola);
                 int nc = fourByteToValue(num_components, bMotorola);
@@ -333,12 +338,7 @@ bool readEXIF(std::string name, EXIFInfo &info)
 
                     fseek(file, pos + offset, SEEK_SET);
 
-                    for(int j = 0; j < nc; j++) {
-                        unsigned char tmpj;
-                        fread(&tmpj, 1, 1, file);
-                        printf("%c", tmpj);
-                    }
-                    printf("\n");
+                    std::string str = readString(file, nc);
 
                     fseek(file, tmppos, SEEK_SET);
                 }
@@ -365,13 +365,7 @@ bool readEXIF(std::string name, EXIFInfo &info)
 
         fread(buf2, 1, 2, file);
 
-        nIFD = 0;
-
-        if(bMotorola) {
-            nIFD = (buf2[0] << 8) + (buf2[1]);
-        } else {
-            nIFD = (buf2[0]) + (buf2[1] << 8);
-        }
+        nIFD = twoByteToValue(buf2, bMotorola);
 
         for(int i = 0; i < nIFD; i++) {
             unsigned char tag[2];
