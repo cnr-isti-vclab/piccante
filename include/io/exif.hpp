@@ -106,6 +106,10 @@ int getTagID(unsigned char tag[2], bool bMotorola)
         return 3;
     }
 
+    if(checkTag(tag, 0x920a, bMotorola)) {
+        return 4;
+    }
+
     return -1;
 }
 
@@ -191,6 +195,22 @@ std::string readString(FILE *file, int length)
 }
 
 /**
+ * @brief readStringFromUChar
+ * @param data
+ * @return
+ */
+std::string readStringFromUChar(unsigned char *data, int length)
+{
+    std::string str;
+
+    for(int i = 0; i < length; i++) {
+        str += (char) data[i];
+    }
+
+    return str;
+}
+
+/**
  * @brief readUnsignedRational
  * @param file
  * @param bMotorola
@@ -216,6 +236,9 @@ struct EXIFInfo
     float fNumber;
     float aperture;
     float iso;
+    float focal_length;
+
+    std::string camera_maker;
 };
 
 bool readEXIF(std::string name, EXIFInfo &info)
@@ -334,16 +357,14 @@ bool readEXIF(std::string name, EXIFInfo &info)
 
                     fpos_t tmppos;
                     fgetpos(file, &tmppos);
-
-
                     fseek(file, pos + offset, SEEK_SET);
-
-                    std::string str = readString(file, nc);
-
+                    info.camera_maker = readString(file, nc);
                     fseek(file, tmppos, SEEK_SET);
+
+                } else {
+                    info.camera_maker = readStringFromUChar(data, nc);
                 }
             }
-
 
             if(checkTag(tag, 0x8769, bMotorola)) {
                 offset = fourByteToValue(data, bMotorola);
@@ -395,7 +416,11 @@ bool readEXIF(std::string name, EXIFInfo &info)
                 fgetpos(file, &tmp_pos);
                 fseek(file, pos + offset, SEEK_SET);
 
-                data_value = readUnsignedRational(file, bMotorola);
+                switch(df) {
+                case 5: {
+                    data_value = readUnsignedRational(file, bMotorola);
+                } break;
+                }
                 //unsigned rational
 
                 fseek(file, tmp_pos, SEEK_SET);
@@ -429,6 +454,11 @@ bool readEXIF(std::string name, EXIFInfo &info)
             {
                 info.aperture = data_value;
 
+            } break;
+
+            case 4:
+            {
+                info.focal_length = data_value;
             } break;
 
             default:

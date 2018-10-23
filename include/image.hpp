@@ -1793,37 +1793,39 @@ PIC_INLINE bool Image::Read(std::string nameFile,
         }
 
         switch(label) {
-        case IO_BMP:
+        case IO_BMP: {
             tmp = ReadBMP(nameFile, dataReader, width, height, channels);
-            break;
+        } break;
 
-        case IO_PPM:
+        case IO_PPM: {
             tmp = ReadPPM(nameFile, dataReader, width, height, channels);
-            break;
+        } break;
 
-        case IO_PGM:
+        case IO_PGM: {
             tmp = ReadPGM(nameFile, dataUC, width, height, channels);
-            break;
+        } break;
 
-        case IO_TGA:
+        case IO_TGA: {
             tmp = ReadTGA(nameFile, dataReader, width, height, channels);
-            break;
+        } break;
 
-        case IO_JPG:
+        case IO_JPG: {
             bExt = true;
 
             EXIFInfo info;
             readEXIF(nameFile, info);
             exposure = estimateAverageLuminance(info.exposureTime, info.aperture, info.iso);
 
-        break;
+        } break;
 
-        case IO_PNG:
+        case IO_PNG: {
             bExt = true;
-            break;
+        } break;
 
-        default:
+        default: {
             tmp = NULL;
+        } break;
+
         }
 
          if(bExt) {
