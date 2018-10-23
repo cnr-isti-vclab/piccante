@@ -69,7 +69,7 @@ unsigned int fourByteToValue(unsigned char data[4], bool bMotorola)
 bool checkTag(unsigned char tag[2], unsigned short tag_r, bool bMotorola)
 {
     unsigned char tag_ref[2];
-    tag_ref[0] = (tag_r >> 256) & 0x00ff;
+    tag_ref[0] = (tag_r >> 8) & 0x00ff;
     tag_ref[1] = tag_r & 0x00ff;
 
     bool bRet = false;
