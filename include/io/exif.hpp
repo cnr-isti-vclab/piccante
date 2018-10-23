@@ -62,12 +62,16 @@ unsigned int fourByteToValue(unsigned char data[4], bool bMotorola)
 /**
  * @brief checkTag
  * @param tag
- * @param tag_ref
+ * @param tag_r
  * @param bMotorola
  * @return
  */
-bool checkTag(unsigned char tag[2], unsigned char tag_ref[2], bool bMotorola)
+bool checkTag(unsigned char tag[2], unsigned short tag_r, bool bMotorola)
 {
+    unsigned char tag_ref[2];
+    tag_ref[0] = (tag_r >> 256) & 0x00ff;
+    tag_ref[1] = tag_r & 0x00ff;
+
     bool bRet = false;
     if(bMotorola) {
         bRet = (tag[0] == tag_ref[0]) && (tag[1] == tag_ref[1]);
@@ -86,23 +90,19 @@ bool checkTag(unsigned char tag[2], unsigned char tag_ref[2], bool bMotorola)
  */
 int getTagID(unsigned char tag[2], bool bMotorola)
 {
-    unsigned char exp_time[] = {0x82, 0x9a};
-    if(checkTag(tag, exp_time, bMotorola)) {
+    if(checkTag(tag, 0x829a, bMotorola)) {
         return 0;
     }
 
-    unsigned char f_number[] = {0x82, 0x9d};
-    if(checkTag(tag, f_number, bMotorola)) {
+    if(checkTag(tag, 0x829d, bMotorola)) {
         return 1;
     }
 
-    unsigned char iso[] = {0x88, 0x27};
-    if(checkTag(tag, iso, bMotorola)) {
+    if(checkTag(tag, 0x8827, bMotorola)) {
         return 2;
     }
 
-    unsigned char aperture[] = {0x92, 0x02};
-    if(checkTag(tag, aperture, bMotorola)) {
+    if(checkTag(tag, 0x9202, bMotorola)) {
         return 3;
     }
 
@@ -344,9 +344,9 @@ bool readEXIF(std::string name, EXIFInfo &info)
                 }
             }
 
-            if(tag[0] == 0x87 && tag[1] == 0x69) {
-                offset = (data[0] << 24) + (data[1] << 16) +
-                         (data[2] << 8) + (data[3]);
+
+            if(checkTag(tag, 0x8769, bMotorola)) {
+                offset = fourByteToValue(data, bMotorola);
             }
         }
 
@@ -358,6 +358,10 @@ bool readEXIF(std::string name, EXIFInfo &info)
         if(offset > 0) {
             fseek(file, pos + offset, SEEK_SET);
         }
+
+        //
+        // IFD 1
+        //
 
         fread(buf2, 1, 2, file);
 
