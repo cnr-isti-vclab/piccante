@@ -142,12 +142,7 @@ PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(float scaleX, float scaleY =
 
     if(scaleX > 0.0f) {
         this->scale[0] = scaleX;
-
-        if(scale[1] > 0.0f) {
-            this->scale[1] = scale[1];
-        } else {
-            this->scale[1] = scale[0];
-        }
+        this->scale[1] = scaleY > 0.0f ? scaleY : scaleX;
     }
 
     width  = -1;

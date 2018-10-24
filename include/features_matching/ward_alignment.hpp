@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../image.hpp"
 #include "../util/vec.hpp"
+#include "../util/string.hpp"
 #include "../image_samplers/image_sampler_bilinear.hpp"
 #include "../filtering/filter_downsampler_2d.hpp"
 #include "../filtering/filter_luminance.hpp"
