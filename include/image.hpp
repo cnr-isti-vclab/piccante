@@ -1984,6 +1984,7 @@ PIC_INLINE Image *Image::allocateSimilarOne()
 {
     Image *ret = new Image(frames, width, height, channels);
     ret->flippedEXR = flippedEXR;
+    ret->exposure = exposure;
     return ret;
 }
 
@@ -2033,6 +2034,7 @@ PIC_INLINE float* Image::getColorSamples(float *samples,
     for(int i = 0; i < nSamples; i++) {
         int index = i * channels;
         int index_d = index * shift;
+
         for(int j = 0; j < channels; j++) {
             samples[index + j] = data[index_d + j];
         }

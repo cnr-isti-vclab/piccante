@@ -50,10 +50,10 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
     /**
-     * @brief SetDirection
+     * @brief setDirection
      * @param direction
      */
-    void SetDirection(int direction);
+    void setDirection(int direction);
 
     /**
      * @brief setImageSampler
@@ -137,14 +137,14 @@ public:
 };
 
 PIC_INLINE FilterSampler1D::FilterSampler1D(float scale, int direction = 0,
-        ImageSampler *isb = NULL)
+        ImageSampler *isb = NULL) : Filter()
 {
     this->isb = NULL;
     update(scale, direction, isb);
 }
 
 PIC_INLINE FilterSampler1D::FilterSampler1D(int size, int direction = 0,
-        ImageSampler *isb = NULL)
+        ImageSampler *isb = NULL) : Filter()
 {
     this->isb = NULL;
     update(size, direction, isb);
@@ -156,7 +156,7 @@ PIC_INLINE void FilterSampler1D::update(float scale, int direction,
     this->scale = scale;
     this->swh   = true;
 
-    SetDirection(direction);
+    setDirection(direction);
     setImageSampler(isb);
 }
 
@@ -166,11 +166,11 @@ PIC_INLINE void FilterSampler1D::update(int size, int direction,
     this->size = size;
     this->swh  = false;
 
-    SetDirection(direction);
+    setDirection(direction);
     setImageSampler(isb);
 }
 
-PIC_INLINE void FilterSampler1D::SetDirection(int direction = 0)
+PIC_INLINE void FilterSampler1D::setDirection(int direction = 0)
 {
     dirs[ direction      % 3] = 1;
     dirs[(direction + 1) % 3] = 0;

@@ -186,7 +186,7 @@ public:
         //downsample
         Image *tmp_1 = L1;
         Image *tmp_2 = L2;
-        for(int i=0; i< shift_bits; i++) {
+        for(int i = 0; i < shift_bits; i++) {
             Image* sml_img1 = FilterDownSampler2D::execute(tmp_1, NULL, 0.5f);
             Image* sml_img2 = FilterDownSampler2D::execute(tmp_2, NULL, 0.5f);
 

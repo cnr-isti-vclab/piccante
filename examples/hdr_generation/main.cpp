@@ -31,7 +31,8 @@ This program is free software: you can redistribute it and/or modify
 
 int main(int argc, char *argv[])
 {
-
+    pic::Image tmp("../data/input/stack/Pentax_K10D.jpg");
+  /*
     printf("Reading a stack of LDR images...");
     bool valid = true;
     pic::ImageVec stack_vec;
@@ -104,6 +105,7 @@ int main(int argc, char *argv[])
     } else {
         printf("No, the files are not valid!\n");
     }
+    */
 
     return 0;
 }
