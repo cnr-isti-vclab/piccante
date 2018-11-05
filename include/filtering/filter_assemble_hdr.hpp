@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../filtering/filter.hpp"
 
+#include "../util/array.hpp"
+
 #include "../algorithms/camera_response_function.hpp"
 
 namespace pic {
@@ -59,9 +61,9 @@ protected:
 
         int n = int(src.size());
 
-        float t_min = FLT_MAX;
-        int index = -1;
-        for(int j = 0; j < n; j++) {
+        float t_min = src[0]->exposure;
+        int index = 0;
+        for(int j = 1; j < n; j++) {
             if(src[j]->exposure < t_min) {
                 t_min = src[j]->exposure;
                 index = j;
@@ -79,25 +81,24 @@ protected:
             for(int i = box->x0; i < box->x1; i++) {
                 int c = (ind + i) * channels;
 
-                for(int k = 0; k < channels; k++) {
-                    acc[k] = 0.0f;
-                    totWeight[k] = 0.0f;
-                }
+                Array<float>::assign(0.0f, acc, channels);
+                Array<float>::assign(0.0f, totWeight, channels);
 
                 float max_val_saturation = 1.0f;
+                float max_val_saturation_fb = -1.0f;
 
                 //for each exposure...
                 for(int l = 0; l < n; l++) {
 
-                    float x = 0.0f;
-                    for(int k = 0; k < channels; k++) {
-                        x += src[l]->data[c + k];
-                    }
+                    float x = Array<float>::sum(&src[l]->data[c], channels);
                     x /= channelsf;
 
+                    float t_mvs = x / t_min;
+
+                    max_val_saturation_fb = MAX(max_val_saturation_fb, t_mvs);
 
                     if(l == index) {
-                        max_val_saturation = x / t_min;
+                        max_val_saturation = t_mvs;
                     }
 
                     float weight = weightFunction(x, weight_type);
@@ -142,9 +143,8 @@ protected:
                         dst->data[c + k] = acc[k];
                     }
                 } else {
-                    for(int k = 0; k < channels; k++) {
-                        dst->data[c + k] = max_val_saturation;
-                    }
+                    max_val_saturation = MAX(max_val_saturation_fb, max_val_saturation);
+                    Array<float>::assign(max_val_saturation, &dst->data[c], channels);
                 }
             }
         }
@@ -161,7 +161,7 @@ public:
      * @param linearization_type
      * @param icrf
      */
-    FilterAssembleHDR(CameraResponseFunction *crf, CRF_WEIGHT weight_type = CW_DEB97, HDR_REC_DOMAIN domain = HRD_LOG)
+    FilterAssembleHDR(CameraResponseFunction *crf, CRF_WEIGHT weight_type = CW_DEB97, HDR_REC_DOMAIN domain = HRD_LOG) : Filter()
     {        
         this->crf = crf;
 
@@ -171,6 +171,8 @@ public:
 
         //a numerical stability value when assembling images in the log-domain
         this->delta_value = 1.0 / 65536.0f;
+
+        minInputImages = 2;
     }
 };
 

@@ -283,7 +283,7 @@ public:
             return NULL;
         }
 
-        Image *ret = imgTarget->allocateSimilarOne();
+        Image *ret = imgSource->allocateSimilarOne();
         ret->setZero();
 
         shift = wa.getExpShift(imgTarget, imgSource);

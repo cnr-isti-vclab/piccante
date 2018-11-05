@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
         crf.DebevecMalik(Triple(&img[0], &img[1], &img[2]));
         printf("Ok.\n");
 
-        //Set each exposure time to the related image
+        //set each exposure time to the related image
         pic::ImageVec stack = Triple(&img[0], img_dark, img_bright);
 
         printf("Assembling the different exposure images... ");
