@@ -39,20 +39,13 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        if(src.size() != 2) {
-            return;
-        }
-
         Image *img  = src[0];
         Image *conv = src[1];
 
         int channels = dst->channels;
 
-        int c_width	 = conv->width;
-        int c_height = conv->height;
-
-        int c_width_h  = (c_width >> 1);
-        int c_height_h = (c_height >> 1);
+        int c_w_h  = (conv->width >> 1);
+        int c_h_h = (conv->height >> 1);
 
         for(int j = box->y0; j < box->y1; j++) {
             for(int i = box->x0; i < box->x1; i++) {
@@ -60,15 +53,14 @@ protected:
 
                 Array<float>::assign(0.0f, dst_data, channels);
 
-                for(int k = -c_height_h; k <= c_height_h; k++) {
-                    for(int l = -c_width_h; l <= c_width_h; l++) {
+                for(int k = -c_h_h; k <= c_h_h; k++) {
+                    for(int l = -c_w_h; l <= c_w_h; l++) {
 
                         float *img_data  = (*img)(i + l, j + k);
-                        float kernel_val = (*conv)(l + c_width_h, k + c_height_h)[0];
+                        float *conv_data = (*conv)(l + c_w_h, k + c_h_h);
 
-                        //Accumulation
                         for(int c = 0; c < channels; c++) {
-                            dst_data[c] += img_data[c] * kernel_val;
+                            dst_data[c] += img_data[c] * conv_data[c];
                         }
                     }
                 }
@@ -83,7 +75,7 @@ public:
      */
     FilterConv2D() : Filter()
     {
-
+        minInputImages = 2;
     }
 
     /**

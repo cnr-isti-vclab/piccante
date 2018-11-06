@@ -183,10 +183,10 @@ public:
     }
 
     /**
-     * @brief normalize
-     * @param data
+     * @brief dot
+     * @param data0
+     * @param data1
      * @param n
-     * @param norm
      * @return
      */
     static inline T dot(T *data0, T *data1, int n)

@@ -33,21 +33,21 @@ namespace pic {
 class TileList
 {
 protected:
-    unsigned int    counter;
+    unsigned int counter;
 
 #ifndef PIC_DISABLE_THREAD
-    std::mutex      mutex;
+    std::mutex mutex;
 #endif
 
 public:
-    int             width, height;
-    int             h_tile, w_tile;
-    int             mod_h, mod_w;
+    int width, height;
+    int h_tile, w_tile;
+    int mod_h, mod_w;
 
     /**
      * @brief tiles a list of tiles
      */
-    std::vector<Tile>		tiles;
+    std::vector<Tile> tiles;
 
     /**
      * @brief TileList basic constructor
@@ -146,9 +146,10 @@ PIC_INLINE BBox *TileList::genBBox(int i, BBox *box)
 
     i = i % tiles.size();
 
-    box->SetBox(tiles[i].startX,
+    box->setBox(tiles[i].startX,
                 tiles[i].startX + tiles[i].width,
-                tiles[i].startY, tiles[i].startY + tiles[i].height,
+                tiles[i].startY,
+                tiles[i].startY + tiles[i].height,
                 0, 1, width, height, 1);
 
     return box;
@@ -181,7 +182,7 @@ PIC_INLINE void TileList::create(int tileSize, int width, int height)
 {
     resetCounter();
 
-    if(tiles.size() > 0) {
+    if(!tiles.empty()) {
         if((tiles[0].width == tileSize) && (this->width == width) &&
            (this->height == height)) {
             return;

@@ -32,6 +32,7 @@ protected:
     FilterConv1D *conv1DFltX, *conv1DFltY;
 
 public:
+
     /**
      * @brief FilterConv2DSP
      * @param data
@@ -78,19 +79,18 @@ public:
         conv1DFltY = NULL;
     }
 
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @param data
+     * @param n
+     * @return
+     */
     static Image *execute(Image *imgIn, Image *imgOut, float *data, int n)
     {
         FilterConv2DSP filter(data, n);
         return filter.Process(Single(imgIn), imgOut);
-    }
-
-    static Image *execute(std::string nameIn, std::string nameOut, float *data,
-                             int n)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = execute(&imgIn, NULL, data, n);
-        imgOut->Write(nameOut);
-        return imgOut;
     }
 };
 

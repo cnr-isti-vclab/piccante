@@ -100,14 +100,15 @@ PIC_INLINE void FilterGLConv2D::FragmentShader()
         ivec2 coordsFrag = ivec2(gl_FragCoord.xy) - shift;
 
         vec4  color = vec4(0.0);
+
         for(int i = 0; i < kernelSize.y; i++) {
+
             for(int j = 0; j < kernelSize.x; j++) {
                 //do a texture fetch
                 vec4 tmpCol = texelFetch(u_tex, coordsFrag.xy + ivec2(j, i), 0);
 
                 //weight
-                float tmp = texelFetch(u_weights, ivec2(j, i), 0).x;
-                color += tmpCol * tmp;
+                color += tmpCol * texelFetch(u_weights, ivec2(j, i), 0);
             }
         }
 

@@ -33,6 +33,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/buffer.hpp"
 #include "util/low_dynamic_range.hpp"
 #include "util/math.hpp"
+#include "util/array.hpp"
 
 //IO formats
 #include "io/bmp.hpp"
@@ -1015,7 +1016,7 @@ PIC_INLINE void Image::allocate(int width, int height, int channels, int frames)
 
 PIC_INLINE void Image::allocateAux()
 {
-    this->fullBox.SetBox(0, width, 0, height, 0, frames, width,
+    this->fullBox.setBox(0, width, 0, height, 0, frames, width,
                          height, frames);
 
     this->depth    = frames;
@@ -1424,18 +1425,14 @@ PIC_INLINE float *Image::getSumVal(BBox *box = NULL, float *ret = NULL)
         ret = new float[channels];
     }
 
-    for(int l = 0; l < channels; l++) {
-        ret[l] = 0.0f;
-    }
+    Array<float>::assign(0.0f, ret, channels);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
             for(int i = box->x0; i < box->x1; i++) {
                 float *tmp_data = (*this)(i, j, k);
 
-                for(int l = 0; l < channels; l++) {
-                    ret[l] += tmp_data[l];
-                }
+                Array<float>::add(tmp_data, ret, channels);
             }
         }
     }
@@ -1470,15 +1467,13 @@ PIC_INLINE float *Image::getMomentsVal(int x0, int y0, int radius, float *ret = 
         return ret;
     }
 
-    int channels_2 = channels * 2;
+    int channels_2 = channels << 1;
 
     if(ret == NULL) {
         ret = new float[channels_2];
     }
 
-    for(int l = 0; l < channels_2; l++) {
-        ret[l] = 0.0f;
-    }
+    Array<float>::assign(0.0f, ret, channels_2);
 
     for(int j = -radius; j <= radius; j++) {
         int y = y0 + j;
@@ -1509,17 +1504,18 @@ PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL, BBox *box = NULL,
         box = &fullBox;
     }
 
+    bool bDeleteMeanVal = false;
+
     if(meanVal == NULL) {
-        meanVal = getMeanVal(box);
+        meanVal = getMeanVal(box, NULL);
+        bDeleteMeanVal = true;
     }
 
     if(ret == NULL) {
         ret = new float[channels];
     }
 
-    for(int l = 0; l < channels; l++) {
-        ret[l] = 0.0f;
-    }
+    Array<float>::assign(0.0f, ret, channels);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
@@ -1538,6 +1534,10 @@ PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL, BBox *box = NULL,
 
     for(int l = 0; l < channels; l++) {
         ret[l] /= totf;
+    }
+
+    if(bDeleteMeanVal) {
+        delete[] meanVal;
     }
 
     return ret;
@@ -1564,9 +1564,7 @@ PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
         ret = new float[n];
     }
 
-    for(int l = 0; l < n; l++) {
-        ret[l] = 0.0f;
-    }
+     Array<float>::assign(0.0f, ret, n);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
@@ -1609,9 +1607,7 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
         ret = new float[channels];
     }
 
-    for(int l = 0; l < channels; l++) {
-        ret[l] = 0.0f;
-    }
+    Array<float>::assign(0.0f, ret, channels);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
