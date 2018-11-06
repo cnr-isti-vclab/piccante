@@ -91,7 +91,7 @@ protected:
     {
         BufferOpsGL *ops = BufferOpsGL::getInstance();
 
-        ops->list[op]->Update(a);
+        ops->list[op]->update(a);
         ops->list[op]->Process(getTexture(), 0, getTexture(), width, height);
     }
 
@@ -124,7 +124,7 @@ protected:
         ImageGL ret(frames, width, height, channels, IMG_GPU, target);
         BufferOpsGL *ops = BufferOpsGL::getInstance();
 
-        ops->list[op]->Update(a);
+        ops->list[op]->update(a);
         ops->list[op]->Process(getTexture(), 0, ret.getTexture(), width, height);
 
         return ret;
@@ -372,7 +372,7 @@ public:
 
         GLuint output = flt->Redux(texture, width, height, channels, stack);
 
-        //copying data from GPU to main memory
+        //copy data from GPU to main memory
         int mode, modeInternalFormat;
         getModesGL(channels, mode, modeInternalFormat);
 
@@ -762,7 +762,7 @@ PIC_INLINE ImageGL *ImageGL::cloneGL()
     //call Image clone function
     Image *tmp = this->clone();
 
-    //wrapping tmp into an ImageGL
+    //wrap tmp into an ImageGL
     return new ImageGL(tmp, target, false, true);
 }
 
@@ -789,7 +789,7 @@ PIC_INLINE void ImageGL::releaseGL()
 PIC_INLINE ImageGL *ImageGL::allocateSimilarOneGL()
 {
 #ifdef PIC_DEBUG
-    printf("%d %d %d %d %d\n", frames, width, height, channels, mode);
+    printf("ImageGL::allocateSimilarOneGL -- %d %d %d %d %d\n", frames, width, height, channels, mode);
 #endif
 
     ImageGL *ret = new ImageGL(frames, width, height, channels, mode, target);
@@ -932,7 +932,7 @@ PIC_INLINE void ImageGL::unBindTexture()
 PIC_INLINE void ImageGL::clamp(float a = 0.0f, float b = 1.0f)
 {
     BufferOpsGL *ops = BufferOpsGL::getInstance();
-    ops->list[BOGL_CLAMP]->Update(a, b);
+    ops->list[BOGL_CLAMP]->update(a, b);
     ops->list[BOGL_CLAMP]->Process(getTexture(), 0, getTexture(), width, height);
 }
 
