@@ -68,12 +68,12 @@ PIC_INLINE unsigned int kMeansAssignLabel( T* sample_j, int nDim,
 template<class T>
 PIC_INLINE T* kMeansComputeMean(T *samples, T *out, int nDim, std::set<unsigned int> *cluster)
 {
-    Array<T>::set(out, nDim, T(0));
+    Array<T>::assign(T(0), out, nDim);
 
     int count = 0;
-     for (std::set<unsigned int>::iterator it = cluster->begin(); it != cluster->end(); it++) {
+     for (auto it = cluster->begin(); it != cluster->end(); it++) {
          int i = *it;
-         Array<T>::add(&samples[i * nDim], out, nDim);
+         Array<T>::add(&samples[i * nDim], nDim, out);
          count++;
      }
 
@@ -177,7 +177,7 @@ PIC_INLINE T* kMeans(T *samples, int nSamples, int nDim,
             //update centers
             float dist = Arrayf::distanceSq(&centers[index], &mean[index], nDim);
 
-            Arrayf::assign(&mean[index], &centers[index], nDim);
+            Arrayf::assign(&mean[index], nDim, &centers[index]);
 
             if(dist > 1e-6f) {
                 bNoChanges = false;

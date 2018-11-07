@@ -232,10 +232,10 @@ PIC_INLINE void evaluateGaussian(Image *img, float sigma = -1.0f,
 }
 
 /**
- * @brief EvaluateSolid renders a centred circle.
+ * @brief evaluateSolid renders a centred circle.
  * @param img is an input image
  */
-PIC_INLINE void EvaluateSolid(Image *img)
+PIC_INLINE void evaluateSolid(Image *img)
 {
     if(img == NULL) {
         return;
