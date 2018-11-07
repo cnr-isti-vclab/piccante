@@ -49,13 +49,13 @@ protected:
     ReinhardTMOGL       *flt_reinhard;
 
     /**
-     * @brief AllocateFilters
+     * @brief allocateFilters
      */
-    void AllocateFilters()
+    void allocateFilters()
     {
         flt_drago    = new DragoTMOGL();
         flt_reinhard = new ReinhardTMOGL();
-        check = ReduxGL::CreateCheck();
+        check = ReduxGL::createCheck();
     }
 
 public:
@@ -110,7 +110,7 @@ public:
         }
 
         if(flt_drago == NULL) {
-            AllocateFilters();
+            allocateFilters();
         }
 
         //compute segmentation map
@@ -174,7 +174,7 @@ public:
             //Reinhard TMO
             imgReinhard = flt_reinhard->execute(imgIn, imgReinhard);
 
-            //Genarating/updating pryamids
+            //generate/update pryamids
             if(pyrA == NULL) {
                 pyrA = new PyramidGL(imgDrago, true);
             } else {

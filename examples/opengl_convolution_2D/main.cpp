@@ -65,9 +65,10 @@ protected:
         img.generateTextureGL();
 
         //read weights
-        weights.Read("../data/input/star.bmp");
-        float *sum = weights.getSumVal();
+        weights.Read("../data/input/star.bmp", pic::LT_NOR);
         weights.generateTextureGL();
+
+        float *sum = weights.getSumVal();
 
         if(sum != NULL) {
             weights /= sum[0];
@@ -79,7 +80,7 @@ protected:
                             pic::QuadGL::getFragmentProgramForView());
         quad = new pic::QuadGL(true);
 
-        //allocating a new filter for simple tone mapping
+        //allocate a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
         tmo->update(2.2f, 0.0f);
 

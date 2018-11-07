@@ -27,7 +27,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-enum REDGL{REDGL_MIN, REDGL_MAX, REDGL_MEAN, REDGL_LOG_MEAN};
+enum REDGL{REDGL_MIN, REDGL_MAX, REDGL_SUM, REDGL_MEAN, REDGL_LOG_MEAN};
 
 typedef std::vector<ReduxGL*> ReduxOperatorsGL;
 
@@ -73,10 +73,11 @@ private:
      */
     ReduxOpsGL()
     {
-        list.push_back(ReduxGL::CreateMin());
-        list.push_back(ReduxGL::CreateMax());
-        list.push_back(ReduxGL::CreateMean());
-        list.push_back(ReduxGL::CreateLogMean());
+        list.push_back(ReduxGL::createMin());
+        list.push_back(ReduxGL::createMax());
+        list.push_back(ReduxGL::createSum());
+        list.push_back(ReduxGL::createMean());
+        list.push_back(ReduxGL::createLogMean());
     }
 
 };

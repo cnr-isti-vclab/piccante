@@ -362,12 +362,16 @@ public:
      */
     float *getVal(float *ret, ReduxGL *flt)
     {
+        if(texture == 0) {
+            return ret;
+        }
+
         if(ret == NULL) {
             ret = new float [channels];
         }
 
         if(stack.empty()) {
-            ReduxGL::AllocateReduxData(width, height, channels, stack, 1);
+            ReduxGL::allocateReduxData(width, height, channels, stack, 1);
         }
 
         GLuint output = flt->Redux(texture, width, height, channels, stack);
@@ -407,6 +411,18 @@ public:
     }
 
     /**
+     * @brief getSumVal
+     * @param imgIn
+     * @param ret
+     * @return
+     */
+    float *getSumVal(float *ret = NULL)
+    {
+        ReduxOpsGL *ops = ReduxOpsGL::getInstance();
+        return getVal(ret, ops->list[REDGL_SUM]);
+    }
+
+    /**
      * @brief getMeanVal
      * @param imgIn
      * @return
@@ -428,7 +444,7 @@ public:
 
         ret = getVal(ret, ops->list[REDGL_LOG_MEAN]);
 
-        for(int i=0; i<channels; i++) {
+        for(int i = 0; i < channels; i++) {
             ret[i] = expf(ret[i]);
         }
 
