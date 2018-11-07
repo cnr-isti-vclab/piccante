@@ -30,14 +30,42 @@ template<class T>
 class Array
 {
 public:
+    T *data;
+    int nData;
 
     /**
      * @brief Array
      */
     Array()
     {
-
     }
+
+    /**
+     * @brief allocate
+     * @param n
+     */
+    void allocate(int n)
+    {
+        if(n < 1) {
+            return;
+        }
+
+        data = new T[n];
+        this->nData = n;
+    }
+
+    /**
+     * @brief release
+     */
+    void release()
+    {
+        if(nData > 0 && data != NULL) {
+            delete[] data;
+            data = NULL;
+            nData = -1;
+        }
+    }
+
 
     /**
      * @brief genValue
@@ -220,44 +248,32 @@ public:
 
     /**
      * @brief mul
-     * @param vec
+     * @param data
      * @param size
-     * @param scale
+     * @param ret
      * @return
      */
-    static inline void mul(T *vec, int size, T *scale)
+    static inline void mul(T *data, int size, T *ret)
     {
-        if(vec == NULL || size < 1) {
+        if(data == NULL || size < 1 || ret == NULL) {
             return;
         }
 
         for(int i = 0; i < size; i++) {
-            vec[i] *= scale[i];
-        }
-    }
-
-    /**
-     * @brief set
-     * @param vec
-     * @param size
-     * @param value
-     */
-    static inline void set(T *a, int size, T value) {
-        for(int i = 0; i < size; i++) {
-            a[i] = value;
+            ret[i] *= data[i];
         }
     }
 
     /**
      * @brief add
-     * @param vec0
-     * @param vec1
+     * @param data
      * @param size
+     * @param ret
      */
-    static inline T* add(T *a, T *ret, int size)
+    static inline T* add(T *data, int size, T *ret)
     {
         for(int i = 0; i < size; i++) {
-            ret[i] += a[i];
+            ret[i] += data[i];
         }
 
         return ret;
@@ -265,37 +281,33 @@ public:
 
     /**
      * @brief div
-     * @param a
+     * @param data
      * @param size
      * @param value
      */
-    static inline void div(T *a, int size, T value)
+    static inline void div(T *data, int size, T value)
     {
         for(int i = 0; i < size; i++) {
-            a[i] /= value;
+            data[i] /= value;
         }
     }
 
     /**
      * @brief sum
-     * @param vec
+     * @param data
      * @param size
      * @return
      */
-    static inline T sum(T *vec, int size)
+    static inline T sum(T *data, int size)
     {
-        if(vec == NULL) {
+        if(data == NULL || size < 1) {
             return T(0);
         }
 
-        if(size < 1) {
-            return T(0);
-        }
-
-        T ret = vec[0];
+        T ret = data[0];
 
         for(int i = 1; i < size; i++) {
-            ret += vec[i];
+            ret += data[i];
         }
 
         return ret;
@@ -304,17 +316,13 @@ public:
     /**
      * @brief cumsum
      * @param vec
-     * @param ret
      * @param size
+     * @param ret
      * @return
      */
-    static inline T *cumsum(T *vec, T *ret, int size)
+    static inline T *cumsum(T *vec, int size, T *ret)
     {
-        if(vec == NULL) {
-            return NULL;
-        }
-
-        if(size < 1) {
+        if(vec == NULL || size < 1) {
             return NULL;
         }
 
@@ -333,47 +341,43 @@ public:
 
     /**
      * @brief assign
-     * @param a
-     * @param ret
+     * @param data
      * @param size
+     * @param ret
      * @return
      */
-    static inline T* assign (T* a, T* ret, int size)
+    static inline T* assign (T* data, int size, T* ret)
     {
-        memcpy(ret, a, sizeof(T) * size);
+        memcpy(ret, data, sizeof(T) * size);
         return ret;
     }
 
     /**
      * @brief assign
-     * @param a
+     * @param data
      * @param ret
      * @param size
      * @return
      */
-    static inline T* assign (T a, T* ret, int size)
+    static inline T* assign (T data, T* ret, int size)
     {
         for(int i = 0; i < size; i++) {
-            ret[i] = a;
+            ret[i] = data;
         }
         return ret;
     }
 
     /**
      * @brief apply
-     * @param vec
-     * @param ret
+     * @param data
      * @param size
+     * @param ret
      * @return
      */
-    static inline T* apply(T *a, T *ret, int size, T(*func)(T))
+    static inline T* apply(T *data,  int size, T *ret, T(*func)(T))
     {
-        if(a == NULL) {
-            return NULL;
-        }
-
-        if(size < 1) {
-            return NULL;
+        if(data == NULL || size < 1) {
+            return ret;
         }
 
         if(ret == NULL) {
@@ -381,7 +385,7 @@ public:
         }
 
         for(int i = 1; i < size; i++) {
-            ret[i] = func(a[i]);
+            ret[i] = func(data[i]);
         }
 
         return ret;
@@ -389,27 +393,23 @@ public:
 
     /**
      * @brief getMax
-     * @param vec
+     * @param data
      * @param size
      * @param ind
      * @return
      */
-    static inline T getMax(T *a, int size, int &ind)
+    static inline T getMax(T *data, int size, int &ind)
     {
-        if(a == NULL) {
+        if(data == NULL || size < 1) {
             return T(size + 1);
         }
 
-        if(size < 1) {
-            return T(size + 1);
-        }
-
-        T ret = a[0];
+        T ret = data[0];
         ind = 0;
 
         for(int i = 1; i < size; i++) {
-            if(ret < a[i]) {
-                ret = a[i];
+            if(ret < data[i]) {
+                ret = data[i];
                 ind = i;
             }
         }
@@ -419,27 +419,23 @@ public:
 
     /**
      * @brief getMin
-     * @param vec
+     * @param data
      * @param size
      * @param ind
      * @return
      */
-    static inline T getMin(T *a, int size, int &ind)
+    static inline T getMin(T *data, int size, int &ind)
     {
-        if(a == NULL) {
+        if(data == NULL || size < 1) {
             return T(size + 1);
         }
 
-        if(size < 1) {
-            return T(size + 1);
-        }
-
-        T ret = a[0];
+        T ret = data[0];
         ind = 0;
 
         for(int i = 1; i < size; i++) {
-            if(ret > a[i]) {
-                ret = a[i];
+            if(ret > data[i]) {
+                ret = data[i];
                 ind = i;
             }
         }

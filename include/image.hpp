@@ -1432,7 +1432,7 @@ PIC_INLINE float *Image::getSumVal(BBox *box = NULL, float *ret = NULL)
             for(int i = box->x0; i < box->x1; i++) {
                 float *tmp_data = (*this)(i, j, k);
 
-                Array<float>::add(tmp_data, ret, channels);
+                Array<float>::add(tmp_data, channels, ret);
             }
         }
     }

@@ -106,7 +106,7 @@ public:
         h.ceiling();
 
         unsigned int *Pcum = NULL;
-        Pcum = Array<unsigned int>::cumsum(h.bin, Pcum, nBin);
+        Pcum = Array<unsigned int>::cumsum(h.bin, nBin, Pcum);
         float  maxPcumf = float(Pcum[nBin - 1]);
         float *PcumNorm = new float[nBin];
         float *x        = new float[nBin];

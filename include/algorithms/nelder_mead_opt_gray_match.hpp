@@ -68,7 +68,7 @@ public:
      */
     float function(float *x, unsigned int n)
     {
-        Array<float>::mul(tmp, channels, x);
+        Array<float>::mul(x, channels, tmp);
         Array<float>::normalize(tmp, channels);
         return Array<float>::distanceSq(col0, tmp, channels);
     }

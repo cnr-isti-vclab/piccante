@@ -71,7 +71,7 @@ protected:
         float *sum = weights.getSumVal();
 
         if(sum != NULL) {
-            weights /= sum[0];
+            weights /= sum;
         }
 
         //create a screen aligned quad

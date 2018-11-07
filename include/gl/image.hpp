@@ -96,6 +96,19 @@ protected:
     }
 
     /**
+     * @brief thisOperatorConstColor
+     * @param a
+     * @param op
+     */
+    inline void thisOperatorConstColor(const float *a, BOGL op)
+    {
+        BufferOpsGL *ops = BufferOpsGL::getInstance();
+
+        ops->list[op]->update(a);
+        ops->list[op]->Process(getTexture(), 0, getTexture(), width, height);
+    }
+
+    /**
      * @brief thisOperatorImage
      * @param a
      * @param op
@@ -559,6 +572,12 @@ public:
      * @param a
      */
     void operator /=(const float &a);
+
+    /**
+     * @brief operator /=
+     * @param a
+     */
+    void operator /=(const float *a);
 
     /**
      * @brief operator /
@@ -1030,6 +1049,11 @@ PIC_INLINE void ImageGL::operator /=(const ImageGL &a)
 PIC_INLINE void ImageGL::operator /=(const float &a)
 {
     thisOperatorConst(a, BOGL_DIV_CONST);
+}
+
+PIC_INLINE void ImageGL::operator /=(const float *a)
+{
+    thisOperatorConstColor(a, BOGL_DIV_CONST);
 }
 
 PIC_INLINE ImageGL ImageGL::operator /(const ImageGL &a)

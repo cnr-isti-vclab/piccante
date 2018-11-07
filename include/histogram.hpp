@@ -315,7 +315,7 @@ public:
     {
         getNormalized();
     
-        bin_c = Array<float>::cumsum(bin_nor, bin_c, nBin);
+        bin_c = Array<float>::cumsum(bin_nor, nBin, bin_c);
 
         if(bNormalized) {
             for(int i=0; i<nBin; i++) {

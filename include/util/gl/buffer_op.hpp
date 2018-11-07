@@ -46,13 +46,13 @@ protected:
     GLenum target;
 
     std::string op;
-    float		c0[4], c1[4];
-    bool		bTexelFetch;
+    float c0[4], c1[4];
+    bool bTexelFetch;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
 
@@ -72,7 +72,7 @@ public:
      * @param c0
      * @param c1
      */
-    void update(float *c0, float *c1);
+    void update(const float *c0, const  float *c1);
 
     /**
      * @brief update
@@ -124,10 +124,10 @@ PIC_INLINE BufferOpGL::BufferOpGL(std::string op, bool bTexelFetch = false, floa
         quad = new QuadGL(true);
     }
 
-    InitShaders();
+    initShaders();
 }
 
-PIC_INLINE void BufferOpGL::InitShaders()
+PIC_INLINE void BufferOpGL::initShaders()
 {
     std::string strOp = "vec4 ret = ";
     strOp.append(op);
@@ -292,7 +292,7 @@ PIC_INLINE void BufferOpGL::InitShaders()
     technique.unbind();
 }
 
-PIC_INLINE void BufferOpGL::update(float *c0, float *c1)
+PIC_INLINE void BufferOpGL::update(const float *c0, const float *c1 = NULL)
 {
     if(c0 != NULL) {
         memcpy(this->c0, c0, sizeof(float) * 4);
