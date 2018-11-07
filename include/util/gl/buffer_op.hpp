@@ -104,13 +104,13 @@ PIC_INLINE BufferOpGL::BufferOpGL(std::string op, bool bTexelFetch = false, floa
     if(c0 != NULL) {
         memcpy(this->c0, c0, 4 * sizeof(float));
     } else {
-        Array<float>::assign(1.0f, this->c0, 4);
+        Arrayf::assign(1.0f, this->c0, 4);
     }
 
     if(c1 != NULL) {
         memcpy(this->c1, c1, 4 * sizeof(float));
     } else {
-        Array<float>::assign(1.0f, this->c1, 4);
+        Arrayf::assign(1.0f, this->c1, 4);
     }
 
     this->op = op;
@@ -312,8 +312,8 @@ PIC_INLINE void BufferOpGL::update(const float *c0, const float *c1 = NULL)
 
 PIC_INLINE void BufferOpGL::update(float c0 = 0.0f, float c1 = 0.0f)
 {
-    Array<float>::assign(c0, this->c0, 4);
-    Array<float>::assign(c1, this->c1, 4);
+    Arrayf::assign(c0, this->c0, 4);
+    Arrayf::assign(c1, this->c1, 4);
 
     technique.bind();
     technique.setUniform1i("u_tex_0",  0);

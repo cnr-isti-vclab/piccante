@@ -120,7 +120,7 @@ public:
         for(int i = 0; i < L->size(); i++) {
             float tmp_L =  L->data[i];
             float LLog = logf(tmp_L);
-            float Ld = expf(LldMin + (LldMax - LldMin) * Array<float>::interp(x, PcumNorm, nBin, LLog));
+            float Ld = expf(LldMin + (LldMax - LldMin) * Arrayf::interp(x, PcumNorm, nBin, LLog));
             float L_old = tmp_L;
             L->data[i] = (Ld - LdMin) / ((LdMax - LdMin) * L_old);
         }

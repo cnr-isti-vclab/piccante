@@ -53,7 +53,7 @@ protected:
 
                 float *data = (*dst)(j, i);
 
-                if(FilterDownPP::distance(data, value, dst->channels) < threshold) {
+                if(Arrayf::distanceSq(data, value, dst->channels) < threshold) {
                     isb.SampleImage(src[0], x, y, data);
                 }
             }

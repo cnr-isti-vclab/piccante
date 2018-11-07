@@ -159,7 +159,7 @@ public:
             }
 
             weights = new float [weights_size];
-            Array<float>::assign(1.0f / imgIn[0]->channelsf, weights, imgIn[0]->channels);
+            Arrayf::assign(1.0f / imgIn[0]->channelsf, weights, imgIn[0]->channels);
         } else {
             if(bChannels) {
                 weights = new float [1];

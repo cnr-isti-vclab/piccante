@@ -112,7 +112,7 @@ public:
             return NULL;
         }
 
-        float white_mean = Array<float>::sum(white, nWhite) / float(nWhite);
+        float white_mean = Arrayf::sum(white, nWhite) / float(nWhite);
 
         float *out = new float[nWhite];
 

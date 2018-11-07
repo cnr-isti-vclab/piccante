@@ -66,8 +66,8 @@ public:
         for(int i = 0; i < strokes->nPixels(); i++) {
             int ind = i * strokes->channels;
 
-            float d_red  = sqrtf(Array<float>::distanceSq(red,  &strokes->data[ind], 3));
-            float d_blue = sqrtf(Array<float>::distanceSq(blue, &strokes->data[ind], 3));
+            float d_red  = sqrtf(Arrayf::distanceSq(red,  &strokes->data[ind], 3));
+            float d_blue = sqrtf(Arrayf::distanceSq(blue, &strokes->data[ind], 3));
 
             out->data[i] = 0.0f;
 
@@ -127,7 +127,7 @@ public:
 
             //fix max
             j = i * img_max->channels;
-            img_max->data[j] = Array<float>::norm_sq(&img_max->data[j], img_max->channels);
+            img_max->data[j] = Arrayf::norm_sq(&img_max->data[j], img_max->channels);
         }
 
         //iterative filtering...

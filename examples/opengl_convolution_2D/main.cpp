@@ -70,8 +70,11 @@ protected:
 
         float *sum = weights.getSumVal();
 
+
+        pic::Arrayf sump(sum, weights.channels, true);
+
         if(sum != NULL) {
-            weights /= sum;
+            weights /= sump;
         }
 
         //create a screen aligned quad

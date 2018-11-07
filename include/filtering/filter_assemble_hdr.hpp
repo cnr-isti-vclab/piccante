@@ -81,8 +81,8 @@ protected:
             for(int i = box->x0; i < box->x1; i++) {
                 int c = (ind + i) * channels;
 
-                Array<float>::assign(0.0f, acc, channels);
-                Array<float>::assign(0.0f, totWeight, channels);
+                Arrayf::assign(0.0f, acc, channels);
+                Arrayf::assign(0.0f, totWeight, channels);
 
                 float max_val_saturation = 1.0f;
                 float max_val_saturation_fb = -1.0f;
@@ -90,7 +90,7 @@ protected:
                 //for each exposure...
                 for(int l = 0; l < n; l++) {
 
-                    float x = Array<float>::sum(&src[l]->data[c], channels);
+                    float x = Arrayf::sum(&src[l]->data[c], channels);
                     x /= channelsf;
 
                     float t_mvs = x / t_min;
@@ -144,7 +144,7 @@ protected:
                     }
                 } else {
                     max_val_saturation = MAX(max_val_saturation_fb, max_val_saturation);
-                    Array<float>::assign(max_val_saturation, &dst->data[c], channels);
+                    Arrayf::assign(max_val_saturation, &dst->data[c], channels);
                 }
             }
         }

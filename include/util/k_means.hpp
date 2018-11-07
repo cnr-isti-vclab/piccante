@@ -175,9 +175,9 @@ PIC_INLINE T* kMeans(T *samples, int nSamples, int nDim,
             kMeansComputeMean(samples, &mean[index], nDim, tmp);
 
             //update centers
-            float dist = Array<float>::distanceSq(&centers[index], &mean[index], nDim);
+            float dist = Arrayf::distanceSq(&centers[index], &mean[index], nDim);
 
-            Array<float>::assign(&mean[index], &centers[index], nDim);
+            Arrayf::assign(&mean[index], &centers[index], nDim);
 
             if(dist > 1e-6f) {
                 bNoChanges = false;

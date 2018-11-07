@@ -41,6 +41,33 @@ public:
     }
 
     /**
+     * @brief Array
+     * @param n
+     */
+    Array(int n)
+    {
+        allocate(n);
+    }
+
+    /**
+     * @brief Array
+     * @param data
+     * @param nData
+     * @param bShallow
+     */
+    Array(T *data, int nData, bool bShallow)
+    {
+        this->nData = nData;
+
+        if(bShallow) {
+            this->data = data;
+        } else {
+            this->data = new T[nData];
+            memcpy(this->data, data, sizeof(T) * nData);
+        }
+    }
+
+    /**
      * @brief allocate
      * @param n
      */
@@ -132,17 +159,17 @@ public:
 
     /**
      * @brief distanceSq
-     * @param a0
-     * @param a1
+     * @param data0
+     * @param data1
      * @param n
      * @return
      */
-    static inline T distanceSq(T *a0, T *a1, int n)
+    static inline T distanceSq(T *data0, T *data1, int n)
     {
         T distSq = T(0);
 
         for(int k = 0; k < n; k++) {
-            T tmp = a0[k] - a1[k];
+            T tmp = data0[k] - data1[k];
             distSq += tmp * tmp;
         }
 
@@ -469,6 +496,21 @@ public:
         return y[offset] * (T(1) - t) + t * y[offset2];
     }
 };
+
+/**
+ * @brief Arrayf
+ */
+typedef	Array<float> Arrayf;
+
+/**
+ * @brief Arrayi
+ */
+typedef	Array<int> Arrayi;
+
+/**
+ * @brief Arrayui
+ */
+typedef	Array<unsigned int> Arrayui;
 
 } // end namespace pic
 

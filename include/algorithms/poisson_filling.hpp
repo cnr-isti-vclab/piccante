@@ -207,7 +207,7 @@ public:
         }
 
         if(mask == NULL) {
-            float *color = Array<float>::genValue(value, 3, NULL);
+            float *color = Arrayf::genValue(value, 3, NULL);
 
             mask = imgIn->convertToMask(color, threshold, false, NULL);
 

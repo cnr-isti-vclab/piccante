@@ -48,7 +48,7 @@ protected:
                 float *tmp_dst = (*dst)(i, j);
                 float *tmp_src = (*src[0])(x, y);
 
-                Array<float>::assign(tmp_src, channels, tmp_dst);
+                Arrayf::assign(tmp_src, channels, tmp_dst);
             }
         }
     }

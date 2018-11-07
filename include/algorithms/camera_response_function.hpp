@@ -789,7 +789,7 @@ public:
         float maxV = -1.0f;
         for (int ch=0; ch<channels; ch++) {
             int ind;
-            maxV = std::max(Array<float>::getMax(this->icrf[ch], 256, ind), maxV);
+            maxV = std::max(Arrayf::getMax(this->icrf[ch], 256, ind), maxV);
         }
 
         for (int ch=0; ch<channels; ch++) {

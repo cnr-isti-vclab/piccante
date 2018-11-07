@@ -51,7 +51,7 @@ protected:
             for(int i = box->x0; i < box->x1; i++) {
                 float *dst_data = (*dst)(i, j);
 
-                Array<float>::assign(0.0f, dst_data, channels);
+                Arrayf::assign(0.0f, dst_data, channels);
 
                 for(int k = -c_h_h; k <= c_h_h; k++) {
                     for(int l = -c_w_h; l <= c_w_h; l++) {

@@ -60,7 +60,7 @@ protected:
                 }
 
                 for(unsigned k = 0; k < 4; k++) {
-                    if(distance(tmp[k], value, channels) > threshold) {
+                    if(Arrayf::distanceSq(tmp[k], value, channels) > threshold) {
                         counter++;
 
                         for(int l = 0; l < channels; l++) {
@@ -102,24 +102,6 @@ public:
     }
 
     /**
-     * @brief distance
-     * @param a
-     * @param b
-     * @param channels
-     * @return
-     */
-    static inline float distance(float *a, float *b, int channels)
-    {
-        float dist = 0.0f;
-        for(int i = 0; i < channels; i++) {
-            float tmp = a[i] - b[i];
-            dist += tmp * tmp;
-        }
-
-        return dist;
-    }
-
-    /**
      * @brief update
      * @param value
      * @param threshold
@@ -129,7 +111,7 @@ public:
         if(value == NULL) {
             this->value = new float[3];
 
-            Array<float>::assign(0.0f, this->value, 3);
+            Arrayf::assign(0.0f, this->value, 3);
         } else {
             this->value = value;
         }

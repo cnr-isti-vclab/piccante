@@ -66,7 +66,7 @@ protected:
                     float *s_cur_k = (*state_cur)(x, y);
                     float *col_k = (*img)(x, y);
 
-                    float dist = Array<float>::distanceSq(col, col_k, channels);
+                    float dist = Arrayf::distanceSq(col, col_k, channels);
 
                     float g_theta = 1.0f - (dist / C);
                     g_theta *= s_cur_k[1];

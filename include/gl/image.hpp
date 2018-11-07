@@ -100,11 +100,14 @@ protected:
      * @param a
      * @param op
      */
-    inline void thisOperatorConstColor(const float *a, BOGL op)
+    inline void thisOperatorConstColor(const Arrayf &a, BOGL op)
     {
         BufferOpsGL *ops = BufferOpsGL::getInstance();
 
-        ops->list[op]->update(a);
+        float c0[4];
+        Arrayf::assign(a.data, a.nData, c0);
+
+        ops->list[op]->update(c0);
         ops->list[op]->Process(getTexture(), 0, getTexture(), width, height);
     }
 
@@ -577,7 +580,7 @@ public:
      * @brief operator /=
      * @param a
      */
-    void operator /=(const float *a);
+    void operator /=(const Arrayf &a);
 
     /**
      * @brief operator /
@@ -1051,7 +1054,7 @@ PIC_INLINE void ImageGL::operator /=(const float &a)
     thisOperatorConst(a, BOGL_DIV_CONST);
 }
 
-PIC_INLINE void ImageGL::operator /=(const float *a)
+PIC_INLINE void ImageGL::operator /=(const Arrayf &a)
 {
     thisOperatorConstColor(a, BOGL_DIV_CONST);
 }

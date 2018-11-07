@@ -69,7 +69,7 @@ protected:
 
                     for(int l = 0; l < areaKernel; l++) {
                         int index_l = l * in->channels;
-                        float d_sq = Array<float>::distanceSq(&values[index_k], &values[index_l], in->channels);
+                        float d_sq = Arrayf::distanceSq(&values[index_k], &values[index_l], in->channels);
                         dist += sqrtf(d_sq);
                     }
 

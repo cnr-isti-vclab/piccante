@@ -183,11 +183,11 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
             for(int i = box->x0; i < box->x1; i++) {
                 int c = js + i * src[0]->xstride; //index
 
-                float L = Array<float>::dot(data, lum_weights, 3);
+                float L = Arrayf::dot(data, lum_weights, 3);
 
                 if(L > 0.0f) {
 
-                    float L_flt = Array<float>::dot(dataFlt, lum_weights, 3);
+                    float L_flt = Arrayf::dot(dataFlt, lum_weights, 3);
                     float Lm	 = L     * alpha_over_epsilon;
                     float Lm_flt = L_flt * alpha_over_epsilon;
 
@@ -198,7 +198,7 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
                         dataOut[ck] = (data[ck] * Ld) / L;
                     }
                 } else {
-                    Array<float>::assign(0.0f, dataOut, src[0]->channels);
+                    Arrayf::assign(0.0f, dataOut, src[0]->channels);
                 }
             }
         }
