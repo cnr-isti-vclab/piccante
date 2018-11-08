@@ -38,6 +38,9 @@ public:
 
     Color()
     {
+        for(unsigned int i = 0; i < N; i++) {
+            data[i] = 0.0f;
+        }
     }
 
     /**
@@ -396,11 +399,11 @@ public:
     }
 
     /**
-     * @brief ScaleTau
+     * @brief scaleTau
      * @param sigma_t
      * @param t
      */
-    void ScaleTau(const Color<N> &sigma_t, float t)
+    void scaleTau(const Color<N> &sigma_t, float t)
     {
         for (int i = 0; i < N; i++) {
             data[i] *= expf(-sigma_t.data[i] * t);
@@ -529,31 +532,24 @@ public:
     void importanceSampling(float e, int &channel, float &pdf)
     {
         float sum = 0.0f;
-        for(unsigned int i=0; i<N; i++) {
+        for(unsigned int i = 0; i < N; i++) {
             sum += data[i];
         }
 
         if(sum > 0.0f) {
-            //TOBEFIXED
-            /*
             float CDF[N];
-            CDF[0] =  x   / sum;
-            CDF[1] = (x + y) / sum;
-            CDF[2] =  1.0f;
+            CDF[0] = data[0] / sum;
+            for(unsigned int i = 1; i < (N - 1); i++) {
+                CDF[i] = (CDF[i - 1] + data[i]) / sum;
+            }
+            CDF[N - 1] = 1.0f; // sanity check
 
-            if(e <= CDF[0]) {
-                channel = 0;
-                pdf = x / sum;
-            } else {
-                if(e <= CDF[1]) {
-                    channel = 1;
-                    pdf = y / sum;
-                } else {
-                    channel = 2;
-                    pdf = z / sum;
+            for(unsigned int i = 0; i < N; i++) {
+                if(e <= CDF[i]) {
+                    channel = i;
+                    pdf = data[i] / sum;
                 }
             }
-            */
         } else {
             channel = int(e * float(N - 1));
             pdf = 1.0f / float(N);
@@ -587,9 +583,11 @@ public:
      * @brief inverse
      * @return
      */
-    Color<N> inverse()
+    Color<N> inverse(float maxVal = -1.0f)
     {
-        float maxVal = getMax();
+        if(maxVal <= 0.0f) {
+            maxVal = getMax();
+        }
 
         Color<N> ret;
 
@@ -604,18 +602,11 @@ public:
      * @brief convertToArray
      * @param col
      */
-    void convertToArray(float *col)
+    float *convertToArray(float *col)
     {
-        memcpy(data, col, N * sizeof(float));
-    }
-
-    /**
-     * @brief convertToArray
-     * @return
-     */
-    float *convertToArray()
-    {
-        float *col = new float[N];
+        if(col == NULL) {
+            col = new float [N];
+        }
 
         memcpy(col, data, N * sizeof(float));
 
@@ -659,6 +650,32 @@ public:
     Color<N> exp()
     {
         Color<N> ret;
+
+        return ret;
+    }
+
+    /**
+     * @brief sqrt
+     * @return
+     */
+    float sqrt()
+    {
+        for(unsigned int i = 0; i < N; i++) {
+            data[i] = sqrtf(data[i]);
+        }
+    }
+
+    /**
+     * @brief squaredSum
+     * @return
+     */
+    float squaredSum()
+    {
+        float ret = data[0] * data[0];
+
+        for(unsigned int i = 1; i < N; i++) {
+            ret += data[i] * data[i];
+        }
 
         return ret;
     }

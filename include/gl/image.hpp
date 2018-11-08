@@ -105,7 +105,7 @@ protected:
         BufferOpsGL *ops = BufferOpsGL::getInstance();
 
         float c0[4];
-        Arrayf::assign(a.data, a.nData, c0);
+        Arrayf::assign(a.data, MIN(a.nData, 4), c0);
 
         ops->list[op]->update(c0);
         ops->list[op]->Process(getTexture(), 0, getTexture(), width, height);
@@ -130,7 +130,27 @@ protected:
     }
 
     /**
-     * @brief newOperatorImage
+     * @brief newOperatorConstColor
+     * @param a
+     * @param op
+     * @return
+     */
+    inline ImageGL newOperatorConstColor(const Arrayf &a, BOGL op)
+    {
+        ImageGL ret(frames, width, height, channels, IMG_GPU, target);
+        BufferOpsGL *ops = BufferOpsGL::getInstance();
+
+        float c0[4];
+        Arrayf::assign(a.data, MIN(a.nData, 4), c0);
+
+        ops->list[op]->update(c0);
+        ops->list[op]->Process(getTexture(), 0, ret.getTexture(), width, height);
+
+        return ret;
+    }
+
+    /**
+     * @brief newOperatorConst
      * @param a
      * @param op
      * @return
