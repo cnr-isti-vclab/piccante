@@ -612,10 +612,14 @@ public:
      * @brief inverse
      * @return
      */
-    Color3 inverse()
+    Color3 inverse(float maxVal = -1.0f)
     {
         Color3 ret;
-        float maxVal = MAX(MAX(x, y), z);
+
+        if (maxVal < 0.0f) {
+            maxVal = MAX(MAX(x, y), z);
+        }
+
         ret.x = maxVal - x;
         ret.y = maxVal - y;
         ret.z = maxVal - z;
