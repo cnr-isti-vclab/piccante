@@ -23,9 +23,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief Color3
+ */
 typedef Color<3> Color3;
 
-//Colors
+//basic colors
 const Color3 RED    = Color3(1.0f, 0.0f, 0.0f);
 const Color3 GREEN  = Color3(0.0f, 1.0f, 0.0f);
 const Color3 BLUE   = Color3(0.0f, 0.0f, 1.0f);
