@@ -65,12 +65,12 @@ void scaleTau(Vec<N, float> &in, const Vec<N, float> &sigma_t, float t)
 }
 
 /**
- * @brief luminance
+ * @brief colorLuminance
  * @param in
  * @return
  */
 template<unsigned int N>
-float luminance(Vec<N, float> &in)
+float colorLuminance(Vec<N, float> &in)
 {
     return  0.213f * in.data[0] +
             0.715f * in.data[1] +
@@ -78,11 +78,11 @@ float luminance(Vec<N, float> &in)
 }
 
 /**
- * @brief saturate
+ * @brief colorSaturate
  * @param in
  */
 template<unsigned int N>
-void saturate(Vec<N, float> &in)
+void colorSaturate(Vec<N, float> &in)
 {
     for (int i = 0; i < N; i++) {
         in.data[i] = in.data[i] * 0.5f + 0.5f;
@@ -137,7 +137,7 @@ Vec<N, float> convertToLDR(Vec<N, float> &in, float exposure = 1.0f, float gamma
     Vec<N, float> ret = in.clone();
     ret *= exposure;
 
-    ret.gamma(1.0f / gammaCor);
+    vecGamma(ret, 1.0f / gammaCor);
     ret.clamp(0.0f, 1.0f);
 
     return ret;

@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_3DS_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_3DS_HPP
 
+#include "../../util/vec.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -129,8 +131,7 @@ PIC_INLINE FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma
     frame = halfKernelSizeTime;
 
     //Poisson samples
-    Vec<3, int> window = Vec<3, int>(halfKernelSize, halfKernelSize,
-                                     halfKernelSizeTime);
+    Vec3i window = Vec3i(halfKernelSize, halfKernelSize, halfKernelSizeTime);
     ms = new MRSamplersGL<3>(ST_BRIDSON, window, 2 * kernelSize, 1, nRand);
     ms->generateTexture();
 
@@ -227,7 +228,8 @@ PIC_INLINE void FilterGLBilateral3DS::update(float sigma_s, float sigma_r, float
     int kernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s);
     int halfKernelSize = kernelSize >> 1;
 
-    ms->updateGL(halfKernelSize, halfKernelSize);
+    Vec3i window = Vec3i(halfKernelSize, halfKernelSize, halfKernelSize);
+    ms->updateGL(window, halfKernelSize);
 
     //shader update
     sigmas2 = 2.0f * this->sigma_s * this->sigma_s;

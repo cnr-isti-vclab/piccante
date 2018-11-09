@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_2DAS_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_2DAS_HPP
 
+#include "../../util/vec.hpp"
 #include "../../gl/filtering/filter.hpp"
 #include "../../gl/filtering/filter_sampling_map.hpp"
 #include "../../gl/point_samplers/sampler_random_m.hpp"
@@ -142,7 +143,8 @@ PIC_INLINE FilterGLBilateral2DAS::FilterGLBilateral2DAS(float sigma_s,
     printf("Window: %d\n", halfKernelSize);
 #endif
 
-    ms = new MRSamplersGL<2>(ST_BRIDSON, halfKernelSize, halfKernelSize, 3, nRand);
+    Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+    ms = new MRSamplersGL<2>(ST_BRIDSON, window, halfKernelSize, 3, nRand);
 
     ms->generateTexture();
     ms->generateLevelsRTexture();
@@ -255,7 +257,8 @@ PIC_INLINE void FilterGLBilateral2DAS::update(float sigma_s, float sigma_r)
     int kernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s);
     int halfKernelSize = kernelSize >> 1;
 
-    ms->updateGL(halfKernelSize, halfKernelSize);
+    Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+    ms->updateGL(window, halfKernelSize);
 
     //shader update
     float sigmas2 = 2.0f * this->sigma_s * this->sigma_s;

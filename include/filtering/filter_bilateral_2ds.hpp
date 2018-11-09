@@ -347,7 +347,8 @@ PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
     printf("Nsamples: %d %f\n", nSamples, sigma_s);
 #endif
 
-    ms = new MRSamplers<2>(type, pg->halfKernelSize, nSamples, 1, 64);
+    Vec2i window = Vec2i(pg->halfKernelSize, pg->halfKernelSize);
+    ms = new MRSamplers<2>(type, window, nSamples, 1, 64);
 
     seed = 1;
 }

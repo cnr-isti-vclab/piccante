@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_3DAS_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_3DAS_HPP
 
+#include "../../util/vec.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -128,7 +130,7 @@ PIC_INLINE FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sig
 
     //Precomputation of the Gaussian Kernel
     int kernelSize = PrecomputedGaussian::getKernelSize(sigma_s);
-    int kernelSizeTime  = PrecomputedGaussian::getKernelSize(sigma_t);
+    int kernelSizeTime = PrecomputedGaussian::getKernelSize(sigma_t);
 
     int halfKernelSize = kernelSize >> 1;
     int halfKernelSizeTime = kernelSizeTime >> 1;
@@ -138,8 +140,7 @@ PIC_INLINE FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sig
     printf("Window: %d\n", halfKernelSize);
 #endif
 
-    Vec<3, int> window = Vec<3, int>(halfKernelSize, halfKernelSize,
-                                     halfKernelSizeTime);
+    Vec3i window = Vec3i(halfKernelSize, halfKernelSize, halfKernelSizeTime);
     ms = new MRSamplersGL<3>(ST_BRIDSON, window, halfKernelSize, 3, nRand);
 
     ms->generateTexture();
@@ -261,7 +262,8 @@ PIC_INLINE void FilterGLBilateral3DAS::update(float sigma_s, float sigma_r, floa
     int kernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s);
     int halfKernelSize = kernelSize >> 1;
 
-    ms->updateGL(halfKernelSize, halfKernelSize);
+    Vec3i window = Vec3i(halfKernelSize, halfKernelSize, halfKernelSize);
+    ms->updateGL(window, halfKernelSize);
 
     //shader update
     float sigmas2 = 2.0f * this->sigma_s * this->sigma_s;

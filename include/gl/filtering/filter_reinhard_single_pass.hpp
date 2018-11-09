@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../base.hpp"
 
+#include "../../util/vec.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../util/file_lister.hpp"
 #include "../../gl/point_samplers/sampler_random_m.hpp"
@@ -108,7 +110,8 @@ PIC_INLINE FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, f
     printf("Window: %d\n", halfKernelSize);
 #endif
 
-    ms = new MRSamplersGL<2>(ST_BRIDSON, halfKernelSize, halfKernelSize, 1,
+    Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+    ms = new MRSamplersGL<2>(ST_BRIDSON, window, halfKernelSize, 1,
                              nSamplers);
     ms->generateTexture();
 
@@ -220,7 +223,8 @@ PIC_INLINE void FilterGLReinhardSinglePass::update(float sigma_s, float sigma_r,
     int halfKernelSize = kernelSize >> 1;
 
     if(flag) {
-        ms->updateGL(halfKernelSize, halfKernelSize);
+        Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+        ms->updateGL(window, halfKernelSize);
     }
 
     //shader update

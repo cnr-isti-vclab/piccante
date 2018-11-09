@@ -137,13 +137,12 @@ PIC_INLINE FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sig
     pg = new PrecomputedGaussian(sigma_s);
 
     //Poisson samples
+    Vec2i window = Vec2i(pg->halfKernelSize, pg->halfKernelSize);
     if(mult > 0) {
-        ms = new MRSamplers<2>(type, pg->halfKernelSize, pg->halfKernelSize * mult, 3,
-                               64);
+        ms = new MRSamplers<2>(type, window, pg->halfKernelSize * mult, 3, 64);
     } else if(mult < 0) {
         mult = -mult;
-        ms = new MRSamplers<2>(type, pg->halfKernelSize, pg->halfKernelSize / mult, 3,
-                               64);
+        ms = new MRSamplers<2>(type, window, pg->halfKernelSize / mult, 3, 64);
     }
 
     seed = 1;

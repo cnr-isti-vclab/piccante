@@ -198,7 +198,8 @@ PIC_INLINE FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma
     printf("Window: %d\n", halfKernelSize);
 #endif
 
-    ms = new MRSamplersGL<2>(ST_BRIDSON, halfKernelSize, halfKernelSize, 1,
+    Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+    ms = new MRSamplersGL<2>(ST_BRIDSON, window, halfKernelSize, 1,
                              nSamplers);
     ms->generateTexture();
 
@@ -393,7 +394,8 @@ PIC_INLINE void FilterGLBilateral2DS::update(float sigma_s, float sigma_r)
     int halfKernelSize = kernelSize >> 1;
 
     if(flag) {
-        ms->updateGL(halfKernelSize, halfKernelSize);
+        Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+        ms->updateGL(window, halfKernelSize);
     }
 
     //shader update

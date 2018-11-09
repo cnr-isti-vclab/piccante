@@ -199,7 +199,8 @@ FilterGLBilateral2DSE::FilterGLBilateral2DSE(float sigma_s, float sigma_p, float
     printf("Window: %d\n", halfKernelSize);
 #endif
 
-    ms = new MRSamplersGL<2>(ST_BRIDSON, halfKernelSize, 4*halfKernelSize, 1,
+    Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+    ms = new MRSamplersGL<2>(ST_BRIDSON, window, 4*halfKernelSize, 1,
                              nSamplers);
     ms->generateTexture();
 
@@ -312,7 +313,8 @@ void FilterGLBilateral2DSE::update(float sigma_s, float sigma_p, float sigma_n, 
     int halfKernelSize = kernelSize >> 1;
 
     if(flag) {
-        ms->updateGL(halfKernelSize, halfKernelSize);
+        Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+        ms->updateGL(window, halfKernelSize);
     }
     
     //shader update
