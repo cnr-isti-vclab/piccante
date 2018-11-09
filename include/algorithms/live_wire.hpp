@@ -73,7 +73,7 @@ protected:
         Vec2f D_p(tmp[1], -tmp[0]);
         float n_D_p_sq = D_p.lengthSq();
         if(n_D_p_sq > 0.0f) {
-            D_p.div(sqrtf(n_D_p_sq));
+            D_p /= sqrtf(n_D_p_sq);
         }
 
         //D_q
@@ -81,7 +81,7 @@ protected:
         Vec2f D_q(tmp[1], -tmp[0]);
         float n_D_q_sq = D_q.lengthSq();
         if(n_D_q_sq > 0.0f) {
-            D_q.div(sqrtf(n_D_q_sq));
+            D_q /= sqrtf(n_D_q_sq);
         }
 
         //Delta_qp
@@ -91,13 +91,12 @@ protected:
         if(D_p.dot(delta_qp) >= 0.0f) {
             L = delta_qp;
         } else {
-            L = delta_qp;
-            L.neg();
+            L = -delta_qp;
         }
 
         float n_L_sq = L.lengthSq();
         if(n_L_sq > 0.0f) {
-            L.div(sqrtf(n_L_sq));
+            L /= sqrtf(n_L_sq);
         }
 
         float dp_pq = D_p.dot(L);

@@ -18,8 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_COLORS_COLOR_HPP
 #define PIC_COLORS_COLOR_HPP
 
-//typedef float float;
 #include "../util/math.hpp"
+#include "../util/vec.hpp"
 
 namespace pic {
 
@@ -27,19 +27,17 @@ namespace pic {
  * @brief The Color class
  */
 
-template <unsigned int N> class Color
+template <unsigned int N> class Color: public Vec<N, float>
 {
 public:
 
     //   R G B
-    //	 X Y Z
     //   0 1 2
-    float data[N];
 
-    Color()
+    Color<N>()
     {
         for(unsigned int i = 0; i < N; i++) {
-            data[i] = 0.0f;
+            this->data[i] = 0.0f;
         }
     }
 
@@ -53,9 +51,9 @@ public:
     {
         assert(N >= 3);
 
-        data[0] = x;
-        data[1] = y;
-        data[2] = z;
+        this->data[0] = x;
+        this->data[1] = y;
+        this->data[2] = z;
     }
 
     /**
@@ -66,9 +64,9 @@ public:
     {
         assert(N >= 3);
 
-        data[0] = val[0];
-        data[1] = val[1];
-        data[2] = val[2];
+        this->data[0] = val[0];
+        this->data[1] = val[1];
+        this->data[2] = val[2];
     }
 
     /**
@@ -78,7 +76,7 @@ public:
     void setBlack()
     {
         for (unsigned int i = 0; i < N; i++) {
-            data[i] = 0.0f;
+            this->data[i] = 0.0f;
         }
     }
 
@@ -88,291 +86,8 @@ public:
     void setWhite()
     {
         for (unsigned int i = 0; i < N; i++) {
-            data[i] = 1.0f;
+            this->data[i] = 1.0f;
         }
-    }
-
-    Color<N> clone()
-    {
-        Color<N> ret;
-        memcpy(ret.data, this->data, N * sizeof(float));
-        return ret;
-    }
-
-    /*
-    *
-    *
-    */
-
-    /*
-    *
-    *	Scalar Operands
-    *
-    */
-
-    /**
-     * @brief operator =
-     * @param a
-     */
-    void operator =(const float &a)
-    {
-        for (int i = 0; i < N; i++) {
-            data[i] = a;
-        }
-    }
-
-    /**
-     * @brief operator +=
-     * @param a
-     */
-    void operator +=(const float &a)
-    {
-        for (int i = 0; i < N; i++) {
-            data[i] += a;
-        }
-    }
-
-    /**
-     * @brief operator +=
-     * @param a
-     */
-    void operator +=(const float *a)
-    {
-        for (int i = 0; i < N; i++) {
-            data[i] = a[i];
-        }
-    }
-
-    /**
-     * @brief operator +
-     * @param a
-     * @return
-     */
-    Color<N> operator +(const float &a) const
-    {
-        Color<N> ret = this->clone();
-        ret += a;
-        return ret;
-    }
-
-    /**
-     * @brief operator -=
-     * @param a
-     */
-    void operator -=(const float &a)
-    {
-        for (int i = 0; i < N; i++) {
-            data[i] -= a;
-        }
-    }
-
-    /**
-     * @brief operator -
-     * @param a
-     * @return
-     */
-    Color<N> operator -(const float &a) const
-    {
-        Color<N> ret = this->clone();
-        ret -= a;
-        return ret;
-    }
-
-    /**
-     * @brief operator *=
-     * @param a
-     */
-    void operator *=(const float &a)
-    {
-        for (int i = 0; i < N; i++) {
-            data[i] *= a;
-        }
-    }
-
-    /**
-     * @brief operator *=
-     * @param a
-     */
-    void operator *=(const float *a)
-    {
-        for (int i = 0; i < N; i++) {
-            data[i] *= a[i];
-        }
-    }
-
-    /**
-     * @brief operator *
-     * @param a
-     * @return
-     */
-    Color<N> operator *(const float &a) const
-    {
-        Color<N> ret = this->clone();
-        ret *= a;
-        return ret;
-    }
-
-    /**
-     * @brief operator /=
-     * @param a
-     */
-    void operator /=(const float &a)
-    {
-        for (int i = 0; i < N; i++) {
-            data[i] /= a;
-        }
-    }
-
-    /**
-     * @brief operator /
-     * @param a
-     * @return
-     */
-    Color<N> operator /(const float &a) const
-    {
-        Color<N> ret = this->clone();
-        ret /= a;
-        return ret;
-    }
-
-    /*
-    *
-    *	Color Operands
-    *
-    */
-
-    /**
-     * @brief operator +=
-     * @param col
-     */
-    void operator +=(const Color<N> &col)
-    {
-        for (int i = 0; i < N; i++) {
-            data[i] += col.data[i];
-        }
-    }
-
-    /**
-     * @brief operator +
-     * @param col
-     * @return
-     */
-    Color operator +(const Color<N> &col) const
-    {
-        Color<N> ret = this->clone();
-        ret += col;
-        return ret;
-    }
-
-    /**
-     * @brief operator -=
-     * @param col
-     */
-    void operator -=(const Color<N> &col)
-    {
-        for (int i = 0; i < N; i++) {
-            data[i] -= col.data[i];
-        }
-    }
-
-    /**
-     * @brief operator -
-     * @return
-     */
-    Color<N> operator -() const
-    {
-        Color<N> ret;
-        for (int i = 0; i < N; i++) {
-            ret.data[i] = -data[i];
-        }
-
-        return ret;
-    }
-
-    /**
-     * @brief operator -
-     * @param col
-     * @return
-     */
-    Color operator -(const Color<N> &col) const
-    {
-        Color<N> ret = this->clone();
-        ret -= col;
-        return ret;
-    }
-
-    /**
-     * @brief operator *=
-     * @param col
-     */
-    void operator *=(const Color<N> &col)
-    {
-        for (int i = 0; i < N; i++) {
-            data[i] *= col.data[i];
-        }
-    }
-
-    /**
-     * @brief operator *
-     * @param col
-     * @return
-     */
-    Color<N> operator *(const Color<N> &col)
-    {
-        Color<N> ret = this->clone();
-        ret *= col;
-        return ret;
-    }
-
-    /**
-     * @brief operator /=
-     * @param col
-     */
-    void operator /=(Color<N> &col)
-    {
-        for (int i = 0; i < N; i++) {
-            data[i] /= col.data[i];
-        }
-    }
-
-    /**
-     * @brief operator /
-     * @param col
-     * @return
-     */
-    Color<N> operator /(Color &col) const
-    {
-        Color<N> ret = this->clone();
-        ret /= col;
-        return ret;
-    }
-
-    /**
-     * @brief operator !=
-     * @param col
-     * @return
-     */
-    bool operator !=(Color<N> &col)
-    {
-        bool ret = false;
-        for (int i = 0; i < N; i++) {
-            ret = ret || (data[i] != col.data[i]);
-        }
-        return ret;
-    }
-
-    /**
-     * @brief operator ==
-     * @param col
-     * @return
-     */
-    bool operator ==(Color<N> &col)
-    {
-        bool ret = true;
-        for (int i = 0; i < N; i++) {
-            ret = ret && (data[i] == col.data[i]);
-        }
-        return ret;
     }
 
     /**
@@ -382,7 +97,7 @@ public:
     void scaleTau(const Color<N> &tau)
     {
         for (int i = 0; i < N; i++) {
-            data[i] *= expf(-tau.data[i]);
+            this->data[i] *= expf(-tau.data[i]);
         }
     }
 
@@ -394,7 +109,7 @@ public:
     void scaleTau(const Color<N> &sigma_t, const Color<N> &tau)
     {
         for (int i = 0; i < N; i++) {
-            data[i] *= expf(-tau.data[i] * sigma_t.data[i]);
+            this->data[i] *= expf(-tau.data[i] * sigma_t.data[i]);
         }
     }
 
@@ -406,7 +121,7 @@ public:
     void scaleTau(const Color<N> &sigma_t, float t)
     {
         for (int i = 0; i < N; i++) {
-            data[i] *= expf(-sigma_t.data[i] * t);
+            this->data[i] *= expf(-sigma_t.data[i] * t);
         }
     }
 
@@ -425,26 +140,6 @@ public:
     }
 
     /**
-     * @brief operator []
-     * @param i
-     * @return
-     */
-    float operator [](int i) const
-    {
-        return data[i];
-    }
-
-    /**
-     * @brief operator []
-     * @param i
-     * @return
-     */
-    float &operator [](int i)
-    {
-        return data[i];
-    }
-
-    /**
      * @brief Mean
      * @return
      */
@@ -452,7 +147,7 @@ public:
     {
         float ret = 0.0f;
         for (int i = 0; i < N; i++) {
-            ret += data[i];
+            ret += this->data[i];
         }
 
         return ret / float(N);
@@ -466,9 +161,9 @@ public:
     {
         assert(N >= 3);
 
-        return	0.213f * data[0] +
-                0.715f * data[1] +
-                0.072f * data[2];
+        return	0.213f * this->data[0] +
+                0.715f * this->data[1] +
+                0.072f * this->data[2];
     }
 
     /**
@@ -477,7 +172,7 @@ public:
     void saturate()
     {
         for (int i = 0; i < N; i++) {
-            data[i] = data[i] * 0.5f + 0.5f;
+            this->data[i] = this->data[i] * 0.5f + 0.5f;
         }
     }
 
@@ -489,38 +184,8 @@ public:
     {
         bool ret = true;
         for (int i = 0; i < N; i++) {
-            ret = ret && (data[i] > 0.0f);
+            ret = ret && (this->data[i] > 0.0f);
         }
-    }
-
-    /**
-     * @brief getMax
-     * @return
-     */
-    float getMax()
-    {
-        float ret = data[0];
-        for (int i = 1; i < N; i++) {
-            ret = data[i] > ret ? data[i] : ret;
-        }
-        return ret;
-    }
-
-    /**
-     * @brief getMaxChannel
-     * @return
-     */
-    int getMaxChannel()
-    {
-        float valMax = getMax();
-
-        for (int i = 1; i < N; i++) {
-            if (valMax == data[i]) {
-                return i;
-            }
-        }
-
-        return -1;
     }
 
     /**
@@ -533,21 +198,21 @@ public:
     {
         float sum = 0.0f;
         for(unsigned int i = 0; i < N; i++) {
-            sum += data[i];
+            sum += this->data[i];
         }
 
         if(sum > 0.0f) {
             float CDF[N];
-            CDF[0] = data[0] / sum;
+            CDF[0] = this->data[0] / sum;
             for(unsigned int i = 1; i < (N - 1); i++) {
-                CDF[i] = (CDF[i - 1] + data[i]) / sum;
+                CDF[i] = (CDF[i - 1] + this->data[i]) / sum;
             }
             CDF[N - 1] = 1.0f; // sanity check
 
             for(unsigned int i = 0; i < N; i++) {
                 if(e <= CDF[i]) {
                     channel = i;
-                    pdf = data[i] / sum;
+                    pdf = this->data[i] / sum;
                 }
             }
         } else {
@@ -563,7 +228,7 @@ public:
     {
         printf("\n Values :");
         for(unsigned int i = 0; i < N; i++) {
-            printf("%d ", data[i]);
+            printf("%d ", this->data[i]);
         }
         printf("\n");
     }
@@ -575,7 +240,7 @@ public:
     void gamma(float g)
     {
         for (int i = 1; i < N; i++) {
-            data[i] = pwof(data[i], g);
+            this->data[i] = pwof(this->data[i], g);
         }
     }
 
@@ -586,13 +251,13 @@ public:
     Color<N> inverse(float maxVal = -1.0f)
     {
         if(maxVal <= 0.0f) {
-            maxVal = getMax();
+            maxVal = this->getMax();
         }
 
         Color<N> ret;
 
         for (int i = 0; i < N; i++) {
-            ret.data[i] = maxVal - data[i];
+            ret.data[i] = maxVal - this->data[i];
         }
 
         return ret;
@@ -608,22 +273,9 @@ public:
             col = new float [N];
         }
 
-        memcpy(col, data, N * sizeof(float));
+        memcpy(col, this->data, N * sizeof(float));
 
         return col;
-    }
-
-    /**
-    * @brief clamp
-    * @param min
-    * @param max
-    * @return
-    */
-    void clamp(float min, float max)
-    {
-        for (int i = 0; i < N; i++) {
-            data[i] = CLAMPi(data[i], min, max);
-        }
     }
 
     /**
@@ -661,23 +313,8 @@ public:
     float sqrt()
     {
         for(unsigned int i = 0; i < N; i++) {
-            data[i] = sqrtf(data[i]);
+            this->data[i] = sqrtf(this->data[i]);
         }
-    }
-
-    /**
-     * @brief squaredSum
-     * @return
-     */
-    float squaredSum()
-    {
-        float ret = data[0] * data[0];
-
-        for(unsigned int i = 1; i < N; i++) {
-            ret += data[i] * data[i];
-        }
-
-        return ret;
     }
 
     /**
