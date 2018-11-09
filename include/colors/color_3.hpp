@@ -26,7 +26,7 @@ namespace pic {
 /**
  * @brief Color3
  */
-typedef Color<3> Color3;
+typedef Vec<3, float> Color3;
 
 //basic colors
 const Color3 RED    = Color3(1.0f, 0.0f, 0.0f);

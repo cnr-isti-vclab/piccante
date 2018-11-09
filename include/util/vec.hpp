@@ -39,6 +39,9 @@ public:
      */
     Vec<N, T>()
     {
+        for(unsigned int i = 0; i < N; i++) {
+            this->data[i] = T(0);
+        }
     }
 
     /**
@@ -90,6 +93,62 @@ public:
         }
     }
 
+    /**
+     * @brief setOne
+     */
+    void setOne()
+    {
+        for(unsigned int i = 0; i < N; i++) {
+            data[i] = T(1);
+        }
+    }
+
+    /**
+     * @brief inverse
+     * @return
+     */
+    Vec<N, T> inverse(T maxVal = T(-1))
+    {
+        if(maxVal <= T(0)) {
+            maxVal = this->getMax();
+        }
+
+        Vec<N, T> ret;
+
+        for (int i = 0; i < N; i++) {
+            ret.data[i] = maxVal - this->data[i];
+        }
+
+        return ret;
+    }
+
+    /**
+     * @brief convertToArray
+     * @param col
+     */
+    T *convertToArray(T *ret)
+    {
+        if(ret == NULL) {
+            ret = new T[N];
+        }
+
+        memcpy(ret, this->data, sizeof(T) * N);
+
+        return ret;
+    }
+
+    /**
+     * @brief isGreaterThanZero
+     * @return
+     */
+    bool isGreaterThanZero()
+    {
+        bool ret = true;
+        T zero = T(0);
+        for (int i = 0; i < N; i++) {
+            ret = ret && (this->data[i] > zero);
+        }
+    }
 
     Vec<N, T> clone()
     {
@@ -132,6 +191,20 @@ public:
         }
 
         return true;
+    }
+
+    /**
+     * @brief Mean
+     * @return
+     */
+    T getMean()
+    {
+        T ret = T(0);
+        for (int i = 0; i < N; i++) {
+            ret += this->data[i];
+        }
+
+        return ret / T(N);
     }
 
     /**
@@ -515,6 +588,7 @@ public:
         }
         return ret;
     }
+
 };
 
 /**
@@ -537,7 +611,7 @@ PIC_INLINE bool insideVecBBox(const Vec<N, float> &sample)
 template<unsigned int N>
 PIC_INLINE Vec<N, float> normalize(Vec<N, float> x)
 {
-    float length = x.distanceSq();
+    float length = x.squaredSum();
 
     if(length > 0.0f) {
         length = sqrtf(length);
@@ -605,6 +679,32 @@ PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, 
     }
 
     return x;
+}
+
+template<unsigned int N>
+void print(Vec<N, float> &ret)
+{
+    printf("\n Values :");
+    for(unsigned int i = 0; i < N; i++) {
+        printf("%d ", ret.data[i]);
+    }
+    printf("\n");
+}
+
+template<unsigned int N>
+void gamma(Vec<N, float> &ret, float g)
+{
+    for (int i = 1; i < N; i++) {
+        ret.data[i] = powf(ret.data[i], g);
+    }
+}
+
+template<unsigned int N>
+void vecSqrt(Vec<N, float> &ret)
+{
+    for(unsigned int i = 0; i < N; i++) {
+        ret.data[i] = sqrtf(ret.data[i]);
+    }
 }
 
 template<unsigned int N, class T>
