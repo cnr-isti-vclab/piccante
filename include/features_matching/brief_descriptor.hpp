@@ -58,9 +58,9 @@ protected:
      */
     void generateSample(int *sample)
     {
-        float theta = C_PI_2 * Random((*m)());
+        float theta = C_PI_2 * getRandom((*m)());
 
-        float u = Random((*m)());
+        float u = getRandom((*m)());
         float r = sqrtf(MAX(-logf(u) * sigma_sq_2, 0.0f));
 
         sample[0] = int(r * cosf(theta));

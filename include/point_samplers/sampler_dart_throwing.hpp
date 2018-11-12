@@ -28,14 +28,14 @@ namespace pic {
 const int CONST_DARTTHROWING = 5000;
 
 /**
- * @brief DartThrowingSampler
+ * @brief getDartThrowingSamples
  * @param m
  * @param radius2
  * @param nSamples
  * @param samples
  */
 template<unsigned int N>
-void DartThrowingSampler(std::mt19937 *m, float radius2, int nSamples,
+void getDartThrowingSamples(std::mt19937 *m, float radius2, int nSamples,
                          std::vector<float> &samples)
 {
     float dist2, delta;
@@ -45,7 +45,7 @@ void DartThrowingSampler(std::mt19937 *m, float radius2, int nSamples,
 
     while(counter < (nSamples * CONST_DARTTHROWING)) {
         for(unsigned int j = 0; j < N; j++) {
-            val[j] = ( Random((*m)()) * 2.0f - 1.0f);
+            val[j] = ( getRandom((*m)()) * 2.0f - 1.0f);
         }
 
         bool bFlag = true;

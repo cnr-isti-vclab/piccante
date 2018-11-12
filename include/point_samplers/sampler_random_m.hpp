@@ -34,14 +34,14 @@ template<unsigned int N>
 class MRSamplers
 {
 protected:
-    RandomSampler<N>		**samplers;
-    int						nSamplers;
-    int						oldSamples;
-    Vec<N, int>				oldWindow;
-    SAMPLER_TYPE			type;
+    RandomSampler<N> **samplers;
+    int nSamplers;
+    int oldSamples;
+    Vec<N, int> oldWindow;
+    SAMPLER_TYPE type;
 
 public:
-    int						nLevels;
+    int nLevels;
 
     /**
      * @brief MRSamplers
@@ -89,7 +89,8 @@ public:
     bool Read(std::string name);
 };
 
-template <unsigned int N> PIC_INLINE MRSamplers<N>::MRSamplers()
+template <unsigned int N>
+PIC_INLINE MRSamplers<N>::MRSamplers()
 {
     samplers = NULL;
     nSamplers = -1;
@@ -98,7 +99,8 @@ template <unsigned int N> PIC_INLINE MRSamplers<N>::MRSamplers()
     nLevels = -1;
 }
 
-template <unsigned int N> PIC_INLINE MRSamplers<N>::MRSamplers(
+template <unsigned int N>
+PIC_INLINE MRSamplers<N>::MRSamplers(
     SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels, int nSamplers)
 {
     this->type = type;
@@ -231,10 +233,10 @@ PIC_INLINE bool MRSamplers<N>::Write(std::string name)
     }
     file << std::endl;
 
-    //writing samplers
+    //write samplers
     for(int i = 0; i < nSamplers; i++) {
         RandomSampler< N > *rs = samplers[i];
-        //writing samples
+        //write samples
         file << "nSamplesR: " << rs->samplesR.size() << std::endl;
         for(unsigned int j=0; j< rs->samplesR.size(); j++) {
             file << rs->samplesR[j] << " ";

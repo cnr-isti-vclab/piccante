@@ -69,7 +69,7 @@ public:
 
         for(int i = 0; i < 100; i++) {
             float tx = float(i) / 100.0f;
-            float ty = tx + (Random(m()) * 0.01f - 0.05f); //noise
+            float ty = tx + (getRandom(m()) * 0.01f - 0.05f); //noise
             float ty_sq = ty * ty;
             x.push_back(tx);
             y.push_back(ty_sq);

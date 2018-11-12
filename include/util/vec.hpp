@@ -681,7 +681,7 @@ PIC_INLINE Vec<N, float> randomPoint(std::mt19937 *m)
     Vec<N, float> x;
 
     for(unsigned int i = 0; i < N; i++) {
-        x[i] = Random((*m)()) * 2.0f - 1.0f;
+        x[i] = getRandom((*m)()) * 2.0f - 1.0f;
     }
 
     return x;
@@ -711,7 +711,7 @@ PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, 
 
     while(true) {
         for(unsigned int i = 0; i < N; i++) {
-            x[i] = Random((*m)()) * 4.0f - 2.0f;
+            x[i] = getRandom((*m)()) * 4.0f - 2.0f;
         }
 
         float t = x.lengthSq();

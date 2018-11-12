@@ -36,10 +36,10 @@ template<unsigned int N>
 bool checkNeighborsBruteForce(std::vector< Vec<N, float> > &samples,
                               Vec<N, float> x, float radius)
 {
-    float radius2 = radius * radius;
+    float radius_sq = radius * radius;
 
     for(unsigned int i = 0; i < samples.size(); i++) {
-        if(x.distanceSq(samples[i]) < radius2) {
+        if(x.distanceSq(samples[i]) < radius_sq) {
             return false;
         }
     }
@@ -48,14 +48,14 @@ bool checkNeighborsBruteForce(std::vector< Vec<N, float> > &samples,
 }
 
 /**
- * @brief BridsonSampler
+ * @brief getBridsonSamples
  * @param m
  * @param radius
  * @param samples
  * @param kSamples
  */
 template<unsigned int N>
-void BridsonSampler(std::mt19937 *m, float radius, std::vector<float> &samples,
+void getBridsonSamples(std::mt19937 *m, float radius, std::vector<float> &samples,
                     int kSamples = 30)
 {
     if(kSamples < 1) {
@@ -87,12 +87,12 @@ void BridsonSampler(std::mt19937 *m, float radius, std::vector<float> &samples,
         int j = 0;
 
         while(bFlag) {
-            //creating samples inside the annulus around sample_i
+            //create samples inside the annulus around sample_i
             Vec<N, float> x = annulusSampling<N>(m, vecSamples[ind], radius);
 
-            //checking if the generated sample is in the bounding box
+            //check if the generated sample is in the bounding box
             if(insideVecBBox(x)) {
-                //checking if sample does not have neighbors in grid with distance radius
+                //check if the sample does not have neighbors in grid with distance radius
                 if(checkNeighborsBruteForce(vecSamples, x, radius)) {
                     vecSamples.push_back(x);
                     int value = int(vecSamples.size()) - 1;

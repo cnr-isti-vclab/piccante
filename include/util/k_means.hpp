@@ -122,7 +122,7 @@ PIC_INLINE T* kMeanscomputeRandomCenters(T *samples, int nSamples, int nDim, int
 
         for(int i = 0; i < k; i++) {
             for(int j = 0; j < nDim; j++) {
-                 centers[i * nDim + j] = T(Random(m()) * (tMax[j] - tMin[j]) + tMin[j]);
+                 centers[i * nDim + j] = T(getRandom(m()) * (tMax[j] - tMin[j]) + tMin[j]);
             }
         }
 

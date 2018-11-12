@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <stdlib.h>
 #include <set>
+#include <limits>
 
 #include "../base.hpp"
 
@@ -75,7 +76,7 @@ const float C_PI_OVER_ONE_80    = 0.017453292519943295769236907685f;
 #endif
 
 #ifndef CLAMPi
-    #define CLAMPi(x, a, b)     (x <  a ? a       : (x > b ? b : x))
+    #define CLAMPi(x, a, b)     (x <  a ? a : (x > b ? b : x))
 #endif
 
 
@@ -86,15 +87,11 @@ const float C_PI_OVER_ONE_80    = 0.017453292519943295769236907685f;
  * @param value
  * @return
  */
-template< typename T > PIC_INLINE bool isnan(T value)
+template< typename T >
+PIC_INLINE bool isnan(T value)
 {
     return value != value ;
 }
-
-#endif
-
-
-#ifndef isnan
 
 /**
  * @brief isinf is it a Inf value?
@@ -126,7 +123,7 @@ PIC_INLINE bool equalf(float a, float b)
  * @brief Randombase returns a number in [0, 1] based on rand().
  * @return It returns a random number in [0, 1].
  */
-PIC_INLINE float Randombase()
+PIC_INLINE float getRandombase()
 {
     return float(rand() % RAND_MAX) / float(RAND_MAX);
 }
@@ -136,19 +133,19 @@ PIC_INLINE float Randombase()
  * @param n is a 32-bit unsigned integer number.
  * @return It returns n as a normalized float in [0, 1].
  */
-PIC_INLINE float Random(unsigned int n)
+PIC_INLINE float getRandom(unsigned int n)
 {
     return float(n) / 4294967295.0f;
 }
 
 /**
- * @brief RandomInt
+ * @brief getRandomInt
  * @param n
  * @param a
  * @param b
  * @return
  */
-PIC_INLINE int RandomInt(unsigned int n, int a, int b)
+PIC_INLINE int getRandomInt(unsigned int n, int a, int b)
 {
     if(a < b) {
         return n % (b - a);
@@ -158,22 +155,22 @@ PIC_INLINE int RandomInt(unsigned int n, int a, int b)
 }
 
 /**
- * @brief SFunction evaluates a cubic s-function.
+ * @brief sFunction evaluates a cubic s-function.
  * @param x is a value in [0.0, 1.0]
  * @return it returns 3 x^2 - 2 x^3
  */
-PIC_INLINE float SFunction(float x)
+PIC_INLINE float sFunction(float x)
 {
     float x2 = x * x;
     return 3.0f * x2 - 2.0f * x2 * x;
 }
 
 /**
- * @brief SCurve5 evaluates a quintic S-Shape: 6x^5-15x^4+10x^3
+ * @brief sCurve5 evaluates a quintic S-Shape: 6x^5-15x^4+10x^3
  * @param x is a value in [0.0, 1.0]
  * @return
  */
-PIC_INLINE float SCurve5(float x)
+PIC_INLINE float sCurve5(float x)
 {
     float x2 = x * x;
     float x4 = x2 * x2;
@@ -186,7 +183,7 @@ PIC_INLINE float SCurve5(float x)
  * @param x a value.
  * @return It return x^2.
  */
-PIC_INLINE float Square(float x)
+PIC_INLINE float square(float x)
 {
     return x * x;
 }
