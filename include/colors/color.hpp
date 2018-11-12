@@ -129,16 +129,18 @@ void importanceSampling(Vec<N, float> &in, float e, int &channel, float &pdf)
  * @param in
  * @param exposure
  * @param gammaCor
+ * @param maxVal
  * @return
  */
 template<unsigned int N>
-Vec<N, float> convertToLDR(Vec<N, float> &in, float exposure = 1.0f, float gammaCor = 2.2f)
+Vec<N, float> convertToLDR(Vec<N, float> &in, float exposure = 1.0f, float gammaCor = 2.2f, float maxVal = 255.0f)
 {
     Vec<N, float> ret = in.clone();
     ret *= exposure;
 
     vecGamma(ret, 1.0f / gammaCor);
-    ret.clamp(0.0f, 1.0f);
+    ret *= maxVal;
+    ret.clamp(0.0f, maxVal);
 
     return ret;
 }
