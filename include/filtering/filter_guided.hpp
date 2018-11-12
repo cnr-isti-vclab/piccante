@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../filtering/filter.hpp"
 
+#include "../util/array.hpp"
+
 #include "../util/math.hpp"
 
 namespace pic {
@@ -184,9 +186,7 @@ PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
 
             for(int c = 0; c < channels; c++) {
 
-                for(int n = 0; n < channels; n++) {
-                    tmp_A[n] = 0.0f;
-                }
+                Array<float>::assign(0.0f, tmp_A, channels);
 
                 for(int k = -radius; k < radius; k++) {
                     for(int l = -radius; l < radius; l++) {

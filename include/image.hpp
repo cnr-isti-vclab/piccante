@@ -1532,9 +1532,7 @@ PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL, BBox *box = NULL,
 
     float totf = float(box->Size() - 1);
 
-    for(int l = 0; l < channels; l++) {
-        ret[l] /= totf;
-    }
+    Array<float>::div(ret, channels, totf);
 
     if(bDeleteMeanVal) {
         delete[] meanVal;
@@ -1554,8 +1552,11 @@ PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
         box = &fullBox;
     }
 
+    bool bMeanValAllocated = false;
+
     if(meanVal == NULL) {
-        meanVal = getMeanVal(box);
+        meanVal = getMeanVal(box, NULL);
+        bMeanValAllocated = true;
     }
 
     int n = channels * channels;
@@ -1564,7 +1565,7 @@ PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
         ret = new float[n];
     }
 
-     Array<float>::assign(0.0f, ret, n);
+    Array<float>::assign(0.0f, ret, n);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
@@ -1586,8 +1587,10 @@ PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
 
     float totf = float(box->Size() - 1);
 
-    for(int l = 0; l < n; l++) {
-        ret[l] /= totf;
+    Array<float>::div(ret, n, totf);
+
+    if(bMeanValAllocated) {
+        delete[] meanVal;
     }
 
     return ret;
@@ -1621,10 +1624,10 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
         }
     }
 
-    float tot = float(box->Size());
+    float totf = float(box->Size());
 
     for(int l = 0; l < channels; l++) {
-        ret[l] = expf(ret[l] / tot);
+        ret[l] = expf(ret[l] / totf);
     }
 
     return ret;
@@ -1662,9 +1665,7 @@ PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.2
         bColorAllocated = true;
         color = new float[channels];
 
-        for(int i = 0; i < channels; i++) {
-            color[i] = 0.0f;
-        }
+        Array<float>::assign(0.0f, color, channels);
     }
 
     int n = width * height;
