@@ -127,7 +127,7 @@ PIC_INLINE bool MRSamplers<N>::update(Vec<N, int> window, int nSamples)
 
     //#pragma omp parallel for
     for(int i = 0; i < nSamplers; i++) {
-        samplers[i]->Update(type, window, nSamples, nLevels);
+        samplers[i]->update(type, window, nSamples, nLevels);
     }
 
     oldWindow = window;
