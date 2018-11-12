@@ -176,9 +176,9 @@ PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
             I->getCovMtxVal(I_mean, &tmpBox, cov.data);
 
             //regularization
-            cov.Add(e_regularization);
+            cov.add(e_regularization);
             //invert matrix
-            cov.Inverse(&inv);
+            cov.getInverse(&inv);
 
             p->getMeanVal(&tmpBox, p_mean);
 
@@ -204,7 +204,7 @@ PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
                 }
 
                 //multiply for inverted matrix
-                inv.Mul(tmp_A, a);
+                inv.mul(tmp_A, a);
 
                 float a_dot_I_mean = 0.0f;
 

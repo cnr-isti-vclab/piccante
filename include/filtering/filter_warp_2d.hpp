@@ -56,7 +56,7 @@ protected:
 
                 pos[0] = float(i + bmin[0] ) - mid[0];
 
-                h_inv.Projection(pos, pos_out);
+                h_inv.projection(pos, pos_out);
 
                 pos_out[0] += mid[0];
                 pos_out[1] += mid[1];
@@ -86,8 +86,8 @@ public:
         this->bCentroid = false;
         this->bSameSize = false;
 
-        h.Identity();
-        h_inv.Identity();
+        h.getIdentity();
+        h_inv.getIdentity();
     }
 
     /**
@@ -159,7 +159,7 @@ public:
             bbox[i][0] -= mid[0];
             bbox[i][1] -= mid[1];
 
-            h.Projection(&bbox[i][0], &bbox_out[i][0]);
+            h.projection(&bbox[i][0], &bbox_out[i][0]);
 
             bbox_out[i][0] += mid[0];
             bbox_out[i][1] += mid[1];
@@ -213,7 +213,7 @@ public:
         this->bCentroid = bCentroid;
 
         this->h = h;
-        h.Inverse(&h_inv);
+        h.getInverse(&h_inv);
     }
 
     /**

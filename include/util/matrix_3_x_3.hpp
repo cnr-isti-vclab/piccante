@@ -52,14 +52,14 @@ public:
      */
     Matrix3x3(float *data)
     {
-        Set(data);
+        set(data);
     }
 
     /**
-     * @brief Clone clones the matrix.
+     * @brief clone clones the matrix.
      * @return it returns the cloned matrix.
      */
-    Matrix3x3 Clone()
+    Matrix3x3 clone()
     {
         Matrix3x3 ret(data);
 
@@ -67,11 +67,11 @@ public:
     }
 
     /**
-     * @brief Set sets the matrix up.
+     * @brief set sets the matrix up.
      * @param data input data, they are assumed to be 9 floats.
      * The matrix is stored by rows.
      */
-    void Set(float *data)
+    void set(float *data)
     {
         if(data != NULL) {
             memcpy(this->data, data, 9 * sizeof(float));
@@ -79,9 +79,9 @@ public:
     }
 
     /**
-     * @brief Identity sets the matrix as an identity matrix; diag(1, 1, 1);
+     * @brief getIdentity sets the matrix as an identity matrix; diag(1, 1, 1);
      */
-    void Identity()
+    void getIdentity()
     {
         data[0] = 1.0f;
         data[1] = 0.0f;
@@ -97,11 +97,11 @@ public:
     }
 
     /**
-     * @brief Mul
+     * @brief mul
      * @param mtx
      * @return
      */
-    Matrix3x3 Mul(const Matrix3x3 &mtx)
+    Matrix3x3 mul(const Matrix3x3 &mtx)
     {
         Matrix3x3 ret;
         ret.data[0] = data[0] * mtx.data[0] +  data[1] * mtx.data[3] + data[2] * mtx.data[6];
@@ -120,12 +120,12 @@ public:
     }
 
     /**
-     * @brief Mul
+     * @brief mul
      * @param vec
      * @param ret
      * @return
      */
-    float *Mul(float *vec, float *ret)
+    float *mul(float *vec, float *ret)
     {
         if(vec == NULL) {
             return ret;
@@ -148,7 +148,7 @@ public:
      * @param ret
      * @return
      */
-    float *MulH(float *vec, float *ret)
+    float *mulH(float *vec, float *ret)
     {
         if(vec == NULL) {
             return ret;
@@ -166,12 +166,12 @@ public:
     }
 
     /**
-     * @brief Projection
+     * @brief projection
      * @param vec
      * @param ret
      * @return
      */
-    float *Projection(float *vec, float *ret) {
+    float *projection(float *vec, float *ret) {
         if(vec == NULL) {
             return ret;
         }
@@ -193,10 +193,10 @@ public:
     }
 
     /**
-     * @brief CrossProduct computes the cross product matrix
+     * @brief crossProduct computes the cross product matrix
      * @param t is a three value array.
      */
-    void CrossProduct(float *t)
+    void crossProduct(float *t)
     {
         if(t == NULL) {
             return;
@@ -219,7 +219,7 @@ public:
      * @brief Add adds a value to the diagonal.
      * @param value is the value to be added.
      */
-    void Add(float value)
+    void add(float value)
     {
         data[0] += value;
         data[4] += value;
@@ -227,10 +227,10 @@ public:
     }
 
     /**
-     * @brief Determinant computes the determinant of the matrix.
+     * @brief getDeterminant computes the determinant of the matrix.
      * @return
      */
-    float Determinant()
+    float getDeterminant()
     {
         return	 data[0] * (data[4] * data[8] - data[5] * data[7]) -
                  data[1] * (data[8] * data[3] - data[5] * data[6]) +
@@ -238,17 +238,17 @@ public:
     }
 
     /**
-     * @brief Inverse computes the inverse of the matrix.
+     * @brief getInverse computes the inverse of the matrix.
      * @param inv
      * @return
      */
-    Matrix3x3 *Inverse(Matrix3x3 *inv)
+    Matrix3x3 *getInverse(Matrix3x3 *inv)
     {
         if(inv == NULL) {
             inv = new Matrix3x3();
         }
 
-        float det = Determinant();
+        float det = getDeterminant();
 
         if(fabsf(det) <= 1e-9f) {
             printf("Error: Negative determinant\n");
@@ -272,11 +272,11 @@ public:
 
     //
     /**
-     * @brief SetTranslationMatrix sets the matrix as a translation matrix.
+     * @brief setTranslationMatrix sets the matrix as a translation matrix.
      * @param tx
      * @param ty
      */
-    void SetTranslationMatrix(float tx, float ty) {
+    void setTranslationMatrix(float tx, float ty) {
         data[0] = 1.0f;
         data[1] = 0.0f;
         data[2] = tx;
@@ -291,10 +291,10 @@ public:
     }
 
     /**
-     * @brief SetRotationMatrix sets the matrix as a rotation matrix
+     * @brief setRotationMatrix sets the matrix as a rotation matrix
      * @param ang
      */
-    void SetRotationMatrix(float ang) {
+    void setRotationMatrix(float ang) {
         float cosAng = cosf(ang);
         float sinAng = sinf(ang);
 
@@ -316,18 +316,18 @@ public:
      * @param horizontal_shear
      * @param vertical_shear
      */
-    void SetShearMatrix(float horizontal_shear, float vertical_shear)
+    void setShearMatrix(float horizontal_shear, float vertical_shear)
     {
-        Identity();
+        getIdentity();
 
         data[1] = vertical_shear;
         data[3] = horizontal_shear;
     }
 
     /**
-     * @brief Transpose computes the transposed matrix.
+     * @brief transpose computes the transposed matrix.
      */
-    void Transpose()
+    void transpose()
     {
         std::swap(data[1], data[3]);
         std::swap(data[5], data[7]);
@@ -339,7 +339,7 @@ public:
      * @param x_scale
      * @param y_scale
      */
-    void SetScaleMatrix(float x_scale, float y_scale)
+    void setScaleMatrix(float x_scale, float y_scale)
     {
         if(x_scale <= 0.0f) {
             x_scale = 1.0f;
@@ -349,7 +349,7 @@ public:
             y_scale = 1.0f;
         }
 
-        Identity();
+        getIdentity();
 
         data[0] = x_scale;
         data[4] = y_scale;
