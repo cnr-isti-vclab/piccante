@@ -40,8 +40,23 @@ public:
     std::vector<float> coeff;
     bool  all_coeff_positive;
 
+    /**
+     * @brief Polynomial
+     */
     Polynomial()
     {
+        all_coeff_positive = true;
+    }
+
+    /**
+     * @brief Polynomial
+     * @param nCoeff
+     */
+    Polynomial(int nCoeff)
+    {
+        for(int i = 0; i < nCoeff; i++) {
+            coeff.push_back(0.0f);
+        }
         all_coeff_positive = true;
     }
 
@@ -240,18 +255,18 @@ public:
      */
     Polynomial horner(float d, float &remainder)
     {
-        Polynomial p;
-
-        p.coeff.push_back(coeff[0]);
-
         int nCoeff = coeff.size();
-        for(int i = 1; i < (nCoeff - 1); i++) {
-            p.coeff.push_back(coeff[i] + p.coeff[i - 1] * d);
+        Polynomial p(nCoeff - 1);
+
+        p.coeff[nCoeff - 2] = coeff[nCoeff - 1];
+
+        for(int i = (nCoeff - 3); i >= 0 ; i--) {
+            p.coeff[i] = (p.coeff[i + 1] * d + coeff[i + 1]);
         }
 
         p.computeAllCoeffPositive();
 
-        remainder = coeff[nCoeff - 1] + p.coeff[nCoeff - 2] * d;
+        remainder = coeff[0] + p.coeff[0] * d;
 
         return p;
     }

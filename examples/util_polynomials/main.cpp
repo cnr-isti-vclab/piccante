@@ -83,8 +83,8 @@ int main(int argc, char *argv[])
     poly3.print();
 
     float r;
-    auto poly3_2 = poly3.horner(3.0f, r);
-    poly3_2.print();
+    auto poly3_2 = poly3.horner(3.0f, r);    
+    printf("H: %s R: %f\n", poly3_2.toString().c_str(), r);;
 
     printf("p(1.0f) = %f\n", poly3.eval(1.0f));
     printf("dp(1.0f) = %f\n", poly3.dEval(1.0f));
