@@ -91,19 +91,36 @@ public:
 
     std::string toString()
     {
+        std::string ret = "";
         if(coeff.empty()) {
-            return "";
+            return ret;
         }
-
-        std::string ret = fromNumberToString(coeff[0]) + " ";
-
         int nCoeff = coeff.size();
-        for(int i = 1; i < (nCoeff- 1); i++) {
-            ret += fromNumberToString(coeff[i]) + " * x^" + fromNumberToString(i) + " + ";
+
+        if(nCoeff > 1) {
+
+            std::string sep = "+ ";
+            if(coeff[1] < 0.0f) {
+                sep = " ";
+            }
+
+            ret = fromNumberToString(coeff[0]) + sep;
+
+            for(int i = 1; i < (nCoeff - 1); i++) {
+
+                if(coeff[i + 1] > 0.0f) {
+                    sep = "+ ";
+                } else {
+                    sep = " ";
+                }
+
+                ret += fromNumberToString(coeff[i]) + " * x^" + fromNumberToString(i) + sep;
+            }
+
+            ret += fromNumberToString(coeff[nCoeff - 1]) + " * x^" + fromNumberToString(nCoeff - 1);
+        } else {
+            ret = fromNumberToString(coeff[0]);
         }
-
-        ret += fromNumberToString(coeff[nCoeff - 1]) + " * x^" + fromNumberToString(nCoeff - 1);
-
         return ret;
     }
 
@@ -148,11 +165,14 @@ public:
     {
         int nCoeff = coeff.size();
 
-        float ret = coeff[0] * float(nCoeff - 1);
+        if(nCoeff < 2) {
+            return 0.0f;
+        }
 
-        for(int i = 1; i < (nCoeff - 1); i++) {
-            int j = (nCoeff - 1) - i;
-            ret = (ret * x) + coeff[i] * float(j);
+        float ret = coeff[nCoeff - 1] * float(nCoeff - 1);
+
+        for(int i = (nCoeff - 2); i > 0 ; i--) {
+            ret = (ret * x) + coeff[i] * float(i);
         }
         return ret;
     }
@@ -237,11 +257,11 @@ public:
     }
 
     /**
-     * @brief getPositiveRoots
+     * @brief getRoots
      * @param x
      * @return
      */
-    bool getPositiveRoots(float *x)
+    bool getRoots(float *x)
     {
         int nCoeff = coeff.size();
 
@@ -250,7 +270,7 @@ public:
         }
 
         if(nCoeff == 2) {
-            //this may be not positive
+            //this coefficient may be not positive
             if(coeff[1] > 0.0f) {
                 x[0] = -coeff[0] / coeff[1];
                 return true;
@@ -260,13 +280,15 @@ public:
         }
 
         if(nCoeff == 3) {
-            //these may be not positive
+            //these coefficients may be not positive
             return getSecondOrderRoots(coeff[2], coeff[1], coeff[0], &x[0], &x[1]);
         }
 
         if(all_coeff_positive) {
             return false;
         }
+
+        printf("AAA\n\n");
 
         float max_coeff0 = -1.0f;
 
@@ -316,17 +338,17 @@ public:
     }
 
     /**
-     * @brief getAllPositiveRoots
+     * @brief getAllRoots
      * @param x
      * @return
      */
-    bool getAllPositiveRoots(float *x)
+    bool getAllRoots(float *x)
     {
         for(int i = 0; i < coeff.size() - 1; i++) {
             x[i] = FLT_MAX;
         }
 
-        bool bOut = getPositiveRoots(&x[0]);
+        bool bOut = getRoots(&x[0]);
 
         if(!bOut) {
             return false;
@@ -339,7 +361,7 @@ public:
         int nCoeff = coeff.size();
         for(int i = 1; i < (nCoeff - 2); i++) {
             p.print();
-            bool bOut = p.getPositiveRoots(&x[i]);
+            bool bOut = p.getRoots(&x[i]);
 
             if(!bOut) {
                 return true;

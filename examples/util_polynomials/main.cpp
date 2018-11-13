@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     printf("p(4.0f) = %f\n", poly.eval(4.0f));
 
     float roots[2];
-    bool bReal = poly.getAllPositiveRoots(roots);
+    bool bReal = poly.getAllRoots(roots);
 
     if(bReal) {
         printf("Roots: %f %f\n", roots[0], roots[1]);
@@ -65,8 +65,9 @@ int main(int argc, char *argv[])
     poly2.print();
 
     printf("p(0.0f) = %f\n", poly2.eval(0.0f));
+    printf("dp(1.0f) = %f\n", poly2.dEval(1.0f));
 
-    bReal = poly2.getPositiveRoots(roots);
+    bReal = poly2.getRoots(roots);
 
     if(bReal) {
         printf("Roots: %f %f\n", roots[0], roots[1]);
@@ -77,14 +78,19 @@ int main(int argc, char *argv[])
     printf("\n\n");
 
     printf("Third order polynomial test:\n");
-    float tmp3[] = {1.0f, -3.0f, -2.0f, 0.5f};
+    float tmp3[] = {-6.0f, 11.0f, -6.0f, 1.0f};
     pic::Polynomial poly3(tmp3, 4);
     poly3.print();
 
+    float r;
+    auto poly3_2 = poly3.horner(3.0f, r);
+    poly3_2.print();
+
     printf("p(1.0f) = %f\n", poly3.eval(1.0f));
+    printf("dp(1.0f) = %f\n", poly3.dEval(1.0f));
 
     float roots3[3];
-    bReal = poly3.getAllPositiveRoots(roots3);
+    bReal = poly3.getRoots(roots3);
 
     if(bReal) {
         printf("Roots: %f %f %f\n", roots3[0], roots3[1], roots3[2]);
