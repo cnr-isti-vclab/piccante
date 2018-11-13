@@ -81,6 +81,7 @@ protected:
         pic::QuadGL::getTechnique(technique,
                             pic::QuadGL::getVertexProgramV3(),
                             pic::QuadGL::getFragmentProgramForView());
+
         quad = new pic::QuadGL(true);
 
         //allocate a new filter for simple tone mapping

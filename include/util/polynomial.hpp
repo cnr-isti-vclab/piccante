@@ -15,8 +15,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_UTIL_POLYNOMIAL_HPP
-#define PIC_UTIL_POLYNOMIAL_HPP
+#ifndef PIC_UTIL_coeffNOMIAL_HPP
+#define PIC_UTIL_coeffNOMIAL_HPP
 
 #include <vector>
 
@@ -25,6 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_DISABLE_EIGEN
     #ifndef PIC_EIGEN_NOT_BUNDLED
         #include "../externals/Eigen/QR"
+        #include "../externals/Eigen/Eigenvalues"
     #else
         #include <Eigen/QR>
     #endif
@@ -32,100 +33,402 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**
- * @brief polynomialVal
- * @param poly
- * @param x
- * @return
- */
-PIC_INLINE float polynomialVal(std::vector< float > & poly, float x)
+
+class Polynomial
 {
-    float val = 0.f;
-    float M = 1.f;
-    for (const float &c : poly) {
-        val += c * M;
-        M *= x;
-    }
-    return val;
-}
+public:
+    std::vector<float> coeff;
+    bool  all_coeff_positive;
 
-#ifndef PIC_DISABLE_EIGEN
-
-/**
- * @brief polynomialFit
- * @param x
- * @param y
- * @param n is the degree of the polynomial
- * @return
- */
-PIC_INLINE std::vector<float> polynomialFit(std::vector<float> &x, std::vector<float> &y, int n)
-{
-    std::vector<float> poly;
-
-    if(n < 1) {
-        return poly;
+    Polynomial()
+    {
+        all_coeff_positive = true;
     }
 
-    if(x.size() != y.size()) {
-        return poly;
+    /**
+     * @brief coeffnomial
+     * @param coeff
+     * @param nCoeff
+     */
+    Polynomial(float *coeff, int nCoeff)
+    {
+        if(nCoeff < 1 || coeff == NULL) {
+            return;
+        }
+
+        this->coeff.assign(coeff, coeff + nCoeff);
+
+        computeAllCoeffPositive();
     }
 
-    int np1 = n + 1;
+    ~Polynomial()
+    {
 
-    int s = int(x.size());
-    Eigen::MatrixXf A(s, np1);
-    Eigen::VectorXf b(s);
-
-    for(int i = 0; i < s; i++) {
-        b(i) = y[i];
-        A(i, n) = 1.0f;
     }
 
-    for(int j = (n - 1); j >= 0; j--) {
+    /**
+     * @brief computeAllCoeffPositive
+     */
+    void computeAllCoeffPositive()
+    {
+        int counter = 0;
+        for (const float &c : coeff) {
+            if(c < 0.0f) {
+                counter++;
+            }
+        }
+
+        all_coeff_positive = counter < 1;
+    }
+
+    /**
+     * @brief print
+     */
+    void print()
+    {
+        printf("%s\n", toString().c_str());
+    }
+
+    std::string toString()
+    {
+        if(coeff.empty()) {
+            return "";
+        }
+
+        std::string ret = fromNumberToString(coeff[0]) + " ";
+
+        int nCoeff = coeff.size();
+        for(int i = 1; i < (nCoeff- 1); i++) {
+            ret += fromNumberToString(coeff[i]) + " * x^" + fromNumberToString(i) + " + ";
+        }
+
+        ret += fromNumberToString(coeff[nCoeff - 1]) + " * x^" + fromNumberToString(nCoeff - 1);
+
+        return ret;
+    }
+
+    /**
+     * @brief getArray
+     * @return
+     */
+    float *getArray(float *ret)
+    {
+        if(ret == NULL) {
+            ret = new float[coeff.size()];
+        }
+
+        for(int i = 0; i < coeff.size(); i++) {
+            ret[i] = coeff[i];
+        }
+        return ret;
+    }
+
+    /**
+     * @brief eval
+     * @param x
+     * @return
+     */
+    float eval(float x)
+    {
+        float val = 0.f;
+        float M = 1.f;
+        for (const float &c : coeff) {
+            val += c * M;
+            M *= x;
+        }
+        return val;
+    }
+
+    /**
+     * @brief dEval
+     * @param t
+     * @return
+     */
+    float dEval(float x)
+    {
+        int nCoeff = coeff.size();
+
+        float ret = coeff[0] * float(nCoeff - 1);
+
+        for(int i = 1; i < (nCoeff - 1); i++) {
+            int j = (nCoeff - 1) - i;
+            ret = (ret * x) + coeff[i] * float(j);
+        }
+        return ret;
+    }
+
+    /**
+     * @brief fit
+     * @param x
+     * @param y
+     * @param n
+     */
+    void fit(std::vector<float> &x, std::vector<float> &y, int n)
+    {
+        if(n < 1 || (x.size() != y.size())) {
+            return;
+        }
+
+        coeff.clear();
+
+        int np1 = n + 1;
+
+        int s = int(x.size());
+        Eigen::MatrixXf A(s, np1);
+        Eigen::VectorXf b(s);
+
         for(int i = 0; i < s; i++) {
-            A(i, j) = x[i] * A(i, j + 1);
+            b(i) = y[i];
+            A(i, n) = 1.0f;
+        }
+
+        for(int j = (n - 1); j >= 0; j--) {
+            for(int i = 0; i < s; i++) {
+                A(i, j) = x[i] * A(i, j + 1);
+            }
+        }
+
+        Eigen::VectorXf _x = A.colPivHouseholderQr().solve(b);
+
+        for(int i = n; i >= 0; i--) {
+            coeff.push_back(_x(i));
         }
     }
 
-    Eigen::VectorXf _x = A.colPivHouseholderQr().solve(b);
+    /**
+     * @brief normalForm
+     */
+    void normalForm()
+    {
+        int last = coeff.size() - 1;
+        if(fabsf(coeff[last]) > 0.0f) {
+            for(int i = 0; i < last; i++) {
+                coeff[i] /= coeff[last];
+            }
 
-    for(int i = n; i >= 0; i--) {
-        poly.push_back(_x(i));
+            coeff[last] = 1.0f;
+        }
     }
 
-    return poly;
-}
+    /**
+     * @brief horner
+     * @param d
+     * @param remainder
+     * @return
+     */
+    Polynomial horner(float d, float &remainder)
+    {
+        Polynomial p;
 
-/**
- * @brief polynomialTest
- */
-PIC_INLINE void polynomialTest()
-{
-    std::vector<float> x, y;
+        p.coeff.push_back(coeff[0]);
 
-    for(int i = 0; i < 10; i++) {
-        float p_x = float(i);
-        float p_y = 3.0f * p_x * p_x +
-                    2.0f * p_x +
-                    1.0f;
+        int nCoeff = coeff.size();
+        for(int i = 1; i < (nCoeff - 1); i++) {
+            p.coeff.push_back(coeff[i] + p.coeff[i - 1] * d);
+        }
 
-        x.push_back(p_x);
-        y.push_back(p_y);
+        p.computeAllCoeffPositive();
+
+        remainder = coeff[nCoeff - 1] + p.coeff[nCoeff - 2] * d;
+
+        return p;
     }
 
-    std::vector< float > tmp = polynomialFit(x, y, 2);
+    /**
+     * @brief getPositiveRoots
+     * @param x
+     * @return
+     */
+    bool getPositiveRoots(float *x)
+    {
+        int nCoeff = coeff.size();
 
-    printf("poly: ");
-    for(int i = 0; i < 3; i++) {
-        printf("%f ", tmp[i]);
-    }
+        if(nCoeff < 2) {
+            return false;
+        }
 
-    float y_2 = polynomialVal(tmp, 4.0f);
-    printf("\n p(4.0f) = %f\n", y_2);
-}
+        if(nCoeff == 2) {
+            //this may be not positive
+            if(coeff[1] > 0.0f) {
+                x[0] = -coeff[0] / coeff[1];
+                return true;
+            } else {
+                return false;
+            }
+        }
 
+        if(nCoeff == 3) {
+            //these may be not positive
+            return getRoots2ndOrder(coeff[2], coeff[1], coeff[0], &x[0], &x[1]);
+        }
+
+        if(all_coeff_positive) {
+            return false;
+        }
+
+        float max_coeff0 = -1.0f;
+
+        for(int i = 1; i < coeff.size(); i++) {
+            float tmp = fabsf(coeff[i]);
+            if(tmp > max_coeff0) {
+                max_coeff0 = tmp;
+            }
+        }
+
+        float tmp = fabsf(coeff[0]);
+        float max_coeff;
+        if(max_coeff0 < tmp) {
+            max_coeff = tmp;
+        } else {
+            max_coeff = max_coeff0;
+        }
+
+        float lower_bound = fabsf(coeff[0]) / (fabsf(coeff[0]) + max_coeff0);
+
+#ifdef GRT_DEBUG
+        float upper_bound = 1.0f + max_coeff / fabsf(coeff[0]);
+        printf("Upper bound: %f\n", upper_bound);
+        printf("Lower bound: %f\n", lower_bound);
 #endif
+
+        float x_p = lower_bound;
+        float x_n;
+        bool notConverged = true;
+        int counter = 0;
+        float E_x_p;
+        while(notConverged) {
+            E_x_p = eval(x_p);
+            x_n = x_p - E_x_p / dEval(x_p);
+            x_p = x_n;
+            counter++;
+
+            notConverged = (fabsf(E_x_p) > 1e-4f) && (counter < 200);
+        }
+
+        if(counter == 200) {
+            return false;
+        } else {
+            *x = x_n;
+            return true;
+        }
+    }
+
+    /**
+     * @brief getAllPositiveRoots
+     * @param x
+     * @return
+     */
+    bool getAllPositiveRoots(float *x)
+    {
+        for(int i = 0; i < coeff.size() - 1; i++) {
+            x[i] = FLT_MAX;
+        }
+
+        bool bOut = getPositiveRoots(&x[0]);
+
+        if(!bOut) {
+            return false;
+        }
+
+        float r;
+        Polynomial p = horner(x[0], r);
+        p.normalForm();
+
+        int nCoeff = coeff.size();
+        for(int i = 1; i < (nCoeff - 2); i++) {
+            p.print();
+            bool bOut = p.getPositiveRoots(&x[i]);
+
+            if(!bOut) {
+                return true;
+            }
+
+            p = p.horner(x[i], r);
+            p.normalForm();
+        }
+
+        return true;
+    }
+
+    /**
+     * @brief getQuarticRoots --> MANDATORY p[0] == 1.0
+     * @param p
+     * @param x
+     * @return
+     */
+    static bool getQuarticRoots(float *p, float *x)
+    {
+#ifndef PIC_DISABLE_EIGEN
+        Eigen::Matrix4f m;
+
+        m << -p[1], -p[2], -p[3], -p[4],
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f;
+
+        Eigen::EigenSolver<Eigen::Matrix4f> es(m);
+        Eigen::Vector4cf e = es.eigenvalues();
+
+        bool bOut = false;
+        if(fabsf(e(0).imag()) < 1e-6f) {
+            x[0] = e(0).real();
+            bOut = true;
+        }
+
+        if(fabsf(e(1).imag()) < 1e-6f) {
+            x[1] = e(1).real();
+            bOut = true;
+        }
+
+        if(fabsf(e(2).imag()) < 1e-6f) {
+            x[2] = e(2).real();
+            bOut = true;
+        }
+
+        if(fabsf(e(3).imag()) < 1e-6f) {
+            x[3] = e(3).real();
+            bOut = true;
+        }
+
+        return bOut;
+#else
+        return true;
+#endif
+    }
+
+    //Solver for second order equations, ax^2 + b x + c = 0
+    static bool getRoots2ndOrder(float a, float b, float c, float *x0, float *x1)
+    {
+        float delta = b * b - 4.0f * a * c;
+
+        if(delta >= 0.0f) {
+            float dnum = 2.0f * a;
+            delta = sqrtf(delta);
+            *x0 = (-b + delta) / dnum;
+            *x1 = (-b - delta) / dnum;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //Solver for second order equations, ax^2 + b x + c = 0, when b is even
+    static bool getRoots2ndOrderEven(float a, float b, float c, float *x0, float *x1)
+    {
+        float delta = b * b - a * c;
+        if(delta >= 0.0f) {
+            delta = sqrtf(delta);
+            *x0 = (-b + delta) / a;
+            *x1 = (-b - delta) / a;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+};
 
 } // end namespace pic
 
-#endif //PIC_UTIL_POLYNOMIAL_HPP
+#endif //PIC_UTIL_coeffNOMIAL_HPP

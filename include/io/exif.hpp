@@ -469,7 +469,7 @@ bool readEXIF(std::string name, EXIFInfo &info)
             }
         }
 
-        printf("%f %f %f\n", info.iso, info.exposureTime, info.fNumber);
+        //printf("%f %f %f\n", info.iso, info.exposureTime, info.fNumber);
 
         fclose(file);
 

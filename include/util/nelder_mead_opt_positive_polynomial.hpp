@@ -42,12 +42,12 @@ public:
 
     float function(float *x, unsigned int n)
     {
-        std::vector< float > poly;
-        poly.assign(x, x + n);
+
+        Polynomial poly(x, n);
 
         float err = 0.0f;
         for(auto i = 0; i < px.size(); i++) {
-            float py_i = polynomialVal(poly, px[i]);
+            float py_i = poly.eval(px[i]);
             if(py_i > 0.0f) {
                 float delta_y = py_i - py[i];
                 err += (delta_y * delta_y);
@@ -77,12 +77,10 @@ public:
 
         NelderMeadOptPositivePolynomial test(x, y);
 
-        std::vector<float> poly = polynomialFit(x, y, 2);
+        Polynomial poly;
+        poly.fit(x, y, 2);
 
-        float *in = new float[poly.size()];
-        for(int i = 0; i < poly.size(); i++) {
-            in[i] = poly[i];
-        }
+        float *in = poly.getArray(NULL);
 
         float *out = test.run(in, 3, 1e-12f, 100000);
 

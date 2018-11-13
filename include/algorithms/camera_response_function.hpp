@@ -162,7 +162,7 @@ protected:
             for(int j = 0; j < 256; j++) {
                 float x = float(j) / 255.0f;
 
-                tmp[j] = polynomialVal(poly[i], x);
+                tmp[j] = poly[i].eval(x);
             }
 
             crf.push_back(tmp);
@@ -178,7 +178,7 @@ public:
     std::vector<float *>    icrf;
     std::vector<float *>     crf;
 
-    std::vector< std::vector<float> >  poly;
+    std::vector< Polynomial >  poly;
     
     /**
      * @brief CameraResponseFunction
@@ -219,7 +219,7 @@ public:
             break;
 
             case IL_POLYNOMIAL: {
-                return polynomialVal(poly[channel], x);
+                return poly[channel].eval(x);
             }
             break;
 
@@ -492,24 +492,24 @@ public:
         if (polynomial_degree > 0) {
             error = 0.f;
             for (int i = 0; i < channels; ++i) {
-                poly[i].assign(polynomial_degree + 1, 0.f);
+                poly[i].coeff.assign(polynomial_degree + 1, 0.f);
                 if (full) {
-                    error += MitsunagaNayarFull(&samples[i * stride], nSamples, exposures, poly[i], computeRatios, RR, eps, max_iterations);
+                    error += MitsunagaNayarFull(&samples[i * stride], nSamples, exposures, poly[i].coeff, computeRatios, RR, eps, max_iterations);
                 } else {
-                    error += MitsunagaNayarClassic(&samples[i * stride], nSamples, exposures, poly[i], computeRatios, R, eps, max_iterations);
+                    error += MitsunagaNayarClassic(&samples[i * stride], nSamples, exposures, poly[i].coeff, computeRatios, R, eps, max_iterations);
                 }
             }
         } else if (polynomial_degree < 0) {
             error = std::numeric_limits<float>::infinity();
-            std::vector<std::vector<float>> tmpCoefficients(channels);
+            std::vector<Polynomial> tmpCoefficients(channels);
             for (int degree = 1; degree <= -polynomial_degree; ++degree) {
                 float tmpError = 0.f;
                 for (int i = 0; i < channels; ++i) {
-                    tmpCoefficients[i].resize(degree + 1);
+                    tmpCoefficients[i].coeff.resize(degree + 1);
                     if (full) {
-                        tmpError += MitsunagaNayarFull(&samples[i * stride], nSamples, exposures, tmpCoefficients[i], computeRatios, RR, eps, max_iterations);
+                        tmpError += MitsunagaNayarFull(&samples[i * stride], nSamples, exposures, tmpCoefficients[i].coeff, computeRatios, RR, eps, max_iterations);
                     } else {
-                        tmpError += MitsunagaNayarClassic(&samples[i * stride], nSamples, exposures, tmpCoefficients[i], computeRatios, R, eps, max_iterations);
+                        tmpError += MitsunagaNayarClassic(&samples[i * stride], nSamples, exposures, tmpCoefficients[i].coeff, computeRatios, R, eps, max_iterations);
                     }
                 }
                 if (tmpError < error) {
