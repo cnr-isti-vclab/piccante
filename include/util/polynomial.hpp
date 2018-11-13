@@ -303,8 +303,6 @@ public:
             return false;
         }
 
-        printf("AAA\n\n");
-
         float max_coeff0 = -1.0f;
 
         for(int i = 1; i < coeff.size(); i++) {

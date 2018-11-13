@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     printf("dp(1.0f) = %f\n", poly3.dEval(1.0f));
 
     float roots3[3];
-    bReal = poly3.getRoots(roots3);
+    bReal = poly3.getAllRoots(roots3);
 
     if(bReal) {
         printf("Roots: %f %f %f\n", roots3[0], roots3[1], roots3[2]);
