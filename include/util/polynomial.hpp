@@ -165,6 +165,7 @@ public:
      */
     void fit(std::vector<float> &x, std::vector<float> &y, int n)
     {
+#ifndef PIC_DISABLE_EIGEN
         if(n < 1 || (x.size() != y.size())) {
             return;
         }
@@ -193,6 +194,7 @@ public:
         for(int i = n; i >= 0; i--) {
             coeff.push_back(_x(i));
         }
+#endif
     }
 
     /**
@@ -259,7 +261,7 @@ public:
 
         if(nCoeff == 3) {
             //these may be not positive
-            return getRoots2ndOrder(coeff[2], coeff[1], coeff[0], &x[0], &x[1]);
+            return getSecondOrderRoots(coeff[2], coeff[1], coeff[0], &x[0], &x[1]);
         }
 
         if(all_coeff_positive) {
@@ -285,7 +287,7 @@ public:
 
         float lower_bound = fabsf(coeff[0]) / (fabsf(coeff[0]) + max_coeff0);
 
-#ifdef GRT_DEBUG
+#ifdef PIC_DEBUG
         float upper_bound = 1.0f + max_coeff / fabsf(coeff[0]);
         printf("Upper bound: %f\n", upper_bound);
         printf("Lower bound: %f\n", lower_bound);
@@ -397,7 +399,7 @@ public:
     }
 
     //Solver for second order equations, ax^2 + b x + c = 0
-    static bool getRoots2ndOrder(float a, float b, float c, float *x0, float *x1)
+    static bool getSecondOrderRoots(float a, float b, float c, float *x0, float *x1)
     {
         float delta = b * b - 4.0f * a * c;
 
@@ -413,7 +415,7 @@ public:
     }
 
     //Solver for second order equations, ax^2 + b x + c = 0, when b is even
-    static bool getRoots2ndOrderEven(float a, float b, float c, float *x0, float *x1)
+    static bool getSecondOrderRootsS(float a, float b, float c, float *x0, float *x1)
     {
         float delta = b * b - a * c;
         if(delta >= 0.0f) {
