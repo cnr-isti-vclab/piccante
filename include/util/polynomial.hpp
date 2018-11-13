@@ -373,7 +373,6 @@ public:
 
         int nCoeff = coeff.size();
         for(int i = 1; i < (nCoeff - 2); i++) {
-            p.print();
             bool bOut = p.getRoots(&x[i]);
 
             if(!bOut) {
@@ -388,7 +387,7 @@ public:
     }
 
     /**
-     * @brief getQuarticRoots --> MANDATORY p[0] == 1.0
+     * @brief getQuarticRoots --> MANDATORY p[5] == 1.0
      * @param p
      * @param x
      * @return
@@ -398,7 +397,7 @@ public:
 #ifndef PIC_DISABLE_EIGEN
         Eigen::Matrix4f m;
 
-        m << -p[1], -p[2], -p[3], -p[4],
+        m << -p[3], -p[2], -p[1], -p[0],
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f;
