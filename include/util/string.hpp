@@ -148,7 +148,7 @@ inline std::string removeExtension(std::string name)
  */
 inline std::string removeLocalPath(std::string name)
 {
-    std::string toFind = "" + getSeparatorChar(name);
+    std::string toFind(1, getSeparatorChar(name));
 
     if(toFind.empty()) {
         return name;
@@ -258,7 +258,7 @@ inline std::string getLocaDirectory(std::string path)
 {
     std::string ret = path;
 
-    std::string toFind = "" + getSeparatorChar(path);
+    std::string toFind(1, getSeparatorChar(path));
 
     if(toFind.empty()) {
         return ret;

@@ -98,5 +98,27 @@ int main(int argc, char *argv[])
         printf("No Real roots!\n");
     }
 
+    printf("\n\n");
+
+    printf("Foruth order polynomial test:\n");
+    float tmp4[] = {24, -50.0f, 35.0f, -10.0f, 1.0f};
+    pic::Polynomial poly4(tmp4, 5);
+    poly4.print();
+
+    auto poly4_2 = poly4.horner(3.0f, r);
+    printf("H: %s R: %f\n", poly4_2.toString().c_str(), r);;
+
+    printf("p(1.0f) = %f\n", poly4.eval(1.0f));
+    printf("dp(1.0f) = %f\n", poly4.dEval(1.0f));
+
+    float roots4[4];
+    bReal = poly4.getAllRoots(roots4);
+
+    if(bReal) {
+        printf("Roots: %f %f %f %f\n", roots4[0], roots4[1], roots4[2], roots4[3]);
+    } else {
+        printf("No Real roots!\n");
+    }
+
     return 0;
 }
