@@ -105,22 +105,21 @@ inline std::string fromNumberToString(T num)
 }
 
 /**
- * @brief whichPath determines the kind of path of the string.
+ * @brief getSeparatorChar returns the folder separator in path as a char.
  * @param path
  * @return
  */
-inline std::string whichPath(std::string path)
+inline char getSeparatorChar(std::string path)
 {
-    std::string toFind = "";
     if(path.find("/") != std::string::npos) {
-        toFind = "/";
+        return '/';
     } else {
         if(path.find("\\") != std::string::npos) {
-            toFind = "\\";
+            return '\\';
+        } else {
+            return '/';
         }
     }
-
-    return toFind;
 }
 
 /**
@@ -149,7 +148,7 @@ inline std::string removeExtension(std::string name)
  */
 inline std::string removeLocalPath(std::string name)
 {
-    std::string toFind = whichPath(name);
+    std::string toFind = "" + getSeparatorChar(name);
 
     if(toFind.empty()) {
         return name;
@@ -259,7 +258,7 @@ inline std::string getLocaDirectory(std::string path)
 {
     std::string ret = path;
 
-    std::string toFind = whichPath(path);
+    std::string toFind = "" + getSeparatorChar(path);
 
     if(toFind.empty()) {
         return ret;
@@ -277,24 +276,6 @@ inline std::string getLocaDirectory(std::string path)
     }
 
     return ret;
-}
-
-/**
- * @brief getSeparatorChar returns the folder separator in path as a char.
- * @param path
- * @return
- */
-inline char getSeparatorChar(std::string path)
-{
-    if(path.find("/") != std::string::npos) {
-        return '/';
-    } else {
-        if(path.find("\\") != std::string::npos) {
-            return '\\';
-        } else {
-            return '/';
-        }
-    }
 }
 
 /**
@@ -383,7 +364,9 @@ inline void parseStringToStdVector(std::string str, char delim,
 inline std::string genBilString(std::string type, float sigma_s,
                                     float sigma_r)
 {
-    std::string ret = type + "_Ss_" + fromNumberToString(sigma_s) + "_Sr_" + fromNumberToString(sigma_r);
+    std::string ret = type +
+            "_Ss_" + fromNumberToString(sigma_s) +
+            "_Sr_" + fromNumberToString(sigma_r);
     return ret;
 }
 
@@ -394,23 +377,24 @@ inline std::string genBilString(std::string type, float sigma_s,
  */
 inline std::string fromFileToStdString(std::string nameFile)
 {
-    std::string retString = "";
-    std::ifstream infile;//Load the file
+    std::ifstream infile;
     infile.open(nameFile.c_str(), std::ios::in);
 
+    std::string ret;
+
     if((!infile.is_open()) || (!infile.good())) {
-        return retString;
+        return ret;
     }
 
     char c = infile.get();
     while (infile.good()) {
-        retString += c;
+        ret += c;
         c = infile.get();
     }
 
     infile.close();
 
-    return retString;
+    return ret;
 }
 
 /**
@@ -449,8 +433,6 @@ inline char *fromStdStringToChar(std::string str)
     return cstr;
 }
 
-
-
 /**
  * @brief checkPath
  * @param name
@@ -471,10 +453,10 @@ inline std::string checkPath(std::string name)
             char *path = getcwd(NULL, 0);
         #endif
 
-        std::string dsepName = pic::getSeparator(name);
-         std::string dsepPath = pic::getSeparator(path);
+        std::string dsepName = getSeparator(name);
+        std::string dsepPath = getSeparator(path);
 
-        name = pic::stdStringRepAll(name, dsepName, dsepPath);
+        name = stdStringRepAll(name, dsepName, dsepPath);
         if(name.at(2) == '\\' || name.at(2) == '/') {
             name = name.substr(3);
         } else {
@@ -488,8 +470,6 @@ inline std::string checkPath(std::string name)
     }
 }
 
-
-
 /**
  * @brief adjustPath modifies the path if it is not global.
  * @param nameFile
@@ -498,14 +478,11 @@ inline std::string checkPath(std::string name)
  */
 std::string adjustPath(std::string nameFile, std::string pathFolder)
 {
-    std::string ret;
-
     if(!checkAbsolutePath(nameFile)) {
         std::string fullPath = checkPath(nameFile);
 
         if(fullPath.empty()) {
-            std::string dsep = getSeparator(pathFolder);
-            ret = pathFolder + dsep + nameFile;
+            std::string ret = pathFolder + getSeparator(pathFolder) + nameFile;
             return ret;
         } else {
             return fullPath;
