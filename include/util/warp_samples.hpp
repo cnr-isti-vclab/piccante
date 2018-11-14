@@ -20,21 +20,21 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 
+#include "../util/math.hpp"
+
 namespace pic {
 
 /**
- * @brief WarpSquareCircle warps from a square to a circle distribution.
+ * @brief warpSquareCircle warps from a square to a circle distribution.
  * @param x
  * @param y
  * @param xo
  * @param yo
  */
-PIC_INLINE void WarpSquareCircle(float x, float y, float *xo, float *yo)
+PIC_INLINE void warpSquareCircle(float x, float y, float *xo, float *yo)
 {
     float phi, r;
 
-//	float a = 2*O.x - 1;
-//	float b = 2*O.y - 1;
 
     if(x * x > y * y) {
         r = x;
@@ -46,6 +46,30 @@ PIC_INLINE void WarpSquareCircle(float x, float y, float *xo, float *yo)
 
     *xo = r * cos(phi);
     *yo = r * sin(phi);
+}
+
+/**
+ * @brief warpNormalDistribution warps from uniform distribution to a normal distribution
+ * @param u1
+ * @param u2
+ */
+PIC_INLINE float warpNormalDistribution(float u0, float u1)
+{
+    return sqrtf(MAX(-2.0f * logf(u0), 0.0f)) .* cos(u1);
+}
+
+/**
+ * @brief warpGaussianDistribution
+ * @param u0
+ * @param u1
+ * @param mu
+ * @param sigma
+ * @return
+ */
+PIC_INLINE float warpGaussianDistribution(float u0, float u1, float mu, float sigma)
+{
+    float x = warpNormalDistribution(u0, u1);
+    return (x + mu) * sigma;
 }
 
 } // end namespace pic
