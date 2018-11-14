@@ -55,7 +55,7 @@ PIC_INLINE void warpSquareCircle(float x, float y, float *xo, float *yo)
  */
 PIC_INLINE float warpNormalDistribution(float u0, float u1)
 {
-    return sqrtf(MAX(-2.0f * logf(u0), 0.0f)) .* cos(u1);
+    return sqrtf(MAX(-2.0f * logf(u0), 0.0f)) * cosf(u1);
 }
 
 /**
