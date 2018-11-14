@@ -195,3 +195,11 @@ examples/build-opengl_tone_mapping-Desktop_Qt_5_4_2_clang_64bit-Debug/opengl_ton
 examples/build-opengl_tone_mapping-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
 
 *.png
+
+examples/data/input/features/checker_board_photo.png
+
+*.hdr
+
+examples/data/input/features/checker_board_photo.png
+
+examples/build-u_polynomials-Desktop_Qt_5_4_2_clang_64bit-Debug/s_kmeans
