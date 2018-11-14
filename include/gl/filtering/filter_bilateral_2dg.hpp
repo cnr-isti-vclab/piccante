@@ -115,7 +115,7 @@ public:
       //  double ms = double(timeVal) / (double(testing) * 1000000.0);
       //  printf("Bilateral Grid on the GPU time: %g ms\n", ms);
 
-        std::string sign = GenBilString("G", sigma_s, sigma_r);
+        std::string sign = genBilString("G", sigma_s, sigma_r);
 
         /*
         std::string nameTime = FileLister::FileNumber(sign, "txt");

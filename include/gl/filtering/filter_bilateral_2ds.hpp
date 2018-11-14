@@ -120,7 +120,7 @@ public:
         double ms = double(timeVal) / (double(testing) * 1000000.0);
         printf("Stochastic Bilateral Filter on GPU time: %f ms\n", ms);
 
-        std::string nameTime = FileLister::getFileNumber(GenBilString("S", sigma_s,
+        std::string nameTime = FileLister::getFileNumber(genBilString("S", sigma_s,
                                sigma_r), "txt");
 
         FILE *file = fopen(nameTime.c_str(), "w");

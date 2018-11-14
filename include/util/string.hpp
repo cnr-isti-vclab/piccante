@@ -525,10 +525,10 @@ inline std::string removeInitialSpaces(char name[])
     size_t pos;
     std::string ret = name;
 
-    pos = work.find(' ');
+    pos = ret.find(' ');
     ret.erase(pos, 1);
 
-    pos = work.find('\n');
+    pos = ret.find('\n');
     ret.erase(pos, 1);
 
     return ret;
