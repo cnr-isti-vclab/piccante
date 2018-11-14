@@ -42,6 +42,7 @@ win32{
 	DEFINES += NOMINMAX
 }
 
+QMAKE_MAC_SDK = macosx10.14
 
 linux-g++*{
     QMAKE_CXXFLAGS += -fopenmp -pthread
