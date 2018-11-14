@@ -1418,7 +1418,7 @@ PIC_INLINE float *Image::getSumVal(BBox *box = NULL, float *ret = NULL)
     }
 
     if(box == NULL) {
-        box = new BBox(width, height, frames);
+        box = &fullBox;
     }
 
     if(ret == NULL) {
@@ -1454,9 +1454,7 @@ PIC_INLINE float *Image::getMeanVal(BBox *box = NULL, float *ret = NULL)
 
     float totf = float(box->Size());
 
-    for(int l = 0; l < channels; l++) {
-        ret[l] /= totf;
-    }
+    Array<float>::div(ret, channels, totf);
 
     return ret;
 }
@@ -1998,6 +1996,7 @@ PIC_INLINE Image *Image::clone() const
 {
     Image *ret = new Image(frames, width, height, channels);
 
+    ret->fullBox = fullBox;
     ret->flippedEXR = flippedEXR;
     ret->exposure = exposure;
     ret->nameFile = nameFile;

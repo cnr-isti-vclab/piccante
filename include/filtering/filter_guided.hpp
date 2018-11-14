@@ -22,6 +22,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../util/array.hpp"
 
+#include "../util/matrix_3_x_3.hpp"
+
 #include "../util/math.hpp"
 
 namespace pic {
@@ -160,10 +162,10 @@ PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
 
     float *buf = new float [channels * 4];
 
-    float *I_mean	= &buf[0];
-    float *p_mean	= &buf[channels    ];
-    float *a		= &buf[channels * 2];
-    float *tmp_A	= &buf[channels * 3];
+    float *I_mean = &buf[0];
+    float *p_mean = &buf[channels];
+    float *a = &buf[channels * 2];
+    float *tmp_A = &buf[channels * 3];
 
     Matrix3x3 cov, inv;
 
@@ -199,26 +201,15 @@ PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
                     }
                 }
 
-                for(int n = 0; n < channels; n++) {
-                    tmp_A[n] /= nPixels;
-                }
+                Array<float>::div(tmp_A, channels, nPixels);
 
                 //multiply for inverted matrix
-                inv.mul(tmp_A, a);
+                a = inv.mul(tmp_A, a);
 
-                float a_dot_I_mean = 0.0f;
-
-                for(int n = 0; n < channels; n++) {
-                    a_dot_I_mean += a[n] * I_mean[n];
-                }
+                float a_dot_I_mean = Array<float>::dot(a, I_mean, channels);
+                float a_dot_I = Array<float>::dot(a, tmpI, channels);
 
                 float b = p_mean[c] - a_dot_I_mean;
-
-                float a_dot_I = 0.0f;
-
-                for(int n = 0; n < channels; n++) {
-                    a_dot_I += a[n] * tmpI[n];
-                }
 
                 tmpQ[c] = a_dot_I + b;
             }
