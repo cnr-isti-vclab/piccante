@@ -57,12 +57,12 @@ public:
     void update(float sigma_s, float sigma_r);
 
     /**
-     * @brief Signature
+     * @brief signature
      * @return
      */
-    std::string Signature()
+    std::string signature()
     {
-        return GenBilString("1D", sigma_s, sigma_r);
+        return genBilString("1D", sigma_s, sigma_r);
     }
 
     /**

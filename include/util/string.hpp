@@ -21,6 +21,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iostream>
+#include <fstream>
+
+#include "../base.hpp"
+
+#ifdef GRT_WIN32
+    #include <direct.h>
+#endif
+
+#ifndef GRT_WIN32
+    #include <unistd.h>
+#endif
 
 namespace pic {
 
@@ -362,16 +374,163 @@ inline void parseStringToStdVector(std::string str, char delim,
 }
 
 /**
- * @brief GenBilString
+ * @brief genBilString
  * @param type
  * @param sigma_s
  * @param sigma_r
  * @return
  */
-inline std::string GenBilString(std::string type, float sigma_s,
+inline std::string genBilString(std::string type, float sigma_s,
                                     float sigma_r)
 {
     std::string ret = type + "_Ss_" + fromNumberToString(sigma_s) + "_Sr_" + fromNumberToString(sigma_r);
+    return ret;
+}
+
+/**
+ * @brief fromFileToStdString writes a file into a std::string.
+ * @param nameFile
+ * @return
+ */
+inline std::string fromFileToStdString(std::string nameFile)
+{
+    std::string retString = "";
+    std::ifstream infile;//Load the file
+    infile.open(nameFile.c_str(), std::ios::in);
+
+    if((!infile.is_open()) || (!infile.good())) {
+        return retString;
+    }
+
+    char c = infile.get();
+    while (infile.good()) {
+        retString += c;
+        c = infile.get();
+    }
+
+    infile.close();
+
+    return retString;
+}
+
+/**
+ * @brief checkAbsolutePath checks if the path is absolute or not.
+ * @param path
+ * @return
+ */
+inline bool checkAbsolutePath(std::string path)
+{
+    //win32 absolute path
+    if(path.find(":\\") != std::string::npos) {
+        return true;
+    }
+
+    if(path.find(":/") != std::string::npos) {
+        return true;
+    }
+
+    if(path.find("\\\\\"") != std::string::npos) {
+        return true;
+    }
+
+    //unix/mac path
+    return (path.at(0) == '/');
+}
+
+/**
+ * @brief fromStdStringToChar converts from a std::string to a char*.
+ * @param str
+ * @return
+ */
+inline char *fromStdStringToChar(std::string str)
+{
+    char *cstr = new char [str.size() + 1];
+    strcpy (cstr, str.c_str());
+    return cstr;
+}
+
+
+
+/**
+ * @brief checkPath
+ * @param name
+ * @return
+ */
+inline std::string checkPath(std::string name)
+{
+    if(name.length() < 3) {
+        return "";
+    }
+
+    if((name.at(0) == '.') && (name.at(0) == '.')) {
+        #ifdef GRT_WIN32
+            char *path = _getcwd(NULL, 0);
+        #endif
+
+        #ifndef GRT_WIN32
+            char *path = getcwd(NULL, 0);
+        #endif
+
+        std::string dsepName = pic::getSeparator(name);
+         std::string dsepPath = pic::getSeparator(path);
+
+        name = pic::stdStringRepAll(name, dsepName, dsepPath);
+        if(name.at(2) == '\\' || name.at(2) == '/') {
+            name = name.substr(3);
+        } else {
+            name = name.substr(2);
+        }
+
+        std::string newPath  = path + dsepPath + name;
+        return newPath;
+    } else {
+        return "";
+    }
+}
+
+
+
+/**
+ * @brief adjustPath modifies the path if it is not global.
+ * @param nameFile
+ * @param pathFolder
+ * @return
+ */
+std::string adjustPath(std::string nameFile, std::string pathFolder)
+{
+    std::string ret;
+
+    if(!checkAbsolutePath(nameFile)) {
+        std::string fullPath = checkPath(nameFile);
+
+        if(fullPath.empty()) {
+            std::string dsep = getSeparator(pathFolder);
+            ret = pathFolder + dsep + nameFile;
+            return ret;
+        } else {
+            return fullPath;
+        }
+    } else {
+        return nameFile;
+    }
+}
+
+/**
+ * @brief removeInitialSpaces removes spaces at the beginning of a string.
+ * @param name
+ * @return
+ */
+inline std::string removeInitialSpaces(char name[])
+{
+    size_t pos;
+    std::string ret = name;
+
+    pos = work.find(' ');
+    ret.erase(pos, 1);
+
+    pos = work.find('\n');
+    ret.erase(pos, 1);
+
     return ret;
 }
 

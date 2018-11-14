@@ -69,9 +69,9 @@ public:
      * @brief Signature
      * @return
      */
-    std::string Signature()
+    std::string signature()
     {
-        return GenBilString("AS", sigma_s, sigma_r);
+        return genBilString("AS", sigma_s, sigma_r);
     }
 
     /**

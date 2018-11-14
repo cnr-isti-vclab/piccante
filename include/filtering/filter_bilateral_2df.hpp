@@ -55,12 +55,12 @@ public:
     FilterBilateral2DF(float sigma_s, float sigma_r);
 
     /**
-     * @brief Signature
+     * @brief signature
      * @return
      */
-    std::string Signature()
+    std::string signature()
     {
-        return GenBilString("F", sigma_s, sigma_r);
+        return genBilString("F", sigma_s, sigma_r);
     }
 
     /**

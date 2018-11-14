@@ -100,12 +100,12 @@ public:
     void Init(SAMPLER_TYPE type, float sigma_s, float sigma_r, int mult);
 
     /**
-     * @brief Signature
+     * @brief signature
      * @return
      */
-    std::string Signature()
+    std::string signature()
     {
-        return GenBilString("S", sigma_s, sigma_r);
+        return genBilString("S", sigma_s, sigma_r);
     }
 
     /**

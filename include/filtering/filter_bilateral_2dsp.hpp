@@ -61,12 +61,12 @@ public:
     }
     
     /**
-     * @brief Signature
+     * @brief signature
      * @return
      */
-    std::string Signature()
+    std::string signature()
     {
-        return GenBilString("SP", bilateralFilter->sigma_s, bilateralFilter->sigma_r);
+        return genBilString("SP", bilateralFilter->sigma_s, bilateralFilter->sigma_r);
     }
 
     /**
