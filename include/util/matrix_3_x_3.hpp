@@ -79,6 +79,18 @@ public:
     }
 
     /**
+     * @brief set sets the matrix up.
+     * @param data input data, they are assumed to be 9 floats.
+     * The matrix is stored by rows.
+     */
+    void set(Matrix3x3 *mtx)
+    {
+        if(mtx != NULL) {
+            this->set(mtx->data);
+        }
+    }
+
+    /**
      * @brief getIdentity sets the matrix as an identity matrix; diag(1, 1, 1);
      */
     void getIdentity()
@@ -238,39 +250,56 @@ public:
     }
 
     /**
-     * @brief getInverse computes the inverse of the matrix.
-     * @param inv
+     * @brief inverse computes the inverse of the matrix.
+     * @param ret
      * @return
      */
-    Matrix3x3 *getInverse(Matrix3x3 *inv)
+    Matrix3x3 *inverse(Matrix3x3 *ret)
     {
-        if(inv == NULL) {
-            inv = new Matrix3x3();
+        if(ret == NULL) {
+            ret = new Matrix3x3();
         }
 
         float det = getDeterminant();
 
         if(fabsf(det) <= 1e-9f) {
             printf("Error: Negative determinant\n");
-            return inv;
+            return ret;
         }
 
-        inv->data[0] =  (data[4] * data[8] - data[5] * data[7]) / det;
-        inv->data[1] = -(data[1] * data[8] - data[2] * data[7]) / det;
-        inv->data[2] =  (data[1] * data[5] - data[2] * data[4]) / det;
+        ret->data[0] =  (data[4] * data[8] - data[5] * data[7]) / det;
+        ret->data[1] = -(data[1] * data[8] - data[2] * data[7]) / det;
+        ret->data[2] =  (data[1] * data[5] - data[2] * data[4]) / det;
 
-        inv->data[3] = -(data[3] * data[8] - data[5] * data[6]) / det;
-        inv->data[4] =  (data[0] * data[8] - data[2] * data[6]) / det;
-        inv->data[5] = -(data[0] * data[5] - data[2] * data[3]) / det;
+        ret->data[3] = -(data[3] * data[8] - data[5] * data[6]) / det;
+        ret->data[4] =  (data[0] * data[8] - data[2] * data[6]) / det;
+        ret->data[5] = -(data[0] * data[5] - data[2] * data[3]) / det;
 
-        inv->data[6] =  (data[3] * data[7] - data[4] * data[6]) / det;
-        inv->data[7] = -(data[0] * data[7] - data[1] * data[6]) / det;
-        inv->data[8] =  (data[0] * data[4] - data[1] * data[3]) / det;
+        ret->data[6] =  (data[3] * data[7] - data[4] * data[6]) / det;
+        ret->data[7] = -(data[0] * data[7] - data[1] * data[6]) / det;
+        ret->data[8] =  (data[0] * data[4] - data[1] * data[3]) / det;
 
-        return inv;
+        return ret;
     }
 
-    //
+    /**
+     * @brief transpose computes the transposed matrix.
+     */
+    Matrix3x3 * transpose(Matrix3x3 *ret)
+    {
+        if(ret == NULL) {
+            ret = new Matrix3x3();
+        }
+
+        ret->set(ret);
+
+        std::swap(ret->data[1], data[3]);
+        std::swap(data[5], data[7]);
+        std::swap(data[2], data[6]);
+
+        return ret;
+    }
+
     /**
      * @brief setTranslationMatrix sets the matrix as a translation matrix.
      * @param tx
@@ -322,16 +351,6 @@ public:
 
         data[1] = vertical_shear;
         data[3] = horizontal_shear;
-    }
-
-    /**
-     * @brief transpose computes the transposed matrix.
-     */
-    void transpose()
-    {
-        std::swap(data[1], data[3]);
-        std::swap(data[5], data[7]);
-        std::swap(data[2], data[6]);
     }
 
     /**

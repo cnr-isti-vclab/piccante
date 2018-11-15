@@ -93,6 +93,14 @@ protected:
     }
 
     /**
+     * @brief ProcessP
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *ProcessP(ImageVec imgIn, Image *imgOut);
+
+    /**
      * @brief setupAux
      * @param imgIn
      * @param imgOut
@@ -312,28 +320,8 @@ PIC_INLINE void Filter::ProcessAux(ImageVec imgIn, Image *imgOut,
     }
 }
 
-PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
 {
-    if(imgIn.size() < minInputImages) {
-        return imgOut;
-    }
-
-    for(int i = 0; i < minInputImages; i ++) {
-        if(imgIn[i] == NULL) {
-            return imgOut;
-        } else {
-            if(!imgIn[i]->isValid()) {
-                return imgOut;
-            }
-        }
-    }
-
-    imgOut = setupAux(imgIn, imgOut);
-
-    if(imgOut == NULL) {
-        return imgOut;
-    }
-
     if((imgOut->width  < TILE_SIZE) &&
        (imgOut->height < TILE_SIZE)) {
         BBox box(imgOut->width, imgOut->height, imgOut->frames);
@@ -362,6 +350,31 @@ PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
     delete[] thrd;
 
     return imgOut;
+}
+
+PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
+{
+    if(imgIn.size() < minInputImages) {
+        return imgOut;
+    }
+
+    for(int i = 0; i < minInputImages; i ++) {
+        if(imgIn[i] == NULL) {
+            return imgOut;
+        } else {
+            if(!imgIn[i]->isValid()) {
+                return imgOut;
+            }
+        }
+    }
+
+    imgOut = setupAux(imgIn, imgOut);
+
+    if(imgOut == NULL) {
+        return imgOut;
+    }
+
+    return ProcessP(imgIn, imgOut);
 }
 
 } // end namespace pic

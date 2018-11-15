@@ -59,6 +59,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_gaussian_3d.hpp"
 #include "filtering/filter_gradient.hpp"
 #include "filtering/filter_gradient_harris_opt.hpp"
+#include "filtering/filter_guided_a_b.hpp"
 #include "filtering/filter_guided.hpp"
 #include "filtering/filter_iterative.hpp"
 #include "filtering/filter_kuwahara.hpp"

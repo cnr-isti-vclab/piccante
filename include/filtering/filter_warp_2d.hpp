@@ -213,7 +213,7 @@ public:
         this->bCentroid = bCentroid;
 
         this->h = h;
-        h.getInverse(&h_inv);
+        h.inverse(&h_inv);
     }
 
     /**

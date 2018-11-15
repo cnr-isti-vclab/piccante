@@ -33,9 +33,9 @@ class FilterLuminance: public Filter
 {
 protected:
 
-    LUMINANCE_TYPE  type;
-    float           *weights;
-    int             weights_size;
+    LUMINANCE_TYPE type;
+    float *weights;
+    int weights_size;
 
     /**
      * @brief ProcessBBox

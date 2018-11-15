@@ -24,6 +24,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../util/matrix_3_x_3.hpp"
 
+#include "filtering/filter_guided_a_b.hpp"
+
 #include "../util/math.hpp"
 
 namespace pic {
@@ -37,6 +39,9 @@ protected:
 
     int radius;
     float e_regularization, nPixels;
+    Image *img_a_b;
+
+    FilterGuidedAB flt;
 
     /**
      * @brief Process1Channel
@@ -71,7 +76,7 @@ public:
      */
     FilterGuided()
     {
-        update(3, 0.1f);
+        update(8, 0.01f);
     }
 
     /**
@@ -92,6 +97,14 @@ public:
     void update(int radius, float e_regularization);
 
     /**
+     * @brief FilterGuided::Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *Process(ImageVec imgIn, Image *imgOut);
+
+    /**
      * @brief execute
      * @param imgIn
      * @param guide
@@ -110,64 +123,19 @@ public:
 
 PIC_INLINE void FilterGuided::update(int radius, float e_regularization)
 {
+    img_a_b = NULL;
+
     this->radius = radius;
     this->e_regularization = e_regularization;
     nPixels = float(radius * radius * 4);
+
+    flt.update(radius, e_regularization);
 }
 
 PIC_INLINE void FilterGuided::Process1Channel(Image *I, Image *p, Image *q,
                                    BBox *box)
 {
-    float I_mean, I_var;
-    float *p_mean = new float [p->channels];
-
-    for(int j = box->y0; j < box->y1; j++) {
-        for(int i = box->x0; i < box->x1; i++) {
-            float *tmpQ = (*q)(i, j);
-            float *tmpI   = (*I)(i, j);
-
-            BBox tmpBox(i - radius, i + radius, j - radius, j + radius);
-
-            I->getMeanVal(&tmpBox, &I_mean);
-            I->getVarianceVal(&I_mean, &tmpBox, &I_var);
-
-            p->getMeanVal(&tmpBox, p_mean);
-
-            for(int c = 0; c < p->channels; c++) {
-                float I_mean_p_mean = I_mean * p_mean[c];
-                float a = 0.0f;
-
-                for(int k = -radius; k < radius; k++) {
-                    for(int l = -radius; l < radius; l++) {
-                        float *I_i = (*I)(i + l, j + k);
-                        float *p_i = (*p)(i + l, j + k);
-                        a += I_i[0] * p_i[c] - I_mean_p_mean;
-                    }
-                }
-
-                a /= (nPixels * (I_var + e_regularization));
-                float b = p_mean[c] - a * I_mean;
-                tmpQ[c] = a * tmpI[0] + b;
-            }
-        }
-    }
-
-    delete[] p_mean;
-}
-
-PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
-        Image *q, BBox *box)
-{
-    int channels = p->channels;
-
-    float *buf = new float [channels * 4];
-
-    float *I_mean = &buf[0];
-    float *p_mean = &buf[channels];
-    float *a = &buf[channels * 2];
-    float *tmp_A = &buf[channels * 3];
-
-    Matrix3x3 cov, inv;
+    float *a_b_mean = new float[img_a_b->channels];
 
     for(int j = box->y0; j < box->y1; j++) {
         for(int i = box->x0; i < box->x1; i++) {
@@ -175,48 +143,47 @@ PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
             float *tmpI = (*I)(i, j);
 
             BBox tmpBox(i - radius, i + radius, j - radius, j + radius);
+            img_a_b->getMeanVal(&tmpBox, a_b_mean);
 
-            I->getMeanVal(&tmpBox, I_mean);
-            I->getCovMtxVal(I_mean, &tmpBox, cov.data);
-
-            //regularization
-            cov.add(e_regularization);
-            //invert matrix
-            cov.getInverse(&inv);
-
-            p->getMeanVal(&tmpBox, p_mean);
-
-            for(int c = 0; c < channels; c++) {
-
-                Array<float>::assign(0.0f, tmp_A, channels);
-
-                for(int k = -radius; k < radius; k++) {
-                    for(int l = -radius; l < radius; l++) {
-                        float *I_i = (*I)(i + l, j + k);
-                        float *p_i = (*p)(i + l, j + k);
-
-                        for(int n = 0; n < channels; n++) {
-                            tmp_A[n] += I_i[n] * p_i[c] - I_mean[n] * p_mean[c];
-                        }
-                    }
-                }
-
-                Array<float>::div(tmp_A, channels, nPixels);
-
-                //multiply for inverted matrix
-                a = inv.mul(tmp_A, a);
-
-                float a_dot_I_mean = Array<float>::dot(a, I_mean, channels);
-                float a_dot_I = Array<float>::dot(a, tmpI, channels);
-
-                float b = p_mean[c] - a_dot_I_mean;
-
-                tmpQ[c] = a_dot_I + b;
+            for(int c = 0; c < p->channels; c++) {
+                float a = a_b_mean[c << 1];
+                float b = a_b_mean[(c << 1) + 1];
+                tmpQ[c] = a * tmpI[0] + b;
             }
         }
     }
 
-    delete[] buf;
+    delete[] a_b_mean;
+}
+
+PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
+        Image *q, BBox *box)
+{
+    float *a_b_mean = new float[img_a_b->channels];
+
+    int shift = I->channels + 1;
+
+    for(int j = box->y0; j < box->y1; j++) {
+        for(int i = box->x0; i < box->x1; i++) {
+            float *tmpQ = (*q)(i, j);
+            float *tmpI = (*I)(i, j);
+
+            BBox tmpBox(i - radius, i + radius, j - radius, j + radius);
+            img_a_b->getMeanVal(&tmpBox, a_b_mean);
+
+            for(int c = 0; c < p->channels; c++) {
+
+                float *a = &a_b_mean[c * shift];
+                float b = a_b_mean[c * shift + 1];
+
+                float a_dot_I = Array<float>::dot(a, tmpI, I->channels);
+
+                tmpQ[c] = a_dot_I + b;
+            }
+
+        }
+    }
+    delete[] a_b_mean;
 }
 
 PIC_INLINE void FilterGuided::ProcessBBox(Image *dst, ImageVec src,
@@ -237,13 +204,38 @@ PIC_INLINE void FilterGuided::ProcessBBox(Image *dst, ImageVec src,
         p = src[0];
     }
 
-    if(I->channels == 1) {
-        Process1Channel(I, p, dst, box);
-    }
-
     if(I->channels == 3) {
         Process3Channel(I, p, dst, box);
+    } else {
+        Process1Channel(I, p, dst, box);
     }
+}
+
+PIC_INLINE Image *FilterGuided::Process(ImageVec imgIn, Image *imgOut)
+{
+    if(imgIn.empty()) {
+        return imgOut;
+    }
+
+    for(int i = 0; i < minInputImages; i ++) {
+        if(imgIn[i] == NULL) {
+            return imgOut;
+        } else {
+            if(!imgIn[i]->isValid()) {
+                return imgOut;
+            }
+        }
+    }
+
+    imgOut = setupAux(imgIn, imgOut);
+
+    if(imgOut == NULL) {
+        return imgOut;
+    }
+
+    img_a_b = flt.Process(imgIn, img_a_b);
+
+    return ProcessP(imgIn, imgOut);
 }
 
 } // end namespace pic
