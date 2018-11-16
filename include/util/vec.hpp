@@ -23,6 +23,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../util/math.hpp"
 
+#include "../util/string.hpp"
+
 namespace pic {
 
 /**
@@ -324,6 +326,30 @@ public:
         }
 
         return out;
+    }
+
+    /**
+     * @brief toString
+     * @param x
+     * @return
+     */
+    std::string toString(Vec<N, T> &x)
+    {
+        std::string ret = "[";
+        for(unsigned int i = 0; i < N; i++) {
+            ret += fromNumberToString(x[i]);
+        }
+        ret += "]";
+
+        return ret;
+    }
+
+    /**
+     * @brief print
+     */
+    void print()
+    {
+        printf("%s\n", toString().c_str());
     }
 
     /*
@@ -688,13 +714,13 @@ PIC_INLINE Vec<N, float> randomPoint(std::mt19937 *m)
 }
 
 template<unsigned int N>
-PIC_INLINE void vecPrint(Vec<N, float> x)
+void vecrint(Vec<N, float> &ret)
 {
-    printf("[");
+    printf("\n Values :");
     for(unsigned int i = 0; i < N; i++) {
-        printf("%f ", x[i]);
+        printf("%d ", ret.data[i]);
     }
-    printf("]\n");
+    printf("\n");
 }
 
 /**
@@ -726,16 +752,6 @@ PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, 
     }
 
     return x;
-}
-
-template<unsigned int N>
-void vecrint(Vec<N, float> &ret)
-{
-    printf("\n Values :");
-    for(unsigned int i = 0; i < N; i++) {
-        printf("%d ", ret.data[i]);
-    }
-    printf("\n");
 }
 
 template<unsigned int N>
