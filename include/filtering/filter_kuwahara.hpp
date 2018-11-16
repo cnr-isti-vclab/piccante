@@ -136,7 +136,7 @@ protected:
                         indx = 3;
                     }
 
-                    //Final filtering
+                    //final filtering
                     switch(indx) {
                     case 0: {
                         for(int l = 0; l < channels; l++) {

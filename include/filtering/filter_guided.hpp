@@ -76,7 +76,7 @@ public:
      */
     FilterGuided() : Filter()
     {
-        update(8, 0.005f);
+        update(5, 0.01f);
     }
 
     /**
