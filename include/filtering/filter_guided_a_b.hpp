@@ -69,7 +69,7 @@ public:
     /**
      * @brief FilterGuidedAB
      */
-    FilterGuidedAB()
+    FilterGuidedAB() : Filter()
     {
         update(8, 0.01f);
     }
@@ -79,7 +79,7 @@ public:
      * @param radius
      * @param e_regularization
      */
-    FilterGuidedAB(int radius, float e_regularization)
+    FilterGuidedAB(int radius, float e_regularization) : Filter()
     {
         update(radius, e_regularization);
     }
@@ -105,7 +105,7 @@ public:
      * @param imgIn
      * @return
      */
-    Image *getI(ImageVec imgIn)
+    Image *getI(ImageVec &imgIn)
     {
         auto n = imgIn.size();
         if(n == 1) {
@@ -124,7 +124,7 @@ public:
      * @param imgIn
      * @return
      */
-    Image *getp(ImageVec imgIn)
+    Image *getp(ImageVec &imgIn)
     {
         auto n = imgIn.size();
         if(n == 1) {
@@ -214,19 +214,17 @@ PIC_INLINE void FilterGuidedAB::Process1Channel(Image *I, Image *p, Image *q,
 PIC_INLINE void FilterGuidedAB::Process3Channel(Image *I, Image *p,
         Image *q, BBox *box)
 {
-    float *buf = new float [p->channels * 4];
+    float *I_mean = new float[I->channels];
+    float *p_mean = new float[p->channels];
 
-    float *I_mean = &buf[0];
-    float *p_mean = &buf[p->channels];
-    float *a = &buf[p->channels * 2];
-    float *tmp_A = &buf[p->channels * 3];
+    float *a = new float[I->channels];
+    float *tmp_A = new float[I->channels];
 
     Matrix3x3 cov, inv;
 
     for(int j = box->y0; j < box->y1; j++) {
         for(int i = box->x0; i < box->x1; i++) {
             float *tmpQ = (*q)(i, j);
-            float *tmpI = (*I)(i, j);
 
             BBox tmpBox(i - radius, i + radius, j - radius, j + radius);
 
@@ -264,20 +262,17 @@ PIC_INLINE void FilterGuidedAB::Process3Channel(Image *I, Image *p,
                 float a_dot_I_mean = Array<float>::dot(a, I_mean, I->channels);
                 //float a_dot_I = Array<float>::dot(a, tmpI, channels);
 
-                float b = p_mean[c] - a_dot_I_mean;
-
-
                 for(int n = 0; n < I->channels; n++) {
-                    tmpQ[index] = a[i];
+                    tmpQ[index] = a[n];
                     index++;
                 }
-                tmpQ[index] = b;
+
+                //b
+                tmpQ[index] = p_mean[c] - a_dot_I_mean;
                 index++;
             }
         }
     }
-
-    delete[] buf;
 }
 
 PIC_INLINE void FilterGuidedAB::ProcessBBox(Image *dst, ImageVec src,

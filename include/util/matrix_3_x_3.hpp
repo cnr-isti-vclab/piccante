@@ -239,10 +239,10 @@ public:
     }
 
     /**
-     * @brief getDeterminant computes the determinant of the matrix.
+     * @brief determinant computes the determinant of the matrix.
      * @return
      */
-    float getDeterminant()
+    float determinant()
     {
         return	 data[0] * (data[4] * data[8] - data[5] * data[7]) -
                  data[1] * (data[8] * data[3] - data[5] * data[6]) +
@@ -260,7 +260,7 @@ public:
             ret = new Matrix3x3();
         }
 
-        float det = getDeterminant();
+        float det = determinant();
 
         if(fabsf(det) <= 1e-9f) {
             printf("Error: Negative determinant\n");

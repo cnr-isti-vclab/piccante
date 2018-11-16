@@ -55,6 +55,13 @@ protected:
     int minInputImages;
 
     /**
+     * @brief checkInput
+     * @param imgIn
+     * @return
+     */
+    bool checkInput(ImageVec &imgIn);
+
+    /**
      * @brief f
      * @param data
      */
@@ -352,20 +359,29 @@ PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
     return imgOut;
 }
 
-PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
+PIC_INLINE bool Filter::checkInput(ImageVec &imgIn)
 {
     if(imgIn.size() < minInputImages) {
-        return imgOut;
+        return false;
     }
 
     for(int i = 0; i < minInputImages; i ++) {
         if(imgIn[i] == NULL) {
-            return imgOut;
+            return false;
         } else {
             if(!imgIn[i]->isValid()) {
-                return imgOut;
+                return false;
             }
         }
+    }
+
+    return true;
+}
+
+PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
+{
+    if(!checkInput(imgIn)) {
+        return imgOut;
     }
 
     imgOut = setupAux(imgIn, imgOut);

@@ -74,9 +74,9 @@ public:
     /**
      * @brief FilterGuided
      */
-    FilterGuided()
+    FilterGuided() : Filter()
     {
-        update(8, 0.01f);
+        update(8, 0.005f);
     }
 
     /**
@@ -84,7 +84,7 @@ public:
      * @param radius
      * @param e_regularization
      */
-    FilterGuided(int radius, float e_regularization)
+    FilterGuided(int radius, float e_regularization) : Filter()
     {
         update(radius, e_regularization);
     }
@@ -146,8 +146,9 @@ PIC_INLINE void FilterGuided::Process1Channel(Image *I, Image *p, Image *q,
             img_a_b->getMeanVal(&tmpBox, a_b_mean);
 
             for(int c = 0; c < p->channels; c++) {
-                float a = a_b_mean[c << 1];
-                float b = a_b_mean[(c << 1) + 1];
+                int index = c << 1;
+                float a = a_b_mean[index];
+                float b = a_b_mean[index + 1];
                 tmpQ[c] = a * tmpI[0] + b;
             }
         }
@@ -173,8 +174,9 @@ PIC_INLINE void FilterGuided::Process3Channel(Image *I, Image *p,
 
             for(int c = 0; c < p->channels; c++) {
 
-                float *a = &a_b_mean[c * shift];
-                float b = a_b_mean[c * shift + 1];
+                int index = c * shift;
+                float *a = &a_b_mean[index];
+                float b = a_b_mean[index + I->channels];
 
                 float a_dot_I = Array<float>::dot(a, tmpI, I->channels);
 
@@ -213,18 +215,8 @@ PIC_INLINE void FilterGuided::ProcessBBox(Image *dst, ImageVec src,
 
 PIC_INLINE Image *FilterGuided::Process(ImageVec imgIn, Image *imgOut)
 {
-    if(imgIn.empty()) {
+    if(!checkInput(imgIn)) {
         return imgOut;
-    }
-
-    for(int i = 0; i < minInputImages; i ++) {
-        if(imgIn[i] == NULL) {
-            return imgOut;
-        } else {
-            if(!imgIn[i]->isValid()) {
-                return imgOut;
-            }
-        }
     }
 
     imgOut = setupAux(imgIn, imgOut);
