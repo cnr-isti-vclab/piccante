@@ -145,7 +145,7 @@ PIC_INLINE void FilterGLWarp2D::update(Matrix3x3 h, bool bSameSize = false, bool
     this->bCentroid = bCentroid;
 
     this->h = h;
-    h.getInverse(&h_inv);
+    h.inverse(&h_inv);
 
     technique.bind();
     technique.setUniform3x3("h_inv", h_inv.data, true);
