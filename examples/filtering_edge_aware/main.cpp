@@ -26,8 +26,6 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -42,7 +40,7 @@ int main(int argc, char *argv[])
 
     printf("Reading an image...");
     pic::Image img;
-    img.Read(img_str);
+    img.Read(img_str, pic::LT_NOR_GAMMA);
     printf("Ok\n");
 
     printf("Is it valid? ");
@@ -64,7 +62,7 @@ int main(int argc, char *argv[])
 
         printf("Writing the file to disk...");
 
-        bWritten = output->Write("../data/output/filtered_median.png");
+        bWritten = output->Write("../data/output/filtered_median.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -82,7 +80,7 @@ int main(int argc, char *argv[])
 
         printf("Writing the file to disk...");
 
-        bWritten = output->Write("../data/output/filtered_median_vec.png");
+        bWritten = output->Write("../data/output/filtered_median_vec.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -101,7 +99,7 @@ int main(int argc, char *argv[])
 
         printf("Writing the file to disk...");
 
-        bWritten = output->Write("../data/output/filtered_bilateral.png");
+        bWritten = output->Write("../data/output/filtered_bilateral.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -116,7 +114,7 @@ int main(int argc, char *argv[])
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_anisotropic_diffusion.png");
+        bWritten = output->Write("../data/output/filtered_anisotropic_diffusion.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -130,7 +128,7 @@ int main(int argc, char *argv[])
         output = fltG.Process(input, output);//filtering the image
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_guided.png");
+        bWritten = output->Write("../data/output/filtered_guided.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -145,7 +143,7 @@ int main(int argc, char *argv[])
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_wls.png");
+        bWritten = output->Write("../data/output/filtered_wls.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -159,7 +157,7 @@ int main(int argc, char *argv[])
         output = fltK.Process(input, output);
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_kuwahara.png");
+        bWritten = output->Write("../data/output/filtered_kuwahara.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
