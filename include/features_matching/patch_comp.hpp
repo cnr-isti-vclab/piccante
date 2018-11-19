@@ -279,7 +279,7 @@ public:
     {
         float alpha_i = 1.0f - alpha;
 
-        float err = 0.0f;
+        float ret = 0.0f;
 
         for(int i = -halfPatchSize; i <= halfPatchSize; i++) {
             for(int j = -halfPatchSize; j <= halfPatchSize; j++) {
@@ -308,12 +308,12 @@ public:
                 err_grad = sqrtf(err_grad);
 
                 //err term
-                err += alpha_i * err_col + alpha * err_grad;
+                ret += alpha_i * err_col + alpha * err_grad;
 
             }
         }
 
-        return err;
+        return ret;
     }
 
     /**
@@ -327,7 +327,7 @@ public:
     float getSSD(int x0, int y0,
                  int x1, int y1)
     {
-        float val = 0.0f;
+        float ret = 0.0f;
 
         for(int i = -halfPatchSize; i <= halfPatchSize; i++) {
             for(int j = -halfPatchSize; j <= halfPatchSize; j++) {
@@ -336,12 +336,12 @@ public:
                 
                 for(int k = 0; k < img0->channels; k++) {
                     float tmp = tmpData0[k] - tmpData1[k];
-                    val += tmp * tmp;
+                    ret += tmp * tmp;
                 }
             }
         }
 
-        return val;
+        return ret;
     }
 
     /**
@@ -362,7 +362,7 @@ public:
         float cosAngle = cosf(a0);
         float sinAngle = sinf(a0);
 
-        float val = 0.0f;
+        float ret = 0.0f;
         float col0[128];
         float x0f, y0f, tmp;
 
@@ -392,16 +392,16 @@ public:
 
                 for(int k = 0; k < img1->channels; k++) {
                     tmp = col1[k] - col0[k];
-                    val += tmp * tmp;
+                    ret += tmp * tmp;
                 }
 
-                if(val > threshold) {
-                    return val;
+                if(ret > threshold) {
+                    return ret;
                 }
             }
         }
 
-        return val;
+        return ret;
     }
 
     /**
@@ -416,7 +416,7 @@ public:
         float cosAngle = cosf(td0->angle);
         float sinAngle = sinf(td0->angle);
 
-        float val = 0.0f;
+        float ret = 0.0f;
         float x0f, y0f, tmp;
 
         float xf = float(td0->x);
@@ -501,16 +501,16 @@ public:
                     float gain = col0_s[k] > 0.0f ? (col1_s[k] / col0_s[k]) : 1.0f;
                     float bias = col0_mu[k] - gain * col1_mu[k];
                     tmp = col1[k] - (col0[k] * gain + bias);
-                    val += tmp * tmp;
+                    ret += tmp * tmp;
                 }
 
-                if(val > threshold) {
-                    return val;
+                if(ret > threshold) {
+                    return ret;
                 }
             }
         }
 
-        return val;
+        return ret;
     }
 
     /**

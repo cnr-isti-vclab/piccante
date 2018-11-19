@@ -52,6 +52,9 @@ int main(int argc, char *argv[])
 
         bool bWritten;
 
+        std::string name = pic::removeExtension(img_str);
+        name = pic::removeLocalPath(name);
+
         //the median filter
         printf("Filtering the image with the Median filter (radius of 3);\n");
 
@@ -62,7 +65,7 @@ int main(int argc, char *argv[])
 
         printf("Writing the file to disk...");
 
-        bWritten = output->Write("../data/output/filtered_median.png", pic::LT_NOR_GAMMA);
+        bWritten = output->Write("../data/output/" + name + "_filtered_median.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -80,7 +83,25 @@ int main(int argc, char *argv[])
 
         printf("Writing the file to disk...");
 
-        bWritten = output->Write("../data/output/filtered_median_vec.png", pic::LT_NOR_GAMMA);
+        bWritten = output->Write("../data/output/" + name + "filtered_median_vec.png", pic::LT_NOR_GAMMA);
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+
+        //the non-local means filter
+        printf("Filtering the image with Non-Local Means filter;\n");
+
+        pic::FilterNonLocalMeans fltNLM(16, 0.02f);
+        output = fltNLM.Process(input, output);
+
+        printf("Ok!\n");
+
+        printf("Writing the file to disk...");
+
+        bWritten = output->Write("../data/output/" + name + "_filtered_non_local_means.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -99,7 +120,7 @@ int main(int argc, char *argv[])
 
         printf("Writing the file to disk...");
 
-        bWritten = output->Write("../data/output/filtered_bilateral.png", pic::LT_NOR_GAMMA);
+        bWritten = output->Write("../data/output/" + name + "_filtered_bilateral.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -114,7 +135,7 @@ int main(int argc, char *argv[])
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_anisotropic_diffusion.png", pic::LT_NOR_GAMMA);
+        bWritten = output->Write("../data/output/" + name + "_filtered_anisotropic_diffusion.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -128,7 +149,7 @@ int main(int argc, char *argv[])
         output = fltG.Process(input, output);//filtering the image
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_guided.png", pic::LT_NOR_GAMMA);
+        bWritten = output->Write("../data/output/" + name + "_filtered_guided.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -143,7 +164,7 @@ int main(int argc, char *argv[])
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_wls.png", pic::LT_NOR_GAMMA);
+        bWritten = output->Write("../data/output/" + name + "_filtered_wls.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -157,7 +178,7 @@ int main(int argc, char *argv[])
         output = fltK.Process(input, output);
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_kuwahara.png", pic::LT_NOR_GAMMA);
+        bWritten = output->Write("../data/output/" + name + "filtered_kuwahara.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");

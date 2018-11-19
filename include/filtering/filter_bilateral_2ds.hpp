@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <random>
 
+#include "../util/string.hpp"
+
 #include "../filtering/filter.hpp"
 #include "../util/precomputed_gaussian.hpp"
 #include "../point_samplers/sampler_random_m.hpp"
@@ -91,13 +93,13 @@ public:
     FilterBilateral2DS(float sigma_s, float sigma_r);
 
     /**
-     * @brief Init
+     * @brief update
      * @param type
      * @param sigma_s
      * @param sigma_r
      * @param mult
      */
-    void Init(SAMPLER_TYPE type, float sigma_s, float sigma_r, int mult);
+    void update(SAMPLER_TYPE type, float sigma_s, float sigma_r, int mult);
 
     /**
      * @brief signature
@@ -169,108 +171,33 @@ public:
     }
 
     /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma_s
-     * @param sigma_r
-     * @param type
-     * @param mult
-     * @return
-     */
-    static Image *execute(std::string nameIn,
-                          std::string nameOut,
-                          float sigma_s, float sigma_r,
-                          SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
-    {
-        //Load the image
-        Image imgIn(nameIn);
-
-        //Filtering
-        FilterBilateral2DS filter(type, sigma_s, sigma_r, mult);
-        //long t0 = timeGetTime();
-        Image *imgOut = filter.Process(Single(&imgIn), NULL);
-        //long t1 = timeGetTime();
-        //printf("Stochastic Bilateral Filter time: %ld\n",t1-t0);
-
-        //Write image out
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameIn2
-     * @param nameOut
-     * @param sigma_s
-     * @param sigma_r
-     * @param type
-     * @param mult
-     * @return
-     */
-    static Image *execute(std::string nameIn,
-                          std::string nameIn2,
-                          std::string nameOut,
-                          float sigma_s, float sigma_r,
-                          SAMPLER_TYPE type = ST_BRIDSON, int mult = 1)
-    {
-        //Load the image
-        Image imgIn(nameIn);
-        Image imgIn2(nameIn2);
-
-        //Filtering
-        FilterBilateral2DS filter(type, sigma_s, sigma_r, mult);
-        //long t0 = timeGetTime();
-        Image *imgOut = filter.Process(Double(&imgIn, &imgIn2), NULL);
-        //long t1 = timeGetTime();
-        //printf("Stochastic Bilateral Filter time: %ld\n",t1-t0);
-
-        //Write image out
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
-
-    /**
-     * @brief BilateralStoK
+     * @brief getK
      * @param kernelSize
      * @return
      */
-    static inline float BilateralStoK(int kernelSize)
+    static inline float getK(int kernelSize)
     {
         //	float ret = 0.9577f/(0.6466f*float(kernelSize)-0.9175f)+0.4505;
         float ret = 0.4055f / (0.6437f * float(kernelSize) - 1.1083f) + 0.7347f;
-
-        if(ret < 0.0f) {
-            return 3.0f;
-        } else {
-            return ret;
-        }
+        ret = ret >= 0.0f ? ret : 3.0f;
     }
 
     /**
-     * @brief BilateralStoK2
+     * @brief getK2
      * @param kernelSize
      * @return
      */
-    static inline float BilateralStoK2(int kernelSize)
+    static inline float getK2(int kernelSize)
     {
         float ret = 0.3233f / (0.5053f * float(kernelSize) - 0.8272f) + 0.7366f;
-
-        if(ret < 0.0f) {
-            return 2.5f;
-        } else {
-            return ret;
-        }
+        ret = ret >= 0.0f ? ret : 2.5f;
     }
 
-    /**
+    /**precomputeKernels
      * @brief PrecomputedKernels
      */
-    static void PrecomputedKernels()
+    static void precomputeKernels()
     {
-        char nameFile[512];
-
         for(int i = 0; i < 6; i++) {
             float sigma_s = powf(2.0f, float(i));
 
@@ -279,7 +206,7 @@ public:
             int nMaxSamples = nSamplesDiv2 * nSamplesDiv2;
             int oldNSamples = -1;
 
-            printf("Computing kernel sigma_s: %f\n", sigma_s);
+            printf("Compute kernel sigma_s: %f\n", sigma_s);
 
             for(int j = 1; j <= 16; j++) {
                 printf("Multiplier: %d\n", j);
@@ -290,9 +217,7 @@ public:
                 }
 
                 FilterBilateral2DS f2DS(sigma_s, 0.01f, j);
-
-                sprintf(nameFile, "kernel_%3.2f_%d.txt", sigma_s, j);
-                f2DS.Write(nameFile);
+                f2DS.Write("kernel_" + fromNumberToString(sigma_s) + "_" + fromNumberToString(j) + ".txt");
                 oldNSamples = nSamples;
             }
         }
@@ -309,21 +234,21 @@ PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(std::string nameFile,
 PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(SAMPLER_TYPE type,
         float sigma_s, float sigma_r, int mult)
 {
-    Init(type, sigma_s, sigma_r, mult);
+    update(type, sigma_s, sigma_r, mult);
 }
 
 PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(float sigma_s, float sigma_r,
         int mult)
 {
-    Init(ST_BRIDSON, sigma_s, sigma_r, mult);
+    update(ST_BRIDSON, sigma_s, sigma_r, mult);
 }
 
 PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(float sigma_s, float sigma_r)
 {
-    Init(ST_BRIDSON, sigma_s, sigma_r, 1);
+    update(ST_BRIDSON, sigma_s, sigma_r, 1);
 }
 
-PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
+PIC_INLINE void FilterBilateral2DS::update(SAMPLER_TYPE type, float sigma_s,
         float sigma_r, int mult)
 {
     //protected values are assigned/computed
@@ -338,7 +263,7 @@ PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
     //Poisson samples
     int nMaxSamples = pg->halfKernelSize * pg->halfKernelSize;
 
-    int nSamples = int(lround(float(pg->kernelSize)) * BilateralStoK(int(sigma_s))) * mult;
+    int nSamples = int(lround(float(pg->kernelSize)) * getK(int(sigma_s))) * mult;
 
     nSamples = MIN(nSamples, nMaxSamples);
     //	nSamples = MIN(	(pg->halfKernelSize*mult), nMaxSamples);
@@ -356,6 +281,7 @@ PIC_INLINE void FilterBilateral2DS::Init(SAMPLER_TYPE type, float sigma_s,
 PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
+    //NOTE: memory leak
     double I_val[4], tmpC[4];
     double sum;
 
@@ -393,8 +319,6 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
     int channels = dst->channels;
     int edgeChannels = edge->channels;
 
-    bool sumTest;
-
     RandomSampler<2> *ps;
     int nSamples;
 
@@ -419,9 +343,7 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
                     I_val[l] = edge_data[l];
             }
 
-            for(int l = 0; l < channels; l++) {
-                tmpC[l] = 0.0;
-            }
+            Array<double>::assign(0.0, tmpC, channels);
 
             sum = 0.0;
 
@@ -482,9 +404,7 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
                         tmpC[l] += val * weight;
                     } else {
                     #endif
-
                         tmpC[l] += base_data[l] * weight;
-
                     #ifdef PIC_SELECTOR
                     }
                     #endif
@@ -492,7 +412,7 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
             }
 
             //Normalization
-            sumTest = sum > 0.0;
+            bool sumTest = sum > 0.0;
 
             for(int l = 0; l < channels; l++) {
                 #ifdef PIC_SELECTOR
@@ -526,6 +446,7 @@ PIC_INLINE bool FilterBilateral2DS::Read(std::string filename)
     if( ms != NULL) {
         delete ms;
     }
+
     ms = new MRSamplers<2>();
     return ms->Read(filename);
 }

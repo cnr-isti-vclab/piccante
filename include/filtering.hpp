@@ -37,6 +37,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_bilateral_2dg.hpp"
 #include "filtering/filter_bilateral_2ds.hpp"
 #include "filtering/filter_bilateral_2dsp.hpp"
+#include "filtering/filter_non_local_means.hpp"
 #include "filtering/filter_channel.hpp"
 #include "filtering/filter_color_conv.hpp"
 #include "filtering/filter_color_distance.hpp"
