@@ -211,3 +211,9 @@ examples/build-u_polynomials-Desktop_Qt_5_4_2_clang_64bit-Debug/main-aed74e84.o.
 examples/build-s_kmeans-Desktop_Qt_5_4_2_clang_64bit-Debug/s_kmeans
 
 examples/build-opengl_push_pull-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
+examples_jni/build-s_livewire-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
+examples_jni/build-cv_find_checker_board-Desktop_Qt_5_4_2_clang_64bit-Release/cv_find_checker_board
+examples_jni/build-cv_find_checker_board-Desktop_Qt_5_4_2_clang_64bit-Release/Makefile
+examples_jni/build-ip_white_balance-Desktop_Qt_5_4_2_clang_64bit-Debug/ip_white_balance
+examples_jni/build-ip_white_balance-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
+examples_jni/build-s_livewire-Desktop_Qt_5_4_2_clang_64bit-Debug/s_livewire
