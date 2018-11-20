@@ -81,8 +81,10 @@ protected:
 
                 float *out = (*dst) (i, j);
 
+                int index = best * in->channels;
+
                 for(int ch = 0; ch < in->channels; ch++) {
-                    out[ch] = values[best * in->channels + ch];
+                    out[ch] = values[index + ch];
                 }
             }
         }

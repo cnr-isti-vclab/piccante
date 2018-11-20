@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FILTERING_FILTER_COLOR_DISTANCE_HPP
 
 #include "../filtering/filter.hpp"
+#include "../util/array.hpp"
 
 namespace pic {
 
@@ -38,11 +39,7 @@ protected:
     {
         float *in = (*data->src[0])(data->x, data->y);
 
-        float sum = 0.0f;
-        for(int k = 0; k < data->dst->channels; k++) {
-            float tmp = in[k] - color[k];
-            sum += tmp * tmp;
-        }
+        float sum = Array<float>::distanceSq(in, color, data->dst->channels);
 
         data->out[0] = expf(- sum / sigma_sq_2);
     }

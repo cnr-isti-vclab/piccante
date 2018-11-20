@@ -66,8 +66,8 @@ protected:
 
             for(int i = box->x0; i < box->x1; i++) {
 
-                float *dataIn  = (*src[0]) (i, j);
-                float *dataOut = (*dst)    (i, j);
+                float *dataIn  = (*src[0])(i, j);
+                float *dataOut = (*dst) (i, j);
 
                 if(bEven) {
                     tmp[1] = dataOut;

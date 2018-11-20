@@ -89,7 +89,8 @@ public:
     void update(int size)
     {
         this->halfSize = checkHalfSize(size);
-        this->areaKernel = (halfSize * 2 + 1) * (halfSize * 2 + 1);
+        size = (halfSize << 1) + 1;
+        this->areaKernel = size * size;
         this->midValue = areaKernel >> 1;
     }
 

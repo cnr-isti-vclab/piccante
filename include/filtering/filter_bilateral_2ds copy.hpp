@@ -279,21 +279,32 @@ PIC_INLINE void FilterBilateral2DS::update(SAMPLER_TYPE type, float sigma_s,
 PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
-    Image *edge, *base;
+    //NOTE: memory leak
+    double I_val[4], tmpC[4];
+    double sum;
+
+    Image *edge, *base, *selector;
+    selector = NULL;
 
     int nImg = int(src.size());
 
     switch(nImg) {
-    //bilateral filter
+    //Bilateral filter
     case 1:
         base = src[0];
         edge = src[0];
         break;
 
-    //cross bilateral filter
+    //Cross bilateral filter
     case 2:
         base = src[0];
         edge = src[1];
+        break;
+
+    case 3:
+        base = src[0];
+        edge = src[1];
+        selector = src[2];
         break;
 
     default:
@@ -301,12 +312,13 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
         edge = src[0];
     }
 
-    double *tmpC = new double[base->channels];
-
     int width = dst->width;
     int height = dst->height;
     int channels = dst->channels;
     int edgeChannels = edge->channels;
+
+    RandomSampler<2> *ps;
+    int nSamples;
 
     //Mersenne Twister
     std::mt19937 m(seed);
@@ -314,27 +326,40 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
     for(int j = box->y0; j < box->y1; j++) {
         for(int i = box->x0; i < box->x1; i++) {
             float *dst_data  = (*dst )(i, j);
+            float *base_data = (*base)(i, j);
             float *edge_data = (*edge)(i, j);
+
+            for(int l = 0; l < edgeChannels; l++) {
+#ifdef PIC_SELECTOR
+
+                if(selector != NULL) {
+                    float t = MIN(MAX(selector->data[c], 0.0f), 1.0f);
+                    float val = t * base->data[c + l] + (1.0f - t) * edge->data[c + l];
+                    I_val[l] = val;
+                } else
+#endif
+                    I_val[l] = edge_data[l];
+            }
 
             Array<double>::assign(0.0, tmpC, channels);
 
-            double sum = 0.0;
+            sum = 0.0;
 
-            RandomSampler<2> *ps = ms->getSampler(&m);
-            int nSamples = int(ps->samplesR.size());
+            ps = ms->getSampler(&m);
+            nSamples = int(ps->samplesR.size());
 
             for(int k = 0; k < nSamples; k += 2) {
-                //fetch addresses
-                int ci = CLAMP(i + ps->samplesR[k    ],  width);
-                int cj = CLAMP(j + ps->samplesR[k + 1], height);
-
                 //
                 //fetch the precomputed Spatial Gaussian kernel
                 //
                 double G1 = pg->coeff[ps->samplesR[k    ] + pg->halfKernelSize] *
                             pg->coeff[ps->samplesR[k + 1] + pg->halfKernelSize];
 
-                float *edge_data_ci_cj = (*edge)(ci, cj);
+                //fetch addresses
+                int ci = CLAMP(i + ps->samplesR[k    ],  width);
+                int cj = CLAMP(j + ps->samplesR[k + 1], height);
+
+                float *edge_data = (*edge)(ci, cj);
 
                 //
                 //compute the Range Gaussian kernel
@@ -342,7 +367,19 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
                 double acc_delta_range_sq = 0.0;
 
                 for(int l = 0; l < edgeChannels; l++) {
-                    double delta_range = edge_data_ci_cj[l] - edge_data[l];
+                    double delta_range;
+                    #ifdef PIC_SELECTOR
+                    if(selector != NULL) {
+                        float t = MIN(MAX(selector->data[c2], 0.0f), 1.0f);
+                        float val = t * base->data[c2 + l] + (1.0f - t) * edge->data[c2 + l];
+                        delta_range = val - I_val[l];
+                    } else {
+                    #endif
+                        delta_range = edge_data[l] - I_val[l];
+                    #ifdef PIC_SELECTOR
+                    }
+                    #endif
+
                     acc_delta_range_sq += delta_range * delta_range;
                 }
 
@@ -354,25 +391,42 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
                 double weight = G1 * G2;
                 sum += weight;
 
-                float *base_data_ci_cj = (*base)(ci, cj);
+                float *base_data = (*base)(ci, cj);
 
                 //filter
                 for(int l = 0; l < channels; l++) {
-                    tmpC[l] += base_data_ci_cj[l] * weight;
+                    #ifdef PIC_SELECTOR
+                    if(selector != NULL) {
+                        float t = MIN(MAX(selector->data[c2], 0.0f), 1.0f);
+                        float val = t * base->data[c2 + l] + (1.0f - t) * edge->data[c2 + l];
+                        tmpC[l] += val * weight;
+                    } else {
+                    #endif
+                        tmpC[l] += base_data[l] * weight;
+                    #ifdef PIC_SELECTOR
+                    }
+                    #endif
                 }
             }
 
             //Normalization
             bool sumTest = sum > 0.0;
-            float *base_data = (*base)(i, j);
 
             for(int l = 0; l < channels; l++) {
-                dst_data[l] = sumTest ? float(tmpC[l] / sum) : base_data[l];
+                #ifdef PIC_SELECTOR
+                if(selector != NULL) {
+                    float t = MIN(MAX(selector->data[c], 0.0f), 1.0f);
+                    float val = t * base->data[c + l] + (1.0f - t) * edge->data[c + l];
+                    dst->data[c + l] = sumTest ? tmpC[l] / sum : val;
+                } else {
+                #endif
+                    dst_data[l] = sumTest ? float(tmpC[l] / sum) : base_data[l];
+                #ifdef PIC_SELECTOR
+                }
+                #endif
             }
         }
     }
-
-    delete[] tmpC;
 }
 
 PIC_INLINE bool FilterBilateral2DS::Write(std::string nameFile)

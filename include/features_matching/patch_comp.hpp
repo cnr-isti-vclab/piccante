@@ -337,7 +337,7 @@ public:
                 float *d0 = (*img0)(x0 + j, y0 + i);
                 float *d1 = (*img1)(x1 + j, y1 + i);
 
-                ret += Array<float>::dot(d0, d1, img0->channels);
+                ret += Array<float>::distanceSq(d0, d1, img0->channels);
             }
         }
 
@@ -390,7 +390,7 @@ public:
 
                 float *col1 = (*img1)(x1 + j - halfPatchSize, y1 + i - halfPatchSize);
 
-                ret += Array<float>::dot(col0, col1, img0->channels);
+                ret += Array<float>::distanceSq(col0, col1, img0->channels);
 
                 if(ret > threshold) {
                     return ret;
