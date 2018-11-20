@@ -34,9 +34,9 @@ namespace pic {
 class FilterNonLocalMeans: public Filter
 {
 protected:
-    float sigma_r;
-    double sigma_r_sq_2;
+    float sigma_r, sigma_r_sq_2;
     int kernelSize;
+    float kernelSize_sq, h, h_sq;
     MRSamplers<2> *ms;
     int seed;
     int nSamples;
@@ -84,14 +84,22 @@ PIC_INLINE void FilterNonLocalMeans::update(int kernelSize, float sigma_r)
 {
     //protected values are assigned/computed
     this->sigma_r = sigma_r;
-    sigma_r_sq_2 = double(sigma_r * sigma_r) * 2.0;
+    sigma_r_sq_2 = sigma_r * sigma_r * 2.0f;
 
     int halfKernelSize = kernelSize >> 1;
     this->kernelSize = (halfKernelSize << 1) + 1;
+    kernelSize_sq = float(this->kernelSize * this->kernelSize);
 
-    int nSamples = int(lround(float(this->kernelSize)) * FilterBilateral2DS::getK(kernelSize));
+    int nMaxSamples = halfKernelSize * halfKernelSize;
 
+    h = sigma_r * 0.5f;
+    h_sq = h * h;
 
+    float density = FilterBilateral2DS::getK(kernelSize);
+    int nSamples = int(lround(float(kernelSize)) * density);
+    nSamples = MIN(nSamples, nMaxSamples);
+
+    printf("NLM: %d %f\n", nSamples, density);
     Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
     ms = new MRSamplers<2>(ST_BRIDSON, window, nSamples, 1, 64);
 
@@ -110,9 +118,7 @@ PIC_INLINE void FilterNonLocalMeans::ProcessBBox(Image *dst, ImageVec src,
 
     PatchComp pc(src[0], src[0], kernelSize);
 
-    float kernelSize_sq = float(kernelSize * kernelSize);
-
-    float weight = sigma_r_sq_2 * kernelSize_sq * dst->channelsf;
+    float area = kernelSize_sq * dst->channelsf;
 
     for(int j = box->y0; j < box->y1; j++) {
         for(int i = box->x0; i < box->x1; i++) {
@@ -132,20 +138,21 @@ PIC_INLINE void FilterNonLocalMeans::ProcessBBox(Image *dst, ImageVec src,
 
                 float *tmp_src = (*src[0])(ci, cj);
 
-                float w = expf(-pc.getSSD(i, j, ci, cj) / weight);
+                float d_sq = pc.getSSD(i, j, ci, cj) / area;
+
+                float w = expf(-MAX(d_sq - sigma_r_sq_2, 0.0f) / h_sq);
                 tot += w;
 
-                for(int c = 0; c < dst->channels; c++) {
+                for(int c = 0; c < channels; c++) {
                     tmp_dst[c] += tmp_src[c] * w;
                 }
-
             }
 
             float *tmp_src = (*src[0])(i, j);
             bool sumTest = tot > 0.0f;
 
-            for(int c = 0; c < dst->channels; c++) {
-                tmp_dst[c] = sumTest ? tmp_dst[c] : tmp_src[c];
+            for(int c = 0; c < channels; c++) {
+                tmp_dst[c] = sumTest ? tmp_dst[c] / tot : tmp_src[c];
             }
         }
     }

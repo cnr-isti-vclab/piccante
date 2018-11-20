@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
         //the non-local means filter
         printf("Filtering the image with Non-Local Means filter;\n");
 
-        pic::FilterNonLocalMeans fltNLM(16, 0.02f);
+        pic::FilterNonLocalMeans fltNLM(11, 0.05f);
         output = fltNLM.Process(input, output);
 
         printf("Ok!\n");

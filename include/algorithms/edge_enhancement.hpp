@@ -24,6 +24,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief edgeEnhancement
+ * @param imgIn
+ * @param sigma_s
+ * @param sigma_r
+ * @return
+ */
 PIC_INLINE Image *edgeEnhancement(Image *imgIn, float sigma_s = 4.0f,
                                  float sigma_r = 0.05f)
 {
@@ -45,6 +52,7 @@ PIC_INLINE Image *edgeEnhancement(Image *imgIn, float sigma_s = 4.0f,
     *detail /= *imgBase;
     imgBase->assign(imgIn);
     *imgBase *= *detail;
+
     return imgBase;
 }
 

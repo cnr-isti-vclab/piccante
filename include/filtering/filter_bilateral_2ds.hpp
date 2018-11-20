@@ -179,7 +179,9 @@ public:
     {
         //	float ret = 0.9577f/(0.6466f*float(kernelSize)-0.9175f)+0.4505;
         float ret = 0.4055f / (0.6437f * float(kernelSize) - 1.1083f) + 0.7347f;
-        ret = ret >= 0.0f ? ret : 3.0f;
+        ret = (ret > 0.0f) ? ret : 3.0f;
+
+        return ret;
     }
 
     /**
@@ -190,7 +192,8 @@ public:
     static inline float getK2(int kernelSize)
     {
         float ret = 0.3233f / (0.5053f * float(kernelSize) - 0.8272f) + 0.7366f;
-        ret = ret >= 0.0f ? ret : 2.5f;
+        ret = (ret > 0.0f) ? ret : 2.5f;
+        return ret;
     }
 
     /**precomputeKernels
