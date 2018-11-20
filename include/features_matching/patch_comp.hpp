@@ -19,6 +19,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FEATURES_MATCHING_PATCH_COMP_HPP
 
 #include "../image.hpp"
+
+#include "../util/array.hpp"
+
 #include "../image_samplers/image_sampler_bilinear.hpp"
 
 #include "../features_matching/transform_data.hpp"
@@ -331,13 +334,10 @@ public:
 
         for(int i = -halfPatchSize; i <= halfPatchSize; i++) {
             for(int j = -halfPatchSize; j <= halfPatchSize; j++) {
-                float *tmpData0 = (*img0)(x0 + j, y0 + i);
-                float *tmpData1 = (*img1)(x1 + j, y1 + i);
-                
-                for(int k = 0; k < img0->channels; k++) {
-                    float tmp = tmpData0[k] - tmpData1[k];
-                    ret += tmp * tmp;
-                }
+                float *d0 = (*img0)(x0 + j, y0 + i);
+                float *d1 = (*img1)(x1 + j, y1 + i);
+
+                ret += Array<float>::dot(d0, d1, img0->channels);
             }
         }
 
@@ -390,10 +390,7 @@ public:
 
                 float *col1 = (*img1)(x1 + j - halfPatchSize, y1 + i - halfPatchSize);
 
-                for(int k = 0; k < img1->channels; k++) {
-                    tmp = col1[k] - col0[k];
-                    ret += tmp * tmp;
-                }
+                ret += Array<float>::dot(col0, col1, img0->channels);
 
                 if(ret > threshold) {
                     return ret;

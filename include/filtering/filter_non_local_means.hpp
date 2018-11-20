@@ -99,7 +99,6 @@ PIC_INLINE void FilterNonLocalMeans::update(int kernelSize, float sigma_r)
     int nSamples = int(lround(float(kernelSize)) * density);
     nSamples = MIN(nSamples, nMaxSamples);
 
-    printf("NLM: %d %f\n", nSamples, density);
     Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
     ms = new MRSamplers<2>(ST_BRIDSON, window, nSamples, 1, 64);
 
