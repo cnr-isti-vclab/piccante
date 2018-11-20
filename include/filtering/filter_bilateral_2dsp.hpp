@@ -83,24 +83,6 @@ public:
         FilterBilateral2DSP filter(sigma_s, sigma_r);
         return filter.Process(Single(imgIn), imgOut);
     }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma_s
-     * @param sigma_r
-     * @return
-     */
-    static Image *execute(std::string nameIn, std::string nameOut, float sigma_s,
-                             float sigma_r)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = execute(&imgIn, NULL, sigma_s, sigma_r);
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
-
 };
 
 } // end namespace pic

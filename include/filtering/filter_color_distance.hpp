@@ -39,7 +39,7 @@ protected:
     {
         float *in = (*data->src[0])(data->x, data->y);
 
-        float sum = Array<float>::distanceSq(in, color, data->dst->channels);
+        float sum = Arrayf::distanceSq(in, color, data->dst->channels);
 
         data->out[0] = expf(- sum / sigma_sq_2);
     }

@@ -40,18 +40,6 @@ protected:
     Image *grid, *gridBlur;
     bool parallel;
 
-public:
-    float s_S, s_R, mul_E;
-
-    /**
-     * @brief Signature
-     * @return
-     */
-    std::string signature()
-    {
-        return genBilString("G", sigma_s, sigma_r);
-    }
-
     /**
      * @brief Splat splats values into the grid.
      * @param base
@@ -70,6 +58,8 @@ public:
      */
     void Slice(Image *out, Image *base, Image *edge, int channels);
 
+public:
+
     /**
      * @brief FilterBilateral2DG
      * @param sigma_s
@@ -78,6 +68,17 @@ public:
     FilterBilateral2DG(float sigma_s, float sigma_r);
 
     ~FilterBilateral2DG();
+
+    float s_S, s_R, mul_E;
+
+    /**
+     * @brief Signature
+     * @return
+     */
+    std::string signature()
+    {
+        return genBilString("G", sigma_s, sigma_r);
+    }
 
     /**
      * @brief Process
@@ -107,63 +108,9 @@ public:
 
         return imgOut;
     }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma_s
-     * @param sigma_r
-     * @return
-     */
-    static Image *execute(std::string nameIn,
-                             std::string nameOut,
-                             float sigma_s, float sigma_r)
-    {
-        //Load the image
-        Image imgIn(nameIn, LT_NOR_GAMMA);
-
-        //Filtering
-        Image *imgOut =  FilterBilateral2DG::execute(&imgIn, NULL, sigma_s, sigma_r);
-
-        //Write image out
-        imgOut->Write(nameOut);
-
-        return imgOut;
-    }
-
-    /**
-     * @brief execute
-     * @param nameBase
-     * @param nameEdge
-     * @param nameOut
-     * @param sigma_s
-     * @param sigma_r
-     * @return
-     */
-    static Image *execute(std::string nameBase,
-                             std::string nameEdge,
-                             std::string nameOut,
-                             float sigma_s, float sigma_r)
-    {
-        //Load the image
-        Image imgBase(nameBase, LT_NOR_GAMMA);
-        Image imgEdge(nameEdge, LT_NOR_GAMMA);
-
-        //Filtering
-        FilterBilateral2DG filter(sigma_s, sigma_r);
-        long t0 = timeGetTime();
-        Image *imgOut = filter.Process(Double(&imgBase, &imgEdge), NULL);
-        long t1 = timeGetTime();
-        printf("Bilateral Grid Filter time: %f\n", float(t1 - t0) / 1000.0f);
-
-        //Write image out
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
 };
 
-PIC_INLINE FilterBilateral2DG::FilterBilateral2DG(float sigma_s, float sigma_r)
+PIC_INLINE FilterBilateral2DG::FilterBilateral2DG(float sigma_s, float sigma_r) : Filter()
 {
     //protected values are assigned/computed
     this->sigma_s = sigma_s;
@@ -287,11 +234,7 @@ PIC_INLINE void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge,
 #ifdef PIC_BILATERAL_GRID_MULTI_PASS
             float E = edge->data[ind + channels];
 #else
-            float E = 0.0f;
-
-            for(int k = 0; k < out->channels; k++) {
-                E += edge->data[ind + k];
-            }
+            float E = Arrayf::sum(&edge->data[ind], out->channels);
 
 #endif
             E *= mul_E;
@@ -314,9 +257,7 @@ PIC_INLINE void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge,
                     out->data[ind + k] = vOut[k] / vOut[out->channels];
                 }
             } else {
-                for(int k = 0; k < out->channels; k++) {
-                    out->data[ind + k] = 0.0f;
-                }
+                Arrayf::assign(0.0f, &out->data[ind], out->channels);
             }
 
 #endif
@@ -326,27 +267,37 @@ PIC_INLINE void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge,
 
 PIC_INLINE Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
 {
-    if(imgIn[0] == NULL) {
-        return NULL;
+    if(!checkInput(imgIn)) {
+        return imgOut;
     }
 
+    imgOut = setupAux(imgIn, imgOut);
+
     if(imgOut == NULL) {
-        imgOut = imgIn[0]->allocateSimilarOne();
+        return imgOut;
     }
 
     Image *base, *edge;
 
-    float maxVal;
+    base = imgIn[0];
+
+    int ind;
+    float *baseMaxmaxVal = base->getMaxVal(NULL, NULL);
+    float maxVal = Arrayf::getMax(baseMaxmaxVal, base->channels, ind);
+    delete[] baseMaxmaxVal;
 
     if(imgIn.size() == 2) {
-        base = imgIn[0];
         edge = imgIn[1];
-        maxVal = MAX(base->getMaxVal()[0], edge->getMaxVal()[0]);
+
+        float *edgeMaxVal = edge->getMaxVal(NULL, NULL);
+
+        maxVal = MAX(maxVal, Arrayf::getMax(edgeMaxVal, edge->channels, ind));
+
+        delete[] edgeMaxVal;
+
         *edge /= maxVal;
     } else {
-        base = imgIn[0];
         edge = imgIn[0];
-        maxVal = base->getMaxVal()[0];
     }
 
     //Range in [0,1]
@@ -379,7 +330,6 @@ PIC_INLINE Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
 
     *imgOut *= maxVal;
     sigma_r = tmpSigma_r;
-    parallel = false;
 
     return imgOut;
 }
