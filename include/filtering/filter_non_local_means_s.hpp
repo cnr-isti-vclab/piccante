@@ -29,17 +29,17 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- * @brief The FilterNonLocalMeans class
+ * @brief The FilterNonLocalMeansS class
  */
-class FilterNonLocalMeans: public Filter
+class FilterNonLocalMeansS: public Filter
 {
 protected:
     float sigma_r, sigma_r_sq_2;
     int kernelSize;
     float kernelSize_sq, h, h_sq;
+
     MRSamplers<2> *ms;
     int seed;
-    int nSamples;
 
     /**
      * @brief ProcessBBox
@@ -52,35 +52,35 @@ protected:
 public:
 
     /**
-     * @brief FilterNonLocalMeans
+     * @brief FilterNonLocalMeansS
      */
-    FilterNonLocalMeans()
+    FilterNonLocalMeansS() : Filter()
     {
         seed = 1;
         ms = NULL;
     }
 
     /**
-     * @brief FilterNonLocalMeans
+     * @brief FilterNonLocalMeansS
      * @param sigma_s
      * @param sigma_r
      */
-    FilterNonLocalMeans(int kernelSize, float sigma_r);
+    FilterNonLocalMeansS(int searchWindow, int kernelSize, float sigma_r);
 
     /**
      * @brief update
      * @param sigma_r
      */
-    void update(int kernelSize, float sigma_r);
+    void update(int searchWindow, int kernelSize, float sigma_r);
 
 };
 
-PIC_INLINE FilterNonLocalMeans::FilterNonLocalMeans(int kernelSize, float sigma_r)
+PIC_INLINE FilterNonLocalMeansS::FilterNonLocalMeansS(int searchWindow, int kernelSize, float sigma_r) : Filter()
 {
-    update(kernelSize, sigma_r);
+    update(searchWindow, kernelSize, sigma_r);
 }
 
-PIC_INLINE void FilterNonLocalMeans::update(int kernelSize, float sigma_r)
+PIC_INLINE void FilterNonLocalMeansS::update(int searchWindow, int kernelSize, float sigma_r)
 {
     //protected values are assigned/computed
     this->sigma_r = sigma_r;
@@ -90,22 +90,23 @@ PIC_INLINE void FilterNonLocalMeans::update(int kernelSize, float sigma_r)
     this->kernelSize = (halfKernelSize << 1) + 1;
     kernelSize_sq = float(this->kernelSize * this->kernelSize);
 
-    int nMaxSamples = halfKernelSize * halfKernelSize;
 
     h = sigma_r * 0.5f;
     h_sq = h * h;
 
-    float density = FilterBilateral2DS::getK(kernelSize);
-    int nSamples = int(lround(float(kernelSize)) * density);
-    nSamples = MIN(nSamples, nMaxSamples);
+    float density = FilterBilateral2DS::getK(searchWindow);
+    int nSamples = int(lround(float(searchWindow)) * density);
+    int nMaxSamples = (searchWindow * searchWindow) / 4;
 
-    Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+    nSamples = MAX(MIN(nSamples * 4, nMaxSamples), 1);
+
+    Vec2i window = Vec2i(searchWindow, searchWindow);
     ms = new MRSamplers<2>(ST_BRIDSON, window, nSamples, 1, 64);
 
     seed = 1;
 }
 
-PIC_INLINE void FilterNonLocalMeans::ProcessBBox(Image *dst, ImageVec src,
+PIC_INLINE void FilterNonLocalMeansS::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
     int width = dst->width;
