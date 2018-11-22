@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         printf("Estimated noise:\n");
-        float *noise =pic::estimateNoise(&img, NULL);
+        float *noise = pic::estimateNoise(&img, NULL);
         for(int i = 0; i < img.channels; i++) {
             printf("Channel i-th: %f\n", noise[i]);
         }
