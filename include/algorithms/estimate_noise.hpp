@@ -49,7 +49,6 @@ float *estimateNoise(Image *img, float *noise = NULL)
     data[8] = 1.0f;
 
     Image conv(1, 3, 3, 1, data);
-    conv.Write("../a.pfm");
 
     FilterConv2D flt;
 
@@ -69,6 +68,7 @@ float *estimateNoise(Image *img, float *noise = NULL)
     Arrayf::div(noise, tmp->channels, 36.0f);
 
     delete tmp;
+    delete data;
 
     return noise;
 }
