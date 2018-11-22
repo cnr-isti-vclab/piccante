@@ -20,6 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The RadialBasisFunction class
+ */
 class RadialBasisFunction
 {
 public:
@@ -37,6 +40,13 @@ public:
         nCenters = 0;
     }
 
+    /**
+     * @brief update
+     * @param centers
+     * @param nCenters
+     * @param nDim
+     * @param var
+     */
     void update(float *centers, int nCenters, int nDim, float var)
     {
         this->nDim = nDim;

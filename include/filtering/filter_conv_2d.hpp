@@ -44,7 +44,7 @@ protected:
 
         int channels = dst->channels;
 
-        int c_w_h  = (conv->width >> 1);
+        int c_w_h = (conv->width >> 1);
         int c_h_h = (conv->height >> 1);
 
         for(int j = box->y0; j < box->y1; j++) {
@@ -60,7 +60,8 @@ protected:
                         float *conv_data = (*conv)(l + c_w_h, k + c_h_h);
 
                         for(int c = 0; c < channels; c++) {
-                            dst_data[c] += img_data[c] * conv_data[c];
+                            int c2 = c % conv->channels;
+                            dst_data[c] += img_data[c] * conv_data[c2];
                         }
                     }
                 }

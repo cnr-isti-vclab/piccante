@@ -35,7 +35,10 @@ public:
     /**
      * @brief BBox is a basic constructor. It does nothing.
      */
-    BBox() {}
+    BBox()
+    {
+
+    }
 
     /**
      * @brief BBox is a constructor setting the BBox up.

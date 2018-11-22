@@ -341,6 +341,12 @@ public:
     void applyFunction(float(*func)(float));
 
     /**
+     * @brief getFullBox computes a full BBox for this image.
+     * @return This function returns a full BBox for this image.
+     */
+    BBox getFullBox();
+
+    /**
      * @brief getMaxVal computes the maximum value for the current Image.
      * @param box is the bounding box where to compute the function. If it
      * is set to NULL the function will be computed on the entire image.
@@ -1016,8 +1022,7 @@ PIC_INLINE void Image::allocate(int width, int height, int channels, int frames)
 
 PIC_INLINE void Image::allocateAux()
 {
-    this->fullBox.setBox(0, width, 0, height, 0, frames, width,
-                         height, frames);
+    this->fullBox = getFullBox();
 
     this->depth    = frames;
     this->widthf   = float(width);
@@ -1029,6 +1034,15 @@ PIC_INLINE void Image::allocateAux()
     this->frames1f = float(frames -1);
 
     calculateStrides();
+}
+
+PIC_INLINE BBox Image::getFullBox()
+{
+    BBox fullBox;
+    fullBox.setBox(0, width, 0, height, 0, frames, width,
+                             height, frames);
+
+    return fullBox;
 }
 
 PIC_INLINE void Image::assign(const Image *imgIn)

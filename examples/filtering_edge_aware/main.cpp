@@ -47,6 +47,12 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("Ok\n");
 
+        printf("Estimated noise:\n");
+        float *noise =pic::estimateNoise(&img, NULL);
+        for(int i = 0; i < img.channels; i++) {
+            printf("Channel i-th: %f\n", noise[i]);
+        }
+
         pic::ImageVec input = pic::Single(&img);
         pic::Image *output = NULL;
 
@@ -94,7 +100,7 @@ int main(int argc, char *argv[])
         //the non-local means filter
         printf("Filtering the image with Non-Local Means filter;\n");
 
-        pic::FilterNonLocalMeansF fltNLM(21, 5, 0.05f);
+        pic::FilterNonLocalMeansF fltNLM(31, 5, 0.05f);
         output = fltNLM.Process(input, output);
 
         printf("Ok!\n");
