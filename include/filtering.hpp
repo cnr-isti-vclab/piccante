@@ -95,6 +95,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_radial_basis_function.hpp"
 #include "filtering/filter_disparity.hpp"
 #include "filtering/filter_deconvolution.hpp"
+#include "filtering/filter_noise_estimation.hpp"
 
 #endif /* PIC_FILTERING_HPP */
 
