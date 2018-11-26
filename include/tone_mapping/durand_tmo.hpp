@@ -63,10 +63,11 @@ PIC_INLINE Image *DurandTMO(Image *imgIn, Image *imgOut = NULL, float target_con
     base->applyFunction(log10fPlusEpsilon);
     detail->applyFunction(log10fPlusEpsilon);
 
-    float max_log_base = base->getMaxVal()[0];
-    float min_log_base = base->getMinVal()[0];
+    float min_log_base, max_log_base;
+    base->getMinVal(NULL, &min_log_base);
+    base->getMaxVal(NULL, &max_log_base);
 
-    float compression_factor =  log10fPlusEpsilon(target_contrast) / (max_log_base - min_log_base);
+    float compression_factor = log10fPlusEpsilon(target_contrast) / (max_log_base - min_log_base);
     float log_absoulte = compression_factor * max_log_base;
 
     *base *= compression_factor;
@@ -74,7 +75,6 @@ PIC_INLINE Image *DurandTMO(Image *imgIn, Image *imgOut = NULL, float target_con
     *base -= log_absoulte;
     base->applyFunction(powf10fe);
 
-    imgOut = imgIn->clone();
     *imgOut /= lum;
     *imgOut *= base;
 

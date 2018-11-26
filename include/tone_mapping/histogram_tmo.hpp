@@ -39,10 +39,11 @@ PIC_INLINE Image *HistogramTMO(Image *imgOut, Image *imgIn)
     }
 
     Image *lum    = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
-    Image *lumOld = lum->clone();
+    *imgOut /= *lum;
+
     lum->sort();
 
-    int size = lum->width * lum->height * lum->frames;
+    int size = lum->nPixels();
 
     float table[257];
 
@@ -50,7 +51,7 @@ PIC_INLINE Image *HistogramTMO(Image *imgOut, Image *imgIn)
         table[i] = lum->getPercentileVal(float(i) / 256.0f);
     }
 
-    table[0] = lum->getMinVal()[0];
+    lum->getMinVal(NULL, &table[0]);
 
     std::vector<float> v(table, table + 257);
 
@@ -60,13 +61,9 @@ PIC_INLINE Image *HistogramTMO(Image *imgOut, Image *imgIn)
         lum->data[i] = powf(float(low - v.begin()) / 256.0f, 2.2f);
     }
 
-    *imgOut /= *lumOld;
-    *imgOut *= *lum;
-
     imgOut->removeSpecials();
 
     delete lum;
-    delete lumOld;
 
     return imgOut;
 }
