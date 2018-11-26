@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
           this is quantized at 8-bit and gamma is applied.
           Note that pic::ReinhardTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bool bWritten = img_tmo_reinhard-Write("../data/output/img_tmo_reinhard.png", pic::LT_NOR_GAMMA);
+        bool bWritten = img_tmo_reinhard->Write("../data/output/img_tmo_reinhard.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");

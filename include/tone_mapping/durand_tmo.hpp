@@ -54,14 +54,13 @@ PIC_INLINE Image *DurandTMO(Image *imgIn, Image *imgOut = NULL, float target_con
     Image *lum = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);
 
     //bilateral filter seperation
-    ImageVec *sep = bilateralSeparation(lum);
+    ImageVec *sep = bilateralSeparation(lum, -1.0f, 0.4f, true);
 
     Image *base = sep->at(0);
     Image *detail = sep->at(1);
 
-
-    base->applyFunction(log10fPlusEpsilon);
-    detail->applyFunction(log10fPlusEpsilon);
+  //  base->applyFunction(log10fPlusEpsilon);
+  //  detail->applyFunction(log10fPlusEpsilon);
 
     float min_log_base, max_log_base;
     base->getMinVal(NULL, &min_log_base);
@@ -73,10 +72,12 @@ PIC_INLINE Image *DurandTMO(Image *imgIn, Image *imgOut = NULL, float target_con
     *base *= compression_factor;
     *base += detail;
     *base -= log_absoulte;
-    base->applyFunction(powf10fe);
+    base->applyFunction(powf10fMinusEpsilon);
 
-    *imgOut /= lum;
     *imgOut *= base;
+    *imgOut /= lum;
+
+    imgOut->removeSpecials();
 
     delete base;
     delete detail;

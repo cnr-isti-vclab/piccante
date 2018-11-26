@@ -346,6 +346,16 @@ PIC_INLINE float log10fPlusEpsilon(float x)
 }
 
 /**
+ * @brief powf10fMinusEpsilon
+ * @param x
+ * @return
+ */
+PIC_INLINE float powf10fMinusEpsilon(float x)
+{
+    return MAX(powf(10.0f, x) - 1e-6f, 0.0f);
+}
+
+/**
  * @brief log2f logarithm in base 2 for floating point
  * @param x
  * @return
