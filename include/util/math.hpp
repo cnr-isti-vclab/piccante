@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_UTIL_MATH_HPP
 
 #include <math.h>
+#include <cmath>
 #include <random>
 #include <stdlib.h>
 #include <set>
@@ -315,21 +316,21 @@ PIC_INLINE int pow2(int n)
 }
 
 /**
- * @brief log10Plus computes log10 of a value plus 1.
+ * @brief logf10PlusOne computes log10 of a value plus 1.
  * @param x is a value for which the log10 needs to be computed.
  * @return It returns log10(x + 1).
  */
-PIC_INLINE float log10Plus(float x)
+PIC_INLINE float log10PlusOne(float x)
 {
     return log10f(x + 1.0f);
 }
 
 /**
- * @brief expMinus
+ * @brief expMinusOne
  * @param x
  * @return
  */
-PIC_INLINE float expMinus(float x)
+PIC_INLINE float expfMinusOne(float x)
 {
     float tmp = powf(10.0f, x) - 1.0f;
     return MAX(tmp, 0.0f);
@@ -426,6 +427,83 @@ PIC_INLINE void getRandomPermutation(std::mt19937 &m, unsigned int *perm, int nP
             index++;
         }
     }
+}
+
+/**
+ * @brief normalDistribution
+ * @param x
+ * @param mu
+ * @param sigma
+ * @return
+ */
+PIC_INLINE float normalDistribution(float x, float mu = 0.0f, float sigma = 1.0f)
+{
+    float ret;
+
+    float sigma_sq_2 = sigma * sigma * 2.0f;
+    float d = x - mu;
+
+    ret = exp(-(d * d) / sigma_sq_2) / sqrtf(sigma_sq_2 * C_PI);
+
+
+    return ret;
+}
+
+/**
+ * @brief betaFunction
+ * @param A
+ * @param B
+ * @return
+ */
+PIC_INLINE float betaFunction(float A, float B, float step = 1e-4)
+{
+    if(step <= 0.0f || step >= 1.0f) {
+        step = 1e-4f;
+    }
+
+    float A1 = A - 1.0f;
+    float B1 = B - 1.0f;
+
+    float ret = 0.0f;
+
+    int tot = 0;
+    for(float x = 0.0f; x <= 1.0f; x += step) {
+        ret += powf(x, A1) * powf(1.0f - x, B1);
+        tot++;
+    }
+
+    return ret / float(tot);
+}
+
+/**
+ * @brief betaPDFwithBeta
+ * @param x
+ * @param A
+ * @param B
+ * @param betaAB
+ * @return
+ */
+PIC_INLINE float betaPDFwithBeta(float x, float A, float B, float betaAB)
+{
+    if(x < 0.0f || x > 1.0f) {
+        return -1.0f;
+    }
+
+    float ret = powf(x, A - 1.0f) * powf(1.0f - x, B - 1.0f);
+
+    return ret / betaAB;
+}
+
+/**
+ * @brief betaPDF
+ * @param x
+ * @param A
+ * @param B
+ * @return
+ */
+PIC_INLINE float betaPDF(float x, float A, float B)
+{
+    return betaPDFwithBeta(x, A, B, betaFunction(A, B));
 }
 
 } // end namespace pic
