@@ -46,6 +46,19 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
+
+    /**
+     * @brief FilterSample2D
+     */
+    FilterSampler2D() : Filter()
+    {
+        scaleX = -1.0f;
+        scaleY = -1.0f;
+        width = -1;
+        height = -1;
+        isb = NULL;
+    }
+
     /**
      * @brief FilterSampler2D
      * @param scale
@@ -89,6 +102,26 @@ public:
 
         channels = imgIn[0]->channels;
         frames = imgIn[0]->frames;
+    }
+
+    /**
+     * @brief update
+     * @param width
+     * @param height
+     * @param isb
+     */
+    void update(int width, int height, ImageSampler *isb)
+    {
+        this->width  = width;
+        this->height = height;
+
+        this->swh = false;
+
+        if(isb == NULL) {
+            this->isb = new ImageSamplerNearest();
+        } else {
+            this->isb = isb;
+        }
     }
 
     /**
@@ -141,7 +174,7 @@ public:
 };
 
 PIC_INLINE FilterSampler2D::FilterSampler2D(float scale,
-        ImageSampler *isb = NULL)
+        ImageSampler *isb = NULL): Filter()
 {
     this->scale  = scale;
     this->scaleX = scale;
@@ -157,7 +190,7 @@ PIC_INLINE FilterSampler2D::FilterSampler2D(float scale,
 }
 
 PIC_INLINE FilterSampler2D::FilterSampler2D(float scaleX, float scaleY,
-        ImageSampler *isb = NULL)
+        ImageSampler *isb = NULL): Filter()
 {
     this->scaleX = scaleX;
     this->scaleY = scaleY;
@@ -172,18 +205,9 @@ PIC_INLINE FilterSampler2D::FilterSampler2D(float scaleX, float scaleY,
 }
 
 PIC_INLINE FilterSampler2D::FilterSampler2D(int width, int height,
-        ImageSampler *isb = NULL)
+        ImageSampler *isb = NULL): Filter()
 {
-    this->width  = width;
-    this->height = height;
-
-    this->swh = false;
-
-    if(isb == NULL) {
-        this->isb = new ImageSamplerNearest();
-    } else {
-        this->isb = isb;
-    }
+    update(width, height, isb);
 }
 
 PIC_INLINE void FilterSampler2D::ProcessBBox(Image *dst, ImageVec src,

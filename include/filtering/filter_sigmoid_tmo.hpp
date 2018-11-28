@@ -69,6 +69,17 @@ public:
                      bool temporal);
 
     /**
+     * @brief update
+     * @param type
+     * @param alpha
+     * @param wp
+     * @param epsilon
+     * @param temporal
+     */
+    void update(SIGMOID_MODE type, float alpha, float wp, float epsilon,
+                     bool temporal);
+
+    /**
      * @brief OutputSize
      * @param imgIn
      * @param width
@@ -103,16 +114,17 @@ public:
 
 PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO() : Filter()
 {
-    type = SIG_TMO;
-    alpha = 0.18f;
-    wp = 1e9f;
-    wp_sq = wp * wp;
-    epsilon = -1.0f;
-    temporal = false;
+    update(SIG_TMO, 0.18f, 1e9f, -1.0f, false);
 }
 
 PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO(SIGMOID_MODE type, float alpha,
                                    float wp = 1e9f, float epsilon = -1.0f, bool temporal = false) : Filter()
+{
+    update(type, alpha, wp, epsilon, temporal);
+}
+
+PIC_INLINE void FilterSigmoidTMO::update(SIGMOID_MODE type, float alpha,
+                                   float wp = 1e9f, float epsilon = -1.0f, bool temporal = false)
 {
     this->type = type;
     this->alpha = alpha;

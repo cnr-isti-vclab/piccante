@@ -105,7 +105,7 @@ protected:
     }
 
 public:
-    unsigned int	*bin, *bin_work;
+    unsigned int *bin, *bin_work;
 
     /**
      * @brief Histogram is the basic constructor setting variables to defaults.
@@ -126,10 +126,10 @@ public:
     }
 
     /**
-     * @brief Histogram is an extension of the basic constructor, where Calculate
+     * @brief Histogram is an extension of the basic constructor, where calculate
      * is called in order to populate the Histogram.
      * @param imgIn is an input image for which Histogram needs to be computed.
-     * @param type is the space of computations (please see Calculate()).
+     * @param type is the space of computations (please see calculate()).
      * @param nBin is the number of bins of the Histogram.
      * @param channel is the color channel for which Histogram needs to be computed.
      */
@@ -144,6 +144,7 @@ public:
         fMax =  FLT_MAX;
 
         epsilon = 1e-6f;
+        this->nBin = 0;
 
         calculate(imgIn, type, nBin, channel);
     }
@@ -152,6 +153,19 @@ public:
     * @brief ~Histogram is the basic destructor which frees memory.
     */
     ~Histogram()
+    {
+        release();
+
+        nBin = 0;
+        type =  VS_LIN;
+        fMin = -FLT_MAX;
+        fMax =  FLT_MAX;
+    }   
+
+    /**
+     * @brief release
+     */
+    void release()
     {
         if(bin != NULL) {
             delete [] bin;
@@ -172,12 +186,7 @@ public:
             delete[] bin_work;
             bin_work = NULL;
         }
-
-        nBin = 0;
-        type =  VS_LIN;
-        fMin = -FLT_MAX;
-        fMax =  FLT_MAX;
-    }   
+    }
 
     /**
      * @brief calculate computes the histogram of an input image. In the case
@@ -195,24 +204,26 @@ public:
     void calculate(Image *imgIn, VALUE_SPACE type, int nBin,
                               int channel = 0)
     {
-        if(imgIn == NULL) {
+        if((imgIn == NULL) || (channel < 0) ) {
             return;
         }
 
-        if((channel < 0) || (channel >= imgIn->channels)) {
+        if(!imgIn->isValid() || (channel >= imgIn->channels)) {
             return;
         }
 
-        if(nBin < 1) {
+        if(nBin < 1 || type == VS_LDR) {
             nBin = 256;
         }
 
-        if(type == VS_LDR) {
-            nBin = 256;
-        }
+        bool c1 = (nBin != this->nBin) && (bin != NULL);
+        bool c2 = (bin == NULL);
+        if(c1 || c2)  {
+            release();
 
-        bin = new unsigned int[nBin];
-        memset((void *)bin, 0, nBin * sizeof(unsigned int));
+            bin = new unsigned int[nBin];
+            memset((void *)bin, 0, nBin * sizeof(unsigned int));
+        }
 
         this->nBin = nBin;
         this->type = type;
@@ -220,7 +231,7 @@ public:
         int size = imgIn->width * imgIn->height * imgIn->channels;
         int channels = imgIn->channels;
 
-        //Statistics
+        //compute statistics
         fMin =  FLT_MAX;
         fMax = -FLT_MAX;
 
@@ -236,7 +247,7 @@ public:
         deltaMaxMin = (fMax - fMin);
         nBinf = float(nBin - 1);
 
-        //histogram calculation
+        //compute the histogram
         for(int i = channel; i < size; i += channels) {           
             float val = projectDomain(imgIn->data[i]);
 
@@ -375,7 +386,7 @@ public:
             }
         }
 
-        img.Write(name);
+        img.Write(name, LT_NONE);
     }
 
     /**

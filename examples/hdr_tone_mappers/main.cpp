@@ -43,7 +43,8 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         printf("Tone mapping using Reinhard et al.'s TMO...");
-        pic::Image *img_tmo_reinhard = pic::ReinhardTMO(&img);
+        pic::ReinhardTMO rtmo;
+        pic::Image *img_tmo_reinhard = rtmo.execute(&img, NULL);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.

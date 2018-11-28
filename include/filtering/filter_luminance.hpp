@@ -182,20 +182,6 @@ public:
         FilterLuminance fltLum(type);
         return fltLum.Process(Single(imgIn), imgOut);
     }
-
-    /**
-     * @brief execute
-     * @param fileInput
-     * @param fileOutput
-     * @return
-     */
-    static Image *execute(std::string fileInput, std::string fileOutput)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterLuminance::execute(&imgIn, NULL, LT_CIE_LUMINANCE);
-        out->Write(fileOutput);
-        return out;
-    }
 };
 
 } // end namespace pic

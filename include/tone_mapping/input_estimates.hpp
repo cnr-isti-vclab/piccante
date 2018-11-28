@@ -21,13 +21,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- * @brief EstimateAlpha
- * @param LMax
+ * @brief estimateAlpha
  * @param LMin
+ * @param LMax
  * @param logAverage
  * @return
  */
-inline float EstimateAlpha(float LMax, float LMin, float logAverage)
+inline float estimateAlpha(float LMin, float LMax, float logAverage)
 {
     float log2f       = logf(2.0f);
     float log2Max     = logf(LMax       + 1e-9f) / log2f;
@@ -40,12 +40,12 @@ inline float EstimateAlpha(float LMax, float LMin, float logAverage)
 }
 
 /**
- * @brief EstimateWhitePoint
- * @param LMax
+ * @brief estimateWhitePoint
  * @param LMin
+ * @param LMax
  * @return
  */
-inline float EstimateWhitePoint(float LMax, float LMin)
+inline float estimateWhitePoint(float LMin, float LMax)
 {
     float log2f       = logf(2.0f);
     float log2Max     = logf(LMax + 1e-9f) / log2f;

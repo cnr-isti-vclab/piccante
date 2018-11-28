@@ -19,18 +19,29 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_TONE_MAPPING_WARD_HISTOGRAM_TMO_HPP
 
 #include "../image.hpp"
+#include "../image_vec.hpp"
 #include "../histogram.hpp"
 #include "../util/array.hpp"
+#include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_sampler_2d.hpp"
+#include "../tone_mapping/tone_mapping_operator.hpp"
 
 namespace pic {
 
-class WardHistogramTMO
+class WardHistogramTMO: public ToneMappingOperator
 {
 protected:
     int nBin;
     float LdMin, LdMax;
     ImageSamplerBilinear isb;
+    Histogram h;
+    float epsilon;
+
+    unsigned int *Pcum;
+    float *PcumNorm, *x;
+
+    FilterLuminance flt_lum;
+    FilterSampler2D flt_smp;
 
 public:
 
@@ -40,9 +51,71 @@ public:
      * @param LdMin
      * @param LdMax
      */
-    WardHistogramTMO(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f)
+    WardHistogramTMO(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f) : ToneMappingOperator()
     {
+        this->Pcum = NULL;
+        this->PcumNorm = NULL;
+        this->x = NULL;
+        this->nBin = 0;
+
+        images.clear();
+        images.push_back(NULL);
+        images.push_back(NULL);
+
         update(nBin, LdMin, LdMax);
+    }
+
+    ~WardHistogramTMO()
+    {
+        release();
+    }
+
+    /**
+     * @brief releaseAux
+     */
+    void releaseAux()
+    {
+        if(Pcum != NULL) {
+            delete[] x;
+            x = NULL;
+        }
+
+        if(PcumNorm != NULL) {
+            delete[] PcumNorm;
+            PcumNorm = NULL;
+        }
+
+        if(x != NULL) {
+            delete[] x;
+            x = NULL;
+        }
+    }
+
+    /**
+     * @brief allocate
+     * @param nBin
+     */
+    void allocate(int nBin)
+    {
+        nBin = nBin > 1 ? nBin : 256;
+
+        if((nBin != this->nBin) || (Pcum == NULL)) {
+            releaseAux();
+        }
+
+        if(Pcum == NULL) {
+            Pcum = new unsigned int[nBin];
+        }
+
+        if(PcumNorm == NULL) {
+            PcumNorm = new float[nBin];
+        }
+
+        if(x == NULL) {
+            x = new float[nBin];
+        }
+
+        this->nBin = nBin;
     }
 
     /**
@@ -53,7 +126,10 @@ public:
      */
     void update(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f)
     {
-        this->nBin = nBin > 1 ? nBin : 256;
+        allocate(nBin);
+
+        epsilon = 1e-6;
+
         this->LdMax = LdMax > 0.0f ? LdMax : 100.0f;
         this->LdMin = LdMin > 0.0f ? LdMin : 1.0f;
 
@@ -70,68 +146,51 @@ public:
      * @param imgOut
      * @return
      */
-    Image *execute(Image *imgIn, Image *imgOut = NULL)
+    Image *Process(Image *imgIn, Image *imgOut)
     {
-        if(imgIn == NULL) {
-            return NULL;
-        }
+        updateImage(imgIn);
 
-        if(imgOut == NULL) {
-            imgOut = imgIn->clone();
-        }
+        images[0] = flt_lum.Process(Single(imgIn), images[0]);
 
-        int maxCoord = MAX(imgIn->width, imgIn->height);
+        int fScaleX, fScaleY;
+        getScaleFiltering(imgIn, fScaleX, fScaleY);
+        flt_smp.update(fScaleX, fScaleY, &isb);
+        images[1] = flt_smp.Process(Single(images[0]), images[1]);
 
-        float maxCoordf       = 2.0f * float(maxCoord) * 0.75f;
-        float viewAngleWidth  = 2.0f * atanf(imgIn->width / maxCoordf);
-        float viewAngleHeight = 2.0f * atanf(imgIn->height / maxCoordf);
+        float LMin, LMax;
+        images[1]->getMinVal(NULL, &LMin);
+        images[1]->getMaxVal(NULL, &LMax);
 
-        int fScaleX = int((2.0f * tanf(viewAngleWidth / 2.0f) / 0.01745f));
-        int fScaleY = int((2.0f * tanf(viewAngleHeight / 2.0f) / 0.01745f));
+        float LlMin = logf(LMin + epsilon);
+        float LlMax = logf(LMax + epsilon);
 
-        Image *L = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);	//Luminance
+        float LldMin = logf(LdMin + epsilon);
+        float LldMax = logf(LdMax + epsilon);
 
-        Image *Lscaled = FilterSampler2D::execute(L, NULL, fScaleX, fScaleY, &isb);
-
-        float LMin = Lscaled->getGT(0.0f);
-        float LMax = Lscaled->getMaxVal()[0];
-        float LlMax = logf(LMax);
-        float LlMin = logf(LMin);
-
-        float LldMax = logf(LdMax);
-        float LldMin = logf(LdMin);
-
-        Histogram h;
-        h.calculate(Lscaled, VS_LOG_E, nBin);
+        h.calculate(images[1], VS_LOG_E, nBin);
         h.ceiling();
 
-        unsigned int *Pcum = NULL;
         Pcum = Array<unsigned int>::cumsum(h.bin, nBin, Pcum);
-        float  maxPcumf = float(Pcum[nBin - 1]);
-        float *PcumNorm = new float[nBin];
-        float *x        = new float[nBin];
+        float maxPcumf = float(Pcum[nBin - 1]);
 
+        float delta = (LlMax - LlMin);
         for(int i = 0; i < nBin; i++) {
             PcumNorm[i] = float(Pcum[i]) / maxPcumf;
-            x[i] = (LlMax - LlMin) * float(i) / float(nBin - 1) + LlMin;
+            x[i] = delta * float(i) / float(nBin - 1) + LlMin;
         }
 
         #pragma omp parallel for
-        for(int i = 0; i < L->size(); i++) {
-            float tmp_L =  L->data[i];
-            float LLog = logf(tmp_L);
-            float Ld = expf(LldMin + (LldMax - LldMin) * Arrayf::interp(x, PcumNorm, nBin, LLog));
-            float L_old = tmp_L;
-            L->data[i] = (Ld - LdMin) / ((LdMax - LdMin) * L_old);
+        for(int i = 0; i < images[0]->size(); i++) {
+            float L_w =  images[0]->data[i];
+
+            float LLog = logf(L_w + epsilon);
+            float Ld = expf(LldMin + (LldMax - LldMin) * Arrayf::interp(x, PcumNorm, nBin, LLog)) - epsilon;
+
+            images[0]->data[i] = (MAX(Ld, 0.0f) - LdMin) / ((LdMax - LdMin) * L_w);
         }
 
-        *imgOut *= *L;
+        *imgOut *= *images[0];
         imgOut->removeSpecials();
-
-        delete L;
-        delete[] Pcum;
-        delete[] x;
-        delete[] PcumNorm;
 
         return imgOut;
     }

@@ -114,12 +114,14 @@ protected:
         switch(method) {
         case 0:
             //apply Reinhard et al.'s TMO (local version)
-            img_tmo = reinhard_tmo->execute(&img, img_tmo, false);
+            reinhard_tmo->update(-1.0f, -1.0f, false);
+            img_tmo = reinhard_tmo->execute(&img, img_tmo);
             break;
 
         case 1:
             //apply Reinhard et al.'s TMO (global version)
-            img_tmo = reinhard_tmo->execute(&img, img_tmo, true);
+            reinhard_tmo->update(-1.0f, -1.0f, true);
+            img_tmo = reinhard_tmo->execute(&img, img_tmo);
             break;
 
         case 2:

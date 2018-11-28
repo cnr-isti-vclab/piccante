@@ -161,7 +161,8 @@ public:
         break;
 
         case 1: {
-            imgOut = flt_reinhard->execute(imgIn, imgOut, false);
+            flt_reinhard->update(-1.0f, -1.0f, true);
+            imgOut = flt_reinhard->execute(imgIn, imgOut);
         }
         break;
 

@@ -80,6 +80,7 @@ public:
      */
     FilterSSIM(float C0, float C1) : Filter()
     {
+        minInputImages = 5;
         update(C0, C1);
     }
 

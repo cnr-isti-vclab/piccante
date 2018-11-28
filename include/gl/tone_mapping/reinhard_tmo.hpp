@@ -38,12 +38,13 @@ protected:
     FilterGLLuminance  *flt_lum;
     FilterGLSigmoidTMO *flt_tmo_global, *flt_tmo_local;
 
-    FilterGL           *filter;
-    FilterGLOp         *simple_sigmoid, *simple_sigmoid_inv;
-    ImageGL            *img_lum, *img_lum_adapt;
+    FilterGL *filter;
+    FilterGLOp *simple_sigmoid, *simple_sigmoid_inv;
+    ImageGL *img_lum, *img_lum_adapt;
 
-    float              Lwa, alpha, phi;
-    bool               bStatisticsRecompute;
+    float Lwa, alpha, phi;
+    bool bStatisticsRecompute, bGlobal;
+
 
     FilterGLReinhardSinglePass *fTMO;
 
@@ -125,6 +126,8 @@ protected:
 
     void setNULL()
     {
+        bGlobal = false;
+
         flt_lum = NULL;
         flt_tmo_global = NULL;
         flt_tmo_local = NULL;
@@ -147,9 +150,12 @@ public:
     /**
      * @brief ReinhardTMOGL
      */
-    ReinhardTMOGL(float alpha = 0.15f, float phi = 8.0f, bool bStatisticsRecompute = true)
+    ReinhardTMOGL(float alpha = 0.15f, float phi = 8.0f, bool bStatisticsRecompute = true, bool bGlobal = false)
     {
-        update(alpha, phi);
+        this->alpha = 0.15f;
+        this->phi = 8.0f;
+
+        update(alpha, phi, bGlobal);
 
         setNULL();
 
@@ -188,11 +194,13 @@ public:
      * @brief update
      * @param alpha
      * @param phi
+     * @param bGlobal
      */
-    void update(float alpha, float phi)
+    void update(float alpha, float phi, bool bGlobal = true)
     {
-        this->alpha = alpha > 0.0f ? alpha : 0.15f;
-        this->phi = phi > 0.0f ? phi : 8.0f;
+        this->bGlobal = bGlobal;
+        this->alpha = alpha > 0.0f ? alpha : this->alpha;
+        this->phi = phi > 0.0f ? phi : this->phi;
     }
 
     /**
@@ -202,7 +210,7 @@ public:
      * @param bGlobal
      * @return
      */
-    ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut = NULL, bool bGlobal = true)
+    ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut = NULL)
     {
         if(bGlobal) {
             return executeGlobal(imgIn, imgOut);

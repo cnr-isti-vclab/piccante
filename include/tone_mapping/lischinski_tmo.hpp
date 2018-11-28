@@ -53,11 +53,11 @@ PIC_INLINE Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL, float alpha 
     float minL_log = log2fPlusEpsilon(minL);
 
     if(alpha <= 0.0f) {
-        alpha = EstimateAlpha(maxL, minL, Lav);
+        alpha = estimateAlpha(minL, maxL, Lav);
     }
 
     if(whitePoint <= 0.0f) {
-        whitePoint = EstimateWhitePoint(maxL, minL);
+        whitePoint = estimateWhitePoint(minL, maxL);
     }
 
     float whitePoint_sq = whitePoint * whitePoint;

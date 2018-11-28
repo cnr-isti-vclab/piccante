@@ -81,8 +81,8 @@ PIC_INLINE Image* SSIMIndex(Image *ori, Image *cmp, float &ssim_index, Image *ss
 
     if(dynamic_range < 0.0f) {
         float min_val, max_val;
-        L_ori->getMaxVal(NULL, &max_val);
         L_ori->getMinVal(NULL, &min_val);
+        L_ori->getMaxVal(NULL, &max_val);
 
         if(min_val <= 0.0f) {
             IntCoord coord;
@@ -108,8 +108,8 @@ PIC_INLINE Image* SSIMIndex(Image *ori, Image *cmp, float &ssim_index, Image *ss
 
     Image img_ori_cmp = (*L_ori) * (*L_cmp);
 
-    (*L_ori) *= (*L_ori);
-    (*L_cmp) *= (*L_cmp);
+    L_ori->applyFunction(square);
+    L_cmp->applyFunction(square);
 
     Image *img_sigma1_sq = FilterGaussian2D::execute(L_ori, NULL, sigma_window);
     Image *img_sigma2_sq = FilterGaussian2D::execute(L_cmp, NULL, sigma_window);
