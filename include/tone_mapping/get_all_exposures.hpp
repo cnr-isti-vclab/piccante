@@ -96,16 +96,16 @@ PIC_INLINE std::vector<float> getAllExposures(Image *imgIn) {
 
     Image *lum = NULL;
 
-    if(img->channels == 1) {
-        lum = img;
+    if(imgIn->channels == 1) {
+        lum = imgIn;
     } else {
-        lum = FilterLuminance::execute(img, NULL, LT_CIE_LUMINANCE);
+        lum = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);
     }
 
     Histogram m(lum, VS_LOG_2, 1024);
     fstops = m.exposureCovering();
 
-    if(img->channels != 1) {
+    if(imgIn->channels != 1) {
         delete lum;
     }
 
