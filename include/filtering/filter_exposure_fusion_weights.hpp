@@ -31,7 +31,7 @@ class FilterExposureFusionWeights: public Filter
 {
 protected:
     float wC, wE, wS;
-    float mu, sigma2;
+    float mu, sigma_sq_2;
 
     /**
      * @brief ProcessBBox
@@ -74,7 +74,7 @@ protected:
 
                 //Well-exposedness
                 float tmpL = src[0]->data[ind] - mu;
-                float pExp = expf(-(tmpL * tmpL) / sigma2);
+                float pExp = expf(-(tmpL * tmpL) / sigma_sq_2);
 
                 //Final weights
                 dst->data[ind] =  powf(pCon, wC) *
@@ -88,18 +88,31 @@ public:
 
     /**
      * @brief FilterExposureFusionWeights
-     * @param type
+     * @param wC
+     * @param wE
+     * @param wS
      */
     FilterExposureFusionWeights(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
+    {
+
+    }
+
+    /**
+     * @brief update
+     * @param wC
+     * @param wE
+     * @param wS
+     */
+    void update(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
     {
         float sigma = 0.2f;
 
         mu = 0.5f;
-        sigma2 = 2.0f * sigma * sigma;
+        sigma_sq_2 = 2.0f * sigma * sigma;
 
-        this->wC = wC > 0.0f ? wC : 1.0f;
-        this->wE = wE > 0.0f ? wE : 1.0f;
-        this->wS = wS > 0.0f ? wS : 1.0f;
+        this->wC = wC > 0.0f ? MIN(wC, 1.0f) : 1.0f;
+        this->wE = wE > 0.0f ? MIN(wE, 1.0f) : 1.0f;
+        this->wS = wS > 0.0f ? MIN(wS, 1.0f) : 1.0f;
     }
 };
 

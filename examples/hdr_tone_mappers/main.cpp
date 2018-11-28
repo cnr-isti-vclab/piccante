@@ -59,7 +59,8 @@ int main(int argc, char *argv[])
         }
 
         printf("Tone mapping using Durand and Dorsey's TMO...");
-        pic::Image *img_tmo_durand = pic::DurandTMO(&img);
+        pic::DurandTMO dtmo;
+        pic::Image *img_tmo_durand = dtmo.execute(&img, NULL);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
@@ -75,7 +76,8 @@ int main(int argc, char *argv[])
 
 
         printf("Tone mapping using Drago et al.'s TMO...");
-        pic::Image *img_tmo_drago = pic::DragoTMO(&img);
+        pic::DragoTMO drtmo;
+        pic::Image *img_tmo_drago = drtmo.execute(&img, NULL);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
@@ -107,7 +109,8 @@ int main(int argc, char *argv[])
         }
 
         printf("Tone mapping using Lischinski et al. 2006 automatic TMO...");
-        pic::Image *img_tmo_lischinski = pic::LischinskiTMO(&img, NULL);
+        pic::LischinskiTMO ltmo;
+        pic::Image *img_tmo_lischinski = ltmo.execute(&img, NULL);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.

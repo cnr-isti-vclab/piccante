@@ -51,7 +51,9 @@ PIC_INLINE Image *colorToGray(Image *imgIn, Image *imgOut)
         flt.update(i + 1);
     }
 
-    imgOut = ExposureFusion(img_vec, 1.0f, 1.0f, 0.0f, imgOut);
+    ExposureFusion ef(1.0f, 1.0f, 0.0f);
+
+    imgOut = ef.executeStack(img_vec, imgOut);
 
     for(int i = 0; i<channels; i++) {
         delete img_vec[i];

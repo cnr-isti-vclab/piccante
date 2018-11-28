@@ -19,135 +19,145 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_TONE_MAPPING_LISCHINSKI_TMO_HPP
 
 #include "../base.hpp"
+#include "../util/math.hpp"
 #include "../tone_mapping/lischinski_minimization.hpp"
 #include "../tone_mapping/input_estimates.hpp"
+#include "../tone_mapping/tone_mapping_operator.hpp"
 
 namespace pic {
 
-/**
- * @brief LischinskiTMO
- * @param imgIn
- * @param imgOut
- * @param alpha
- * @return
- */
-PIC_INLINE Image *LischinskiTMO(Image *imgIn, Image *imgOut = NULL, float alpha = -1.0f,
-        float whitePoint = -1.0f)
+class LischinskiTMO: public ToneMappingOperator
 {
-    if(imgIn == NULL) {
-        return NULL;
+protected:
+    FilterLuminance flt_lum;
+
+    float alpha, whitePoint;
+
+public:
+
+    /**
+     * @brief LischinskiTMO
+     * @param alpha
+     * @param whitePoint
+     */
+    LischinskiTMO(float alpha = 0.15f, float whitePoint = 1e6f)
+    {
+        images.push_back(NULL);
+        images.push_back(NULL);
+        images.push_back(NULL);
+        update(alpha, whitePoint);
     }
 
-    if(imgIn->channels != 3) {
-        return NULL;
+    void update(float alpha = 0.15f, float whitePoint = 1e6f)
+    {
+        this->alpha = alpha;
+        this->whitePoint = whitePoint;
     }
 
-    //extract luminance
-    FilterLuminance fltLum;
-    Image *lum = fltLum.Process(Single(imgIn), NULL);
-
-    float maxL = lum->getMaxVal()[0];
-    float minL = lum->getMinVal()[0];
-    float Lav = lum->getLogMeanVal()[0];
-    float maxL_log = log2fPlusEpsilon(maxL);
-    float minL_log = log2fPlusEpsilon(minL);
-
-    if(alpha <= 0.0f) {
-        alpha = estimateAlpha(minL, maxL, Lav);
-    }
-
-    if(whitePoint <= 0.0f) {
-        whitePoint = estimateWhitePoint(minL, maxL);
-    }
-
-    float whitePoint_sq = whitePoint * whitePoint;
-
-    int Z = int(ceilf(maxL_log - minL_log));
-
-    if(Z <= 0) {
-        return NULL;
-    } else {
-        if(imgOut == NULL) {
-            imgOut = imgIn->clone();
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *Process(Image *imgIn, Image *imgOut)
+    {
+        if(imgIn == NULL) {
+            return NULL;
         }
-    }
 
-    //Choose the representative Rz for each zone
-    std::vector<float> *zones = new std::vector<float>[Z];
-    float *fstop = new float[Z];
-    float *Rz = new float[Z];
+        if(imgIn->channels != 3) {
+            return NULL;
+        }
 
-    for(int i = 0; i < Z; i++) {
-        Rz[i] = 0.0f;
-        fstop[i] = 0.0f;
-    }
+        updateImage(imgIn);
 
-    for(int i = 0; i < lum->height; i++) {
-        for(int j = 0; j < lum->width; j++) {
-            float L = (*lum)(j,i)[0];
+        //extract luminance
+        images[0] = flt_lum.Process(Single(imgIn), images[0]);
+
+        float minL, maxL, Lav;
+
+        images[0]->getMinVal(NULL, &minL);
+        images[0]->getMaxVal(NULL, &maxL);
+        images[0]->getLogMeanVal(NULL, &Lav);
+
+        float minL_log = log2fPlusEpsilon(minL);
+        float maxL_log = log2fPlusEpsilon(maxL);
+
+        if(alpha <= 0.0f) {
+            alpha = estimateAlpha(minL, maxL, Lav);
+        }
+
+        if(whitePoint <= 0.0f) {
+            whitePoint = estimateWhitePoint(minL, maxL);
+        }
+
+        float whitePoint_sq = whitePoint * whitePoint;
+
+        int Z = int(ceilf(maxL_log - minL_log));
+
+        if(Z <= 0) {
+            return imgOut;
+        }
+
+        //Choose the representative Rz for each zone
+        std::vector<float> *zones = new std::vector<float>[Z];
+        float *fstop = new float[Z];
+        float *Rz = new float[Z];
+
+        Array<float>::assign(0.0f, Rz, Z);
+        Array<float>::assign(0.0f, fstop, Z);
+
+        for(int i = 0; i < images[0]->size(); i++) {
+            float L = images[0]->data[i];
             float L_log = log2fPlusEpsilon(L);
 
             int zone = CLAMP(int(ceilf(L_log - minL_log)), Z);
-
             zones[zone].push_back(L);
         }
-    }
 
-    for(int i = 0; i < Z; i++) {
-        int n = int(zones[i].size());
-        if(n > 0) {
-            std::sort(zones[i].begin(), zones[i].end());
-            Rz[i] = zones[i][n / 2];
-            if(Rz[i] > 0.0f) {
-                //photographic operator
-                float Rz2 = Rz[i] * alpha / Lav;
-                float f = (Rz2 * (1 + Rz2 / whitePoint_sq) ) / (1.0f + Rz2);
-                fstop[i] = log2fPlusEpsilon(f / Rz[i]);
+        for(int i = 0; i < Z; i++) {
+            int n = int(zones[i].size());
+            if(n > 0) {
+                std::sort(zones[i].begin(), zones[i].end());
+                Rz[i] = zones[i][n / 2];
+                if(Rz[i] > 0.0f) {
+                    //photographic operator
+                    float Rz2 = Rz[i] * alpha / Lav;
+                    float f = (Rz2 * (1 + Rz2 / whitePoint_sq) ) / (1.0f + Rz2);
+                    fstop[i] = log2fPlusEpsilon(f / Rz[i]);
+                }
             }
         }
-    }
 
-    //create the fstop map
-    lum->applyFunction(log2fPlusEpsilon);
+        //create the fstop map
+        images[0]->applyFunction(log2fPlusEpsilon);
 
-    Image *fstopMap = lum->allocateSimilarOne();
+        if(images[1] == NULL) {
+            images[1] = images[0]->allocateSimilarOne();
+        }
 
-    for(int i = 0; i < lum->height; i++) {
-        for(int j = 0; j < lum->width; j++) {
-            float L_log = (*lum)(j,i)[0];
-
+        for(int i = 0; i < images[0]->size(); i++) {
+            float L_log = images[0]->data[i];
             int zone = CLAMP(int(ceilf(L_log - minL_log)), Z);
-
-            (*fstopMap)(j,i)[0] = fstop[zone];
-
+            images[1]->data[i] = fstop[zone];
         }
+
+        //run Lischinski minimization
+        images[2] = LischinskiMinimization(images[0], images[1], NULL, 0.007f, images[2]);
+
+        images[2]->applyFunction(pow2f);
+        *imgOut *= images[2];
+
+        delete[] zones;
+        delete[] Rz;
+        delete[] fstop;
+
+        return imgOut;
     }
+};
 
-    //Lischinski minimization
-    Image *tmp = lum->allocateSimilarOne();
-    *tmp = 0.007f;
-    Image *fstopMap_min = LischinskiMinimization(lum, fstopMap, tmp);
 
-    for(int i = 0; i < imgOut->height; i++) {
-        for(int j = 0; j < imgOut->width; j++) {
-            float *val = (*imgOut)(j, i);
-
-            float exposure = powf(2.0f, (*fstopMap_min)(j, i)[0]);
-
-            for(int i = 0; i < imgOut->channels; i++) {
-                val[i] *= exposure;
-            }
-        }
-    }
-
-    delete[] zones;
-    delete[] Rz;
-    delete[] fstop;
-    delete fstopMap;
-    delete fstopMap_min;
-
-    return imgOut;
-}
 
 } // end namespace pic
 

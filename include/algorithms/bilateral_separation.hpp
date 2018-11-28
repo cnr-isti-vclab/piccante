@@ -27,20 +27,28 @@ namespace pic {
 /**
  * @brief bilateralSeparation
  * @param imgIn
+ * @param out
  * @param sigma_s
- * @param simga_r
- * @return
+ * @param sigma_r
+ * @param bLogDomain
  */
-PIC_INLINE ImageVec* bilateralSeparation(Image *imgIn,
+PIC_INLINE void bilateralSeparation(Image *imgIn, ImageVec &out,
                                          float sigma_s = -1.0f,
                                          float sigma_r = 0.4f,
                                          bool bLogDomain = false)
 {
     if(imgIn == NULL) {
-        return NULL;
+        return;
     }
 
-    ImageVec *out = new ImageVec;
+    if(!imgIn->isValid()) {
+        return;
+    }
+
+    if(out.size() < 2) {
+        out.push_back(NULL);
+        out.push_back(NULL);
+    }
 
     if(sigma_s <= 0.0f) {
         sigma_s = MAX(imgIn->widthf, imgIn->heightf) * 0.02f;
@@ -70,10 +78,8 @@ PIC_INLINE ImageVec* bilateralSeparation(Image *imgIn,
         img_detail->removeSpecials();
     }
 
-    out->push_back(img_flt);
-    out->push_back(img_detail);
-
-    return out;
+    out[0] = img_flt;
+    out[1] = img_detail;
 }
 
 } // end namespace pic

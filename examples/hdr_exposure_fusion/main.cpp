@@ -49,22 +49,11 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("OK\n");
 
-        printf("Extracting exposures from the HDR image...");
-        pic::ImageVec stack = pic::getAllExposuresImages(&img);
-
-        for(unsigned int i = 0; i < stack.size(); i++) {
-            std::string img_str_out = "../data/output/exposure_" + pic::fromNumberToString(i) + ".png";
-            stack[i]->clamp(0.0f, 1.0f);
-
-            //write the extraced exposure image
-            stack[i]->Write(img_str_out, pic::LT_NOR);
-        }
-
-        printf("Ok\n");
-
         printf("Tone mapping using Exposure Fusion...");
 
-        pic::Image *imgToneMapped = pic::ExposureFusion(stack, 0.2f, 1.0f, 0.2f, NULL);
+        pic::ExposureFusion ef(0.2f, 1.0f, 0.2f);
+        pic::Image *imgToneMapped = ef.execute(&img, NULL);
+        //= pic::ExposureFusion(stack, 0.2f, 1.0f, 0.2f, NULL);
         printf("Ok\n");
 
         printf("Writing the tone mapped image to disk...\n");

@@ -39,7 +39,7 @@ protected:
      * @param imgIn
      * @param imgOut
      */
-    virtual Image* Process(Image *imgIn, Image *imgOut)
+    virtual Image *Process(Image *imgIn, Image *imgOut)
     {
         return imgOut;
     }
@@ -140,6 +140,10 @@ public:
 
         if(imgOut == NULL) {
             imgOut = imgIn->clone();
+        }
+
+        if(imgIn == NULL) {
+            return NULL;
         }
 
         imgOut = Process(imgIn, imgOut);

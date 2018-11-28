@@ -25,6 +25,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter_exposure_fusion_weights.hpp"
 #include "../algorithms/pyramid.hpp"
 
+#include "../tone_mapping/get_all_exposures.hpp"
+#include "../tone_mapping/tone_mapping_operator.hpp"
+
 namespace pic {
 
 /**
@@ -36,94 +39,157 @@ namespace pic {
  * @param imgOut
  * @return
  */
-PIC_INLINE Image *ExposureFusion(ImageVec imgIn, float wC = 1.0f, float wE = 1.0f,
-                      float wS = 1.0f, Image *imgOut = NULL)
-{
-    int n = int(imgIn.size());
 
-    if(n < 2) {
+class ExposureFusion: public ToneMappingOperator
+{
+public:
+    FilterLuminance flt_lum;
+
+    FilterExposureFusionWeights flt_weights;
+
+    /**
+     * @brief ExposureFusion
+     * @param wC
+     * @param wE
+     * @param wS
+     */
+    ExposureFusion(float wC = 1.0f, float wE = 1.0f,
+                   float wS = 1.0f)
+    {
+        images.push_back(NULL);
+        images.push_back(NULL);
+        images.push_back(NULL);
+
+        update(wC, wE, wS);
+    }
+
+    ~ExposureFusion()
+    {
+        release();
+    }
+
+    /**
+     * @brief update
+     * @param wC
+     * @param wE
+     * @param wS
+     */
+    void update(float wC = 1.0f, float wE = 1.0f,
+                float wS = 1.0f)
+    {
+        flt_weights.update(wC, wE, wS);
+    }
+
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *Process(Image *imgIn, Image *imgOut)
+    {
+        pic::ImageVec stack = getAllExposuresImages(imgIn);
+
+        for(auto i = 0; i < stack.size(); i++) {
+            stack[i]->clamp(0.0f, 1.0f);
+        }
+
+        imgOut = executeStack(stack, imgOut);
+
         return imgOut;
     }
 
-    //Computing weights values
-    int channels = imgIn[0]->channels;
-    int width = imgIn[0]->width;
-    int height = imgIn[0]->height;
+    /**
+     * @brief executeStack
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *executeStack(ImageVec imgIn, Image *imgOut)
+    {
+        int n = int(imgIn.size());
 
-    Image *lum     = new Image(1, width, height, 1);
-    Image *weights = new Image(1, width, height, 1);
-    Image *acc     = new Image(1, width, height, 1);
+        if(n < 2) {
+            return imgOut;
+        }
 
-    acc->setZero();
+        //compute weights values
+        int channels = imgIn[0]->channels;
+        int width = imgIn[0]->width;
+        int height = imgIn[0]->height;
 
-    FilterLuminance flt_lum;
-    FilterExposureFusionWeights flt_weights(wC, wE, wS);
+        updateImage(imgIn[0]);
 
-    for(int j = 0; j < n; j++) {
+        if(images[2] == NULL) {//images[2] --> acc
+            images[2] = new Image(1, width, height, 1);
+        }
+
+        images[2]->setZero();
+
+        for(int j = 0; j < n; j++) {
+            #ifdef PIC_DEBUG
+                printf("Processing image %d\n", j);
+            #endif
+
+            //images[0] --> lum
+            images[0] = flt_lum.Process(Single(imgIn[j]), images[0]);
+
+            //images[0] --> weights
+            images[1] = flt_weights.Process(Double(images[0], imgIn[j]), images[1]);
+
+            *images[2] += *images[1];
+        }
+
+        for(int i = 0; i < images[2]->size(); i++) {
+            images[2]->data[i] = images[2]->data[i] > 0.0f ? images[2]->data[i] : 1.0f;
+        }
+
+        //Accumulation Pyramid
         #ifdef PIC_DEBUG
-            printf("Processing image %d\n", j);
+            printf("Blending...");
         #endif
 
-        lum = flt_lum.Process(Single(imgIn[j]), lum);
+        Pyramid *pW   = new Pyramid(width, height, 1, false, 2);
+        Pyramid *pI   = new Pyramid(width, height, channels, true, 2);
+        Pyramid *pOut = new Pyramid(width, height, channels, true, 2);
 
-        weights = flt_weights.Process(Double(lum, imgIn[j]), weights);
+        pOut->setValue(0.0f);
 
-        *acc += *weights;
+        for(int j = 0; j < n; j++) {
+            images[0] = flt_lum.Process(Single(imgIn[j]), images[0]);
+            images[1] = flt_weights.Process(Double(images[0], imgIn[j]), images[1]);
+
+            //normalization
+            *images[1] /= *images[2];
+
+            pW->update(images[1]);
+            pI->update(imgIn[j]);
+
+            pI->mul(pW);
+
+            pOut->add(pI);
+        }
+
+        #ifdef PIC_DEBUG
+            printf(" ok\n");
+        #endif
+
+        //final result
+        imgOut = pOut->reconstruct(imgOut);
+
+        #pragma omp parallel for
+        for(int i = 0; i < imgOut->size(); i++) {
+            imgOut->data[i] = MAX(imgOut->data[i], 0.0f);
+        }
+
+        //free the memory
+        delete pW;
+        delete pOut;
+        delete pI;
+
+        return imgOut;
     }
-
-    for(int i=0; i<acc->size(); i++) {
-        acc->data[i] = acc->data[i] > 0.0f ? acc->data[i] : 1.0f;
-    }
-
-    //Accumulation Pyramid
-    #ifdef PIC_DEBUG
-        printf("Blending...");
-    #endif
-
-    Pyramid *pW   = new Pyramid(width, height, 1, false, 2);
-    Pyramid *pI   = new Pyramid(width, height, channels, true, 2);
-    Pyramid *pOut = new Pyramid(width, height, channels, true, 2);
-
-    pOut->setValue(0.0f);
-
-    for(int j = 0; j < n; j++) {
-        lum = flt_lum.Process(Single(imgIn[j]), lum);
-        weights = flt_weights.Process(Double(lum, imgIn[j]), weights);
-
-        //normalization
-        *weights /= *acc;
-
-        pW->update(weights);
-        pI->update(imgIn[j]);
-
-        pI->mul(pW);
-
-        pOut->add(pI);
-    }
-
-    #ifdef PIC_DEBUG
-        printf(" ok\n");
-    #endif
-
-    //final result
-    imgOut = pOut->reconstruct(imgOut);
-
-    #pragma omp parallel for
-    for(int i = 0; i < imgOut->size(); i++) {
-        imgOut->data[i] = MAX(imgOut->data[i], 0.0f);
-    }
-
-    //free the memory
-    delete pW;
-    delete pOut;
-    delete pI;
-
-    delete acc;
-    delete weights;
-    delete lum;
-
-    return imgOut;
-}
+};
 
 } // end namespace pic
 
