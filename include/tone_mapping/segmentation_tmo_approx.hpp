@@ -102,7 +102,7 @@ public:
     {
         computeStatistics(imgIn);
 
-        //Create filters
+        //create filters
         if(fltIt == NULL) {
             fltBil = new FilterBilateral2DS(1.0f, nLayer);
             fltIt  = new FilterIterative(fltBil, iterations);

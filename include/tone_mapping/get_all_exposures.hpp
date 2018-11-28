@@ -42,12 +42,10 @@ PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
     }
 
     Image *img_lum = NULL;
-    bool bAllocated = false;
 
     if(imgIn->channels == 1) {
         img_lum = imgIn;
     } else {
-        bAllocated = true;
         img_lum = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);
     }
 
@@ -74,7 +72,7 @@ PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
         maxFstop++;
     }
 
-    if(bAllocated) {
+    if(imgIn->channels != 1) {
         delete img_lum;
     }
 }
@@ -96,12 +94,20 @@ PIC_INLINE std::vector<float> getAllExposures(Image *imgIn) {
         return fstops;
     }
 
-    Image *lum = FilterLuminance::execute(imgIn, NULL);
+    Image *lum = NULL;
+
+    if(img->channels == 1) {
+        lum = img;
+    } else {
+        lum = FilterLuminance::execute(img, NULL, LT_CIE_LUMINANCE);
+    }
 
     Histogram m(lum, VS_LOG_2, 1024);
     fstops = m.exposureCovering();
 
-    delete lum;
+    if(img->channels != 1) {
+        delete lum;
+    }
 
     return fstops;
 }
@@ -126,6 +132,7 @@ PIC_INLINE ImageVec getAllExposuresImages(Image *imgIn, std::vector<float> &fsto
         Image *expo = flt.Process(input, NULL);
 
         expo->exposure = powf(2.0f, fstops[i]);
+        expo->clamp(0.0f, 1.0f);
 
         ret.push_back(expo);
     }

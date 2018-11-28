@@ -87,7 +87,7 @@ public:
             imgOut = new Image(1, imgIn->width, imgIn->height, imgIn->channels);
         }
 
-        //Compute segmentation map
+        //compute segmentation map
         seg_map = seg.execute(imgIn, seg_map);
 
         /*	0 ---> Drago et al. 2003
@@ -115,7 +115,7 @@ public:
         seg_map->Write("weight_map.pfm");
 #endif
 
-        //Checking if we have different zones
+        //check if we have different zones
         int value = 10;
 
         if(count[0] > 0 && count[1] > 0) {

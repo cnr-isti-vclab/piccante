@@ -38,12 +38,25 @@ PIC_INLINE float findBestExposureHistogram(Image *img)
         return 0.0f;
     }
 
-    Image *lum = FilterLuminance::execute(img, NULL, LT_CIE_LUMINANCE);
+    if(!img->isValid()) {
+        return 0.0f;
+    }
+
+    Image *lum = NULL;
+
+    if(img->channels == 1) {
+        lum = img;
+    } else {
+        lum = FilterLuminance::execute(img, NULL, LT_CIE_LUMINANCE);
+    }
+
     Histogram hist(lum, VS_LOG_2, 1024, 0);
 
     float fstop = hist.getBestExposure(8);
 
-    delete lum;
+    if(img->channels != 1) {
+        delete lum;
+    }
 
     return fstop;
 }
@@ -59,14 +72,26 @@ PIC_INLINE float findBestExposureMean(Image *img)
         return 0.0f;
     }
 
-    Image *lum = FilterLuminance::execute(img, NULL, LT_CIE_LUMINANCE);
+    if(!img->isValid()) {
+        return 0.0f;
+    }
+
+    Image *lum = NULL;
+
+    if(img->channels == 1) {
+        lum = img;
+    } else {
+        lum = FilterLuminance::execute(img, NULL, LT_CIE_LUMINANCE);
+    }
 
     float lum_mean;
     lum->getMeanVal(NULL, &lum_mean);
 
     float fstop = -log2f(lum_mean) - 1.0f;
 
-    delete lum;
+    if(img->channels != 1) {
+        delete lum;
+    }
 
     return fstop;
 }

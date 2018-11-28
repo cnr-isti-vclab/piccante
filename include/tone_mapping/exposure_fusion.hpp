@@ -90,10 +90,6 @@ public:
     {
         pic::ImageVec stack = getAllExposuresImages(imgIn);
 
-        for(auto i = 0; i < stack.size(); i++) {
-            stack[i]->clamp(0.0f, 1.0f);
-        }
-
         imgOut = executeStack(stack, imgOut);
 
         return imgOut;
