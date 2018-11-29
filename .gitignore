@@ -219,3 +219,4 @@ examples_jni/build-ip_white_balance-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
 examples_jni/build-s_livewire-Desktop_Qt_5_4_2_clang_64bit-Debug/s_livewire
 examples/build-hdr_tone_mapping-Desktop_Qt_5_4_2_clang_64bit-Debug/hdr_tone_mapping
 examples/build-hdr_tone_mapping-Desktop_Qt_5_4_2_clang_64bit-Debug/hdr_tone_mapping
+examples/build-hdr_tone_mapping-Desktop_Qt_5_4_2_clang_64bit-Debug/hdr_tone_mapping

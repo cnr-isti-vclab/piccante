@@ -153,38 +153,7 @@ PIC_INLINE void FilterGLLuminance::update(LUMINANCE_TYPE type)
 {
     this->type = type;
 
-    switch(type)
-    {
-    case LT_WARD_LUMINANCE:
-        {
-            weights[0] = 54.0f  / 256.0f;
-            weights[1] = 183.0f / 256.0f;
-            weights[2] = 19.0f  / 256.0f;
-        }
-        break;
-
-    case LT_CIE_LUMINANCE:
-        {
-            weights[0] = 0.2126f;
-            weights[1] = 0.7152f;
-            weights[2] = 0.0722f;
-        }
-        break;
-
-    case LT_MEAN:
-        {
-            float inv_3 = 1.0f / 3.0f;
-            weights[0] = inv_3;
-            weights[1] = inv_3;
-            weights[2] = inv_3;
-        }
-        break;
-
-    default:
-        {
-
-        } break;
-    }
+    FilterLuminance::computeWeights(type, 3, weights);
 
     technique.bind();
     technique.setUniform1i("u_tex", 0);

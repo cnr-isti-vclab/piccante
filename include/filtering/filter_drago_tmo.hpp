@@ -81,32 +81,13 @@ PIC_INLINE void FilterDragoTMO::update(float Ld_Max, float b, float Lw_Max,
                             float Lw_a)
 {
     //protected values are assigned/computed
-    if(Ld_Max > 0.0f) {
-        this->Ld_Max = Ld_Max;
-    } else {
-        this->Ld_Max = 100.0f;
-    }
-
-    if(b > 0.0f) {
-        this->b = b;
-    } else {
-        this->b = 0.95f;
-    }
-
-    if(Lw_Max > 0.0f) {
-        this->Lw_Max = Lw_Max;
-    } else {
-        this->Lw_Max = 1e6f;
-    }
-
-    if(Lw_a > 0.0f) {
-        this->Lw_a = Lw_a;
-    } else {
-        this->Lw_a = 0.5f;
-    }
+    this->Ld_Max = (Ld_Max > 0.0f) ? Ld_Max : 100.0f;
+    this->b = (b > 0.0f) ? b : 0.95f;
+    this->Lw_Max = (Lw_Max > 0.0f) ? Lw_Max : 1e6f;
+    this->Lw_a = (Lw_a > 0.0f) ? Lw_a : 0.5f;
 
     //constants
-    Lw_a_scaled  = this->Lw_a / powf(1.0f + b - 0.85f, 5.0f);
+    Lw_a_scaled   = this->Lw_a / powf(1.0f + b - 0.85f, 5.0f);
     Lw_Max_scaled = this->Lw_Max / Lw_a_scaled;
 
     constant1 = logf(b) / logf(0.5f);

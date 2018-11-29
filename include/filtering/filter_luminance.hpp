@@ -24,7 +24,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-enum LUMINANCE_TYPE{LT_CIE_LUMINANCE, LT_WARD_LUMINANCE, LT_MEAN, LT_PASS_THROUGH};
+enum LUMINANCE_TYPE{LT_CIE_LUMINANCE, LT_WARD_LUMINANCE, LT_MEAN};
 
 /**
  * @brief The FilterLuminance class
@@ -35,7 +35,6 @@ protected:
 
     LUMINANCE_TYPE type;
     float *weights;
-    int weights_size;
 
     /**
      * @brief ProcessBBox
@@ -45,8 +44,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        int transformChannels = MIN(src[0]->channels, weights_size);
-
         for(int j = box->y0; j < box->y1; j++) {
 
             for(int i = box->x0; i < box->x1; i++) {
@@ -54,8 +51,8 @@ protected:
                 float *data_src = (*src[0])(i, j);
                 float *data_dst = (*dst)(i, j);
 
-                data_dst[0] = 0.0f;
-                for(int k = 0; k < transformChannels; k++) {
+                data_dst[0] = data_src[0] * weights[0];
+                for(int k = 1; k < src[0]->channels; k++) {
                     data_dst[0] += data_src[k] * weights[k];
                 }
             }
@@ -71,8 +68,6 @@ public:
     FilterLuminance(LUMINANCE_TYPE type = LT_CIE_LUMINANCE) : Filter()
     {
         weights = NULL;
-        weights_size = -1;
-
         update(type);
     }
 
@@ -84,55 +79,61 @@ public:
     }
 
     /**
+     * @brief computeWeights
+     * @param type
+     * @param weights
+     * @return
+     */
+    static float *computeWeights(LUMINANCE_TYPE type, int channels, float *weights)
+    {
+        if(weights == NULL) {
+            weights = new float[channels];
+        }
+
+        if(channels == 3) {
+            switch(type)
+            {
+            case LT_WARD_LUMINANCE:
+                {
+                    weights[0] =  54.0f  / 256.0f;
+                    weights[1] =  183.0f / 256.0f;
+                    weights[2] =  19.0f  / 256.0f;
+                }
+                break;
+
+            case LT_CIE_LUMINANCE:
+                {
+                    weights[0] =  0.2126f;
+                    weights[1] =  0.7152f;
+                    weights[2] =  0.0722f;
+                }
+                break;
+
+            default:
+                {
+                    weights[0] = 1.0f / 3.0f;
+                    weights[1] = weights[0];
+                    weights[2] = weights[0];
+                }
+            }
+        } else {
+            if(channels == 1) {
+                weights[0] = 1.0f;
+            } else {
+                Arrayf::assign(1.0f / float(channels), weights, channels);
+            }
+        }
+
+        return weights;
+    }
+
+    /**
      * @brief update
      * @param type
      */
     void update(LUMINANCE_TYPE type = LT_CIE_LUMINANCE)
     {
         this->type = type;
-
-        if(weights != NULL) {
-            delete[] weights;
-        }
-
-        weights = NULL;
-
-        switch(type)
-        {
-        case LT_WARD_LUMINANCE:
-            {
-                weights = new float[3];
-                weights_size = 3;
-                weights[0] =  54.0f  / 256.0f;
-                weights[1] =  183.0f / 256.0f;
-                weights[2] =  19.0f  / 256.0f;
-            }
-            break;
-
-        case LT_CIE_LUMINANCE:
-            {
-                weights = new float[3];
-                weights_size = 3;
-                weights[0] =  0.2126f;
-                weights[1] =  0.7152f;
-                weights[2] =  0.0722f;
-            }
-            break;
-
-        case LT_MEAN:
-            {
-                weights = NULL;
-                weights_size = -1;
-            }
-            break;
-                
-        default:
-            {
-                weights = NULL;
-                weights_size = -1;
-            }
-            break;
-        }
     }
 
     /**
@@ -150,24 +151,11 @@ public:
         channels    = 1;
         frames      = imgIn[0]->frames;
 
-        bool bChannels = (weights_size != imgIn[0]->channels);
-        if( bChannels && (type == LT_MEAN) ) {
-            weights_size = imgIn[0]->channels;
-
-            if(weights != NULL) {
-                delete[] weights;
-            }
-
-            weights = new float [weights_size];
-            Arrayf::assign(1.0f / imgIn[0]->channelsf, weights, imgIn[0]->channels);
-        } else {
-            if(bChannels) {
-                weights = new float [1];
-                weights[0] = 1.0f;
-
-                type = LT_PASS_THROUGH;
-            }
+        if(weights != NULL) {
+            delete[] weights;
         }
+
+        weights = computeWeights(type, imgIn[0]->channels, weights);
     }
 
     /**

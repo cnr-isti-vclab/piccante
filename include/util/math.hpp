@@ -506,6 +506,27 @@ PIC_INLINE float betaPDF(float x, float A, float B)
     return betaPDFwithBeta(x, A, B, betaFunction(A, B));
 }
 
+/**
+ * @brief sigmoid
+ * @param x
+ * @return
+ */
+PIC_INLINE float sigmoid(float x)
+{
+    return x / (x + 1.0f);
+}
+
+/**
+ * @brief sigmoidInv
+ * @param x
+ * @return
+ */
+PIC_INLINE float sigmoidInv(float x)
+{
+    return x / (1.0f - x);
+}
+
+
 } // end namespace pic
 
 #endif

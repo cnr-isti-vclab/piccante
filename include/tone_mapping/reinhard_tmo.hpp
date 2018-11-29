@@ -20,34 +20,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 #include "../util/string.hpp"
+#include "../util/math.hpp"
 #include "../filtering/filter.hpp"
 #include "../filtering/filter_bilateral_2ds.hpp"
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_sigmoid_tmo.hpp"
-#include "../tone_mapping/input_estimates.hpp"
 #include "../tone_mapping/tone_mapping_operator.hpp"
 
 namespace pic {
-
-/**
- * @brief Sigmoid
- * @param x
- * @return
- */
-inline float Sigmoid(float x)
-{
-    return x / (x + 1.0f);
-}
-
-/**
- * @brief SigmoidInv
- * @param x
- * @return
- */
-inline float SigmoidInv(float x)
-{
-    return x / (1.0f - x);
-}
 
 /**
  * @brief The ReinhardTMO class
@@ -78,6 +58,41 @@ public:
     ~ReinhardTMO()
     {
         release();
+    }
+
+
+    /**
+     * @brief estimateAlpha
+     * @param LMin
+     * @param LMax
+     * @param logAverage
+     * @return
+     */
+    static float estimateAlpha(float LMin, float LMax, float logAverage)
+    {
+        float log2f       = logf(2.0f);
+        float log2Max     = logf(LMax       + 1e-9f) / log2f;
+        float log2Min     = logf(LMin       + 1e-9f) / log2f;
+        float log2Average = logf(logAverage + 1e-9f) / log2f;
+
+        float tmp = (2.0f * log2Average - log2Min - log2Max) / (log2Max - log2Min);
+
+        return 0.18f * powf(4.0f, tmp);
+    }
+
+    /**
+     * @brief estimateWhitePoint
+     * @param LMin
+     * @param LMax
+     * @return
+     */
+    static float estimateWhitePoint(float LMin, float LMax)
+    {
+        float log2f       = logf(2.0f);
+        float log2Max     = logf(LMax + 1e-9f) / log2f;
+        float log2Min     = logf(LMin + 1e-9f) / log2f;
+
+        return 1.5f * powf(2.0f, (log2Max - log2Min - 5.0f));
     }
 
     /**
@@ -131,7 +146,7 @@ public:
         }
 
         //filter luminance in the sigmoid-space
-        images[0]->applyFunction(&Sigmoid);
+        images[0]->applyFunction(&sigmoid);
 
         float s_max = 8.0f;
         float sigma_s = 0.56f * powf(1.6f, s_max);
@@ -142,9 +157,9 @@ public:
 
         images[1] = flt_bilateral.Process(Single(images[0]), images[1]);
 
-        images[0]->applyFunction(&SigmoidInv);
+        images[0]->applyFunction(&sigmoidInv);
 
-        images[1]->applyFunction(&SigmoidInv);
+        images[1]->applyFunction(&sigmoidInv);
 
         //apply a sigmoid filter
         if(bUpdate) {

@@ -21,7 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../base.hpp"
 #include "../util/math.hpp"
 #include "../tone_mapping/lischinski_minimization.hpp"
-#include "../tone_mapping/input_estimates.hpp"
+#include "../tone_mapping/reinhard_tmo.hpp"
 #include "../tone_mapping/tone_mapping_operator.hpp"
 
 namespace pic {
@@ -85,11 +85,11 @@ public:
         float maxL_log = log2fPlusEpsilon(maxL);
 
         if(alpha <= 0.0f) {
-            alpha = estimateAlpha(minL, maxL, Lav);
+            alpha = ReinhardTMO::estimateAlpha(minL, maxL, Lav);
         }
 
         if(whitePoint <= 0.0f) {
-            whitePoint = estimateWhitePoint(minL, maxL);
+            whitePoint = ReinhardTMO::estimateWhitePoint(minL, maxL);
         }
 
         float whitePoint_sq = whitePoint * whitePoint;
@@ -100,7 +100,7 @@ public:
             return imgOut;
         }
 
-        //Choose the representative Rz for each zone
+        //choose the representative Rz for each zone
         std::vector<float> *zones = new std::vector<float>[Z];
         float *fstop = new float[Z];
         float *Rz = new float[Z];

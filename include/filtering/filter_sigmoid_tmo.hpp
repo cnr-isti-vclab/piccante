@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../util/array.hpp"
 
 #include "../filtering/filter.hpp"
+#include "../filtering/filter_luminance.hpp"
 
 namespace pic {
 
@@ -33,6 +34,8 @@ class FilterSigmoidTMO: public Filter
 {
 protected:
     bool temporal;
+    float *lum_weights, *lum_weights_flt;
+
     float c, alpha, epsilon, wp, wp_sq;
     SIGMOID_MODE type;
 
@@ -68,6 +71,17 @@ public:
     FilterSigmoidTMO(SIGMOID_MODE type, float alpha, float wp, float epsilon,
                      bool temporal);
 
+    ~FilterSigmoidTMO()
+    {
+        if(lum_weights != NULL) {
+            delete[] lum_weights;
+        }
+
+        if(lum_weights_flt != NULL) {
+            delete[] lum_weights_flt;
+        }
+    }
+
     /**
      * @brief update
      * @param type
@@ -93,6 +107,21 @@ public:
             epsilon = calculateEpsilon(imgIn);
         }
 
+        if(lum_weights != NULL) {
+            delete[] lum_weights;
+            lum_weights = NULL;
+        }
+
+        if(lum_weights_flt != NULL) {
+            delete[] lum_weights_flt;
+            lum_weights_flt = NULL;
+        }
+
+        lum_weights = FilterLuminance::computeWeights(LT_CIE_LUMINANCE, imgIn[0]->channels, NULL);
+
+        int whichImage = (imgIn.size() > 1) ? 1 : 0;
+        lum_weights_flt = FilterLuminance::computeWeights(LT_CIE_LUMINANCE, imgIn[whichImage]->channels, NULL);
+
         width       = imgIn[0]->width;
         height      = imgIn[0]->height;
         channels    = imgIn[0]->channels;
@@ -114,12 +143,16 @@ public:
 
 PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO() : Filter()
 {
+    lum_weights = NULL;
+    lum_weights_flt = NULL;
     update(SIG_TMO, 0.18f, 1e9f, -1.0f, false);
 }
 
 PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO(SIGMOID_MODE type, float alpha,
                                    float wp = 1e9f, float epsilon = -1.0f, bool temporal = false) : Filter()
 {
+    lum_weights = NULL;
+    lum_weights_flt = NULL;
     update(type, alpha, wp, epsilon, temporal);
 }
 
@@ -172,79 +205,41 @@ PIC_INLINE float FilterSigmoidTMO::calculateEpsilon(ImageVec imgIn)
 PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
 
-    float *data, *dataFlt;
+    Image *img, *img_flt;
 
-    if(src.size() == 2) {
-        data    = src[0]->data;
-        dataFlt = src[1]->data;
+    img = src[0];
+
+    if(src.size() > 1) {
+        img_flt = src[1];
     } else {
-        data    = src[0]->data;
-        dataFlt = src[0]->data;
+        img_flt = src[0];
     }
 
-    float *dataOut = dst->data;
+    float alpha_over_epsilon = alpha / epsilon;
 
-    if(src[0]->channels == 3) {
-        float lum_weights[] = {0.213f, 0.715f, 0.072f};
+    for(int j = box->y0; j < box->y1; j++) {
 
-        float alpha_over_epsilon = alpha / epsilon;
+        for(int i = box->x0; i < box->x1; i++) {
 
-        for(int j = box->y0; j < box->y1; j++) {
-            int js = j * src[0]->ystride;
+            float *p = (*img)(i, j);
+            float *p_flt = (*img_flt)(i, j);
+            float *dstOut = (*dst)(i, j);
 
-            for(int i = box->x0; i < box->x1; i++) {
-                int c = js + i * src[0]->xstride; //index
+            float L = Arrayf::dot(p, lum_weights, img->channels);
 
-                float L = Arrayf::dot(data, lum_weights, 3);
+            if(L > 0.0f) {
+                float L_flt = Arrayf::dot(p_flt, lum_weights_flt, img_flt->channels);
 
-                if(L > 0.0f) {
+                float Lm = L * alpha_over_epsilon;
+                float Lm_flt = L_flt * alpha_over_epsilon;
 
-                    float L_flt = Arrayf::dot(dataFlt, lum_weights, 3);
-                    float Lm	 = L     * alpha_over_epsilon;
-                    float Lm_flt = L_flt * alpha_over_epsilon;
+                float Ld = Lm / (1.0f + Lm_flt);
 
-                    float Ld = Lm / (1.0f + Lm_flt);
-
-                    for(int k = 0; k < src[0]->channels; k++) {
-                        int ck = c + k;
-                        dataOut[ck] = (data[ck] * Ld) / L;
-                    }
-                } else {
-                    Arrayf::assign(0.0f, dataOut, src[0]->channels);
+                for(int k = 0; k < dst->channels; k++) {
+                    dstOut[k] = (p[k] * Ld) / L;
                 }
-            }
-        }
-    } else {
-        float Lm, Lm_Flt;
-
-        for(int j = box->y0; j < box->y1; j++) {
-            int js = j * src[0]->ystride;
-
-            for(int i = box->x0; i < box->x1; i++) {
-                int c = js + i * src[0]->xstride; //index
-
-                for(int k = 0; k < src[0]->channels; k++) {
-                    int ck = c + k;
-
-                    switch(type) {
-
-                    case SIG_TMO_WP: {
-                        Lm =     (data[ck]    * alpha) / epsilon;
-                        Lm_Flt = (dataFlt[ck] * alpha) / epsilon;
-
-                        dataOut[ck] = Lm * (1.0f + Lm / wp_sq) / (1.0f + Lm_Flt);
-                    }
-                    break;
-
-                    default: {
-                        Lm = data[ck] * alpha;
-                        Lm_Flt = dataFlt[ck] * alpha;
-
-                        dataOut[ck] = Lm / (Lm_Flt + epsilon);
-                    }
-                    break;
-                    }
-                }
+            } else {
+                Arrayf::assign(0.0f, dstOut, dst->channels);
             }
         }
     }

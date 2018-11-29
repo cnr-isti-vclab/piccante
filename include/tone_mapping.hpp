@@ -30,7 +30,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "tone_mapping/ward_histogram_tmo.hpp"
 #include "tone_mapping/segmentation_tmo_approx.hpp"
 #include "tone_mapping/durand_tmo.hpp"
-#include "tone_mapping/input_estimates.hpp"
 
 #endif /* PIC_TONE_MAPPING_HPP */
 
