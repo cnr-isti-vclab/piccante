@@ -63,17 +63,17 @@ public:
      */
     void ReinhardApprox(float &alpha1, float &alpha2)
     {
-        alpha2 = powf(1.6f, 9.0f); //sigma_r
         alpha1 = 1.0f / (2.0f * sqrtf(2.0f));	//sigma_s
+        alpha2 = powf(1.6f, 9.0f); //sigma_r
     }
 
     /**
-     * @brief Compute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *Compute(Image *imgIn, Image *imgOut)
+    Image *execute(Image *imgIn, Image *imgOut)
     {
         if(imgIn == NULL) {
             return NULL;
@@ -160,14 +160,14 @@ public:
                 pyrB->update(imgReinhard);
             }
 
-            //Blending weight
+            //compute blending weight
             if(pyrWeight == NULL) {
                 pyrWeight = new Pyramid(seg_map, false);
             } else {
                 pyrWeight->update(seg_map);
             }
 
-            //Blending
+            //blend
             pyrA->blend(pyrB, pyrWeight);
             pyrA->reconstruct(imgOut);
         }

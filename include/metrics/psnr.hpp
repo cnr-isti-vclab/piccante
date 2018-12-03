@@ -58,7 +58,7 @@ PIC_INLINE double PSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
  * @brief rPSNR computes the relateive peak signal to noise ratio (rPSNR) between two images.
  * @param ori is the original image.
  * @param cmp is the distorted image.
- * @param bLargeDifferences, if true, skips big differences for stability.
+ * @param bLargeDifferences, if true, skips large differences for stability.
  * @return It returns the PSNR value between ori and cmp.
  */
 PIC_INLINE double rPSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)

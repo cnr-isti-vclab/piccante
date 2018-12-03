@@ -57,23 +57,30 @@ int main(int argc, char *argv[])
     if(img0.isValid()) {
         printf("OK\n");
 
+        std::string name = pic::removeLocalPath(img0_str);
+        name = pic::removeExtension(name);
+
         pic::Image *tmp;
         if(bCreate) {
             printf("Filtering the input image (blurring)...");
-            tmp = pic::FilterGaussian2D::Execute(&img0, NULL, 12.0f);
+            tmp = pic::FilterGaussian2D::execute(&img0, NULL, 16.0f);
             printf("Ok\n");
+            tmp->Write("../data/output/" + name + "_flt.hdr");
+        } else {
+            tmp = &img1;
         }
-
-        tmp->Write("../data/output/metrics_img_flt.hdr");
 
         printf("Computing the SSIM index...");
         float ssim_index;
 
-        pic::Image *ssim_map = pic::SSIMIndex(&img0, tmp, ssim_index, NULL, 0.01f, 0.03f, 1.5f, 255.0f);
+        pic::SSIMIndex metric;
+        pic::Image *ssim_map = metric.execute(&img0, tmp, ssim_index, NULL);
         printf("Ok\n");
 
+
+
         if(ssim_map != NULL) {
-            ssim_map->Write("../data/output/metrics_ssim_map.hdr");
+            ssim_map->Write("../data/output/" + name + "_ssim_map.hdr");
         }
 
         printf("SSIM index: %f\n", ssim_index);

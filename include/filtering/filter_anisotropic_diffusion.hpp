@@ -37,7 +37,7 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    float k, delta_t;
+    float k, k_sq, delta_t;
     unsigned int mode;
 
 public:
@@ -50,7 +50,7 @@ public:
     FilterAnsiotropicDiffusion(float k, unsigned int mode);
 
     /**
-     * @brief AnisotropicDiffusion
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param k
@@ -58,7 +58,7 @@ public:
      * @param iterations
      * @return
      */
-    static Image *AnisotropicDiffusion(ImageVec imgIn, Image *imgOut,
+    static Image *execute(ImageVec imgIn, Image *imgOut,
                                           float k, unsigned int mode, unsigned int iterations)
     {
         FilterAnsiotropicDiffusion ansio_flt(k, mode);
@@ -68,7 +68,7 @@ public:
     }
 
     /**
-     * @brief AnisotropicDiffusion
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma_s
@@ -76,7 +76,7 @@ public:
      * @param maxIterations
      * @return
      */
-    static Image *AnisotropicDiffusion(ImageVec imgIn, Image *imgOut,
+    static Image *execute(ImageVec imgIn, Image *imgOut,
                                           float sigma_s, float sigma_r, int maxIterations = -1)
     {
 
@@ -96,7 +96,7 @@ public:
             iterations = int(ceilf(5.0f * sigma_s));
         }
 
-        FilterAnsiotropicDiffusion ansio_flt(sigma_r, 1);
+        FilterAnsiotropicDiffusion ansio_flt(sigma_r, 2);
         FilterIterative iter_flt(&ansio_flt, iterations);
         imgOut = iter_flt.Process(imgIn, imgOut);
         return imgOut;
@@ -111,13 +111,15 @@ PIC_INLINE FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
         k = 0.11f;
     }
 
-    if(mode > 2 || mode < 1) {
-        mode = 1;
+    if(mode > 2 || mode < 0) {
+        mode = 0;
     }
 
     delta_t = 1.0f / 7.0f;
 
     this->k = k;
+    this->k_sq = k * k;
+
     this->mode = mode;
 }
 
@@ -132,17 +134,11 @@ PIC_INLINE void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src
     float *gW = new float [channels];
     float *gE = new float [channels];
 
-    float k2 = k * k;
-
     for(int j = box->y0; j < box->y1; j++) {
         for(int i = box->x0; i < box->x1; i++) {
 
             float *dst_data  = (*dst)(i, j);
             float *img_data  = (*img)(i, j);
-
-            for(int p = 0; p < channels; p++) {
-                dst_data[p] = img_data[p];
-            }
 
             float *img_dataN = (*img)(i + 1, j    );
             float *img_dataS = (*img)(i - 1, j    );
@@ -166,22 +162,42 @@ PIC_INLINE void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src
                 cE += gE[p] * gE[p];
             }
 
-            if(mode == 1) {
-                cN = expf(-cN / k2);
-                cS = expf(-cS / k2);
-                cW = expf(-cW / k2);
-                cE = expf(-cE / k2);
-            }
+            switch(mode) {
+                case 1:
+                {
+                    cN = 1.0f / (1.0f + cN / k_sq);
+                    cS = 1.0f / (1.0f + cS / k_sq);
+                    cW = 1.0f / (1.0f + cW / k_sq);
+                    cE = 1.0f / (1.0f + cE / k_sq);
+                } break;
 
-            if(mode == 2) {
-                cN = 1.0f / (1.0f + cN / k2);
-                cS = 1.0f / (1.0f + cS / k2);
-                cW = 1.0f / (1.0f + cW / k2);
-                cE = 1.0f / (1.0f + cE / k2);
+                case 2:
+                {
+                    float t;
+                    t = 1.0f - expf(-3.315f / powf(cN / k_sq, 8.0f));
+                    cN = cN > 0.0f ? t : 1.0f;
+
+                    t = 1.0f - expf(-3.315f / powf(cS / k_sq, 8.0f));
+                    cS = cS > 0.0f ? t : 1.0f;
+
+                    t = 1.0f - expf(-3.315f / powf(cW / k_sq, 8.0f));
+                    cW = cW > 0.0f ? t : 1.0f;
+
+                    t = 1.0f - expf(-3.315f / powf(cE / k_sq, 8.0f));
+                    cE = cE > 0.0f ? t : 1.0f;
+                } break;
+
+                default:
+                {
+                    cN = expf(-cN / k_sq);
+                    cS = expf(-cS / k_sq);
+                    cW = expf(-cW / k_sq);
+                    cE = expf(-cE / k_sq);
+                } break;
             }
 
             for(int p = 0; p < channels; p++) {
-                dst_data[p] += delta_t *
+                dst_data[p] = img_data[p] + delta_t *
                         (cN * gN[p] + cS * gS[p] + cW * gW[p] + cE * gE[p]);
             }
         }

@@ -32,11 +32,21 @@ protected:
     FilterGaussian1D *gaussianFilter;
 
 public:
+
+
+    FilterGaussian2D() : FilterNPasses()
+    {
+        gaussianFilter = new FilterGaussian1D(1.0f);
+
+        insertFilter(gaussianFilter);
+        insertFilter(gaussianFilter);
+    }
+
     /**
      * @brief FilterGaussian2D
      * @param sigma
      */
-    FilterGaussian2D(float sigma)
+    FilterGaussian2D(float sigma) : FilterNPasses()
     {
         gaussianFilter = new FilterGaussian1D(sigma);
 
@@ -52,6 +62,15 @@ public:
             delete gaussianFilter;
             gaussianFilter = NULL;
         }
+    }
+
+    /**
+     * @brief update
+     * @param sigma
+     */
+    void update(float sigma)
+    {
+        gaussianFilter->update(sigma, 0);
     }
 
     /**

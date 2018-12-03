@@ -155,9 +155,11 @@ PIC_INLINE void FilterConv1D::update(float *data, int n, int direction)
     this->data = data;
     this->n = n;
 
-    dirs[ direction      % 3] = 1;
-    dirs[(direction + 1) % 3] = 0;
-    dirs[(direction + 2) % 3] = 0;
+    if(direction > 0) {
+        dirs[ direction      % 3] = 1;
+        dirs[(direction + 1) % 3] = 0;
+        dirs[(direction + 2) % 3] = 0;
+    }
 }
 
 PIC_INLINE FilterConv1D::~FilterConv1D()

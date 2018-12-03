@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
         //the Anisotropic Diffusion
         printf("Filtering the image with the Anisotropic Diffusion;\n");
         printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
-        output = pic::FilterAnsiotropicDiffusion::AnisotropicDiffusion(input, output, 8.0f, 0.05f);
+        output = pic::FilterAnsiotropicDiffusion::execute(input, output, 8.0f, 0.05f);
         printf("Ok!\n");
 
         printf("Writing the file to disk...");

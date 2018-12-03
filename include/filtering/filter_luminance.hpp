@@ -153,6 +153,7 @@ public:
 
         if(weights != NULL) {
             delete[] weights;
+            weights = NULL;
         }
 
         weights = computeWeights(type, imgIn[0]->channels, weights);
