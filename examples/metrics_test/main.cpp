@@ -45,7 +45,8 @@ int main(int argc, char *argv[])
         bCreate = true;
     }
 
-    //load  values in [0, 255]; note: no gamma removal or normalization in [0, 1]
+    //Image values are loaded and normalized in [0, 1];
+    //NOTE: gamma removal or CRF linearization are NOT applied.
     pic::Image img0, img1;
     img0.Read(img0_str, pic::LT_NOR);
 
