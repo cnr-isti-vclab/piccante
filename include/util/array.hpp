@@ -471,29 +471,42 @@ public:
     }
 
     /**
-     * @brief interp
+     * @brief interp linearly interpolates x and y data
      * @param x
      * @param y
-     * @param size
+     * @param size the size of x and y
      * @param xval
      * @return
      */
     static inline T interp(T *x, T *y, int size, T xval)
     {
-        int offset, offset2;
-        T *ptr  = std::lower_bound(&x[0], &x[size - 1], xval);
-        offset  = MAX(0, (int)(ptr - x - 1));
+        int sm1 = size - 1;
+        if((xval >= x[0]) && (xval <= x[sm1])) {
+            int offset2;
+            T *ptr = std::lower_bound(&x[0], &x[sm1], xval);
+            int offset = MAX(0, (int)(ptr - x - 1));
 
-        if(offset == (size - 1)) {
-            offset2 = offset;
-            offset  = offset2 - 1;
+            if(offset == sm1) {
+                offset2 = offset;
+                offset  = offset2 - 1;
+            } else {
+                offset2 = MIN(size - 1, offset + 1);
+            }
+
+            T t = (xval - x[offset]) / (x[offset2] - x[offset]);
+
+            return y[offset] * (T(1) - t) + t * y[offset2];
         } else {
-            offset2 = MIN(size - 1, offset + 1);
+            if(xval > x[sm1]) {
+                int sm2 = size - 2;
+                T t = (xval - x[sm2]) / (x[sm1] - x[sm2]);
+                return t * (y[sm1] - y[sm2])  + y[sm2];
+            } else {
+                T t = (xval - x[0]) / (x[1] - x[0]);
+                return t * (y[1] - y[0])  + y[0];
+            }
         }
 
-        T t = (xval - x[offset]) / (x[offset2] - x[offset]);
-
-        return y[offset] * (T(1) - t) + t * y[offset2];
     }
 };
 

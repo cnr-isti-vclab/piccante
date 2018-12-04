@@ -80,11 +80,11 @@ int main(int argc, char *argv[])
             ssim_map->Write("../data/output/" + name + "_ssim_map.hdr");
         }
 
-        printf("SSIM index: %f\n", ssim_index);
-        printf("MSE: %f\n", pic::MSE(&img0, tmp, false));
-        printf("RMSE: %f\n", pic::RMSE(&img0, tmp));
-        printf("PSNR: %f\n", pic::PSNR(&img0, tmp));
-        printf("MAE: %f\n", pic::MAE(&img0, tmp, false));
+        printf("SSIM index: %3.3f\n", ssim_index);
+        printf("MSE: %3.3f\n", pic::MSE(&img0, tmp, false));
+        printf("RMSE: %3.3f\n", pic::RMSE(&img0, tmp));
+        printf("PSNR: %3.3f\n", pic::PSNR(&img0, tmp));
+        printf("MAE: %3.3f\n", pic::MAE(&img0, tmp, false));
         printf("Relative Error: %f\n", pic::RelativeError(&img0, tmp));
 
     } else {
