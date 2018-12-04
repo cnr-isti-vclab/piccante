@@ -39,14 +39,15 @@ PIC_INLINE double MAE(Image *ori, Image *cmp, bool bLargeDifferences = false)
         return -2.0;
     }
 
+    if(!ori->isValid() || !cmp->isValid()) {
+        return -4.0;
+    }
+
     if(!ori->isSimilarType(cmp)) {
         return -1.0;
     }
 
     int size = ori->size();
-
-    double acc = 0.0;
-    int count = 0;
 
     double largeDifferences = C_LARGE_DIFFERENCES;
 
@@ -54,21 +55,21 @@ PIC_INLINE double MAE(Image *ori, Image *cmp, bool bLargeDifferences = false)
         largeDifferences = FLT_MAX;
     }
 
+    double acc = 0.0;
+    int count = 0;
     for(int i = 0; i < size; i++) {
         double valO = ori->data[i];
         double valc = cmp->data[i];
 
         double delta = fabs(valO - valc);
 
-        if(delta <= largeDifferences) {
-            count++;
+        if(delta < largeDifferences) {
             acc += delta;
+            count++;
         }
     }
 
-    acc /= double(count);
-
-    return float(acc);
+    return acc / double(count);
 }
 
 } // end namespace pic

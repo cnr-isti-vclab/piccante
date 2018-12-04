@@ -33,27 +33,31 @@ namespace pic {
  * @param bLargeDifferences, if true, skips big differences for stability.
  * @return It returns the maxium error value between ori and cmp.
  */
-PIC_INLINE double MaximumError(Image *ori, Image *cmp, bool bLargeDifferences = false)
+PIC_INLINE float MaximumError(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
-        return -2.0;
+        return -2.0f;
+    }
+
+    if(!ori->isValid() || !cmp->isValid()) {
+        return -4.0f;
     }
 
     if(!ori->isSimilarType(cmp)) {
-        return -1.0;
+        return -1.0f;
     }
 
     int size = ori->size();
 
-    double maxVal = 0.0;
 
     float largeDifferences = C_LARGE_DIFFERENCESf;
     if(!bLargeDifferences) {
         largeDifferences = FLT_MAX;
     }
 
+    float maxVal = -FLT_MAX;
     for(int i = 0; i < size; i++) {
-        double delta = fabs(ori->data[i] - cmp->data[i]);
+        float delta = fabsf(ori->data[i] - cmp->data[i]);
 
         if((delta < C_LARGE_DIFFERENCES) && (maxVal < delta)) {
             maxVal = delta;

@@ -40,11 +40,15 @@ PIC_INLINE double RelativeError(Image *ori, Image *cmp, bool bLargeDifferences =
         return -2.0;
     }
 
+    if(!ori->isValid() || !cmp->isValid()) {
+        return -4.0;
+    }
+
     if(!ori->isSimilarType(cmp)) {
         return -1.0;
     }
 
-    int size = ori->width * ori->height * ori->channels;
+    int size = ori->size();
 
     double relErr = 0.0f;
     int count = 0;

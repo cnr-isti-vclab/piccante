@@ -33,7 +33,7 @@ namespace pic {
  * @param bLargeDifferences, if true, skips big differences for stability.
  * @return It returns the MSE value between ori and cmp.
  */
-PIC_INLINE double MSE(Image *ori, Image *cmp, bool bLargeDifferences=false)
+PIC_INLINE double MSE(Image *ori, Image *cmp, bool bLargeDifferences = false)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -43,19 +43,20 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, bool bLargeDifferences=false)
         return -1.0;
     }
 
-    int size = ori->width * ori->height * ori->channels;
-    double delta = 0.0;
-    double acc   = 0.0;
+    int size = ori->size();
+
 
     int count = 0;
 
     float largeDifferences = C_LARGE_DIFFERENCESf;
+
     if(!bLargeDifferences) {
         largeDifferences = FLT_MAX;
     }
 
+    double acc = 0.0;
     for(int i = 0; i < size; i++) {
-        delta = ori->data[i] - cmp->data[i];
+        double delta = ori->data[i] - cmp->data[i];
 
         if(delta <= largeDifferences) {
             acc += delta * delta;
@@ -67,7 +68,7 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, bool bLargeDifferences=false)
 }
 
 /**
- * @brief MSE computes the mean square error (MSE) between two images with given exposure and gamma.
+ * @brief MSE computes the mean square error (MSE) between two HDR images with given exposure and gamma.
  * @param ori is the original image.
  * @param cmp is the distorted image.
  * @param gamma is the encoding gamma.
@@ -78,6 +79,10 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
+    }
+
+    if(!ori->isValid() || !cmp->isValid()) {
+        return -4.0;
     }
 
     if(!ori->isSimilarType(cmp)) {

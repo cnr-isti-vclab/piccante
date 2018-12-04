@@ -24,6 +24,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 #include "../metrics/base.hpp"
 #include "../util/indexed_array.hpp"
+#include "../util/array.hpp"
 
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_gaussian_2d.hpp"
@@ -78,13 +79,16 @@ public:
             return ret;
         }
 
-        if(!img->isValid() || img->channels != 1) {
+        if(!img->isValid()) {
             return ret;
         }
 
-        float min_val, max_val;
-        img->getMinVal(NULL, &min_val);
-        img->getMaxVal(NULL, &max_val);
+        float *min_val_v = img->getMinVal(NULL, NULL);
+        float *max_val_v = img->getMaxVal(NULL, NULL);
+
+        int ind;
+        float min_val = Arrayf::getMin(min_val_v, img->channels, ind);
+        float max_val = Arrayf::getMax(max_val_v, img->channels, ind);
 
         if(min_val <= 0.0f) {
             IntCoord coord;
@@ -95,7 +99,20 @@ public:
                 min_val = 1.0f / 255.0f;
             }
 
-            ret = max_val / min_val;
+            if(max_val > min_val) {
+                ret = max_val / min_val;
+            } else {
+                ret = min_val / max_val;
+            }
+
+        }
+
+        if(min_val_v != NULL) {
+            delete [] min_val_v;
+        }
+
+        if(max_val_v != NULL) {
+            delete [] max_val_v;
         }
 
         return ret;
@@ -118,6 +135,8 @@ public:
             return ssim_map;
         }
 
+        Image *ori_d = NULL;
+        Image *cmp_d = NULL;
         if(bDownsampling) {
             float f = MAX(1.0f, lround(MIN(ori->widthf, ori->heightf) / 256.0f));
 
@@ -125,7 +144,6 @@ public:
                 printf("\nDownsampling factor: %f\n", f);
             #endif
 
-            Image *ori_d, *cmp_d;
             if(f > 1.0f) {
                 ori_d = FilterDownSampler2D::execute(ori, NULL, f);
                 cmp_d = FilterDownSampler2D::execute(cmp, NULL, f);

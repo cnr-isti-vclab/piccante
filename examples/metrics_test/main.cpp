@@ -70,20 +70,21 @@ int main(int argc, char *argv[])
             tmp = &img1;
         }
 
-        printf("Computing the SSIM index...");
         float ssim_index;
-
         pic::SSIMIndex metric;
         pic::Image *ssim_map = metric.execute(&img0, tmp, ssim_index, NULL);
         printf("Ok\n");
-
-
 
         if(ssim_map != NULL) {
             ssim_map->Write("../data/output/" + name + "_ssim_map.hdr");
         }
 
         printf("SSIM index: %f\n", ssim_index);
+        printf("MSE: %f\n", pic::MSE(&img0, tmp, false));
+        printf("RMSE: %f\n", pic::RMSE(&img0, tmp));
+        printf("PSNR: %f\n", pic::PSNR(&img0, tmp));
+        printf("MAE: %f\n", pic::MAE(&img0, tmp, false));
+        printf("Relative Error: %f\n", pic::RelativeError(&img0, tmp));
 
     } else {
         printf("No, the file is not valid!\n");
