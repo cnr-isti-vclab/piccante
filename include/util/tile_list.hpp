@@ -66,11 +66,10 @@ public:
 
     /**
      * @brief genBBox
-     * @param i
-     * @param box
+     * @param index
      * @return
      */
-    BBox *genBBox(int i, BBox *box);
+    BBox getBBox(int index);
 
     /**
      * @brief getNext returns the index of the next tile to process.
@@ -134,25 +133,14 @@ PIC_INLINE TileList::TileList(int tileSize, int width, int height)
 
 PIC_INLINE TileList::~TileList()
 {
-    for(unsigned int i=0; i<tiles.size(); i++) {
-    }
+    tiles.clear();
 }
 
-PIC_INLINE BBox *TileList::genBBox(int i, BBox *box)
+PIC_INLINE BBox TileList::getBBox(int index)
 {
-    if(box == NULL) {
-        box = new BBox();
-    }
+    int i = index % tiles.size();
 
-    i = i % tiles.size();
-
-    box->setBox(tiles[i].startX,
-                tiles[i].startX + tiles[i].width,
-                tiles[i].startY,
-                tiles[i].startY + tiles[i].height,
-                0, 1, width, height, 1);
-
-    return box;
+    return tiles[i].getBBox(width, height);
 }
 
 PIC_INLINE unsigned int TileList::getNext()

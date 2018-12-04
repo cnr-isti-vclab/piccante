@@ -78,6 +78,15 @@ public:
      * @brief FilterSSIM
      * @param type
      */
+    FilterSSIM() : Filter()
+    {
+        minInputImages = 5;
+    }
+
+    /**
+     * @brief FilterSSIM
+     * @param type
+     */
     FilterSSIM(float C0, float C1) : Filter()
     {
         minInputImages = 5;

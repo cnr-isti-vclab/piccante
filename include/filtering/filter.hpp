@@ -311,13 +311,11 @@ PIC_INLINE void Filter::ProcessAux(ImageVec imgIn, Image *imgOut,
                                     TileList *tiles)
 {
     bool state = true;
-    BBox box;
-
     while(state) {
         unsigned int currentTile = tiles->getNext();
 
         if(currentTile < tiles->tiles.size()) {
-            tiles->genBBox(currentTile, &box);
+            BBox box = tiles->getBBox(currentTile);
             box.z0 = 0;
             box.z1 = imgOut->frames;
             ProcessBBox(imgOut, imgIn, &box);

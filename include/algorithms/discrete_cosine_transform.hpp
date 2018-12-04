@@ -69,8 +69,7 @@ public:
         TileList tiles(size, imgOut->width, imgOut->height);
 
         for(unsigned int t = 0; t < tiles.tiles.size(); t++) {
-            BBox box;
-            tiles.genBBox(t, &box);
+            BBox box = tiles.getBBox(t);
 
             for(int v = box.y0; v < box.y1; v++) {
                 int vr = v % size;
@@ -155,8 +154,7 @@ public:
         TileList tiles(size, imgOut->width, imgOut->height);
 
         for(unsigned int t = 0; t < tiles.tiles.size(); t++) {
-            BBox box;
-            tiles.genBBox(t, &box);
+            BBox box = tiles.getBBox(t);
 
             for(int y = box.y0; y < box.y1; y++) {
                 int yr = y % size;

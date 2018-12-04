@@ -41,6 +41,7 @@ public:
 
     FilterLuminance flt_lum;
     FilterGaussian2D flt_gauss2D;
+    FilterSSIM flt_ssim;
 
     SSIMIndex()
     {
@@ -153,8 +154,14 @@ public:
             }
         }
 
-        Image *L_ori = flt_lum.Process(Single(ori), NULL);
-        Image *L_cmp = flt_lum.Process(Single(cmp), NULL);
+        Image *L_ori, *L_cmp;
+        if(ori->channels > 1) {
+            L_ori = flt_lum.Process(Single(ori), NULL);
+            L_cmp = flt_lum.Process(Single(cmp), NULL);
+        } else {
+            L_ori = ori->clone();
+            L_cmp = cmp->clone();
+        }
 
         if(dynamic_range <= 0.0f) {
             dynamic_range = getDynamicRange(L_ori);
@@ -166,20 +173,20 @@ public:
         float C1 = K1 * dynamic_range;
         C1 = C1 * C1;
 
-        Image *img_mu1 = FilterGaussian2D::execute(L_ori, NULL, sigma_window);
-        Image *img_mu2 = FilterGaussian2D::execute(L_cmp, NULL, sigma_window);
+        Image *img_mu1 = flt_gauss2D.Process(Single(L_ori), NULL);
+        Image *img_mu2 = flt_gauss2D.Process(Single(L_cmp), NULL);
 
         Image img_ori_cmp = (*L_ori) * (*L_cmp);
 
         L_ori->applyFunction(square);
         L_cmp->applyFunction(square);
 
-        Image *img_sigma1_sq = FilterGaussian2D::execute(L_ori, NULL, sigma_window);
-        Image *img_sigma2_sq = FilterGaussian2D::execute(L_cmp, NULL, sigma_window);
-        Image *img_sigma1_sigma2 = FilterGaussian2D::execute(&img_ori_cmp, NULL, sigma_window);
+        Image *img_sigma1_sq = flt_gauss2D.Process(Single(L_ori), NULL);
+        Image *img_sigma2_sq = flt_gauss2D.Process(Single(L_cmp), NULL);
+        Image *img_sigma1_sigma2 = flt_gauss2D.Process(Single(&img_ori_cmp), NULL);
 
         if(C0 > 0.0f && C1 > 0.0f) {
-            FilterSSIM flt_ssim(C0, C1);
+            flt_ssim.update(C0, C1);
 
             ImageVec src;
             src.push_back(img_mu1);
