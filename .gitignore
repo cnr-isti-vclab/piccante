@@ -232,3 +232,6 @@ examples/build-simple_qt-Desktop_Qt_5_10_0_MSVC2017_64bit-Debug/debug/moc_predef
 examples/build-simple_qt-Desktop_Qt_5_10_0_MSVC2017_64bit-Debug/debug/moc_window.cpp
 examples/build-simple_qt-Desktop_Qt_5_10_0_MSVC2017_64bit-Debug/debug/qrc_resources.cpp
 examples/build-simple_qt-Desktop_Qt_5_10_0_MSVC2017_64bit-Debug/Makefile
+examples/build-metrics_test-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
+examples/build-metrics_test-Desktop_Qt_5_4_2_clang_64bit-Debug/simple_gray_scale
+examples/build-hdr_tone_mapping-Desktop_Qt_5_4_2_clang_64bit-Debug/hdr_tone_mapping
