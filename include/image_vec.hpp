@@ -152,6 +152,31 @@ PIC_INLINE void ImageVecRelease(ImageVec &stack)
     }
 }
 
+/**
+ * @brief ImageVecCheck
+ * @param vec
+ * @param minInputImages
+ * @return
+ */
+PIC_INLINE bool ImageVecCheck(ImageVec &imgIn, int minInputImages)
+{
+    if(imgIn.size() < minInputImages) {
+        return false;
+    }
+
+    for(int i = 0; i < minInputImages; i ++) {
+        if(imgIn[i] == NULL) {
+            return false;
+        } else {
+            if(!imgIn[i]->isValid()) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 } // end namespace pic
 
 #endif /* PIC_IMAGE_RAW_VEC_HPP */

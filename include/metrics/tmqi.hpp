@@ -22,16 +22,21 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 #include "../image.hpp"
+#include "../image_vec.hpp"
 #include "../metrics/base.hpp"
 #include "../util/indexed_array.hpp"
 #include "../util/array.hpp"
 #include "../util/math.hpp"
 #include "../util/tile_list.hpp"
 
+#include "../util/string.hpp"
+
+#include "../algorithms/pyramid.hpp"
+
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_gaussian_2d.hpp"
 #include "../filtering/filter_downsampler_2d.hpp"
-#include "../filtering/filter_ssim.hpp"
+#include "../filtering/filter_tmqi.hpp"
 
 namespace pic {
 
@@ -45,7 +50,7 @@ public:
     std::vector<float> weights;
     FilterLuminance flt_lum;
     FilterGaussian2D flt_gauss2D;
-    FilterSSIM flt_ssim;
+    FilterTMQI flt_tmqi;
 
     /**
      * @brief TMQI
@@ -56,6 +61,8 @@ public:
         invA = 1.0f - a;
         alpha = 0.3046f;
         beta = 0.7088f;
+
+        flt_gauss2D.update(1.5f);
 
         weights.push_back(0.0448f);
         weights.push_back(0.2856f);
@@ -117,16 +124,84 @@ public:
     }
 
     /**
-     * @brief structuralFidelity
+     * @brief localStructuralFidelity
      * @param L_HDR
      * @param L_LDR
      * @param S
      * @param s_map
      * @return
      */
-    Image* structuralFidelity(Image *L_HDR, Image *L_LDR, float &S, Image *s_map = NULL)
-    {
+    Image* localStructuralFidelity(Image *L_HDR, Image *L_LDR, float sf, float &S, Image *s_map = NULL)
+    {        
+        Image *img1 = L_HDR->clone();
+        Image *img2 = L_LDR->clone();
+
+        Image *mu1 = flt_gauss2D.Process(Single(img1), NULL);
+        Image *mu2 = flt_gauss2D.Process(Single(img2), NULL);
+
+        Image img12 = (*L_HDR) * (*L_LDR);
+        Image mu12 = (*mu1) * (*mu2);
+
+        mu1->applyFunction(square);
+        mu2->applyFunction(square);
+        img1->applyFunction(square);
+        img2->applyFunction(square);
+
+        Image *sigma1 = flt_gauss2D.Process(Single(img1), NULL);
+        *sigma1 -= mu1;
+        sigma1->applyFunction(sqrtf_s);
+
+        Image *sigma2 = flt_gauss2D.Process(Single(img2), NULL);
+        *sigma2 -= mu2;
+        sigma2->applyFunction(sqrtf_s);
+
+        Image *sigma12 = flt_gauss2D.Process(Single(&img12), NULL);
+        *sigma12 -= mu12;
+
+        flt_tmqi.update(sf);
+
+        ImageVec vec = Triple(sigma1, sigma2, sigma12);
+        s_map = flt_tmqi.Process(vec, s_map);
+
+        s_map->getMeanVal(NULL, &S);
+
+        vec.push_back(mu1);
+        vec.push_back(mu2);
+
+        ImageVecRelease(vec);
+
         return s_map;
+    }
+
+    /**
+     * @brief structuralFidelity
+     * @param L_HDR
+     * @param L_LDR
+     * @return
+     */
+    float structuralFidelity(Image *L_HDR, Image *L_LDR)
+    {
+        float S = 1.0f;
+        float f = 32.0f;
+
+        Image *t_HDR = L_HDR;
+        Image *t_LDR = L_LDR;
+        for(auto i = 0; i < weights.size(); i++) {
+            float S_i;
+            f /= 2.0f;
+            localStructuralFidelity(t_HDR, t_LDR, f, S_i, NULL);
+
+           // map->Write("../name_" + fromNumberToString(i) + ".pfm");
+
+            printf("%f - %f\n", S_i, weights[i]);
+
+            S *= powf(S_i, weights[i]);
+
+            t_HDR = FilterDownSampler2D::execute(t_HDR, NULL, 0.5f);
+            t_LDR = FilterDownSampler2D::execute(t_LDR, NULL, 0.5f);
+        }
+
+        return S;
     }
 
     /**
@@ -139,33 +214,27 @@ public:
      * @param tmqi_map
      * @return
      */
-    Image *execute(Image *img_HDR, Image *img_LDR, float &Q, float &N, float &S, Image *tmqi_map = NULL)
+    Image *execute(ImageVec imgIn, float &Q, float &N, float &S, Image *tmqi_map = NULL)
     {
         N = -1.0f;
         S = -1.0f;
         Q = -1.0f;
 
-        if(img_HDR == NULL || img_LDR == NULL) {
-            return tmqi_map;
-        }
+        bool bCheckInput = ImageVecCheck(imgIn, 2) && ImageVecCheckSimilarType(imgIn);
 
-        if(!img_HDR->isValid() || !img_LDR->isValid()) {
-            return tmqi_map;
-        }
-
-        if(!img_HDR->isSimilarType(img_LDR)) {
+        if(!bCheckInput) {
             return tmqi_map;
         }
 
         float max_img_LDR;
-        img_LDR->getMaxVal(NULL, &max_img_LDR);
+        imgIn[1]->getMaxVal(NULL, &max_img_LDR);
 
         if(max_img_LDR <= 1.0f) {
             return tmqi_map;
         }
 
-        Image *L_HDR = flt_lum.Process(Single(img_HDR), NULL);
-        Image *L_LDR = flt_lum.Process(Single(img_LDR), NULL);
+        Image *L_HDR = flt_lum.Process(Single(imgIn[0]), NULL);
+        Image *L_LDR = flt_lum.Process(Single(imgIn[1]), NULL);
 
         float min_L_HDR, max_L_HDR;
 
@@ -178,7 +247,8 @@ public:
         *L_HDR *= scale;
 
         N = statisticalNaturalness(L_LDR);
-        tmqi_map = structuralFidelity(L_HDR, L_LDR, S, tmqi_map);
+
+        S = structuralFidelity(L_HDR, L_LDR);
 
         Q = a * powf(S, alpha) + invA * powf(N, beta);
 

@@ -85,11 +85,11 @@ public:
     ~Pyramid();
 
     /**
-     * @brief SetLapGauss
+     * @brief setLapGauss
      * @param lapGauss is a boolean parameter. If it is true, a Laplacian pyramid
      * will be created, otherwise a Gaussian one.
      */
-    void SetLapGauss(bool lapGauss)
+    void setLapGauss(bool lapGauss)
     {
         this->lapGauss = lapGauss;
     }

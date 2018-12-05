@@ -24,6 +24,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <functional>
 
+#include "../image.hpp"
 #include "../image_vec.hpp"
 #include "../util/tile_list.hpp"
 #include "../util/string.hpp"
@@ -359,21 +360,7 @@ PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
 
 PIC_INLINE bool Filter::checkInput(ImageVec &imgIn)
 {
-    if(imgIn.size() < minInputImages) {
-        return false;
-    }
-
-    for(int i = 0; i < minInputImages; i ++) {
-        if(imgIn[i] == NULL) {
-            return false;
-        } else {
-            if(!imgIn[i]->isValid()) {
-                return false;
-            }
-        }
-    }
-
-    return true;
+    return ImageVecCheck(imgIn, minInputImages);
 }
 
 PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)

@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 
         float ssim_index;
         pic::SSIMIndex metric;
-        pic::Image *ssim_map = metric.execute(&img0, tmp, ssim_index, NULL);
+        pic::Image *ssim_map = metric.execute(Double(&img0, tmp), ssim_index, NULL);
         printf("Ok\n");
 
         if(ssim_map != NULL) {
@@ -89,8 +89,9 @@ int main(int argc, char *argv[])
 
         pic::TMQI tmqi;
         img0 *= 255.0f;
-        float N = tmqi.statisticalNaturalness(pic::FilterLuminance::execute(&img0, NULL));
-        printf("Naturalness: %f\n", N);
+        float Q, N, S;
+        tmqi.execute(pic::Double(tmp, &img0), Q, N, S, NULL);
+        printf("TMQI -- Q: %f N: %f S: %f\n", Q, N, S);
     } else {
         printf("No, the file is not valid!\n");
     }

@@ -124,21 +124,18 @@ public:
      * @param ori
      * @param cmp
      */
-    Image *execute(Image *ori, Image *cmp, float &ssim_index, Image *ssim_map = NULL)
+    Image *execute(ImageVec imgIn, float &ssim_index, Image *ssim_map = NULL)
     {
         ssim_index = -1.0f;
 
-        if(ori == NULL || cmp == NULL) {
+        bool bCheckInput = ImageVecCheck(imgIn, 2) && ImageVecCheckSimilarType(imgIn);
+
+        if(!bCheckInput) {
             return ssim_map;
         }
 
-        if(!ori->isValid() || !cmp->isValid()) {
-            return ssim_map;
-        }
-
-        if(!ori->isSimilarType(cmp)) {
-            return ssim_map;
-        }
+        Image *ori = imgIn[0];
+        Image *cmp = imgIn[1];
 
         Image *ori_d = NULL;
         Image *cmp_d = NULL;
@@ -207,14 +204,8 @@ public:
         }
 
         if(bAllocated) {
-
-            if(ori_d != NULL) {
-                delete ori_d;
-            }
-
-            if(cmp_d != NULL) {
-                delete cmp_d;
-            }
+            auto vec = Double(ori_d, cmp_d);
+            ImageVecRelease(vec);
         }
 
         return ssim_map;

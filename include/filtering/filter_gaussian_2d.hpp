@@ -33,7 +33,9 @@ protected:
 
 public:
 
-
+    /**
+     * @brief FilterGaussian2D
+     */
     FilterGaussian2D() : FilterNPasses()
     {
         gaussianFilter = new FilterGaussian1D(1.0f);

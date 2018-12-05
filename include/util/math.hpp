@@ -191,6 +191,16 @@ PIC_INLINE float square(float x)
 }
 
 /**
+ * @brief sqrtf_s
+ * @param x
+ * @return
+ */
+PIC_INLINE float sqrtf_s(float x)
+{
+    return sqrtf(MAX(x, 0.0f));
+}
+
+/**
  * @brief Clamp clamps a value, x, in the bound [a,b].
  * @param x
  * @param a
@@ -456,6 +466,19 @@ PIC_INLINE float normalDistribution(float x, float mu = 0.0f, float sigma = 1.0f
     ret = exp(-(d * d) / sigma_sq_2) / sqrtf(sigma_sq_2 * C_PI);
 
     return ret;
+}
+
+/**
+ * @brief normalCDF
+ * @param x
+ * @param mu
+ * @param sigma
+ * @return
+ */
+float normalCDF(float x, float mu, float sigma)
+{
+    float t = (x - mu) / (sigma * C_SQRT_2);
+    return (1.0f + std::erf(t)) / 2.0f;
 }
 
 /**

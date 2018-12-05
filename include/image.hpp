@@ -341,6 +341,12 @@ public:
     void applyFunction(float(*func)(float));
 
     /**
+     * @brief applyFunctionParam
+     * @param param
+     */
+    void applyFunctionParam(float(*func)(float, std::vector<float>&), std::vector<float> &param);
+
+    /**
      * @brief getFullBox computes a full BBox for this image.
      * @return This function returns a full BBox for this image.
      */
@@ -1202,11 +1208,25 @@ PIC_INLINE void Image::applyFunction(float(*func)(float))
         return;
     }
 
-    int size = width * height * channels;
+    int size = frames * width * height * channels;
 
     #pragma omp parallel for
     for(int i = 0; i < size; i++) {
         data[i] = (*func)(data[i]);
+    }
+}
+
+PIC_INLINE void Image::applyFunctionParam(float(*func)(float, std::vector<float>&), std::vector<float> &param)
+{
+    if(!isValid()) {
+        return;
+    }
+
+    int size = frames * width * height * channels;
+
+    #pragma omp parallel for
+    for(int i = 0; i < size; i++) {
+        data[i] = (*func)(data[i], param);
     }
 }
 
