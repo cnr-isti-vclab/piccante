@@ -140,7 +140,7 @@ public:
     }
 
     /**
-     * @brief minCoord computes the min value.
+     * @brief min computes the min value.
      * @param data
      * @param coord
      * @return
@@ -158,14 +158,14 @@ public:
     }
 
     /**
-     * @brief scalingAddress scales values.
+     * @brief scale scales values.
      * @param coord
      * @param scaling
      */
-    static void scalingAddress(IntCoord &coord, int scaling)
+    static void scale(IntCoord &coord, int scale)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
-            coord.at(i) = coord.at(i) * scaling;
+            coord.at(i) = coord.at(i) * scale;
         }
     }
 

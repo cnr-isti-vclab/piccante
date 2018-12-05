@@ -31,7 +31,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-enum MULTI_EXPOSURE_TYPE{MET_HISTOGRAM, MET_MIN_MAX};
+enum MULTI_EXPOSURE_TYPE{MET_HISTOGRAM, MET_MIN_MAX, MET_FROM_INPUT};
 
 /**
  * @brief mPSNR computes the multiple-exposure peak signal-to-noise ratio (mPSNR) between two images.
@@ -46,6 +46,10 @@ PIC_INLINE double mPSNR(Image *ori, Image *cmp, MULTI_EXPOSURE_TYPE type, int mi
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
+    }
+
+    if(!ori->isValid() || !cmp->isValid()) {
+        return -3.0;
     }
 
     if(!ori->isSimilarType(cmp)) {
@@ -71,6 +75,17 @@ PIC_INLINE double mPSNR(Image *ori, Image *cmp, MULTI_EXPOSURE_TYPE type, int mi
             exposures.insert(exposures.begin(), exposures_v, exposures_v + nExposures_v);
 
         } break;
+
+        case MET_FROM_INPUT: {
+            for(int i = minFstop; i <= maxFstop; i++) {
+                exposures.push_back(i);
+            }
+
+        } break;
+    }
+
+    if(exposures.empty()) {
+        return -5.0;
     }
 
     #ifdef PIC_DEBUG
@@ -79,22 +94,25 @@ PIC_INLINE double mPSNR(Image *ori, Image *cmp, MULTI_EXPOSURE_TYPE type, int mi
         printf("-- min F-stop: %d \t max F-stop: %d\n", minFstop, maxFstop);
     #endif
 
-    double aMSE = 0.0;
+    int nBit = 8;
     float gamma = 2.2f; //typically 2.2
-    for(unsigned int i=0; i<exposures.size(); i++) {
-        double tmp = MSE(ori, cmp, gamma, exposures[i]);
+    auto n = exposures.size();
+    double mse = 0.0;
+    for(auto i = 0; i < n; i++) {
+        double mse_i = MSE(ori, cmp, gamma, exposures[i], nBit);
 
         #ifdef PIC_DEBUG
-            printf("-- Pass: %d \t MSE: %g\n", i, tmp);
+            printf("-- Pass: %d \t MSE: %g\n", i, mse_i);
        #endif
 
-        aMSE += tmp;
+        mse += mse_i;
     }
 
-    aMSE /= double(maxFstop - minFstop + 1);
+    mse /= double(n * ori->channels);
 
-    double MSEconst = double(ori->channels) * 65025.0; //NOTE: 65025 = 255 * 255;
-    float ret = float(10.0 * log10(MSEconst / aMSE));
+    int nValues = (1 << nBit) - 1;
+    double nValuesd = double(nValues);
+    double ret = 10.0 * log10((nValuesd * nValuesd) / mse);
 
     #ifdef PIC_DEBUG
         printf("-- value: %f\n", ret);

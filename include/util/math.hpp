@@ -33,7 +33,8 @@ namespace pic {
 const float C_LOG_NAT_2         = 0.69314718055994530941723212145818f;
 
 //Reciprocal natural logarithm of 2
-const float C_INV_LOG_NAT_2     = 1.4426950408889634073599246810019f;
+const float  C_INV_LOG_NAT_2    = 1.4426950408889634073599246810019f;
+const double C_INV_LOG_NAT_2_D  = 1.4426950408889634073599246810019;
 
 //Epsilon
 const float C_EPSILON           = 1e-6f;
@@ -364,6 +365,16 @@ PIC_INLINE float powf10fMinusEpsilon(float x)
 PIC_INLINE float log2f(float x)
 {
     return logf(x) * C_INV_LOG_NAT_2;
+}
+
+/**
+ * @brief log2
+ * @param x
+ * @return
+ */
+PIC_INLINE double log2(double x)
+{
+    return log(x) * C_INV_LOG_NAT_2_D;
 }
 
 /**

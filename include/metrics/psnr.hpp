@@ -35,9 +35,10 @@ namespace pic {
  * @param max_value is the maximum value of the domain of ori and cmp. If ori and comp
  * are normalized 8-bit LDR/SDR images max_value MUST BE 1.0!
  * @param bLargeDifferences, if true, skips big differences for stability.
+ * @param type is the domain where to compute MSE (linear, logarithmic, and PU).
  * @return It returns the PSNR value between ori and cmp.
  */
-PIC_INLINE double PSNR(Image *ori, Image *cmp, double max_value = -1.0, bool bLargeDifferences = false)
+PIC_INLINE double PSNR(Image *ori, Image *cmp, double max_value = -1.0, bool bLargeDifferences = false, METRICS_DOMAIN type = MD_LIN)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -65,7 +66,9 @@ PIC_INLINE double PSNR(Image *ori, Image *cmp, double max_value = -1.0, bool bLa
         delete[] max_value_cmp;
     }
 
-    double rmse_value = RMSE(ori, cmp, bLargeDifferences);
+    double rmse_value = RMSE(ori, cmp, bLargeDifferences, type);
+
+    max_value = changeDomain(max_value, type);
 
     if(rmse_value > 0.0) {
         return 20.0 * log10(max_value / rmse_value);

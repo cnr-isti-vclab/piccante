@@ -31,12 +31,17 @@ namespace pic {
  * @param ori is the original image.
  * @param cmp is the distorted image.
  * @param bLargeDifferences, if true, skips big differences for stability.
+ * @param type is the domain where to compute MSE (linear, logarithmic, and PU).
  * @return It returns the MSE value between ori and cmp.
  */
-PIC_INLINE double MSE(Image *ori, Image *cmp, bool bLargeDifferences = false)
+PIC_INLINE double MSE(Image *ori, Image *cmp, bool bLargeDifferences = false, METRICS_DOMAIN type = MD_LIN)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
+    }
+
+    if(!ori->isValid() || !cmp->isValid()) {
+        return -4.0;
     }
 
     if(!ori->isSimilarType(cmp)) {
@@ -56,7 +61,10 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, bool bLargeDifferences = false)
 
     double acc = 0.0;
     for(int i = 0; i < size; i++) {
-        double delta = ori->data[i] - cmp->data[i];
+        float o_val = changeDomain(ori->data[i], type);
+        float c_val = changeDomain(cmp->data[i], type);
+
+        double delta = double(o_val - c_val);
 
         if(delta <= largeDifferences) {
             acc += delta * delta;
@@ -73,9 +81,10 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, bool bLargeDifferences = false)
  * @param cmp is the distorted image.
  * @param gamma is the encoding gamma.
  * @param fstop is the f-stop value of the image.
+ * @param nBit is the number of bits used for the discretization.
  * @return It returns the MSE value between ori and cmp.
  */
-PIC_INLINE double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 0.0f)
+PIC_INLINE double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 0.0f, int nBit = 8)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
@@ -97,12 +106,15 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 
 
     unsigned long long acc = 0;
 
-    for(int i = 0; i < size; i++) {
-        int oriLDR = int(255.0f * (powf(ori->data[i] * exposure, invGamma)));
-        int cmpLDR = int(255.0f * (powf(cmp->data[i] * exposure, invGamma)));
+    unsigned int nValues = (1 << nBit) - 1;
+    float nValuesf = float(nValues);
 
-        oriLDR = CLAMPi(oriLDR, 0, 255);
-        cmpLDR = CLAMPi(cmpLDR, 0, 255);
+    for(int i = 0; i < size; i++) {
+        int oriLDR = int(nValuesf * (powf(ori->data[i] * exposure, invGamma)));
+        int cmpLDR = int(nValuesf * (powf(cmp->data[i] * exposure, invGamma)));
+
+        oriLDR = CLAMPi(oriLDR, 0, nValues);
+        cmpLDR = CLAMPi(cmpLDR, 0, nValues);
 
         int delta = cmpLDR - oriLDR;
 
@@ -117,11 +129,12 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 
  * @param ori is the original image.
  * @param cmp is the distorted image.
  * @param bLargeDifferences, if true, skips big differences for stability.
+ * @param type is the domain where to compute RMSE (linear, logarithmic, and PU).
  * @return It returns the MSE value between ori and cmp.
  */
-PIC_INLINE double RMSE(Image *ori, Image *cmp, bool bLargeDifferences = false)
+PIC_INLINE double RMSE(Image *ori, Image *cmp, bool bLargeDifferences = false, METRICS_DOMAIN type = MD_LIN)
 {
-    return sqrt(MSE(ori, cmp, bLargeDifferences));
+    return sqrt(MSE(ori, cmp, bLargeDifferences, type));
 }
 
 } // end namespace pic

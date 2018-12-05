@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 #include "../histogram.hpp"
 
+#include "../util/math.hpp"
 #include "../util/indexed_array.hpp"
 
 #include "../filtering/filter_luminance.hpp"
@@ -57,8 +58,8 @@ PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
     float commonMin = IndexedArray::min(img_lum->data, coord);
     float commonMax = IndexedArray::max(img_lum->data, coord);
 
-    float tminFstop = logf(commonMin) / logf(2.0f);
-    float tmaxFstop = logf(commonMax) / logf(2.0f);
+    float tminFstop = log2f(commonMin);
+    float tmaxFstop = log2f(commonMax);
 
     minFstop = int(lround(tminFstop));
     maxFstop = int(lround(tmaxFstop));

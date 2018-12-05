@@ -31,22 +31,22 @@ namespace pic {
 /**
  * @brief PUEncode encodes luminance values in a perceptually uniform space.
  * @param L is a luminance value in cd/m^2; it works for values
- * in the range [10^-6, 10^5] cd/m^2
+ * in the range [10^-6, 10^10] cd/m^2
  * @return it returns a perceptually uniform value
  */
 float PUEncode(float L)
 {
-    return Arrayf::interp(C_PU_x, C_PU_y, 256, L);
+    return Arrayf::interp(C_PU_x, C_PU_y, 256, log10f(L));
 }
 
 /**
  * @brief PUDecode decodes perceptually uniform values into luminance values.
  * @param p is a perceptually uniform luminance value
- * @return it returns a luminance value in the range [10^-6, 10^5] cd/m^2
+ * @return it returns a luminance value in the range [10^-6, 10^10] cd/m^2
  */
 float PUDecode(float p)
 {
-    return Arrayf::interp(C_PU_y, C_PU_x, 256, L);
+    return powf(10.0f, Arrayf::interp(C_PU_y, C_PU_x, 256, p));
 }
 
 } // end namespace pic
