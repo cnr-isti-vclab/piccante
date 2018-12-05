@@ -138,6 +138,8 @@ public:
 
         Image *ori_d = NULL;
         Image *cmp_d = NULL;
+
+        bool bAllocated = false;
         if(bDownsampling) {
             float f = MAX(1.0f, lround(MIN(ori->widthf, ori->heightf) / 256.0f));
 
@@ -151,6 +153,8 @@ public:
 
                 ori = ori_d;
                 cmp = cmp_d;
+
+                bAllocated = true;
             }
         }
 
@@ -196,11 +200,24 @@ public:
             src.push_back(img_sigma1_sigma2);
 
             ssim_map = flt_ssim.Process(src, ssim_map);
-        } else {
 
+            if(ssim_map != NULL) {
+                ssim_map->getMeanVal(NULL, &ssim_index);
+            }
+
+            ImageVecRelease(src);
         }
 
-        ssim_map->getMeanVal(NULL, &ssim_index);
+        if(bAllocated) {
+
+            if(ori_d != NULL) {
+                delete ori_d;
+            }
+
+            if(cmp_d != NULL) {
+                delete cmp_d;
+            }
+        }
 
         return ssim_map;
     }

@@ -25,6 +25,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../metrics/base.hpp"
 #include "../util/indexed_array.hpp"
 #include "../util/array.hpp"
+#include "../util/math.hpp"
+#include "../util/tile_list.hpp"
 
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_gaussian_2d.hpp"
@@ -33,6 +35,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The TMQI class
+ */
 class TMQI
 {
 public:
@@ -42,6 +47,9 @@ public:
     FilterGaussian2D flt_gauss2D;
     FilterSSIM flt_ssim;
 
+    /**
+     * @brief TMQI
+     */
     TMQI()
     {
         a = 0.8012f;
@@ -66,6 +74,39 @@ public:
         float u;
         img_LDR->getMeanVal(NULL, &u);
 
+        TileList tl(11, img_LDR->width, img_LDR->height);
+
+        float sig = 0.0f;
+        int n = int(tl.size());
+        for(int i = 0; i < n; i++) {
+            auto j = tl.getNext();
+
+            auto box = tl.getBBox(j);
+
+            float var_i;
+            img_LDR->getVarianceVal(NULL, &box, &var_i);
+
+            sig += sqrtf(var_i);
+        }
+
+        sig /= float(n);
+
+        float p_hat[] ={4.4f, 10.1f};
+        float beta_mode = (p_hat[0] - 1.0f) / (p_hat[0] + p_hat[1] - 2.0f);
+
+        float C_0 = betaPDF(beta_mode, p_hat[0], p_hat[1]);
+        float C = betaPDF(sig / 64.29f, p_hat[0], p_hat[1]);
+        float pc = C / C_0;
+
+        float mu_hat = 115.94f;
+        float sigma_hat = 27.99f;
+
+        float B = normalDistribution(u, mu_hat, sigma_hat);
+        float B_0 = normalDistribution(mu_hat, mu_hat, sigma_hat);
+
+        float pb = B / B_0;
+
+        return pb * pc;
     }
 
     /**

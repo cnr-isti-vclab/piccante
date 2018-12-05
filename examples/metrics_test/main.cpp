@@ -87,6 +87,10 @@ int main(int argc, char *argv[])
         printf("MAE: %3.3f\n", pic::MAE(&img0, tmp, false));
         printf("Relative Error: %f\n", pic::RelativeError(&img0, tmp));
 
+        pic::TMQI tmqi;
+        img0 *= 255.0f;
+        float N = tmqi.statisticalNaturalness(pic::FilterLuminance::execute(&img0, NULL));
+        printf("Naturalness: %f\n", N);
     } else {
         printf("No, the file is not valid!\n");
     }

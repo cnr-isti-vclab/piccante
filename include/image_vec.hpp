@@ -112,7 +112,7 @@ PIC_INLINE void ImaveVecGetExposureTimesAsArray(ImageVec &stack, std::vector<flo
 {
     output.clear();
 
-    for(unsigned int i = 0; i < stack.size(); i++) {
+    for(auto i = 0; i < stack.size(); i++) {
         float tmp = bLog ? logf(stack[i]->exposure) : stack[i]->exposure;
         output.push_back(tmp);
     }
@@ -129,13 +129,27 @@ PIC_INLINE bool ImageVecCheckSimilarType(ImageVec &stack)
         return false;
     }
 
-    for (size_t i=1; i<stack.size(); i++) {
+    for (auto i = 1; i < stack.size(); i++) {
         if (!stack[0]->isSimilarType(stack[i])) {
             return false;
         }
     }
 
     return true;
+}
+
+/**
+ * @brief ImageVecRelease
+ * @param stack
+ */
+PIC_INLINE void ImageVecRelease(ImageVec &stack)
+{
+    for (auto i = 0; i < stack.size(); i++) {
+        if(stack[i] != NULL) {
+            delete stack[i];
+            stack[i] = NULL;
+        }
+    }
 }
 
 } // end namespace pic

@@ -78,6 +78,12 @@ public:
     unsigned int getNext();
 
     /**
+     * @brief size
+     * @return
+     */
+    unsigned int size();
+
+    /**
      * @brief resetCounter sets the counter to zero.
      */
     void resetCounter();
@@ -154,6 +160,11 @@ PIC_INLINE unsigned int TileList::getNext()
         counter++;
     }
     return ret;
+}
+
+PIC_INLINE unsigned int TileList::size()
+{
+    return tiles.size();
 }
 
 PIC_INLINE void TileList::resetCounter()

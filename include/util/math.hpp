@@ -453,9 +453,7 @@ PIC_INLINE float normalDistribution(float x, float mu = 0.0f, float sigma = 1.0f
 
     float sigma_sq_2 = sigma * sigma * 2.0f;
     float d = x - mu;
-
     ret = exp(-(d * d) / sigma_sq_2) / sqrtf(sigma_sq_2 * C_PI);
-
 
     return ret;
 }
