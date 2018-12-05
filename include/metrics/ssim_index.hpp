@@ -136,6 +136,10 @@ public:
             return ssim_map;
         }
 
+        if(!ori->isSimilarType(cmp)) {
+            return ssim_map;
+        }
+
         Image *ori_d = NULL;
         Image *cmp_d = NULL;
 
@@ -158,14 +162,8 @@ public:
             }
         }
 
-        Image *L_ori, *L_cmp;
-        if(ori->channels > 1) {
-            L_ori = flt_lum.Process(Single(ori), NULL);
-            L_cmp = flt_lum.Process(Single(cmp), NULL);
-        } else {
-            L_ori = ori->clone();
-            L_cmp = cmp->clone();
-        }
+        Image *L_ori = flt_lum.Process(Single(ori), NULL);
+        Image *L_cmp = flt_lum.Process(Single(cmp), NULL);
 
         if(dynamic_range <= 0.0f) {
             dynamic_range = getDynamicRange(L_ori);

@@ -41,8 +41,8 @@ namespace pic {
 class TMQI
 {
 public:
-    float a, alpha, beta;
-
+    float a, invA, alpha, beta;
+    std::vector<float> weights;
     FilterLuminance flt_lum;
     FilterGaussian2D flt_gauss2D;
     FilterSSIM flt_ssim;
@@ -53,28 +53,35 @@ public:
     TMQI()
     {
         a = 0.8012f;
+        invA = 1.0f - a;
         alpha = 0.3046f;
         beta = 0.7088f;
+
+        weights.push_back(0.0448f);
+        weights.push_back(0.2856f);
+        weights.push_back(0.3001f);
+        weights.push_back(0.2363f);
+        weights.push_back(0.1333f);
     }
 
     /**
      * @brief statisticalNaturalness
      * @return
      */
-    float statisticalNaturalness(Image *img_LDR)
+    float statisticalNaturalness(Image *L_LDR)
     {
-        if(img_LDR == NULL) {
+        if(L_LDR == NULL) {
             return FLT_MAX;
         }
 
-        if(img_LDR->channels != 1) {
+        if(L_LDR->channels != 1) {
             return FLT_MAX;
         }
 
         float u;
-        img_LDR->getMeanVal(NULL, &u);
+        L_LDR->getMeanVal(NULL, &u);
 
-        TileList tl(11, img_LDR->width, img_LDR->height);
+        TileList tl(11, L_LDR->width, L_LDR->height);
 
         float sig = 0.0f;
         int n = int(tl.size());
@@ -84,7 +91,7 @@ public:
             auto box = tl.getBBox(j);
 
             float var_i;
-            img_LDR->getVarianceVal(NULL, &box, &var_i);
+            L_LDR->getVarianceVal(NULL, &box, &var_i);
 
             sig += sqrtf(var_i);
         }
@@ -110,13 +117,72 @@ public:
     }
 
     /**
-     * @brief execute
-     * @param ori
-     * @param cmp
+     * @brief structuralFidelity
+     * @param L_HDR
+     * @param L_LDR
+     * @param S
+     * @param s_map
+     * @return
      */
-    Image *execute(Image *ori, Image *img_LDR)
+    Image* structuralFidelity(Image *L_HDR, Image *L_LDR, float &S, Image *s_map = NULL)
     {
-        return NULL;
+        return s_map;
+    }
+
+    /**
+     * @brief execute
+     * @param img_HDR
+     * @param img_LDR
+     * @param Q
+     * @param N
+     * @param S
+     * @param tmqi_map
+     * @return
+     */
+    Image *execute(Image *img_HDR, Image *img_LDR, float &Q, float &N, float &S, Image *tmqi_map = NULL)
+    {
+        N = -1.0f;
+        S = -1.0f;
+        Q = -1.0f;
+
+        if(img_HDR == NULL || img_LDR == NULL) {
+            return tmqi_map;
+        }
+
+        if(!img_HDR->isValid() || !img_LDR->isValid()) {
+            return tmqi_map;
+        }
+
+        if(!img_HDR->isSimilarType(img_LDR)) {
+            return tmqi_map;
+        }
+
+        float max_img_LDR;
+        img_LDR->getMaxVal(NULL, &max_img_LDR);
+
+        if(max_img_LDR <= 1.0f) {
+            return tmqi_map;
+        }
+
+        Image *L_HDR = flt_lum.Process(Single(img_HDR), NULL);
+        Image *L_LDR = flt_lum.Process(Single(img_LDR), NULL);
+
+        float min_L_HDR, max_L_HDR;
+
+        L_HDR->getMinVal(NULL, &min_L_HDR);
+        L_HDR->getMaxVal(NULL, &max_L_HDR);
+
+        *L_HDR -= min_L_HDR;
+
+        float scale = (powf(2.0f, 32.0f) - 1.0f) / (max_L_HDR - min_L_HDR);
+        *L_HDR *= scale;
+
+        N = statisticalNaturalness(L_LDR);
+        tmqi_map = structuralFidelity(L_HDR, L_LDR, S, tmqi_map);
+
+        Q = a * powf(S, alpha) + invA * powf(N, beta);
+
+        return tmqi_map;
     }
 
 };
