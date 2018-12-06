@@ -41,57 +41,49 @@ int main(int argc, char *argv[])
         img0_str = argv[1];
         img1_str = argv[2];
     } else {
-        img0_str = "../data/input/singapore.png";
+        img0_str = "../data/input/bottles.hdr";
         bCreate = true;
     }
 
-    //Image values are loaded and normalized in [0, 1];
-    //NOTE: gamma removal or CRF linearization are NOT applied.
     pic::Image img0, img1;
     img0.Read(img0_str, pic::LT_NOR);
 
     if(!bCreate) {
-        img1.Read(img1_str, pic::LT_NOR);
+        //this an LDR image with values in [0,255]!
+        bCreate = img1.Read(img1_str, pic::LT_NONE);
     }
 
     printf("Is it valid? ");
-    if(img0.isValid()) {
+    if(img0.isValid() && bCreate) {
         printf("OK\n");
 
         std::string name = pic::removeLocalPath(img0_str);
         name = pic::removeExtension(name);
 
-        pic::Image *tmp;
+        pic::Image *tmp = NULL;
         if(bCreate) {
-            printf("Filtering the input image (blurring)...");
-            tmp = pic::FilterGaussian2D::execute(&img0, NULL, 16.0f);
+            printf("Tone mapping the input image...");
+            pic::DragoTMO dtmo;
+            tmp = dtmo.Process(&img0, tmp);
             printf("Ok\n");
-            tmp->Write("../data/output/" + name + "_flt.hdr");
+            tmp->Write("../data/output/" + name + "_flt.png");
+
+            tmp->applyFunction(pic::simple8bitWithGamma);
         } else {
             tmp = &img1;
-        }
+        }        
 
-        float ssim_index;
-        pic::SSIMIndex metric;
-        pic::Image *ssim_map = metric.execute(Double(&img0, tmp), ssim_index, NULL);
-        printf("Ok\n");
-
-        if(ssim_map != NULL) {
-            ssim_map->Write("../data/output/" + name + "_ssim_map.hdr");
-        }
-
-        printf("SSIM index: %3.3f\n", ssim_index);
-        printf("MSE: %3.3f\n", pic::MSE(&img0, tmp, false));
-        printf("RMSE: %3.3f\n", pic::RMSE(&img0, tmp));
-        printf("PSNR: %3.3f\n", pic::PSNR(&img0, tmp));
-        printf("MAE: %3.3f\n", pic::MAE(&img0, tmp, false));
-        printf("Relative Error: %f\n", pic::RelativeError(&img0, tmp));
-
-        pic::TMQI tmqi;
-        img0 *= 255.0f;
         float Q, N, S;
-        tmqi.execute(pic::Double(tmp, &img0), Q, N, S, NULL);
+        pic::TMQI tmqi;
+        tmqi.execute(pic::Double(&img0, tmp), Q, N, S, NULL);
         printf("TMQI -- Q: %f N: %f S: %f\n", Q, N, S);
+        printf("MSE: %3.3f\n", pic::MSE(&img0, tmp, false, pic::MD_PU));
+        printf("RMSE: %3.3f\n", pic::RMSE(&img0, tmp, false, pic::MD_PU));
+        printf("PSNR: %3.3f\n", pic::PSNR(&img0, tmp, false, pic::MD_PU));
+        printf("MAE: %3.3f\n", pic::MAE(&img0, tmp, false, pic::MD_PU));
+        printf("Relative Error: %f\n", pic::RelativeError(&img0, tmp, false, pic::MD_PU));
+
+
     } else {
         printf("No, the file is not valid!\n");
     }

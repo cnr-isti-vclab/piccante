@@ -36,7 +36,7 @@ namespace pic {
  */
 float PUEncode(float L)
 {
-    return Arrayf::interp(C_PU_x, C_PU_y, 256, log10f(L));
+    return Arrayf::interp(C_PU_x, C_PU_y, 256, log10f(L + 1e-7f));
 }
 
 /**

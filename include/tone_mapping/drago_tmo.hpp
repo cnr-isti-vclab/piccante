@@ -75,6 +75,10 @@ public:
      */
     Image *Process(Image *imgIn, Image *imgOut)
     {
+        if(!checkInput(imgIn)) {
+            return imgOut;
+        }
+
         updateImage(imgIn);
 
         //compute luminance and its statistics

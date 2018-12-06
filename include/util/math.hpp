@@ -558,6 +558,17 @@ PIC_INLINE float sigmoidInv(float x)
     return x / (1.0f - x);
 }
 
+/**
+ * @brief simple8bitWithGamma
+ * @param x
+ * @return
+ */
+PIC_INLINE float simple8bitWithGamma(float x)
+{
+    float t0 = powf(x, 1.0f / 2.2f) * 255.0f;
+    float t1 = CLAMPi(t0, 0.0f, 255.0f);
+    return float(int(t1));
+}
 
 } // end namespace pic
 

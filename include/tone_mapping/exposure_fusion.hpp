@@ -56,6 +56,11 @@ protected:
         return x > 0.0 ? x : 1.0f;
     }
 
+    /**
+     * @brief setNegToZero
+     * @param x
+     * @return
+     */
     static float setNegToZero(float x)
     {
         return MAX(x, 0.0f);
@@ -120,7 +125,7 @@ public:
     {
         int n = int(imgIn.size());
 
-        if(n < 2 || ImageVecCheck(imgIn, -1)) {
+        if(n < 2 || !ImageVecCheck(imgIn, -1)) {
             return imgOut;
         }
 
@@ -186,7 +191,7 @@ public:
         //final result
         imgOut = pOut->reconstruct(imgOut);
 
-        imgOut->applyFunction(setNegToZero);
+      //  imgOut->applyFunction(setNegToZero);
 
         //free the memory
         delete pW;

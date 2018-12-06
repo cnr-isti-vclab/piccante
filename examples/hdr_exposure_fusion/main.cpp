@@ -57,7 +57,10 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         printf("Writing the tone mapped image to disk...\n");
-        bool bWritten = imgToneMapped->Write("../data/output/exposure_fusion_tmo.png", pic::LT_NOR);
+
+        std::string name = pic::removeLocalPath(img_str);
+
+        bool bWritten = imgToneMapped->Write("../data/output/"+ pic::removeExtension(name)  + "_ef.png", pic::LT_NOR);
 
         if(bWritten) {
             printf("Ok\n");
