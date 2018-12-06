@@ -19,6 +19,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_ALGORITHMS_PYRAMID_HPP
 
 #include "../image.hpp"
+#include "../image_vec.hpp"
+#include "../util/std_util.hpp"
 #include "../filtering/filter_gaussian_2d.hpp"
 #include "../filtering/filter_sampler_2d.hpp"
 #include "../filtering/filter_sampler_2dsub.hpp"
@@ -176,11 +178,7 @@ PIC_INLINE Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, 
 
 PIC_INLINE Pyramid::~Pyramid()
 {
-    for(unsigned int i = 0; i < stack.size(); i++) {
-        if(stack[i] != NULL) {
-            delete stack[i];
-        }
-    }
+    ImageVecRelease(stack);
 
     if(flt_gauss != NULL) {
         delete flt_gauss;
@@ -303,7 +301,7 @@ PIC_INLINE void Pyramid::update(Image *img)
         return;
     }
 
-    if(stack.empty()) {
+    if(stack.empty() || !img->isValid()) {
         return;
     }
 

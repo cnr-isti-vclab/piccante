@@ -53,31 +53,25 @@ protected:
                 tmp[3] = (*src[0])(j + 1, i + 1);
 
                 int counter = 0;
-                float *tmp_ret = (*dst)(j2, i2);
+                float *out = (*dst)(j2, i2);
 
-                for(int l = 0; l < channels; l++) {
-                    tmp_ret[l] = 0.0f;
-                }
+                Arrayf::assign(0.0f, out, channels);
 
-                for(unsigned k = 0; k < 4; k++) {
+                for(int k = 0; k < 4; k++) {
                     if(Arrayf::distanceSq(tmp[k], value, channels) > threshold) {
                         counter++;
 
                         for(int l = 0; l < channels; l++) {
-                            tmp_ret[l] += tmp[k][l];
+                            out[l] += tmp[k][l];
                         }
                     }
                 }
 
                 if(counter > 0) {
-                    float counter_f = float(counter);
-                    for(int l = 0; l < channels; l++) {
-                        tmp_ret[l] /= counter_f;
-                    }
+                    float counter_f = float(counter);                    
+                    Arrayf::div(out, channels, counter_f);
                 } else {
-                    for(int l = 0; l < channels; l++) {
-                        tmp_ret[l] = value[l];
-                    }
+                    Arrayf::assign(value, channels, out);
                 }
             }
         }

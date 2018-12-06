@@ -20,6 +20,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+#include <math.h>
+
+#include "../util/array.hpp"
+
 /**
  * @brief The PrecomputedGaussian class
  */
@@ -33,11 +37,17 @@ protected:
     {
         halfKernelSize = kernelSize >> 1;
         kernelSize = (halfKernelSize << 1) + 1;
+
+        if(coeff != NULL) {
+            delete[] coeff;
+            coeff = NULL;
+        }
+
         coeff = new float[kernelSize];
 
-        float sum = 0.0f;
         float sigma_sq_2 = (2.0f * sigma * sigma);
 
+        float sum = 0.0f;
         for(int i = 0; i < kernelSize; i++) {
             int i_s = i - halfKernelSize;
             i_s *= i_s;
@@ -47,9 +57,7 @@ protected:
 
         //normalize the kernel
         if(sum > 0.0f) {
-            for(int i = 0; i < kernelSize; i++) {
-                coeff[i] /= sum;
-            }
+            Arrayf::div(coeff, kernelSize, sum);
         }
     }
 
@@ -74,6 +82,7 @@ public:
      */
     PrecomputedGaussian(float sigma)
     {
+        coeff = NULL;
         calculateKernel(sigma);
     }
 
@@ -81,22 +90,26 @@ public:
     {
         if(coeff != NULL) {
             delete[] coeff;
+            coeff = NULL;
         }
-
-        coeff = NULL;
     }
 
     /**
      * @brief calculateKernel computes a Gaussian kernel of size sigma
      * @param sigma
      */
-    void calculateKernel(float sigma)
+    void calculateKernel(float sigma, int kernelSize = -1)
     {
         this->sigma = sigma;
-        //The sigma for the size of the kernel
-        kernelSize = PrecomputedGaussian::getKernelSize(sigma);
 
-        //Precompute Gaussian coefficients
+        //the sigma for the size of the kernel
+        if(kernelSize < 3) {
+            this->kernelSize = PrecomputedGaussian::getKernelSize(sigma);
+        } else {
+            this->kernelSize = kernelSize;
+        }
+
+        //precompute Gaussian coefficients
         precomputeCoefficients();
     }
 

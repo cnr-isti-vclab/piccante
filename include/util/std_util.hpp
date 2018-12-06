@@ -79,6 +79,22 @@ inline void setToANullVector(std::vector< T* > &vec, unsigned int n)
     }
 }
 
+/**
+ * @brief release
+ * @param data
+ * @return
+ */
+template<class T>
+inline T* releasePtr(T *data)
+{
+    if(data != NULL) {
+        delete data;
+        data = NULL;
+    }
+
+    return data;
+}
+
 } // end namespace pic
 
 #endif // PIC_UTIL_STD_UTIL_HPP

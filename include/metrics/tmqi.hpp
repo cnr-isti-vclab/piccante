@@ -36,6 +36,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_gaussian_2d.hpp"
 #include "../filtering/filter_downsampler_2d.hpp"
+#include "../filtering/filter_down_pp.hpp"
+
 #include "../filtering/filter_tmqi.hpp"
 
 namespace pic {
@@ -187,18 +189,21 @@ public:
         Image *t_HDR = L_HDR;
         Image *t_LDR = L_LDR;
         for(auto i = 0; i < weights.size(); i++) {
-            float S_i;
             f /= 2.0f;
-            localStructuralFidelity(t_HDR, t_LDR, f, S_i, NULL);
 
-           // map->Write("../name_" + fromNumberToString(i) + ".pfm");
+            if(t_HDR != NULL && t_LDR != NULL) {
+                float S_i;
+                localStructuralFidelity(t_HDR, t_LDR, f, S_i, NULL);
 
-            printf("%f - %f\n", S_i, weights[i]);
+                S *= powf(S_i, weights[i]);
 
-            S *= powf(S_i, weights[i]);
-
-            t_HDR = FilterDownSampler2D::execute(t_HDR, NULL, 0.5f);
-            t_LDR = FilterDownSampler2D::execute(t_LDR, NULL, 0.5f);
+                int width = t_HDR->width >> 1;
+                int height = t_HDR->height >> 1;
+                t_HDR = FilterSampler2D::execute(t_HDR, NULL, width, height);
+                t_LDR = FilterSampler2D::execute(t_LDR, NULL, width, height);
+            } else {
+                break;
+            }
         }
 
         return S;

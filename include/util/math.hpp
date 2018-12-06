@@ -478,7 +478,7 @@ PIC_INLINE float normalDistribution(float x, float mu = 0.0f, float sigma = 1.0f
 float normalCDF(float x, float mu, float sigma)
 {
     float t = (x - mu) / (sigma * C_SQRT_2);
-    return (1.0f + std::erf(t)) / 2.0f;
+    return (1.0f + std::erf(t)) * 0.5f;
 }
 
 /**

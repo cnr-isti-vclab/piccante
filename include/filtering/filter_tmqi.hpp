@@ -31,6 +31,8 @@ class FilterTMQI: public Filter
 {
 protected:
 
+    float C1, C2;
+
     /**
      * @brief ProcessBBox
      * @param dst
@@ -39,28 +41,19 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        float C1 = 0.01f;
-        float C2 = 10.0f;
-
-        int width    = src[0]->width;
-        int channels = src[0]->channels;
-
         for(int j = box->y0; j < box->y1; j++) {
-            int c = j * width;
-
             for(int i = box->x0; i < box->x1; i++) {
-                int ind = (c + i) *  channels;
+                float *out = (*dst)(i, j);
 
-                float sigma1 = src[0]->data[ind];
+                float sigma1 = (*src[0])(i, j)[0];
                 float sigma1p = normalCDF(sigma1, u_hdr, sig_hdr);
 
-                float sigma2 = src[1]->data[ind];
+                float sigma2 = (*src[1])(i, j)[0];
                 float sigma2p = normalCDF(sigma2, u_ldr, sig_ldr);
 
-                float sigma12 = src[2]->data[ind];
+                float sigma12 = (*src[2])(i, j)[0];
 
-                float tmp =  (((2*sigma1p*sigma2p)+C1)/((sigma1p*sigma1p)+(sigma2p*sigma2p)+C1))*((sigma12+C2)/(sigma1*sigma2 + C2));
-                dst->data[ind] = tmp;
+                out[0] = (((2*sigma1p*sigma2p)+C1)/((sigma1p*sigma1p)+(sigma2p*sigma2p)+C1))*((sigma12+C2)/(sigma1*sigma2 + C2));
             }
         }
     }
@@ -75,6 +68,8 @@ public:
      */
     FilterTMQI() : Filter()
     {
+        C1 = 0.01f;
+        C2 = 10.0f;
         minInputImages = 3;
     }
 
@@ -96,6 +91,7 @@ public:
     void update(float sf)
     {
         float CSF = MannosCSF(sf);
+
         u_hdr = 128.0f / (1.4f * CSF);
         sig_hdr = u_hdr / 3.0f;
 

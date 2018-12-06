@@ -77,11 +77,14 @@ int main(int argc, char *argv[])
         pic::TMQI tmqi;
         tmqi.execute(pic::Double(&img0, tmp), Q, N, S, NULL);
         printf("TMQI -- Q: %f N: %f S: %f\n", Q, N, S);
+
+        /*
         printf("MSE: %3.3f\n", pic::MSE(&img0, tmp, false, pic::MD_PU));
         printf("RMSE: %3.3f\n", pic::RMSE(&img0, tmp, false, pic::MD_PU));
         printf("PSNR: %3.3f\n", pic::PSNR(&img0, tmp, false, pic::MD_PU));
         printf("MAE: %3.3f\n", pic::MAE(&img0, tmp, false, pic::MD_PU));
         printf("Relative Error: %f\n", pic::RelativeError(&img0, tmp, false, pic::MD_PU));
+        */
 
 
     } else {
