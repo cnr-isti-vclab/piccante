@@ -24,7 +24,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter_laplacian.hpp"
 #include "../filtering/filter_exposure_fusion_weights.hpp"
 #include "../algorithms/pyramid.hpp"
-
+#include "../util/std_util.hpp"
 #include "../tone_mapping/get_all_exposures.hpp"
 #include "../tone_mapping/tone_mapping_operator.hpp"
 
@@ -42,10 +42,26 @@ namespace pic {
 
 class ExposureFusion: public ToneMappingOperator
 {
-public:
+protected:
     FilterLuminance flt_lum;
-
     FilterExposureFusionWeights flt_weights;
+
+    /**
+     * @brief ifNegGetOne
+     * @param x
+     * @return
+     */
+    static float ifNegGetOne(float x)
+    {
+        return x > 0.0 ? x : 1.0f;
+    }
+
+    static float setNegToZero(float x)
+    {
+        return MAX(x, 0.0f);
+    }
+
+public:
 
     /**
      * @brief ExposureFusion
@@ -56,9 +72,8 @@ public:
     ExposureFusion(float wC = 1.0f, float wE = 1.0f,
                    float wS = 1.0f)
     {
-        images.push_back(NULL);
-        images.push_back(NULL);
-        images.push_back(NULL);
+
+        setToANullVector<Image>(images, 3);
 
         update(wC, wE, wS);
     }
@@ -90,22 +105,22 @@ public:
     {
         pic::ImageVec stack = getAllExposuresImages(imgIn);
 
-        imgOut = executeStack(stack, imgOut);
+        imgOut = ProcessStack(stack, imgOut);
 
         return imgOut;
     }
 
     /**
-     * @brief executeStack
+     * @brief ProcessStack
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *executeStack(ImageVec imgIn, Image *imgOut)
+    Image *ProcessStack(ImageVec imgIn, Image *imgOut)
     {
         int n = int(imgIn.size());
 
-        if(n < 2) {
+        if(n < 2 || ImageVecCheck(imgIn, -1)) {
             return imgOut;
         }
 
@@ -136,11 +151,9 @@ public:
             *images[2] += *images[1];
         }
 
-        for(int i = 0; i < images[2]->size(); i++) {
-            images[2]->data[i] = images[2]->data[i] > 0.0f ? images[2]->data[i] : 1.0f;
-        }
+        images[2]->applyFunction(ifNegGetOne);
 
-        //Accumulation Pyramid
+        //accumulate Pyramid
         #ifdef PIC_DEBUG
             printf("Blending...");
         #endif
@@ -173,10 +186,7 @@ public:
         //final result
         imgOut = pOut->reconstruct(imgOut);
 
-        #pragma omp parallel for
-        for(int i = 0; i < imgOut->size(); i++) {
-            imgOut->data[i] = MAX(imgOut->data[i], 0.0f);
-        }
+        imgOut->applyFunction(setNegToZero);
 
         //free the memory
         delete pW;

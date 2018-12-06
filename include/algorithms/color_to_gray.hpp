@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 #include "../image.hpp"
+#include "../image_vec.hpp"
 #include "../filtering/filter_channel.hpp"
 #include "../tone_mapping/exposure_fusion.hpp"
 
@@ -53,11 +54,13 @@ PIC_INLINE Image *colorToGray(Image *imgIn, Image *imgOut)
 
     ExposureFusion ef(1.0f, 1.0f, 0.0f);
 
-    imgOut = ef.executeStack(img_vec, imgOut);
+    imgOut = ef.ProcessStack(img_vec, imgOut);
 
     for(int i = 0; i<channels; i++) {
         delete img_vec[i];
     }
+
+    ImageVecRelease(img_vec);
 
     return imgOut;
 }

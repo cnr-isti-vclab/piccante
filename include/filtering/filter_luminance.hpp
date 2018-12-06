@@ -52,9 +52,8 @@ protected:
                 float *data_dst = (*dst)(i, j);
 
                 data_dst[0] = data_src[0] * weights[0];
-                for(int k = 1; k < src[0]->channels; k++) {
-                    data_dst[0] += data_src[k] * weights[k];
-                }
+
+                data_dst[0] = Arrayf::dot(data_src, weights, src[0]->channels);
             }
         }
     }

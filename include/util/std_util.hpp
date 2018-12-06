@@ -51,7 +51,12 @@ inline void stdVectorClear(std::vector<T *> &vec)
 {
     for(unsigned int i = 0; i < vec.size(); i++) {
         T *tmp = vec[i];
-        delete tmp;
+
+        if(tmp != NULL) {
+            delete tmp;
+        }
+
+        vec[i] = NULL;
     }
 
     vec.clear();

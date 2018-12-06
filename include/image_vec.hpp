@@ -150,6 +150,8 @@ PIC_INLINE void ImageVecRelease(ImageVec &stack)
             stack[i] = NULL;
         }
     }
+
+    stack.clear();
 }
 
 /**
@@ -160,11 +162,18 @@ PIC_INLINE void ImageVecRelease(ImageVec &stack)
  */
 PIC_INLINE bool ImageVecCheck(ImageVec &imgIn, int minInputImages)
 {
-    if(imgIn.size() < minInputImages) {
-        return false;
+    int n;
+    if(minInputImages < 0) {
+        n = imgIn.size();
+    } else {
+        if(imgIn.size() < minInputImages) {
+            return false;
+        }
+
+        n = minInputImages;
     }
 
-    for(int i = 0; i < minInputImages; i ++) {
+    for(int i = 0; i < n; i ++) {
         if(imgIn[i] == NULL) {
             return false;
         } else {

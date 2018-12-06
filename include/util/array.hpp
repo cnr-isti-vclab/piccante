@@ -320,6 +320,30 @@ public:
     }
 
     /**
+     * @brief getMean
+     * @param data
+     * @param size
+     * @param ind
+     * @return
+     */
+    static inline T getMean(T *data, int size)
+    {
+        if(data == NULL || size < 1) {
+            return T(0);
+        }
+
+        T ret = data[0];
+
+        for(int i = 1; i < size; i++) {
+            ret += data[i];
+        }
+
+        ret /= T(size);
+
+        return ret;
+    }
+
+    /**
      * @brief sum
      * @param data
      * @param size

@@ -21,6 +21,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 #include "../base.hpp"
+#include "../util/math.hpp"
+#include "../util/array.hpp"
 
 /**
  * @brief computeSaturation
@@ -34,24 +36,15 @@ PIC_INLINE float computeSaturation(float *data, int channels = 3)
         return 1.0f;
     }
 
-    float tmp, var, tmpMu;
+    float mu = Arrayf::getMean(data, channels);
 
-    tmpMu = 0.0f;
-
+    float var = data[0];
     for(int i = 0; i < channels; i++) {
-        tmpMu += data[i];
-    }
-
-    tmpMu /= float(channels);
-
-    var = 0.0f;
-
-    for(int i = 0; i < channels; i++) {
-        tmp = data[i] - tmpMu;
+        float tmp = data[i] - mu;
         var += tmp * tmp;
     }
 
-    var = sqrtf(MAX(var / float(channels), 0.0f));
+    var = sqrtf_s(var / float(channels));
 
     return var;
 }

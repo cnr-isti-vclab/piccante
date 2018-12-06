@@ -64,11 +64,7 @@ public:
      */
     void release()
     {
-        for(auto i = 0; i < images.size(); i++) {
-            delete images[i];
-            images[i] = NULL;
-        }
-
+        ImageVecRelease(images);
         releaseAux();
     }
 
