@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 #include "../image_vec.hpp"
 #include "../util/std_util.hpp"
+#include "../filtering/filter.hpp"
 #include "../filtering/filter_gaussian_2d.hpp"
 #include "../filtering/filter_sampler_2d.hpp"
 #include "../filtering/filter_sampler_2dsub.hpp"
@@ -41,6 +42,7 @@ protected:
     FilterSampler2D     *flt_sampler;
     FilterSampler2DSub  *flt_sub;
     FilterSampler2DAdd  *flt_add;
+    std::vector< Filter* > filters;
 
     ImageVec trackerRec, trackerUp;
 
@@ -183,44 +185,29 @@ PIC_INLINE Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, 
 PIC_INLINE Pyramid::~Pyramid()
 {
     stdVectorClear<Image>(stack);
-
-    if(flt_gauss != NULL) {
-        delete flt_gauss;
-        flt_gauss = NULL;
-    }
-
-    if(flt_sampler != NULL) {
-        delete flt_sampler;
-        flt_sampler = NULL;
-    }
-
-    if(flt_sub != NULL) {
-        delete flt_sub;
-        flt_sub = NULL;
-    }
-
-    if(flt_add != NULL) {
-        delete flt_add;
-        flt_add = NULL;
-    }
+    stdVectorClear<Filter>(filters);
 }
 
 PIC_INLINE void Pyramid::initFilters()
 {
     if(flt_gauss == NULL) {
         flt_gauss = new FilterGaussian2D(1.0f);
+        filters.push_back(flt_gauss);
     }
 
     if(flt_sampler == NULL) {
         flt_sampler = new FilterSampler2D(0.5f);
+        filters.push_back(flt_sampler);
     }
 
     if(flt_sub == NULL) {
         flt_sub = new FilterSampler2DSub(NULL);
+        filters.push_back(flt_sub);
     }
 
     if(flt_add == NULL) {
         flt_add = new FilterSampler2DAdd(NULL);
+        filters.push_back(flt_add);
     }
 }
 

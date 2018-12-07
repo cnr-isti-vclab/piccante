@@ -42,6 +42,7 @@ protected:
     FilterGLSampler2D   *flt_sampler;
     FilterGLOp		*flt_add, *flt_sub;
     FilterGLBlend       *flt_blend;
+    std::vector<FilterGL *> filters;
 
     ImageGLVec          trackerRec, trackerUp;
 
@@ -164,53 +165,34 @@ PIC_INLINE PyramidGL::~PyramidGL()
     stdVectorClear<ImageGL>(stack);
     stdVectorClear<ImageGL>(trackerUp);
     stdVectorClear<ImageGL>(trackerRec);
-
-    if(flt_gauss != NULL) {
-        delete flt_gauss;
-        flt_gauss = NULL;
-    }
-
-    if(flt_sampler != NULL) {
-        delete flt_sampler;
-        flt_sampler = NULL;
-    }
-
-    if(flt_add != NULL) {
-        delete flt_add;
-        flt_add = NULL;
-    }
-
-    if(flt_sub != NULL) {
-        delete flt_sub;
-        flt_sub = NULL;
-    }
-
-    if(flt_blend != NULL) {
-        delete flt_blend;
-        flt_blend = NULL;
-    }
+    stdVectorClear<FilterGL>(filters);
 }
 
 PIC_INLINE void PyramidGL::initFilters()
 {
     if(flt_gauss == NULL) {
         flt_gauss = new FilterGLGaussian2D(1.0f);
+        filters.push_back(flt_gauss);
     }
 
     if(flt_sampler == NULL) {
         flt_sampler = new FilterGLSampler2D(0.5f);
+        filters.push_back(flt_sampler);
     }
 
     if(flt_add == NULL) {
         flt_add  = FilterGLOp::CreateOpAdd(false);
+        filters.push_back(flt_add);
     }
 
     if(flt_sub == NULL) {
         flt_sub  = FilterGLOp::CreateOpSub(false);
+        filters.push_back(flt_sub);
     }
 
     if(flt_blend == NULL) {
         flt_blend = new FilterGLBlend();
+        filters.push_back(flt_blend);
     }
 }
 
@@ -294,9 +276,9 @@ PIC_INLINE void PyramidGL::update(ImageGL *img)
             tmpD = flt_sampler->Process(SingleGL(tmpG), trackerUp[i]);
         }
 
-        if(lapGauss) {	//Laplacian Pyramid
+        if(lapGauss) { //Laplacian Pyramid
             flt_sub->Process(DoubleGL(tmpImg, tmpD), tmpG);
-        } else {		//Gaussian Pyramid
+        } else { //Gaussian Pyramid
             *tmpG = *tmpImg;
         }
 

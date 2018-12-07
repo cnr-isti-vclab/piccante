@@ -57,17 +57,6 @@ public:
     FilterGLDragoTMO();
 
     /**
-     * @brief FilterGLDragoTMO
-     * @param Ld_Max
-     * @param b
-     * @param LMax
-     * @param Lwa
-     * @param bGammaCorrection
-     */
-    FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
-                     bool bGammaCorrection);
-
-    /**
      * @brief update
      * @param Ld_Max
      * @param b
@@ -85,40 +74,6 @@ PIC_INLINE FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()
     Lwa		= -1.0f;
 
     bGammaCorrection = false;
-
-    FragmentShader();
-    initShaders();
-}
-
-PIC_INLINE FilterGLDragoTMO::FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
-                                   bool bGammaCorrection = false): FilterGL()
-{
-    //protected values are assigned/computed
-    if(Ld_Max > 0.0f) {
-        this->Ld_Max = Ld_Max;
-    } else {
-        this->Ld_Max = 100.0f;
-    }
-
-    if(b > 0.0f) {
-        this->b = b;
-    } else {
-        this->b = 0.95f;
-    }
-
-    if(LMax > 0.0f) {
-        this->LMax = LMax;
-    } else {
-        this->LMax = 1e6f;
-    }
-
-    if(Lwa > 0.0f) {
-        this->Lwa = Lwa;
-    } else {
-        this->Lwa = 1.0f;
-    }
-
-    this->bGammaCorrection = bGammaCorrection;
 
     FragmentShader();
     initShaders();
@@ -153,14 +108,6 @@ PIC_INLINE void FilterGLDragoTMO::FragmentShader()
     fragment_source = gammaCorrection(fragment_source, bGammaCorrection);
 }
 
-PIC_INLINE void FilterGLDragoTMO::computeConstants()
-{
-    Lwa_scaled  = Lwa / powf(1.0f + b - 0.85f, 5.0f);
-    LMax_scaled = LMax / Lwa_scaled;
-    constant1   = logf(b) / logf(0.5f);
-    constant2   = (Ld_Max / 100.0f) / (log10(1 + LMax_scaled));
-}
-
 PIC_INLINE void FilterGLDragoTMO::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLDragoTMO");
@@ -169,31 +116,15 @@ PIC_INLINE void FilterGLDragoTMO::initShaders()
 
 PIC_INLINE void FilterGLDragoTMO::update(float Ld_Max, float b, float LMax, float Lwa)
 {
-    if(Ld_Max > 0.0f) {
-        this->Ld_Max = Ld_Max;
-    } else {
-        this->Ld_Max = 100.0f;
-    }
+    this->Ld_Max = Ld_Max > 0.0f ? Ld_Max : 100.0f;
+    this->b = b > 0.0f ? b : 0.95f;
+    this->LMax = LMax > 0.0f ? LMax : 1e6f;
+    this->Lwa = Lwa > 0.0f ? Lwa : 1.0f;
 
-    if(b > 0.0f) {
-        this->b = b;
-    } else {
-        this->b = 0.95f;
-    }
-
-    if(LMax > 0.0f) {
-        this->LMax = LMax;
-    } else {
-        this->LMax = 1e6f;
-    }
-
-    if(Lwa > 0.0f) {
-        this->Lwa = Lwa;
-    } else {
-        this->Lwa = 1.0f;
-    }
-
-    computeConstants();
+    Lwa_scaled  = Lwa / powf(1.0f + b - 0.85f, 5.0f);
+    LMax_scaled = LMax / Lwa_scaled;
+    constant1   = logf(b) / logf(0.5f);
+    constant2   = (Ld_Max / 100.0f) / (log10(1 + LMax_scaled));
 
     technique.bind();
     technique.setUniform1i("u_tex", 0);

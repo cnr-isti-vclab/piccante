@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_TONE_MAPPING_DRAGO_TMO_HPP
 #define PIC_GL_TONE_MAPPING_DRAGO_TMO_HPP
 
+#include <vector>
+
 #include "../../util/math.hpp"
 #include "../../gl/filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter_drago_tmo.hpp"
@@ -31,19 +33,24 @@ class DragoTMOGL
 {
 protected:
     FilterGLLuminance *flt_lum;
-    FilterGLOp        *flt_log;
     FilterGLDragoTMO  *flt_tmo;
+    std::vector<FilterGL* > filters;
 
-    ImageGL           *img_lum;
-    float              LMax, Lwa, Ld_Max, bias;
-    bool               bStatisticsRecompute;
+    ImageGL *img_lum;
+    float LMax, Lwa, Ld_Max, bias;
+    bool bStatisticsRecompute, bAllocate;
+
     /**
      * @brief allocateFilters
      */
     void allocateFilters()
     {
+        bAllocate = true;
         flt_lum = new FilterGLLuminance();
         flt_tmo = new FilterGLDragoTMO();
+
+        filters.push_back(flt_lum);
+        filters.push_back(flt_tmo);
     }
 
 public:
@@ -54,9 +61,7 @@ public:
     {
         update(Ld_Max, bias);
 
-        flt_lum = NULL;
-        flt_tmo = NULL;
-        img_lum = NULL;
+        bAllocate = false;
 
         LMax = -1.0f;
         Lwa = -1.0f;
@@ -66,15 +71,7 @@ public:
 
     ~DragoTMOGL()
     {
-        if(flt_lum != NULL) {
-            delete flt_lum;
-            flt_lum = NULL;
-        }
-
-        if(flt_tmo != NULL) {
-            delete flt_tmo;
-            flt_tmo = NULL;
-        }
+        stdVectorClear<FilterGL>(filters);
 
         if(img_lum != NULL) {
             delete img_lum;
@@ -82,6 +79,11 @@ public:
         }
     }
 
+    /**
+     * @brief update
+     * @param Ld_Max
+     * @param bias
+     */
     void update(float Ld_Max = 100.0f, float bias = 0.95f)
     {
         this->Ld_Max = Ld_Max > 0.0f ? Ld_Max : 100.0f;
@@ -100,7 +102,7 @@ public:
             return imgOut;
         }
 
-        if(flt_lum == NULL) {
+        if(!bAllocate) {
             allocateFilters();
         }
 

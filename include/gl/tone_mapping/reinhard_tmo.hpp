@@ -36,14 +36,13 @@ class ReinhardTMOGL
 {
 protected:
     FilterGLLuminance  *flt_lum;
-    FilterGLSigmoidTMO *flt_tmo_global, *flt_tmo_local;
+    FilterGLSigmoidTMO *flt_tmo_global;
+    std::vector<FilterGL*> filters;
 
-    FilterGL *filter;
-    FilterGLOp *simple_sigmoid, *simple_sigmoid_inv;
     ImageGL *img_lum, *img_lum_adapt;
 
     float Lwa, alpha, phi;
-    bool bStatisticsRecompute, bGlobal;
+    bool bStatisticsRecompute, bGlobal, bAllocate;
 
 
     FilterGLReinhardSinglePass *fTMO;
@@ -53,12 +52,9 @@ protected:
      */
     void allocateFilters()
     {
+        bAllocate = true;
         flt_lum = new FilterGLLuminance();
         flt_tmo_global = new FilterGLSigmoidTMO(0.18f, false, false);
-        flt_tmo_local = new FilterGLSigmoidTMO(0.18f, true, false);
-
-        simple_sigmoid     = new FilterGLOp("I0 / (I0 + 1.0)", true, NULL, NULL);
-        simple_sigmoid_inv = new FilterGLOp("I0 / (1.0 - I0)", true, NULL, NULL);
     }
 
     /**
@@ -69,14 +65,6 @@ protected:
      */
     ImageGL *executeGlobal(ImageGL *imgIn, ImageGL *imgOut = NULL)
     {
-        if(imgIn == NULL) {
-            return imgOut;
-        }
-
-        if(flt_lum == NULL) {
-            allocateFilters();
-        }
-
         img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
 
         if(bStatisticsRecompute || (Lwa < 0.0f)) {
@@ -100,14 +88,6 @@ protected:
      */
     ImageGL *executeLocal(ImageGL *imgIn, ImageGL *imgOut = NULL)
     {
-        if(imgIn == NULL) {
-            return imgOut;
-        }
-
-        if(flt_lum == NULL) {
-            allocateFilters();
-        }
-
         if(fTMO == NULL) {
             fTMO = new FilterGLReinhardSinglePass(alpha, phi);
         }
@@ -124,24 +104,14 @@ protected:
         return imgOut;
     }
 
+    /**
+     * @brief setNULL
+     */
     void setNULL()
     {
         bGlobal = false;
-
-        flt_lum = NULL;
-        flt_tmo_global = NULL;
-        flt_tmo_local = NULL;
-
-        simple_sigmoid = NULL;
-        simple_sigmoid_inv = NULL;
-
         img_lum = NULL;
-        img_lum_adapt = NULL;
-
-        filter = NULL;
-
         Lwa = -1.0f;
-
         fTMO = NULL;
     }
 
@@ -155,6 +125,8 @@ public:
         this->alpha = 0.15f;
         this->phi = 8.0f;
 
+        bAllocate = false;
+
         update(alpha, phi, bGlobal);
 
         setNULL();
@@ -164,30 +136,7 @@ public:
 
     ~ReinhardTMOGL()
     {
-        if(flt_lum != NULL) {
-            delete flt_lum;
-            flt_lum = NULL;
-        }
-
-        if(img_lum != NULL) {
-            delete img_lum;
-            img_lum = NULL;
-        }
-
-        if(img_lum_adapt != NULL) {
-            delete img_lum_adapt;
-            img_lum_adapt = NULL;
-        }
-
-        if(filter != NULL) {
-            delete filter;
-            filter = NULL;
-        }
-
-        if(simple_sigmoid != NULL) {
-            delete simple_sigmoid;
-            simple_sigmoid = NULL;
-        }
+        stdVectorClear<FilterGL>(filters);
     }
 
     /**
@@ -212,14 +161,24 @@ public:
      */
     ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut = NULL)
     {
+        if(imgIn == NULL) {
+            return imgOut;
+        }
+
+        if(!imgIn->isValid()) {
+            return imgOut;
+        }
+
+        if(!bAllocate) {
+            allocateFilters();
+        }
+
         if(bGlobal) {
             return executeGlobal(imgIn, imgOut);
         } else {
             return executeLocal(imgIn, imgOut);
         }
     }
-
-
 };
 
 } // end namespace pic

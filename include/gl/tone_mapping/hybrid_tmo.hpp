@@ -36,24 +36,25 @@ namespace pic {
 class HybridTMOGL
 {
 protected:
-    SegmentationGL      seg;
-    FilterGLRemapping   remap;
+    SegmentationGL seg;
+    FilterGLRemapping remap;
     ReduxGL*check;
-    ImageGL             *seg_map;
-    ImageGL             *imgDrago, *imgReinhard, *remapped;
-    PyramidGL           *pyrA, *pyrB, *pyrWeight;
-    float               Ld_Max, b;
-    bool                bFirst;
+    ImageGL *seg_map;
+    ImageGL *imgDrago, *imgReinhard, *remapped;
+    PyramidGL *pyrA, *pyrB, *pyrWeight;
+    float Ld_Max, b;
+    bool bFirst, bAllocate;
 
-    DragoTMOGL          *flt_drago;
-    ReinhardTMOGL       *flt_reinhard;
+    DragoTMOGL *flt_drago;
+    ReinhardTMOGL *flt_reinhard;
 
     /**
      * @brief allocateFilters
      */
     void allocateFilters()
     {
-        flt_drago    = new DragoTMOGL();
+        bAllocate = true;
+        flt_drago = new DragoTMOGL();
         flt_reinhard = new ReinhardTMOGL();
         check = ReduxGL::createCheck();
     }
@@ -65,6 +66,7 @@ public:
      */
     HybridTMOGL()
     {
+        bAllocate = false;
         bFirst = true;
 
         flt_reinhard = NULL;
@@ -109,7 +111,7 @@ public:
                                     IMG_GPU, GL_TEXTURE_2D);
         }
 
-        if(flt_drago == NULL) {
+        if(bAllocate) {
             allocateFilters();
         }
 

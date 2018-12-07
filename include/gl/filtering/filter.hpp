@@ -48,7 +48,8 @@ protected:
 
 public:
 
-    std::vector<FilterGL *> filters;
+    bool bDelete;
+    std::vector< FilterGL* > filters;
 
     std::string vertex_source, geometry_source, fragment_source;
 
@@ -57,6 +58,8 @@ public:
      */
     FilterGL()
     {
+        bDelete = false;
+
         fbo = NULL;
 
         quad = NULL;
@@ -191,7 +194,7 @@ public:
      */
     virtual ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
     {
-        return allocateOutputMemory(imgIn, imgOut, false);
+        return allocateOutputMemory(imgIn, imgOut, bDelete);
     }
 
     /**

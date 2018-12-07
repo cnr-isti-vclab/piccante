@@ -56,15 +56,19 @@ protected:
     void allocateFilters()
     {
         flt_lum = new FilterGLLuminance();
+        flt_lum->bDelete = true;
         filters.push_back(flt_lum);
 
         remove_negative = new FilterGLOp("max(I0, vec4(0.0))", true, NULL, NULL);
+        remove_negative->bDelete = true;
         filters.push_back(remove_negative);
 
         convert_zero_to_one = new FilterGLOp("I0.x > 0.0 ? I0 : vec4(1.0)", true, NULL, NULL);
+        convert_zero_to_one->bDelete = true;
         filters.push_back(convert_zero_to_one);
 
         flt_weights = new FilterGLExposureFusionWeights(wC, wE, wS);
+        flt_weights->bDelete = true;
         filters.push_back(flt_weights);
     }
 
@@ -77,11 +81,6 @@ public:
         bAllocate = false;
 
         update(wC, wE, wS);
-
-        flt_lum =  NULL;
-        flt_weights = NULL;
-        convert_zero_to_one = NULL;
-        remove_negative = NULL;
 
         lum = NULL;
         acc = NULL;
