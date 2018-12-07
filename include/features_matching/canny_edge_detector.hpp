@@ -77,23 +77,9 @@ public:
      */
     void update(float sigma = 1.4f, float threshold_1 = 0.05f, float threshold_2 = 0.3f)
     {
-        if(sigma > 0.0f) {
-            this->sigma = sigma;
-        } else {
-            this->sigma = 1.4f;
-        }
-
-        if(threshold_1 > 0.0f) {
-            this->threshold_1 = threshold_1;
-        } else {
-            this->threshold_1 = 0.05f;
-        }
-
-        if(threshold_2 > 0.0f) {
-            this->threshold_2 = threshold_2;
-        } else {
-            this->threshold_2 = 0.3f;
-        }
+        this->sigma = sigma > 0.0f ? sigma : 1.4f;
+        this->threshold_1 = threshold_1 > 0.0f ? threshold_1 : 0.05f;
+        this->threshold_2 = threshold_2 > 0.0f ? threshold_1 : 0.3f;
 
         if(threshold_2 < threshold_1) {
             float tmp = threshold_1;

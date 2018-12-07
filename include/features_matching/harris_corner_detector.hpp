@@ -128,19 +128,9 @@ public:
      */
     void update(float sigma = 1.0f, int radius = 3, float threshold = 0.001f)
     {
-        if(sigma > 0.0f) {
-            this->sigma = sigma;
-        } else {
-            this->sigma = 1.0f;
-        }
-
-        if(radius > 0) {
-            this->radius = radius;
-        } else {
-            this->radius = 1;
-        }
-
-        this->threshold = threshold;
+        this->sigma = sigma > 0.0f ? sigma : 1.0f;
+        this->radius = radius > 0 ? radius : 1;
+        this->threshold = threshold > 0.0f ? threshold : 0.001f;
     }
 
     /**
@@ -167,8 +157,9 @@ public:
             lum = FilterLuminance::execute(img, lum, LT_CIE_LUMINANCE);
         }
 
-        float maxL = lum->getMaxVal(NULL, NULL)[0];
-        float minL = lum->getMinVal(NULL, NULL)[0];
+        float minL, maxL;
+        lum->getMinVal(NULL, &minL);
+        lum->getMaxVal(NULL, &maxL);
 
         float delta = maxL - minL;
 

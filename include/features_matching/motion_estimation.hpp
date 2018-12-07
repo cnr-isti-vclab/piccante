@@ -140,7 +140,7 @@ public:
             maxRadius = 1;
         }
 
-        //estimating the blockSize if not given
+        //estimate the blockSize if not given
         if(blockSize < 1) {
             float nPixels = float(img0->nPixels());
             float tmp = ceilf(log10f(nPixels));
