@@ -22,6 +22,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../util/std_util.hpp"
 
+#include "../../gl//tone_mapping/get_all_exposures.hpp"
+
 #include "../../gl/filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter_exposure_fusion_weights.hpp"
 #include "../../gl/filtering/filter_op.hpp"
@@ -36,7 +38,7 @@ class ExposureFusionGL
 protected:
     std::vector<FilterGL *> filters;
 
-    FilterGLLuminance  *flt_lum;
+    FilterGLLuminance *flt_lum;
     FilterGLExposureFusionWeights *flt_weights;
     FilterGLOp *remove_negative, *convert_zero_to_one;    
 
@@ -45,6 +47,8 @@ protected:
     PyramidGL *pW, *pI, *pOut;
 
     float wC, wS, wE;
+
+    bool bAllocate;
 
     /**
      * @brief allocateFilters
@@ -70,6 +74,8 @@ public:
      */
     ExposureFusionGL(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
     {
+        bAllocate = false;
+
         update(wC, wE, wS);
 
         flt_lum =  NULL;
@@ -135,12 +141,62 @@ public:
     }
 
     /**
+     * @brief allocate
+     * @param imgIn
+     */
+    void allocate(ImageGLVec imgIn)
+    {
+        if(!bAllocate) {
+            bAllocate = true;
+
+            int width = imgIn[0]->width;
+            int height = imgIn[0]->height;
+            int channels = imgIn[0]->channels;
+
+            acc = new ImageGL(1, width, height, 1, IMG_GPU, GL_TEXTURE_2D);
+            pW = new PyramidGL(width, height, 1, false);
+            pI = new PyramidGL(width, height, channels, true);
+            pOut = new PyramidGL(width, height, channels, true);
+
+            allocateFilters();
+        } else {
+            if(!pOut->stack[0]->isSimilarType(imgIn[0])) {
+                bAllocate = false;
+
+                delete acc;
+                delete pW;
+                delete pI;
+                delete pOut;
+
+                allocate(imgIn);
+            }
+        }
+    }
+
+    /**
      * @brief Process
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut = NULL)
+    ImageGL *Process(ImageGL *imgIn, ImageGL *imgOut)
+    {
+        pic::ImageGLVec img_vec = getAllExposuresImagesGL(imgIn, 2.2f);
+
+        imgOut = ProcessStack(img_vec, imgOut);
+
+        stdVectorClear<ImageGL>(img_vec);
+
+        return imgOut;
+    }
+
+    /**
+     * @brief ProcessStack
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    ImageGL *ProcessStack(ImageGLVec imgIn, ImageGL *imgOut = NULL)
     {
         unsigned int n = imgIn.size();
 
@@ -148,21 +204,11 @@ public:
             return imgOut;
         }
 
+        allocate(imgIn);
+
+
         //compute weights values
-        int width = imgIn[0]->width;
-        int height = imgIn[0]->height;
-        int channels = imgIn[0]->channels;
-
-        if(acc == NULL) {
-            acc = new ImageGL(1, width, height, 1, IMG_GPU, GL_TEXTURE_2D);
-        }
-
         *acc = 0.0f;
-
-        if(flt_lum == NULL) {
-            allocateFilters();
-        }
-
         for(unsigned int j = 0; j < n; j++) {
             #ifdef PIC_DEBUG
                 printf("Processing image %d\n", j);
@@ -181,18 +227,6 @@ public:
         #ifdef PIC_DEBUG
             printf("Blending...");
         #endif
-
-        if(pW == NULL) {
-            pW = new PyramidGL(width, height, 1, false);
-        }
-
-        if(pI == NULL) {
-            pI = new PyramidGL(width, height, channels, true);
-        }
-
-        if(pOut == NULL) {
-            pOut = new PyramidGL(width, height, channels, true);
-        }
 
         pOut->setValue(0.0f);
 

@@ -182,7 +182,7 @@ PIC_INLINE Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, 
 
 PIC_INLINE Pyramid::~Pyramid()
 {
-    ImageVecRelease(stack);
+    stdVectorClear<Image>(stack);
 
     if(flt_gauss != NULL) {
         delete flt_gauss;

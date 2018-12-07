@@ -15,12 +15,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_TONE_MAPPING_TONE_MAPPING_OPERATOR_HPP
-#define PIC_TONE_MAPPING_TONE_MAPPING_OPERATOR_HPP
+#ifndef PIC_TONE_MAPPING_TONE_MAPPING_OPERATOR_GL_HPP
+#define PIC_TONE_MAPPING_TONE_MAPPING_OPERATOR_GL_HPP
+
+#include "../../util/std_util.hpp"
 
 #include "../image.hpp"
 #include "../image_vec.hpp"
-#include "../util/array.hpp"
 #include "../filtering/filter_luminance.hpp"
 
 namespace pic {
@@ -28,18 +29,18 @@ namespace pic {
 /**
  * @brief The ToneMappingOperator class
  */
-class ToneMappingOperator
+class ToneMappingOperatorGL
 {
 protected:
 
-    ImageVec images;
+    ImageGLVec images;
 
     /**
      * @brief Process
      * @param imgIn
      * @param imgOut
      */
-    virtual Image *Process(Image *imgIn, Image *imgOut)
+    virtual ImageGL *Process(ImageGL *imgIn, ImageGL *imgOut)
     {
         return imgOut;
     }
@@ -64,7 +65,7 @@ public:
      */
     void release()
     {
-        stdVectorClear<Image>(images);
+        stdVectorClear<ImageGL>(images);
         releaseAux();
     }
 
@@ -72,7 +73,7 @@ public:
      * @brief updateImage
      * @param imgIn
      */
-    void updateImage(Image *imgIn)
+    void updateImage(ImageGL *imgIn)
     {
         bool bRelease = false;
         for(auto i = 0; i < images.size(); i++) {
@@ -91,29 +92,11 @@ public:
     }
 
     /**
-     * @brief getScaleFiltering
-     * @param imgIn
-     * @param fx
-     * @param fy
-     */
-    static void getScaleFiltering(Image *imgIn, int &fScaleX, int &fScaleY)
-    {
-        int maxCoord = MAX(imgIn->width, imgIn->height);
-
-        float maxCoordf       = 2.0f * float(maxCoord) * 0.75f;
-        float viewAngleWidth  = 2.0f * atanf(imgIn->width / maxCoordf);
-        float viewAngleHeight = 2.0f * atanf(imgIn->height / maxCoordf);
-
-        fScaleX = int((2.0f * tanf(viewAngleWidth / 2.0f) / 0.01745f));
-        fScaleY = int((2.0f * tanf(viewAngleHeight / 2.0f) / 0.01745f));
-    }
-
-    /**
      * @brief checkInput
      * @param imgIn
      * @return
      */
-    bool checkInput(Image *imgIn)
+    bool checkInput(ImageGL *imgIn)
     {
         if(imgIn == NULL) {
             return false;
@@ -128,7 +111,7 @@ public:
      * @param imgOut
      * @return
      */
-    Image *execute(Image *imgIn, Image *imgOut = NULL)
+    ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut = NULL)
     {
         if(!checkInput(imgIn)) {
             return imgOut;
@@ -138,7 +121,7 @@ public:
             imgOut = imgIn->clone();
         } else {
             if(!imgOut->isSimilarType(imgIn)) {
-                imgOut = imgIn->allocateSimilarOne();
+                imgOut = imgIn->allocateSimilarOneGL();
             }
         }
 

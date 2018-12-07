@@ -23,8 +23,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../base.hpp"
 #include "../image.hpp"
 #include "../metrics/base.hpp"
+
 #include "../util/indexed_array.hpp"
 #include "../util/array.hpp"
+#include "../util/std_util.hpp"
 
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_gaussian_2d.hpp"
@@ -200,12 +202,12 @@ public:
                 ssim_map->getMeanVal(NULL, &ssim_index);
             }
 
-            ImageVecRelease(src);
+            stdVectorClear<Image>(src);
         }
 
         if(bAllocated) {
             auto vec = Double(ori_d, cmp_d);
-            ImageVecRelease(vec);
+            stdVectorClear<Image>(vec);
         }
 
         return ssim_map;

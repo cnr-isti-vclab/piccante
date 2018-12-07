@@ -112,6 +112,8 @@ public:
 
         imgOut = ProcessStack(stack, imgOut);
 
+        stdVectorClear<Image>(stack);
+
         return imgOut;
     }
 

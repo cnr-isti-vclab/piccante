@@ -60,7 +60,7 @@ PIC_INLINE Image *colorToGray(Image *imgIn, Image *imgOut)
         delete img_vec[i];
     }
 
-    ImageVecRelease(img_vec);
+    stdVectorClear<Image>(img_vec);
 
     return imgOut;
 }
