@@ -52,41 +52,10 @@ public:
      */
     void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width = int(imgIn[0]->widthf  * scale);
+        width = int(imgIn[0]->widthf * scale);
         height = int(imgIn[0]->heightf * scale);
         channels = imgIn[0]->channels;
         frames = imgIn[0]->frames;
-    }
-
-    /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
-    {
-        int w, h, f, c;
-        OutputSize(imgIn, w, h, c, f);
-
-        if(imgOut == NULL) {
-            imgOut = new ImageGL(f, w, h, c, IMG_GPU, imgIn[0]->getTarget());
-        } else {
-            if((imgOut->width != w) &&
-               (imgOut->height != h) &&
-               (imgOut->channels != c) &&
-               (imgOut->frames != f)) {
-                delete imgOut;
-                imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
-            }
-
-            if(!imgIn[0]->isSimilarType(imgOut)) {
-                delete imgOut;
-                imgOut = new ImageGL(f, w, h, c, IMG_GPU, imgIn[0]->getTarget());
-            }
-        }
-
-        return imgOut;
     }
 
     /**

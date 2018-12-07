@@ -71,14 +71,7 @@ public:
      */
     ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
     {
-        if(imgOut == NULL) {
-            imgOut = imgIn[0]->allocateSimilarOneGL();
-        } else {
-            if(!imgIn[0]->isSimilarType(imgOut)) {
-                delete imgOut;
-                imgOut = imgIn[0]->allocateSimilarOneGL();
-            }
-        }
+        imgOut = allocateOutputMemory(imgIn, imgOut, false);
 
         if(imgIn.size() == 1) {
             param.clear();

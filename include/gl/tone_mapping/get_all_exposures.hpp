@@ -31,7 +31,7 @@ namespace pic {
  * @param imgIn
  * @return
  */
-PIC_INLINE ImageGLVec getAllExposuresImagesGL(ImageGL *imgIn)
+PIC_INLINE ImageGLVec getAllExposuresImagesGL(ImageGL *imgIn, float gamma = 2.2f)
 {
     ImageGLVec ret;
 
@@ -43,19 +43,20 @@ PIC_INLINE ImageGLVec getAllExposuresImagesGL(ImageGL *imgIn)
 
     std::vector<float> exposures = getAllExposures((Image*) imgIn);
 
-    FilterGLSimpleTMO flt(1.0f, 0.0f);
+    FilterGLSimpleTMO flt(gamma, 0.0f);
 
     ImageGLVec input = SingleGL(imgIn);
 
     for(unsigned int i = 0; i < exposures.size(); i++) {
-        flt.update(2.2f, exposures[i]);
+        flt.update(gamma, exposures[i]);
 
         #ifdef PIC_DEBUG
             printf("Exposure: %f\n", exposures[i]);
         #endif
 
-        ImageGL *expo = flt.Process(input, NULL);
+        ImageGL *expo = flt.Process(input, NULL);               
         expo->clamp(0.0f, 1.0f);
+
         ret.push_back(expo);
     }
 

@@ -64,7 +64,7 @@ protected:
 
         //read an input image
         img.Read("../data/input/bottles.hdr");
-        img.generateTextureGL();
+        img.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         //create a screen aligned quad
         pic::QuadGL::getTechnique(technique,
@@ -77,7 +77,7 @@ protected:
         ef = new pic::ExposureFusionGL();
 
         //compute a stack of LDR images from an HDR image
-        img_vec = pic::getAllExposuresImagesGL(&img);
+        img_vec = pic::getAllExposuresImagesGL(&img, 2.2f);
 
         //allocate a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
@@ -107,7 +107,7 @@ protected:
 
         if(method == 0) {
             //compute exposure fusion for the stack (img_vec)
-            img_tmo = ef->Process(img_vec, img_tmo, 0.2f, 1.0f, 0.2f);
+            img_tmo = ef->Process(img_vec, img_tmo);
         } else {
             //simple tone mapping: gamma + exposure correction
             img_tmo = tmo->Process(SingleGL(&img), img_tmo);

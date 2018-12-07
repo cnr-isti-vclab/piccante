@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../util/math.hpp"
 
+#include "../../util/std_util.hpp"
+
 #include "../../gl/filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter_exposure_fusion_weights.hpp"
 #include "../../gl/filtering/filter_op.hpp"
@@ -116,12 +118,7 @@ public:
             pOut = NULL;
         }
 
-        for(unsigned int i = 0; i < filters.size(); i++) {
-            if(filters[i] != NULL) {
-                delete filters[i];
-                filters[i] = NULL;
-            }
-        }
+        stdVectorClear<FilterGL>(filters);
     }
 
     /**
@@ -138,14 +135,14 @@ public:
     }
 
     /**
-     * @brief execute
+     * @brief Process
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL *execute(ImageGLVec imgIn, ImageGL *imgOut = NULL)
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut = NULL)
     {
-        int n = int(imgIn.size());
+        unsigned int n = imgIn.size();
 
         if(n < 2) {
             return imgOut;
@@ -166,7 +163,7 @@ public:
             allocateFilters();
         }
 
-        for(int j = 0; j < n; j++) {
+        for(unsigned int j = 0; j < n; j++) {
             #ifdef PIC_DEBUG
                 printf("Processing image %d\n", j);
             #endif
@@ -199,7 +196,7 @@ public:
 
         pOut->setValue(0.0f);
 
-        for(int j = 0; j < n; j++) {
+        for(unsigned int j = 0; j < n; j++) {
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
             weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 

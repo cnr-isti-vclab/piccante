@@ -58,7 +58,7 @@ protected:
      * @param lapGauss
      * @param limitLevel
      */
-    void create(Image *img, int width, int height, int channels, bool lapGauss, int limitLevel);
+    void create(Image *img, bool lapGauss, int limitLevel);
 
 public:
 
@@ -162,7 +162,7 @@ PIC_INLINE Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 1)
     flt_add = NULL;
 
     if(img != NULL) {
-        create(img, img->width, img->height, img->channels, lapGauss, limitLevel);
+        create(img, lapGauss, limitLevel);
     }
 }
 
@@ -173,7 +173,11 @@ PIC_INLINE Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, 
     flt_sub = NULL;
     flt_add = NULL;
 
-    create(NULL, width, height, channels, lapGauss, limitLevel);
+    Image *img = new Image(1, width, height, channels);
+
+    create(img, lapGauss, limitLevel);
+
+    delete img;
 }
 
 PIC_INLINE Pyramid::~Pyramid()
@@ -220,7 +224,7 @@ PIC_INLINE void Pyramid::initFilters()
     }
 }
 
-PIC_INLINE void Pyramid::create(Image *img, int width, int height, int channels, bool lapGauss, int limitLevel = 1)
+PIC_INLINE void Pyramid::create(Image *img, bool lapGauss, int limitLevel = 1)
 {
     this->lapGauss  = lapGauss;
 
@@ -232,32 +236,7 @@ PIC_INLINE void Pyramid::create(Image *img, int width, int height, int channels,
 
     initFilters();
 
-    int levels = MAX(log2(MIN(width, height)) - limitLevel, 1);
-
-    if(img == NULL) {
-        int tmp_width  = width;
-        int tmp_height = height;
-        for(int i = 0; i < (levels + 1); i++) {
-            Image *tmp = new Image(1, tmp_width, tmp_height, channels);
-            *tmp = 0.0f;
-            stack.push_back(tmp);
-
-            tmp_width = tmp_width >> 1 ;
-            tmp_height = tmp_height >> 1;
-        }
-
-        tmp_width  = width >> 1;
-        tmp_height = height >> 1;
-        for(int i = 0; i < (levels - 1); i++) {
-            Image *tmp = new Image(1, tmp_width, tmp_height, channels);
-            *tmp = 0.0f;
-            trackerUp.push_back(tmp);
-
-            tmp_width = tmp_width >> 1;
-            tmp_height = tmp_height >> 1;
-        }
-        return;
-    }
+    int levels = MAX(log2(MIN(img->width, img->height)) - limitLevel, 1);
 
     Image *tmpImg = img;
 
@@ -270,10 +249,10 @@ PIC_INLINE void Pyramid::create(Image *img, int width, int height, int channels,
 
         tmpD = flt_sampler->Process(Single(tmpG), NULL);
 
-        if(lapGauss) {	//Laplacian Pyramid
+        if(lapGauss) { //Laplacian Pyramid
             flt_sub->Process(Double(tmpImg, tmpD), tmpG);
             stack.push_back(tmpG);
-        } else {			//Gaussian Pyramid
+        } else { //Gaussian Pyramid
             tmpG->assign(tmpImg);
             stack.push_back(tmpG);
         }

@@ -281,7 +281,8 @@ PIC_INLINE ImageGL *FilterGLNPasses::setupAuxNSame(ImageGLVec imgIn,
         }
     }
 
-    if((getIterations() % 2) == 0) {
+    int nIterations = getIterations();
+    if((nIterations % 2) == 0) {
         imgTmpSame[0] = imgAllocated;
         imgTmpSame[1] = imgOut;
     } else {

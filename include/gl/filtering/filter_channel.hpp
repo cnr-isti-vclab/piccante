@@ -77,32 +77,6 @@ public:
     }
 
     /**
-     * @brief setupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
-    {
-        int w, h, c, f;
-        OutputSize(imgIn, w, h, c, f);
-
-        if(imgOut == NULL) {
-            imgOut = new ImageGL(f, w, h, 1, IMG_GPU, imgIn[0]->getTarget());
-        } else {
-            if((imgOut->width != w) &&
-               (imgOut->height != h) &&
-               (imgOut->channels != c) &&
-               (imgOut->frames != f)) {
-                delete imgOut;
-                imgOut = new ImageGL(f, w, h, 1, IMG_GPU, imgIn[0]->getTarget());
-            }
-        }
-
-        return imgOut;
-    }
-
-    /**
      * @brief execute
      * @param imgIn
      * @param imgOut
