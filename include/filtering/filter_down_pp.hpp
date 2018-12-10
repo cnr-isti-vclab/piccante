@@ -123,8 +123,14 @@ public:
      */
     void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn[0]->width >> 1;
-        height      = imgIn[0]->height >> 1;
+        if(imgIn.size() == 1) {
+            width       = imgIn[0]->width >> 1;
+            height      = imgIn[0]->height >> 1;
+        } else {
+            width       = imgIn[1]->width;
+            height      = imgIn[1]->height;
+
+        }
         channels    = imgIn[0]->channels;
         frames      = imgIn[0]->frames;
     }

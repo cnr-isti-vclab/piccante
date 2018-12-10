@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
         //Recovering black pixels with push-pull
         pic::PushPull pp;
 
-        pic::Image *imgOut = pp.execute(&img, 0.0f);
+        pic::Image *imgOut = pp.execute(&img, NULL, 0.0f);
 
         printf("Writing recovered result using Push-Pull... ");
 

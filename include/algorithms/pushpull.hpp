@@ -110,7 +110,7 @@ public:
         } else { //update previously created pyramid: Pull
             int c = 1;
             while(MIN(work->width, work->height) > 1) {
-                flt_down.Process(Single(work), stack[c]);
+                flt_down.Process(Double(work, stack[c]), stack[c]);
                 work = stack[c];
                 c++;
             }
@@ -120,7 +120,7 @@ public:
         int n = int(stack.size()) - 2;
 
         for(int i = n; i >= 0; i--) {
-            flt_up.Process(Single(stack[i + 1]), stack[i]);            
+            flt_up.Process(Double(stack[i + 1], stack[i]), stack[i]);
         }
 
         return imgOut;
@@ -143,7 +143,7 @@ public:
         }
 
         pp.update(tmp_value, 1e-9f);
-        imgOut = pp.Process(img, NULL);
+        imgOut = pp.Process(img, imgOut);
 
         delete[] tmp_value;
 

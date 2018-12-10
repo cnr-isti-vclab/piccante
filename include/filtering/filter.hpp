@@ -218,13 +218,13 @@ public:
         int w, h, c, f;
         OutputSize(imgIn, w, h, c, f);
 
-        if(imgOut == NULL) {
+        if(imgOut == NULL) {            
             imgOut = new Image(f, w, h, c);
         } else {
-            bool bSame = imgOut->width == w &&
-                         imgOut->height == h &&
-                         imgOut->channels == c &&
-                         imgOut->frames == f;
+            bool bSame = (imgOut->width == w) &&
+                         (imgOut->height == h) &&
+                         (imgOut->channels == c) &&
+                         (imgOut->frames == f);
 
             if(!bSame) {
                 imgOut = new Image(f, w, h, c);
