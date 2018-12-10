@@ -18,6 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_SEGMENTATION_TMO_APPROX_HPP
 #define PIC_TONE_MAPPING_SEGMENTATION_TMO_APPROX_HPP
 
+#include "../util/array.hpp"
+#include "../util/std_util.hpp"
+
+#include "../algorithms/superpixels_slic.hpp"
+
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_iterative.hpp"
 #include "../filtering/filter_bilateral_2ds.hpp"
@@ -34,64 +39,7 @@ protected:
     FilterBilateral2DS *fltBil;
     Image *L, *imgIn_flt;
 
-    int	 iterations;
-    float perCent, nLayer;
-
-public:
-    float minVal, maxVal;
-
-    /**
-     * @brief Segmentation
-     */
-    Segmentation()
-    {
-        nLayer = 0.0f;
-        iterations = 0;
-
-        fltBil = NULL;
-        fltIt  = NULL;
-
-        L = NULL;
-        imgIn_flt = NULL;
-
-        maxVal = FLT_MAX;
-        minVal = 0.0f;
-
-        perCent  = 0.005f;
-    }
-
-    ~Segmentation()
-    {
-        if(imgIn_flt != NULL) {
-            delete imgIn_flt;
-        }
-
-        if(L != NULL) {
-            delete L;
-        }
-
-        if(fltIt != NULL) {
-            delete fltIt;
-        }
-
-        if(fltBil != NULL) {
-            delete fltBil;
-        }
-    }
-
-    /**
-     * @brief computeStatistics
-     * @param imgIn
-     */
-    void computeStatistics(Image *imgIn)
-    {
-        float nLevels, area;
-
-        nLevels		= log10f(maxVal) - log10f(minVal) + 1.0f;
-        nLayer		= ((maxVal - minVal) / nLevels) / 4.0f;
-        area		= imgIn->widthf * imgIn->heightf * perCent;
-        iterations	= MAX(int(sqrtf(area)) / 2, 1);
-    }
+    float perCent;
 
     /**
      * @brief executeSegmentationBilatearal
@@ -100,7 +48,14 @@ public:
      */
     Image *executeSegmentationBilatearal(Image *imgIn)
     {
-        computeStatistics(imgIn);
+        float minVal, maxVal;
+        imgIn->getMinVal(NULL, &minVal);
+        imgIn->getMaxVal(NULL, &maxVal);
+
+        float nLevels = log10f(maxVal) - log10f(minVal) + 1.0f;
+        int nLayer = ((maxVal - minVal) / nLevels) / 4.0f;
+        float area = imgIn->widthf * imgIn->heightf * perCent;
+        int iterations = MAX(int(sqrtf(area)) / 2, 1);
 
         //create filters
         if(fltIt == NULL) {
@@ -132,6 +87,29 @@ public:
         return imgOut;
     }
 
+public:
+
+    /**
+     * @brief Segmentation
+     */
+    Segmentation()
+    {
+        fltBil = NULL;
+        fltIt  = NULL;
+        L = NULL;
+        imgIn_flt = NULL;
+
+        perCent  = 0.005f;
+    }
+
+    ~Segmentation()
+    {
+        delete_s(imgIn_flt);
+        delete_s(L);
+        delete_s(fltIt);
+        delete_s(fltBil);
+    }
+
     /**
      * @brief execute
      * @param imgIn
@@ -155,27 +133,21 @@ public:
         //compute luminance
         FilterLuminance::execute(imgIn, imgOut, LT_CIE_LUMINANCE);
 
-        //get min and max value
-        maxVal = imgOut->getMaxVal()[0];
-        minVal = imgOut->getMinVal()[0] + 1e-9f;
-
         Image *imgIn_flt = executeSegmentationBilatearal(imgIn);
 
         //threshold
-        float minShift = floorf(log10f(minVal));
         float *data = imgIn_flt->data;
+        int channels = imgIn_flt->channels;
+
+        float *weights = FilterLuminance::computeWeights(LT_CIE_LUMINANCE, channels, NULL);
 
         #pragma omp parallel for
-
-        for(int i = 0; i < imgIn_flt->size(); i += imgIn_flt->channels) {
-            float Lum = 0.213f * data[i] + 0.715f * data[i + 1] + 0.072f * data[i + 2];
-
-            if(Lum > 0.0f) {
-                imgOut->data[i / 3] = floorf(log10f(Lum));
-            } else {
-                imgOut->data[i / 3] = minShift;
-            }
+        for(int i = 0; i < imgIn_flt->size(); i += channels) {
+            float L = Arrayf::dot(weights, &data[i], channels) + 1e-7f;
+            imgOut->data[i / 3] = floorf(log10f(L));
         }
+
+        delete_vec_s<float>(weights);
 
         #ifdef PIC_DEBUG
             imgOut->Write("Segmentation.pfm");

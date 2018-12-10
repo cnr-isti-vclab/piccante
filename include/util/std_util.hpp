@@ -95,6 +95,37 @@ inline T* releasePtr(T *data)
     return data;
 }
 
+/**
+ * @brief delete_s
+ * @param data
+ * @return
+ */
+template<class T>
+inline T* delete_s(T *data)
+{
+    if(data != NULL) {
+        delete data;
+        data = NULL;
+    }
+    return data;
+}
+
+/**
+ * @brief delete_vec_s
+ * @param data
+ * @return
+ */
+template<class T>
+inline T* delete_vec_s(T *data)
+{
+    if(data != NULL) {
+        delete[] data;
+        data = NULL;
+    }
+    return data;
+}
+
+
 } // end namespace pic
 
 #endif // PIC_UTIL_STD_UTIL_HPP
