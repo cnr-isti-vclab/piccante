@@ -26,8 +26,16 @@ int main(int argc, char *argv[])
 {
     printf("Reading an HDR file...");
 
+    std::string img_str;
+
+    if(argc == 2) {
+        img_str = argv[1];
+    } else {
+        img_str = "../data/input/bottles.hdr";
+    }
+
     pic::Image img;
-    img.Read("../data/input/bottles.hdr");
+    img.Read(img_str);
 
     printf("Ok\n");
 
@@ -41,7 +49,10 @@ int main(int argc, char *argv[])
         //Adding a hole in the image
         img.copySubImage(&img_black, 292, 130);
 
-        img.Write("../data/output/pull_push_black_pixels.hdr");
+        auto name = pic::getFileNameOnly(img_str);
+        auto ext =pic::getExtension(name);
+
+        img.Write("../data/output/" + name + "pp_black_pixels." + ext);
 
         //Recovering black pixels with push-pull
         pic::PushPull pp;
@@ -50,7 +61,7 @@ int main(int argc, char *argv[])
 
         printf("Writing recovered result using Push-Pull... ");
 
-        bool bWritten = imgOut->Write("../data/output/pull_push_reconstruction.hdr");
+        bool bWritten = imgOut->Write("../data/output/" + name + "pp_reconstruction." + ext);
 
         if(bWritten) {
             printf("Ok\n");

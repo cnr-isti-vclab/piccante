@@ -26,15 +26,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 
-/*
-#ifdef GRT_WIN32
+
+#ifdef PIC_WIN32
     #include <direct.h>
 #endif
 
-#ifndef GRT_WIN32
-    //#include <unistd.h>
+#ifndef PIC_WIN32
+    #include <unistd.h>
 #endif
-*/
+
 
 namespace pic {
 
@@ -447,11 +447,11 @@ inline std::string checkPath(std::string name)
     }
 
     if((name.at(0) == '.') && (name.at(0) == '.')) {
-        #ifdef GRT_WIN32
+        #ifdef PIC_WIN32
             char *path = _getcwd(NULL, 0);
         #endif
 
-        #ifndef GRT_WIN32
+        #ifndef PIC_WIN32
             char *path = getcwd(NULL, 0);
         #endif
 
