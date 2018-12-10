@@ -46,22 +46,25 @@ int main(int argc, char *argv[])
         pic::Image img_black(1, 32, 32, 3);
         img_black.setZero();
 
-        //Adding a hole in the image
-        img.copySubImage(&img_black, 292, 130);
+        //add a hole in the image
+        srand (time(NULL));
+        img.copySubImage(&img_black, (rand() % img.width) - 32, (rand() % img.height) - 32);
 
         auto name = pic::getFileNameOnly(img_str);
-        auto ext =pic::getExtension(name);
+        auto ext = pic::getExtension(img_str);
 
-        img.Write("../data/output/" + name + "pp_black_pixels." + ext);
+        printf("%s %s\n", name.c_str(), ext.c_str());
 
-        //Recovering black pixels with push-pull
+        img.Write("../data/output/" + name + "_pp_black_pixels." + ext);
+
+        //recover black pixels with push-pull
         pic::PushPull pp;
 
         pic::Image *imgOut = pp.execute(&img, NULL, 0.0f);
 
         printf("Writing recovered result using Push-Pull... ");
 
-        bool bWritten = imgOut->Write("../data/output/" + name + "pp_reconstruction." + ext);
+        bool bWritten = imgOut->Write("../data/output/" + name + "_pp_reconstruction." + ext);
 
         if(bWritten) {
             printf("Ok\n");
