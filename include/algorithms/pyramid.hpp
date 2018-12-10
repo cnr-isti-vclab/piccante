@@ -294,7 +294,7 @@ PIC_INLINE void Pyramid::update(Image *img)
 
         if(lapGauss) {	//Laplacian Pyramid
             flt_sub->Process(Double(tmpImg, tmpD), tmpG);
-        } else {		//Gaussian Pyramid
+        } else { //Gaussian Pyramid
             tmpG->assign(tmpImg);
         }
 

@@ -86,7 +86,7 @@ public:
      * @param value
      * @param threshold
      */
-    FilterDownPP(float *value, float threshold) : Filter()
+    FilterDownPP(float *value = NULL, float threshold = 1e-4f) : Filter()
     {
         update(value, threshold);
     }
@@ -110,11 +110,7 @@ public:
             this->value = value;
         }
 
-        if(threshold > 0.0f) {
-            this->threshold = threshold;
-        } else {
-            this->threshold = 1e-4f;
-        }
+        this->threshold = (threshold > 0.0f) ? threshold : 1e-4f;
     }
 
     /**
@@ -129,21 +125,8 @@ public:
     {
         width       = imgIn[0]->width >> 1;
         height      = imgIn[0]->height >> 1;
-        channels    = imgIn[0]->frames;
+        channels    = imgIn[0]->channels;
         frames      = imgIn[0]->frames;
-    }
-
-    /**
-     * @brief execute
-     * @param imgIn
-     * @param imgOut
-     * @param type
-     * @return
-     */
-    static Image *execute(Image *imgIn, Image *imgOut)
-    {
-        FilterDownPP flt(NULL, 1e-3f);
-        return flt.Process(Single(imgIn), imgOut);
     }
 };
 

@@ -53,7 +53,8 @@ protected:
 
                 float *data = (*dst)(j, i);
 
-                if(Arrayf::distanceSq(data, value, dst->channels) < threshold) {
+                float dist = Arrayf::distanceSq(data, value, src[0]->channels);
+                if(dist <= threshold) {
                     isb.SampleImage(src[0], x, y, data);
                 }
             }
@@ -67,7 +68,7 @@ public:
      * @param value
      * @param threshold
      */
-    FilterUpPP(float *value, float threshold) : Filter()
+    FilterUpPP(float *value = NULL, float threshold = 1e-9f) : Filter()
     {
         update(value, threshold);
     }
@@ -90,11 +91,7 @@ public:
             this->value = value;
         }
 
-        if(threshold > 0.0f) {
-            this->threshold = threshold;
-        } else {
-            this->threshold = 1e-4f;
-        }
+        this->threshold = (threshold > 0.0f) ? threshold : 1e-9f;
     }
 
     /**
@@ -109,21 +106,8 @@ public:
     {
         width       = imgIn[0]->width << 1;
         height      = imgIn[0]->height << 1;
-        channels    = imgIn[0]->frames;
+        channels    = imgIn[0]->channels;
         frames      = imgIn[0]->frames;
-    }
-
-    /**
-     * @brief execute
-     * @param imgIn
-     * @param imgOut
-     * @param type
-     * @return
-     */
-    static Image *execute(Image *imgIn, Image *imgOut)
-    {
-        FilterUpPP flt(NULL, 1e-6f);
-        return flt.Process(Single(imgIn), imgOut);
     }
 };
 

@@ -37,7 +37,7 @@ namespace pic{
  * @return
  */
 template<class T>
-PIC_INLINE unsigned int kMeansAssignLabel( T* sample_j, int nDim,
+PIC_INLINE unsigned int kMeansAssignLabel(T* sample_j, int nDim,
                                 T* centers, unsigned int k)
 {
     T dist = Array<T>::distanceSq(sample_j, &centers[0], nDim);
@@ -121,14 +121,14 @@ PIC_INLINE T* kMeanscomputeRandomCenters(T *samples, int nSamples, int nDim, int
         }
 
         for(int i = 0; i < k; i++) {
+            int index = i * nDim;
             for(int j = 0; j < nDim; j++) {
-                 centers[i * nDim + j] = T(getRandom(m()) * (tMax[j] - tMin[j]) + tMin[j]);
+                 centers[index + j] = T(getRandom(m()) * (tMax[j] - tMin[j]) + tMin[j]);
             }
         }
 
     return centers;
 }
-
 
 /**
  * @brief KMeans
@@ -233,7 +233,11 @@ PIC_INLINE  T* kMeansSelect(T *samples, int nSamples, int nDim,
     bool bFlag = true;
     while(bFlag) {
         k++;
-        printf("k: %d\n", k);
+
+        #if PIC_DEBUG
+            printf("k: %d\n", k);
+        #endif
+
         labels.clear();
         if(centers != NULL) {
             delete[] centers;
@@ -255,7 +259,11 @@ PIC_INLINE  T* kMeansSelect(T *samples, int nSamples, int nDim,
 
         if(k > 2) {
             float relErr = fabsf(float(err - prevErr)) / float(prevErr);
-            printf("%f %f %f\n", err, prevErr, relErr);
+
+             #if PIC_DEBUG
+                printf("%f %f %f\n", err, prevErr, relErr);
+            #endif
+
             if(relErr < threshold) {
                 bFlag = false;
             }

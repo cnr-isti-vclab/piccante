@@ -72,6 +72,8 @@ public:
 
 PIC_INLINE FilterSampler2DSub::FilterSampler2DSub(ImageSampler *isb) : Filter()
 {
+    this->minInputImages = 2;
+
     if(isb != NULL) {
         bIsb = false;
         this->isb = isb;
@@ -100,16 +102,13 @@ PIC_INLINE void FilterSampler2DSub::update(ImageSampler *isb)
 
 PIC_INLINE void FilterSampler2DSub::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-    if(src.size() != 2) {
-        return;
-    }
-
     int channels = dst->channels;
 
     Image *src0 = src[0];
     Image *src1 = src[1];
 
-    float *tmp_mem = new float[channels * 2];
+    float *tmp_mem = new float[channels << 1];
+
     float *vOut  = &tmp_mem[0];
     float *vsrc0 = &tmp_mem[channels];
 

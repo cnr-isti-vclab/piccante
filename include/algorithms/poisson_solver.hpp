@@ -96,7 +96,7 @@ PIC_INLINE Image *computePoissonSolver(Image *f, Image *ret = NULL)
     A.setFromTriplets(tL.begin(), tL.end());
     Eigen::SimplicialCholesky<Eigen::SparseMatrix<double> > solver(A);
 
-    for(int k=0; k< f->channels; k++) {
+    for(int k = 0; k < f->channels; k++) {
 
         Eigen::VectorXd b, x;
         b = Eigen::VectorXd::Zero(tot);

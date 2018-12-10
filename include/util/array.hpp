@@ -166,10 +166,11 @@ public:
      */
     static inline T distanceSq(T *data0, T *data1, int n)
     {
-        T distSq = T(0);
+        T tmp = data0[0] - data1[0];
+        T distSq = tmp * tmp;
 
-        for(int k = 0; k < n; k++) {
-            T tmp = data0[k] - data1[k];
+        for(int k = 1; k < n; k++) {
+            tmp = data0[k] - data1[k];
             distSq += tmp * tmp;
         }
 

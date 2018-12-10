@@ -140,7 +140,7 @@ PIC_INLINE Image *computePoissonImageEditing(Image *source, Image *target, bool 
         printf("Ok\n");
     #endif
 
-    //Solving the system for each color channel
+    //solve the linear system for each color channel
     Eigen::SimplicialCholesky<Eigen::SparseMatrix<double> > solver(A);
 
     for(int k=0; k< target->channels; k++) {
@@ -148,7 +148,7 @@ PIC_INLINE Image *computePoissonImageEditing(Image *source, Image *target, bool 
         Eigen::VectorXd b, x;
         b = Eigen::VectorXd::Zero(tot);
 
-        //assigning values to b
+        //assign values to b
         int count = 0;
         for(int i = 0; i < height; i++) {
             int tmpI = i * width;

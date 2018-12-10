@@ -89,7 +89,7 @@ protected:
         A.coeffRef(k, 128) = 1.0f;
         k++;
 
-        //Smoothness term
+        //smoothness term
         for(int i = 0; i < (n - 2); i++) {
             float w_l = lambda * w[i + 1];
             A.coeffRef(k, i)     =         w_l;
