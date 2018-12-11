@@ -31,15 +31,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- * @brief ExposureFusion
- * @param imgIn
- * @param wC
- * @param wE
- * @param wS
- * @param imgOut
- * @return
+ * @brief The ExposureFusion class
  */
-
 class ExposureFusion: public ToneMappingOperator
 {
 protected:
@@ -160,7 +153,7 @@ public:
 
         images[2]->applyFunction(ifNegGetOne);
 
-        //accumulate Pyramid
+        //accumulate into a Pyramid
         #ifdef PIC_DEBUG
             printf("Blending...");
         #endif
@@ -193,7 +186,7 @@ public:
         //final result
         imgOut = pOut->reconstruct(imgOut);
 
-      //  imgOut->applyFunction(setNegToZero);
+        imgOut->applyFunction(setNegToZero);
 
         //free the memory
         delete pW;
