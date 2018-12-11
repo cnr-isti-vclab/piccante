@@ -86,7 +86,7 @@ public:
      * @param value
      * @param threshold
      */
-    FilterDownPP(float *value = NULL, float threshold = 1e-4f) : Filter()
+    FilterDownPP(float *value, float threshold) : Filter()
     {
         update(value, threshold);
     }
@@ -102,12 +102,10 @@ public:
      */
     void update(float *value, float threshold)
     {
-        if(value == NULL) {
-            this->value = new float[3];
+        this->value = value;
 
-            Arrayf::assign(0.0f, this->value, 3);
-        } else {
-            this->value = value;
+        if(value == NULL) {
+            printf("ERROR in FilterDownPP");
         }
 
         this->threshold = (threshold > 0.0f) ? threshold : 1e-4f;
@@ -131,6 +129,7 @@ public:
             height      = imgIn[1]->height;
 
         }
+
         channels    = imgIn[0]->channels;
         frames      = imgIn[0]->frames;
     }

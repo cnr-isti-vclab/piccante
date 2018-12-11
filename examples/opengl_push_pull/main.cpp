@@ -41,7 +41,7 @@ class GLWidget : public QGLWidget, protected QOpenGLFunctions
 protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
-    pic::ImageGL img, *imgRec, *img_flt_tmo;
+    pic::ImageGL img, *im gRec, *img_flt_tmo;
     pic::TechniqueGL technique;
     int method;
     pic::PushPullGL *pp;
@@ -108,7 +108,9 @@ protected:
 
         //simple tone mapping: gamma + exposure correction
         if(method == 1) {
-            imgRec = pp->process(&img, imgRec, NULL);
+            pp->update(pic::Arrayf::zeros(img.channels), 1e-4f);
+
+            imgRec = pp->Process(&img, imgRec);
             img_flt_tmo = tmo->Process(pic::SingleGL(imgRec), img_flt_tmo);
         } else {
             img_flt_tmo = tmo->Process(pic::SingleGL(&img), img_flt_tmo);

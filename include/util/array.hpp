@@ -178,6 +178,19 @@ public:
     }
 
     /**
+     * @brief zeros
+     * @param n
+     * @return
+     */
+    static inline T* zeros(int n)
+    {
+        T *ret = new T[n];
+        assign(T(0), ret, n);
+
+        return ret;
+    }
+
+    /**
      * @brief norm_sq
      * @param data
      * @param n

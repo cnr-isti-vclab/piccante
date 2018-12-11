@@ -19,6 +19,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_GL_ALGORITHMS_PUSHPULL_HPP
 
 #include "../../gl/image.hpp"
+#include "../../gl/image_vec.hpp"
+
+#include "../../util/array.hpp"
+
 #include "../../gl/filtering/filter_down_pp.hpp"
 #include "../../gl/filtering/filter_up_pp.hpp"
 
@@ -66,23 +70,12 @@ public:
     }
 
     /**
-     * @brief process computes push-pull.
-     * @param img
+     * @brief update
      * @param value
-     * @return
+     * @param threshold
      */
-    ImageGL *process(ImageGL *imgIn, ImageGL *imgOut, float *value, float threshold = 1e-6f)
+    void update(float *value, float threshold = 1e-6f)
     {
-        if(imgIn == NULL) {
-            return imgOut;
-        }
-
-        if(imgOut == NULL) {
-            imgOut = imgIn->cloneGL();
-        } else {
-            *imgOut = *imgIn;
-        }
-
         if(flt_down == NULL) {
             flt_down = new FilterGLDownPP(value, threshold);
         } else {
@@ -94,9 +87,28 @@ public:
         } else {
             flt_up->update(value, threshold);
         }
+    }
+
+    /**
+     * @brief Process computes push-pull.
+     * @param img
+     * @param value
+     * @return
+     */
+    ImageGL *Process(ImageGL *imgIn, ImageGL *imgOut)
+    {
+        if(imgIn == NULL) {
+            return imgOut;
+        }
+
+        if(imgOut == NULL) {
+            imgOut = imgIn->cloneGL();
+        } else {
+            *imgOut = *imgIn;
+        }
 
         ImageGL *work = imgOut;
-        if(stack.empty()) { //creating the pyramid: Pull
+        if(stack.empty()) { //create the pyramid: Pull
             stack.push_back(imgOut);
 
             while(MIN(work->width, work->height) > 1) {
@@ -107,10 +119,10 @@ public:
                     work = tmp;
                 }
             }
-        } else { //updating previously created pyramid: Pull
+        } else { //update previously created pyramid: Pull
             int c = 1;
             while(MIN(work->width, work->height) > 1) {
-                flt_down->Process(SingleGL(work), stack[c]);
+                flt_down->Process(DoubleGL(work, stack[c]), stack[c]);
 
                 work = stack[c];
                 c++;
@@ -130,21 +142,23 @@ public:
     /**
      * @brief Execute
      * @param img
+     * @param imgOut
      * @param value
      * @return
      */
-    static ImageGL *execute(ImageGL *img, float value)
+    static ImageGL *execute(ImageGL *img,  ImageGL *imgOut, float value)
     {
         PushPullGL pp;
 
         float *tmp_value = new float[img->channels];
-        for(int i = 0; i < img->channels; i++) {
-            tmp_value[i] = value;
-        }
+        Arrayf::assign(value, tmp_value, img->channels);
 
-        return pp.process(img, NULL, tmp_value);
+        pp.update(tmp_value, 1e-4f);
+        imgOut = pp.Process(img, imgOut);
 
         delete[] tmp_value;
+
+        return imgOut;
     }
 };
 

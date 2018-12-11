@@ -32,8 +32,8 @@ class PushPull
 {
 protected:
 
-    FilterDownPP flt_down;
-    FilterUpPP flt_up;
+    FilterDownPP *flt_down;
+    FilterUpPP *flt_up;
     ImageVec stack;
 
     /**
@@ -69,11 +69,19 @@ public:
      * @param value
      * @param threshold
      */
-    void update(float *value = NULL, float threshold = 1e-9f)
+    void update(float *value, float threshold)
     {
-        flt_down.update(value, threshold);
-        flt_up.update(value, threshold);
+        if(flt_down == NULL) {
+            flt_down = new FilterDownPP(value, threshold);
+        } else {
+            flt_down->update(value, threshold);
+        }
 
+        if(flt_up == NULL) {
+            flt_up = new FilterUpPP(value, threshold);
+        } else {
+            flt_up->update(value, threshold);
+        }
     }
 
     /**
@@ -100,7 +108,7 @@ public:
             stack.push_back(imgOut);
 
             while(MIN(work->width, work->height) > 1) {
-                Image *tmp = flt_down.Process(Single(work), NULL);
+                Image *tmp = flt_down->Process(Single(work), NULL);
 
                 if(tmp != NULL) {
                     stack.push_back(tmp);
@@ -110,7 +118,7 @@ public:
         } else { //update previously created pyramid: Pull
             int c = 1;
             while(MIN(work->width, work->height) > 1) {
-                flt_down.Process(Double(work, stack[c]), stack[c]);
+                flt_down->Process(Double(work, stack[c]), stack[c]);
                 work = stack[c];
                 c++;
             }
@@ -120,7 +128,7 @@ public:
         int n = int(stack.size()) - 2;
 
         for(int i = n; i >= 0; i--) {
-            flt_up.Process(Double(stack[i + 1], stack[i]), stack[i]);
+            flt_up->Process(Double(stack[i + 1], stack[i]), stack[i]);
         }
 
         return imgOut;
@@ -142,7 +150,7 @@ public:
             tmp_value[i] = value;
         }
 
-        pp.update(tmp_value, 1e-9f);
+        pp.update(tmp_value, 1e-4f);
         imgOut = pp.Process(img, imgOut);
 
         delete[] tmp_value;

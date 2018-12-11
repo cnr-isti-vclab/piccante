@@ -1130,14 +1130,16 @@ PIC_INLINE void Image::copySubImage(Image *imgIn, int startX, int startY)
         return;
     }
 
-    if(imgIn->channels != channels) {
+    if(!this->isValid() ||
+            !imgIn->isValid() ||
+            (imgIn->channels != channels)) {
         return;
     }
 
-    //Checking bounds
+    //check bounds
     int sX, sY, eX, eY, dX, dY, shiftX, shiftY;
 
-    //Start
+    //start
     sX = MIN(startX, width);
     sX = MAX(sX, 0);
 
@@ -1152,7 +1154,7 @@ PIC_INLINE void Image::copySubImage(Image *imgIn, int startX, int startY)
         shiftX = -sX;
     }
 
-    //End
+    //end
     eX = MIN(startX + imgIn->width, width);
     eX = MAX(eX, 0);
 
@@ -1175,9 +1177,7 @@ PIC_INLINE void Image::copySubImage(Image *imgIn, int startX, int startY)
             float *curr_data = (*this)(i, j);
             float *imgIn_data = (*imgIn)(i + shiftX, j + shiftY);
 
-            for(int k = 0; k < channels; k++) {
-                curr_data[k] = imgIn_data[k];
-            }
+            Arrayf::assign(imgIn_data, channels, curr_data);
         }
     }
 }
