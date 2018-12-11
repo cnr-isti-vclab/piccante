@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
         printf("Ok\n");
 
         printf("Fusing the aligned images... ");
-        auto image_vec = Triple(&img[0], img_bright, shift_dark);
+        auto image_vec = pic::Triple(&img[0], img_bright, img_dark);
         pic::ExposureFusion ef(0.2f, 1.0f, 0.2f);
         pic::Image *imgOut = ef.ProcessStack(image_vec, NULL);
 
