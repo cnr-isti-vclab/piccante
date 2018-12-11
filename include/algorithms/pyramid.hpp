@@ -35,7 +35,7 @@ namespace pic {
 class Pyramid
 {
 protected:
-    bool lapGauss;
+    bool lapGauss, bCreated;
     int limitLevel;
 
     FilterGaussian2D    *flt_gauss;
@@ -61,6 +61,17 @@ protected:
      * @param limitLevel
      */
     void create(Image *img, bool lapGauss, int limitLevel);
+
+    /**
+     * @brief release
+     */
+    void release()
+    {
+        stdVectorClear<Image>(trackerUp);
+        stdVectorClear<Image>(trackerRec);
+        stdVectorClear<Image>(stack);
+        stdVectorClear<Filter>(filters);
+    }
 
 public:
 
@@ -154,26 +165,33 @@ public:
     {
         return stack[index % stack.size()];
     }
+
+    /**
+     * @brief setNULL
+     */
+    void setNULL()
+    {
+        release();
+
+        flt_gauss = NULL;
+        flt_sampler = NULL;
+        flt_sub = NULL;
+        flt_add = NULL;
+
+        bCreated = false;
+    }
 };
 
 PIC_INLINE Pyramid::Pyramid(Image *img, bool lapGauss, int limitLevel = 1)
 {
-    flt_gauss = NULL;
-    flt_sampler = NULL;
-    flt_sub = NULL;
-    flt_add = NULL;
+    setNULL();
 
-    if(img != NULL) {
-        create(img, lapGauss, limitLevel);
-    }
+    create(img, lapGauss, limitLevel);
 }
 
 PIC_INLINE Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, int limitLevel = 1)
 {
-    flt_gauss = NULL;
-    flt_sampler = NULL;
-    flt_sub = NULL;
-    flt_add = NULL;
+    setNULL();
 
     Image *img = new Image(1, width, height, channels);
 
@@ -184,42 +202,42 @@ PIC_INLINE Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, 
 
 PIC_INLINE Pyramid::~Pyramid()
 {
-    stdVectorClear<Image>(stack);
-    stdVectorClear<Filter>(filters);
+    release();
 }
 
 PIC_INLINE void Pyramid::initFilters()
 {
-    if(flt_gauss == NULL) {
+    if(!bCreated) {
         flt_gauss = new FilterGaussian2D(1.0f);
         filters.push_back(flt_gauss);
-    }
 
-    if(flt_sampler == NULL) {
         flt_sampler = new FilterSampler2D(0.5f);
         filters.push_back(flt_sampler);
-    }
 
-    if(flt_sub == NULL) {
         flt_sub = new FilterSampler2DSub(NULL);
         filters.push_back(flt_sub);
-    }
 
-    if(flt_add == NULL) {
         flt_add = new FilterSampler2DAdd(NULL);
         filters.push_back(flt_add);
+
+        bCreated = true;
     }
 }
 
 PIC_INLINE void Pyramid::create(Image *img, bool lapGauss, int limitLevel = 1)
 {
-    this->lapGauss  = lapGauss;
-
-    if(limitLevel < 1) {
-        limitLevel = 1;
+    if(img == NULL) {
+        return;
     }
 
+    if(!img->isValid()) {
+        return;
+    }
+
+    limitLevel = MAX(limitLevel, 1);
+
     this->limitLevel = limitLevel;
+    this->lapGauss  = lapGauss;
 
     initFilters();
 
@@ -287,9 +305,9 @@ PIC_INLINE void Pyramid::update(Image *img)
         tmpG = flt_gauss->Process(Single(tmpImg), stack[i]);
 
         if(i == (levels - 1)) {
-            tmpD = flt_sampler->Process(Single(tmpG), stack[i + 1]);
+            tmpD = flt_sampler->Process(Double(tmpG, stack[i + 1]), stack[i + 1]);
         } else {
-            tmpD = flt_sampler->Process(Single(tmpG), trackerUp[i]);
+            tmpD = flt_sampler->Process(Double(tmpG, trackerUp[i]), trackerUp[i]);
         }
 
         if(lapGauss) {	//Laplacian Pyramid

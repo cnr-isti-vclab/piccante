@@ -35,8 +35,8 @@ namespace pic {
 class PyramidGL
 {
 protected:
-    bool                lapGauss;
-    int                 limitLevel;
+    bool lapGauss, bCreated;
+    int limitLevel;
 
     FilterGLGaussian2D  *flt_gauss;
     FilterGLSampler2D   *flt_sampler;
@@ -61,6 +61,17 @@ protected:
      * @param limitLevel
      */
     void create(ImageGL *img, bool lapGauss, int limitLevel);
+
+    /**
+     * @brief release
+     */
+    void release()
+    {
+        stdVectorClear<ImageGL>(stack);
+        stdVectorClear<ImageGL>(trackerUp);
+        stdVectorClear<ImageGL>(trackerRec);
+        stdVectorClear<FilterGL>(filters);
+    }
 
 public:
 
@@ -117,6 +128,13 @@ public:
     void add(const PyramidGL *pyr);
 
     /**
+     * @brief reconstruct
+     * @param imgOut
+     * @return
+     */
+    ImageGL *reconstruct(ImageGL *imgOut);
+
+    /**
      * @brief blend
      * @param pyr
      * @param weight
@@ -124,20 +142,43 @@ public:
     void blend(PyramidGL *pyr, PyramidGL *weight);
 
     /**
-     * @brief reconstruct
-     * @param imgOut
+     * @brief size
      * @return
      */
-    ImageGL *reconstruct(ImageGL *imgOut);
+    int size()
+    {
+        return int(stack.size());
+    }
+
+    /**
+     * @brief get
+     * @param index
+     * @return
+     */
+    Image *get(int index)
+    {
+        return stack[index % stack.size()];
+    }
+
+    /**
+     * @brief setNULL
+     */
+    void setNULL()
+    {
+        release();
+
+        flt_gauss = NULL;
+        flt_sampler = NULL;
+        flt_sub = NULL;
+        flt_add = NULL;
+
+        bCreated = false;
+    }
 };
 
 PIC_INLINE PyramidGL::PyramidGL(ImageGL *img, bool lapGauss, int limitLevel = 1)
 {
-    flt_gauss = NULL;
-    flt_sampler = NULL;
-    flt_add = NULL;
-    flt_sub = NULL;
-    flt_blend = NULL;
+    setNULL();
 
     if(img != NULL) {
         create(img, lapGauss, limitLevel);
@@ -146,11 +187,7 @@ PIC_INLINE PyramidGL::PyramidGL(ImageGL *img, bool lapGauss, int limitLevel = 1)
 
 PIC_INLINE PyramidGL::PyramidGL(int width, int height, int channels, bool lapGauss, int limitLevel = 1)
 {
-    flt_gauss = NULL;
-    flt_sampler = NULL;
-    flt_add = NULL;
-    flt_sub = NULL;
-    flt_blend = NULL;
+    setNULL();
 
     ImageGL *img = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
     *img = 0.0f;
@@ -162,37 +199,28 @@ PIC_INLINE PyramidGL::PyramidGL(int width, int height, int channels, bool lapGau
 
 PIC_INLINE PyramidGL::~PyramidGL()
 {
-    stdVectorClear<ImageGL>(stack);
-    stdVectorClear<ImageGL>(trackerUp);
-    stdVectorClear<ImageGL>(trackerRec);
-    stdVectorClear<FilterGL>(filters);
+    release();
 }
 
 PIC_INLINE void PyramidGL::initFilters()
 {
-    if(flt_gauss == NULL) {
+    if(!bCreated) {
         flt_gauss = new FilterGLGaussian2D(1.0f);
         filters.push_back(flt_gauss);
-    }
 
-    if(flt_sampler == NULL) {
         flt_sampler = new FilterGLSampler2D(0.5f);
         filters.push_back(flt_sampler);
-    }
 
-    if(flt_add == NULL) {
         flt_add  = FilterGLOp::CreateOpAdd(false);
         filters.push_back(flt_add);
-    }
 
-    if(flt_sub == NULL) {
         flt_sub  = FilterGLOp::CreateOpSub(false);
         filters.push_back(flt_sub);
-    }
 
-    if(flt_blend == NULL) {
         flt_blend = new FilterGLBlend();
         filters.push_back(flt_blend);
+
+        bCreated = true;
     }
 }
 
@@ -271,9 +299,9 @@ PIC_INLINE void PyramidGL::update(ImageGL *img)
         tmpG = flt_gauss->Process(SingleGL(tmpImg), stack[i]);
 
         if(i == (levels - 1) ) {
-            tmpD = flt_sampler->Process(SingleGL(tmpG), stack[i + 1]);
+            tmpD = flt_sampler->Process(DoubleGL(tmpG, stack[i + 1]), stack[i + 1]);
         } else {
-            tmpD = flt_sampler->Process(SingleGL(tmpG), trackerUp[i]);
+            tmpD = flt_sampler->Process(DoubleGL(tmpG, trackerUp[i]), trackerUp[i]);
         }
 
         if(lapGauss) { //Laplacian Pyramid

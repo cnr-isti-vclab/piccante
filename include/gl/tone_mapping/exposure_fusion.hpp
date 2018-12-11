@@ -37,6 +37,8 @@ class ExposureFusionGL
 {
 protected:
     std::vector<FilterGL *> filters;
+    std::vector<PyramidGL *> pyramids;
+    ImageGLVec images;
 
     FilterGLLuminance *flt_lum;
     FilterGLExposureFusionWeights *flt_weights;
@@ -48,6 +50,7 @@ protected:
 
     float wC, wS, wE;
 
+    bool bAllocatedFilters;
     bool bAllocate;
 
     /**
@@ -55,21 +58,24 @@ protected:
      */
     void allocateFilters()
     {
-        flt_lum = new FilterGLLuminance();
-        flt_lum->bDelete = true;
-        filters.push_back(flt_lum);
+        if(!bAllocatedFilters) {
+            flt_lum = new FilterGLLuminance();
+            flt_lum->bDelete = true;
+            filters.push_back(flt_lum);
 
-        remove_negative = new FilterGLOp("max(I0, vec4(0.0))", true, NULL, NULL);
-        remove_negative->bDelete = true;
-        filters.push_back(remove_negative);
+            remove_negative = new FilterGLOp("max(I0, vec4(0.0))", true, NULL, NULL);
+            remove_negative->bDelete = true;
+            filters.push_back(remove_negative);
 
-        convert_zero_to_one = new FilterGLOp("I0.x > 0.0 ? I0 : vec4(1.0)", true, NULL, NULL);
-        convert_zero_to_one->bDelete = true;
-        filters.push_back(convert_zero_to_one);
+            convert_zero_to_one = new FilterGLOp("I0.x > 0.0 ? I0 : vec4(1.0)", true, NULL, NULL);
+            convert_zero_to_one->bDelete = true;
+            filters.push_back(convert_zero_to_one);
 
-        flt_weights = new FilterGLExposureFusionWeights(wC, wE, wS);
-        flt_weights->bDelete = true;
-        filters.push_back(flt_weights);
+            flt_weights = new FilterGLExposureFusionWeights(wC, wE, wS);
+            flt_weights->bDelete = true;
+            filters.push_back(flt_weights);
+            bAllocatedFilters = true;
+        }
     }
 
 public:
@@ -79,6 +85,7 @@ public:
     ExposureFusionGL(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
     {
         bAllocate = false;
+        bAllocatedFilters = false;
 
         update(wC, wE, wS);
 
@@ -93,36 +100,8 @@ public:
 
     ~ExposureFusionGL()
     {
-        if(lum != NULL) {
-            delete lum;
-            lum = NULL;
-        }
-
-        if(acc != NULL) {
-            delete acc;
-            acc = NULL;
-        }
-
-        if(weights != NULL) {
-            delete weights;
-            weights = NULL;
-        }
-
-        if(pW != NULL) {
-            delete pW;
-            pW = NULL;
-        }
-
-        if(pI != NULL) {
-            delete pI;
-            pI = NULL;
-        }
-
-        if(pOut != NULL) {
-            delete pOut;
-            pOut = NULL;
-        }
-
+        stdVectorClear<ImageGL>(images);
+        stdVectorClear<PyramidGL>(pyramids);
         stdVectorClear<FilterGL>(filters);
     }
 
@@ -153,19 +132,28 @@ public:
             int channels = imgIn[0]->channels;
 
             acc = new ImageGL(1, width, height, 1, IMG_GPU, GL_TEXTURE_2D);
+            lum = new ImageGL(1, width, height, 1, IMG_GPU, GL_TEXTURE_2D);
+            weights = new ImageGL(1, width, height, 1, IMG_GPU, GL_TEXTURE_2D);
+
+            images.push_back(acc);
+            images.push_back(lum);
+            images.push_back(weights);
+
             pW = new PyramidGL(width, height, 1, false);
             pI = new PyramidGL(width, height, channels, true);
             pOut = new PyramidGL(width, height, channels, true);
+
+            pyramids.push_back(pW);
+            pyramids.push_back(pI);
+            pyramids.push_back(pOut);
 
             allocateFilters();
         } else {
             if(!pOut->stack[0]->isSimilarType(imgIn[0])) {
                 bAllocate = false;
 
-                delete acc;
-                delete pW;
-                delete pI;
-                delete pOut;
+                stdVectorClear<ImageGL>(images);
+                stdVectorClear<PyramidGL>(pyramids);
 
                 allocate(imgIn);
             }
@@ -204,7 +192,6 @@ public:
         }
 
         allocate(imgIn);
-
 
         //compute weights values
         *acc = 0.0f;

@@ -92,12 +92,25 @@ public:
      */
     void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        if(swh) {
-            width  = int(imgIn[0]->widthf  * scaleX);
-            height = int(imgIn[0]->heightf * scaleY);
+        if(imgIn.empty()) {
+            width = -2;
+            height = -2;
+            channels = -2;
+            frames = -2;
+            return;
+        }
+
+        if(imgIn.size() == 1) {
+            if(swh) {
+                width  = int(imgIn[0]->widthf  * scaleX);
+                height = int(imgIn[0]->heightf * scaleY);
+            } else {
+                width = this->width;
+                height = this->height;
+            }
         } else {
-            width = this->width;
-            height = this->height;
+            width = imgIn[1]->width;
+            height = imgIn[1]->height;
         }
 
         channels = imgIn[0]->channels;

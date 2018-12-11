@@ -38,7 +38,40 @@ protected:
      * @param src
      * @param box
      */
-    void ProcessBBox(Image *dst, ImageVec src, BBox *box);
+    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
+    {
+        int channels = dst->channels;
+
+        Image *src0 = src[0];
+        Image *src1 = src[1];
+
+        float *tmp_mem = new float[channels << 1];
+
+        float *vOut  = &tmp_mem[0];
+        float *vsrc0 = &tmp_mem[channels];
+
+        float inv_height1f = 1.0f / float(box->height - 1);
+        float inv_width1f = 1.0f / float(box->width - 1);
+
+        for(int j = box->y0; j < box->y1; j++) {
+            float y = float(j) * inv_height1f;
+
+            for(int i = box->x0; i < box->x1; i++) {
+                float x = float(i) * inv_width1f;
+
+                float *tmp_dst  = (*dst )(i, j);
+
+                isb->SampleImage(src0, x, y, vsrc0);
+                isb->SampleImage(src1, x, y, vOut);
+
+                for(int k = 0; k < channels; k++) {
+                    tmp_dst[k] = vsrc0[k] - vOut[k];
+                }
+            }
+        }
+
+        delete[] tmp_mem;
+    }
 
 public:
 
@@ -46,15 +79,39 @@ public:
      * @brief FilterSampler2DSub
      * @param isb
      */
-    FilterSampler2DSub(ImageSampler *isb);
+    FilterSampler2DSub(ImageSampler *isb) : Filter()
+    {
+        this->minInputImages = 2;
 
-    ~FilterSampler2DSub();
+        if(isb != NULL) {
+            bIsb = false;
+            this->isb = isb;
+        } else {
+            bIsb = true;
+            this->isb = new ImageSamplerBilinear();
+        }
+    }
+
+    ~FilterSampler2DSub()
+    {
+        if(bIsb) {
+            delete isb;
+        }
+    }
 
     /**
      * @brief update
      * @param isb
      */
-    void update(ImageSampler *isb);
+    void update(ImageSampler *isb)
+    {
+        if((this->isb != NULL) && (bIsb)) {
+            delete this->isb;
+        }
+
+        this->isb = isb;
+        bIsb = false;
+    }
 
     /**
      * @brief execute
@@ -69,71 +126,6 @@ public:
         return filter.Process(Single(imgIn), imgOut);
     }
 };
-
-PIC_INLINE FilterSampler2DSub::FilterSampler2DSub(ImageSampler *isb) : Filter()
-{
-    this->minInputImages = 2;
-
-    if(isb != NULL) {
-        bIsb = false;
-        this->isb = isb;
-    } else {
-        bIsb = true;
-        this->isb = new ImageSamplerBilinear();
-    }
-}
-
-PIC_INLINE FilterSampler2DSub::~FilterSampler2DSub()
-{
-    if(bIsb) {
-        delete isb;
-    }
-}
-
-PIC_INLINE void FilterSampler2DSub::update(ImageSampler *isb)
-{
-    if((this->isb != NULL) && (bIsb)) {
-        delete this->isb;
-    }
-
-    this->isb = isb;
-    bIsb = false;
-}
-
-PIC_INLINE void FilterSampler2DSub::ProcessBBox(Image *dst, ImageVec src, BBox *box)
-{
-    int channels = dst->channels;
-
-    Image *src0 = src[0];
-    Image *src1 = src[1];
-
-    float *tmp_mem = new float[channels << 1];
-
-    float *vOut  = &tmp_mem[0];
-    float *vsrc0 = &tmp_mem[channels];
-
-    float inv_height1f = 1.0f / float(box->height - 1);
-    float inv_width1f = 1.0f / float(box->width - 1);
-
-    for(int j = box->y0; j < box->y1; j++) {
-        float y = float(j) * inv_height1f;
-
-        for(int i = box->x0; i < box->x1; i++) {
-            float x = float(i) * inv_width1f;
-
-            float *tmp_dst  = (*dst )(i, j);
-
-            isb->SampleImage(src0, x, y, vsrc0);
-            isb->SampleImage(src1, x, y, vOut);
-
-            for(int k = 0; k < channels; k++) {
-                tmp_dst[k] = vsrc0[k] - vOut[k];
-            }
-        }
-    }
-
-    delete[] tmp_mem;
-}
 
 } // end namespace pic
 

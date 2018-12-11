@@ -33,14 +33,40 @@ protected:
     /**
      * @brief initShaders
      */
-    void initShaders();
+    void initShaders()
+    {
+        fragment_source = MAKE_STRING
+                          (
+                              uniform sampler2D u_tex; \n
+                              uniform float   scale; \n
+                              out     vec4    f_color; \n
+
+        void main(void) { \n
+            vec2 coords = gl_FragCoord.xy / vec2(scale);
+            vec3  color = texelFetch(u_tex, ivec2(coords), 0).xyz; \n
+            f_color = vec4(color.xyz, 1.0); \n
+        }
+                          );
+
+        technique.initStandard("330", vertex_source, fragment_source, "FilterGLSampler2D");
+
+        technique.bind();
+        technique.setUniform1i("u_tex", 0);
+        technique.setUniform1f("scale", scale);
+        technique.unbind();
+    }
 
 public:
     /**
      * @brief FilterGLSampler2D
      * @param scale
      */
-    FilterGLSampler2D(float scale);
+    FilterGLSampler2D(float scale) : FilterGL()
+    {
+        update(scale);
+
+        initShaders();
+    }
 
     /**
      * @brief OutputSize
@@ -52,8 +78,21 @@ public:
      */
     void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width = int(imgIn[0]->widthf * scale);
-        height = int(imgIn[0]->heightf * scale);
+        if(imgIn.empty()) {
+            width = -1;
+            height = -2;
+            channels = -2;
+            frames = -2;
+        }
+
+        if(imgIn.size() == 1) {
+            width = int(imgIn[0]->widthf * scale);
+            height = int(imgIn[0]->heightf * scale);
+        } else {
+            width = imgIn[1]->width;
+            height = imgIn[1]->height;
+        }
+
         channels = imgIn[0]->channels;
         frames = imgIn[0]->frames;
     }
@@ -62,7 +101,14 @@ public:
      * @brief update
      * @param scale
      */
-    void update(float scale);
+    void update(float scale)
+    {
+        this->scale = scale;
+
+        technique.bind();
+        technique.setUniform1f("scale", scale);
+        technique.unbind();
+    }
 
     /**
      * @brief execute
@@ -83,44 +129,6 @@ public:
     }
 };
 
-PIC_INLINE FilterGLSampler2D::FilterGLSampler2D(float scale): FilterGL()
-{
-    update(scale);
-
-    initShaders();
-}
-
-PIC_INLINE void FilterGLSampler2D::update(float scale)
-{
-    this->scale = scale;
-
-    technique.bind();
-    technique.setUniform1f("scale", scale);
-    technique.unbind();
-}
-
-PIC_INLINE void FilterGLSampler2D::initShaders()
-{
-    fragment_source = MAKE_STRING
-                      (
-                          uniform sampler2D u_tex; \n
-                          uniform float   scale; \n
-                          out     vec4    f_color; \n
-
-    void main(void) { \n
-        vec2 coords = gl_FragCoord.xy / vec2(scale);
-        vec3  color = texelFetch(u_tex, ivec2(coords), 0).xyz; \n
-        f_color = vec4(color.xyz, 1.0); \n
-    }
-                      );
-
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGLSampler2D");
-
-    technique.bind();
-    technique.setUniform1i("u_tex", 0);
-    technique.setUniform1f("scale", scale);
-    technique.unbind();
-}
 
 } // end namespace pic
 

@@ -66,6 +66,22 @@ public:
 
         initShaders();
     }
+
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width    = imgIn[0]->width;
+        height   = imgIn[0]->height;
+        channels = 1;
+        frames   = imgIn[0]->frames;
+    }
 };
 
 PIC_INLINE void FilterGLExposureFusionWeights::FragmentShader()
