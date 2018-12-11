@@ -38,13 +38,13 @@ protected:
     bool lapGauss, bCreated;
     int limitLevel;
 
-    FilterGLGaussian2D  *flt_gauss;
-    FilterGLSampler2D   *flt_sampler;
-    FilterGLOp		*flt_add, *flt_sub;
-    FilterGLBlend       *flt_blend;
+    FilterGLGaussian2D *flt_gauss;
+    FilterGLSampler2D *flt_sampler;
+    FilterGLOp *flt_add, *flt_sub;
+    FilterGLBlend  *flt_blend;
     std::vector<FilterGL *> filters;
 
-    ImageGLVec          trackerRec, trackerUp;
+    ImageGLVec trackerRec, trackerUp;
 
     /**
      * @brief initFilters
@@ -226,13 +226,18 @@ PIC_INLINE void PyramidGL::initFilters()
 
 PIC_INLINE void PyramidGL::create(ImageGL *img, bool lapGauss, int limitLevel = 1)
 {
-    this->lapGauss = lapGauss;
-
-    if(limitLevel < 1) {
-        limitLevel = 1;
+    if(img == NULL) {
+        return;
     }
 
-    this->limitLevel  = limitLevel;
+    if(!img->isValid()) {
+        return;
+    }
+
+    limitLevel = MAX(limitLevel, 1);
+
+    this->limitLevel = limitLevel;
+    this->lapGauss = lapGauss;
 
     initFilters();
 
@@ -242,7 +247,6 @@ PIC_INLINE void PyramidGL::create(ImageGL *img, bool lapGauss, int limitLevel = 
     ImageGL *tmpG   = NULL;
     ImageGL *tmpD   = NULL;
 
-    //normal image case
     for(int i = 0; i < levels; i++) {
 
         tmpG = flt_gauss->Process(SingleGL(tmpImg), NULL);

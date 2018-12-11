@@ -38,10 +38,10 @@ protected:
     bool lapGauss, bCreated;
     int limitLevel;
 
-    FilterGaussian2D    *flt_gauss;
-    FilterSampler2D     *flt_sampler;
-    FilterSampler2DSub  *flt_sub;
-    FilterSampler2DAdd  *flt_add;
+    FilterGaussian2D *flt_gauss;
+    FilterSampler2D *flt_sampler;
+    FilterSampler2DSub *flt_sub;
+    FilterSampler2DAdd *flt_add;
     std::vector< Filter* > filters;
 
     ImageVec trackerRec, trackerUp;
@@ -244,7 +244,6 @@ PIC_INLINE void Pyramid::create(Image *img, bool lapGauss, int limitLevel = 1)
     int levels = MAX(log2(MIN(img->width, img->height)) - limitLevel, 1);
 
     Image *tmpImg = img;
-
     Image *tmpG = NULL;
     Image *tmpD = NULL;
 
