@@ -125,7 +125,6 @@ public:
     void allocate(ImageGLVec imgIn)
     {
         if(!bAllocate) {
-            bAllocate = true;
 
             int width = imgIn[0]->width;
             int height = imgIn[0]->height;
@@ -148,6 +147,8 @@ public:
             pyramids.push_back(pOut);
 
             allocateFilters();
+
+            bAllocate = true;
         } else {
             if(!pOut->stack[0]->isSimilarType(imgIn[0])) {
                 bAllocate = false;

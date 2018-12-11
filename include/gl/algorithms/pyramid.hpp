@@ -171,6 +171,7 @@ public:
         flt_sampler = NULL;
         flt_sub = NULL;
         flt_add = NULL;
+        flt_blend = NULL;
 
         bCreated = false;
     }
@@ -227,10 +228,6 @@ PIC_INLINE void PyramidGL::initFilters()
 PIC_INLINE void PyramidGL::create(ImageGL *img, bool lapGauss, int limitLevel = 1)
 {
     if(img == NULL) {
-        return;
-    }
-
-    if(!img->isValid()) {
         return;
     }
 
