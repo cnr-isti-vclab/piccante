@@ -158,9 +158,10 @@ public:
             printf("Blending...");
         #endif
 
-        Pyramid *pW   = new Pyramid(width, height, 1, false, 2);
-        Pyramid *pI   = new Pyramid(width, height, channels, true, 2);
-        Pyramid *pOut = new Pyramid(width, height, channels, true, 2);
+        int limitLevel = 1;
+        Pyramid *pW   = new Pyramid(width, height, 1, false, limitLevel);
+        Pyramid *pI   = new Pyramid(width, height, channels, true, limitLevel);
+        Pyramid *pOut = new Pyramid(width, height, channels, true, limitLevel);
 
         pOut->setValue(0.0f);
 

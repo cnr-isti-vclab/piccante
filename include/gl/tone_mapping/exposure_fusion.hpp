@@ -138,9 +138,10 @@ public:
             images.push_back(lum);
             images.push_back(weights);
 
-            pW = new PyramidGL(width, height, 1, false);
-            pI = new PyramidGL(width, height, channels, true);
-            pOut = new PyramidGL(width, height, channels, true);
+            int limitLevel = 1;
+            pW = new PyramidGL(width, height, 1, false, limitLevel);
+            pI = new PyramidGL(width, height, channels, true, limitLevel);
+            pOut = new PyramidGL(width, height, channels, true, limitLevel);
 
             pyramids.push_back(pW);
             pyramids.push_back(pI);
