@@ -138,6 +138,25 @@ public:
     }
 
     /**
+     * @brief insertFilter
+     * @param flt
+     */
+    void insertFilter(FilterGL *flt)
+    {
+        if(flt == NULL) {
+            return;
+        }
+
+        if(!flt->filters.empty()) {
+            for(unsigned int i = 0; i < flt->filters.size(); i++) {
+                insertFilter(flt->filters[i]);
+            }
+        } else {
+            filters.push_back(flt);
+        }
+    }
+
+    /**
      * @brief setTarget
      * @param target
      */

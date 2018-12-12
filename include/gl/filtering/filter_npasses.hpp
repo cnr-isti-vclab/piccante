@@ -126,12 +126,6 @@ public:
     }
 
     /**
-     * @brief insertFilter
-     * @param flt
-     */
-    void insertFilter(FilterGL *flt);
-
-    /**
      * @brief Process
      * @param imgIn
      * @param imgOut
@@ -204,21 +198,6 @@ PIC_INLINE void FilterGLNPasses::OutputSize(ImageGLVec imgIn, int &width, int &h
     imgIn[0] = tmp;
 
     delete imgIn0;
-}
-
-PIC_INLINE void FilterGLNPasses::insertFilter(FilterGL *flt)
-{
-    if(flt == NULL) {
-        return;
-    }
-
-    if(!flt->filters.empty()) {
-        for(unsigned int i = 0; i < flt->filters.size(); i++) {
-            insertFilter(flt->filters[i]);
-        }
-    } else {
-        filters.push_back(flt);
-    }
 }
 
 PIC_INLINE ImageGL *FilterGLNPasses::setupAuxNGen(ImageGLVec imgIn,

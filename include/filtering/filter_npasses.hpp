@@ -113,12 +113,6 @@ public:
     void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames);
 
     /**
-     * @brief insertFilter
-     * @param flt
-     */
-    void insertFilter(Filter *flt);
-
-    /**
      * @brief Process
      * @param imgIn
      * @param imgOut
@@ -188,21 +182,6 @@ PIC_INLINE void FilterNPasses::OutputSize(ImageVec imgIn, int &width, int &heigh
     imgIn[0] = tmp;
 
     delete imgIn0;
-}
-
-PIC_INLINE void FilterNPasses::insertFilter(Filter *flt)
-{
-    if(flt == NULL) {
-        return;
-    }
-
-    if(!flt->filters.empty()) {
-        for(unsigned int i = 0; i < flt->filters.size(); i++) {
-            insertFilter(flt->filters[i]);
-        }
-    } else {
-        filters.push_back(flt);
-    }
 }
 
 PIC_INLINE Image *FilterNPasses::setupAuxNGen(ImageVec imgIn,
