@@ -184,10 +184,12 @@ PIC_INLINE void FilterDownSampler2D::release()
     for (int i = 0; i < 2; i++) {
         if (flt[i] != NULL) {
             delete flt[i];
+            flt[i] = NULL;
         }
 
         if (isg[i] != NULL) {
             delete isg[i];
+            isg[i] = NULL;
         }
     }
 }

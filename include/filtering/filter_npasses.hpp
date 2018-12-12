@@ -128,6 +128,8 @@ PIC_INLINE FilterNPasses::FilterNPasses() : Filter()
     for(int i = 0; i < 2; i++) {
         imgTmpSame[i] = NULL;
     }
+
+    imgTmp.clear();
 }
 
 PIC_INLINE FilterNPasses::~FilterNPasses()
