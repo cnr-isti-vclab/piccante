@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     img0.Read(img0_str, pic::LT_NOR);
 
     if(!bCreate) {
-        bCreate = img1.Read(img1_str, pic::LT_NOR);
+        bCreate = !img1.Read(img1_str, pic::LT_NOR);
     }
 
     printf("Is it valid? ");

@@ -112,11 +112,11 @@ public:
         }
 
         if(min_val_v != NULL) {
-            delete [] min_val_v;
+            delete[] min_val_v;
         }
 
         if(max_val_v != NULL) {
-            delete [] max_val_v;
+            delete[] max_val_v;
         }
 
         return ret;
