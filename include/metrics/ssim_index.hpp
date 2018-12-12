@@ -108,6 +108,7 @@ public:
                 ret = min_val / max_val;
             }
 
+            return ret;
         }
 
         if(min_val_v != NULL) {

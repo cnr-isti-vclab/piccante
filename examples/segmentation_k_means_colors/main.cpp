@@ -53,6 +53,8 @@ int main(int argc, char *argv[])
         unsigned int k;
         float *centers = pic::kMeansSelect<float>(samples, nSamples, channels, k, labels, 0.1f, 100);
 
+        printf("The number of k is: %d\n", k);
+
         if(centers != NULL) {
             int n = img.size();
 

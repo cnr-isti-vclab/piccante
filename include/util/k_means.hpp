@@ -101,31 +101,36 @@ PIC_INLINE T* kMeanscomputeRandomCenters(T *samples, int nSamples, int nDim, int
 
     centers = new T[k * nDim];
 
-        std::mt19937 m(std::chrono::system_clock::now().time_since_epoch().count());
+    std::mt19937 m(std::chrono::system_clock::now().time_since_epoch().count());
 
-        T *tMax = new T[nDim];
-        T *tMin = new T[nDim];
+    T *tMax = new T[nDim];
+    T *tMin = new T[nDim];
 
+    for(int j = 0; j < nDim; j++) {
+        T s = samples[j];
+        tMin[j] = s;
+        tMax[j] = s;
+    }
+
+    for(int i = 1; i < nSamples; i++) {
+        int index = i * nDim;
         for(int j = 0; j < nDim; j++) {
-            tMax[j] = -FLT_MAX;
-            tMin[j] =  FLT_MAX;
-        }
+            T s = samples[index + j];
 
-        for(int i = 0; i < nSamples; i++) {
-            int index = i * nDim;
-            for(int j = 0; j < nDim; j++) {
-                T s = samples[index + j];
-                tMax[j] = MAX(tMax[j], s);
-                tMin[j] = MIN(tMin[j], s);
-            }
+            tMin[j] = MIN(tMin[j], s);
+            tMax[j] = MAX(tMax[j], s);
         }
+    }
 
-        for(int i = 0; i < k; i++) {
-            int index = i * nDim;
-            for(int j = 0; j < nDim; j++) {
-                 centers[index + j] = T(getRandom(m()) * (tMax[j] - tMin[j]) + tMin[j]);
-            }
+    for(int i = 0; i < k; i++) {
+        int index = i * nDim;
+        for(int j = 0; j < nDim; j++) {
+            centers[index + j] = T(getRandom(m()) * (tMax[j] - tMin[j]) + tMin[j]);
         }
+    }
+
+    delete[] tMin;
+    delete[] tMax;
 
     return centers;
 }
@@ -203,6 +208,8 @@ PIC_INLINE T* kMeans(T *samples, int nSamples, int nDim,
             }
         }
     }
+
+    delete[] mean;
 
     return centers;
 }
