@@ -152,8 +152,8 @@ public:
             #endif
 
             if(f > 1.0f) {
-                ori_d = FilterDownSampler2D::execute(ori, NULL, f);
-                cmp_d = FilterDownSampler2D::execute(cmp, NULL, f);
+                ori_d = FilterDownSampler2D::execute(ori, NULL, 1.0f / f);
+                cmp_d = FilterDownSampler2D::execute(cmp, NULL, 1.0f / f);
 
                 ori = ori_d;
                 cmp = cmp_d;
@@ -164,6 +164,7 @@ public:
 
         Image *L_ori = flt_lum.Process(Single(ori), NULL);
         Image *L_cmp = flt_lum.Process(Single(cmp), NULL);
+
 
         if(dynamic_range <= 0.0f) {
             dynamic_range = getDynamicRange(L_ori);
