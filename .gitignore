@@ -246,3 +246,8 @@ examples/build-b_push_pull-Desktop_Qt_5_4_2_clang_64bit-Debug/b_push_pull
 examples/build-b_push_pull-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
 examples/build-hdr_exposure_fusion_stack-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
 examples/build-hdr_exposure_fusion_stack-Desktop_Qt_5_4_2_clang_64bit-Debug/hdr_exposure_fusion_stack
+examples/build-hdr_metrics-Desktop_Qt_5_4_2_clang_64bit-Debug/hdr_metrics
+examples/build-hdr_metrics-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
+examples/build-s_kmeans_colors-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
+examples/build-s_kmeans_colors-Desktop_Qt_5_4_2_clang_64bit-Debug/s_kmeans_colors
+examples/data/output/singapore_ssim_map.pfm

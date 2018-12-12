@@ -75,11 +75,6 @@ class Image
 protected:
 
     /**
-     * @brief release makes allocated buffers free.
-     */
-    void release();
-
-    /**
      * @brief setNULL sets buffers values to NULL.
      */
     void setNULL();
@@ -200,6 +195,11 @@ public:
      * e.g. strides.
      */
     void allocateAux();
+
+    /**
+     * @brief release frees allocated buffers.
+     */
+    void release();
 
     /**
      * @brief copySubImage copies imgIn in the current image.

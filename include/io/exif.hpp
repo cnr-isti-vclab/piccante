@@ -475,7 +475,9 @@ bool readEXIF(std::string name, EXIFInfo &info)
             }
         }
 
-        printf("%f %f %f\n", info.iso, info.exposureTime, info.fNumber);
+        #ifdef PIC_DEBUG
+            printf("%f %f %f\n", info.iso, info.exposureTime, info.fNumber);
+        #endif
 
         fclose(file);
 
