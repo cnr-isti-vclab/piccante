@@ -50,12 +50,13 @@ int main(int argc, char *argv[])
     pic::Image img0, img1;
     img0.Read(img0_str, pic::LT_NOR);
 
+    bool bLoaded = false;
     if(!bCreate) {
-        bCreate = !img1.Read(img1_str, pic::LT_NOR);
+        bLoaded = img1.Read(img1_str, pic::LT_NOR);
     }
 
     printf("Is it valid? ");
-    if(img0.isValid() && bCreate) {
+    if(img0.isValid() && (bCreate || bLoaded)) {
         printf("OK\n");
 
         std::string name = pic::removeLocalPath(img0_str);

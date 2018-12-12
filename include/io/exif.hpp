@@ -241,6 +241,12 @@ struct EXIFInfo
     std::string camera_maker;
 };
 
+/**
+ * @brief readEXIF
+ * @param name
+ * @param info
+ * @return
+ */
 bool readEXIF(std::string name, EXIFInfo &info)
 {
         FILE *file = fopen(name.c_str(), "rb");
@@ -355,11 +361,11 @@ bool readEXIF(std::string name, EXIFInfo &info)
                 if(total_data_byte > 4) {
                     int offset = fourByteToValue(data, bMotorola);
 
-                    fpos_t tmppos;
-                    fgetpos(file, &tmppos);
-                    fseek(file, pos + offset, SEEK_SET);
+                    fpos_t tmp_pos;
+                    fgetpos(file, &tmp_pos);
+                    fseek(file, offset, SEEK_CUR);
                     info.camera_maker = readString(file, nc);
-                    fseek(file, tmppos, SEEK_SET);
+                    fsetpos(file, &tmp_pos);
 
                 } else {
                     info.camera_maker = readStringFromUChar(data, nc);
@@ -469,7 +475,7 @@ bool readEXIF(std::string name, EXIFInfo &info)
             }
         }
 
-        //printf("%f %f %f\n", info.iso, info.exposureTime, info.fNumber);
+        printf("%f %f %f\n", info.iso, info.exposureTime, info.fNumber);
 
         fclose(file);
 
