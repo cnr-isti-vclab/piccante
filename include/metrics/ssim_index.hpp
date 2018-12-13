@@ -165,7 +165,6 @@ public:
         Image *L_ori = flt_lum.Process(Single(ori), NULL);
         Image *L_cmp = flt_lum.Process(Single(cmp), NULL);
 
-
         if(dynamic_range <= 0.0f) {
             dynamic_range = getDynamicRange(L_ori);
         }
