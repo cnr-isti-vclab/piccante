@@ -173,17 +173,13 @@ PIC_INLINE FilterGLOp::FilterGLOp(std::string op, bool bTexelFetch = false,
     if(c0 != NULL) {
         memcpy(this->c0, c0, 4 * sizeof(float));
     } else {
-        for(int i = 0; i < 4; i++) {
-            this->c0[i] = 1.0f;
-        }
+        Arrayf::assign(1.0f, this->c0, 4);
     }
 
     if(c1 != NULL) {
         memcpy(this->c1, c1, 4 * sizeof(float));
     } else {
-        for(int i = 0; i < 4; i++) {
-            this->c0[i] = 1.0f;
-        }
+        Arrayf::assign(1.0f, this->c1, 4);
     }
 
     this->op = op;

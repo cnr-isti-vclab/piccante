@@ -85,7 +85,7 @@ PIC_INLINE FilterGLDeformGrid::FilterGLDeformGrid(Image *grid_move): FilterGL()
     grid_diff = *grid_rest - *grid_move;
 
     grid_diff_gl = new ImageGL(&grid_diff, true);
-    grid_diff_gl->generateTextureGL();
+    grid_diff_gl->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
     param.push_back(grid_diff_gl);
 
     initShaders();
@@ -98,15 +98,8 @@ PIC_INLINE FilterGLDeformGrid::~FilterGLDeformGrid()
 
 PIC_INLINE void FilterGLDeformGrid::releaseAux()
 {
-    if(grid_rest != NULL) {
-        delete grid_rest;
-        grid_rest = NULL;
-    }
-
-    if(grid_diff_gl != NULL) {
-        delete grid_diff_gl;
-        grid_diff_gl = NULL;
-    }
+    grid_rest = delete_s(grid_rest);
+    grid_diff_gl = delete_s(grid_diff_gl);
 }
 
 PIC_INLINE void FilterGLDeformGrid::initShaders()

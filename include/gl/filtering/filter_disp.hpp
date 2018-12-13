@@ -102,13 +102,13 @@ void FilterGLDisp::initShaders()
                           uniform sampler2D u_texL; \n
                           uniform sampler2D u_texR; \n
                           uniform sampler2D u_texD; \n
-                          uniform int		  halfKernelSize; \n
-                          uniform float	  sigma; \n
-                          uniform float	  sigma_s2; \n
-                          uniform float	  sigma_r2; \n
-                          uniform float	  bUse; \n
-                          uniform	float     bLeft; \n
-                          out     vec4      f_color; \n
+                          uniform int halfKernelSize; \n
+                          uniform float	sigma; \n
+                          uniform float	sigma_s2; \n
+                          uniform float	sigma_r2; \n
+                          uniform float	bUse; \n
+                          uniform float bLeft; \n
+                          out     vec4 f_color; \n
 
     vec4 fetchDispCol(ivec2 coords) {
         float shiftf = texelFetch(u_texD, coords, 0).x;

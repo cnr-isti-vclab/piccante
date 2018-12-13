@@ -37,15 +37,6 @@ protected:
 
     int channel;
 
-    /**
-     * @brief setChannel
-     * @param channel
-     */
-    void setChannel(int channel)
-    {
-        this->channel = channel > -1 ? channel : 0;
-    }
-
 public:
 
     /**
@@ -124,8 +115,8 @@ public:
 
 PIC_INLINE FilterGLChannel::FilterGLChannel(int channel) : FilterGL()
 {
-    setChannel(channel);
     initShaders();
+    update(channel);
 }
 
 PIC_INLINE void FilterGLChannel::initShaders()
@@ -146,20 +137,19 @@ PIC_INLINE void FilterGLChannel::initShaders()
     }
                       );
 
-
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLChannel");
-
-    update(channel);
 }
 
 PIC_INLINE void FilterGLChannel::update(int channel)
 {
-    setChannel(channel);
+    this->channel = channel > -1 ? channel : 0;
 
-    technique.bind();
-    technique.setUniform1i("u_tex", 0);
-    technique.setUniform1i("channel", channel);
-    technique.unbind();
+    if(technique.isValid()) {
+        technique.bind();
+        technique.setUniform1i("u_tex", 0);
+        technique.setUniform1i("channel", channel);
+        technique.unbind();
+    }
 }
 
 } // end namespace pic

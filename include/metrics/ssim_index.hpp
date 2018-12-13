@@ -111,8 +111,8 @@ public:
             return ret;
         }
 
-        delete_s(min_val);
-        delete_s(max_val_v);
+        delete_vec_s(min_val_v);
+        delete_vec_s(max_val_v);
 
         return ret;
     }

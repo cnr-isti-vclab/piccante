@@ -49,11 +49,6 @@ protected:
                           );
 
         technique.initStandard("330", vertex_source, fragment_source, "FilterGLSampler2D");
-
-        technique.bind();
-        technique.setUniform1i("u_tex", 0);
-        technique.setUniform1f("scale", scale);
-        technique.unbind();
     }
 
 public:
@@ -63,9 +58,8 @@ public:
      */
     FilterGLSampler2D(float scale) : FilterGL()
     {
-        update(scale);
-
         initShaders();
+        update(scale);
     }
 
     /**
@@ -103,12 +97,16 @@ public:
      */
     void update(float scale)
     {
-        this->scale = scale;
+        if(scale > 0.0f) {
+            this->scale = scale;
+        }
 
-        technique.bind();
-        technique.setUniform1f("scale", scale);
-        technique.unbind();
-    }
+        if(technique.isValid()) {
+            technique.bind();
+            technique.setUniform1f("scale", scale);
+            technique.unbind();
+        }
+    }        
 
     /**
      * @brief execute

@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <string>
 
+#include "../../util/std_util.hpp"
 #include "../../util/gl/program.hpp"
 
 namespace pic {
@@ -43,6 +44,10 @@ protected:
     }
 
 public:
+
+    /**
+     * @brief TechniqueGL
+     */
     TechniqueGL()
     {
 
@@ -50,9 +55,12 @@ public:
 
     ~TechniqueGL()
     {
-        for(unsigned int i = 0; i < shaders.size(); i++) {
-            delete shaders[i];
-        }
+        stdVectorClear<ProgramGL>(shaders);
+    }
+
+    bool isValid()
+    {
+        return main.bCompiled;
     }
 
     bool init( std::string version_number,

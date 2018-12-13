@@ -30,9 +30,6 @@ class FilterGLFromStrokeToMask: public FilterGL
 {
 protected:
 
-    LUMINANCE_TYPE type;
-    float weights[3];
-
     /**
      * @brief initShaders
      */
@@ -56,14 +53,6 @@ public:
     void update(LUMINANCE_TYPE type);
 
     /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
-
-    /**
      * @brief execute
      * @param imgIn
      * @param imgOut
@@ -73,24 +62,6 @@ public:
     {
         FilterGLFromStrokeToMask filter(LT_CIE_LUMINANCE);
         imgOut = filter.Process(SingleGL(imgIn), imgOut);
-        return imgOut;
-    }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @return
-     */
-    static ImageGL *execute(std::string nameIn, std::string nameOut)
-    {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
-
-        ImageGL *imgOut = execute(&imgIn, NULL);
-
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
         return imgOut;
     }
 };
@@ -137,56 +108,6 @@ void FilterGLFromStrokeToMask::update()
     technique.bind();
     technique.setUniform1i("u_tex", 0);
     technique.unbind();
-}
-
-ImageGL *FilterGLFromStrokeToMask::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn.empty()) {
-        return imgOut;
-    }
-
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(1, w, h, 1, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, 1, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    technique.bind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    technique.unbind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

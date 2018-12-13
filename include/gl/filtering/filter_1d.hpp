@@ -129,7 +129,6 @@ PIC_INLINE FilterGL1D::FilterGL1D(int direction, GLenum target): FilterGL()
         dirs[direction % 3] = 1;
         break;
     }
-
 }
 
 PIC_INLINE void FilterGL1D::changePass(int pass, int tPass)
@@ -138,17 +137,13 @@ PIC_INLINE void FilterGL1D::changePass(int pass, int tPass)
     if(target == GL_TEXTURE_2D) {
         dirs[ pass % 2 ] = 1;
         dirs[(pass + 1) % 2 ] = 0;
+    } else {
+        if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY) {
+            dirs[ pass % 3 ] = 1;
+            dirs[(pass + 1) % 3 ] = 0;
+            dirs[(pass + 2) % 3 ] = 0;
+        }
     }
-
-    if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY) {
-        dirs[ pass % 3 ] = 1;
-        dirs[(pass + 1) % 3 ] = 0;
-        dirs[(pass + 2) % 3 ] = 0;
-    }
-
-#ifdef PIC_DEBUG
-//    printf("%d %d %d\n", dirs[0], dirs[1], dirs[2]);
-#endif
 
     setUniform();
 }

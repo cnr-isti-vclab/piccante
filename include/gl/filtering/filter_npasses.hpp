@@ -152,10 +152,7 @@ PIC_INLINE FilterGLNPasses::~FilterGLNPasses()
 
 PIC_INLINE void FilterGLNPasses::releaseAux()
 {
-    if(imgAllocated != NULL) {
-        delete imgAllocated;
-        imgAllocated = NULL;
-    }
+    delete_s(imgAllocated);
 
     imgTmpSame[0] = NULL;
     imgTmpSame[1] = NULL;

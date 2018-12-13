@@ -53,7 +53,7 @@ public:
      * @param bSameSize
      * @param bCentroid
      */
-    FilterGLWarp2D(Matrix3x3 h, bool bSameSize, bool bCentroid);
+    FilterGLWarp2D();
 
     /**
      * @brief update
@@ -119,11 +119,12 @@ public:
     }
 };
 
-PIC_INLINE FilterGLWarp2D::FilterGLWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false) : FilterGL()
+PIC_INLINE FilterGLWarp2D::FilterGLWarp2D() : FilterGL()
 {
     initShaders();
 
-    update(h, bSameSize, bCentroid);
+    Matrix3x3 h;
+    update(h, false, false);
 }
 
 PIC_INLINE void FilterGLWarp2D::update(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)

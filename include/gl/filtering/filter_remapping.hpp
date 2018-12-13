@@ -34,53 +34,42 @@ protected:
     /**
      * @brief initShaders
      */
-    void initShaders();
+    void initShaders()
+    {
+        /*	0 ---> Drago et al. 2003
+            1 ---> Reinhard et al. 2002
+            LumZone     = [-2, -1, 0, 1, 2, 3, 4];
+            TMOForZone =  [ 0,  0, 1, 0, 1, 0, 0];	*/
+
+        fragment_source = MAKE_STRING
+                          (
+                              uniform sampler2D u_tex; \n
+                              s out     vec4     f_color; \n
+        void main(void) { \n
+            ivec2 coords = ivec2(gl_FragCoord.xy); \n
+            int indx = int(texelFetch(u_tex, coords, 0).x + 2.0); \n
+            indx = (indx == 2) ? 1 : 0; \n
+            indx = (indx == 4) ? 1 : indx;\n
+            f_color = vec4(vec3(float(indx)), 1.0);\n
+        }
+                          );
+
+        technique.initStandard("330", vertex_source, fragment_source, "FilterGLRemapping");
+
+        technique.bind();
+        technique.setUniform1i("u_tex", 0);
+        technique.unbind();
+    }
 
 public:
     /**
      * @brief FilterGLRemapping
      */
-    FilterGLRemapping();
-};
-
-PIC_INLINE FilterGLRemapping::FilterGLRemapping(): FilterGL()
-{
-    initShaders();
-}
-
-PIC_INLINE void FilterGLRemapping::initShaders()
-{
-    /*	0 ---> Drago et al. 2003
-    	1 ---> Reinhard et al. 2002
-    	LumZone     = [-2, -1, 0, 1, 2, 3, 4];
-    	TMOForZone =  [ 0,  0, 1, 0, 1, 0, 0];	*/
-
-    fragment_source = MAKE_STRING
-                      (
-                          uniform sampler2D u_tex; \n
-                          out     vec4      f_color; \n
-
-    void main(void) {
-        \n
-        ivec2 coords = ivec2(gl_FragCoord.xy);
-        \n
-        int indx = int(texelFetch(u_tex, coords, 0).x + 2.0);
-        \n
-        indx = (indx == 2) ? 1 : 0;
-        \n
-        indx = (indx == 4) ? 1 : indx;
-        \n
-        f_color = vec4(vec3(float(indx)), 1.0);
-        \n
+    FilterGLRemapping()
+    {
+        initShaders();
     }
-                      );
-
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGLRemapping");
-
-    technique.bind();
-    technique.setUniform1i("u_tex", 0);
-    technique.unbind();
-}
+};
 
 } // end namespace pic
 

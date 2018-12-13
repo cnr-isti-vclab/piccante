@@ -126,7 +126,7 @@ public:
     {
         this->acc_operator = acc_operator;
 
-        setup(kernelSize);
+        update(kernelSize);
 
         FragmentShader(NULL, 0, GL_TEXTURE_2D);
         initShaders();
@@ -147,21 +147,19 @@ public:
     }
 
     /**
-     * @brief setup
+     * @brief update
      * @param kernelSize
      */
-    void setup(int kernelSize)
+    void update(int kernelSize)
     {
-        if(kernelSize < 1) {
-            kernelSize = 3;
-        }
+        kernelSize = (kernelSize > 0) ? kernelSize : 3;
 
         if((kernelSize % 2) == 0) {
             kernelSize++;
         }
 
         this->kernelSize = kernelSize;
-        halfKernelSize = kernelSize >> 1;
+        this->halfKernelSize = kernelSize >> 1;
     }
 };
 

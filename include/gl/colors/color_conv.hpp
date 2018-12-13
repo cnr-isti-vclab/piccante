@@ -30,8 +30,7 @@ namespace pic {
 class ColorConvGL
 {
 protected:
-    bool direct;
-
+    int direct;
     TechniqueGL techniques[2];
 
 public:
@@ -41,7 +40,7 @@ public:
      */
     ColorConvGL(bool direct = true)
     {
-        this->direct = direct;
+        setTransform(direct);
     }
 
     /**
@@ -107,7 +106,7 @@ public:
      */
     void setTransform(bool direct)
     {
-        this->direct = direct;
+        this->direct = direct ? 1 : 0;
     }
 
     /**
@@ -115,11 +114,7 @@ public:
      */
     void bindProgram()
     {
-        if(direct) {
-            techniques[0].bind();
-        } else {
-            techniques[1].bind();
-        }
+        techniques[direct].bind();
     }
 
     /**
@@ -127,11 +122,7 @@ public:
      */
     void unbindProgram()
     {
-        if(direct) {
-            techniques[0].unbind();
-        } else {
-            techniques[1].unbind();
-        }
+        techniques[direct].unbind();
     }
     
     /**

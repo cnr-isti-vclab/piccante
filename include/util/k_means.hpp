@@ -241,7 +241,7 @@ PIC_INLINE  T* kMeansSelect(T *samples, int nSamples, int nDim,
     while(bFlag) {
         k++;
 
-        #if PIC_DEBUG
+        #ifdef PIC_DEBUG
             printf("k: %d\n", k);
         #endif
 
@@ -267,7 +267,7 @@ PIC_INLINE  T* kMeansSelect(T *samples, int nSamples, int nDim,
         if(k > 2) {
             float relErr = fabsf(float(err - prevErr)) / float(prevErr);
 
-             #if PIC_DEBUG
+             #ifdef PIC_DEBUG
                 printf("%f %f %f\n", err, prevErr, relErr);
             #endif
 

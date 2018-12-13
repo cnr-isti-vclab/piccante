@@ -40,6 +40,7 @@ protected:
     void initShaders();
 
 public:
+
     /**
      * @brief FilterGLLuminance
      */
@@ -107,16 +108,13 @@ PIC_INLINE void FilterGLLuminance::initShaders()
     uniform sampler2D u_tex; \n
     uniform vec3 weights; \n
     out     vec4 f_color; \n
-    \n
-    void main(void) {
-        \n
+    void main(void) {\n
         ivec2 coords = ivec2(gl_FragCoord.xy); \n
         vec3 color = texelFetch(u_tex, coords, 0).xyz; \n
         float L = dot(color, weights); \n
         f_color = vec4(L, L, L, 1.0); \n
-        \n
     }
-                      );
+    );
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLLuminance");
 

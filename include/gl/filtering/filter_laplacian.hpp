@@ -55,7 +55,7 @@ protected:
             color += texelFetch(u_tex, coords - ivec2(1, 0), 0).xyz;\n
             color += texelFetch(u_tex, coords + ivec2(0, 1), 0).xyz;\n
             color += texelFetch(u_tex, coords - ivec2(0, 1), 0).xyz;\n
-            f_color = vec4(color, 1.0); //Magnitude
+            f_color = vec4(color, 1.0);
         }\n
                           );
     }

@@ -34,8 +34,6 @@ protected:
 
     void initShaders();
 
-    void FragmentShader();
-
 public:
     /**
      * @brief FilterGLSimpleTMO
@@ -59,28 +57,17 @@ public:
 
 PIC_INLINE FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
 {
-    gamma = 2.2f;
-    fstop = 0.0f;
-
-    FragmentShader();
     initShaders();
+    update(2.2f, 0.0f);
 }
 
 PIC_INLINE FilterGLSimpleTMO::FilterGLSimpleTMO(float gamma, float fstop): FilterGL()
 {
-    //protected values are assigned/computed
-    if(gamma <= 0.0f) {
-        gamma = 2.2f;
-    }
-
-    this->gamma = gamma;
-    this->fstop = fstop;
-
-    FragmentShader();
     initShaders();
+    update(gamma, fstop);
 }
 
-PIC_INLINE void FilterGLSimpleTMO::FragmentShader()
+PIC_INLINE void FilterGLSimpleTMO::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
@@ -97,13 +84,8 @@ PIC_INLINE void FilterGLSimpleTMO::FragmentShader()
         \n
     }\n
                       );
-}
 
-PIC_INLINE void FilterGLSimpleTMO::initShaders()
-{
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLSimpleTMO");
-
-    update(gamma, fstop);
 }
 
 PIC_INLINE void FilterGLSimpleTMO::update(float gamma, float fstop)
@@ -116,11 +98,13 @@ PIC_INLINE void FilterGLSimpleTMO::update(float gamma, float fstop)
     float invGamma = 1.0f / gamma;
     float exposure = powf(2.0f, fstop);
 
-    technique.bind();
-    technique.setUniform1i("u_tex", 0);
-    technique.setUniform1f("tn_gamma", invGamma);
-    technique.setUniform1f("tn_exposure", exposure);
-    technique.unbind();
+    if(technique.isValid()) {
+        technique.bind();
+        technique.setUniform1i("u_tex", 0);
+        technique.setUniform1f("tn_gamma", invGamma);
+        technique.setUniform1f("tn_exposure", exposure);
+        technique.unbind();
+    }
 }
 
 } // end namespace pic
