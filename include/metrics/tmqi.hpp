@@ -177,6 +177,8 @@ public:
         s_map->getMeanVal(NULL, &S);
 
         stdVectorClear<Image>(vec);
+        delete_s(img1);
+        delete_s(img2);
 
         return s_map;
     }
