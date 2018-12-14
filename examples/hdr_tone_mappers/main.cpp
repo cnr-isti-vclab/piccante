@@ -43,8 +43,7 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         printf("Tone mapping using Reinhard et al.'s TMO...");
-        pic::ReinhardTMO rtmo;
-        pic::Image *img_tmo_reinhard = rtmo.execute(&img, NULL);
+        pic::Image *img_tmo_reinhard = pic::ReinhardTMO::execute(&img, NULL);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
@@ -59,8 +58,7 @@ int main(int argc, char *argv[])
         }
 
         printf("Tone mapping using Durand and Dorsey's TMO...");
-        pic::DurandTMO dtmo;
-        pic::Image *img_tmo_durand = dtmo.execute(&img, NULL);
+        pic::Image *img_tmo_durand = pic::DurandTMO::execute(&img, NULL);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
@@ -76,8 +74,7 @@ int main(int argc, char *argv[])
 
 
         printf("Tone mapping using Drago et al.'s TMO...");
-        pic::DragoTMO drtmo;
-        pic::Image *img_tmo_drago = drtmo.execute(&img, NULL);
+        pic::Image *img_tmo_drago = pic::DragoTMO::execute(&img, NULL);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
@@ -91,10 +88,8 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
-
         printf("Tone mapping using Ward Histogram Adjustment TMO...");
-        pic::WardHistogramTMO wtmo;
-        pic::Image *img_tmo_ward = wtmo.execute(&img);
+        pic::Image *img_tmo_ward = pic::WardHistogramTMO::execute(&img, NULL);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
@@ -109,8 +104,7 @@ int main(int argc, char *argv[])
         }
 
         printf("Tone mapping using Lischinski et al. 2006 automatic TMO...");
-        pic::LischinskiTMO ltmo;
-        pic::Image *img_tmo_lischinski = ltmo.execute(&img, NULL);
+        pic::Image *img_tmo_lischinski = pic::LischinskiTMO::execute(&img, NULL);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.

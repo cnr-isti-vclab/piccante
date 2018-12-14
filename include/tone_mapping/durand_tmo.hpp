@@ -68,17 +68,17 @@ public:
     }
 
     /**
-     * @brief Process
+     * @brief ProcessAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *Process(Image *imgIn, Image *imgOut)
+    Image *ProcessAux(ImageVec imgIn, Image *imgOut)
     {
-        updateImage(imgIn);
+        updateImage(imgIn[0]);
 
         //luminance image
-        images[2] = flt_lum.Process(Single(imgIn), images[2]);
+        images[2] = flt_lum.Process(imgIn, images[2]);
 
         //bilateral filter seperation
         bilateralSeparation(images[2], images, -1.0f, 0.4f, true);
@@ -104,6 +104,18 @@ public:
         imgOut->removeSpecials();
 
         return imgOut;
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image *execute(Image *imgIn, Image *imgOut)
+    {
+        DurandTMO dtmo(5.0f);
+        return dtmo.Process(Single(imgIn), imgOut);
     }
 };
 

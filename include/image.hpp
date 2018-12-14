@@ -34,6 +34,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/low_dynamic_range.hpp"
 #include "util/math.hpp"
 #include "util/array.hpp"
+#include "util/indexed_array.hpp"
+#include "util/std_util.hpp"
 
 //IO formats
 #include "io/bmp.hpp"
@@ -460,6 +462,14 @@ public:
      * @return This function returns the first value greater than val.
      */
     float getGT(float val);
+
+    /**
+     * @brief getDynamicRange computes the dynamic range of the image.
+     * @param bRobust is a value that enables robust computation of the dynamic range using percentile.
+     * @param percentile is the percentile value used when computing the dynamic range in a robust way.
+     * @return
+     */
+    float getDynamicRange(bool bRobust, float percentile);
 
     /**
      * @brief sort sorts values in data and stores them into dataTMP.
@@ -1287,6 +1297,60 @@ PIC_INLINE float Image::getGT(float val)
     }
 
     return -1.0f;
+}
+
+PIC_INLINE float Image::getDynamicRange(bool bRobust = false, float percentile = 0.99f)
+{
+    if(!isValid()) {
+        return -1.0f;
+    }
+
+    if(bRobust) {
+        if(percentile <= 0.5f) {
+            percentile = 0.99f;
+        }
+
+        float percentile_low = 1.0f - percentile;
+
+        float min_val = getPercentileVal(percentile_low);
+        float max_val = getPercentileVal(percentile);
+
+        if(min_val > 0.0f) {
+            return max_val / min_val;
+        } else {
+            return getDynamicRange(true, 1.0f);
+        }
+    } else {
+        float ret = -1.0f;
+
+        float *min_val_v = getMinVal(NULL, NULL);
+        float *max_val_v = getMaxVal(NULL, NULL);
+
+        int ind;
+        float min_val = Arrayf::getMin(min_val_v, channels, ind);
+        float max_val = Arrayf::getMax(max_val_v, channels, ind);
+
+        if(min_val <= 0.0f) {
+            IntCoord coord;
+            IndexedArray::findSimple(data, size(), IndexedArray::bFuncNotNeg, coord);
+            min_val = IndexedArray::min(data, coord);
+
+            if(min_val <= 0.0f) {
+                min_val = 1.0f / 255.0f;
+            }
+
+            if(max_val > min_val) {
+                ret = max_val / min_val;
+            } else {
+                ret = min_val / max_val;
+            }
+        }
+
+        delete_vec_s(min_val_v);
+        delete_vec_s(max_val_v);
+
+        return ret;
+    }
 }
 
 PIC_INLINE void Image::blend(Image *img, Image *weight)

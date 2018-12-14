@@ -24,7 +24,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 #include "../metrics/base.hpp"
 
-#include "../util/indexed_array.hpp"
 #include "../util/array.hpp"
 #include "../util/std_util.hpp"
 
@@ -67,54 +66,6 @@ public:
         this->bDownsampling = bDownsampling;
 
         flt_gauss2D.update(sigma_window);
-    }
-
-    /**
-     * @brief getDynamicRange
-     * @param img
-     * @return
-     */
-    static float getDynamicRange(Image *img)
-    {
-        float ret = -1.0f;
-
-        if(img == NULL) {
-            return ret;
-        }
-
-        if(!img->isValid()) {
-            return ret;
-        }
-
-        float *min_val_v = img->getMinVal(NULL, NULL);
-        float *max_val_v = img->getMaxVal(NULL, NULL);
-
-        int ind;
-        float min_val = Arrayf::getMin(min_val_v, img->channels, ind);
-        float max_val = Arrayf::getMax(max_val_v, img->channels, ind);
-
-        if(min_val <= 0.0f) {
-            IntCoord coord;
-            IndexedArray::findSimple(img->data, img->size(), IndexedArray::bFuncNotNeg, coord);
-            min_val = IndexedArray::min(img->data, coord);
-
-            if(min_val <= 0.0f) {
-                min_val = 1.0f / 255.0f;
-            }
-
-            if(max_val > min_val) {
-                ret = max_val / min_val;
-            } else {
-                ret = min_val / max_val;
-            }
-
-            return ret;
-        }
-
-        delete_vec_s(min_val_v);
-        delete_vec_s(max_val_v);
-
-        return ret;
     }
 
     /**
@@ -161,7 +112,7 @@ public:
         Image *L_cmp = flt_lum.Process(Single(cmp), NULL);
 
         if(dynamic_range <= 0.0f) {
-            dynamic_range = getDynamicRange(L_ori);
+            dynamic_range = L_ori->getDynamicRange(false, 1.0f);
         }
 
         float C0 = K0 * dynamic_range;

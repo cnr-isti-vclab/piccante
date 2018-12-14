@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_HYBRID_TMO_HPP
 #define PIC_TONE_MAPPING_HYBRID_TMO_HPP
 
-#include "../tone_mapping/segmentation_tmo_approx.hpp"
+#include "../algorithms/segmentation_tmo_approx.hpp"
 #include "../algorithms/pyramid.hpp"
 #include "../filtering/filter_drago_tmo.hpp"
 #include "../filtering/filter_sigmoid_tmo.hpp"
@@ -88,7 +88,7 @@ public:
         }
 
         //compute segmentation map
-        seg_map = seg.execute(imgIn, seg_map);
+        seg_map = seg.Process(imgIn, seg_map);
 
         /*	0 ---> Drago et al. 2003
         	1 ---> Reinhard et al. 2002

@@ -37,6 +37,29 @@ protected:
     FilterLuminance flt_lum;
     FilterDragoTMO flt_drg;
 
+    /**
+     * @brief ProcessAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *ProcessAux(Image *imgIn, Image *imgOut)
+    {
+        updateImage(imgIn);
+
+        //compute luminance and its statistics
+        images[0] = flt_lum.Process(Single(imgIn), images[0]);
+
+        float Lw_Max, Lw_a;
+        images[0]->getMaxVal(NULL, &Lw_Max);
+        images[0]->getMaxVal(NULL, &Lw_a);
+
+        //tone map
+        flt_drg.update(Ld_Max, b, Lw_Max, Lw_a);
+        imgOut = flt_drg.Process(Double(imgIn, images[0]), imgOut);
+        return imgOut;
+    }
+
 public:
 
     /**
@@ -68,30 +91,15 @@ public:
     }
 
     /**
-     * @brief Process
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *Process(Image *imgIn, Image *imgOut)
+    static Image *execute(Image *imgIn, Image *imgOut)
     {
-        if(!checkInput(imgIn)) {
-            return imgOut;
-        }
-
-        updateImage(imgIn);
-
-        //compute luminance and its statistics
-        images[0] = flt_lum.Process(Single(imgIn), images[0]);
-
-        float Lw_Max, Lw_a;
-        images[0]->getMaxVal(NULL, &Lw_Max);
-        images[0]->getMaxVal(NULL, &Lw_a);
-
-        //tone map
-        flt_drg.update(Ld_Max, b, Lw_Max, Lw_a);
-        imgOut = flt_drg.Process(Double(imgIn, images[0]), imgOut);
-        return imgOut;
+        DragoTMO dtmo(100.0f, 0.95f);
+        return dtmo.Process(Single(imgIn), imgOut);
     }
 };
 } // end namespace pic

@@ -15,8 +15,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_TONE_MAPPING_SEGMENTATION_TMO_APPROX_HPP
-#define PIC_TONE_MAPPING_SEGMENTATION_TMO_APPROX_HPP
+#ifndef PIC_ALGORITHMS_SEGMENTATION_TMO_APPROX_HPP
+#define PIC_ALGORITHMS_SEGMENTATION_TMO_APPROX_HPP
 
 #include "../util/array.hpp"
 #include "../util/std_util.hpp"
@@ -42,49 +42,43 @@ protected:
     float perCent;
 
     /**
-     * @brief executeSegmentationBilatearal
+     * @brief ProcessAux
      * @param imgIn
-     * @return
-     */
-    Image *executeSegmentationBilatearal(Image *imgIn)
-    {
-        float minVal, maxVal;
-        imgIn->getMinVal(NULL, &minVal);
-        imgIn->getMaxVal(NULL, &maxVal);
-
-        float nLevels = log10f(maxVal) - log10f(minVal) + 1.0f;
-        int nLayer = ((maxVal - minVal) / nLevels) / 4.0f;
-        float area = imgIn->widthf * imgIn->heightf * perCent;
-        int iterations = MAX(int(sqrtf(area)) / 2, 1);
-
-        //create filters
-        if(fltIt == NULL) {
-            fltBil = new FilterBilateral2DS(1.0f, nLayer);
-            fltIt  = new FilterIterative(fltBil, iterations);
-        }
-
-#ifdef PIC_DEBUG
-        printf("Layer: %f iterations: %d\n", nLayer, iterations);
-#endif
-        //Iterative bilateral filtering
-        Image *imgOut = fltIt->Process(Single(imgIn), imgIn_flt);
-
-        //imgOut->Write("filtered.pfm");
-        return imgOut;
-    }
-
-    /**
-     * @brief executeSuperPixels
-     * @param imgIn
+     * @param bBilateral
      * @param nSuperPixels
      * @return
      */
-    Image *executeSuperPixels(Image *imgIn, int nSuperPixels = 4096)
+    Image *ProcessAux(Image *imgIn, bool bBilateral, int nSuperPixels = 4096)
     {
-        Slic sp;
-        sp.execute(imgIn, nSuperPixels);
-        Image *imgOut = sp.getMeanImage(NULL);
-        return imgOut;
+        if(bBilateral) {
+            float minVal, maxVal;
+            imgIn->getMinVal(NULL, &minVal);
+            imgIn->getMaxVal(NULL, &maxVal);
+
+            float nLevels = log10f(maxVal) - log10f(minVal) + 1.0f;
+            int nLayer = ((maxVal - minVal) / nLevels) / 4.0f;
+            float area = imgIn->widthf * imgIn->heightf * perCent;
+            int iterations = MAX(int(sqrtf(area)) / 2, 1);
+
+            //create filters
+            if(fltIt == NULL) {
+                fltBil = new FilterBilateral2DS(1.0f, nLayer);
+                fltIt  = new FilterIterative(fltBil, iterations);
+            }
+
+    #ifdef PIC_DEBUG
+            printf("Layer: %f iterations: %d\n", nLayer, iterations);
+    #endif
+            //Iterative bilateral filtering
+            Image *imgOut = fltIt->Process(Single(imgIn), imgIn_flt);
+
+            return imgOut;
+        } else {
+            Slic sp;
+            sp.execute(imgIn, nSuperPixels);
+            Image *imgOut = sp.getMeanImage(NULL);
+            return imgOut;
+        }
     }
 
 public:
@@ -111,12 +105,12 @@ public:
     }
 
     /**
-     * @brief execute
+     * @brief Process
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *execute(Image *imgIn, Image *imgOut)
+    Image *Process(Image *imgIn, Image *imgOut)
     {
         if(imgIn == NULL) {
             return NULL;
@@ -133,7 +127,7 @@ public:
         //compute luminance
         FilterLuminance::execute(imgIn, imgOut, LT_CIE_LUMINANCE);
 
-        Image *imgIn_flt = executeSegmentationBilatearal(imgIn);
+        Image *imgIn_flt = ProcessAux(imgIn, true, 4096);
 
         //threshold
         float *data = imgIn_flt->data;
@@ -159,5 +153,5 @@ public:
 
 } // end namespace pic
 
-#endif /* PIC_TONE_MAPPING_SEGMENTATION_TMO_APPROX_HPP */
+#endif /* PIC_ALGORITHMS_SEGMENTATION_TMO_APPROX_HPP */
 

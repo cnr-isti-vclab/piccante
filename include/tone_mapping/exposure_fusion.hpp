@@ -59,64 +59,34 @@ protected:
         return MAX(x, 0.0f);
     }
 
-public:
-
     /**
-     * @brief ExposureFusion
-     * @param wC
-     * @param wE
-     * @param wS
-     */
-    ExposureFusion(float wC = 1.0f, float wE = 1.0f,
-                   float wS = 1.0f)
-    {
-
-        setToANullVector<Image>(images, 3);
-
-        update(wC, wE, wS);
-    }
-
-    ~ExposureFusion()
-    {
-        release();
-    }
-
-    /**
-     * @brief update
-     * @param wC
-     * @param wE
-     * @param wS
-     */
-    void update(float wC = 1.0f, float wE = 1.0f,
-                float wS = 1.0f)
-    {
-        flt_weights.update(wC, wE, wS);
-    }
-
-    /**
-     * @brief Process
+     * @brief ProcessAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *Process(Image *imgIn, Image *imgOut)
+    Image *ProcessAux(ImageVec imgIn, Image *imgOut)
     {
-        pic::ImageVec stack = getAllExposuresImages(imgIn);
+        if(imgIn.size() > 1) {
+            return ProcessAuxStack(imgIn, imgOut);
+        } else {
+            pic::ImageVec stack = getAllExposuresImages(imgIn[0]);
 
-        imgOut = ProcessStack(stack, imgOut);
+            imgOut = ProcessAuxStack(stack, imgOut);
 
-        stdVectorClear<Image>(stack);
+            stdVectorClear<Image>(stack);
 
-        return imgOut;
+            return imgOut;
+        }
     }
 
     /**
-     * @brief ProcessStack
+     * @brief ProcessAuxStack
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *ProcessStack(ImageVec imgIn, Image *imgOut)
+    Image *ProcessAuxStack(ImageVec imgIn, Image *imgOut)
     {
         int n = int(imgIn.size());
 
@@ -195,6 +165,64 @@ public:
         delete pI;
 
         return imgOut;
+    }
+
+public:
+
+    /**
+     * @brief ExposureFusion
+     * @param wC
+     * @param wE
+     * @param wS
+     */
+    ExposureFusion(float wC = 1.0f, float wE = 1.0f,
+                   float wS = 1.0f)
+    {
+
+        setToANullVector<Image>(images, 3);
+
+        update(wC, wE, wS);
+    }
+
+    ~ExposureFusion()
+    {
+        release();
+    }
+
+    /**
+     * @brief update
+     * @param wC
+     * @param wE
+     * @param wS
+     */
+    void update(float wC = 1.0f, float wE = 1.0f,
+                float wS = 1.0f)
+    {
+        flt_weights.update(wC, wE, wS);
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image* execute(Image *imgIn, Image *imgOut)
+    {
+        ExposureFusion ef(1.0f, 1.0f, 1.0f);
+        return ef.Process(Single(imgIn), imgOut);
+    }
+
+    /**
+     * @brief executeStack
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image* executeStack(ImageVec imgIn, Image *imgOut)
+    {
+        ExposureFusion ef(1.0f, 1.0f, 1.0f);
+        return ef.Process(imgIn, imgOut);
     }
 };
 

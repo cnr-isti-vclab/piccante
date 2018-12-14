@@ -31,122 +31,14 @@ namespace pic {
 class WardHistogramTMO: public ToneMappingOperator
 {
 protected:
-    int nBin;
-    float LdMin, LdMax;
-    ImageSamplerBilinear isb;
-    Histogram h;
-    float epsilon;
-
-    unsigned int *Pcum;
-    float *PcumNorm, *x;
-
-    FilterLuminance flt_lum;
-    FilterSampler2D flt_smp;
-
-public:
 
     /**
-     * @brief WardHistogramTMO
-     * @param nBin
-     * @param LdMin
-     * @param LdMax
-     */
-    WardHistogramTMO(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f) : ToneMappingOperator()
-    {
-        this->Pcum = NULL;
-        this->PcumNorm = NULL;
-        this->x = NULL;
-        this->nBin = 0;
-
-        images.clear();
-        images.push_back(NULL);
-        images.push_back(NULL);
-
-        update(nBin, LdMin, LdMax);
-    }
-
-    ~WardHistogramTMO()
-    {
-        release();
-    }
-
-    /**
-     * @brief releaseAux
-     */
-    void releaseAux()
-    {
-        if(Pcum != NULL) {
-            delete[] x;
-            x = NULL;
-        }
-
-        if(PcumNorm != NULL) {
-            delete[] PcumNorm;
-            PcumNorm = NULL;
-        }
-
-        if(x != NULL) {
-            delete[] x;
-            x = NULL;
-        }
-    }
-
-    /**
-     * @brief allocate
-     * @param nBin
-     */
-    void allocate(int nBin)
-    {
-        nBin = nBin > 1 ? nBin : 256;
-
-        if((nBin != this->nBin) || (Pcum == NULL)) {
-            releaseAux();
-        }
-
-        if(Pcum == NULL) {
-            Pcum = new unsigned int[nBin];
-        }
-
-        if(PcumNorm == NULL) {
-            PcumNorm = new float[nBin];
-        }
-
-        if(x == NULL) {
-            x = new float[nBin];
-        }
-
-        this->nBin = nBin;
-    }
-
-    /**
-     * @brief update
-     * @param nBin
-     * @param LdMin
-     * @param LdMax
-     */
-    void update(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f)
-    {
-        allocate(nBin);
-
-        epsilon = 1e-6;
-
-        this->LdMax = LdMax > 0.0f ? LdMax : 100.0f;
-        this->LdMin = LdMin > 0.0f ? LdMin : 1.0f;
-
-        if(this->LdMin > this->LdMax) {
-            LdMin = 1.0f;
-            LdMax = 100.0f;
-        }
-
-    }
-
-    /**
-     * @brief execute
+     * @brief ProcessAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *Process(Image *imgIn, Image *imgOut)
+    Image *ProcessAux(Image *imgIn, Image *imgOut)
     {
         updateImage(imgIn);
 
@@ -193,6 +85,116 @@ public:
         imgOut->removeSpecials();
 
         return imgOut;
+    }
+
+    /**
+     * @brief allocate
+     * @param nBin
+     */
+    void allocate(int nBin)
+    {
+        nBin = nBin > 1 ? nBin : 256;
+
+        if((nBin != this->nBin) || (Pcum == NULL)) {
+            releaseAux();
+        }
+
+        if(Pcum == NULL) {
+            Pcum = new unsigned int[nBin];
+        }
+
+        if(PcumNorm == NULL) {
+            PcumNorm = new float[nBin];
+        }
+
+        if(x == NULL) {
+            x = new float[nBin];
+        }
+
+        this->nBin = nBin;
+    }
+
+    int nBin;
+    float LdMin, LdMax;
+    ImageSamplerBilinear isb;
+    Histogram h;
+    float epsilon;
+
+    unsigned int *Pcum;
+    float *PcumNorm, *x;
+
+    FilterLuminance flt_lum;
+    FilterSampler2D flt_smp;
+
+public:
+
+    /**
+     * @brief WardHistogramTMO
+     * @param nBin
+     * @param LdMin
+     * @param LdMax
+     */
+    WardHistogramTMO(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f) : ToneMappingOperator()
+    {
+        this->Pcum = NULL;
+        this->PcumNorm = NULL;
+        this->x = NULL;
+        this->nBin = 0;
+
+        images.clear();
+        images.push_back(NULL);
+        images.push_back(NULL);
+
+        update(nBin, LdMin, LdMax);
+    }
+
+    ~WardHistogramTMO()
+    {
+        release();
+    }
+
+    /**
+     * @brief releaseAux
+     */
+    void releaseAux()
+    {
+        Pcum = delete_vec_s(Pcum);
+        PcumNorm = delete_vec_s(PcumNorm);
+        x = delete_vec_s(x);
+    }
+
+    /**
+     * @brief update
+     * @param nBin
+     * @param LdMin
+     * @param LdMax
+     */
+    void update(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f)
+    {
+        allocate(nBin);
+
+        epsilon = 1e-6;
+
+        this->LdMax = LdMax > 0.0f ? LdMax : 100.0f;
+        this->LdMin = LdMin > 0.0f ? LdMin : 1.0f;
+
+        if(this->LdMin > this->LdMax) {
+            LdMin = 1.0f;
+            LdMax = 100.0f;
+        }
+
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image* execute(Image *imgIn, Image *imgOut)
+    {
+        WardHistogramTMO wtmo(256, 1.0f, 100.0f);
+        return wtmo.Process(Single(imgIn), imgOut);
     }
 };
 

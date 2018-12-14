@@ -20,7 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 #include "../util/math.hpp"
-#include "../tone_mapping/lischinski_minimization.hpp"
+#include "../algorithms/lischinski_minimization.hpp"
 #include "../tone_mapping/reinhard_tmo.hpp"
 #include "../tone_mapping/tone_mapping_operator.hpp"
 
@@ -33,47 +33,22 @@ protected:
 
     float alpha, whitePoint;
 
-public:
-
     /**
-     * @brief LischinskiTMO
-     * @param alpha
-     * @param whitePoint
-     */
-    LischinskiTMO(float alpha = 0.15f, float whitePoint = 1e6f)
-    {
-        images.push_back(NULL);
-        images.push_back(NULL);
-        images.push_back(NULL);
-        update(alpha, whitePoint);
-    }
-
-    void update(float alpha = 0.15f, float whitePoint = 1e6f)
-    {
-        this->alpha = alpha;
-        this->whitePoint = whitePoint;
-    }
-
-    /**
-     * @brief Process
+     * @brief ProcessAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *Process(Image *imgIn, Image *imgOut)
+    Image *ProcessAux(ImageVec imgIn, Image *imgOut)
     {
-        if(imgIn == NULL) {
-            return NULL;
+        if(imgIn[0]->channels != 3) {
+            return imgOut;
         }
 
-        if(imgIn->channels != 3) {
-            return NULL;
-        }
-
-        updateImage(imgIn);
+        updateImage(imgIn[0]);
 
         //extract luminance
-        images[0] = flt_lum.Process(Single(imgIn), images[0]);
+        images[0] = flt_lum.Process(imgIn, images[0]);
 
         float minL, maxL, Lav;
 
@@ -154,6 +129,44 @@ public:
         delete[] fstop;
 
         return imgOut;
+    }
+
+public:
+
+    /**
+     * @brief LischinskiTMO
+     * @param alpha
+     * @param whitePoint
+     */
+    LischinskiTMO(float alpha = 0.15f, float whitePoint = 1e6f)
+    {
+        images.push_back(NULL);
+        images.push_back(NULL);
+        images.push_back(NULL);
+        update(alpha, whitePoint);
+    }
+
+    /**
+     * @brief update
+     * @param alpha
+     * @param whitePoint
+     */
+    void update(float alpha = 0.15f, float whitePoint = 1e6f)
+    {
+        this->alpha = alpha;
+        this->whitePoint = whitePoint;
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image *execute(Image *imgIn, Image *imgOut)
+    {
+        LischinskiTMO ltmo(0.15f, 1e6f);
+        return ltmo.Process(Single(imgIn), imgOut);
     }
 };
 

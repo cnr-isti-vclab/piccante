@@ -43,6 +43,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "algorithms/white_balance.hpp"
 #include "algorithms/color_classification.hpp"
 #include "algorithms/binarization.hpp"
+#include "algorithms/segmentation_tmo_approx.hpp"
+#include "algorithms/lischinski_minimization.hpp"
 
 #endif /* PIC_ALGORITHMS_HPP */
 

@@ -25,7 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 #include "../algorithms/white_balance.hpp"
 #include "../filtering/filter_radial_basis_function.hpp"
-#include "../tone_mapping/lischinski_minimization.hpp"
+#include "../algorithms/lischinski_minimization.hpp"
 #include "../util/mask.hpp"
 
 namespace pic {

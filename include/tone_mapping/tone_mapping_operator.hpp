@@ -35,11 +35,11 @@ protected:
     ImageVec images;
 
     /**
-     * @brief Process
+     * @brief ProcessAux
      * @param imgIn
      * @param imgOut
      */
-    virtual Image *Process(Image *imgIn, Image *imgOut)
+    virtual Image *ProcessAux(ImageVec imgIn, Image *imgOut)
     {
         return imgOut;
     }
@@ -109,40 +109,26 @@ public:
     }
 
     /**
-     * @brief checkInput
-     * @param imgIn
-     * @return
-     */
-    bool checkInput(Image *imgIn)
-    {
-        if(imgIn == NULL) {
-            return false;
-        }
-
-        return imgIn->isValid();
-    }
-
-    /**
-     * @brief execute
+     * @brief Process
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *execute(Image *imgIn, Image *imgOut = NULL)
+    Image *Process(ImageVec imgIn, Image *imgOut = NULL)
     {
-        if(!checkInput(imgIn)) {
+        if(!ImageVecCheck(imgIn, -1)) {
             return imgOut;
         }
 
         if(imgOut == NULL) {
-            imgOut = imgIn->clone();
+            imgOut = imgIn[0]->clone();
         } else {
-            if(!imgOut->isSimilarType(imgIn)) {
-                imgOut = imgIn->allocateSimilarOne();
+            if(!imgOut->isSimilarType(imgIn[0])) {
+                imgOut = imgIn[0]->allocateSimilarOne();
             }
         }
 
-        imgOut = Process(imgIn, imgOut);
+        imgOut = ProcessAux(imgIn, imgOut);
 
         return imgOut;
     }

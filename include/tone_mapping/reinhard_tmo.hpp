@@ -34,12 +34,72 @@ namespace pic {
  */
 class ReinhardTMO : public ToneMappingOperator
 {
-public:
+protected:
+    /**
+     * @brief ProcessAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *ProcessAux(ImageVec imgIn, Image *imgOut)
+    {
+        //luminance image
+        images[0] = flt_lum.Process(imgIn, images[0]);
+
+        float LMin, LMax, LogAverage;
+        images[0]->getMaxVal(NULL, &LMax);
+        images[0]->getMinVal(NULL, &LMin);
+        images[0]->getLogMeanVal(NULL, &LogAverage);
+
+        bool bUpdate = false;
+        if(alpha <= 0.0f) {
+            alpha = estimateAlpha(LMin, LMax, LogAverage);
+            bUpdate = true;
+        }
+
+        if(whitePoint <= 0.0f) {
+            whitePoint = estimateWhitePoint(LMin, LMax);
+            bUpdate = true;
+        }
+
+        //filter luminance in the sigmoid-space
+        images[0]->applyFunction(&sigmoid);
+
+        float s_max = 8.0f;
+        float sigma_s = 0.56f * powf(1.6f, s_max);
+
+        float sigma_r = powf(2.0f, phi) * alpha / (s_max * s_max);
+
+        flt_bilateral.update(ST_BRIDSON, sigma_s, sigma_r, 1);
+
+        images[1] = flt_bilateral.Process(Single(images[0]), images[1]);
+
+        images[0]->applyFunction(&sigmoidInv);
+
+        images[1]->applyFunction(&sigmoidInv);
+
+        //apply a sigmoid filter
+        if(bUpdate) {
+            flt_sigmoid.update(SIG_TMO, alpha, whitePoint, -1.0f, false);
+        }
+
+        images[2] = flt_sigmoid.Process(Double(images[0], images[1]), images[2]);
+
+        //remove HDR luminance and replacing it with LDR one
+        *imgOut /= *images[0];
+        *imgOut *= *images[2];
+
+        imgOut->removeSpecials();
+
+        return imgOut;
+    }
 
     float alpha, whitePoint, phi;
     FilterSigmoidTMO flt_sigmoid;
     FilterBilateral2DS flt_bilateral;
     FilterLuminance flt_lum;
+
+public:
 
     /**
      * @brief ReinhardTMO
@@ -59,7 +119,6 @@ public:
     {
         release();
     }
-
 
     /**
      * @brief estimateAlpha
@@ -111,70 +170,15 @@ public:
     }
 
     /**
-     * @brief Process
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *Process(Image *imgIn, Image *imgOut)
+    static Image* execute(Image *imgIn, Image *imgOut)
     {
-        if(imgIn == NULL) {
-            return NULL;
-        }
-
-        if(imgOut == NULL) {
-            imgOut = imgIn->clone();
-        }
-
-        //luminance image
-        images[0] = flt_lum.Process(Single(imgIn), images[0]);
-
-        float LMin, LMax, LogAverage;
-        images[0]->getMaxVal(NULL, &LMax);
-        images[0]->getMinVal(NULL, &LMin);
-        images[0]->getLogMeanVal(NULL, &LogAverage);
-
-        bool bUpdate = false;
-        if(alpha <= 0.0f) {
-            alpha = estimateAlpha(LMin, LMax, LogAverage);
-            bUpdate = true;
-        }
-
-        if(whitePoint <= 0.0f) {
-            whitePoint = estimateWhitePoint(LMin, LMax);
-            bUpdate = true;
-        }
-
-        //filter luminance in the sigmoid-space
-        images[0]->applyFunction(&sigmoid);
-
-        float s_max = 8.0f;
-        float sigma_s = 0.56f * powf(1.6f, s_max);
-
-        float sigma_r = powf(2.0f, phi) * alpha / (s_max * s_max);
-
-        flt_bilateral.update(ST_BRIDSON, sigma_s, sigma_r, 1);
-
-        images[1] = flt_bilateral.Process(Single(images[0]), images[1]);
-
-        images[0]->applyFunction(&sigmoidInv);
-
-        images[1]->applyFunction(&sigmoidInv);
-
-        //apply a sigmoid filter
-        if(bUpdate) {
-            flt_sigmoid.update(SIG_TMO, alpha, whitePoint, -1.0f, false);
-        }
-
-        images[2] = flt_sigmoid.Process(Double(images[0], images[1]), images[2]);
-
-        //remove HDR luminance and replacing it with LDR one
-        *imgOut /= *images[0];
-        *imgOut *= *images[2];
-
-        imgOut->removeSpecials();
-
-        return imgOut;
+        ReinhardTMO rtmo;
+        return rtmo.Process(Single(imgIn), imgOut);
     }
 };
 

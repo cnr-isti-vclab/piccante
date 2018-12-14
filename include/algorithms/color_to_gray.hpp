@@ -54,7 +54,7 @@ PIC_INLINE Image *colorToGray(Image *imgIn, Image *imgOut)
 
     ExposureFusion ef(1.0f, 1.0f, 0.0f);
 
-    imgOut = ef.ProcessStack(img_vec, imgOut);
+    imgOut = ef.Process(img_vec, imgOut);
 
     for(int i = 0; i<channels; i++) {
         delete img_vec[i];

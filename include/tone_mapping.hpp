@@ -21,14 +21,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "tone_mapping/get_all_exposures.hpp"
 #include "tone_mapping/exposure_fusion.hpp"
 #include "tone_mapping/find_best_exposure.hpp"
-#include "tone_mapping/histogram_tmo.hpp"
 #include "tone_mapping/hybrid_tmo.hpp"
-#include "tone_mapping/lischinski_minimization.hpp"
 #include "tone_mapping/lischinski_tmo.hpp"
 #include "tone_mapping/reinhard_tmo.hpp"
 #include "tone_mapping/drago_tmo.hpp"
 #include "tone_mapping/ward_histogram_tmo.hpp"
-#include "tone_mapping/segmentation_tmo_approx.hpp"
 #include "tone_mapping/durand_tmo.hpp"
 
 #endif /* PIC_TONE_MAPPING_HPP */
