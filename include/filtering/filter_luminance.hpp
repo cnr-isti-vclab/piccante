@@ -74,6 +74,7 @@ public:
     {
         if(weights != NULL) {
             delete[] weights;
+            weights = NULL;
         }
     }
 

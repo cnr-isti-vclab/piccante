@@ -44,17 +44,20 @@ protected:
         return imgOut;
     }
 
+    /**
+     * @brief releaseAux
+     */
+    virtual void releaseAux()
+    {
+
+    }
+
 public:
 
     /**
      * @brief ToneMappingOperator
      */
     ToneMappingOperator()
-    {
-
-    }
-
-    virtual void releaseAux()
     {
 
     }

@@ -27,6 +27,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 float C_PU_x[256] = {
+    -5.000000,
+    -4.882784,
+    -4.765568,
+    -4.706960,
     -4.648352,
     -4.589744,
     -4.531136,

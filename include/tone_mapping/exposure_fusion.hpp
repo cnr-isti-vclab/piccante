@@ -19,12 +19,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_TONE_MAPPING_EXPOSURE_FUSION_HPP
 
 #include "../base.hpp"
+#include "../util/std_util.hpp"
 #include "../colors/saturation.hpp"
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_laplacian.hpp"
 #include "../filtering/filter_exposure_fusion_weights.hpp"
+
 #include "../algorithms/pyramid.hpp"
-#include "../util/std_util.hpp"
+
 #include "../tone_mapping/get_all_exposures.hpp"
 #include "../tone_mapping/tone_mapping_operator.hpp"
 
@@ -38,6 +40,8 @@ class ExposureFusion: public ToneMappingOperator
 protected:
     FilterLuminance flt_lum;
     FilterExposureFusionWeights flt_weights;
+
+    Pyramid *pW, *pI, *pOut;
 
     /**
      * @brief ifNegGetOne
@@ -129,9 +133,6 @@ protected:
         #endif
 
         int limitLevel = 1;
-        Pyramid *pW   = new Pyramid(width, height, 1, false, limitLevel);
-        Pyramid *pI   = new Pyramid(width, height, channels, true, limitLevel);
-        Pyramid *pOut = new Pyramid(width, height, channels, true, limitLevel);
 
         pOut->setValue(0.0f);
 
@@ -159,12 +160,18 @@ protected:
 
         imgOut->applyFunction(setNegToZero);
 
-        //free the memory
-        delete pW;
-        delete pOut;
-        delete pI;
 
         return imgOut;
+    }
+
+    /**
+     * @brief releaseAux
+     */
+    void releaseAux()
+    {
+        pW = delete_s(pW);
+        pI = delete_s(pI);
+        pOut = delete_s(pOut);
     }
 
 public:

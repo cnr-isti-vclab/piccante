@@ -117,7 +117,7 @@ protected:
     virtual Image *setupAux(ImageVec imgIn, Image *imgOut);
 
 public:
-    bool cachedOnly;
+    bool cachedOnly, bDelete;
     std::vector<Filter *> filters;
 
     /**
@@ -125,6 +125,7 @@ public:
      */
     Filter()
     {
+        bDelete = false;
         minInputImages = 1;
         cachedOnly = false;
         scale = 1.0f;
@@ -227,6 +228,10 @@ public:
                          (imgOut->frames == f);
 
             if(!bSame) {
+                if(bDelete) {
+                    delete imgOut;
+                }
+
                 imgOut = new Image(f, w, h, c);
             }
         }
@@ -282,7 +287,7 @@ public:
 
 PIC_INLINE Image *Filter::setupAux(ImageVec imgIn, Image *imgOut)
 {
-    return allocateOutputMemory(imgIn, imgOut, false);
+    return allocateOutputMemory(imgIn, imgOut, bDelete);
 }
 
 PIC_INLINE std::string Filter::getOutPutName(std::string nameIn)
