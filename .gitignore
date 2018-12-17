@@ -251,3 +251,4 @@ examples/build-hdr_metrics-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
 examples/build-s_kmeans_colors-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
 examples/build-s_kmeans_colors-Desktop_Qt_5_4_2_clang_64bit-Debug/s_kmeans_colors
 examples/data/output/singapore_ssim_map.pfm
+examples/build-hdr_metrics-Desktop_Qt_5_4_2_clang_64bit-Debug/ip_metrics

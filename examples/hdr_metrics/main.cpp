@@ -41,18 +41,16 @@ int main(int argc, char *argv[])
         img0_str = argv[1];
         img1_str = argv[2];
     } else {
-        img0_str = "../data/input/singapore.png";
+        img0_str = "../data/input/bottles.hdr";
         bCreate = true;
     }
 
-    //Image values are loaded and normalized in [0, 1];
-    //NOTE: gamma removal or CRF linearization are NOT applied.
     pic::Image img0, img1;
-    img0.Read(img0_str, pic::LT_NOR);
+    img0.Read(img0_str);
 
     bool bLoaded = false;
     if(!bCreate) {
-        bLoaded = img1.Read(img1_str, pic::LT_NOR);
+        bLoaded = img1.Read(img1_str);
     }
 
     printf("Is it valid? ");
@@ -66,28 +64,32 @@ int main(int argc, char *argv[])
         pic::Image *tmp;
         if(bCreate) {
             printf("Filtering the input image (blurring)...");
-            tmp = pic::FilterGaussian2D::execute(&img0, NULL, 16.0f);
+            tmp = pic::FilterGaussian2D::execute(&img0, NULL, 4.0f);
             printf("Ok\n");
             tmp->Write("../data/output/" + name + "_flt." + name_ext);
         } else {
             tmp = &img1;
         }
 
-        float ssim_index;
-        pic::SSIMIndex metric;
-        pic::Image *ssim_map = metric.execute(Double(&img0, tmp), ssim_index, NULL);
-        printf("Ok\n");
+        printf("MSE (classic): %3.3f \t  MSE (PU-encoding): %3.3f\n",
+               pic::MSE(&img0, tmp, false, pic::MD_LIN),
+               pic::MSE(&img0, tmp, false, pic::MD_PU));
 
-        if(ssim_map != NULL) {
-            ssim_map->Write("../data/output/" + name + "_ssim_map.pfm");
-        }
+        printf("RMSE (classic): %3.3f \t  RMSE (PU-encoding): %3.3f\n",
+        pic::RMSE(&img0, tmp, false, pic::MD_LIN),
+        pic::RMSE(&img0, tmp, false, pic::MD_PU));
 
-        printf("SSIM index: %3.3f\n", ssim_index);
-        printf("MSE: %3.3f\n", pic::MSE(&img0, tmp, false));
-        printf("RMSE: %3.3f\n", pic::RMSE(&img0, tmp));
-        printf("PSNR: %3.3f\n", pic::PSNR(&img0, tmp, -1.0f, false, pic::MD_PU ));
-        printf("MAE: %3.3f\n", pic::MAE(&img0, tmp, false));
-        printf("Relative Error: %f\n", pic::RelativeError(&img0, tmp));
+        printf("PSNR (classic): %3.3f \t PSNR (PU-encoding): %3.3f\n",
+               pic::PSNR(&img0, tmp, -1.0f, false, pic::MD_LIN ),
+               pic::PSNR(&img0, tmp, -1.0f, false, pic::MD_PU ));
+
+        printf("MAE (classic): %3.3f \t MAE (PU-encoding): %3.3f\n",
+               pic::MAE(&img0, tmp, false, pic::MD_LIN),
+               pic::MAE(&img0, tmp, false, pic::MD_PU));
+
+        printf("Relative Error (classic): %3.3f \t Relative Error (PU-encoding): %3.3f\n",
+               pic::RelativeError(&img0, tmp, false, pic::MD_LIN),
+               pic::RelativeError(&img0, tmp, false, pic::MD_PU));
 
     } else {
         printf("No, the file is not valid!\n");
