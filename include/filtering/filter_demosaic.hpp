@@ -106,7 +106,7 @@ protected:
         float *dataIn = imgIn->data;
         float *data = imgOut->data;
 
-        //Copying the original pixels!
+        //copy the original pixels!
         //#pragma omp parallel for
         for(j = sy; j < height; j += 2) {
             for(i = sx; i < width; i += 2) {
@@ -136,11 +136,11 @@ protected:
 
             for(i = ssx; i < (width); i += 2) {
                 //
-                //		    0.5
+                //          0.5
                 //      -1   0  -1
                 //  -1   4   5   4   -1
                 //      -1   0  -1
-                //		    0.5
+                //          0.5
                 //
                 int current = j * width + i;
 
@@ -176,11 +176,11 @@ protected:
 
             for(i = ssx; i < (width); i += 2) {
                 //
-                //		     -1
+                //           -1
                 //       -1   4  -1
                 //  0.5   0   5   0   0.5
                 //       -1   4  -1
-                //		     -1
+                //           -1
                 //
                 int current = j * width + i;
 
@@ -217,11 +217,11 @@ protected:
 
             for(i = ssx; i < (width); i += 2) {
                 //
-                //		     -3/2
+                //           -3/2
                 //         2   0   2
                 //  -3/2   0   6   0   -3/2
                 //         2   0   2
-                //		     -3/2
+                //           -3/2
                 //
                 int current = j * width + i;
                 tmp =	6.0f *	dataIn[current] +

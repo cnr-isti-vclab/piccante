@@ -71,6 +71,25 @@ int main(int argc, char *argv[])
             tmp = &img1;
         }
 
+        float ssim_index, ssim_index_pu;
+        pic::SSIMIndex ssim;
+        pic::Image *ssim_map = ssim.execute(Double(&img0, tmp), ssim_index, NULL);
+        printf("Ok\n");
+
+        if(ssim_map != NULL) {
+            ssim_map->Write("../data/output/" + name + "_ssim_map_lin.pfm");
+        }
+
+        ssim.update(-1.0f, -1.0f, -1.0f, -1.0f, true, pic::MD_PU);
+        ssim_map = ssim.execute(Double(&img0, tmp), ssim_index_pu, ssim_map);
+
+        if(ssim_map != NULL) {
+            ssim_map->Write("../data/output/" + name + "_ssim_map_pu.pfm");
+        }
+
+        printf("SSIM (classic): %3.3f \t  SSIM (PU-encoding): %3.3f\n",
+               ssim_index, ssim_index_pu);
+
         printf("MSE (classic): %3.3f \t  MSE (PU-encoding): %3.3f\n",
                pic::MSE(&img0, tmp, false, pic::MD_LIN),
                pic::MSE(&img0, tmp, false, pic::MD_PU));

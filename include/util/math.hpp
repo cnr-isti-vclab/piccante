@@ -354,7 +354,7 @@ PIC_INLINE float expfMinusOne(float x)
  */
 PIC_INLINE float log10fPlusEpsilon(float x)
 {
-    return log10f(x + 1e-6f);
+    return log10f(x + 1e-7f);
 }
 
 /**
@@ -364,7 +364,7 @@ PIC_INLINE float log10fPlusEpsilon(float x)
  */
 PIC_INLINE float powf10fMinusEpsilon(float x)
 {
-    return MAX(powf(10.0f, x) - 1e-6f, 0.0f);
+    return MAX(powf(10.0f, x) - 1e-7f, 0.0f);
 }
 
 /**

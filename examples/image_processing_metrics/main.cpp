@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
         }
 
         float ssim_index;
-        pic::SSIMIndex metric;
-        pic::Image *ssim_map = metric.execute(Double(&img0, tmp), ssim_index, NULL);
+        pic::SSIMIndex ssim;
+        pic::Image *ssim_map = ssim.execute(Double(&img0, tmp), ssim_index, NULL);
         printf("Ok\n");
 
         if(ssim_map != NULL) {

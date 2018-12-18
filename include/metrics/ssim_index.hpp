@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 #include "../image.hpp"
+#include "../util/math.hpp"
 #include "../metrics/base.hpp"
 
 #include "../util/array.hpp"
@@ -50,7 +51,13 @@ public:
 
     SSIMIndex()
     {
-        update(0.01f, 0.03f, 1.5f, -1.0f, true, MD_LIN);
+        K0 = 0.01f;
+        K1 = 0.03f;
+        dynamic_range = -1.0f;
+        sigma_window = 1.5f;
+        type = MD_LIN;
+        bDownsampling = true;
+        flt_gauss2D.update(sigma_window);
     }
 
     /**
@@ -62,12 +69,17 @@ public:
      * @param bDownsampling
      * @param type
      */
-    void update(float K0 = 0.01f, float  K1 = 0.03f, float  sigma_window = 1.5f, float dynamic_range = -1.0f, bool bDownsampling = true, METRICS_DOMAIN type = MD_LIN)
+    void update(float K0 = 0.01f,
+                float K1 = 0.03f,
+                float sigma_window = 1.5f,
+                float dynamic_range = -1.0f,
+                bool bDownsampling = true,
+                METRICS_DOMAIN type = MD_LIN)
     {
-        this->K0 = K0;
-        this->K1 = K1;
-        this->sigma_window = sigma_window;
-        this->dynamic_range = dynamic_range;
+        this->K0 = K0 > 0.0f ? K0 : this->K0;
+        this->K1 = K1 > 0.0f ? K1 : this->K0;
+        this->sigma_window = sigma_window > 0.0f ? sigma_window : this->sigma_window;
+        this->dynamic_range = dynamic_range > 0.0f ? dynamic_range : this->dynamic_range;
         this->bDownsampling = bDownsampling;
         this->type = type;
 
@@ -116,6 +128,26 @@ public:
 
         Image *L_ori = flt_lum.Process(Single(ori), NULL);
         Image *L_cmp = flt_lum.Process(Single(cmp), NULL);
+
+        switch(type)
+        {
+            case MD_PU:
+            {
+                L_ori->applyFunction(PUEncode);
+                L_cmp->applyFunction(PUEncode);
+            } break;
+
+            case MD_LOG10:
+            {
+                L_ori->applyFunction(log10fPlusEpsilon);
+                L_cmp->applyFunction(log10fPlusEpsilon);
+            } break;
+
+            default:
+            {
+
+            } break;
+        }
 
         if(dynamic_range <= 0.0f) {
             dynamic_range = L_ori->getDynamicRange(false, 1.0f);
