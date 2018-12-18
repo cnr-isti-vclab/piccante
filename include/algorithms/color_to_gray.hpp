@@ -45,11 +45,11 @@ PIC_INLINE Image *colorToGray(Image *imgIn, Image *imgOut)
     ImageVec img_vec;
     ImageVec input = Single(imgIn);
 
-    FilterChannel flt(0);
+    FilterChannel flt(SingleInt(0));
     int channels = imgIn->channels;
     for(int i = 0; i < channels; i++) {
         img_vec.push_back(flt.Process(input, NULL));
-        flt.update(i + 1);
+        flt.update(SingleInt(i + 1));
     }
 
     ExposureFusion ef(1.0f, 1.0f, 0.0f);

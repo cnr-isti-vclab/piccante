@@ -154,7 +154,7 @@ PIC_INLINE void FilterSamplingMap::update(float sigma, float scale)
     fltD = new FilterSampler2D(scale, &isb);
     fltS = new FilterSigmoidTMO();
     fltG = new FilterGradient();
-    fltC = new FilterChannel(2);
+    fltC = new FilterChannel(SingleInt(2));
     fltG2D = new FilterGaussian2D(sigma);
 
     insertFilter(fltL);     //Luminance

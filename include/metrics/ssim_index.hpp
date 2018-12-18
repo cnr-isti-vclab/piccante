@@ -36,7 +36,7 @@ namespace pic {
 
 class SSIMIndex
 {
-public:
+protected:
     float K0, K1, sigma_window, dynamic_range;
     bool bDownsampling;
 
@@ -44,9 +44,13 @@ public:
     FilterGaussian2D flt_gauss2D;
     FilterSSIM flt_ssim;
 
+    METRICS_DOMAIN type;
+
+public:
+
     SSIMIndex()
     {
-        update(0.01f, 0.03f, 1.5f, -1.0f, true);
+        update(0.01f, 0.03f, 1.5f, -1.0f, true, MD_LIN);
     }
 
     /**
@@ -56,14 +60,16 @@ public:
      * @param sigma_window
      * @param dynamic_range
      * @param bDownsampling
+     * @param type
      */
-    void update(float K0 = 0.01f, float  K1 = 0.03f, float  sigma_window = 1.5f, float dynamic_range = -1.0f, bool bDownsampling = true)
+    void update(float K0 = 0.01f, float  K1 = 0.03f, float  sigma_window = 1.5f, float dynamic_range = -1.0f, bool bDownsampling = true, METRICS_DOMAIN type = MD_LIN)
     {
         this->K0 = K0;
         this->K1 = K1;
         this->sigma_window = sigma_window;
         this->dynamic_range = dynamic_range;
         this->bDownsampling = bDownsampling;
+        this->type = type;
 
         flt_gauss2D.update(sigma_window);
     }

@@ -2078,6 +2078,7 @@ PIC_INLINE Image *Image::allocateSimilarOne()
     Image *ret = new Image(frames, width, height, channels);
     ret->flippedEXR = flippedEXR;
     ret->exposure = exposure;
+    ret->alpha = alpha;
     return ret;
 }
 

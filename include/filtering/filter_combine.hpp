@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../filtering/filter.hpp"
 
+#include "../filtering/filter_channel.hpp"
+
 namespace pic {
 
 /**
@@ -160,29 +162,23 @@ public:
     }
 
     /**
-     * @brief execute
+     * @brief getOnlyRGB
      * @param nameIn
      * @param nameOut
      * @return
      */
-    static Image *execute(Image *imgIn, Image *imgOut)
+    static Image *getOnlyRGB(Image *imgIn, Image *imgOut)
     {
-        FilterChannel filter(0);
-        Image *outR = filter.Process(Single(imgIn), NULL);
-
-        filter.update(1);
-        Image *outG = filter.Process(Single(imgIn), NULL);
-
-        filter.update(2);
-        Image *outB = filter.Process(Single(imgIn), NULL);
-
         ImageVec src;
-        src.push_back(outR);
-        src.push_back(outG);
-        src.push_back(outB);
+        FilterChannel filter(SingleInt(0));
 
-        FilterCombine filterC;
-        imgOut = filterC.Process(src, NULL);
+        for(int i = 0; i < 3; i++) {
+            Image *out = filter.Process(Single(imgIn), NULL);
+            src.push_back(out);
+            filter.update(SingleInt(i + 1));
+        }
+
+        imgOut = execute(src, NULL);
 
         return imgOut;
     }

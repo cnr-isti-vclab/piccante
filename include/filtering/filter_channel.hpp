@@ -22,6 +22,22 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+PIC_INLINE std::vector<int> SingleInt(int v0)
+{
+    std::vector<int> ret;
+    ret.push_back(MAX(v0, 0));
+    return ret;
+}
+
+PIC_INLINE std::vector<int> TripleInt(int v0, int v1, int v2)
+{
+    std::vector<int> ret;
+    ret.push_back(MAX(v0, 0));
+    ret.push_back(MAX(v1, 0));
+    ret.push_back(MAX(v2, 0));
+    return ret;
+}
+
 /**
  * @brief The FilterChannel class
  */
@@ -37,41 +53,44 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        int tmpChannel = CLAMPi(channel, 0, src[0]->channels);
+        int totChannels =  CLAMPi(channels_vec.size(), 0, src[0]->channels);
 
         for(int p = box->z0; p < box->z1; p++) {
             for(int j = box->y0; j < box->y1; j++) {
                 for(int i = box->x0; i < box->x1; i++) {
 
-                    float *dst_data =	(*dst)(i, j, p);
-                    float *data =	 (*src[0])(i, j, p);
+                    float *dataOut = (*dst)(i, j, p);
+                    float *dataIn = (*src[0])(i, j, p);
 
-                    dst_data[0] = data[tmpChannel];
+                    for(int k = 0; k < totChannels; k++) {
+                        int index = channels_vec[k];
+                        dataOut[k] = dataIn[index];
+                    }
                 }
             }
         }
     }
 
-    int channel;
+    std::vector<int> channels_vec;
 
 public:
 
     /**
      * @brief FilterChannel
-     * @param channel
+     * @param channels_vec
      */
-    FilterChannel(int channel) : Filter()
+    FilterChannel(std::vector<int> channels_vec) : Filter()
     {
-        update(channel);
+        update(channels_vec);
     }
 
     /**
      * @brief update
-     * @param channel
+     * @param channels_vec
      */
-    void update(int channel)
+    void update(std::vector<int> channels_vec)
     {
-        this->channel = channel;
+        this->channels_vec = channels_vec;
     }
 
     /**
@@ -86,7 +105,7 @@ public:
     {
         width       = imgIn[0]->width;
         height      = imgIn[0]->height;
-        channels    = 1;
+        channels    = MAX(1, this->channels_vec.size());
         frames      = imgIn[0]->frames;
     }
 
@@ -99,8 +118,33 @@ public:
      */
     static Image *execute(Image *imgIn, Image *imgOut, int channel = 0)
     {
-        FilterChannel fltCh(channel);
+        FilterChannel fltCh(SingleInt(channel));
         return fltCh.Process(Single(imgIn), imgOut);
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @param channel
+     * @return
+     */
+    static Image *execute(Image *imgIn, Image *imgOut, std::vector<int> channels_vec)
+    {
+        FilterChannel fltCh(channels_vec);
+        return fltCh.Process(Single(imgIn), imgOut);
+    }
+
+    /**
+     * @brief removeAlpha
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image *removeAlpha(Image *imgIn, Image *imgOut)
+    {
+        imgOut = execute(imgIn, imgOut, TripleInt(0, 1, 2));
+        return imgOut;
     }
 
     /**
@@ -111,14 +155,9 @@ public:
         Image imgIn(1, 512, 512, 3);
         imgIn = 1.0f;
 
-        FilterChannel filter(0);
-        Image *outR = filter.Process(Single(&imgIn), NULL);
-
-        filter.update(1);
-        Image *outG = filter.Process(Single(&imgIn), NULL);
-
-        filter.update(2);
-        Image *outB = filter.Process(Single(&imgIn), NULL);
+        Image *outR = execute(&imgIn, NULL, SingleInt(0));
+        Image *outG = execute(&imgIn, NULL, SingleInt(1));
+        Image *outB = execute(&imgIn, NULL, SingleInt(2));
 
         outR->Write("channel_R.pfm");
         outG->Write("channel_G.pfm");
