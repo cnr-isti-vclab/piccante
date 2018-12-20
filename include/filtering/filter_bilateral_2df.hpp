@@ -76,34 +76,8 @@ public:
     {
         //filter
         FilterBilateral2DF filter(sigma_s, sigma_r);
-        long t0 = timeGetTime();
         Image *out = filter.Process(Single(imgIn), imgOut);
-        long t1 = timeGetTime();
-        printf("Full Bilateral Filter time: %ld\n", t1 - t0);
         return out;
-    }
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma_s
-     * @param sigma_r
-     * @return
-     */
-    static Image *execute(std::string nameIn,
-                             std::string nameOut,
-                             float sigma_s, float sigma_r)
-    {
-        //Load the image
-        Image imgIn(nameIn);
-
-        //Filter
-        Image *imgOut = FilterBilateral2DF::execute(&imgIn, NULL, sigma_s, sigma_r);
-
-        //Write image out
-        imgOut->Write(nameOut);
-        return imgOut;
     }
 };
 
