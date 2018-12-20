@@ -515,6 +515,7 @@ public:
                         tmpError += MitsunagaNayarClassic(&samples[i * stride], nSamples, exposures, tmpCoefficients[i].coeff, computeRatios, R, eps, max_iterations);
                     }
                 }
+
                 if (tmpError < error) {
                     error = tmpError;
                     poly = std::move(tmpCoefficients);
