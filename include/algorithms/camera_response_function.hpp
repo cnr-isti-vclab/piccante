@@ -54,7 +54,7 @@ protected:
     */
     float *gsolve(int *samples, std::vector< float > &log_exposure, float lambda, int nSamples)
     {
-		#ifndef PIC_DISABLE_EIGEN
+        #ifndef PIC_DISABLE_EIGEN
 
         int nExposure = int(log_exposure.size());
 
@@ -77,10 +77,10 @@ protected:
 
                 float w_ij = w[tmp];
 
-                A.coeffRef(k, tmp)   =  w_ij;
+                A.coeffRef(k, tmp) =  w_ij;
                 A.coeffRef(k, n + i) = -w_ij;
                 
-                b[k]                 =  w_ij * log_exposure[j];
+                b[k] =  w_ij * log_exposure[j];
 
                 k++;
             }
@@ -108,7 +108,8 @@ protected:
         for(int i = 0; i < n; i++) {
             ret[i] = expf(x[i]);
         }
-		#else
+
+        #else
             float *ret = NULL;
         #endif
 
@@ -125,12 +126,14 @@ protected:
         for(unsigned int i = 0; i < icrf.size(); i++) {
             if(icrf[i] != NULL) {
                 delete[] icrf[i];
+                icrf[i] = NULL;
             }
         }
 
         for(unsigned int i = 0; i < crf.size(); i++) {
             if(crf[i] != NULL) {
                 delete[] crf[i];
+                crf[i] = NULL;
             }
         }
 
@@ -169,16 +172,16 @@ protected:
         }
     }
 
-    SubSampleStack          stackOut;
-    IMG_LIN                 type_linearization;
-    float                   w[256];
+    SubSampleStack stackOut;
+    IMG_LIN type_linearization;
+    float w[256];
 
 public:
 
-    std::vector<float *>    icrf;
-    std::vector<float *>     crf;
+    std::vector<float *> icrf;
+    std::vector<float *> crf;
 
-    std::vector< Polynomial >  poly;
+    std::vector< Polynomial > poly;
     
     /**
      * @brief CameraResponseFunction
@@ -461,10 +464,10 @@ public:
 
         type_linearization = IL_POLYNOMIAL;
 
-        //Sort the array by exposure
+        //sort the array by exposure
         ImaveVecSortByExposureTime(stack);
 
-        //Subsampling the image stack
+        //subsample the image stack
         stackOut.execute(stack, nSamples, alpha);
         int *samples = stackOut.get();
         nSamples = stackOut.getNSamples();
@@ -473,7 +476,7 @@ public:
             return false;
         }
 
-        //Computing CRF using Mitsunaga and Nayar
+        //compute the CRF using Mitsunaga and Nayar
         int channels = stack[0]->channels;
 
         std::size_t nExposures = stack.size();

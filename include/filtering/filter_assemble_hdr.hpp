@@ -70,8 +70,6 @@ protected:
             }
         }        
 
-        float channelsf = float(channels);
-
         float *acc = new float[channels];
         float *totWeight = new float[channels];
 
@@ -91,7 +89,7 @@ protected:
                 for(int l = 0; l < n; l++) {
 
                     float x = Arrayf::sum(&src[l]->data[c], channels);
-                    x /= channelsf;
+                    x /= dst->channelsf;
 
                     float t_mvs = x / t_min;
 
