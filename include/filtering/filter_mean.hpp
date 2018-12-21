@@ -78,11 +78,7 @@ public:
         if(this->size != size) {
             this->size = size;
 
-            if( data != NULL) {
-                delete[] data;
-                data = NULL;
-            }
-
+            data = delete_vec_s(data);
             data = FilterConv1D::getKernelMean(size);
         }        
     }

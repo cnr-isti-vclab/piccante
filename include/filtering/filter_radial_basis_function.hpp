@@ -22,6 +22,8 @@ namespace pic {
 
 #include "../algorithms/radial_basis_function.hpp"
 
+#include "../filtering/filter.hpp"
+
 /**
  * @brief The FilterRadialBasisFunction class
  */
@@ -39,7 +41,7 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        if(rbf == NULL || src.size() < 1) {
+        if(rbf == NULL) {
             return;
         }
 
@@ -56,8 +58,7 @@ protected:
                 float *dataIn  = (*src[0]) (i, j);
                 float *dataOut = (*dst)    (i, j);
 
-                float out = rbf->eval(dataIn);
-                dataOut[0] = out;
+                dataOut[0] = rbf->eval(dataIn);
             }
         }
     }

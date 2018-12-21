@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_CONV_1D_HPP
 #define PIC_FILTERING_FILTER_CONV_1D_HPP
 
+#include "../util/std_util.hpp"
+#include "../util/array.hpp"
 #include "../filtering/filter.hpp"
 #include "../util/precomputed_gaussian.hpp"
 
@@ -31,7 +33,7 @@ class FilterConv1D: public Filter
 protected:
     int dirs[3];
     float *data; //NOTE: this an external pointer; NEVER release it!
-    int n;
+    int kernelSize, halfKernelSize;
 
     /**
      * @brief ProcessBBox
@@ -54,7 +56,7 @@ public:
      * @param n
      * @param direction
      */
-    FilterConv1D(float *data, int n, int direction);
+    FilterConv1D(float *data, int kernelSize, int direction);
 
     ~FilterConv1D();
 
@@ -64,7 +66,7 @@ public:
      * @param n
      * @param direction
      */
-    void update(float *data, int n, int direction);
+    void update(float *data, int kernelSize, int direction);
 
     /**
      * @brief changePass
@@ -133,7 +135,8 @@ public:
 
 PIC_INLINE FilterConv1D::FilterConv1D()
 {
-    n = 0;
+    kernelSize = 0;
+    halfKernelSize = 0;
     data = NULL;
 
     dirs[0] = 0;
@@ -141,19 +144,21 @@ PIC_INLINE FilterConv1D::FilterConv1D()
     dirs[2] = 0;
 }
 
-PIC_INLINE FilterConv1D::FilterConv1D(float *data, int n, int direction = 0)
+PIC_INLINE FilterConv1D::FilterConv1D(float *data, int kernelSize, int direction = 0)
 {
-    update(data, n, direction);
+    update(data, kernelSize, direction);
 }
 
-PIC_INLINE void FilterConv1D::update(float *data, int n, int direction)
+PIC_INLINE void FilterConv1D::update(float *data, int kernelSize, int direction)
 {
-    if(data == NULL || n < 0) {
+    if(data == NULL || kernelSize < 1) {
         return;
     }
 
     this->data = data;
-    this->n = n;
+    this->kernelSize = kernelSize;
+
+    this->halfKernelSize = kernelSize >> 1;
 
     if(direction > 0) {
         dirs[ direction      % 3] = 1;
@@ -165,7 +170,8 @@ PIC_INLINE void FilterConv1D::update(float *data, int n, int direction)
 PIC_INLINE FilterConv1D::~FilterConv1D()
 {
     data = NULL;
-    n = -1;
+    kernelSize = -1;
+    halfKernelSize = -1;
 }
 
 PIC_INLINE void FilterConv1D::changePass(int pass, int tPass)
@@ -203,24 +209,18 @@ PIC_INLINE void FilterConv1D::changePass(int x, int y, int z)
 
 PIC_INLINE void FilterConv1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-    int channels = dst->channels;
-
     Image *source = src[0];
-
-    int halfKernelSize = n >> 1;
 
     for(int m = box->z0; m < box->z1; m++) {
 
         for(int j = box->y0; j < box->y1; j++) {
 
             for(int i = box->x0; i < box->x1; i++) {
-                float *tmpDst = (*dst)(i, j, m);
+                float *dst_data = (*dst)(i, j, m);
 
-                for(int l = 0; l < channels; l++) {
-                    tmpDst[l] = 0.0f;
-                }
+                Arrayf::assign(0.0f, dst_data, dst->channels);
 
-                for(int k = 0; k < n; k++) { //1D Filtering
+                for(int k = 0; k < kernelSize; k++) { //1D Filtering
                     int tmpCoord = k - halfKernelSize;
 
                     //Address cj
@@ -232,8 +232,8 @@ PIC_INLINE void FilterConv1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 
                     float *tmpSource = (*source)(ci, cj, cm);
 
-                    for(int l = 0; l < channels; l++) {
-                        tmpDst[l] += tmpSource[l] * data[k];
+                    for(int l = 0; l < dst->channels; l++) {
+                        dst_data[l] += tmpSource[l] * data[k];
                     }
                 }
             }
