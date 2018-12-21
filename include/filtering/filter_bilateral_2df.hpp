@@ -18,8 +18,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_BILATERAL_2DF_HPP
 #define PIC_FILTERING_FILTER_BILATERAL_2DF_HPP
 
-#include "../filtering/filter.hpp"
+#include "../util/std_util.hpp"
+
+#include "../util/array.hpp"
+
 #include "../util/precomputed_gaussian.hpp"
+
+#include "../filtering/filter.hpp"
 
 namespace pic {
 
@@ -29,7 +34,7 @@ namespace pic {
 class FilterBilateral2DF: public Filter
 {
 protected:
-    float sigma_s, sigma_r;
+    float sigma_s, sigma_r, sigma_r_sq_2;
 
     PrecomputedGaussian *pg;
 
@@ -53,6 +58,8 @@ public:
      * @param sigma_r
      */
     FilterBilateral2DF(float sigma_s, float sigma_r);
+
+    ~FilterBilateral2DF();
 
     /**
      * @brief signature
@@ -81,19 +88,25 @@ public:
     }
 };
 
-PIC_INLINE FilterBilateral2DF::FilterBilateral2DF()
+PIC_INLINE FilterBilateral2DF::FilterBilateral2DF() : Filter()
 {
     pg = NULL;
 }
 
-PIC_INLINE FilterBilateral2DF::FilterBilateral2DF(float sigma_s, float sigma_r)
+PIC_INLINE FilterBilateral2DF::FilterBilateral2DF(float sigma_s, float sigma_r) : Filter()
 {
     //protected values are assigned/computed
-    this->sigma_s = sigma_s;
-    this->sigma_r = sigma_r;
+    this->sigma_s = sigma_s > 0.0f ? sigma_s : 1.0f;
+    this->sigma_r = sigma_r > 0.0f ? sigma_r : 0.01f;
+    this->sigma_r_sq_2 = this->sigma_r * this->sigma_r * 2.0f;
 
     //Precomputation of the Gaussian filter
     pg = new PrecomputedGaussian(sigma_s);
+}
+
+FilterBilateral2DF::~FilterBilateral2DF()
+{
+    pg = delete_s(pg);
 }
 
 PIC_INLINE void FilterBilateral2DF::ProcessBBox(Image *dst, ImageVec src, BBox *box)
@@ -103,7 +116,7 @@ PIC_INLINE void FilterBilateral2DF::ProcessBBox(Image *dst, ImageVec src, BBox *
     //Filtering
     Image *edge, *base;
 
-    if(src.size() == 2) {
+    if(src.size() > 1) {
         //Joint/Cross Bilateral Filtering
         base = src[0];
         edge = src[1];
@@ -112,62 +125,51 @@ PIC_INLINE void FilterBilateral2DF::ProcessBBox(Image *dst, ImageVec src, BBox *
         edge = src[0];
     }
 
-    float sigma_r2 = (2.0f * sigma_r * sigma_r);
-
     for(int j = box->y0; j < box->y1; j++) {
         for(int i = box->x0; i < box->x1; i++) {
             //Convolution kernel
-            float *tmpDst = (*dst)(i, j);
+            float *dst_data = (*dst)(i, j);
+
+            float *data_edge = (*edge)(i, j);
+
+            Arrayf::assign(0.0f, dst_data, channels);
+
             float sum = 0.0f;
-
-            float *tmpEdge = (*edge)(i, j);
-
-            for(int m = 0; m < channels; m++) {
-                tmpDst[m]  = 0.0;
-            }
-
             for(int k = 0; k < pg->kernelSize; k++) {
                 int cj = j + k - pg->halfKernelSize;
 
                 for(int l = 0; l < pg->kernelSize; l++) {
-                    //Spatial filtering
-                    float Gauss1 = pg->coeff[k] * pg->coeff[l];
-
-                    //Address
                     int ci = i + l - pg->halfKernelSize;
 
-                    //Range filtering
-                    float tmp = 0.0;
-                    float *tmpEdge2 = (*edge)(ci, cj);
+                    //Spatial weight
+                    float G1 = pg->coeff[k] * pg->coeff[l];
 
-                    for(int m = 0; m < channels; m++) {
-                        float tmp3 = tmpEdge2[m] - tmpEdge[m];
-                        tmp += tmp3 * tmp3;
-                    }
+                    //Range weight
+                    float *cur_edge = (*edge)(ci, cj);
 
-                    float Gauss2 = expf(-tmp / sigma_r2);
+                    float tmp = Arrayf::distanceSq(data_edge, cur_edge, edge->channels);
+                    float G2 = expf(-tmp / sigma_r_sq_2);
 
                     //Weight
-                    float weight = Gauss1 * Gauss2;
+                    float weight = G1 * G2;
 
-                    //Filtering
-                    float *tmpBase = (*base)(ci, cj);
+                    //filter
+                    float *base_data_cur = (*base)(ci, cj);
 
                     for(int m = 0; m < channels; m++) {
-                        tmpDst[m] += tmpBase[m] * weight;
+                        dst_data[m] += base_data_cur[m] * weight;
                     }
 
                     sum += weight;
                 }
             }
 
-            //Normalization
-            bool sumTest = sum > 0.0f;
-
-            float *tmpBase = (*base)(i, j);
-
-            for(int m = 0; m < channels; m++) {
-                tmpDst[m] = sumTest ? tmpDst[m] / sum : tmpBase[m];
+            //normalization
+            if(sum > 0.0f) {
+                Arrayf::div(dst_data, channels, sum);
+            } else {
+                float *base_data = (*base)(i, j);
+                Arrayf::assign(base_data, channels, dst_data);
             }
         }
     }
