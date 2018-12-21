@@ -37,7 +37,7 @@ public:
      * @param sigma_s
      * @param sigma_r
      */
-    FilterBilateral2DSP(float sigma_s, float sigma_r)
+    FilterBilateral2DSP(float sigma_s, float sigma_r) : FilterNPasses()
     {
         bilateralFilter = new FilterBilateral1D(sigma_s, sigma_r);
 

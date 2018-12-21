@@ -70,7 +70,7 @@ protected:
 
         float sigma_r = powf(2.0f, phi) * alpha / (s_max * s_max);
 
-        flt_bilateral.update(ST_BRIDSON, sigma_s, sigma_r, 1);
+        flt_bilateral.update(sigma_s, sigma_r);
 
         images[1] = flt_bilateral.Process(Single(images[0]), images[1]);
 

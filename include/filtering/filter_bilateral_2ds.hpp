@@ -34,8 +34,7 @@ namespace pic {
 class FilterBilateral2DS: public Filter
 {
 protected:
-    float sigma_s, sigma_r;
-    double sigma_r_sq_2;
+    float sigma_s, sigma_r, sigma_r_sq_2;
     PrecomputedGaussian *pg;
     MRSamplers<2> *ms;
     int seed;
@@ -75,31 +74,16 @@ public:
      * @param sigma_r
      * @param mult
      */
-    FilterBilateral2DS(SAMPLER_TYPE type, float sigma_s, float sigma_r, int mult);
-
-    /**
-     * @brief FilterBilateral2DS
-     * @param sigma_s
-     * @param sigma_r
-     * @param mult
-     */
-    FilterBilateral2DS(float sigma_s, float sigma_r, int mult);
-
-    /**
-     * @brief FilterBilateral2DS
-     * @param sigma_s
-     * @param sigma_r
-     */
-    FilterBilateral2DS(float sigma_s, float sigma_r);
+    FilterBilateral2DS(float sigma_s, float sigma_r, int mult, SAMPLER_TYPE type);
 
     /**
      * @brief update
-     * @param type
      * @param sigma_s
      * @param sigma_r
      * @param mult
+     * @param type
      */
-    void update(SAMPLER_TYPE type, float sigma_s, float sigma_r, int mult);
+    void update(float sigma_s, float sigma_r, int mult, SAMPLER_TYPE type);
 
     /**
      * @brief signature
@@ -134,12 +118,10 @@ public:
     static Image *execute(Image *imgIn,
                              float sigma_s, float sigma_r)
     {
-        //Filtering
-        FilterBilateral2DS filter(sigma_s, sigma_r, 1);
-        //long t0 = timeGetTime();
+        //create the filter
+        FilterBilateral2DS filter(sigma_s, sigma_r, 1, ST_BRIDSON);
+        //filter
         Image *imgOut = filter.Process(Single(imgIn), NULL);
-        //long t1 = timeGetTime();
-        //printf("Stochastic Bilateral Filter time: %ld\n",t1-t0);
         return imgOut;
     }
 
@@ -154,7 +136,7 @@ public:
     static Image *execute(Image *imgIn, Image *imgEdge,
                              float sigma_s, float sigma_r)
     {
-        FilterBilateral2DS filter(sigma_s, sigma_r, 1);
+        FilterBilateral2DS filter(sigma_s, sigma_r, 1, ST_BRIDSON);
         Image *imgOut;
 
         if(imgEdge == NULL) {
@@ -214,7 +196,7 @@ public:
                     break;
                 }
 
-                FilterBilateral2DS f2DS(sigma_s, 0.01f, j);
+                FilterBilateral2DS f2DS(sigma_s, 0.01f, j, ST_BRIDSON);
                 f2DS.Write("kernel_" + fromNumberToString(sigma_s) + "_" + fromNumberToString(j) + ".txt");
                 oldNSamples = nSamples;
             }
@@ -223,37 +205,25 @@ public:
 };
 
 PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(std::string nameFile,
-        float sigma_r)
+        float sigma_r) : Filter()
 {
     Read(nameFile);
     this->sigma_r = sigma_r;
 }
 
-PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(SAMPLER_TYPE type,
-        float sigma_s, float sigma_r, int mult)
+PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(
+        float sigma_s, float sigma_r, int mult = 1, SAMPLER_TYPE type = ST_BRIDSON) : Filter()
 {
-    update(type, sigma_s, sigma_r, mult);
+    update(sigma_s, sigma_r, mult, type);
 }
 
-PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(float sigma_s, float sigma_r,
-        int mult)
-{
-    update(ST_BRIDSON, sigma_s, sigma_r, mult);
-}
-
-PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(float sigma_s, float sigma_r)
-{
-    update(ST_BRIDSON, sigma_s, sigma_r, 1);
-}
-
-PIC_INLINE void FilterBilateral2DS::update(SAMPLER_TYPE type, float sigma_s,
-        float sigma_r, int mult)
+PIC_INLINE void FilterBilateral2DS::update( float sigma_s,
+        float sigma_r, int mult = 1, SAMPLER_TYPE type = ST_BRIDSON)
 {
     //protected values are assigned/computed
-    this->sigma_s = sigma_s;
-    this->sigma_r = sigma_r;
-
-    sigma_r_sq_2 = double(sigma_r * sigma_r) * 2.0;
+    this->sigma_s = sigma_s > 0.0f ? sigma_s : 1.0f;
+    this->sigma_r = sigma_r > 0.0f ? sigma_r : 0.01f;
+    this->sigma_r_sq_2 = this->sigma_r * this->sigma_r * 2.0f;
 
     //Precomputation of the Gaussian Kernel
     pg = new PrecomputedGaussian(sigma_s);//, sigma_r);
@@ -281,15 +251,7 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
 {
     Image *edge, *base;
 
-    int nImg = int(src.size());
-
-    switch(nImg) {
-    //bilateral filter
-    case 1:
-        base = src[0];
-        edge = src[0];
-        break;
-
+    switch(src.size()) {
     //cross bilateral filter
     case 2:
         base = src[0];
@@ -301,10 +263,6 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
         edge = src[0];
     }
 
-    double *tmpC = new double[base->channels];
-
-    int width = dst->width;
-    int height = dst->height;
     int channels = dst->channels;
     int edgeChannels = edge->channels;
 
@@ -316,63 +274,57 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
             float *dst_data  = (*dst )(i, j);
             float *edge_data = (*edge)(i, j);
 
-            Array<double>::assign(0.0, tmpC, channels);
+            Array<float>::assign(0.0f, dst_data, channels);
 
-            double sum = 0.0;
 
             RandomSampler<2> *ps = ms->getSampler(&m);
             int nSamples = int(ps->samplesR.size());
 
+            float sum = 0.0f;
             for(int k = 0; k < nSamples; k += 2) {
                 //fetch addresses
-                int ci = CLAMP(i + ps->samplesR[k    ],  width);
-                int cj = CLAMP(j + ps->samplesR[k + 1], height);
+                int ci = i + ps->samplesR[k    ];
+                int cj = j + ps->samplesR[k + 1];
 
                 //
                 //fetch the precomputed Spatial Gaussian kernel
                 //
-                double G1 = pg->coeff[ps->samplesR[k    ] + pg->halfKernelSize] *
-                            pg->coeff[ps->samplesR[k + 1] + pg->halfKernelSize];
+                float G1 = pg->coeff[ps->samplesR[k    ] + pg->halfKernelSize] *
+                           pg->coeff[ps->samplesR[k + 1] + pg->halfKernelSize];
 
                 float *edge_data_ci_cj = (*edge)(ci, cj);
 
                 //
                 //compute the Range Gaussian kernel
                 //
-                double acc_delta_range_sq = 0.0;
+                float acc_delta_range_sq = Arrayf::distanceSq(edge_data_ci_cj, edge_data, edgeChannels);
 
-                for(int l = 0; l < edgeChannels; l++) {
-                    double delta_range = edge_data_ci_cj[l] - edge_data[l];
-                    acc_delta_range_sq += delta_range * delta_range;
-                }
-
-                double G2 = exp(-acc_delta_range_sq / sigma_r_sq_2);
+                float G2 = exp(-acc_delta_range_sq / sigma_r_sq_2);
 
                 //
                 //compute the final weight
                 //
-                double weight = G1 * G2;
+                float weight = G1 * G2;
                 sum += weight;
 
                 float *base_data_ci_cj = (*base)(ci, cj);
 
                 //filter
                 for(int l = 0; l < channels; l++) {
-                    tmpC[l] += base_data_ci_cj[l] * weight;
+                    dst_data[l] += base_data_ci_cj[l] * weight;
                 }
             }
 
-            //Normalization
-            bool sumTest = sum > 0.0;
-            float *base_data = (*base)(i, j);
-
-            for(int l = 0; l < channels; l++) {
-                dst_data[l] = sumTest ? float(tmpC[l] / sum) : base_data[l];
+            //normalization
+            if(sum > 0.0f) {
+                Arrayf::div(dst_data, channels, sum);
+            } else {
+                float *base_data = (*base)(i, j);
+                Arrayf::assign(base_data, channels, dst_data);
             }
+
         }
     }
-
-    delete[] tmpC;
 }
 
 PIC_INLINE bool FilterBilateral2DS::Write(std::string nameFile)

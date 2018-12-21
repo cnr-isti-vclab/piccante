@@ -61,6 +61,27 @@ int main(int argc, char *argv[])
         std::string name = pic::removeExtension(img_str);
         name = pic::removeLocalPath(name);
 
+        //the bilateral filter
+        printf("Filtering the image with a Fast Bilateral filter;\n");
+        printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
+
+        pic::FilterBilateral2DS flt(8.0f, 0.05f);
+        output = flt.Process(input, output);
+
+        output = pic::FilterBilateral2DAS::execute(&img, output, 8.0f, 0.05f);
+
+        printf("Ok!\n");
+
+        printf("Writing the file to disk...");
+
+        bWritten = output->Write("../data/output/" + name + "_filtered_bilateral.png", pic::LT_NOR_GAMMA);
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+
         //the median filter
         printf("Filtering the image with the Median filter (radius of 3);\n");
 
@@ -115,24 +136,6 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
-        //the bilateral filter
-        printf("Filtering the image with a Fast Bilateral filter;\n");
-        printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
-
-        pic::FilterBilateral2DG flt(8.0f, 0.05f);
-        output = flt.Process(input, output);
-
-        printf("Ok!\n");
-
-        printf("Writing the file to disk...");
-
-        bWritten = output->Write("../data/output/" + name + "_filtered_bilateral.png", pic::LT_NOR_GAMMA);
-
-        if(bWritten) {
-            printf("Ok\n");
-        } else {
-            printf("Writing had some issues!\n");
-        }
 
         //the Anisotropic Diffusion
         printf("Filtering the image with the Anisotropic Diffusion;\n");

@@ -65,12 +65,10 @@ int main(int argc, char *argv[])
 
         printf("Ok\n");
 
-        pic::ReinhardTMO rtmo;
-
         if(imgOut != NULL) {
             imgOut->Write("../data/output/image_debevec_crf.hdr");
 
-            pic::Image *imgTmo = rtmo.Process(imgOut, NULL);
+            pic::Image *imgTmo = pic::ReinhardTMO::execute(imgOut, NULL);
             imgTmo->Write("../data/output/image_debevec_crf_tmo.png", pic::LT_NOR_GAMMA);
             delete imgTmo;
             delete imgOut;
@@ -93,7 +91,7 @@ int main(int argc, char *argv[])
             if(imgOut != NULL) {
                 imgOut->Write("../data/output/image_mitusunaga_crf.hdr");
 
-                pic::Image *imgTmo = rtmo.Process(imgOut, NULL);
+                pic::Image *imgTmo = pic::ReinhardTMO::execute(imgOut, NULL);
                 imgTmo->Write("../data/output/image_mitusunaga_crf_tmo.png", pic::LT_NOR_GAMMA);
 
                 delete imgTmo;

@@ -162,7 +162,7 @@ PIC_INLINE void FilterSamplingMap::update(float sigma, float scale)
     insertFilter(fltS);     //Sigmoid TMO
     insertFilter(fltG);     //Gradient
     insertFilter(fltC);     //Gradient
-    insertFilter(fltG2D);   //Gaussian
+    insertFilter(fltG2D, true);   //Gaussian
 }
 
 } // end namespace pic

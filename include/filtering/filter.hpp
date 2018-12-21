@@ -243,18 +243,18 @@ public:
      * @brief insertFilter
      * @param flt
      */
-    void insertFilter(Filter *flt)
+    void insertFilter(Filter *flt, bool asSingle = false)
     {
         if(flt == NULL) {
             return;
         }
 
-        if(!flt->filters.empty()) {
+        if(asSingle || flt->filters.empty()) {
+            filters.push_back(flt);
+        } else {
             for(unsigned int i = 0; i < flt->filters.size(); i++) {
                 insertFilter(flt->filters[i]);
             }
-        } else {
-            filters.push_back(flt);
         }
     }
 
