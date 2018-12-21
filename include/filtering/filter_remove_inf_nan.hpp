@@ -85,7 +85,7 @@ public:
     /**
      * @brief FilterRemoveInfNaN
      */
-    FilterRemoveInfNaN()
+    FilterRemoveInfNaN() : Filter()
     {
     }
 

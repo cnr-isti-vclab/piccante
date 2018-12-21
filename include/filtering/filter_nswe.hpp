@@ -41,7 +41,7 @@ protected:
         float *img_dataE = (*data->src[0])(data->x    , data->y + 1);
 
         for(int k = 0; k < data->src[0]->channels; k++) {
-            int tmp = k * 4;
+            int tmp = k << 2;
             data->out[tmp    ] = img_dataN[k] - img_data[k];
             data->out[tmp + 1] = img_dataS[k] - img_data[k];
             data->out[tmp + 2] = img_dataW[k] - img_data[k];
@@ -106,7 +106,7 @@ public:
     {
         width    = imgIn[0]->width;
         height   = imgIn[0]->height;
-        channels = imgIn[0]->channels * 4;
+        channels = imgIn[0]->channels << 2;
         frames   = imgIn[0]->frames;
     }
 
@@ -120,20 +120,6 @@ public:
     {
         FilterNSWE filter;
         return filter.Process(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief execute
-     * @param fileInput
-     * @param fileOutput
-     * @return
-     */
-    static Image *execute(std::string fileInput, std::string fileOutput)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterNSWE::execute(&imgIn, NULL);
-        out->Write(fileOutput);
-        return out;
     }
 };
 

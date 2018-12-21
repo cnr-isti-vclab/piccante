@@ -149,6 +149,13 @@ PIC_INLINE FilterConv1D::FilterConv1D(float *data, int kernelSize, int direction
     update(data, kernelSize, direction);
 }
 
+PIC_INLINE FilterConv1D::~FilterConv1D()
+{
+    data = NULL;
+    kernelSize = -1;
+    halfKernelSize = -1;
+}
+
 PIC_INLINE void FilterConv1D::update(float *data, int kernelSize, int direction)
 {
     if(data == NULL || kernelSize < 1) {
@@ -165,13 +172,6 @@ PIC_INLINE void FilterConv1D::update(float *data, int kernelSize, int direction)
         dirs[(direction + 1) % 3] = 0;
         dirs[(direction + 2) % 3] = 0;
     }
-}
-
-PIC_INLINE FilterConv1D::~FilterConv1D()
-{
-    data = NULL;
-    kernelSize = -1;
-    halfKernelSize = -1;
 }
 
 PIC_INLINE void FilterConv1D::changePass(int pass, int tPass)

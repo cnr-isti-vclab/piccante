@@ -35,7 +35,7 @@ public:
      * @brief FilterLoG2D
      * @param sigma
      */
-    FilterLoG2D(float sigma) : FilterDiffGauss(sigma * sqrtf(2), sigma / sqrtf(2.0f))
+    FilterLoG2D(float sigma) : FilterDiffGauss(sigma * sqrtf(2.0f), sigma / sqrtf(2.0f))
     {
         this->sigma = sigma;
     }
