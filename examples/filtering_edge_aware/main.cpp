@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         printf("Filtering the image with a Fast Bilateral filter;\n");
         printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
 
-        pic::FilterBilateral2DG flt(8.0f, 0.05f);
+        pic::FilterBilateral2DS flt(8.0f, 0.05f);
         output = flt.Process(input, output);
 
         //output = pic::FilterBilateral2DAS::execute(&img, output, 8.0f, 0.05f);
