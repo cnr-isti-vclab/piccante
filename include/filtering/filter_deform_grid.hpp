@@ -18,11 +18,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_DEFORM_GRID_HPP
 #define PIC_FILTERING_FILTER_DEFORM_GRID_HPP
 
+#include "../util/vec.hpp"
+
+#include "../util/std_util.hpp"
+
 #include "../filtering/filter.hpp"
 #include "../image_samplers/image_sampler_bicubic.hpp"
 #include "../image_samplers/image_sampler_bilinear.hpp"
 #include "../image_samplers/image_sampler_nearest.hpp"
-#include "../util/vec.hpp"
 
 namespace pic {
 
@@ -44,6 +47,7 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
+        float vDiff[3];
         for(int j = box->y0; j < box->y1; j++) {
             float y = float(j) / dst->height1f;
 
@@ -52,7 +56,6 @@ protected:
 
                 float x = float(i) / dst->width1f;
 
-                float vDiff[3];
                 isb.SampleImage(&grid_diff, x, y, vDiff);
 
                 isb.SampleImage(src[0], x + vDiff[0], y + vDiff[1] , tmp_dst);
@@ -76,7 +79,7 @@ public:
 
     ~FilterDeformGrid()
     {
-        delete grid_rest;
+        delete_s(grid_rest);
     }
 
     /**

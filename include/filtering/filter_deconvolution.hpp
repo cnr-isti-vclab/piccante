@@ -63,11 +63,7 @@ public:
      */
     void setup(int nIterations)
     {
-        if(nIterations < 1) {
-            nIterations = 16;
-        }
-
-        this->nIterations = nIterations;
+        this->nIterations = nIterations > 0 ? nInterations : 16;
     }
 
     /**
