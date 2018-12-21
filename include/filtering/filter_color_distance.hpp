@@ -77,22 +77,6 @@ protected:
     }
     */
 
-    Image *setupAux(ImageVec imgIn, Image *imgOut)
-    {
-        int w, h, c, f;
-        OutputSize(imgIn, w, h, c, f);
-
-        if(imgOut == NULL) {
-            imgOut = new Image(f, w, h, c);
-        } else {
-            if(!imgOut->isSimilarType(imgIn[0])) {
-                imgOut = new Image(f, w, h, c);
-            }
-        }
-
-        return imgOut;
-    }
-
 public:
 
     /**

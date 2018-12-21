@@ -165,8 +165,8 @@ PIC_INLINE FilterCrop::FilterCrop(Vec4i min, Vec4i max) : Filter()
 
 PIC_INLINE FilterCrop::FilterCrop(Vec3f min, Vec3f max) : Filter()
 {
-    this->maxf = max;
     this->minf = min;
+    this->maxf = max;
 
     flag = true;
 }
