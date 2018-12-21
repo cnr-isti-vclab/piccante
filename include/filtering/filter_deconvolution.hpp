@@ -47,6 +47,7 @@ public:
      */
     FilterDeconvolution(int nIterations) : Filter()
     {
+        minInputImages = 2;
         psf_hat = NULL;
         img_est_conv = NULL;
         img_err = NULL;
@@ -63,7 +64,7 @@ public:
      */
     void setup(int nIterations)
     {
-        this->nIterations = nIterations > 0 ? nInterations : 16;
+        this->nIterations = nIterations > 0 ? nIterations : 16;
     }
 
     /**
@@ -74,23 +75,13 @@ public:
      */
     Image *Process(ImageVec imgIn, Image *imgOut)
     {
-        if(imgIn.size() < 2) {
+        if (!checkInput(imgIn)) {
             return imgOut;
-        }
-
-        for(int i = 0; i < 2; i ++) {
-            if(imgIn[i] == NULL) {
-                return imgOut;
-            } else {
-                if(!imgIn[i]->isValid()) {
-                    return imgOut;
-                }
-            }
         }
 
         imgOut = setupAux(imgIn, imgOut);
 
-        if(imgOut == NULL) {
+        if (imgOut == NULL) {
             return imgOut;
         }
 
