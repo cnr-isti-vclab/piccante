@@ -42,21 +42,22 @@ protected:
      * @param imgIn
      * @param imgOut
      * @return
-     */
-    Image *ProcessAux(Image *imgIn, Image *imgOut)
+     */    
+    Image *ProcessAux(ImageVec imgIn, Image *imgOut)
     {
-        updateImage(imgIn);
+        updateImage(imgIn[0]);
 
         //compute luminance and its statistics
-        images[0] = flt_lum.Process(Single(imgIn), images[0]);
+        images[0] = flt_lum.Process(imgIn, images[0]);
 
         float Lw_Max, Lw_a;
         images[0]->getMaxVal(NULL, &Lw_Max);
-        images[0]->getMaxVal(NULL, &Lw_a);
+        images[0]->getLogMeanVal(NULL, &Lw_a);
 
         //tone map
         flt_drg.update(Ld_Max, b, Lw_Max, Lw_a);
-        imgOut = flt_drg.Process(Double(imgIn, images[0]), imgOut);
+        imgOut = flt_drg.Process(Double(imgIn[0], images[0]), imgOut);
+
         return imgOut;
     }
 

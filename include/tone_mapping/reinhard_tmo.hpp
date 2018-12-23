@@ -177,7 +177,7 @@ public:
      */
     static Image* execute(Image *imgIn, Image *imgOut)
     {
-        ReinhardTMO rtmo;
+        ReinhardTMO rtmo(0.05f, 1e6f, 8.0f);
         return rtmo.Process(Single(imgIn), imgOut);
     }
 };

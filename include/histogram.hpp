@@ -290,12 +290,11 @@ public:
      * @brief ceiling limits the maximum value of the histogram using Ward
      * algorithm.
      */
-    void ceiling()
+    void ceiling(float k)
     {
-        float k = 1.0f / float(nBin - 1);
         float tolerance = float(Array<unsigned int>::sum(bin, nBin)) * 0.025f;
         int   trimmings = 0;
-        bool  bFlag     = true;
+        bool  bFlag = true;
 
         while((trimmings <= tolerance) && bFlag) {
             trimmings = 0;
@@ -308,7 +307,7 @@ public:
 
                 for(int i = 0; i < nBin; i++) {
                     if(bin[i] > ceiling) {
-                        trimmings = trimmings + bin[i] - ceiling;
+                        trimmings += (bin[i] - ceiling);
                         bin[i] = ceiling;
                     }
                 }

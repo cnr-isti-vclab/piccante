@@ -38,50 +38,56 @@ protected:
      * @param imgOut
      * @return
      */
-    Image *ProcessAux(Image *imgIn, Image *imgOut)
+    Image *ProcessAux(ImageVec imgIn, Image *imgOut)
     {
-        updateImage(imgIn);
+        updateImage(imgIn[0]);
 
-        images[0] = flt_lum.Process(Single(imgIn), images[0]);
+        images[0] = flt_lum.Process(imgIn, images[0]);
 
         int fScaleX, fScaleY;
-        getScaleFiltering(imgIn, fScaleX, fScaleY);
+        getScaleFiltering(imgIn[0], fScaleX, fScaleY);
         flt_smp.update(fScaleX, fScaleY, &isb);
         images[1] = flt_smp.Process(Single(images[0]), images[1]);
 
+        //compute min and max luminance
         float LMin, LMax;
         images[1]->getMinVal(NULL, &LMin);
         images[1]->getMaxVal(NULL, &LMax);
 
-        float LlMin = logf(LMin + epsilon);
-        float LlMax = logf(LMax + epsilon);
+        float log_LMin = logf(LMin + epsilon);
+        float log_LMax = logf(LMax + epsilon);
 
-        float LldMin = logf(LdMin + epsilon);
-        float LldMax = logf(LdMax + epsilon);
+        float log_LdMin = logf(LdMin + epsilon);
+        float log_LdMax = logf(LdMax + epsilon);
 
+        float delta_Ld = LdMax - LdMin;
+        float delta_log_L = (log_LMax - log_LMin);
+        float delta_log_Ld = log_LdMax - log_LdMin;
+
+        //compute the histogram with ceiling
         h.calculate(images[1], VS_LOG_E, nBin);
-        h.ceiling();
+        h.ceiling(delta_log_L / (float(nBin) * delta_log_Ld));
 
         Pcum = Array<unsigned int>::cumsum(h.bin, nBin, Pcum);
         float maxPcumf = float(Pcum[nBin - 1]);
 
-        float delta = (LlMax - LlMin);
         for(int i = 0; i < nBin; i++) {
             PcumNorm[i] = float(Pcum[i]) / maxPcumf;
-            x[i] = delta * float(i) / float(nBin - 1) + LlMin;
+            x[i] = delta_log_L * float(i) / float(nBin - 1) + log_LMin;
         }
 
         #pragma omp parallel for
         for(int i = 0; i < images[0]->size(); i++) {
             float L_w =  images[0]->data[i];
 
-            float LLog = logf(L_w + epsilon);
-            float Ld = expf(LldMin + (LldMax - LldMin) * Arrayf::interp(x, PcumNorm, nBin, LLog)) - epsilon;
+            float log_L_w = logf(L_w + epsilon);
+            float Ld = expf(delta_log_Ld * Arrayf::interp(x, PcumNorm, nBin, log_L_w) + log_LdMin) - epsilon;
 
-            images[0]->data[i] = (MAX(Ld, 0.0f) - LdMin) / ((LdMax - LdMin) * L_w);
+            images[0]->data[i] = (MAX(Ld, 0.0f) - LdMin) / (delta_Ld * L_w);
         }
 
         *imgOut *= *images[0];
+
         imgOut->removeSpecials();
 
         return imgOut;
@@ -91,25 +97,19 @@ protected:
      * @brief allocate
      * @param nBin
      */
-    void allocate(int nBin)
+    void allocate(int nBin = 256)
     {
-        nBin = nBin > 1 ? nBin : 256;
+        nBin = nBin > 16 ? nBin : 256;
 
-        if((nBin != this->nBin) || (Pcum == NULL)) {
-            releaseAux();
+        if(this->nBin == nBin) {
+            return;
         }
 
-        if(Pcum == NULL) {
-            Pcum = new unsigned int[nBin];
-        }
+        releaseAux();
 
-        if(PcumNorm == NULL) {
-            PcumNorm = new float[nBin];
-        }
-
-        if(x == NULL) {
-            x = new float[nBin];
-        }
+        Pcum = new unsigned int[nBin];
+        PcumNorm = new float[nBin];
+        x = new float[nBin];
 
         this->nBin = nBin;
     }
@@ -130,9 +130,9 @@ public:
 
     /**
      * @brief WardHistogramTMO
-     * @param nBin
-     * @param LdMin
-     * @param LdMax
+     * @param nBin is the number of bins of the histogram
+     * @param LdMin is the minimum luminance of the LDR display in cd/m^2
+     * @param LdMax is the maximum luminance of the LDR display in cd/m^2
      */
     WardHistogramTMO(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f) : ToneMappingOperator()
     {
@@ -165,9 +165,9 @@ public:
 
     /**
      * @brief update
-     * @param nBin
-     * @param LdMin
-     * @param LdMax
+     * @param nBin is the number of bins of the histogram
+     * @param LdMin is the minimum luminance of the LDR display in cd/m^2
+     * @param LdMax is the maximum luminance of the LDR display in cd/m^2
      */
     void update(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f)
     {
@@ -193,7 +193,7 @@ public:
      */
     static Image* execute(Image *imgIn, Image *imgOut)
     {
-        WardHistogramTMO wtmo(256, 1.0f, 100.0f);
+        WardHistogramTMO wtmo(100, 1.0f, 200.0f);
         return wtmo.Process(Single(imgIn), imgOut);
     }
 };

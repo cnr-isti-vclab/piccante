@@ -254,3 +254,5 @@ examples/data/output/singapore_ssim_map.pfm
 examples/build-hdr_metrics-Desktop_Qt_5_4_2_clang_64bit-Debug/ip_metrics
 examples/data/output/bottles_ssim_map_pu.pfm
 examples/data/output/bottles_ssim_map_lin.pfm
+examples/build-hdr_tone_mapping-Desktop_Qt_5_8_0_clang_64bit-Debug/Makefile
+examples/build-hdr_tone_mapping-Desktop_Qt_5_8_0_clang_64bit-Debug/hdr_tone_mapping
