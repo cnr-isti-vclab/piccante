@@ -152,6 +152,7 @@ public:
         for(int i = 0; i < coeff.size(); i++) {
             ret[i] = coeff[i];
         }
+
         return ret;
     }
 
@@ -238,7 +239,9 @@ public:
     void normalForm()
     {
         int last = coeff.size() - 1;
+
         if(fabsf(coeff[last]) > 0.0f) {
+
             for(int i = 0; i < last; i++) {
                 coeff[i] /= coeff[last];
             }
@@ -342,7 +345,7 @@ public:
             notConverged = (fabsf(E_x_p) > 1e-4f) && (counter < 200);
         }
 
-        if(counter == 200) {
+        if(counter >= 200) {
             return false;
         } else {
             *x = x_n;
@@ -432,7 +435,15 @@ public:
 #endif
     }
 
-    //Solver for second order equations, ax^2 + b x + c = 0
+    /**
+     * @brief getSecondOrderRoots solves second order equations, ax^2 + b x + c = 0
+     * @param a is the a coefficient
+     * @param b is the b coefficient
+     * @param c is the c coefficient
+     * @param x0 is the first zero
+     * @param x1 is the second zero
+     * @return It returns true, if x0 and x1 have a real value, false otherwise
+     */
     static bool getSecondOrderRoots(float a, float b, float c, float *x0, float *x1)
     {
         float delta = b * b - 4.0f * a * c;
@@ -448,7 +459,15 @@ public:
         }
     }
 
-    //Solver for second order equations, ax^2 + b x + c = 0, when b is even
+    /**
+     * @brief getSecondOrderRootsS solves second order equations, ax^2 + 2 b x + c = 0; i.e., 2 b is even!
+     * @param a is the a coefficient
+     * @param b is the b coefficient
+     * @param c is the c coefficient
+     * @param x0 is the first zero
+     * @param x1 is the second zero
+     * @return It returns true, if x0 and x1 have a real value, false otherwise
+     */
     static bool getSecondOrderRootsS(float a, float b, float c, float *x0, float *x1)
     {
         float delta = b * b - a * c;
