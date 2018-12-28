@@ -106,13 +106,14 @@ public:
      * @param alpha
      * @param whitePoint
      * @param phi
+     * @param sig_mode
      */
-    ReinhardTMO(float alpha = 0.18f, float whitePoint = -1.0f, float phi = 8.0f)
+    ReinhardTMO(float alpha = 0.18f, float whitePoint = -1.0f, float phi = 8.0f, SIGMOID_MODE sig_mode = SIG_TMO)
     {
         images.push_back(NULL);
         images.push_back(NULL);
         images.push_back(NULL);
-        update(alpha, whitePoint, phi);
+        update(alpha, whitePoint, phi, sig_mode);
     }
 
     ~ReinhardTMO()
@@ -159,8 +160,9 @@ public:
      * @param alpha
      * @param whitePoint
      * @param phi
+     * @param sig_mode
      */
-    void update(float alpha = 0.18f, float whitePoint = -1.0f, float phi = 8.0f)
+    void update(float alpha = 0.18f, float whitePoint = -1.0f, float phi = 8.0f, SIGMOID_MODE sig_mode = SIG_TMO)
     {
         this->alpha = alpha;
         this->whitePoint = whitePoint;

@@ -232,8 +232,13 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
 
                 float Lm = L * alpha_over_epsilon;
                 float Lm_flt = L_flt * alpha_over_epsilon;
+                float Ld;
 
-                float Ld = Lm / (1.0f + Lm_flt);
+                if(type == SIG_TMO_WP) {
+                    Ld = L * (1.0f + L / wp_sq) / (1.0f + Lm_flt);
+                } else {
+                    Ld = Lm / (1.0f + Lm_flt);
+                }
 
                 for(int k = 0; k < dst->channels; k++) {
                     dstOut[k] = (p[k] * Ld) / L;
