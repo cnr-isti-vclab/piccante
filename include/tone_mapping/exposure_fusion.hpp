@@ -133,7 +133,7 @@ protected:
         #endif
 
 
-        int limitLevel = 1;
+        int limitLevel = 2;
 
         releaseAux();
 
@@ -167,7 +167,9 @@ protected:
 
         imgOut->applyFunction(setNegToZero);
 
-
+        float maxVal;
+        imgOut->getMaxVal(NULL, &maxVal);
+        *imgOut /= maxVal;
         return imgOut;
     }
 

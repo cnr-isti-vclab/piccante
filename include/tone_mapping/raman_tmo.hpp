@@ -22,7 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../util/std_util.hpp"
 
 #include "../filtering/filter_luminance.hpp"
-#include "../filtering/filter_bilateral_2ds.hpp"
+#include "../filtering/filter_bilateral_2dg.hpp"
 
 #include "../tone_mapping/get_all_exposures.hpp"
 #include "../tone_mapping/tone_mapping_operator.hpp"
@@ -35,7 +35,6 @@ namespace pic {
 class RamanTMO: public ToneMappingOperator
 {
 protected:
-    FilterBilateral2DS flt_bil;
     FilterLuminance flt_lum;
 
     /**
@@ -80,16 +79,11 @@ protected:
 
         int width = imgIn[0]->width;
         int height = imgIn[0]->height;
-        int channels = imgIn[0]->channels;
 
         float sigma_s = K1 * MIN(width, height);
         float imageStackMin = 0.0f;
         float imageStackMax = 1.0f;
         float sigma_r = K2 * (imageStackMax - imageStackMin);
-
-        flt_bil.update(sigma_s, sigma_r, 1, ST_BRIDSON);
-
-        //compute weights values
 
         updateImage(imgIn[0]);
 
@@ -108,8 +102,8 @@ protected:
             images[0] = flt_lum.Process(Single(imgIn[j]), images[0]);
 
             //images[1] --> weights
-            images[1] = flt_bil.Process(Single(images[0]), images[1]);
-            images[1] -= images[0];
+            images[1] = FilterBilateral2DG::execute(images[0], images[1], sigma_s, sigma_r);
+            *images[1] -= *images[0];
             images[1]->applyFunction(fabsf);
             *images[1] += C;
 
@@ -125,16 +119,16 @@ protected:
 
         for(int j = 0; j < n; j++) {
             images[0] = flt_lum.Process(Single(imgIn[j]), images[0]);
-            images[1] = flt_bil.Process(Single(images[0]), images[1]);
-            images[1] -= images[0];
+
+            images[1] = FilterBilateral2DG::execute(images[0], images[1], sigma_s, sigma_r);
+            *images[1] -= *images[0];
             images[1]->applyFunction(fabsf);
             *images[1] += C;
 
             //normalization
-            *images[1] /= *images[2];
-
             auto tmp = imgIn[j]->clone();
             *tmp *= *images[1];
+            *tmp /= *images[2];
 
             *imgOut += *tmp;
         }

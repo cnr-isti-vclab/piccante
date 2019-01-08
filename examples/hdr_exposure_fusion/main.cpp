@@ -51,14 +51,14 @@ int main(int argc, char *argv[])
 
         printf("Tone mapping using Exposure Fusion...");
 
-        pic::Image *imgToneMapped = pic::ExposureFusion::execute(&img, NULL);
+        pic::Image *img_ef = pic::ExposureFusion::execute(&img, NULL);
         printf("Ok\n");
 
         printf("Writing the tone mapped image to disk...\n");
 
         std::string name = pic::removeLocalPath(img_str);
 
-        bool bWritten = imgToneMapped->Write("../data/output/"+ pic::removeExtension(name)  + "_ef.png", pic::LT_NOR);
+        bool bWritten = img_ef->Write("../data/output/"+ pic::removeExtension(name)  + "_ef.png", pic::LT_NOR);
 
         if(bWritten) {
             printf("Ok\n");
@@ -66,6 +66,17 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
+        printf("Tone mapping using Raman Fusion Operator...");
+
+        pic::Image *img_rf = pic::RamanTMO::execute(&img, NULL);
+
+        bWritten = img_rf->Write("../data/output/"+ pic::removeExtension(name)  + "_rf.png", pic::LT_NOR);
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
     } else {
         printf("No it is not a valid file!\n");
     }

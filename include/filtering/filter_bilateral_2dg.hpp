@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 //#define BILATERAL_GRID_MULTI_PASS
 
+#include "../util/std_util.hpp"
+
 #include "../filtering/filter.hpp"
 #include "../filtering/filter_gaussian_3d.hpp"
 #include "../image_samplers/image_sampler_bilinear.hpp"
@@ -101,10 +103,12 @@ public:
     {
         FilterBilateral2DG filter(sigma_s, sigma_r);
 
-        long t0 = timeGetTime();
+        //long t0 = timeGetTime();
+
         imgOut = filter.Process(Single(imgIn), NULL); //Filtering
-        long t1 = timeGetTime();
-        printf("Bilateral Grid Filter time: %f\n", float(t1 - t0) / 1000.0f);
+
+        //long t1 = timeGetTime();
+        //printf("Bilateral Grid Filter time: %f\n", float(t1 - t0) / 1000.0f);
 
         return imgOut;
     }
@@ -126,17 +130,9 @@ PIC_INLINE FilterBilateral2DG::FilterBilateral2DG(float sigma_s, float sigma_r) 
 
 PIC_INLINE FilterBilateral2DG::~FilterBilateral2DG()
 {
-    if(grid != NULL) {
-        delete grid;
-    }
-
-    if(gridBlur != NULL) {
-        delete gridBlur;
-    }
-
-    if(fltG != NULL) {
-        delete fltG;
-    }
+    delete_s(grid);
+    delete_s(gridBlur);
+    delete_s(fltG);
 }
 
 PIC_INLINE Image *FilterBilateral2DG::Splat(Image *base, Image *edge, int channels)
@@ -155,15 +151,21 @@ PIC_INLINE Image *FilterBilateral2DG::Splat(Image *base, Image *edge, int channe
         #endif
 
 #ifdef PIC_BILATERAL_GRID_MULTI_PASS
+        #ifdef PIC_DEBUG
         printf("Grid - Memory Mb: %3.2f\n",
                float(width + 1)*float(height + 1)*float(range + 1) * 8.0f /
                (1024.0f * 1024.0f));
+        #endif
+
         grid = new Image(range + 1, width + 1, height + 1, 2);
         gridBlur = new Image(range + 1, width + 1, height + 1, 2);
 #else
+        #ifdef PIC_DEBUG
         printf("Grid - Memory Mb: %3.2f\n",
                float(width + 1)*float(height + 1)*float(range + 1) * 16.0f /
                (1024.0f * 1024.0f));
+        #endif
+
         grid = new Image(range + 1, width + 1, height + 1, base->channels + 1);
         gridBlur = new Image(range + 1, width + 1, height + 1, base->channels + 1);
 #endif
@@ -251,7 +253,6 @@ PIC_INLINE void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge,
             }
 
 #else
-
             if(vOut[out->channels] > 0.0f) {
                 for(int k = 0; k < out->channels; k++) {
                     out->data[ind + k] = vOut[k] / vOut[out->channels];
