@@ -29,6 +29,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "tone_mapping/durand_tmo.hpp"
 #include "tone_mapping/ferwerda_tmo.hpp"
 #include "tone_mapping/schlick_tmo.hpp"
+#include "tone_mapping/raman_tmo.hpp"
+
 
 #endif /* PIC_TONE_MAPPING_HPP */
 

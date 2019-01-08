@@ -44,11 +44,20 @@ int main(int argc, char *argv[])
 
         bool bWritten;
 
+        printf("Tone mapping using Raman et al. 2009 TMO...");
+        pic::Image *img_tmo_raman = pic::RamanTMO::execute(&img, NULL);
+        /*pic::LT_NOR_GAMMA implies that when we save the image,
+          this is quantized at 8-bit and gamma is applied.
+          Note that pic::Schlick tone maps an HDR image
+          but it does not apply gamma.*/
+        bWritten = img_tmo_raman->Write("../data/output/img_tmo_raman.png", pic::LT_NOR_GAMMA);
+
+
         printf("Tone mapping using Schlick 1994 TMO...");
         pic::Image *img_tmo_schlick = pic::SchlickTMO::execute(&img, NULL);
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
-          Note that pic::FerwerdaTMO tone maps an HDR image
+          Note that pic::Schlick tone maps an HDR image
           but it does not apply gamma.*/
         bWritten = img_tmo_schlick->Write("../data/output/img_tmo_schlick.png", pic::LT_NOR_GAMMA);
 

@@ -55,13 +55,19 @@ int main(int argc, char *argv[])
 
         printf("Fusing the aligned images... ");
         auto image_vec = pic::Triple(img_bright, &img[0], img_dark);
-        pic::Image *imgOut = pic::ExposureFusion::executeStack(image_vec, NULL);
+        pic::Image *imgOut1 = pic::ExposureFusion::executeStack(image_vec, NULL);
+
+        if(imgOut1 != NULL) {
+            imgOut1->Write("../data/output/stack_aligned_exposure_fusion.png", pic::LT_NOR);
+        }
+
+        pic::Image *imgOut2 = pic::RamanTMO::executeStack(image_vec, NULL);
+
+        if(imgOut2 != NULL) {
+            imgOut2->Write("../data/output/stack_aligned_raman.png", pic::LT_NOR);
+        }
 
         printf("Ok\n");
-
-        if(imgOut != NULL) {
-            imgOut->Write("../data/output/stack_aligned.png", pic::LT_NOR);
-        }
 
     } else {
         printf("No, the files are not valid!\n");
