@@ -68,7 +68,7 @@ protected:
             scale[1] = 0.97f;
             scale[2] = 1.27f;
         } else {
-           Arrayf::assign(0.0f, scale, channels);
+           Arrayf::assign(1.0f, scale, channels);
         }
 
         for(int i = 0; i < channels; i++) {
@@ -87,6 +87,7 @@ protected:
             }
         }
 
+        //NOTE: this is done to have values in [0,1] and not in cd/m^2!
         *imgOut /= Ld_Max;
 
         return imgOut;

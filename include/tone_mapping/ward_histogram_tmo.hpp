@@ -66,7 +66,10 @@ protected:
 
         //compute the histogram with ceiling
         h.calculate(images[1], VS_LOG_E, nBin);
-        h.ceiling(delta_log_L / (float(nBin) * delta_log_Ld));
+
+        if(bCeiling) {
+            h.ceiling(delta_log_L / (float(nBin) * delta_log_Ld));
+        }
 
         Pcum = Array<unsigned int>::cumsum(h.bin, nBin, Pcum);
         float maxPcumf = float(Pcum[nBin - 1]);
@@ -123,6 +126,7 @@ protected:
     unsigned int *Pcum;
     float *PcumNorm, *x;
 
+    bool bCeiling;
     FilterLuminance flt_lum;
     FilterSampler2D flt_smp;
 
@@ -133,13 +137,15 @@ public:
      * @param nBin is the number of bins of the histogram
      * @param LdMin is the minimum luminance of the LDR display in cd/m^2
      * @param LdMax is the maximum luminance of the LDR display in cd/m^2
+     * @param bCeiling enables histogram ceiling or not
      */
-    WardHistogramTMO(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f) : ToneMappingOperator()
+    WardHistogramTMO(int nBin = 256, float LdMin = 1.0f, float LdMax = 100.0f, bool bCeiling = true) : ToneMappingOperator()
     {
         this->Pcum = NULL;
         this->PcumNorm = NULL;
         this->x = NULL;
         this->nBin = 0;
+        this->bCeiling = bCeiling;
 
         images.clear();
         images.push_back(NULL);
