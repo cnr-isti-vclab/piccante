@@ -79,10 +79,30 @@ PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
 }
 
 /**
- * @brief getAllExposures converts an image into a stack of exposure values which
- * generates all required exposure images for reconstructing the input image.
- * @param imgIn is an input image.
- * @return It returns an array of exposure values encoding the
+ * @brief getAllExposuresUniform computes all required exposure values for reconstructing the input image
+ * using uniform sampling
+ * @param imgIn is an input image
+ * @return It returns an std::vector<float> with all f-stops values encoding imgIn
+ */
+PIC_INLINE std::vector<float> getAllExposuresUniform(Image *imgIn)
+{
+    std::vector<float> ret;
+
+    int iMin, iMax;
+    getMinMaxFstops(imgIn, iMin, iMax);
+
+    for(int i = iMin; i <= iMax; i++) {
+        ret.push_back(i);
+    }
+
+    return ret;
+}
+
+/**
+ * @brief getAllExposures computes all required exposure values for reconstructing the input image
+ * using histogram sampling
+ * @param imgIn is an input image
+ * @return It returns an std::vector<float> with all exposure values encoding imgIn
  */
 PIC_INLINE std::vector<float> getAllExposures(Image *imgIn) {
     std::vector<float> fstops;

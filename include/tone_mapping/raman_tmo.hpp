@@ -48,7 +48,11 @@ protected:
         if(imgIn.size() > 1) {
             return ProcessAuxStack(imgIn, imgOut);
         } else {
-            pic::ImageVec stack = getAllExposuresImages(imgIn[0]);
+
+            std::vector<float> fstops = getAllExposuresUniform(imgIn[0]);
+            ImageVec stack = getAllExposuresImages(imgIn[0], fstops);
+
+            //pic::ImageVec stack = getAllExposures(imgIn[0]);
 
             imgOut = ProcessAuxStack(stack, imgOut);
 
@@ -56,6 +60,17 @@ protected:
 
             return imgOut;
         }
+    }
+
+    /**
+     * @brief ramanFunction
+     * @param x
+     * @param param
+     * @return
+     */
+    static float ramanFunction(float x, std::vector<float>& param)
+    {
+        return fabsf(x) + param[0];
     }
 
     /**
@@ -77,7 +92,7 @@ protected:
         float K2 = 0.1f;
         float C = 70.0f / 255.0f;
 
-        int width = imgIn[0]->width;
+        int width  = imgIn[0]->width;
         int height = imgIn[0]->height;
 
         float sigma_s = K1 * MIN(width, height);
@@ -87,28 +102,15 @@ protected:
 
         updateImage(imgIn[0]);
 
-        if(images[2] == NULL) {//images[2] --> acc
+        std::vector<float> param;
+        param.push_back(C);
+
+        if(images[2] == NULL) {
+            //images[2] --> acc
             images[2] = new Image(1, width, height, 1);
         }
 
         images[2]->setZero();
-
-        for(int j = 0; j < n; j++) {
-            #ifdef PIC_DEBUG
-                printf("Processing image %d\n", j);
-            #endif
-
-            //images[0] --> lum
-            images[0] = flt_lum.Process(Single(imgIn[j]), images[0]);
-
-            //images[1] --> weights
-            images[1] = FilterBilateral2DG::execute(images[0], images[1], sigma_s, sigma_r);
-            *images[1] -= *images[0];
-            images[1]->applyFunction(fabsf);
-            *images[1] += C;
-
-            *images[2] += *images[1];
-        }
 
         //accumulate into a Pyramid
         #ifdef PIC_DEBUG
@@ -122,16 +124,18 @@ protected:
 
             images[1] = FilterBilateral2DG::execute(images[0], images[1], sigma_s, sigma_r);
             *images[1] -= *images[0];
-            images[1]->applyFunction(fabsf);
-            *images[1] += C;
+            images[1]->applyFunctionParam(ramanFunction, param);
+
+            *images[2] += *images[1];
 
             //normalization
             auto tmp = imgIn[j]->clone();
             *tmp *= *images[1];
-            *tmp /= *images[2];
 
             *imgOut += *tmp;
         }
+
+        *imgOut /= *images[2];
 
         #ifdef PIC_DEBUG
             printf(" ok\n");
