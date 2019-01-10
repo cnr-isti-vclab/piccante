@@ -86,6 +86,7 @@ protected:
         images[2] = flt_sigmoid.Process(Double(images[0], images[1]), images[2]);
 
         //remove HDR luminance and replacing it with LDR one
+        *imgOut = *imgIn[0];
         *imgOut /= *images[0];
         *imgOut *= *images[2];
 

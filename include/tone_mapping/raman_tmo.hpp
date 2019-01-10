@@ -51,7 +51,6 @@ protected:
 
             std::vector<float> fstops = getAllExposuresUniform(imgIn[0]);
             ImageVec stack = getAllExposuresImages(imgIn[0], fstops);
-
             //pic::ImageVec stack = getAllExposures(imgIn[0]);
 
             imgOut = ProcessAuxStack(stack, imgOut);

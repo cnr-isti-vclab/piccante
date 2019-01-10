@@ -98,6 +98,7 @@ public:
         *base -= log_absoulte;
         base->applyFunction(powf10fMinusEpsilon);
 
+        *imgOut = *imgIn[0];
         *imgOut *= base;
         *imgOut /= images[2];
 

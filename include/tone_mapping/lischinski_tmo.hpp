@@ -59,6 +59,12 @@ protected:
         float minL_log = log2fPlusEpsilon(minL);
         float maxL_log = log2fPlusEpsilon(maxL);
 
+        int Z = int(ceilf(maxL_log - minL_log));
+
+        if(Z <= 0) {
+            return imgOut;
+        }
+
         if(alpha <= 0.0f) {
             alpha = ReinhardTMO::estimateAlpha(minL, maxL, Lav);
         }
@@ -68,12 +74,6 @@ protected:
         }
 
         float whitePoint_sq = whitePoint * whitePoint;
-
-        int Z = int(ceilf(maxL_log - minL_log));
-
-        if(Z <= 0) {
-            return imgOut;
-        }
 
         //choose the representative Rz for each zone
         std::vector<float> *zones = new std::vector<float>[Z];
@@ -98,8 +98,8 @@ protected:
                 Rz[i] = zones[i][n / 2];
                 if(Rz[i] > 0.0f) {
                     //photographic operator
-                    float Rz2 = Rz[i] * alpha / Lav;
-                    float f = (Rz2 * (1 + Rz2 / whitePoint_sq) ) / (1.0f + Rz2);
+                    float Rz_s = Rz[i] * alpha / Lav;
+                    float f = (Rz_s * (1.0f + Rz_s / whitePoint_sq) ) / (1.0f + Rz_s);
                     fstop[i] = log2fPlusEpsilon(f / Rz[i]);
                 }
             }
@@ -122,6 +122,8 @@ protected:
         images[2] = LischinskiMinimization(images[0], images[1], NULL, 0.007f, images[2]);
 
         images[2]->applyFunction(pow2f);
+
+        *imgOut = *imgIn[0];
         *imgOut *= images[2];
 
         delete[] zones;
@@ -165,7 +167,7 @@ public:
      */
     static Image *execute(Image *imgIn, Image *imgOut)
     {
-        LischinskiTMO ltmo(0.15f, 1e6f);
+        LischinskiTMO ltmo(0.05f, 1e6f);
         return ltmo.Process(Single(imgIn), imgOut);
     }
 };
