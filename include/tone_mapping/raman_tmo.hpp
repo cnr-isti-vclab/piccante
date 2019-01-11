@@ -95,9 +95,6 @@ protected:
         int height = imgIn[0]->height;
 
         float sigma_s = K1 * MIN(width, height);
-        float imageStackMin = 0.0f;
-        float imageStackMax = 1.0f;
-        float sigma_r = K2 * (imageStackMax - imageStackMin);
 
         updateImage(imgIn[0]);
 
@@ -120,6 +117,12 @@ protected:
 
         for(int j = 0; j < n; j++) {
             images[0] = flt_lum.Process(Single(imgIn[j]), images[0]);
+
+            float min, max;
+
+            images[0]->getMinVal(NULL, &min);
+            images[0]->getMaxVal(NULL, &max);
+            float sigma_r = K2 * (max - min);
 
             images[1] = FilterBilateral2DG::execute(images[0], images[1], sigma_s, sigma_r);
             *images[1] -= *images[0];
