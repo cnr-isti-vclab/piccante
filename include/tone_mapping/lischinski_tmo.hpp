@@ -41,10 +41,6 @@ protected:
      */
     Image *ProcessAux(ImageVec imgIn, Image *imgOut)
     {
-        if(imgIn[0]->channels != 3) {
-            return imgOut;
-        }
-
         updateImage(imgIn[0]);
 
         //extract luminance
@@ -92,13 +88,12 @@ protected:
         }
 
         for(int i = 0; i < Z; i++) {
-            int n = int(zones[i].size());
-            if(n > 0) {
+            if(!zones[i].empty()) {
                 std::sort(zones[i].begin(), zones[i].end());
-                Rz[i] = zones[i][n / 2];
+                Rz[i] = zones[i][zones[i].size() >> 1];
+
                 if(Rz[i] > 0.0f) {
-                    //photographic operator
-                    float Rz_s = Rz[i] * alpha / Lav;
+                    float Rz_s = Rz[i] * alpha / Lav; //photographic operator
                     float f = (Rz_s * (1.0f + Rz_s / whitePoint_sq) ) / (1.0f + Rz_s);
                     fstop[i] = log2fPlusEpsilon(f / Rz[i]);
                 }
@@ -167,12 +162,10 @@ public:
      */
     static Image *execute(Image *imgIn, Image *imgOut)
     {
-        LischinskiTMO ltmo(0.05f, 1e6f);
+        LischinskiTMO ltmo(0.15f, 1e6f);
         return ltmo.Process(Single(imgIn), imgOut);
     }
 };
-
-
 
 } // end namespace pic
 
