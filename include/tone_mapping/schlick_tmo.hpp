@@ -21,7 +21,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../base.hpp"
 
 #include "../util/array.hpp"
+#include "../util/indexed_array.hpp"
 
+#include "../image.hpp"
 #include "../filtering/filter.hpp"
 #include "../filtering/filter_luminance.hpp"
 #include "../tone_mapping/tone_mapping_operator.hpp"
@@ -50,52 +52,48 @@ protected:
         updateImage(imgIn[0]);
 
         //compute luminance and its statistics
+        float LMin, LMax;
+
         images[0] = flt_lum.Process(imgIn, images[0]);
 
-        float LMin, LMax;
-        LMin = images[0]->getGT(0.0f);
+        IntCoord ret;
+        IndexedArray::findSimple(images[0]->data, images[0]->size(), IndexedArray::bFuncNotNeg, ret, 1);
+        LMin = IndexedArray::percentile(images[0]->data, ret, 0.01f);
+
         images[0]->getMaxVal(NULL, &LMax);
 
         int channels = imgIn[0]->channels;
 
-        float p_prime = p;
+        bool bNonUniform = (mode.compare("nonuniform") == 0);
 
-        bool bNonUniform = false;
-
-        if(mode.compare("automatic") == 0) {
+        float p_prime;
+        if((mode.compare("automatic") == 0) || bNonUniform) {
             int nValues = 1 << nBit;
             p_prime = L0 * LMax / (float(nValues) * LMin);
-        }
-
-        if(mode.compare("nonuniform") == 0) {
-            int nValues = 1 << nBit;
-            p_prime = L0 * LMax / (float(nValues) * LMin);
-            bNonUniform = true;
+        } else {
+            p_prime = p;
         }
 
         float cSqrtLminLmax = sqrtf(LMin * LMax);
 
         #pragma omp parallel for
-        for(int i = 0; i < imgIn[0]->size(); i += channels) {
+        for(int i = 0; i < images[0]->size(); i++) {
 
-            int indexL = i / channels;
-            float Lw = images[0]->data[indexL];
-
-            float p_prime_w = p_prime;
+            float Lw = images[0]->data[i];
 
             if(Lw > 0.0f) {
+                float p_prime_w = p_prime;
 
                 if(bNonUniform) {
-                    p_prime_w = (1.0f - k + k * Lw / cSqrtLminLmax);
+                    p_prime_w *= (1.0f - k + k * Lw / cSqrtLminLmax);
                 }
 
-                float Ld = p_prime_w * Lw / ((p_prime_w - 1.0f) * Lw + LMax);
+                float Ld = (p_prime_w * Lw) / ((p_prime_w - 1.0f) * Lw + LMax);
 
-                float scale = Ld / Lw;
-
+                int index = i * channels;
                 for(int j = 0; j < channels; j++) {
-                    int index = i + j;
-                    imgOut->data[index] = imgIn[0]->data[index] * scale;
+                    int k = index + j;
+                    imgOut->data[k] = (imgIn[0]->data[k] * Ld) / Lw;
                 }
             }
         }
@@ -149,7 +147,7 @@ public:
      */
     static Image *execute(Image *imgIn, Image *imgOut)
     {
-        SchlickTMO stmo("nonuniform", 1.0f / 0.005f, 8, 1.0f, 0.5f);
+        SchlickTMO stmo("automatic", 1.0f / 0.005f, 8, 1.0f, 0.5f);
         return stmo.Process(Single(imgIn), imgOut);
     }
 };

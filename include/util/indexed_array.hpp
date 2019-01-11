@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
+#include "../util/math.hpp"
+
 namespace pic {
 
 /**
@@ -44,7 +46,7 @@ public:
      */
     static bool bFuncNotNeg(float val)
     {
-        return (val > 0.0f);
+        return val > 0.0f;
     }
 
     /**
@@ -114,29 +116,11 @@ public:
 
         float ret = 0.0f;
 
-        for(unsigned int i = 0; i < coord.size(); i++) {
+        for(auto i = 0; i < coord.size(); i++) {
             ret += data[coord[i]];
         }
 
         return ret / float(coord.size());
-    }
-
-    /**
-     * @brief max computes the max value.
-     * @param data
-     * @param coord
-     * @return
-     */
-    static float max(float *data, IntCoord &coord)
-    {
-        float ret = -FLT_MAX;
-
-        for(unsigned int i = 0; i < coord.size(); i++) {
-            int j = coord[i];
-            ret = ret < data[j] ? data[j] : ret;
-        }
-
-        return ret;
     }
 
     /**
@@ -147,12 +131,69 @@ public:
      */
     static float min(float *data, IntCoord &coord)
     {
-        float ret = FLT_MAX;
-
-        for(unsigned int i = 0; i < coord.size(); i++) {
-            int j = coord[i];
-            ret = ret > data[j] ? data[j] : ret;
+        if(coord.empty()) {
+            return FLT_MAX;
         }
+
+        float ret = data[coord[0]];
+
+        for(auto i = 1; i < coord.size(); i++) {
+            int j = coord[i];
+            ret = MIN(ret, data[j]);
+        }
+
+        return ret;
+    }
+
+    /**
+     * @brief max computes the max value.
+     * @param data
+     * @param coord
+     * @return
+     */
+    static float max(float *data, IntCoord &coord)
+    {
+        if(coord.empty()) {
+            return -FLT_MAX;
+        }
+
+        float ret = data[coord[0]];
+
+        for(auto i = 1; i < coord.size(); i++) {
+            int j = coord[i];
+            ret = MAX(ret, data[j]);
+        }
+
+        return ret;
+    }
+
+    /**
+     * @brief percentile
+     * @param data
+     * @param coord
+     * @param percent
+     * @return
+     */
+    static float percentile(float *data, IntCoord &coord, float percent)
+    {
+        if(coord.empty()) {
+            return FLT_MAX;
+        }
+
+        auto n = coord.size();
+        float *tmp = new float[n];
+
+        for(auto i = 0; i < n; i++) {
+            int j = coord[i];
+            tmp[i] = data[j];
+        }
+
+        std::sort(tmp, tmp + n);
+
+        percent = CLAMPi(percent, 0.0f, 1.0f);
+
+        float ret = tmp[int(float(n - 1) * percent)];
+        delete[] tmp;
 
         return ret;
     }
@@ -164,7 +205,7 @@ public:
      */
     static void scale(IntCoord &coord, int scale)
     {
-        for(unsigned int i = 0; i < coord.size(); i++) {
+        for(auto i = 0; i < coord.size(); i++) {
             coord.at(i) = coord.at(i) * scale;
         }
     }
@@ -184,7 +225,7 @@ public:
         float delta = 1e-6f;
         float ret = 0.0f;
 
-        for(unsigned int i = 0; i < coord.size(); i++) {
+        for(auto i = 0; i < coord.size(); i++) {
             int j = coord[i];
             ret += log10f(data[j] + delta);
         }
@@ -208,7 +249,7 @@ public:
         float ret = 0.0f;
         float log2f = logf(2.0f);
 
-        for(unsigned int i = 0; i < coord.size(); i++) {
+        for(auto i = 0; i < coord.size(); i++) {
             int j = coord[i];
             ret += logf(data[j] + delta) / log2f;
         }

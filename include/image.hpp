@@ -457,13 +457,6 @@ public:
     float getMedVal();
 
     /**
-     * @brief getGT finds the first value greater than val.
-     * @param val is the reference value.
-     * @return This function returns the first value greater than val.
-     */
-    float getGT(float val);
-
-    /**
      * @brief getDynamicRange computes the dynamic range of the image.
      * @param bRobust is a value that enables robust computation of the dynamic range using percentile.
      * @param percentile is the percentile value used when computing the dynamic range in a robust way.
@@ -1276,27 +1269,6 @@ PIC_INLINE float Image::getPercentileVal(float perCent = 0.5f)
 PIC_INLINE float Image::getMedVal()
 {
     return getPercentileVal(0.5f);
-}
-
-PIC_INLINE float Image::getGT(float val)
-{
-    if(!isValid()) {
-        return -1.0f;
-    }
-
-    if(dataTMP == NULL) {
-        sort();
-    }
-
-    int size = frames * width * height * channels;
-
-    for(int i = 0; i < size; i++) {
-        if(dataTMP[i] > val) {
-            return dataTMP[i];
-        }
-    }
-
-    return -1.0f;
 }
 
 PIC_INLINE float Image::getDynamicRange(bool bRobust = false, float percentile = 0.99f)

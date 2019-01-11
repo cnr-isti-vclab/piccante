@@ -86,10 +86,14 @@ protected:
             float log_L_w = logf(L_w + epsilon);
             float Ld = expf(delta_log_Ld * Arrayf::interp(x, PcumNorm, nBin, log_L_w) + log_LdMin) - epsilon;
 
-            images[0]->data[i] = (MAX(Ld, 0.0f) - LdMin) / (delta_Ld * L_w);
-        }
+            float scale = (MAX(Ld, 0.0f) - LdMin) / (delta_Ld * L_w);
 
-        *imgOut *= *images[0];
+            int index = i * imgOut->channels;
+            for(int j = 0; j < imgOut->channels; j++) {
+                int k = index + j;
+                imgOut->data[k] = imgIn[0]->data[k] * scale;
+            }
+        }
 
         imgOut->removeSpecials();
 
