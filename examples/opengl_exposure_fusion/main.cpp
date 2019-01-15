@@ -33,6 +33,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QVBoxLayout>
 #include <QLabel>
 
+#define PIC_DEBUG
 #include "piccante.hpp"
 
 class GLWidget : public QGLWidget, protected QOpenGLFunctions

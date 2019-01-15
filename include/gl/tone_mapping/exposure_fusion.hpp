@@ -42,7 +42,7 @@ protected:
 
     FilterGLLuminance *flt_lum;
     FilterGLExposureFusionWeights *flt_weights;
-    FilterGLOp *remove_negative, *convert_zero_to_one;    
+    FilterGLOp *remove_negative;
 
     ImageGL *lum, *acc, *weights;
 
@@ -66,10 +66,6 @@ protected:
             remove_negative = new FilterGLOp("max(I0, vec4(0.0))", true, NULL, NULL);
             remove_negative->bDelete = true;
             filters.push_back(remove_negative);
-
-            convert_zero_to_one = new FilterGLOp("I0.x > 0.0 ? I0 : vec4(1.0)", true, NULL, NULL);
-            convert_zero_to_one->bDelete = true;
-            filters.push_back(convert_zero_to_one);
 
             flt_weights = new FilterGLExposureFusionWeights(wC, wE, wS);
             flt_weights->bDelete = true;
@@ -187,7 +183,7 @@ public:
      */
     ImageGL *ProcessStack(ImageGLVec imgIn, ImageGL *imgOut = NULL)
     {
-        int n = int(imgIn.size());
+        unsigned int n = imgIn.size();
 
         if(n < 2) {
             return imgOut;
@@ -197,19 +193,17 @@ public:
 
         //compute weights values
         *acc = 0.0f;
-        for(int j = 0; j < n; j++) {
+        for(unsigned int j = 0; j < n; j++) {
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
             weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 
             *acc += *weights;
         }
 
-        convert_zero_to_one->Process(SingleGL(acc), acc);
-
         //accumulate on a pyramid
         pOut->setValue(0.0f);
 
-        for(int j = 0; j < n; j++) {
+        for(unsigned int j = 0; j < n; j++) {
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
             weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 

@@ -109,13 +109,18 @@ PIC_INLINE void FilterGLExposureFusionWeights::FragmentShader()
         pSat = pow(pSat, wS);\n
 
         //well-exposedness weight
-        float L = texelFetch(u_tex_lum, coords, 0).x;\n
-        float tmp = (L - mu);\n
-        float pExp = exp(-(tmp * tmp) / sigma_sq_2);\n
+        float pExp = 1.0;\n
+        float delta;\n
+        delta = (color.x - mu);\n
+        pExp *= exp(-(delta * delta) / sigma_sq_2);\n
+        delta = (color.y - mu);\n
+        pExp *= exp(-(delta * delta) / sigma_sq_2);\n
+        delta = (color.z - mu);\n
+        pExp *= exp(-(delta * delta) / sigma_sq_2);\n
         pExp = pow(pExp, wE);\n
 
         //contrast weight
-        float pCon = -4.0 * L;
+        float pCon = -4.0 * texelFetch(u_tex_lum, coords, 0).x;
         pCon += texelFetch(u_tex_lum, coords + ivec2(1, 0), 0).x;\n
         pCon += texelFetch(u_tex_lum, coords - ivec2(1, 0), 0).x;\n
         pCon += texelFetch(u_tex_lum, coords + ivec2(0, 1), 0).x;\n
@@ -123,7 +128,7 @@ PIC_INLINE void FilterGLExposureFusionWeights::FragmentShader()
         pCon = abs(pCon);\n
         pCon = pow(pCon, wC);\n
 
-        f_color = vec4(vec3(pCon * pExp * pSat), 1.0);\n
+        f_color = vec4(vec3(pCon * pExp * pSat + 1e-12), 1.0);\n
     }\n
                       );
 }

@@ -61,12 +61,15 @@ protected:
                         pCurN0[0] + pCurS0[0] + pCurE0[0] + pCurW0[0]);
 
                 //well-exposedness
-                float tmpL = pCur0[0] - mu;
-                float pExp = expf(-(tmpL * tmpL) / sigma_sq_2);
+                float pExp = 1.0f;
+                for(int c= 0; c < src[1]->channels; c++) {
+                    float delta = pCur1[c] - mu;
+                    pExp *= expf(-(delta * delta) / sigma_sq_2);
+                }
 
                 //final weights
                 float *out = (*dst)(i, j);
-                out[0] = powf(pCon, wC) * powf(pExp, wE) * powf(pSat, wS);
+                out[0] = powf(pCon, wC) * powf(pExp, wE) * powf(pSat, wS) + 1e-12f;
             }
         }
     }

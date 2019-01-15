@@ -45,16 +45,6 @@ protected:
     Pyramid *pW, *pI, *pOut;
 
     /**
-     * @brief ifNegGetOne
-     * @param x
-     * @return
-     */
-    static float ifNegGetOne(float x)
-    {
-        return x > 0.0f ? x : 1.0f;
-    }
-
-    /**
      * @brief setNegToZero
      * @param x
      * @return
@@ -121,13 +111,11 @@ protected:
             *images[2] += *images[1];
         }
 
-        images[2]->applyFunction(ifNegGetOne);
-
         //accumulate into a Pyramid
 
         releaseAux();
 
-        int limitLevel = 1;
+        int limitLevel = 0;
         pW = new Pyramid(width, height, 1, false, limitLevel);
         pI = new Pyramid(width, height, channels, true, limitLevel);
         pOut = new Pyramid(width, height, channels, true, limitLevel);

@@ -276,7 +276,7 @@ PIC_INLINE void PyramidGL::update(ImageGL *img)
         return;
     }
 
-    if(stack.empty() || !img->isValid()) {
+    if(stack.empty()) {
         return;
     }
 
