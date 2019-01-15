@@ -187,7 +187,7 @@ public:
      */
     ImageGL *ProcessStack(ImageGLVec imgIn, ImageGL *imgOut = NULL)
     {
-        unsigned int n = imgIn.size();
+        int n = int(imgIn.size());
 
         if(n < 2) {
             return imgOut;
@@ -197,13 +197,8 @@ public:
 
         //compute weights values
         *acc = 0.0f;
-        for(unsigned int j = 0; j < n; j++) {
-            #ifdef PIC_DEBUG
-                printf("Processing image %d\n", j);
-            #endif
-
+        for(int j = 0; j < n; j++) {
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
-
             weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 
             *acc += *weights;
@@ -212,13 +207,9 @@ public:
         convert_zero_to_one->Process(SingleGL(acc), acc);
 
         //accumulate on a pyramid
-        #ifdef PIC_DEBUG
-            printf("Blending...");
-        #endif
-
         pOut->setValue(0.0f);
 
-        for(unsigned int j = 0; j < n; j++) {
+        for(int j = 0; j < n; j++) {
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
             weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 
@@ -232,10 +223,6 @@ public:
 
             pOut->add(pI);
         }
-
-        #ifdef PIC_DEBUG
-            printf(" ok\n");
-        #endif
 
         //final result
         imgOut = pOut->reconstruct(imgOut);

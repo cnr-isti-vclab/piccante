@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 #include "../util/std_util.hpp"
+#include "../util/array.hpp"
 #include "../colors/saturation.hpp"
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_laplacian.hpp"
@@ -50,7 +51,7 @@ protected:
      */
     static float ifNegGetOne(float x)
     {
-        return x > 0.0 ? x : 1.0f;
+        return x > 0.0f ? x : 1.0f;
     }
 
     /**
@@ -112,13 +113,8 @@ protected:
         images[2]->setZero();
 
         for(int j = 0; j < n; j++) {
-            #ifdef PIC_DEBUG
-                printf("Processing image %d\n", j);
-            #endif
-
             //images[0] --> lum
             images[0] = flt_lum.Process(Single(imgIn[j]), images[0]);
-
             //images[0] --> weights
             images[1] = flt_weights.Process(Double(images[0], imgIn[j]), images[1]);
 
@@ -128,15 +124,10 @@ protected:
         images[2]->applyFunction(ifNegGetOne);
 
         //accumulate into a Pyramid
-        #ifdef PIC_DEBUG
-            printf("Blending...");
-        #endif
-
-
-        int limitLevel = 2;
 
         releaseAux();
 
+        int limitLevel = 1;
         pW = new Pyramid(width, height, 1, false, limitLevel);
         pI = new Pyramid(width, height, channels, true, limitLevel);
         pOut = new Pyramid(width, height, channels, true, limitLevel);
@@ -158,18 +149,11 @@ protected:
             pOut->add(pI);
         }
 
-        #ifdef PIC_DEBUG
-            printf(" ok\n");
-        #endif
-
         //final result
         imgOut = pOut->reconstruct(imgOut);
 
         imgOut->applyFunction(setNegToZero);
 
-        float maxVal;
-        imgOut->getMaxVal(NULL, &maxVal);
-        *imgOut /= maxVal;
         return imgOut;
     }
 

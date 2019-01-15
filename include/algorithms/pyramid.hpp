@@ -194,6 +194,7 @@ PIC_INLINE Pyramid::Pyramid(int width, int height, int channels, bool lapGauss, 
     setNULL();
 
     Image *img = new Image(1, width, height, channels);
+    *img = 0.0f;
 
     create(img, lapGauss, limitLevel);
 
@@ -234,7 +235,7 @@ PIC_INLINE void Pyramid::create(Image *img, bool lapGauss, int limitLevel = 1)
         return;
     }
 
-    limitLevel = MAX(limitLevel, 1);
+    limitLevel = MAX(limitLevel, 0);
 
     this->limitLevel = limitLevel;
     this->lapGauss  = lapGauss;
@@ -248,16 +249,14 @@ PIC_INLINE void Pyramid::create(Image *img, bool lapGauss, int limitLevel = 1)
     Image *tmpD = NULL;
 
     for(int i = 0; i < levels; i++) {
-
         tmpG = flt_gauss->Process(Single(tmpImg), NULL);
-
         tmpD = flt_sampler->Process(Single(tmpG), NULL);
 
         if(lapGauss) { //Laplacian Pyramid
             flt_sub->Process(Double(tmpImg, tmpD), tmpG);
             stack.push_back(tmpG);
         } else { //Gaussian Pyramid
-            tmpG->assign(tmpImg);
+            *tmpG = *tmpImg;
             stack.push_back(tmpG);
         }
 
@@ -279,7 +278,6 @@ PIC_INLINE void Pyramid::create(Image *img, bool lapGauss, int limitLevel = 1)
 
 PIC_INLINE void Pyramid::update(Image *img)
 {
-    //TODO: check if the image and the pyramid are compatible
     if(img == NULL) {
         return;
     }
@@ -292,14 +290,13 @@ PIC_INLINE void Pyramid::update(Image *img)
         return;
     }
 
-    Image *tmpImg = img;
-
     Image *tmpG = NULL;
     Image *tmpD = NULL;
+    Image *tmpImg = img;
 
-    unsigned int levels = MAX(log2(MIN(img->width, img->height)) - limitLevel, 1);
+    int levels = MAX(log2(MIN(img->width, img->height)) - limitLevel, 1);
 
-    for(unsigned int i = 0; i < levels; i++) {
+    for(int i = 0; i < levels; i++) {
 
         tmpG = flt_gauss->Process(Single(tmpImg), stack[i]);
 
@@ -380,7 +377,8 @@ PIC_INLINE void Pyramid::add(const Pyramid *pyr)
 
 PIC_INLINE void Pyramid::blend(Pyramid *pyr, Pyramid *weight)
 {
-    if((stack.size() != pyr->stack.size()) && (pyr->stack.size() > 0)) {
+    if(stack.size() != pyr->stack.size() ||
+       stack.size() != weight->stack.size()) {
         return;
     }
 

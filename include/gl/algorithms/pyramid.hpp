@@ -181,9 +181,7 @@ PIC_INLINE PyramidGL::PyramidGL(ImageGL *img, bool lapGauss, int limitLevel = 1)
 {
     setNULL();
 
-    if(img != NULL) {
-        create(img, lapGauss, limitLevel);
-    }
+    create(img, lapGauss, limitLevel);
 }
 
 PIC_INLINE PyramidGL::PyramidGL(int width, int height, int channels, bool lapGauss, int limitLevel = 1)
@@ -231,7 +229,7 @@ PIC_INLINE void PyramidGL::create(ImageGL *img, bool lapGauss, int limitLevel = 
         return;
     }
 
-    limitLevel = MAX(limitLevel, 1);
+    limitLevel = MAX(limitLevel, 0);
 
     this->limitLevel = limitLevel;
     this->lapGauss = lapGauss;
@@ -245,18 +243,14 @@ PIC_INLINE void PyramidGL::create(ImageGL *img, bool lapGauss, int limitLevel = 
     ImageGL *tmpD   = NULL;
 
     for(int i = 0; i < levels; i++) {
-
         tmpG = flt_gauss->Process(SingleGL(tmpImg), NULL);
-
         tmpD = flt_sampler->Process(SingleGL(tmpG), NULL);
 
         if(lapGauss) { //Laplacian Pyramid
             flt_sub->Process(DoubleGL(tmpImg, tmpD), tmpG);
-
             stack.push_back(tmpG);
         } else { //Gaussian Pyramid
             *tmpG = *tmpImg;
-
             stack.push_back(tmpG);
         }
 
@@ -282,7 +276,7 @@ PIC_INLINE void PyramidGL::update(ImageGL *img)
         return;
     }
 
-    if(stack.empty()) {
+    if(stack.empty() || !img->isValid()) {
         return;
     }
 
@@ -315,7 +309,7 @@ PIC_INLINE void PyramidGL::update(ImageGL *img)
     }
 }
 
-PIC_INLINE ImageGL *PyramidGL::reconstruct(ImageGL *imgOut)
+PIC_INLINE ImageGL *PyramidGL::reconstruct(ImageGL *imgOut = NULL)
 {
     if(stack.size() < 2) {
         return imgOut;
@@ -347,10 +341,6 @@ PIC_INLINE ImageGL *PyramidGL::reconstruct(ImageGL *imgOut)
 
 PIC_INLINE void PyramidGL::setValue(float value)
 {
-    if(stack.empty()) {
-        return;
-    }
-
     for(unsigned int i = 0; i < stack.size(); i++) {
         *stack[i] = value;
     }
