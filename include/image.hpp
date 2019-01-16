@@ -1366,11 +1366,11 @@ PIC_INLINE void Image::minimum(Image *img)
         return;
     }
 
-    int size = height * width * channels;
+    int n = size();
 
     #pragma omp parallel for
 
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < n; i++) {
         data[i] = data[i] > img->data[i] ? img->data[i] : data[i];
     }
 }
@@ -1381,10 +1381,10 @@ PIC_INLINE void Image::maximum(Image *img)
         return;
     }
 
-    int size = height * width * channels;
+    int n = size();
 
     #pragma omp parallel for
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < n; i++) {
         data[i] = data[i] < img->data[i] ? img->data[i] : data[i];
     }
 }
@@ -1395,12 +1395,11 @@ PIC_INLINE void Image::setZero()
         return;
     }
 
-    int size = frames * height * width * channels;
-//	memset(data, 0, size * sizeof(float));
+    int n = size();
 
     #pragma omp parallel for
 
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < n; i++) {
         data[i] = 0.0f;
     }
 }
@@ -1412,9 +1411,9 @@ PIC_INLINE void Image::setRand(unsigned int seed = 1)
     }
 
     std::mt19937 m(seed);
-    int size = frames * height * width * channels;
+    int n = size();
 
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < n; i++) {
         data[i] = float(m()) / 4294967295.0f;
     }
 }
@@ -1499,14 +1498,14 @@ PIC_INLINE float *Image::getSumVal(BBox *box = NULL, float *ret = NULL)
         ret = new float[channels];
     }
 
-    Array<float>::assign(0.0f, ret, channels);
+    Arrayf::assign(0.0f, ret, channels);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
             for(int i = box->x0; i < box->x1; i++) {
                 float *tmp_data = (*this)(i, j, k);
 
-                Array<float>::add(tmp_data, channels, ret);
+                Arrayf::add(tmp_data, channels, ret);
             }
         }
     }
@@ -1528,7 +1527,7 @@ PIC_INLINE float *Image::getMeanVal(BBox *box = NULL, float *ret = NULL)
 
     float totf = float(box->Size());
 
-    Array<float>::div(ret, channels, totf);
+    Arrayf::div(ret, channels, totf);
 
     return ret;
 }
@@ -1545,7 +1544,7 @@ PIC_INLINE float *Image::getMomentsVal(int x0, int y0, int radius, float *ret = 
         ret = new float[channels_2];
     }
 
-    Array<float>::assign(0.0f, ret, channels_2);
+    Arrayf::assign(0.0f, ret, channels_2);
 
     for(int j = -radius; j <= radius; j++) {
         int y = y0 + j;
@@ -1587,7 +1586,7 @@ PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL, BBox *box = NULL,
         ret = new float[channels];
     }
 
-    Array<float>::assign(0.0f, ret, channels);
+    Arrayf::assign(0.0f, ret, channels);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
@@ -1604,7 +1603,7 @@ PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL, BBox *box = NULL,
 
     float totf = float(box->Size() - 1);
 
-    Array<float>::div(ret, channels, totf);
+    Arrayf::div(ret, channels, totf);
 
     if(bDeleteMeanVal) {
         delete[] meanVal;
@@ -1637,7 +1636,7 @@ PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
         ret = new float[n];
     }
 
-    Array<float>::assign(0.0f, ret, n);
+    Arrayf::assign(0.0f, ret, n);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
@@ -1659,7 +1658,7 @@ PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
 
     float totf = float(box->Size() - 1);
 
-    Array<float>::div(ret, n, totf);
+    Arrayf::div(ret, n, totf);
 
     if(bMeanValAllocated) {
         delete[] meanVal;
@@ -1682,7 +1681,7 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
         ret = new float[channels];
     }
 
-    Array<float>::assign(0.0f, ret, channels);
+    Arrayf::assign(0.0f, ret, channels);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
@@ -1737,7 +1736,7 @@ PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.2
         bColorAllocated = true;
         color = new float[channels];
 
-        Array<float>::assign(0.0f, color, channels);
+        Arrayf::assign(0.0f, color, channels);
     }
 
     int n = width * height;
