@@ -60,6 +60,7 @@ protected:
     {
         if(!bAllocatedFilters) {
             flt_lum = new FilterGLLuminance();
+            flt_lum->update(LT_LUMA);
             flt_lum->bDelete = true;
             filters.push_back(flt_lum);
 

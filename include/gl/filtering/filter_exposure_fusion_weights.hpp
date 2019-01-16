@@ -103,30 +103,23 @@ PIC_INLINE void FilterGLExposureFusionWeights::FragmentShader()
 
         //saturation weight
         vec3 color = texelFetch(u_tex, coords, 0).xyz;\n
-        float tmpMu = dot(color.xyz, vec3(1.0 / 3.0));\n
+        float tmpMu = dot(color.xyz, vec3(1.0)) / 3.0;\n
         vec3 tmpVar = color - vec3(tmpMu);\n
         float pSat = sqrt( dot(tmpVar, tmpVar) / 3.0);\n
         pSat = pow(pSat, wS);\n
 
         //well-exposedness weight
-        float pExp = 1.0;\n
-        float delta;\n
-        delta = (color.x - mu);\n
-        pExp *= exp(-(delta * delta) / sigma_sq_2);\n
-        delta = (color.y - mu);\n
-        pExp *= exp(-(delta * delta) / sigma_sq_2);\n
-        delta = (color.z - mu);\n
-        pExp *= exp(-(delta * delta) / sigma_sq_2);\n
+        vec3 delta = color - vec3(mu);\n
+        float pExp = exp(-dot(delta, delta) / sigma_sq_2);\n
         pExp = pow(pExp, wE);\n
 
         //contrast weight
-        float pCon = -4.0 * texelFetch(u_tex_lum, coords, 0).x;
-        pCon += texelFetch(u_tex_lum, coords + ivec2(1, 0), 0).x;\n
-        pCon += texelFetch(u_tex_lum, coords - ivec2(1, 0), 0).x;\n
-        pCon += texelFetch(u_tex_lum, coords + ivec2(0, 1), 0).x;\n
-        pCon += texelFetch(u_tex_lum, coords - ivec2(0, 1), 0).x;\n
-        pCon = abs(pCon);\n
-        pCon = pow(pCon, wC);\n
+        float pCon = -4.0 * texelFetch(u_tex_lum, coords, 0).x+
+                     texelFetch(u_tex_lum, coords + ivec2(1, 0), 0).x+\n
+                     texelFetch(u_tex_lum, coords - ivec2(1, 0), 0).x+\n
+                     texelFetch(u_tex_lum, coords + ivec2(0, 1), 0).x+\n
+                     texelFetch(u_tex_lum, coords - ivec2(0, 1), 0).x;\n
+        pCon = pow(abs(pCon), wC);\n
 
         f_color = vec4(vec3(pCon * pExp * pSat + 1e-12), 1.0);\n
     }\n

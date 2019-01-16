@@ -83,7 +83,7 @@ protected:
      */
     Image *ProcessAuxStack(ImageVec imgIn, Image *imgOut)
     {
-        int n = int(imgIn.size());
+        unsigned int n = imgIn.size();
 
         if(n < 2 || !ImageVecCheck(imgIn, -1)) {
             return imgOut;
@@ -102,7 +102,7 @@ protected:
 
         images[2]->setZero();
 
-        for(int j = 0; j < n; j++) {
+        for(unsigned int j = 0; j < n; j++) {
             //images[0] --> lum
             images[0] = flt_lum.Process(Single(imgIn[j]), images[0]);
             //images[0] --> weights
@@ -115,14 +115,14 @@ protected:
 
         releaseAux();
 
-        int limitLevel = 0;
+        int limitLevel = 1;
         pW = new Pyramid(width, height, 1, false, limitLevel);
         pI = new Pyramid(width, height, channels, true, limitLevel);
         pOut = new Pyramid(width, height, channels, true, limitLevel);
 
         pOut->setValue(0.0f);
 
-        for(int j = 0; j < n; j++) {
+        for(unsigned int j = 0; j < n; j++) {
             images[0] = flt_lum.Process(Single(imgIn[j]), images[0]);
             images[1] = flt_weights.Process(Double(images[0], imgIn[j]), images[1]);
 
@@ -170,6 +170,7 @@ public:
         pI = NULL;
         pOut = NULL;
 
+        flt_lum.update(LT_LUMA);
         setToANullVector<Image>(images, 3);
 
         update(wC, wE, wS);

@@ -19,12 +19,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FILTERING_FILTER_LUMINANCE_HPP
 
 #include "../util/array.hpp"
+#include "../util/std_util.hpp"
 
 #include "../filtering/filter.hpp"
 
 namespace pic {
 
-enum LUMINANCE_TYPE{LT_CIE_LUMINANCE, LT_WARD_LUMINANCE, LT_MEAN};
+enum LUMINANCE_TYPE{LT_CIE_LUMINANCE, LT_LUMA, LT_WARD_LUMINANCE, LT_MEAN};
 
 /**
  * @brief The FilterLuminance class
@@ -72,10 +73,7 @@ public:
 
     ~FilterLuminance()
     {
-        if(weights != NULL) {
-            delete[] weights;
-            weights = NULL;
-        }
+        weights = delete_s(weights);
     }
 
     /**
@@ -94,27 +92,32 @@ public:
             switch(type)
             {
             case LT_WARD_LUMINANCE:
-                {
-                    weights[0] =  54.0f  / 256.0f;
-                    weights[1] =  183.0f / 256.0f;
-                    weights[2] =  19.0f  / 256.0f;
-                }
-                break;
+             {
+                weights[0] =  54.0f  / 256.0f;
+                weights[1] =  183.0f / 256.0f;
+                weights[2] =  19.0f  / 256.0f;
+            } break;
+
+            case LT_LUMA:
+            {
+                weights[0] =  0.2989f;
+                weights[1] =  0.5870f;
+                weights[2] =  0.114f;
+            } break;
 
             case LT_CIE_LUMINANCE:
-                {
-                    weights[0] =  0.2126f;
-                    weights[1] =  0.7152f;
-                    weights[2] =  0.0722f;
-                }
-                break;
+            {
+                weights[0] =  0.2126f;
+                weights[1] =  0.7152f;
+                weights[2] =  0.0722f;
+            } break;
 
             default:
-                {
-                    weights[0] = 1.0f / 3.0f;
-                    weights[1] = weights[0];
-                    weights[2] = weights[0];
-                }
+            {
+                weights[0] = 1.0f / 3.0f;
+                weights[1] = weights[0];
+                weights[2] = weights[0];
+            }
             }
         } else {
             if(channels == 1) {
@@ -151,11 +154,7 @@ public:
         channels    = 1;
         frames      = imgIn[0]->frames;
 
-        if(weights != NULL) {
-            delete[] weights;
-            weights = NULL;
-        }
-
+        weights = delete_s(weights);
         weights = computeWeights(type, imgIn[0]->channels, weights);
     }
 

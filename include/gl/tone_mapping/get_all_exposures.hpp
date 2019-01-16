@@ -35,26 +35,21 @@ PIC_INLINE ImageGLVec getAllExposuresImagesGL(ImageGL *imgIn, float gamma = 2.2f
 {
     ImageGLVec ret;
 
-    if(imgIn != NULL) {
-        imgIn->loadToMemory();
-    } else {
+    if(imgIn == NULL) {
         return ret;
     }
 
-    std::vector<float> exposures = getAllExposures((Image*) imgIn);
+    std::vector<float> fstops = getAllExposures((Image*) imgIn);
 
     FilterGLSimpleTMO flt(gamma, 0.0f);
 
     ImageGLVec input = SingleGL(imgIn);
 
-    for(unsigned int i = 0; i < exposures.size(); i++) {
-        flt.update(gamma, exposures[i]);
+    for(unsigned int i = 0; i < fstops.size(); i++) {
+        flt.update(gamma, fstops[i]);
+        ImageGL *expo = flt.Process(input, NULL);
 
-        #ifdef PIC_DEBUG
-            printf("Exposure: %f\n", exposures[i]);
-        #endif
-
-        ImageGL *expo = flt.Process(input, NULL);               
+        expo->exposure = powf(2.0f, fstops[i]);
         expo->clamp(0.0f, 1.0f);
 
         ret.push_back(expo);

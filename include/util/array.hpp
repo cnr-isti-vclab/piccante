@@ -358,6 +358,27 @@ public:
     }
 
     /**
+     * @brief getVariance
+     * @param data
+     * @param size
+     * @return
+     */
+    static inline T getVariance(T *data, int size)
+    {
+        T mu = getMean(data, size);
+
+        T tmp = data[0] - mu;
+        T ret = tmp * tmp;
+
+        for(int i = 1; i < size; i++) {
+            tmp = data[i] - mu;
+            ret += tmp * tmp;
+        }
+
+        return ret / T(size);
+    }
+
+    /**
      * @brief sum
      * @param data
      * @param size

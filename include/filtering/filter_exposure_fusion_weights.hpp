@@ -62,7 +62,7 @@ protected:
 
                 //well-exposedness
                 float pExp = 1.0f;
-                for(int c= 0; c < src[1]->channels; c++) {
+                for(int c = 0; c < src[1]->channels; c++) {
                     float delta = pCur1[c] - mu;
                     pExp *= expf(-(delta * delta) / sigma_sq_2);
                 }

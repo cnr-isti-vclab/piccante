@@ -33,20 +33,10 @@ namespace pic {
 PIC_INLINE float computeSaturation(float *data, int channels = 3)
 {
     if(channels == 1) {
-        return 1.0f;
+        return 0.0f;
+    } else {
+        return sqrtf_s(Arrayf::getVariance(data, channels));
     }
-
-    float mu = Arrayf::getMean(data, channels);
-
-    float var = data[0];
-    for(int i = 0; i < channels; i++) {
-        float tmp = data[i] - mu;
-        var += tmp * tmp;
-    }
-
-    var = sqrtf_s(var / float(channels));
-
-    return var;
 }
 
 } // end namespace pic
