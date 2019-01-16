@@ -1290,7 +1290,11 @@ PIC_INLINE float Image::getDynamicRange(bool bRobust = false, float percentile =
         if(min_val > 0.0f) {
             return max_val / min_val;
         } else {
-            return getDynamicRange(true, 1.0f);
+            if(percentile > 0.5f) {
+                return getDynamicRange(true, percentile * 0.99f);
+            } else {
+                return 0.0f;
+            }
         }
     } else {
         float ret = -1.0f;
@@ -1307,14 +1311,14 @@ PIC_INLINE float Image::getDynamicRange(bool bRobust = false, float percentile =
             IndexedArray::findSimple(data, size(), IndexedArray::bFuncNotNeg, coord);
             min_val = IndexedArray::min(data, coord);
 
-            if(min_val <= 0.0f) {
-                min_val = 1.0f / 255.0f;
-            }
-
-            if(max_val > min_val) {
-                ret = max_val / min_val;
+            if(min_val != max_val) {
+                if(max_val > min_val) {
+                    ret = max_val / min_val;
+                } else {
+                    ret = -2.0f;
+                }
             } else {
-                ret = min_val / max_val;
+                ret = 0.0f;
             }
         }
 
