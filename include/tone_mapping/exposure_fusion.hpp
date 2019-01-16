@@ -45,11 +45,11 @@ protected:
     Pyramid *pW, *pI, *pOut;
 
     /**
-     * @brief setNegToZero
+     * @brief removeNegative
      * @param x
      * @return
      */
-    static float setNegToZero(float x)
+    static float removeNegative(float x)
     {
         return MAX(x, 0.0f);
     }
@@ -100,12 +100,10 @@ protected:
             images[2] = new Image(1, width, height, 1);
         }
 
-        images[2]->setZero();
-
+        //compute weights values
+        *images[2] = 0.0f;
         for(unsigned int j = 0; j < n; j++) {
-            //images[0] --> lum
             images[0] = flt_lum.Process(Single(imgIn[j]), images[0]);
-            //images[0] --> weights
             images[1] = flt_weights.Process(Double(images[0], imgIn[j]), images[1]);
 
             *images[2] += *images[1];
@@ -133,14 +131,12 @@ protected:
             pI->update(imgIn[j]);
 
             pI->mul(pW);
-
             pOut->add(pI);
         }
 
         //final result
         imgOut = pOut->reconstruct(imgOut);
-
-        imgOut->applyFunction(setNegToZero);
+        imgOut->applyFunction(removeNegative);
 
         return imgOut;
     }

@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_GAUSSIAN_2D_HPP
 #define PIC_FILTERING_FILTER_GAUSSIAN_2D_HPP
 
+#include "../util/std_util.hpp"
+
 #include "../filtering/filter_npasses.hpp"
 #include "../filtering/filter_gaussian_1d.hpp"
 
@@ -29,7 +31,7 @@ namespace pic {
 class FilterGaussian2D: public FilterNPasses
 {
 protected:
-    FilterGaussian1D *gaussianFilter;
+    FilterGaussian1D *filter;
 
 public:
 
@@ -38,10 +40,10 @@ public:
      */
     FilterGaussian2D() : FilterNPasses()
     {
-        gaussianFilter = new FilterGaussian1D(1.0f);
+        filter = new FilterGaussian1D(1.0f);
 
-        insertFilter(gaussianFilter);
-        insertFilter(gaussianFilter);
+        insertFilter(filter);
+        insertFilter(filter);
     }
 
     /**
@@ -50,20 +52,17 @@ public:
      */
     FilterGaussian2D(float sigma) : FilterNPasses()
     {
-        gaussianFilter = new FilterGaussian1D(sigma);
+        filter = new FilterGaussian1D(sigma);
 
-        insertFilter(gaussianFilter);
-        insertFilter(gaussianFilter);
+        insertFilter(filter);
+        insertFilter(filter);
     }
 
     ~FilterGaussian2D()
     {
         release();
 
-        if(gaussianFilter != NULL) {
-            delete gaussianFilter;
-            gaussianFilter = NULL;
-        }
+        filter = delete_s(filter);
     }
 
     /**
@@ -72,7 +71,7 @@ public:
      */
     void update(float sigma)
     {
-        gaussianFilter->update(sigma, 0);
+        filter->update(sigma, 0);
     }
 
     /**

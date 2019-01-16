@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_GL_FILTERING_FILTER_GAUSSIAN_2D_HPP
 
 #include "../../base.hpp"
+#include "../../util/std_util.hpp"
 
 #include "../../gl/filtering/filter_npasses.hpp"
 #include "../../gl/filtering/filter_gaussian_1d.hpp"
@@ -43,87 +44,44 @@ public:
     /**
      * @brief FilterGLGaussian2D
      */
-    FilterGLGaussian2D();
-    ~FilterGLGaussian2D();
+    FilterGLGaussian2D()
+    {
+        target = GL_TEXTURE_2D;
+
+        filter = new FilterGLGaussian1D(1.0f, 0, target);
+        insertFilter(filter);
+        insertFilter(filter);
+    }
 
     /**
      * @brief FilterGLGaussian2D
      * @param sigma
      */
-    FilterGLGaussian2D(float sigma);
+    FilterGLGaussian2D(float sigma)
+    {
+        target = GL_TEXTURE_2D;
+
+        filter = new FilterGLGaussian1D(sigma, 0, target);
+        insertFilter(filter);
+        insertFilter(filter);
+    }
+
+    ~FilterGLGaussian2D()
+    {
+        release();
+
+        delete_s(filter);
+    }
 
     /**
      * @brief update
      * @param sigma
      */
-    void update(float sigma);
-
-    /**
-     * @brief execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma
-     * @return
-     */
-    static ImageGL *execute(std::string nameIn, std::string nameOut, float sigma)
+    void update(float sigma)
     {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(GL_TEXTURE_2D, false);
-
-        FilterGLGaussian2D *filter = new FilterGLGaussian2D(sigma);
-
-#ifdef PIC_DEBUG
-        GLuint testTQ1 = glBeginTimeQuery();
-#endif
-
-        ImageGL *imgOut = filter->Process(SingleGL(&imgIn), NULL);
-
-#ifdef PIC_DEBUG
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        printf("Gaussian 2D Filter on GPU time: %g ms\n",
-               float(timeVal) / 100000000.0f);
-#endif
-
-        //Read from the GPU
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
+        filter->update(sigma);
     }
 };
-
-PIC_INLINE FilterGLGaussian2D::FilterGLGaussian2D(): FilterGLNPasses()
-{
-    init(1.0f);
-}
-
-PIC_INLINE FilterGLGaussian2D::FilterGLGaussian2D(float sigma): FilterGLNPasses()
-{
-    init(sigma);
-}
-
-PIC_INLINE void FilterGLGaussian2D::init(float sigma)
-{
-    target = GL_TEXTURE_2D;
-
-    filter = new FilterGLGaussian1D(sigma, 0, target);
-    insertFilter(filter);
-    insertFilter(filter);
-}
-
-PIC_INLINE FilterGLGaussian2D::~FilterGLGaussian2D()
-{
-    if(filter != NULL) {
-        delete filter;
-        filter = NULL;
-    }
-
-    release();
-}
-
-PIC_INLINE void FilterGLGaussian2D::update(float sigma)
-{
-    filter->update(sigma);
-}
 
 } // end namespace pic
 

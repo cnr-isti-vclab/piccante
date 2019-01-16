@@ -42,7 +42,7 @@ protected:
 
     FilterGLLuminance *flt_lum;
     FilterGLExposureFusionWeights *flt_weights;
-    FilterGLOp *remove_negative;
+    FilterGLOp *removeNegative;
 
     ImageGL *lum, *acc, *weights;
 
@@ -64,9 +64,9 @@ protected:
             flt_lum->bDelete = true;
             filters.push_back(flt_lum);
 
-            remove_negative = new FilterGLOp("max(I0, vec4(0.0))", true, NULL, NULL);
-            remove_negative->bDelete = true;
-            filters.push_back(remove_negative);
+            removeNegative = new FilterGLOp("max(I0, vec4(0.0))", true, NULL, NULL);
+            removeNegative->bDelete = true;
+            filters.push_back(removeNegative);
 
             flt_weights = new FilterGLExposureFusionWeights(wC, wE, wS);
             flt_weights->bDelete = true;
@@ -215,13 +215,12 @@ public:
             pI->update(imgIn[j]);
 
             pI->mul(pW);
-
             pOut->add(pI);
         }
 
         //final result
         imgOut = pOut->reconstruct(imgOut);
-        imgOut = remove_negative->Process(SingleGL(imgOut), imgOut);
+        imgOut = removeNegative->Process(SingleGL(imgOut), imgOut);
 
         return imgOut;
     }

@@ -47,10 +47,7 @@ protected:
         Image *src0 = src[0];
         Image *src1 = src[1];
 
-        float *tmp_mem = new float[channels << 1];
-
-        float *vOut  = &tmp_mem[0];
-        float *vsrc0 = &tmp_mem[channels];
+        float *vSrc1  = new float[channels];
 
         float inv_height1f = 1.0f / float(box->height - 1);
         float inv_width1f = 1.0f / float(box->width - 1);
@@ -63,16 +60,14 @@ protected:
 
                 float *tmp_dst  = (*dst )(i, j);
 
-                isb->SampleImage(src0, x, y, vsrc0);
-                isb->SampleImage(src1, x, y, vOut);
+                isb->SampleImage(src0, x, y, tmp_dst);
+                isb->SampleImage(src1, x, y, vSrc1);
 
-                for(int k = 0; k < channels; k++) {
-                    tmp_dst[k] = vsrc0[k] + vOut[k];
-                }
+                Arrayf::add(vSrc1, channels, tmp_dst);
             }
         }
 
-        delete[] tmp_mem;
+        delete_s(vSrc1);
     }
 
 public:
