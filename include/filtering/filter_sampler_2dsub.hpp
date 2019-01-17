@@ -29,7 +29,7 @@ namespace pic {
 class FilterSampler2DSub: public Filter
 {
 protected:
-    bool bIsb;
+    ImageSamplerBilinear isb_default;
     ImageSampler *isb;
 
     /**
@@ -40,37 +40,29 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        int channels = dst->channels;
+        float *vSrc1 = new float[dst->channels];
 
-        Image *src0 = src[0];
-        Image *src1 = src[1];
-
-        float *tmp_mem = new float[channels << 1];
-
-        float *vOut  = &tmp_mem[0];
-        float *vsrc0 = &tmp_mem[channels];
-
-        float inv_height1f = 1.0f / float(box->height - 1);
-        float inv_width1f = 1.0f / float(box->width - 1);
+        float height1f = float(box->height - 1);
+        float width1f = float(box->width - 1);
 
         for(int j = box->y0; j < box->y1; j++) {
-            float y = float(j) * inv_height1f;
+            float y = float(j) / height1f;
 
             for(int i = box->x0; i < box->x1; i++) {
-                float x = float(i) * inv_width1f;
+                float x = float(i) / width1f;
 
-                float *tmp_dst  = (*dst )(i, j);
+                float *out = (*dst )(i, j);
 
-                isb->SampleImage(src0, x, y, vsrc0);
-                isb->SampleImage(src1, x, y, vOut);
+                isb->SampleImage(src[0], x, y, out);
+                isb->SampleImage(src[1], x, y, vSrc1);
 
-                for(int k = 0; k < channels; k++) {
-                    tmp_dst[k] = vsrc0[k] - vOut[k];
+                for(int k = 0; k < dst->channels; k++) {
+                    out[k] -= vSrc1[k];
                 }
             }
         }
 
-        delete[] tmp_mem;
+        delete[] vSrc1;
     }
 
 public:
@@ -84,19 +76,14 @@ public:
         this->minInputImages = 2;
 
         if(isb != NULL) {
-            bIsb = false;
             this->isb = isb;
         } else {
-            bIsb = true;
-            this->isb = new ImageSamplerBilinear();
+            this->isb = &isb_default;
         }
     }
 
     ~FilterSampler2DSub()
     {
-        if(bIsb) {
-            delete isb;
-        }
     }
 
     /**
@@ -105,12 +92,9 @@ public:
      */
     void update(ImageSampler *isb)
     {
-        if((this->isb != NULL) && (bIsb)) {
-            delete this->isb;
+        if(isb != NULL) {
+            this->isb = isb;
         }
-
-        this->isb = isb;
-        bIsb = false;
     }
 
     /**

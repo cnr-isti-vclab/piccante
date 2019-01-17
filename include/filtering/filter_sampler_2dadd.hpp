@@ -31,7 +31,7 @@ namespace pic {
 class FilterSampler2DAdd: public Filter
 {
 protected:
-    bool bIsb;
+    ImageSamplerBilinear isb_default;
     ImageSampler *isb;
 
     /**
@@ -42,28 +42,23 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        int channels = dst->channels;
+        float *vSrc1  = new float[dst->channels];
 
-        Image *src0 = src[0];
-        Image *src1 = src[1];
-
-        float *vSrc1  = new float[channels];
-
-        float inv_height1f = 1.0f / float(box->height - 1);
-        float inv_width1f = 1.0f / float(box->width - 1);
+        float height1f = float(box->height - 1);
+        float width1f = float(box->width - 1);
 
         for(int j = box->y0; j < box->y1; j++) {
-            float y = float(j) * inv_height1f;
+            float y = float(j) / height1f;
 
             for(int i = box->x0; i < box->x1; i++) {
-                float x = float(i) * inv_width1f;
+                float x = float(i) / width1f;
 
                 float *tmp_dst  = (*dst )(i, j);
 
-                isb->SampleImage(src0, x, y, tmp_dst);
-                isb->SampleImage(src1, x, y, vSrc1);
+                isb->SampleImage(src[0], x, y, tmp_dst);
+                isb->SampleImage(src[1], x, y, vSrc1);
 
-                Arrayf::add(vSrc1, channels, tmp_dst);
+                Arrayf::add(vSrc1, dst->channels, tmp_dst);
             }
         }
 
@@ -81,19 +76,14 @@ public:
         this->minInputImages = 2;
 
         if(isb != NULL) {
-            bIsb = false;
             this->isb = isb;
         } else {
-            bIsb = true;
-            this->isb = new ImageSamplerBilinear();
+            this->isb = &isb_default;
         }
     }
 
     ~FilterSampler2DAdd()
     {
-        if(bIsb) {
-            delete isb;
-        }
     }
 
     /**
@@ -102,12 +92,7 @@ public:
      */
     void update(ImageSampler *isb)
     {
-        if((this->isb != NULL) && (bIsb)) {
-            delete this->isb;
-        }
-
         this->isb = isb;
-        bIsb = false;
     }
 
     /**

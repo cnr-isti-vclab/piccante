@@ -32,6 +32,7 @@ namespace pic {
 class FilterSampler2D: public Filter
 {
 protected:
+    ImageSamplerNearest isb_default;
     ImageSampler *isb;
     float scaleX, scaleY;
     int width, height;
@@ -211,7 +212,7 @@ PIC_INLINE FilterSampler2D::FilterSampler2D(float scaleX, float scaleY,
     this->swh = true;
 
     if(isb == NULL) {
-        this->isb = new ImageSamplerNearest();
+        this->isb = &isb_default;
     } else {
         this->isb = isb;
     }
@@ -226,21 +227,19 @@ PIC_INLINE FilterSampler2D::FilterSampler2D(int width, int height,
 PIC_INLINE void FilterSampler2D::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
-    Image *source = src[0];
-
-    float inv_height1f = 1.0f / float(box->height - 1);
-    float inv_width1f = 1.0f / float(box->width - 1);
+    float height1f = float(box->height - 1);
+    float width1f = float(box->width - 1);
 
     for(int j = box->y0; j < box->y1; j++) {
-        float y = float(j) * inv_height1f;
+        float y = float(j) / height1f;
 
         for(int i = box->x0; i < box->x1; i++) {
 
-            float x = float(i) * inv_width1f;
+            float x = float(i) / width1f;
 
             float *tmp_dst = (*dst)(i, j);
 
-            isb->SampleImage(source, x, y, tmp_dst);
+            isb->SampleImage(src[0], x, y, tmp_dst);
         }
     }
 }

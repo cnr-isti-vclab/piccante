@@ -22,8 +22,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../util/std_util.hpp"
 
-#include "../../gl//tone_mapping/get_all_exposures.hpp"
+#include "../../gl/tone_mapping/get_all_exposures.hpp"
 
+#include "../../gl/algorithms/pyramid.hpp"
 #include "../../gl/filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter_exposure_fusion_weights.hpp"
 #include "../../gl/filtering/filter_op.hpp"
@@ -135,7 +136,7 @@ public:
             images.push_back(lum);
             images.push_back(weights);
 
-            int limitLevel = 1;
+            int limitLevel = 2;
             pW = new PyramidGL(width, height, 1, false, limitLevel);
             pI = new PyramidGL(width, height, channels, true, limitLevel);
             pOut = new PyramidGL(width, height, channels, true, limitLevel);

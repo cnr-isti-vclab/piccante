@@ -36,6 +36,7 @@ namespace pic {
 class FilterSampler1D: public Filter
 {
 protected:
+    ImageSamplerNearest isb_default;
     ImageSampler *isb;
     int dirs[3];
     int size;
@@ -181,7 +182,7 @@ PIC_INLINE void FilterSampler1D::setImageSampler(ImageSampler *isb)
 {
     if(isb == NULL) {
         if(this->isb == NULL) {
-            this->isb = new ImageSamplerNearest();
+            this->isb = &isb_default;
         }
     } else {
         this->isb = isb;
@@ -191,8 +192,6 @@ PIC_INLINE void FilterSampler1D::setImageSampler(ImageSampler *isb)
 PIC_INLINE void FilterSampler1D::ProcessBBox(Image *dst, ImageVec src,
         BBox *box)
 {
-    Image *source = src[0];
-
     float width1f  = float(box->width  - 1);
     float height1f = float(box->height - 1);
 
@@ -203,7 +202,7 @@ PIC_INLINE void FilterSampler1D::ProcessBBox(Image *dst, ImageVec src,
             float x = float(i) / width1f;
 
             float *tmp_data = (*dst)(i, j);
-            isb->SampleImage(source, x, y, tmp_data);
+            isb->SampleImage(src[0], x, y, tmp_data);
         }
     }
 }

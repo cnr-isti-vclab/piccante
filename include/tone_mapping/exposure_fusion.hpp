@@ -113,7 +113,7 @@ protected:
 
         releaseAux();
 
-        int limitLevel = 1;
+        int limitLevel = 2;
         pW = new Pyramid(width, height, 1, false, limitLevel);
         pI = new Pyramid(width, height, channels, true, limitLevel);
         pOut = new Pyramid(width, height, channels, true, limitLevel);
@@ -213,6 +213,7 @@ public:
         return ef.Process(imgIn, imgOut);
     }
 };
+
 
 } // end namespace pic
 
