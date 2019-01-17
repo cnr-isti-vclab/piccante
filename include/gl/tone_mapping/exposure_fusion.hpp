@@ -221,6 +221,15 @@ public:
 
         //final result
         imgOut = pOut->reconstruct(imgOut);
+
+        float *minVal = imgOut->getMinVal(NULL);
+        float *maxVal = imgOut->getMaxVal(NULL);
+
+        int ind;
+        float minV = Arrayf::getMin(minVal, imgOut->channels, ind);
+        float maxV = Arrayf::getMax(maxVal, imgOut->channels, ind);
+        *imgOut -= minV;
+        *imgOut /= (maxV - minV);
         imgOut = removeNegative->Process(SingleGL(imgOut), imgOut);
 
         return imgOut;

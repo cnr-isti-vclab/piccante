@@ -136,6 +136,16 @@ protected:
 
         //final result
         imgOut = pOut->reconstruct(imgOut);
+
+        float *minVal = imgOut->getMinVal(NULL, NULL);
+        float *maxVal = imgOut->getMaxVal(NULL, NULL);
+
+        int ind;
+        float minV = Arrayf::getMin(minVal, imgOut->channels, ind);
+        float maxV = Arrayf::getMax(maxVal, imgOut->channels, ind);
+        *imgOut -= minV;
+        *imgOut /= (maxV- minV);
+
         imgOut->applyFunction(removeNegative);
 
         return imgOut;

@@ -242,7 +242,7 @@ PIC_INLINE void Pyramid::create(Image *img, bool lapGauss, int limitLevel = 1)
 
     initFilters();
 
-    int levels = MAX(log2(MIN(img->width, img->height)) - limitLevel, 1);
+    int levels = log2(MIN(img->width, img->height)) - limitLevel;
 
     Image *tmpImg = img;
     Image *tmpG = NULL;
