@@ -39,7 +39,7 @@ protected:
     {
         int k2 = 0;
 
-        for(unsigned int i = 0; i < data->nSrc; i++) {
+        for(auto i = 0; i < data->nSrc; i++) {
             float *tmp_src = (*data->src[i])(data->x, data->y);
 
             for(int k = 0; k < data->src[i]->channels; k++) {

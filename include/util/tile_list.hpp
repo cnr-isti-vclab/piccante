@@ -164,7 +164,7 @@ PIC_INLINE unsigned int TileList::getNext()
 
 PIC_INLINE unsigned int TileList::size()
 {
-    return unsigned int(tiles.size());
+    return (unsigned int)(tiles.size());
 }
 
 PIC_INLINE void TileList::resetCounter()
