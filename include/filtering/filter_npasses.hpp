@@ -295,7 +295,7 @@ PIC_INLINE Image *FilterNPasses::ProcessSame(ImageVec imgIn, Image *imgOut,
 
     flt_0->Process(imgIn, imgTmpSame[0]);
 
-    for(unsigned int i = 1; i < n; i++) {
+    for(int i = 1; i < n; i++) {
         auto flt_i = getFilter(i);
         flt_i->changePass(i, n);
 

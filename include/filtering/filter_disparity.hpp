@@ -56,7 +56,7 @@ protected:
                 int maxX = MIN(i + halfMaxDisparity, src[1]->width);
 
                 for(int x = minX; x < maxX; x++) {
-                     pc->improveStereo(i, j, x, prevL, prevU, maxDisparity, xB, dB);
+                     pc->improveStereo(i, j, x, prevL, prevU, float(maxDisparity), xB, dB);
                 }
 
                 float *out = (*dst)(i, j);

@@ -78,7 +78,7 @@ PIC_INLINE double mPSNR(Image *ori, Image *cmp, MULTI_EXPOSURE_TYPE type, int mi
 
         case MET_FROM_INPUT: {
             for(int i = minFstop; i <= maxFstop; i++) {
-                exposures.push_back(i);
+                exposures.push_back(float(i));
             }
 
         } break;

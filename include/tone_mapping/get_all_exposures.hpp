@@ -92,7 +92,7 @@ PIC_INLINE std::vector<float> getAllExposuresUniform(Image *imgIn)
     getMinMaxFstops(imgIn, iMin, iMax);
 
     for(int i = iMin; i <= iMax; i++) {
-        ret.push_back(i);
+        ret.push_back(float(i));
     }
 
     return ret;

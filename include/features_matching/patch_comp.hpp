@@ -364,7 +364,7 @@ public:
 
         float ret = 0.0f;
         float col0[128];
-        float x0f, y0f, tmp;
+        float x0f, y0f;
 
         float xf = float(x0);
         float yf = float(y0);

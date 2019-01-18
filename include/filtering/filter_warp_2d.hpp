@@ -154,7 +154,7 @@ public:
         bmax[0] = - (1 << 30);
         bmax[1] = bmax[0];
 
-        for(int i=0;i<4;i++) {
+        for(int i = 0; i < 4; i++) {
 
             bbox[i][0] -= mid[0];
             bbox[i][1] -= mid[1];
@@ -227,11 +227,11 @@ public:
     void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(bCentroid) {
-            mid[0] = imgIn[0]->widthf  * 0.5f;
-            mid[1] = imgIn[0]->heightf * 0.5f;
+            mid[0] = imgIn[0]->width >> 1;
+            mid[1] = imgIn[0]->height >> 1;
         } else {
-            mid[0] = 0.0f;
-            mid[1] = 0.0f;
+            mid[0] = 0;
+            mid[1] = 0;
         }
 
         if(!bSameSize) {

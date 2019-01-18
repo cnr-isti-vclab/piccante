@@ -110,7 +110,8 @@ public:
         if(coeff.empty()) {
             return ret;
         }
-        int nCoeff = coeff.size();
+
+        auto nCoeff = coeff.size();
 
         if(nCoeff > 1) {
 
@@ -121,7 +122,7 @@ public:
 
             ret = fromNumberToString(coeff[0]) + sep;
 
-            for(int i = 1; i < (nCoeff - 1); i++) {
+            for(auto i = 1; i < (nCoeff - 1); i++) {
 
                 if(coeff[i + 1] > 0.0f) {
                     sep = "+ ";
@@ -179,7 +180,7 @@ public:
      */
     float dEval(float x)
     {
-        int nCoeff = coeff.size();
+        auto nCoeff = coeff.size();
 
         if(nCoeff < 2) {
             return 0.0f;
@@ -187,7 +188,7 @@ public:
 
         float ret = coeff[nCoeff - 1] * float(nCoeff - 1);
 
-        for(int i = (nCoeff - 2); i > 0 ; i--) {
+        for(auto i = (nCoeff - 2); i > 0 ; i--) {
             ret = (ret * x) + coeff[i] * float(i);
         }
         return ret;
@@ -238,7 +239,7 @@ public:
      */
     void normalForm()
     {
-        int last = coeff.size() - 1;
+        auto last = coeff.size() - 1;
 
         if(fabsf(coeff[last]) > 0.0f) {
 
@@ -258,7 +259,7 @@ public:
      */
     Polynomial horner(float d, float &remainder)
     {
-        int nCoeff = coeff.size();
+        int nCoeff = int(coeff.size());
         Polynomial p(nCoeff - 1);
 
         p.coeff[nCoeff - 2] = coeff[nCoeff - 1];
@@ -281,7 +282,7 @@ public:
      */
     bool getRoots(float *x)
     {
-        int nCoeff = coeff.size();
+        auto nCoeff = coeff.size();
 
         if(nCoeff < 2) {
             return false;
@@ -374,7 +375,7 @@ public:
         Polynomial p = horner(x[0], r);
         p.normalForm();
 
-        int nCoeff = coeff.size();
+        int nCoeff = int(coeff.size());
         for(int i = 1; i < (nCoeff - 2); i++) {
             bool bOut = p.getRoots(&x[i]);
 

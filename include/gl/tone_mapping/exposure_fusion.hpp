@@ -185,7 +185,7 @@ public:
      */
     ImageGL *ProcessStack(ImageGLVec imgIn, ImageGL *imgOut = NULL)
     {
-        unsigned int n = imgIn.size();
+        auto n = imgIn.size();
 
         if(n < 2) {
             return imgOut;
@@ -195,7 +195,7 @@ public:
 
         //compute weights values
         *acc = 0.0f;
-        for(unsigned int j = 0; j < n; j++) {
+        for(auto j = 0; j < n; j++) {
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
             weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 
@@ -205,7 +205,7 @@ public:
         //accumulate on a pyramid
         pOut->setValue(0.0f);
 
-        for(unsigned int j = 0; j < n; j++) {
+        for(auto j = 0; j < n; j++) {
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
             weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 

@@ -87,7 +87,7 @@ public:
     {
         ImageGL imgIn(1, 512, 512, 3, IMG_GPU_CPU, GL_TEXTURE_2D);
 
-        for(unsigned int i = 0; i < imgIn.size(); i += 3) {
+        for(auto i = 0; i < imgIn.size(); i += 3) {
             imgIn.data[i    ] = 1.0f;
             imgIn.data[i + 1] = 0.5f;
             imgIn.data[i + 2] = 0.25f;

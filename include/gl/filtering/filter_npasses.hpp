@@ -309,7 +309,7 @@ PIC_INLINE ImageGL *FilterGLNPasses::ProcessSame(ImageGLVec imgIn, ImageGL *imgO
     flt_0->changePass(0, n);
     flt_0->Process(imgIn, imgTmpSame[0]);
 
-    for(unsigned int i = 1; i < n; i++) {
+    for(auto i = 1; i < n; i++) {
         auto flt_i = getFilter(0);
         flt_i->changePass(i, n);
 

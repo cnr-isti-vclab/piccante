@@ -151,7 +151,7 @@ public:
                                    int shift_bits = 6)
     {
         if(img1 == NULL || img2 == NULL) {
-            return Vec2i(0, 0.0);
+            return Vec2i(0, 0);
         }
 
         if(!img1->isSimilarType(img2)) {

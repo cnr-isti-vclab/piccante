@@ -183,7 +183,7 @@ public:
     {
         allocate(nBin);
 
-        epsilon = 1e-6;
+        epsilon = 1e-6f;
 
         this->LdMax = LdMax > 0.0f ? LdMax : 100.0f;
         this->LdMin = LdMin > 0.0f ? LdMin : 1.0f;

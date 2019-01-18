@@ -50,6 +50,8 @@ float changeDomain(float x, METRICS_DOMAIN type = MD_LIN)
         return PUEncode(x);
     } break;
     }
+
+    return x;
 }
 
 } // end namespace pic

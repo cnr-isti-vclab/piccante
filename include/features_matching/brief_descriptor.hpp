@@ -166,7 +166,8 @@ public:
         if(seed >= 0) {
             m = new std::mt19937(seed);
         } else {
-            m = new std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());
+            auto seed_time = std::chrono::system_clock::now().time_since_epoch().count();
+            m = new std::mt19937(int (seed_time));
         }
 
         this->S = S;

@@ -82,7 +82,7 @@ protected:
         FilterFData f_data;
         f_data.src = src;
         f_data.dst = dst;
-        f_data.nSrc = src.size();
+        f_data.nSrc = unsigned int(src.size());
 
         for(int k = box->z0; k < box->z1; k++) {
             f_data.z = k;

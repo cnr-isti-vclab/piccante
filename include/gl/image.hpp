@@ -836,8 +836,8 @@ PIC_INLINE void ImageGL::releaseGL()
         target = 0;
     }
 
-    unsigned int n = stack.size();
-    for(unsigned int i = 0; i < n; i++) {
+    auto n = stack.size();
+    for(auto i = 0; i < n; i++) {
         if(stack[i] != 0) {
             glDeleteTextures(1, &stack[i]);
             stack[i] = 0;

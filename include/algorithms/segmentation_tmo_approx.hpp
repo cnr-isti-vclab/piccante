@@ -56,7 +56,7 @@ protected:
             imgIn->getMaxVal(NULL, &maxVal);
 
             float nLevels = log10f(maxVal) - log10f(minVal) + 1.0f;
-            int nLayer = ((maxVal - minVal) / nLevels) / 4.0f;
+            float nLayer = ((maxVal - minVal) / nLevels) / 4.0f;
             float area = imgIn->widthf * imgIn->heightf * perCent;
             int iterations = MAX(int(sqrtf(area)) / 2, 1);
 

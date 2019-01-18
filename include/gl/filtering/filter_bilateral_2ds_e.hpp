@@ -324,21 +324,21 @@ void FilterGLBilateral2DSE::update(float sigma_s, float sigma_p, float sigma_n, 
     float sigmaa2 = 2.0f * this->sigma_a * this->sigma_a;
 
     technique.bind();
-    technique.setUniform1i("u_tex",       0);
-    technique.setUniform1i("u_poisson",   1);
+    technique.setUniform1i("u_tex",     0);
+    technique.setUniform1i("u_poisson",  1);
     technique.setUniform1i("u_rand",	2);
 
     technique.setUniform1i("u_edge_pos",  3);
     technique.setUniform1i("u_edge_nor",  4);
     technique.setUniform1i("u_edge_alb",  5);
 
-    technique.setUniform1i("kernelSize",       kernelSize);
-    technique.setUniform1f("kernelSizef",      float(kernelSize));
-    technique.setUniform1f("sigma_s2",         sigmas2);
-    technique.setUniform1f("sigma_pos2",       sigmap2);
-    technique.setUniform1f("sigma_nor2",        sigman2);
-    technique.setUniform1f("sigma_alb2",        sigmaa2);
-    technique.setUniform1f("nSamples",          ms->nSamples >> 1);
+    technique.setUniform1i("kernelSize", kernelSize);
+    technique.setUniform1f("kernelSizef", float(kernelSize));
+    technique.setUniform1f("sigma_s2", sigmas2);
+    technique.setUniform1f("sigma_pos2", sigmap2);
+    technique.setUniform1f("sigma_nor2", sigman2);
+    technique.setUniform1f("sigma_alb2", sigmaa2);
+    technique.setUniform1i("nSamples", ms->nSamples >> 1);
     technique.unbind();
 }
 

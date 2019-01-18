@@ -64,7 +64,7 @@ PIC_INLINE std::vector< int > executeLiveWireMultipleJNI(std::string imageInPath
 
         std::vector< Vec2i > out_tmp;
 
-        int n = controlPoints.size() >> 1;
+        int n = int(controlPoints.size()) >> 1;
         for(auto i = 0; i < (n - 1); i++) {
             int indexS = i << 1;
             int indexE = (i + 1) << 1;

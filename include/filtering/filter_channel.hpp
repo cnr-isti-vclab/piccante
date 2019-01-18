@@ -53,7 +53,7 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        int totChannels =  CLAMPi(channels_vec.size(), 0, src[0]->channels);
+        int totChannels =  CLAMPi(int(channels_vec.size()), 0, src[0]->channels);
 
         for(int p = box->z0; p < box->z1; p++) {
             for(int j = box->y0; j < box->y1; j++) {
@@ -105,7 +105,7 @@ public:
     {
         width       = imgIn[0]->width;
         height      = imgIn[0]->height;
-        channels    = MAX(1, this->channels_vec.size());
+        channels    = MAX(1, int(this->channels_vec.size()));
         frames      = imgIn[0]->frames;
     }
 

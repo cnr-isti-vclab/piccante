@@ -106,7 +106,7 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 
 
     unsigned long long acc = 0;
 
-    unsigned int nValues = (1 << nBit) - 1;
+    int nValues = (1 << nBit) - 1;
     float nValuesf = float(nValues);
 
     for(int i = 0; i < size; i++) {
