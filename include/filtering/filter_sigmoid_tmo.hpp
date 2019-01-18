@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FILTERING_FILTER_SIGMOID_TMO_HPP
 
 #include "../util/array.hpp"
+#include "../util/std_util.hpp"
 
 #include "../filtering/filter.hpp"
 #include "../filtering/filter_luminance.hpp"
@@ -35,7 +36,6 @@ class FilterSigmoidTMO: public Filter
 protected:
     bool temporal;
     float *lum_weights, *lum_weights_flt;
-
     float c, alpha, epsilon, wp, wp_sq;
     SIGMOID_MODE type;
 
@@ -55,6 +55,7 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
+\
     /**
      * @brief FilterSigmoidTMO
      */
@@ -73,13 +74,8 @@ public:
 
     ~FilterSigmoidTMO()
     {
-        if(lum_weights != NULL) {
-            delete[] lum_weights;
-        }
-
-        if(lum_weights_flt != NULL) {
-            delete[] lum_weights_flt;
-        }
+        delete_s(lum_weights);
+        delete_s(lum_weights_flt);
     }
 
     /**
@@ -107,15 +103,8 @@ public:
             epsilon = calculateEpsilon(imgIn);
         }
 
-        if(lum_weights != NULL) {
-            delete[] lum_weights;
-            lum_weights = NULL;
-        }
-
-        if(lum_weights_flt != NULL) {
-            delete[] lum_weights_flt;
-            lum_weights_flt = NULL;
-        }
+        lum_weights = delete_s(lum_weights);
+        lum_weights_flt = delete_s(lum_weights_flt);
 
         lum_weights = FilterLuminance::computeWeights(LT_CIE_LUMINANCE, imgIn[0]->channels, NULL);
 
@@ -136,7 +125,7 @@ public:
      */
     static Image *execute(Image *imgIn, Image *imgOut)
     {
-        FilterSigmoidTMO filter;
+        FilterSigmoidTMO filter(SIG_TMO, 0.18f, 1e9f, -1.0f, false);
         return filter.Process(Single(imgIn), imgOut);
     }
 };
@@ -145,11 +134,11 @@ PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO() : Filter()
 {
     lum_weights = NULL;
     lum_weights_flt = NULL;
-    update(SIG_TMO, 0.18f, 1e9f, -1.0f, false);
+    update(SIG_TMO, 0.18f, 1e6f, -1.0f, false);
 }
 
 PIC_INLINE FilterSigmoidTMO::FilterSigmoidTMO(SIGMOID_MODE type, float alpha,
-                                   float wp = 1e9f, float epsilon = -1.0f, bool temporal = false) : Filter()
+                                   float wp, float epsilon, bool temporal) : Filter()
 {
     lum_weights = NULL;
     lum_weights_flt = NULL;
@@ -174,11 +163,11 @@ PIC_INLINE float FilterSigmoidTMO::calculateEpsilon(ImageVec imgIn)
 
     switch(type) {
     case SIG_TMO:
-        tmpEpsilon = imgIn[0]->getLogMeanVal(NULL, NULL)[0];
+        imgIn[0]->getLogMeanVal(NULL, &tmpEpsilon);
         break;
 
     case SIG_TMO_WP:
-        tmpEpsilon = imgIn[0]->getLogMeanVal(NULL, NULL)[0];
+        imgIn[0]->getLogMeanVal(NULL, &tmpEpsilon);
         break;
 
     case SIG_SDM:
@@ -223,6 +212,7 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
 
             float *p = (*img)(i, j);
             float *p_flt = (*img_flt)(i, j);
+
             float *dstOut = (*dst)(i, j);
 
             float L = Arrayf::dot(p, lum_weights, img->channels);

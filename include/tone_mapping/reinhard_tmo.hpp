@@ -52,6 +52,7 @@ protected:
         images[0]->getLogMeanVal(NULL, &LogAverage);
 
         bool bUpdate = false;
+
         if(alpha <= 0.0f) {
             alpha = estimateAlpha(LMin, LMax, LogAverage);
             bUpdate = true;
@@ -62,28 +63,31 @@ protected:
             bUpdate = true;
         }
 
-        //filter luminance in the sigmoid-space
-        images[0]->applyFunction(&sigmoid);
-
-        float s_max = 8.0f;
-        float sigma_s = 0.56f * powf(1.6f, s_max);
-
-        float sigma_r = powf(2.0f, phi) * alpha / (s_max * s_max);
-
-        flt_bilateral.update(sigma_s, sigma_r);
-
-        images[1] = flt_bilateral.Process(Single(images[0]), images[1]);
-
-        images[0]->applyFunction(&sigmoidInv);
-
-        images[1]->applyFunction(&sigmoidInv);
-
-        //apply a sigmoid filter
+        printf("%f %f\n", whitePoint, LMax);
         if(bUpdate) {
-            flt_sigmoid.update(SIG_TMO, alpha, whitePoint, -1.0f, false);
+            flt_sigmoid.update(this->sig_mode, this->alpha, this->whitePoint, -1.0f, false);
         }
 
-        images[2] = flt_sigmoid.Process(Double(images[0], images[1]), images[2]);
+        //filter luminance in the sigmoid-space
+        if(phi > 0.0f) {
+            images[0]->applyFunction(&sigmoid);
+
+            float s_max = 8.0f;
+            float sigma_s = 0.56f * powf(1.6f, s_max);
+
+            float sigma_r = powf(2.0f, phi) * alpha / (s_max * s_max);
+
+            flt_bilateral.update(sigma_s, sigma_r);
+
+            images[1] = flt_bilateral.Process(Single(images[0]), images[1]);
+
+            images[0]->applyFunction(&sigmoidInv);
+
+            images[1]->applyFunction(&sigmoidInv);
+            images[2] = flt_sigmoid.Process(Double(images[0], images[1]), images[2]);
+        } else {
+            images[2] = flt_sigmoid.Process(Single(images[0]), images[2]);
+        }
 
         //remove HDR luminance and replacing it with LDR one
         *imgOut = *imgIn[0];
@@ -95,6 +99,7 @@ protected:
         return imgOut;
     }
 
+    SIGMOID_MODE sig_mode;
     float alpha, whitePoint, phi;
     FilterSigmoidTMO flt_sigmoid;
     FilterBilateral2DS flt_bilateral;
@@ -163,24 +168,61 @@ public:
      * @param phi
      * @param sig_mode
      */
-    void update(float alpha = 0.18f, float whitePoint = -1.0f, float phi = 8.0f, SIGMOID_MODE sig_mode = SIG_TMO)
+    void update(float alpha = 0.18f, float whitePoint = 1e6f, float phi = 8.0f, SIGMOID_MODE sig_mode = SIG_TMO)
     {
         this->alpha = alpha;
         this->whitePoint = whitePoint;
         this->phi = phi;
+        this->sig_mode = sig_mode;
 
-        flt_sigmoid.update(SIG_TMO, alpha, whitePoint, -1.0f, false);
+        flt_sigmoid.update(SIG_TMO, this->alpha, this->whitePoint, -1.0f, false);
     }
 
     /**
-     * @brief execute
+     * @brief executeGlobal1
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static Image* execute(Image *imgIn, Image *imgOut)
+    static Image* executeGlobal1(Image *imgIn, Image *imgOut)
     {
-        ReinhardTMO rtmo(0.05f, 1e6f, 8.0f);
+        ReinhardTMO rtmo(-1.0f, -1.0f, -8.0f, SIG_TMO);
+        return rtmo.Process(Single(imgIn), imgOut);
+    }
+
+    /**
+     * @brief executeGlobal2
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image* executeGlobal2(Image *imgIn, Image *imgOut)
+    {
+        ReinhardTMO rtmo(-1.0f, -1.0f, -8.0f, SIG_TMO_WP);
+        return rtmo.Process(Single(imgIn), imgOut);
+    }
+
+    /**
+     * @brief executeLocal1
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image* executeLocal1(Image *imgIn, Image *imgOut)
+    {
+        ReinhardTMO rtmo(-1.0f, -1.0f, 8.0f, SIG_TMO);
+        return rtmo.Process(Single(imgIn), imgOut);
+    }
+
+    /**
+     * @brief executeLocal2
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image* executeLocal2(Image *imgIn, Image *imgOut)
+    {
+        ReinhardTMO rtmo(-1.0f, -1.0f, 8.0f, SIG_TMO_WP);
         return rtmo.Process(Single(imgIn), imgOut);
     }
 };

@@ -70,14 +70,59 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
-        printf("Tone mapping using Reinhard et al.'s TMO...");
-        image_tmo = pic::ReinhardTMO::execute(&img, image_tmo);
+        printf("Tone mapping using global Reinhard et al.'s TMO...");
+        image_tmo = pic::ReinhardTMO::executeGlobal1(&img, image_tmo);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
           Note that pic::ReinhardTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bWritten = image_tmo->Write("../data/output/" + nameOut + "_reinhard_tmo.png", pic::LT_NOR_GAMMA);
+        bWritten = image_tmo->Write("../data/output/" + nameOut + "_reinhard_gtmo1.png", pic::LT_NOR_GAMMA);
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+
+        printf("Tone mapping using global Reinhard et al.'s TMO...");
+        image_tmo = pic::ReinhardTMO::executeGlobal2(&img, image_tmo);
+
+        /*pic::LT_NOR_GAMMA implies that when we save the image,
+          this is quantized at 8-bit and gamma is applied.
+          Note that pic::ReinhardTMO tone maps an HDR image
+          but it does not apply gamma.*/
+        bWritten = image_tmo->Write("../data/output/" + nameOut + "_reinhard_gtmo2.png", pic::LT_NOR_GAMMA);
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+
+        printf("Tone mapping using local Reinhard et al.'s TMO...");
+        image_tmo = pic::ReinhardTMO::executeLocal1(&img, image_tmo);
+
+        /*pic::LT_NOR_GAMMA implies that when we save the image,
+          this is quantized at 8-bit and gamma is applied.
+          Note that pic::ReinhardTMO tone maps an HDR image
+          but it does not apply gamma.*/
+        bWritten = image_tmo->Write("../data/output/" + nameOut + "_reinhard_ltmo1.png", pic::LT_NOR_GAMMA);
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+
+        printf("Tone mapping using local Reinhard et al.'s TMO...");
+        image_tmo = pic::ReinhardTMO::executeLocal2(&img, image_tmo);
+
+        /*pic::LT_NOR_GAMMA implies that when we save the image,
+          this is quantized at 8-bit and gamma is applied.
+          Note that pic::ReinhardTMO tone maps an HDR image
+          but it does not apply gamma.*/
+        bWritten = image_tmo->Write("../data/output/" + nameOut + "_reinhard_ltmo2.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
