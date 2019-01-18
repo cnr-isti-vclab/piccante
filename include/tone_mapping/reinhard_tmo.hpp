@@ -35,6 +35,33 @@ namespace pic {
 class ReinhardTMO : public ToneMappingOperator
 {
 protected:
+
+    /**
+     * @brief sigmoidParam
+     * @param x
+     * @param param
+     * @return
+     */
+    static float sigmoidParam(float x, std::vector< float > &param)
+    {
+        float x_s = x * param[0];
+
+        return x_s / (x_s + param[1]);
+    }
+
+    /**
+     * @brief sigmoidInvParam
+     * @param y
+     * @param param
+     * @return
+     */
+    static float sigmoidInvParam(float y, std::vector< float > &param)
+    {
+        float x_s = y *  param[1] / (1.0f -  y);
+
+        return x_s / param[0];
+    }
+
     /**
      * @brief ProcessAux
      * @param imgIn
@@ -63,27 +90,30 @@ protected:
             bUpdate = true;
         }
 
-        printf("%f %f\n", whitePoint, LMax);
         if(bUpdate) {
             flt_sigmoid.update(this->sig_mode, this->alpha, this->whitePoint, -1.0f, false);
         }
 
         //filter luminance in the sigmoid-space
         if(phi > 0.0f) {
-            images[0]->applyFunction(&sigmoid);
-
             float s_max = 8.0f;
-            float sigma_s = 0.56f * powf(1.6f, s_max);
+            float value = powf(2.0f, phi) * alpha / (s_max * s_max);
 
-            float sigma_r = powf(2.0f, phi) * alpha / (s_max * s_max);
+            std::vector<float> param;
+            param.push_back(alpha / LogAverage);
+            param.push_back(value);
 
-            flt_bilateral.update(sigma_s, sigma_r);
+            float pEpsilon = 0.05f; //threshold
+            images[0]->applyFunctionParam(sigmoidParam, param);//applyFunction(&sigmoid);
+
+
+            flt_bilateral.update(1.6f, pEpsilon / 2.0f);
 
             images[1] = flt_bilateral.Process(Single(images[0]), images[1]);
 
-            images[0]->applyFunction(&sigmoidInv);
+            images[0]->applyFunctionParam(sigmoidInvParam, param);
+            images[1]->applyFunctionParam(sigmoidInvParam, param);
 
-            images[1]->applyFunction(&sigmoidInv);
             images[2] = flt_sigmoid.Process(Double(images[0], images[1]), images[2]);
         } else {
             images[2] = flt_sigmoid.Process(Single(images[0]), images[2]);
