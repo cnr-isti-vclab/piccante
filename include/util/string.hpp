@@ -388,7 +388,7 @@ inline std::string fromFileToStdString(std::string nameFile)
         return ret;
     }
 
-    char c = infile.get();
+    int c = infile.get();
     while (infile.good()) {
         ret += c;
         c = infile.get();

@@ -383,7 +383,9 @@ bool readEXIF(std::string name, EXIFInfo &info)
         //printf("OFFSET: %d\n", offset_next_IFD);
 
         if(offset > 0) {
-            fseek(file, pos + offset, SEEK_SET);
+            fsetpos(file, &pos);
+            fseek(file, offset, SEEK_CUR);
+            //NOTE: this works but gives warnings --> fseek(file, pos + offset, SEEK_SET);           
         }
 
         //
@@ -420,7 +422,10 @@ bool readEXIF(std::string name, EXIFInfo &info)
 
                 fpos_t tmp_pos;
                 fgetpos(file, &tmp_pos);
-                fseek(file, pos + offset, SEEK_SET);
+
+                fsetpos(file, &pos);
+                fseek(file, offset, SEEK_CUR);
+                //fseek(file, pos + offset, SEEK_SET);
 
                 switch(df) {
                 case 5: {
@@ -429,7 +434,8 @@ bool readEXIF(std::string name, EXIFInfo &info)
                 }
                 //unsigned rational
 
-                fseek(file, tmp_pos, SEEK_SET);
+                fsetpos(file, &tmp_pos);
+                //fseek(file, tmp_pos, SEEK_SET);
             } else {
                 switch(df) {
                 case 3: {

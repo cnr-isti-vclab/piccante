@@ -68,7 +68,7 @@ PIC_INLINE double PSNR(Image *ori, Image *cmp, double max_value = -1.0, bool bLa
 
     double rmse_value = RMSE(ori, cmp, bLargeDifferences, type);
 
-    max_value = changeDomain(max_value, type);
+    max_value = double(changeDomain(float(max_value), type));
 
     if(rmse_value > 0.0) {
         return 20.0 * log10(max_value / rmse_value);
