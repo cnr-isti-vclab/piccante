@@ -78,7 +78,7 @@ public:
     */
     Vec<N, T>(T *data)
     {
-        for (unsigned int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] = data[i];
         }
     }
@@ -88,7 +88,7 @@ public:
      */
     void setZero()
     {
-        for(unsigned int i = 0; i < N; i++) {
+        for(auto i = 0; i < N; i++) {
             data[i] = T(0);
         }
     }
@@ -98,7 +98,7 @@ public:
      */
     void setOne()
     {
-        for(unsigned int i = 0; i < N; i++) {
+        for(auto i = 0; i < N; i++) {
             data[i] = T(1);
         }
     }
@@ -115,7 +115,7 @@ public:
 
         Vec<N, T> ret;
 
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             ret.data[i] = maxVal - this->data[i];
         }
 
@@ -145,7 +145,7 @@ public:
     {
         bool ret = true;
         T zero = T(0);
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             ret = ret && (this->data[i] > zero);
         }
 
@@ -160,7 +160,7 @@ public:
     {
         bool ret = false;
         T zero = T(0);
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             ret = ret || (this->data[i] < zero);
         }
 
@@ -201,7 +201,7 @@ public:
      */
     bool equal(Vec<N, T> a)
     {
-        for(unsigned int i = 0; i < N; i++) {
+        for(auto i = 0; i < N; i++) {
             if(a[i] != data[i]) {
                 return false;
             }
@@ -217,7 +217,7 @@ public:
     T getMean()
     {
         T ret = T(0);
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             ret += this->data[i];
         }
 
@@ -231,7 +231,7 @@ public:
     T getMax()
     {
         T ret = this->data[0];
-        for (int i = 1; i < N; i++) {
+        for (auto i = 1; i < N; i++) {
             ret = this->data[i] > ret ? this->data[i] : ret;
         }
         return ret;
@@ -245,7 +245,7 @@ public:
     {
         float valMax = getMax();
 
-        for (int i = 1; i < N; i++) {
+        for (auto i = 1; i < N; i++) {
             if (valMax == this->data[i]) {
                 return i;
             }
@@ -261,7 +261,7 @@ public:
     T dot(Vec<N, T> a)
     {
         T out = T(0);
-        for(unsigned int i=0; i<N; i++) {
+        for(auto i=0; i<N; i++) {
             out += data[i] * a[i];
         }
         return out;
@@ -275,7 +275,7 @@ public:
     {
         T ret = this->data[0] * this->data[0];
 
-        for(unsigned int i = 1; i < N; i++) {
+        for(auto i = 1; i < N; i++) {
             ret += this->data[i] * this->data[i];
         }
 
@@ -292,7 +292,7 @@ public:
         T tmp = data[0] - x[0];
         T d2 = tmp * tmp;
 
-        for(unsigned int i = 1; i < N; i++) {
+        for(auto i = 1; i < N; i++) {
             tmp = data[i] - x[i];
             d2 += tmp * tmp;
         }
@@ -308,7 +308,7 @@ public:
     */
     void clamp(T min, T max)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] = CLAMPi(this->data[i], min, max);
         }
     }
@@ -321,7 +321,7 @@ public:
     {
         T out = data[0] * data[0];
 
-        for(unsigned int i = 1; i < N; i++) {
+        for(auto i = 1; i < N; i++) {
             out += data[i] * data[i];
         }
 
@@ -336,7 +336,7 @@ public:
     std::string toString(Vec<N, T> &x)
     {
         std::string ret = "[";
-        for(unsigned int i = 0; i < N; i++) {
+        for(auto i = 0; i < N; i++) {
             ret += fromNumberToString(x[i]);
         }
         ret += "]";
@@ -364,7 +364,7 @@ public:
      */
     void operator =(const T &a)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] = a;
         }
     }
@@ -375,7 +375,7 @@ public:
     */
     void operator =(const T *a)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] = a[i];
         }
     }
@@ -386,7 +386,7 @@ public:
     */
     void operator =(const Vec<N, T> &a)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] = a.data[i];
         }
     }
@@ -397,7 +397,7 @@ public:
      */
     void operator +=(const T &a)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] += a;
         }
     }
@@ -408,7 +408,7 @@ public:
      */
     void operator +=(const T *a)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] = a[i];
         }
     }
@@ -431,7 +431,7 @@ public:
      */
     void operator -=(const T &a)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] -= a;
         }
     }
@@ -451,7 +451,7 @@ public:
 
     void mul(const T &a)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] *= a;
         }
     }
@@ -471,7 +471,7 @@ public:
      */
     void operator *=(const T *a)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] *= a[i];
         }
     }
@@ -495,7 +495,7 @@ public:
      */
     void operator /=(const float &a)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] /= a;
         }
     }
@@ -525,7 +525,7 @@ public:
      */
     void operator +=(const Vec<N, T> &col)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] += col.data[i];
         }
     }
@@ -549,7 +549,7 @@ public:
      */
     void operator -=(const Vec<N, T> &col)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] -= col.data[i];
         }
     }
@@ -561,7 +561,7 @@ public:
     Vec<N, T> operator -() const
     {
         Vec<N, T> ret;
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             ret.data[i] = -this->data[i];
         }
 
@@ -583,7 +583,7 @@ public:
 
     void mul(const Vec<N, T> &a)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] *= a.data[i];
         }
     }
@@ -616,7 +616,7 @@ public:
      */
     void operator /=(Vec<N, T> &a)
     {
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             this->data[i] /= a.data[i];
         }
     }
@@ -642,7 +642,7 @@ public:
     bool operator !=(Vec<N, T> &a)
     {
         bool ret = false;
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             ret = ret || (this->data[i] != a.data[i]);
         }
         return ret;
@@ -656,7 +656,7 @@ public:
     bool operator ==(Vec<N, T> &a)
     {
         bool ret = true;
-        for (int i = 0; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             ret = ret && (this->data[i] == a.data[i]);
         }
         return ret;
@@ -672,7 +672,7 @@ public:
 template<unsigned int N>
 PIC_INLINE bool insideVecBBox(const Vec<N, float> &sample)
 {
-    for(unsigned int i = 0; i < N; i++) {
+    for(auto i = 0; i < N; i++) {
         if((sample[i] < -1.0f) || (sample[i] > 1.0f)) {
             return false;
         }
@@ -688,7 +688,7 @@ PIC_INLINE Vec<N, float> normalize(Vec<N, float> x)
 
     if(length > 0.0f) {
         length = sqrtf(length);
-        for(unsigned int i = 0; i < N; i++) {
+        for(auto i = 0; i < N; i++) {
             x[i] /= length;
         }
     }
@@ -706,7 +706,7 @@ PIC_INLINE Vec<N, float> randomPoint(std::mt19937 *m)
 {
     Vec<N, float> x;
 
-    for(unsigned int i = 0; i < N; i++) {
+    for(auto i = 0; i < N; i++) {
         x[i] = getRandom((*m)()) * 2.0f - 1.0f;
     }
 
@@ -717,7 +717,7 @@ template<unsigned int N>
 void vecrint(Vec<N, float> &ret)
 {
     printf("\n Values :");
-    for(unsigned int i = 0; i < N; i++) {
+    for(auto i = 0; i < N; i++) {
         printf("%d ", ret.data[i]);
     }
     printf("\n");
@@ -736,7 +736,7 @@ PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, 
     Vec<N, float> x;
 
     while(true) {
-        for(unsigned int i = 0; i < N; i++) {
+        for(auto i = 0; i < N; i++) {
             x[i] = getRandom((*m)()) * 4.0f - 2.0f;
         }
 
@@ -747,7 +747,7 @@ PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, 
         }
     }
 
-    for(unsigned int i = 0; i < N; i++) {
+    for(auto i = 0; i < N; i++) {
         x[i] = x[i] * radius + center[i];
     }
 
@@ -757,7 +757,7 @@ PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, 
 template<unsigned int N>
 void vecGamma(Vec<N, float> &ret, float g)
 {
-    for (int i = 1; i < N; i++) {
+    for (auto i = 1; i < N; i++) {
         ret.data[i] = powf(ret.data[i], g);
     }
 }
@@ -765,7 +765,7 @@ void vecGamma(Vec<N, float> &ret, float g)
 template<unsigned int N>
 void vecSqrt(Vec<N, float> &ret)
 {
-    for (unsigned int i = 0; i < N; i++) {
+    for (auto i = 0; i < N; i++) {
         ret.data[i] = sqrtf(ret.data[i]);
     }
 }
@@ -774,7 +774,7 @@ template<unsigned int N>
 Vec<N, float> vecValOver(Vec<N, float> &in, float value)
 {
     Vec<N, float> ret;
-    for (unsigned int i = 0; i < N; i++) {
+    for (auto i = 0; i < N; i++) {
         ret.data[i] = value / in.data[i];
     }
 
