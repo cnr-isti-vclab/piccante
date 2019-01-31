@@ -79,8 +79,8 @@ inline std::string stdStringRep(std::string str, std::string strSub,
 inline std::string stdStringRepAll(std::string str, std::string strSub,
                                    std::string strRep)
 {
-    int n_sub  = int(strSub.size());
-    int n_rep = int(strRep.size());
+    auto n_sub = strSub.size();
+    auto n_rep = strRep.size();
 
     std::string ret = str;
     std::string::size_type pos = ret.find(strSub);
@@ -192,7 +192,7 @@ inline std::string getExtension(std::string name)
     std::string ext = "";
 
     if(pos != std::string::npos) {
-        int n = int(name.length() - pos);
+        auto n = name.length() - pos;
         ext = name.substr(n, n);
     }
 

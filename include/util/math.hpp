@@ -147,7 +147,7 @@ PIC_INLINE float getRandom(unsigned int n)
  * @param b
  * @return
  */
-PIC_INLINE int getRandomInt(unsigned int n, int a, int b)
+PIC_INLINE int getRandomInt(int n, int a, int b)
 {
     if(a < b) {
         return n % (b - a);
@@ -431,14 +431,14 @@ PIC_INLINE int powint(int x, int b)
  * @param nPerm is the size of perm.
  * @param n is the number of object to permutate.
  */
-PIC_INLINE void getRandomPermutation(std::mt19937 &m, unsigned int *perm, int nPerm, int n)
+PIC_INLINE void getRandomPermutation(std::mt19937 &m, unsigned int *perm, unsigned int nPerm, unsigned int n)
 {
-    std::set< int > checker;
+    std::set< unsigned int > checker;
 
-    int tmp = m() % n;
+    unsigned int tmp = m() % n;
     checker.insert(tmp);
     perm[0] = tmp;
-    int index = 1;
+    unsigned int index = 1;
 
     while(index < nPerm) {
         tmp = m() % n;
