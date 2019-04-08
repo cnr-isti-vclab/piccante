@@ -170,7 +170,7 @@ public:
     Vec<N, T> clone()
     {
         Vec<N, T> ret;
-        memcpy(ret.data, this->data, N * sizeof(T));
+        memcpy(ret.data, data, N * sizeof(T));
         return ret;
     }
 
@@ -309,7 +309,7 @@ public:
     void clamp(T min, T max)
     {
         for (auto i = 0; i < N; i++) {
-            this->data[i] = CLAMPi(this->data[i], min, max);
+            data[i] = CLAMPi(data[i], min, max);
         }
     }
 
@@ -757,7 +757,7 @@ PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, 
 template<unsigned int N>
 void vecGamma(Vec<N, float> &ret, float g)
 {
-    for (auto i = 1; i < N; i++) {
+    for (auto i = 0; i < N; i++) {
         ret.data[i] = powf(ret.data[i], g);
     }
 }
