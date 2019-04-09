@@ -72,6 +72,8 @@ inline float LischinskiFunctionGauss(float Lcur, float Lref, float param[2])
  * @param L
  * @param g
  * @param omega
+ * @param omega_global
+ * @param gOut
  * @param alpha
  * @param lambda
  * @param LISCHINSKI_EPSILON
