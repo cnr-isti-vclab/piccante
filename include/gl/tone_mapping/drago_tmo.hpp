@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
+#include "../../util/array.hpp"
 #include "../../util/math.hpp"
 #include "../../gl/filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter_drago_tmo.hpp"
@@ -61,6 +62,8 @@ public:
     {
         update(Ld_Max, bias);
 
+        img_lum = NULL;
+
         bAllocate = false;
 
         LMax = -1.0f;
@@ -72,11 +75,7 @@ public:
     ~DragoTMOGL()
     {
         stdVectorClear<FilterGL>(filters);
-
-        if(img_lum != NULL) {
-            delete img_lum;
-            img_lum = NULL;
-        }
+        img_lum = delete_s(img_lum);
     }
 
     /**

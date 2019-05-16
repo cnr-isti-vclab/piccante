@@ -40,7 +40,7 @@ class GLWidget : public QGLWidget, protected QOpenGLFunctions
 {
 protected:
     pic::QuadGL *quad;
-    pic::FilterGLColorConv *tmo;
+    pic::FilterGLSimpleTMO *tmo;
     pic::DragoTMOGL        *drago_tmo;
     pic::ReinhardTMOGL     *reinhard_tmo;
     pic::DurandTMOGL       *durand_tmo;
@@ -77,7 +77,7 @@ protected:
         quad = new pic::QuadGL(true);
 
         //allocate a new filter for simple tone mapping
-        tmo = new pic::FilterGLColorConv(new pic::ColorConvGLRGBtosRGB());
+        tmo = new pic::FilterGLSimpleTMO();//(new pic::ColorConvGLRGBtosRGB());
 
         //allocate Drago et al.'s TMO
         drago_tmo = new pic::DragoTMOGL();
@@ -112,27 +112,27 @@ protected:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         switch(method) {
-        case 0:
+        case 0: {
             //apply Reinhard et al.'s TMO (local version)
             reinhard_tmo->update(-1.0f, -1.0f, false);
             img_tmo = reinhard_tmo->execute(&img, img_tmo);
-            break;
+        } break;
 
-        case 1:
+        case 1: {
             //apply Reinhard et al.'s TMO (global version)
             reinhard_tmo->update(-1.0f, -1.0f, true);
             img_tmo = reinhard_tmo->execute(&img, img_tmo);
-            break;
+        } break;
 
-        case 2:
+        case 2: {
             //apply Drago et al.'s TMO
             img_tmo = drago_tmo->execute(&img, img_tmo);
-            break;
+        } break;
 
-        case 3:
+        case 3: {
             //apply Durand et al.'s TMO
             img_tmo = durand_tmo->execute(&img, img_tmo);
-            break;
+        } break;
         }
 
         //convert the image color space from linear RGB to sRGB
