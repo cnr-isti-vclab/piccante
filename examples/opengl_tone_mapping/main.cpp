@@ -26,6 +26,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../opengl_common_code/gl_core_4_0.h"
 #endif
 
+#define PIC_DEBUG
+
 #include <QKeyEvent>
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
@@ -40,7 +42,7 @@ class GLWidget : public QGLWidget, protected QOpenGLFunctions
 {
 protected:
     pic::QuadGL *quad;
-    pic::FilterGLSimpleTMO *tmo;
+    pic::FilterGLColorConv *tmo;
     pic::DragoTMOGL        *drago_tmo;
     pic::ReinhardTMOGL     *reinhard_tmo;
     pic::DurandTMOGL       *durand_tmo;
@@ -65,6 +67,9 @@ protected:
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
+        img_tmo_with_sRGB = NULL;
+        img_tmo = NULL;
+
         //read an input image
         img.Read("../data/input/bottles.hdr");
         img.generateTextureGL();
@@ -77,7 +82,8 @@ protected:
         quad = new pic::QuadGL(true);
 
         //allocate a new filter for simple tone mapping
-        tmo = new pic::FilterGLSimpleTMO();//(new pic::ColorConvGLRGBtosRGB());
+        auto conv_sRGB = new pic::ColorConvGLRGBtosRGB(true);
+        tmo = new pic::FilterGLColorConv((pic::ColorConvGL*)conv_sRGB, true);
 
         //allocate Drago et al.'s TMO
         drago_tmo = new pic::DragoTMOGL();

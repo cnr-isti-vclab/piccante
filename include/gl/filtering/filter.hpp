@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_GL_FILTERING_FILTER_HPP
 
 #include "../../util/array.hpp"
+#include "../../util/std_util.hpp"
 #include "../../gl/image.hpp"
 #include "../../gl/image_vec.hpp"
 #include "../../util/array.hpp"
@@ -82,15 +83,8 @@ public:
      */
     void release()
     {
-        if(quad != NULL) {
-            delete quad;
-            quad = NULL;
-        }
-
-        if(fbo != NULL) {
-            delete fbo;
-            fbo = NULL;
-        }
+        delete_s(quad);
+        delete_s(fbo);
 
         releaseAux();
     }

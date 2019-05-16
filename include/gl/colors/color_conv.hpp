@@ -106,7 +106,7 @@ public:
      */
     void setTransform(bool direct)
     {
-        this->direct = direct ? 1 : 0;
+        this->direct = direct ? 0 : 1;
     }
 
     /**
