@@ -100,13 +100,19 @@ public:
         nWhite = -1;
     }
 
+    /**
+     * @brief getScalingFactors
+     * @param white
+     * @param nWhite
+     * @return
+     */
     static float *getScalingFactors(float *white, int nWhite)
     {
         if(white == NULL || nWhite < 1) {
             return NULL;
         }
 
-        float white_mean = Array<float>::sum(white, nWhite) / float(nWhite);
+        float white_mean = Arrayf::sum(white, nWhite) / float(nWhite);
 
         float *out = new float[nWhite];
 
@@ -142,7 +148,7 @@ public:
             memcpy(this->white, white, sizeof(float) * nWhite);
         }
 
-        for(auto i = 0; i < nWhite; i++) {
+        for(unsigned int i = 0; i < nWhite; i++) {
             if(fabsf(this->white[i]) <= 1e-9f) {
                 this->white[i] = 1.0f;
             }

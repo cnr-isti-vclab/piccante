@@ -39,14 +39,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
-
 public:
     /**
      * @brief FilterSampler3D
@@ -56,13 +48,29 @@ public:
     FilterSampler3D(float scale, ImageSampler *isb);
 
     /**
-     * @brief Execute
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width  = int(imgIn[0]->widthf  * scale);
+        height = int(imgIn[0]->heightf * scale);
+        frames = int(imgIn[0]->framesf * scale);
+        channels = imgIn[0]->channels;
+    }
+
+    /**
+     * @brief execute
      * @param in
      * @param isb
      * @param scale
      * @return
      */
-    static Image *Execute(Image *in, ImageSampler *isb, float scale)
+    static Image *execute(Image *in, ImageSampler *isb, float scale)
     {
         FilterSampler3D filterUp(scale, isb);
         Image *out = filterUp.Process(Single(in), NULL);
@@ -70,22 +78,10 @@ public:
     }
 };
 
-PIC_INLINE FilterSampler3D::FilterSampler3D(float scale, ImageSampler *isb)
+PIC_INLINE FilterSampler3D::FilterSampler3D(float scale, ImageSampler *isb) : Filter()
 {
     this->scale = scale;
     this->isb = isb;
-}
-
-PIC_INLINE Image *FilterSampler3D::SetupAux(ImageVec imgIn, Image *imgOut)
-{
-    if(imgOut == NULL) {
-        imgOut = new Image( int(imgIn[0]->framesf * scale),
-                            int(imgIn[0]->widthf  * scale),
-                            int(imgIn[0]->heightf * scale),
-                            imgIn[0]->channels);
-    }
-
-    return imgOut;
 }
 
 PIC_INLINE void FilterSampler3D::ProcessBBox(Image *dst, ImageVec src, BBox *box)

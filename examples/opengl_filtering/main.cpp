@@ -1,18 +1,26 @@
 /*
 
-PICCANTE
-The hottest HDR imaging library!
-http://piccantelib.net
+PICCANTE Examples
+The hottest examples of Piccante:
+http://vcg.isti.cnr.it/piccante
 
 Copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
+This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3.0 of the License, or
+    (at your option) any later version.
 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    See the GNU Lesser General Public License
+    ( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
 */
 
 /**
@@ -21,29 +29,31 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * a suggestion for running examples.
 */
 
-#ifdef _MSC_VER
-    #define PIC_DISABLE_OPENGL_NON_CORE
-    #include "../common_code/gl_core_4_0.h"
-#endif
-
-//#define PIC_DISABLE_TINY_EXR
+#include "../common_code/gl_include.hpp"
 
 #include <QKeyEvent>
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
 #include <QApplication>
-#include <QOpenGLFunctions>
 #include <QVBoxLayout>
 #include <QLabel>
 
 #include "piccante.hpp"
 
-class GLWidget : public QGLWidget, protected QOpenGLFunctions
+class GLWidget : public QGLWidget
+        #ifndef _MSC_VER
+        , protected QOpenGLFunctions
+        #endif
 {
 protected:
     pic::QuadGL *quad;
     pic::FilterGLSimpleTMO *tmo;
+    pic::FilterGLBilateral2DF *fltBilF;
     pic::FilterGLBilateral2DG *fltBilG;
+    pic::FilterGLBilateral2DSP *fltBilSP;
+    pic::FilterGLBilateral2DS *fltBilS;
+    pic::FilterGLGaussian2D *fltGauss;
+    pic::FilterGLAnisotropicDiffusion *fltAD;
 
     pic::ImageGL *img, *img_flt, *img_flt_tmo;
     pic::TechniqueGL technique;
@@ -55,33 +65,65 @@ protected:
      */
     void initializeGL(){
 
+    #ifndef _MSC_VER
         initializeOpenGLFunctions();
+    #endif
 
-        #ifdef PIC_WIN32
-            if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
-                printf("OpenGL functions are not loaded!\n");
-            }
-        #endif
+    #ifdef _MSC_VER
+        if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+            printf("OpenGL functions are not loaded!\n");
+        }
+    #endif
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
-        //reading an input image
+        //read an input image
         img = new pic::ImageGL();
-        img->Read("../data/input/yellow_flowers.png");
-        img->generateTextureGL();
+        img->Read("../data/input/yellow_flowers.png", pic::LT_NOR_GAMMA);
+        img->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
-        //creating a screen aligned quad
+        #ifdef PIC_DEBUG
+            printf("Image is read: %d\n", bRead);
+        #endif
+
+        //create a screen aligned quad
         pic::QuadGL::getTechnique(technique,
                                 pic::QuadGL::getVertexProgramV3(),
                                 pic::QuadGL::getFragmentProgramForView());
 
         quad = new pic::QuadGL(true);
 
-        //allocating a new filter for simple tone mapping
+        //allocate a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
 
-        //allocating a new bilateral filter
-        fltBilG = new pic::FilterGLBilateral2DG(4.0f, 0.1f);
+        float sigma_s = 16.0f;
+        float sigma_r = 0.1f;
+
+        fltGauss = new pic::FilterGLGaussian2D(sigma_s);
+
+        //allocate a new bilateral filter
+        fltBilG = new pic::FilterGLBilateral2DG(sigma_s, sigma_r);
+
+        //allocate a new bilateral filter
+        fltBilSP = new pic::FilterGLBilateral2DSP(sigma_s, sigma_r);
+
+        //allocate a new bilateral filter
+        fltBilS = new pic::FilterGLBilateral2DS(sigma_s, sigma_r);
+
+        //allocate a new bilateral filter
+        fltBilF = new pic::FilterGLBilateral2DF(sigma_s, sigma_r);
+
+        //allocate a new anisotropic diffusion filter
+        fltAD = new pic::FilterGLAnisotropicDiffusion(sigma_s, sigma_r);
+
+        /*
+        auto *out = pic::FilterGLSamplingMap::execute(img, NULL, 16.0f);
+        out->loadToMemory();
+        out->Write("testSampling.png");
+        */
+
+        img_flt_tmo = NULL;
+        img_flt = NULL;
     }
 
     /**
@@ -106,22 +148,78 @@ protected:
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        if(method == 0) {
-            //applying the bilateral filter
-            img_flt = fltBilG->Process(SingleGL(img), img_flt);
+        pic::ImageGL *img_out = NULL;
+        switch(method)
+        {
+            case 0:
+                //input image
+                img_out = img;
+                window_ext->setWindowTitle(tr("Filtering Example: Original Image"));
 
-            //simple tone mapping: gamma + exposure correction
-            img_flt_tmo = tmo->Process(SingleGL(img_flt), img_flt_tmo);
-        } else {
-            //simple tone mapping: gamma + exposure correction
-            img_flt_tmo = tmo->Process(SingleGL(img), img_flt_tmo);
+            break;
+
+            case 1:
+                //apply the gaussian filter
+                img_flt = fltGauss->Process(SingleGL(img), img_flt);
+                img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Guassian Filter"));
+
+            break;
+
+            case 2:
+                //apply the sampling bilateral filter
+                img_flt = fltBilF->Process(SingleGL(img), img_flt);
+                img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Full Bilateral"));
+
+            break;
+
+            case 3:
+                //apply the bilateral grid filter
+                img_flt = fltBilG->Process(SingleGL(img), img_flt);
+                img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Bilateral Grid"));
+
+            break;
+
+            case 4:
+                //apply the separate bilateral filter
+                img_flt = fltBilSP->Process(SingleGL(img), img_flt);
+                img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Separate Bilateral"));
+
+            break;
+
+            case 5:
+                //apply the sampling bilateral filter
+                img_flt = fltBilS->Process(SingleGL(img), img_flt);
+                img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Sub-Sampled Bilateral"));
+            break;
+
+            case 6:
+                //apply the anisotropic diffusion filter
+                img_flt = fltAD->AnisotropicDiffusion(SingleGL(img), img_flt);
+                img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Anisotropic Diffusion"));
+
+            break;
+
+        default:
+            img_out = img;
+            break;
         }
+
+        //simple tone mapping: gamma + exposure correction
+        img_flt_tmo = tmo->Process(SingleGL(img_out), img_flt_tmo);
 
         //visualization
         quad->Render(technique, img_flt_tmo->getTexture());
     }
 
 public:
+
+    QWidget *window_ext;
 
     /**
      * @brief GLWidget
@@ -144,7 +242,7 @@ public:
      */
     void update()
     {
-        method = (method + 1) % 2;
+        method = (method + 1) % 7;
     }
 };
 
@@ -166,13 +264,14 @@ public:
         resize(800, 533 + 64);
 
         window_gl = new GLWidget(format, this);
+        window_gl->window_ext = this;
 
         layout = new QVBoxLayout();
 
         layout->addWidget(window_gl);
 
         label = new QLabel(
-        "Pease hit the space bar in order to switch from the filtered image to the original one.", this);
+        "Pease hit the space bar in order to switch from the original one to the filtered one using different filters.", this);
         label->setAlignment(Qt::AlignHCenter);
         label->setFixedWidth(800);
         label->setFixedHeight(64);

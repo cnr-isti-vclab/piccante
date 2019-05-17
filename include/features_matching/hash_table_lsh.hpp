@@ -38,14 +38,15 @@ public:
 
     std::vector< unsigned int *> *descs;
     std::vector< unsigned int > *table;
-    unsigned int    nTable;
-    unsigned int    hash_size, desc_size, size_ui;
+    unsigned int nTable;
+    unsigned int hash_size, desc_size, size_ui;
 
     HashTableLSH(unsigned int hash_size, unsigned int *g_f, std::vector< unsigned int *> *descs, unsigned int desc_size)
     {
         if(hash_size == 0) {
             hash_size = 8;
         }
+
         this->hash_size = hash_size;
 
         nTable = 1 << hash_size;

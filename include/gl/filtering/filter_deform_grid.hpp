@@ -37,9 +37,9 @@ protected:
     ImageGL *grid_diff_gl;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
     /**
@@ -47,11 +47,18 @@ public:
      */
     FilterGLDeformGrid(Image *grid_move);
 
+    ~FilterGLDeformGrid();
+
     /**
-     * @brief Update
+     * @brief releaseAux
+     */
+    void releaseAux();
+
+    /**
+     * @brief update
      * @param type
      */
-    void Update(Image *grid_move);
+    void update(Image *grid_move);
 
     /**
      * @brief getCoordinatesAfterTransform
@@ -70,7 +77,7 @@ public:
     }
 };
 
-FilterGLDeformGrid::FilterGLDeformGrid(Image *grid_move): FilterGL()
+PIC_INLINE FilterGLDeformGrid::FilterGLDeformGrid(Image *grid_move): FilterGL()
 {
     this->grid_rest = FilterDeformGrid::getUniformGrid(grid_move->width, grid_move->height);
     this->grid_move = grid_move;
@@ -78,13 +85,24 @@ FilterGLDeformGrid::FilterGLDeformGrid(Image *grid_move): FilterGL()
     grid_diff = *grid_rest - *grid_move;
 
     grid_diff_gl = new ImageGL(&grid_diff, true);
-    grid_diff_gl->generateTextureGL();
+    grid_diff_gl->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
     param.push_back(grid_diff_gl);
 
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLDeformGrid::InitShaders()
+PIC_INLINE FilterGLDeformGrid::~FilterGLDeformGrid()
+{
+    release();
+}
+
+PIC_INLINE void FilterGLDeformGrid::releaseAux()
+{
+    grid_rest = delete_s(grid_rest);
+    grid_diff_gl = delete_s(grid_diff_gl);
+}
+
+PIC_INLINE void FilterGLDeformGrid::initShaders()
 {
     fragment_source  = GLSL_BICUBIC();
     fragment_source += GLSL_TEXTURE_BICUBIC();
@@ -107,10 +125,10 @@ void FilterGLDeformGrid::InitShaders()
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLDeformGrid");
 
-    Update(NULL);
+    update(NULL);
 }
 
-void FilterGLDeformGrid::Update(Image *grid_move)
+PIC_INLINE void FilterGLDeformGrid::update(Image *grid_move)
 {
     if(grid_move != NULL) {
 

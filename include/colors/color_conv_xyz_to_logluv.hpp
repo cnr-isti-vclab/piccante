@@ -28,7 +28,7 @@ namespace pic {
 class ColorConvXYZtoLogLuv: public ColorConv
 {
 protected:
-    float	epsilon;
+    float epsilon;
 
 public:
 

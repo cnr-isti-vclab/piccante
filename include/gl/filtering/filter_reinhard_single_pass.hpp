@@ -18,6 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_REINHARD_TMO_SINGLE_PASS_HPP
 #define PIC_GL_FILTERING_REINHARD_TMO_SINGLE_PASS_HPP
 
+#include "../../base.hpp"
+
+#include "../../util/vec.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../util/file_lister.hpp"
 #include "../../gl/point_samplers/sampler_random_m.hpp"
@@ -39,7 +43,7 @@ protected:
     //Random numbers tile
     ImageGL *imageRand;
 
-    void InitShaders();
+    void initShaders();
     void FragmentShader();
 
 public:
@@ -55,11 +59,11 @@ public:
     ~FilterGLReinhardSinglePass();
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      */
-    void Update(float sigma_s, float sigma_r, float Lwa);
+    void update(float sigma_s, float sigma_r, float Lwa);
 
     /**
      * @brief Process
@@ -72,7 +76,7 @@ public:
 
 };
 
-FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, float phi = 8.0f): FilterGL()
+PIC_INLINE FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, float phi = 8.0f): FilterGL()
 {
     this->alpha = alpha;
 
@@ -106,15 +110,16 @@ FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, float phi = 
     printf("Window: %d\n", halfKernelSize);
 #endif
 
-    ms = new MRSamplersGL<2>(ST_BRIDSON, halfKernelSize, halfKernelSize, 1,
+    Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+    ms = new MRSamplersGL<2>(ST_BRIDSON, window, halfKernelSize, 1,
                              nSamplers);
     ms->generateTexture();
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
-FilterGLReinhardSinglePass::~FilterGLReinhardSinglePass()
+PIC_INLINE FilterGLReinhardSinglePass::~FilterGLReinhardSinglePass()
 {
     delete imageRand;
     delete ms;
@@ -122,7 +127,7 @@ FilterGLReinhardSinglePass::~FilterGLReinhardSinglePass()
     //free shader etc...
 }
 
-void FilterGLReinhardSinglePass::FragmentShader()
+PIC_INLINE void FilterGLReinhardSinglePass::FragmentShader()
 {
     fragment_source = MAKE_STRING
                                           (
@@ -185,7 +190,7 @@ void FilterGLReinhardSinglePass::FragmentShader()
 
 }
 
-void FilterGLReinhardSinglePass::InitShaders()
+PIC_INLINE void FilterGLReinhardSinglePass::initShaders()
 {
 #ifdef PIC_DEBUG
     printf("Number of samples: %d\n", ms->nSamples);
@@ -193,10 +198,10 @@ void FilterGLReinhardSinglePass::InitShaders()
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLReinhardSinglePass");
 
-    Update(-1.0f, -1.0f, 1.0f);
+    update(-1.0f, -1.0f, 1.0f);
 }
 
-void FilterGLReinhardSinglePass::Update(float sigma_s, float sigma_r, float Lwa)
+PIC_INLINE void FilterGLReinhardSinglePass::update(float sigma_s, float sigma_r, float Lwa)
 {
     bool flag = false;
 
@@ -218,7 +223,8 @@ void FilterGLReinhardSinglePass::Update(float sigma_s, float sigma_r, float Lwa)
     int halfKernelSize = kernelSize >> 1;
 
     if(flag) {
-        ms->updateGL(halfKernelSize, halfKernelSize);
+        Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+        ms->updateGL(window, halfKernelSize);
     }
 
     //shader update
@@ -242,8 +248,7 @@ void FilterGLReinhardSinglePass::Update(float sigma_s, float sigma_r, float Lwa)
     technique.unbind();
 }
 
-//Processing
-ImageGL *FilterGLReinhardSinglePass::Process(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLReinhardSinglePass::Process(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {

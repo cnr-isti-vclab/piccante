@@ -18,6 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_TONE_MAPPING_DRAGO_TMO_HPP
 #define PIC_GL_TONE_MAPPING_DRAGO_TMO_HPP
 
+#include <vector>
+
+#include "../../util/array.hpp"
+#include "../../util/math.hpp"
 #include "../../gl/filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter_drago_tmo.hpp"
 
@@ -30,31 +34,37 @@ class DragoTMOGL
 {
 protected:
     FilterGLLuminance *flt_lum;
-    FilterGLOp        *flt_log;
     FilterGLDragoTMO  *flt_tmo;
+    std::vector<FilterGL* > filters;
 
-    ImageGL           *img_lum;
+    ImageGL *img_lum;
+    float LMax, Lwa, Ld_Max, bias;
+    bool bStatisticsRecompute, bAllocate;
 
-    float              LMax, Lwa;
-    bool               bStatisticsRecompute;
     /**
-     * @brief AllocateFilters
+     * @brief allocateFilters
      */
-    void AllocateFilters()
+    void allocateFilters()
     {
+        bAllocate = true;
         flt_lum = new FilterGLLuminance();
         flt_tmo = new FilterGLDragoTMO();
+
+        filters.push_back(flt_lum);
+        filters.push_back(flt_tmo);
     }
 
 public:
     /**
      * @brief DragoTMOGL
      */
-    DragoTMOGL(bool bStatisticsRecompute = true)
+    DragoTMOGL(float Ld_Max = 100.0f, float bias = 0.85f, bool bStatisticsRecompute = true)
     {
-        flt_lum = NULL;
-        flt_tmo = NULL;
+        update(Ld_Max, bias);
+
         img_lum = NULL;
+
+        bAllocate = false;
 
         LMax = -1.0f;
         Lwa = -1.0f;
@@ -64,39 +74,35 @@ public:
 
     ~DragoTMOGL()
     {
-        if(flt_lum != NULL) {
-            delete flt_lum;
-            flt_lum = NULL;
-        }
-
-        if(flt_tmo != NULL) {
-            delete flt_tmo;
-            flt_tmo = NULL;
-        }
-
-        if(img_lum != NULL) {
-            delete img_lum;
-            img_lum = NULL;
-        }
+        stdVectorClear<FilterGL>(filters);
+        img_lum = delete_s(img_lum);
     }
 
     /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
+     * @brief update
      * @param Ld_Max
      * @param bias
+     */
+    void update(float Ld_Max = 100.0f, float bias = 0.95f)
+    {
+        this->Ld_Max = Ld_Max > 0.0f ? Ld_Max : 100.0f;
+        this->bias = CLAMPi(bias, 0.0f, 1.0f);
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
      * @return
      */
-    ImageGL *Process(ImageGL *imgIn, ImageGL *imgOut = NULL,
-                     float Ld_Max = 100.0f, float bias = 0.95f)
+    ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut = NULL)
     {
         if(imgIn == NULL) {
             return imgOut;
         }
 
-        if(flt_lum == NULL) {
-            AllocateFilters();
+        if(!bAllocate) {
+            allocateFilters();
         }
 
         img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
@@ -106,7 +112,7 @@ public:
             img_lum->getLogMeanVal(&Lwa);
         }
 
-        flt_tmo->Update(Ld_Max, bias, LMax, Lwa);
+        flt_tmo->update(Ld_Max, bias, LMax, Lwa);
         imgOut = flt_tmo->Process(DoubleGL(imgIn, img_lum), imgOut);
 
         return imgOut;

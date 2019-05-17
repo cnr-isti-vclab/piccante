@@ -25,28 +25,55 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief The FilterGLAnisotropicDiffusion class
+ */
 class FilterGLAnisotropicDiffusion: public FilterGL
 {
 protected:
-    void InitShaders();
+    /**
+     * @brief initShaders
+     */
+    void initShaders();
+
+    /**
+     * @brief FragmentShader
+     */
     void FragmentShader();
 
     float delta_t, k;
     unsigned int iterations;
-    FilterGLIterative	*flt;
+    FilterGLIterative *flt;
 
 public:
-    //Basic constructors
+    /**
+     * @brief FilterGLAnisotropicDiffusion
+     * @param k
+     * @param iterations
+     */
     FilterGLAnisotropicDiffusion(float k, unsigned int iterations);
-    FilterGLAnisotropicDiffusion(float sigma_r, float sigma_s);
 
-    //Updating k
-    void Update(float k);
+    /**
+     * @brief FilterGLAnisotropicDiffusion
+     * @param sigma_s
+     * @param sigma_r
+     */
+    FilterGLAnisotropicDiffusion(float sigma_s, float sigma_r);
 
-    //Processing
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
+    ~FilterGLAnisotropicDiffusion();
 
-    //Anisotropic Diffusion
+    /**
+     * @brief update
+     * @param k
+     */
+    void update(float k);
+
+    /**
+     * @brief AnisotropicDiffusion
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
     ImageGL *AnisotropicDiffusion(ImageGLVec imgIn, ImageGL *imgOut)
     {
         if(flt == NULL) {
@@ -76,15 +103,13 @@ PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float k,
 
     //protected values are assigned/computed
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
-PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigma_r,
-        float sigma_s): FilterGL()
+PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigma_s,
+        float sigma_r): FilterGL()
 {
-    if(sigma_r <= 0.0f) {
-        sigma_r = 0.11f;
-    }
+    sigma_r = sigma_r <= 0.0f ? 0.11f : sigma_r;
 
     flt = NULL;
 
@@ -95,7 +120,17 @@ PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigm
 
     //protected values are assigned/computed
     FragmentShader();
-    InitShaders();
+    initShaders();
+}
+
+PIC_INLINE FilterGLAnisotropicDiffusion::~FilterGLAnisotropicDiffusion()
+{
+    release();
+
+    if(flt != NULL) {
+        delete flt;
+        flt = NULL;
+    }
 }
 
 PIC_INLINE void FilterGLAnisotropicDiffusion::FragmentShader()
@@ -103,7 +138,7 @@ PIC_INLINE void FilterGLAnisotropicDiffusion::FragmentShader()
     fragment_source = MAKE_STRING
                       (
                           uniform sampler2D u_tex; \n
-                          uniform float	  k2; \n
+                          uniform float	  k_sq; \n
                           uniform float	  delta_t; \n
                           out     vec4      f_color; \n
 
@@ -131,7 +166,7 @@ PIC_INLINE void FilterGLAnisotropicDiffusion::FragmentShader()
         \n
         vec4 c = vec4(dot(gN, gN), dot(gS, gS), dot(gW, gW), dot(gE, gE));
         \n
-        c = exp(-c / vec4(k2));
+        c = exp(-c / vec4(k_sq));
         \n
         f_color = vec4(cB + delta_t *(c.x * gN + c.y * gS + c.z * gW + c.w * gE), 1.0);
         \n
@@ -139,71 +174,23 @@ PIC_INLINE void FilterGLAnisotropicDiffusion::FragmentShader()
                       );
 }
 
-PIC_INLINE void FilterGLAnisotropicDiffusion::InitShaders()
+PIC_INLINE void FilterGLAnisotropicDiffusion::initShaders()
 {
     FragmentShader();
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLAnisotropicDiffusion");
-    Update(k);
+    update(k);
 }
 
-PIC_INLINE void FilterGLAnisotropicDiffusion::Update(float k)
+PIC_INLINE void FilterGLAnisotropicDiffusion::update(float k)
 {
-    if(k > 0.0f) {
-        this->k = k;
-    }
-
-    float k2 = this->k * this->k;
+    this->k = k > 0.0f ? k : this->k;
+    float k_sq = this->k * this->k;
 
     technique.bind();
     technique.setUniform1i("u_tex", 0);
-    technique.setUniform1f("k2", k2);
+    technique.setUniform1f("k_sq", k_sq);
     technique.setUniform1f("delta_t", delta_t);
     technique.unbind();
-}
-
-PIC_INLINE ImageGL *FilterGLAnisotropicDiffusion::Process(ImageGLVec imgIn,
-        ImageGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
-
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //bind shaders
-    technique.bind();
-
-    //bind Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //render an aligned quad
-    quad->Render();
-
-    //unbind the FBO
-    fbo->unbind();
-
-    //unbind shaders
-    technique.unbind();
-
-    //unbind textures
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

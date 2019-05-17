@@ -28,9 +28,8 @@ namespace pic {
 class FilterGLBilateral1D: public FilterGL1D
 {
 protected:
-    float	sigma_s, sigma_r;
+    float sigma_s, sigma_r;
 
-    void InitShaders();
     void FragmentShader();
 
 public:
@@ -46,46 +45,16 @@ public:
                         GLenum target);
 
     /**
-     * @brief SetUniformAux
+     * @brief setUniformAux
      */
-    void SetUniformAux();
+    void setUniformAux();
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      */
-    void Update(float sigma_s, float sigma_r);
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma_s
-     * @param sigma_r
-     * @return
-     */
-    static ImageGL *Execute(std::string nameIn, std::string nameOut,
-                               float sigma_s, float sigma_r)
-    {
-        GLuint testTQ = glBeginTimeQuery();
-        glEndTimeQuery(testTQ);
-
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-
-        FilterGLBilateral1D filter(sigma_s, sigma_r, true, GL_TEXTURE_2D);
-
-        GLuint testTQ1 = glBeginTimeQuery();
-        ImageGL *imgOut = filter.Process(SingleGL(&imgIn), NULL);
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        printf("Gaussian 1D Filter on GPU time: %g ms\n",
-               double(timeVal) / 100000000.0);
-
-        imgOut->readFromFBO(filter.getFbo());
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
+    void update(float sigma_s, float sigma_r);
 };
 
 FilterGLBilateral1D::FilterGLBilateral1D(float sigma_s, float sigma_r,
@@ -96,7 +65,7 @@ FilterGLBilateral1D::FilterGLBilateral1D(float sigma_s, float sigma_r,
     this->sigma_r = sigma_r;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLBilateral1D::FragmentShader()
@@ -190,34 +159,25 @@ void FilterGLBilateral1D::FragmentShader()
     }
 }
 
-void FilterGLBilateral1D::InitShaders()
+void FilterGLBilateral1D::setUniformAux()
 {
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral1D");
-
-    Update(sigma_s, sigma_r);
-}
-
-void FilterGLBilateral1D::SetUniformAux()
-{
-    float sigma_s2 = 2.0f * sigma_s * sigma_s;
-    float sigma_r2 = 2.0f * sigma_r * sigma_r;
+    float sigma_s_sq2 = 2.0f * sigma_s * sigma_s;
+    float sigma_r_sq2 = 2.0f * sigma_r * sigma_r;
 
     //Precomputation of the Gaussian Kernel
-    int halfKernelSize = PrecomputedGaussian::getKernelSize(sigma_s) >> 1;
+    int halfKernelSize = PrecomputedGaussian::getKernelSize(MAX(sigma_s, sigma_r)) >> 1;
 
-    technique.bind();
-    technique.setUniform1f("sigma_s2",	sigma_s2);
-    technique.setUniform1f("sigma_r2",	sigma_r2);
+    technique.setUniform1f("sigma_s2",	sigma_s_sq2);
+    technique.setUniform1f("sigma_r2",	sigma_r_sq2);
     technique.setUniform1i("halfKernelSize", halfKernelSize);
-    technique.unbind();
 }
 
-void FilterGLBilateral1D::Update(float sigma_s, float sigma_r)
+void FilterGLBilateral1D::update(float sigma_s, float sigma_r)
 {
     this->sigma_s = sigma_s;
     this->sigma_r = sigma_r;
 
-    SetUniform();
+    setUniform();
 }
 
 } // end namespace pic

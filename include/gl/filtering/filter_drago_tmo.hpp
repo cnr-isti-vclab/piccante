@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_DRAGO_TMO_HPP
 #define PIC_GL_FILTERING_FILTER_DRAGO_TMO_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../gl/filtering/filter_luminance.hpp"
 
@@ -34,14 +36,14 @@ protected:
     bool bGammaCorrection;
 
     /**
-     * @brief ComputeConstants
+     * @brief computeConstants
      */
-    void ComputeConstants();
+    void computeConstants();
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -55,27 +57,16 @@ public:
     FilterGLDragoTMO();
 
     /**
-     * @brief FilterGLDragoTMO
-     * @param Ld_Max
-     * @param b
-     * @param LMax
-     * @param Lwa
-     * @param bGammaCorrection
-     */
-    FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
-                     bool bGammaCorrection);
-
-    /**
-     * @brief Update
+     * @brief update
      * @param Ld_Max
      * @param b
      * @param LMax
      * @param Lwa
      */
-    void Update(float Ld_Max, float b, float LMax, float Lwa);
+    void update(float Ld_Max, float b, float LMax, float Lwa);
 };
 
-FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()
+PIC_INLINE FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()
 {
     Ld_Max	=  100.0f;
     b		=  0.95f;
@@ -85,60 +76,24 @@ FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()
     bGammaCorrection = false;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
-FilterGLDragoTMO::FilterGLDragoTMO(float Ld_Max, float b, float LMax, float Lwa,
-                                   bool bGammaCorrection = false): FilterGL()
-{
-    //protected values are assigned/computed
-    if(Ld_Max > 0.0f) {
-        this->Ld_Max = Ld_Max;
-    } else {
-        this->Ld_Max = 100.0f;
-    }
-
-    if(b > 0.0f) {
-        this->b = b;
-    } else {
-        this->b = 0.95f;
-    }
-
-    if(LMax > 0.0f) {
-        this->LMax = LMax;
-    } else {
-        this->LMax = 1e6f;
-    }
-
-    if(Lwa > 0.0f) {
-        this->Lwa = Lwa;
-    } else {
-        this->Lwa = 1.0f;
-    }
-
-    this->bGammaCorrection = bGammaCorrection;
-
-    FragmentShader();
-    InitShaders();
-}
-
-void FilterGLDragoTMO::FragmentShader()
+PIC_INLINE void FilterGLDragoTMO::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
-    uniform sampler2D u_tex;	\n
-    //uniform sampler2D u_lum;	\n
-    uniform float	  constant1;\n
-    uniform float	  constant2;\n
-    uniform float     LMax;		\n
-    uniform float     Lwa;		\n
-    out     vec4      f_color;	\n
+    uniform sampler2D u_tex;\n
+    uniform float constant1;\n
+    uniform float constant2;\n
+    uniform float LMax;\n
+    uniform float Lwa;\n
+    out     vec4  f_color;\n
 
     void main(void) {
         \n
         ivec2 coords   = ivec2(gl_FragCoord.xy);\n
         vec3  color    = texelFetch(u_tex, coords, 0).xyz;\n
-        //float L        = texelFetch(u_lum, coords, 0).x;\n
         float L        = dot(vec3(0.213, 0.715, 0.072), color);
         float L_scaled = L / Lwa;\n
         float tmp      = pow((L_scaled / LMax), constant1);\n
@@ -150,54 +105,29 @@ void FilterGLDragoTMO::FragmentShader()
     }\n
                       );
 
-    fragment_source = GammaCorrection(fragment_source, bGammaCorrection);
+    fragment_source = gammaCorrection(fragment_source, bGammaCorrection);
 }
 
-void FilterGLDragoTMO::ComputeConstants()
+PIC_INLINE void FilterGLDragoTMO::initShaders()
 {
+    technique.initStandard("330", vertex_source, fragment_source, "FilterGLDragoTMO");
+    update(Ld_Max, b, LMax, Lwa);
+}
+
+PIC_INLINE void FilterGLDragoTMO::update(float Ld_Max, float b, float LMax, float Lwa)
+{
+    this->Ld_Max = Ld_Max > 0.0f ? Ld_Max : 100.0f;
+    this->b = b > 0.0f ? b : 0.95f;
+    this->LMax = LMax > 0.0f ? LMax : 1e6f;
+    this->Lwa = Lwa > 0.0f ? Lwa : 1.0f;
+
     Lwa_scaled  = Lwa / powf(1.0f + b - 0.85f, 5.0f);
     LMax_scaled = LMax / Lwa_scaled;
     constant1   = logf(b) / logf(0.5f);
     constant2   = (Ld_Max / 100.0f) / (log10(1 + LMax_scaled));
-}
-
-void FilterGLDragoTMO::InitShaders()
-{
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGLDragoTMO");
-    Update(Ld_Max, b, LMax, Lwa);
-}
-
-void FilterGLDragoTMO::Update(float Ld_Max, float b, float LMax, float Lwa)
-{
-    if(Ld_Max > 0.0f) {
-        this->Ld_Max = Ld_Max;
-    } else {
-        this->Ld_Max = 100.0f;
-    }
-
-    if(b > 0.0f) {
-        this->b = b;
-    } else {
-        this->b = 0.95f;
-    }
-
-    if(LMax > 0.0f) {
-        this->LMax = LMax;
-    } else {
-        this->LMax = 1e6f;
-    }
-
-    if(Lwa > 0.0f) {
-        this->Lwa = Lwa;
-    } else {
-        this->Lwa = 1.0f;
-    }
-
-    ComputeConstants();
 
     technique.bind();
     technique.setUniform1i("u_tex", 0);
-    //technique.setUniform1i("u_lum", 1);
     technique.setUniform1f("constant1", constant1);
     technique.setUniform1f("constant2", constant2);
     technique.setUniform1f("LMax", LMax_scaled);

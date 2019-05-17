@@ -74,26 +74,11 @@ protected:
         }
     }
 
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
-        }
-
-        return imgOut;
-    }
-
 public:
     /**
      * @brief FilterMosaic
      */
-    FilterMosaic()
+    FilterMosaic() : Filter()
     {
 
     }
@@ -106,36 +91,36 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn->width;
-        height      = imgIn->height;
-        channels    = 1;
-        frames      = imgIn->frames;
+        width    = imgIn[0]->width;
+        height   = imgIn[0]->height;
+        channels = 1;
+        frames   = imgIn[0]->frames;
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut)
+    static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterMosaic flt;
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param fileInput
      * @param fileOutput
      * @return
      */
-    static Image *Execute(std::string fileInput, std::string fileOutput)
+    static Image *execute(std::string fileInput, std::string fileOutput)
     {
         Image imgIn(fileInput);
-        Image *out = FilterMosaic::Execute(&imgIn, NULL);
+        Image *out = FilterMosaic::execute(&imgIn, NULL);
         out->Write(fileOutput);
         return out;
     }

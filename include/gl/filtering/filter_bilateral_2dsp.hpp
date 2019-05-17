@@ -31,23 +31,7 @@ namespace pic {
 class FilterGLBilateral2DSP: public FilterGLNPasses
 {
 protected:
-    FilterGLBilateral1D		*filter;
-
-    /**
-     * @brief InitShaders
-     */
-    void InitShaders()
-    {
-
-    }
-
-    /**
-     * @brief FragmentShader
-     */
-    void FragmentShader()
-    {
-
-    }
+    FilterGLBilateral1D *filter;
 
 public:
     /**
@@ -62,15 +46,17 @@ public:
      */
     FilterGLBilateral2DSP(float sigma_s, float sigma_r);
 
+    ~FilterGLBilateral2DSP();
+
     /**
-    * @brief Update
+    * @brief update
     * @param sigma_s
     * @param sigma_r
     */
-    void Update(float sigma_s, float sigma_r);
+    void update(float sigma_s, float sigma_r);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma_s
@@ -78,14 +64,14 @@ public:
      * @param testing
      * @return
      */
-    static ImageGL *Execute(std::string nameIn, std::string nameOut,
+    static ImageGL *execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r, int testing)
     {
         GLuint testTQ = glBeginTimeQuery();
         glEndTimeQuery(testTQ);
 
         ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
+        imgIn.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         FilterGLBilateral2DSP filter(sigma_s, sigma_r);
         ImageGL *imgRet = new ImageGL(1, imgIn.width, imgIn.height, 3, IMG_GPU, GL_TEXTURE_2D);
@@ -109,7 +95,7 @@ public:
         double ms = double(timeVal) / (double(testing) * 1000000.0);
         printf("Separate Bilateral Filter on GPU time: %f ms\n", ms);
 
-        std::string sign = GenBilString("S", sigma_s, sigma_r);
+        std::string sign = genBilString("S", sigma_s, sigma_r);
         std::string nameTime = FileLister::getFileNumber(sign, "txt");
 
         FILE *file = fopen(nameTime.c_str(), "w");
@@ -126,24 +112,36 @@ public:
     }
 };
 
-FilterGLBilateral2DSP::FilterGLBilateral2DSP(): FilterGLNPasses()
+PIC_INLINE FilterGLBilateral2DSP::FilterGLBilateral2DSP(): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
+
+    filter = new FilterGLBilateral1D(1.0f, 0.01f, 0, GL_TEXTURE_2D);
+    insertFilter(filter);
+    insertFilter(filter);
 }
 
-FilterGLBilateral2DSP::FilterGLBilateral2DSP(float sigma_s,
+PIC_INLINE FilterGLBilateral2DSP::FilterGLBilateral2DSP(float sigma_s,
         float sigma_r): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D;
 
     filter = new FilterGLBilateral1D(sigma_s, sigma_r, 0, GL_TEXTURE_2D);
-    InsertFilter(filter);
-    InsertFilter(filter);
+    insertFilter(filter);
+    insertFilter(filter);
 }
 
-void FilterGLBilateral2DSP::Update(float sigma_s, float sigma_r)
+PIC_INLINE FilterGLBilateral2DSP::~FilterGLBilateral2DSP()
 {
-    filter->Update(sigma_s, sigma_r);
+    if(filter != NULL) {
+        delete filter;
+        filter = NULL;
+    }
+}
+
+PIC_INLINE void FilterGLBilateral2DSP::update(float sigma_s, float sigma_r)
+{
+    filter->update(sigma_s, sigma_r);
 }
 
 } // end namespace pic

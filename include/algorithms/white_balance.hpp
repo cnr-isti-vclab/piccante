@@ -37,7 +37,7 @@ PIC_INLINE Image* applyWhiteBalance(Image *img, float *white_color)
     }
 
     FilterWhiteBalance flt_wb(white_color, img->channels, true);
-    Image *img_wb = flt_wb.ProcessP(Single(img), NULL);
+    Image *img_wb = flt_wb.Process(Single(img), NULL);
 
     return img_wb;
 }

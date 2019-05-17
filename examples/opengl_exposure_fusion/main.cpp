@@ -1,18 +1,26 @@
 /*
 
-PICCANTE
-The hottest HDR imaging library!
-http://piccantelib.net
+PICCANTE Examples
+The hottest examples of Piccante:
+http://vcg.isti.cnr.it/piccante
 
 Copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
+This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3.0 of the License, or
+    (at your option) any later version.
 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    See the GNU Lesser General Public License
+    ( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
 */
 
 /**
@@ -21,21 +29,21 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * a suggestion for running examples.
 */
 
-#ifdef _MSC_VER
-    #include "../common_code/gl_core_4_0.h"
-#endif
+#include "../common_code/gl_include.hpp"
 
 #include <QKeyEvent>
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
 #include <QApplication>
-#include <QOpenGLFunctions>
 #include <QVBoxLayout>
 #include <QLabel>
 
 #include "piccante.hpp"
 
-class GLWidget : public QGLWidget, protected QOpenGLFunctions
+class GLWidget : public QGLWidget
+        #ifndef _MSC_VER
+        , protected QOpenGLFunctions
+        #endif
 {
 protected:
     pic::QuadGL *quad;
@@ -52,19 +60,21 @@ protected:
      */
     void initializeGL(){
 
+    #ifndef _MSC_VER
         initializeOpenGLFunctions();
+    #endif
 
-        #ifdef PIC_WIN32
-            if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
-                printf("OpenGL functions are not loaded!\n");
-            }
-        #endif
+    #ifdef _MSC_VER
+        if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+            printf("OpenGL functions are not loaded!\n");
+        }
+    #endif
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
         //read an input image
         img.Read("../data/input/bottles.hdr");
-        img.generateTextureGL();
+        img.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         //create a screen aligned quad
         pic::QuadGL::getTechnique(technique,
@@ -77,7 +87,7 @@ protected:
         ef = new pic::ExposureFusionGL();
 
         //compute a stack of LDR images from an HDR image
-        img_vec = pic::getAllExposuresImagesGL(&img);
+        img_vec = pic::getAllExposuresImagesGL(&img, 2.2f);
 
         //allocate a new filter for simple tone mapping
         tmo = new pic::FilterGLSimpleTMO();
@@ -107,7 +117,7 @@ protected:
 
         if(method == 0) {
             //compute exposure fusion for the stack (img_vec)
-            img_tmo = ef->Process(img_vec, img_tmo, 0.2f, 1.0f, 0.2f);
+            img_tmo = ef->ProcessStack(img_vec, img_tmo);
         } else {
             //simple tone mapping: gamma + exposure correction
             img_tmo = tmo->Process(SingleGL(&img), img_tmo);

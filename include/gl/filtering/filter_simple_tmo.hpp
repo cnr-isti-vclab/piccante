@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_SIMPLE_TMO_HPP
 #define PIC_GL_FILTERING_FILTER_SIMPLE_TMO_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -30,9 +32,7 @@ class FilterGLSimpleTMO: public FilterGL
 protected:
     float fstop, gamma;
 
-    void InitShaders();
-
-    void FragmentShader();
+    void initShaders();
 
 public:
     /**
@@ -48,72 +48,26 @@ public:
     FilterGLSimpleTMO(float gamma, float fstop);
 
     /**
-     * @brief Update
+     * @brief update
      * @param fstop
      * @param gamma
      */
-    void Update(float gamma, float fstop);
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param gamma
-     * @param fstop
-     * @return
-     */
-    ImageGL *Execute(std::string nameIn, std::string nameOut, float gamma,
-                        float fstop)
-    {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-
-        FilterGLSimpleTMO filter(gamma, fstop);
-
-        GLuint testTQ1 = glBeginTimeQuery();
-        ImageGL *imgOut = new ImageGL(1, imgIn.width, imgIn.height, 4,
-                                            IMG_GPU_CPU, GL_TEXTURE_2D);
-
-        int n = 100;
-
-        for(int i = 0; i < n; i++) {
-            filter.Process(SingleGL(&imgIn), imgOut);
-        }
-
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        printf("Full Bilateral Filter on GPU time: %f ms\n",
-               double(timeVal) / (double(n) * 1000000.0));
-
-        imgOut->readFromFBO(filter.getFbo());
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
+    void update(float gamma, float fstop);
 };
 
-FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
+PIC_INLINE FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
 {
-    gamma = 2.2f;
-    fstop = 0.0f;
-
-    FragmentShader();
-    InitShaders();
+    initShaders();
+    update(2.2f, 0.0f);
 }
 
-FilterGLSimpleTMO::FilterGLSimpleTMO(float gamma, float fstop): FilterGL()
+PIC_INLINE FilterGLSimpleTMO::FilterGLSimpleTMO(float gamma, float fstop): FilterGL()
 {
-    //protected values are assigned/computed
-    if(gamma <= 0.0f) {
-        gamma = 2.2f;
-    }
-
-    this->gamma = gamma;
-    this->fstop = fstop;
-
-    FragmentShader();
-    InitShaders();
+    initShaders();
+    update(gamma, fstop);
 }
 
-void FilterGLSimpleTMO::FragmentShader()
+PIC_INLINE void FilterGLSimpleTMO::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
@@ -130,28 +84,27 @@ void FilterGLSimpleTMO::FragmentShader()
         \n
     }\n
                       );
-}
 
-void FilterGLSimpleTMO::InitShaders()
-{
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLSimpleTMO");
-
-    Update(gamma, fstop);
 }
 
-void FilterGLSimpleTMO::Update(float gamma, float fstop)
+PIC_INLINE void FilterGLSimpleTMO::update(float gamma, float fstop)
 {
+    gamma = gamma > 0.0f ? gamma : 2.2f;
+
     this->gamma = gamma;
     this->fstop = fstop;
 
     float invGamma = 1.0f / gamma;
     float exposure = powf(2.0f, fstop);
 
-    technique.bind();
-    technique.setUniform1i("u_tex", 0);
-    technique.setUniform1f("tn_gamma", invGamma);
-    technique.setUniform1f("tn_exposure", exposure);
-    technique.unbind();
+    if(technique.isValid()) {
+        technique.bind();
+        technique.setUniform1i("u_tex", 0);
+        technique.setUniform1f("tn_gamma", invGamma);
+        technique.setUniform1f("tn_exposure", exposure);
+        technique.unbind();
+    }
 }
 
 } // end namespace pic

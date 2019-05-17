@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../base.hpp"
 
+#include "../../gl/image.hpp"
+
 #include "../../point_samplers/sampler_random_m.hpp"
 
 namespace pic {
@@ -43,8 +45,9 @@ template <unsigned int N>
 class MRSamplersGL: public MRSamplers<N>
 {
 protected:
-    GLuint	texture;
-    GLuint	levelsRtexture;
+    GLuint texture;
+    GLuint levelsRtexture;
+    int width, height;
 
 public:
     int		nSamples;
@@ -77,6 +80,17 @@ public:
     GLuint getTexture()
     {
         return texture;
+    }
+
+    /**
+     * @brief getImage
+     * @return
+     */
+    ImageGL *getImage()
+    {
+        ImageGL *ret = new ImageGL(texture, GL_TEXTURE_2D);
+
+        return ret;
     }
 
     /**
@@ -178,7 +192,10 @@ template <unsigned int N> GLuint MRSamplersGL<N>::generateTexture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32I, nSamples / N, this->nSamplers, 0,
+    width = nSamples / N;
+    height = this->nSamplers;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32I, width, height, 0,
                  GL_RGBA_INTEGER, GL_INT, buffer);
 
     //nSamples = nSamples>>1;

@@ -31,10 +31,10 @@ namespace pic {
 class Tile
 {
 public:
-    int				startX, startY;
-    int				width,  height;
-    std::string     name;
-    Image		    *tile;
+    int startX, startY;
+    int width,  height;
+    std::string name;
+    Image *tile;
 
     /**
      * @brief Tile
@@ -45,7 +45,6 @@ public:
         startY = -1;
         width  = -1;
         height = -1;
-
         name = "";
         tile = NULL;
     }
@@ -57,6 +56,23 @@ public:
         }
 
         tile = NULL;
+    }
+
+    /**
+     * @brief getBBox
+     * @param img_width
+     * @param img_height
+     * @return
+     */
+    BBox getBBox(int img_width, int img_height)
+    {
+        BBox ret;
+        ret.setBox(startX,
+                   startX + width,
+                   startY,
+                   startY + height,
+                    0, 1, img_width, img_height, 1);
+        return ret;
     }
 };
 

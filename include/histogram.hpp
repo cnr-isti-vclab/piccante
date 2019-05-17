@@ -105,7 +105,7 @@ protected:
     }
 
 public:
-    unsigned int	*bin, *bin_work;
+    unsigned int *bin, *bin_work;
 
     /**
      * @brief Histogram is the basic constructor setting variables to defaults.
@@ -126,10 +126,10 @@ public:
     }
 
     /**
-     * @brief Histogram is an extension of the basic constructor, where Calculate
+     * @brief Histogram is an extension of the basic constructor, where calculate
      * is called in order to populate the Histogram.
      * @param imgIn is an input image for which Histogram needs to be computed.
-     * @param type is the space of computations (please see Calculate()).
+     * @param type is the space of computations (please see calculate()).
      * @param nBin is the number of bins of the Histogram.
      * @param channel is the color channel for which Histogram needs to be computed.
      */
@@ -144,6 +144,7 @@ public:
         fMax =  FLT_MAX;
 
         epsilon = 1e-6f;
+        this->nBin = 0;
 
         calculate(imgIn, type, nBin, channel);
     }
@@ -152,6 +153,19 @@ public:
     * @brief ~Histogram is the basic destructor which frees memory.
     */
     ~Histogram()
+    {
+        release();
+
+        nBin = 0;
+        type =  VS_LIN;
+        fMin = -FLT_MAX;
+        fMax =  FLT_MAX;
+    }   
+
+    /**
+     * @brief release
+     */
+    void release()
     {
         if(bin != NULL) {
             delete [] bin;
@@ -172,12 +186,7 @@ public:
             delete[] bin_work;
             bin_work = NULL;
         }
-
-        nBin = 0;
-        type =  VS_LIN;
-        fMin = -FLT_MAX;
-        fMax =  FLT_MAX;
-    }   
+    }
 
     /**
      * @brief calculate computes the histogram of an input image. In the case
@@ -195,24 +204,26 @@ public:
     void calculate(Image *imgIn, VALUE_SPACE type, int nBin,
                               int channel = 0)
     {
-        if(imgIn == NULL) {
+        if((imgIn == NULL) || (channel < 0) ) {
             return;
         }
 
-        if((channel < 0) || (channel >= imgIn->channels)) {
+        if(!imgIn->isValid() || (channel >= imgIn->channels)) {
             return;
         }
 
-        if(nBin < 1) {
+        if(nBin < 1 || type == VS_LDR) {
             nBin = 256;
         }
 
-        if(type == VS_LDR) {
-            nBin = 256;
-        }
+        bool c1 = (nBin != this->nBin) && (bin != NULL);
+        bool c2 = (bin == NULL);
+        if(c1 || c2)  {
+            release();
 
-        bin = new unsigned int[nBin];
-        memset((void *)bin, 0, nBin * sizeof(unsigned int));
+            bin = new unsigned int[nBin];
+            memset((void *)bin, 0, nBin * sizeof(unsigned int));
+        }
 
         this->nBin = nBin;
         this->type = type;
@@ -220,7 +231,7 @@ public:
         int size = imgIn->width * imgIn->height * imgIn->channels;
         int channels = imgIn->channels;
 
-        //Statistics
+        //compute statistics
         fMin =  FLT_MAX;
         fMax = -FLT_MAX;
 
@@ -236,7 +247,7 @@ public:
         deltaMaxMin = (fMax - fMin);
         nBinf = float(nBin - 1);
 
-        //histogram calculation
+        //compute the histogram
         for(int i = channel; i < size; i += channels) {           
             float val = projectDomain(imgIn->data[i]);
 
@@ -279,12 +290,11 @@ public:
      * @brief ceiling limits the maximum value of the histogram using Ward
      * algorithm.
      */
-    void ceiling()
+    void ceiling(float k)
     {
-        float k = 1.0f / float(nBin - 1);
         float tolerance = float(Array<unsigned int>::sum(bin, nBin)) * 0.025f;
         int   trimmings = 0;
-        bool  bFlag     = true;
+        bool  bFlag = true;
 
         while((trimmings <= tolerance) && bFlag) {
             trimmings = 0;
@@ -297,7 +307,7 @@ public:
 
                 for(int i = 0; i < nBin; i++) {
                     if(bin[i] > ceiling) {
-                        trimmings = trimmings + bin[i] - ceiling;
+                        trimmings += (bin[i] - ceiling);
                         bin[i] = ceiling;
                     }
                 }
@@ -315,7 +325,7 @@ public:
     {
         getNormalized();
     
-        bin_c = Array<float>::cumsum(bin_nor, bin_c, nBin);
+        bin_c = Array<float>::cumsum(bin_nor, nBin, bin_c);
 
         if(bNormalized) {
             for(int i=0; i<nBin; i++) {
@@ -375,7 +385,7 @@ public:
             }
         }
 
-        img.Write(name);
+        img.Write(name, LT_NONE);
     }
 
     /**
@@ -401,7 +411,7 @@ public:
             return ret;
         }
 
-        //assuming 8-bit images
+        //NOTE: this code assumes to extract 8-bit images
         float halfnBits = float( nBits >> 1 );
 
         float dMM = deltaMaxMin / nBinf;
@@ -421,11 +431,12 @@ public:
             int indMin = MAX(ind - removingBins, 0);
             int indMax = MIN(ind + removingBins, nBin);
 
-            for(int i=indMin; i<indMax; i++) {
+            for(int i = indMin; i < indMax; i++) {
                 bin_work[i] = 0;
             }
 
-            float fstop = - (float(ind) * dMM + fMin) - 1.0f;
+            float fstop_ind = float(ind) * dMM + fMin;
+            float fstop = -fstop_ind - 1.0f;
 
             ret.push_back(fstop);
         }
@@ -434,23 +445,27 @@ public:
     }
 
     /**
-     * @brief getBestInterval computes the best interval center.
+     * @brief getBestExposure computes the best interval center.
      * @param nBits is the number of bits in the budget for the output image.
      * @return It returns the exposure, in f-stops, for setting the image
      * with the best exposure at given dynamic range.
      */
-    float getBestInterval(int nBits)
+    float getBestExposure(int nBits, float overlap = 0.5f)
     {
+        if(overlap < 0.0f) {
+            overlap = 0.5f;
+        }
+
         float nBits_f = float(nBits);
         if((type != VS_LOG_2) && (nBits_f > deltaMaxMin) && (nBits < 1)){
             return 0.0f;
         }
 
         float n_values_f = float(1 << nBits);
-        float delta_inv = nBinf / deltaMaxMin;
-        int range_size_hist = int(float(nBits) / (delta_inv / n_values_f) + 0.5f);
+        float dMM = deltaMaxMin / nBinf;
+        int range_size_hist = int(float(nBits) / (1.0f / (n_values_f * dMM)) + overlap);
 
-        range_size_hist = range_size_hist < 1 ? 1 : range_size_hist;
+        range_size_hist = range_size_hist < 1 ? 2 : range_size_hist;
 
         #ifdef PIC_DEBUG
             printf("Histogram [%f %f] %d\n", fMin, fMax, range_size_hist);
@@ -472,19 +487,10 @@ public:
             }
         }
 
-        float mid = float(range_size_hist) / 2.0f;
-        return (float(index + mid) / delta_inv) + fMin;
-    }
+        int mid = range_size_hist >> 1;
 
-    /**
-     * @brief getBestExposure computes the best exposure given
-     * a budget dynamig range.
-     * @param range is the input dynamic range.
-     * @return It returns the exposure value in f-stops.
-     */
-    float getBestExposure(int range = 8)
-    {
-        return -getBestInterval(range);
+        float fstop_index = (float(index + mid) * dMM) + fMin;
+        return -fstop_index - 1.0f;
     }
 };
 

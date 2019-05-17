@@ -18,6 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_UP_PP_HPP
 #define PIC_GL_FILTERING_FILTER_UP_PP_HPP
 
+#include "../../base.hpp"
+
+#include "../../util/array.hpp"
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -32,159 +35,94 @@ protected:
     float threshold, *value;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders()
+    {
+        fragment_source = MAKE_STRING
+                          (
+                              uniform sampler2D u_tex0; \n
+                              uniform sampler2D u_tex1; \n
+                              uniform vec4    value; \n
+                              uniform float   threshold; \n
+                              out     vec4    f_color; \n
+
+        void main(void) { \n
+            ivec2 coords = ivec2(gl_FragCoord.xy); \n
+            vec3 color = texelFetch(u_tex1, coords, 0).xyz; \n
+
+            vec3 ret;
+
+            if(distance(color, value.xyz) < threshold) { \n
+                ret = texelFetch(u_tex0, coords / ivec2(2), 0).xyz; \n
+            } else { \n
+                ret = color.xyz; \n
+            }\n
+
+            f_color = vec4(ret.xyz, 1.0); \n
+        }
+                          );
+
+        technique.initStandard("330", vertex_source, fragment_source, "FilterGLUpPP");
+
+    }
 
 public:
     /**
      * @brief FilterGLUpPP
      * @param scale
      */
-    FilterGLUpPP(float *value, float threshold);
+    FilterGLUpPP(float *value, float threshold)
+    {
+        initShaders();
+        update(value, threshold);
+    }
 
     /**
-     * @brief Update
+     * @brief update
      * @param value
      * @param threshold
      */
-    void Update(float *value, float threshold);
+    void update(float *value, float threshold)
+    {
+        this->value = value;
+
+        if(value == NULL) {
+            printf("Error in FilterGLUpPP\n");
+        }
+
+        this->threshold = (threshold > 0.0f) ? threshold : 1e-4f;
+
+        technique.bind();
+        technique.setUniform1i("u_tex0", 0);
+        technique.setUniform1i("u_tex1", 1);
+        technique.setUniform1f("threshold", this->threshold);
+        technique.setUniform4fv("value", this->value);
+        technique.unbind();
+    }
 
     /**
-     * @brief Process
+     * @brief OutputSize
      * @param imgIn
-     * @param imgOut
-     * @return
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
-};
-
-FilterGLUpPP::FilterGLUpPP(float *value, float threshold): FilterGL()
-{
-    value = NULL;
-
-    InitShaders();
-    Update(value, threshold);
-}
-
-void FilterGLUpPP::InitShaders()
-{
-    fragment_source = MAKE_STRING
-                      (
-                          uniform sampler2D u_tex0; \n
-                          uniform sampler2D u_tex1; \n
-                          uniform vec4    value; \n
-                          uniform float   threshold; \n
-                          out     vec4    f_color; \n
-
-    void main(void) { \n
-        ivec2 coords = ivec2(gl_FragCoord.xy); \n
-        vec3 color = texelFetch(u_tex1, coords, 0).xyz; \n
-
-        vec3 ret;
-
-        if(distance(color, value.xyz) < threshold) { \n
-            ret = texelFetch(u_tex0, coords / ivec2(2), 0).xyz; \n
-        } else { \n
-            ret = color.xyz; \n
-        }\n
-
-        f_color = vec4(ret.xyz, 1.0); \n
-    }
-                      );
-
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGLUpPP");
-}
-
-/**
- * @brief Update
- * @param value
- * @param threshold
- */
-void FilterGLUpPP::Update(float *value, float threshold)
-{
-    if(value == NULL) {
-        this->value = new float[4];
-
-        for(int i = 0; i < 4; i++) {
-            this->value[i] = 0.0f;
+    void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        if(imgIn.size() == 1) {
+            width       = imgIn[0]->width << 1;
+            height      = imgIn[0]->height << 1;
+        } else {
+            width       = imgIn[1]->width;
+            height      = imgIn[1]->height;
         }
-    } else {
-        this->value = value;
+
+        channels    = imgIn[0]->channels;
+        frames      = imgIn[0]->frames;
     }
-
-    if(threshold > 0.0f) {
-        this->threshold = threshold;
-    } else {
-        this->threshold = 1e-4f;
-    }
-
-    technique.bind();
-    technique.setUniform1i("u_tex0", 0);
-    technique.setUniform1i("u_tex1", 1);
-    technique.setUniform1f("threshold", this->threshold);
-    technique.setUniform4fv("value", this->value);
-    technique.unbind();
-}
-
-ImageGL *FilterGLUpPP::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return NULL;
-    }
-
-    if(imgIn.size() != 2) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width  << 1;
-    int h = imgIn[0]->height << 1;
-    int f = imgIn[0]->frames;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
-    }
-
-    //Fbo
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, f, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    technique.bind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, imgIn[1]->getTexture());
-
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    technique.unbind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
-}
+};
 
 } // end namespace pic
 

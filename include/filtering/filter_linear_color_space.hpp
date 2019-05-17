@@ -71,7 +71,7 @@ public:
     /**
      * @brief FilterLinearColorSpace
      */
-    FilterLinearColorSpace()
+    FilterLinearColorSpace() : Filter()
     {
         matrix  = NULL;
         nMatrix = 0;
@@ -135,33 +135,33 @@ public:
     }
 
     /**
-     * @brief Execute_RGB_to_XYZ
+     * @brief execute_RGB_to_XYZ
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static Image *Execute_RGB_to_XYZ(Image *imgIn, Image *imgOut)
+    static Image *execute_RGB_to_XYZ(Image *imgIn, Image *imgOut)
     {
         FilterLinearColorSpace flt;
 
         flt.getRGB2XYZMatrix();
 
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 
     /**
-     * @brief Execute_XYZ_to_RGB
+     * @brief execute_XYZ_to_RGB
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static Image *Execute_XYZ_to_RGB(Image *imgIn, Image *imgOut)
+    static Image *execute_XYZ_to_RGB(Image *imgIn, Image *imgOut)
     {
         FilterLinearColorSpace flt;
 
         flt.getXYZ2RGBMatrix();
 
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 
 };

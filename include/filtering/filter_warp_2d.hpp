@@ -56,7 +56,7 @@ protected:
 
                 pos[0] = float(i + bmin[0] ) - mid[0];
 
-                h_inv.Projection(pos, pos_out);
+                h_inv.projection(pos, pos_out);
 
                 pos_out[0] += mid[0];
                 pos_out[1] += mid[1];
@@ -73,47 +73,6 @@ protected:
         }
     }
 
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut != NULL) {
-            return imgOut;
-        }
-
-        if(bCentroid) {
-            mid[0] = imgIn[0]->widthf  * 0.5f;
-            mid[1] = imgIn[0]->heightf * 0.5f;
-        } else {
-            mid[0] = 0.0f;
-            mid[1] = 0.0f;
-        }
-
-        if(!bSameSize) {
-            if(this->bComputeBoundingBox) {
-                computeBoundingBox(h, bCentroid,
-                                   imgIn[0]->widthf, imgIn[0]->heightf,
-                                   bmin, bmax);
-            }
-
-            imgOut = new Image(1, bmax[0] - bmin[0], bmax[1] - bmin[1], imgIn[0]->channels);
-        } else {
-            bmin[0] = 0;
-            bmin[1] = 0;
-
-            bmax[0] = imgIn[0]->width;
-            bmax[1] = imgIn[0]->height;
-
-            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, imgIn[0]->channels);
-        }
-
-        return imgOut;
-    }    
-
     bool bSameSize, bCentroid;
 
 public:
@@ -127,8 +86,8 @@ public:
         this->bCentroid = false;
         this->bSameSize = false;
 
-        h.Identity();
-        h_inv.Identity();
+        h.getIdentity();
+        h_inv.getIdentity();
     }
 
     /**
@@ -137,9 +96,9 @@ public:
      * @param bSameSize
      * @param bCentroid
      */
-    FilterWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
+    FilterWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false) : Filter()
     {
-        Update(h, bSameSize, bCentroid);
+        update(h, bSameSize, bCentroid);
     }
 
     /**
@@ -195,12 +154,12 @@ public:
         bmax[0] = - (1 << 30);
         bmax[1] = bmax[0];
 
-        for(int i=0;i<4;i++) {
+        for(int i = 0; i < 4; i++) {
 
             bbox[i][0] -= mid[0];
             bbox[i][1] -= mid[1];
 
-            h.Projection(&bbox[i][0], &bbox_out[i][0]);
+            h.projection(&bbox[i][0], &bbox_out[i][0]);
 
             bbox_out[i][0] += mid[0];
             bbox_out[i][1] += mid[1];
@@ -228,7 +187,12 @@ public:
         }
     }
 
-    void SetBoundingBox(int *bmin, int *bmax)
+    /**
+     * @brief setBoundingBox
+     * @param bmin
+     * @param bmax
+     */
+    void setBoundingBox(int *bmin, int *bmax)
     {
         memcpy(this->bmin, bmin, sizeof(int) * 2);
         memcpy(this->bmax, bmax, sizeof(int) * 2);
@@ -236,12 +200,12 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param h
      * @param bSameSize
      * @param bCentroid
      */
-    void Update(Matrix3x3 h, bool bSameSize, bool bCentroid = false)
+    void update(Matrix3x3 h, bool bSameSize, bool bCentroid = false)
     {
         this->bComputeBoundingBox = true;
 
@@ -249,7 +213,7 @@ public:
         this->bCentroid = bCentroid;
 
         this->h = h;
-        h.Inverse(&h_inv);
+        h.inverse(&h_inv);
     }
 
     /**
@@ -260,28 +224,36 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
+        if(bCentroid) {
+            mid[0] = imgIn[0]->width >> 1;
+            mid[1] = imgIn[0]->height >> 1;
+        } else {
+            mid[0] = 0;
+            mid[1] = 0;
+        }
+
         if(!bSameSize) {
             if(this->bComputeBoundingBox) {
                 computeBoundingBox(h, bCentroid,
-                                   imgIn->widthf, imgIn->heightf,
+                                   imgIn[0]->widthf, imgIn[0]->heightf,
                                    bmin, bmax);
             }
 
             width  = bmax[0] - bmin[0];
             height = bmax[1] - bmin[1];
         } else {
-            width  = imgIn->width;
-            height = imgIn->height;
+            width  = imgIn[0]->width;
+            height = imgIn[0]->height;
         }
-\
-        frames   = imgIn->frames;
-        channels = imgIn->channels;
+
+        frames   = imgIn[0]->frames;
+        channels = imgIn[0]->channels;
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param img
      * @param imgOut
      * @param h
@@ -289,10 +261,10 @@ public:
      * @param bCentroid
      * @return
      */
-    static Image *Execute(Image *img, Image *imgOut, Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
+    static Image *execute(Image *img, Image *imgOut, Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
     {
         FilterWarp2D flt(h, bSameSize, bCentroid);
-        imgOut = flt.ProcessP(Single(img), imgOut);
+        imgOut = flt.Process(Single(img), imgOut);
         return imgOut;
     }
 };

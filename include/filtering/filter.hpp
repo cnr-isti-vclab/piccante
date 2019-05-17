@@ -24,13 +24,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <functional>
 
+#include "../image.hpp"
 #include "../image_vec.hpp"
 #include "../util/tile_list.hpp"
 #include "../util/string.hpp"
 
 namespace pic {
 
-//This depends on the architecture!
+//NOTE: This depends on the architecture!
 #define TILE_SIZE 64
 
 struct FilterFData
@@ -40,6 +41,7 @@ struct FilterFData
 
     Image *dst;
     ImageVec src;
+    int nSrc;
 };
 
 /**
@@ -50,6 +52,15 @@ class Filter
 protected:
     float scale;
     std::vector< float > param_f;
+
+    int minInputImages;
+
+    /**
+     * @brief checkInput
+     * @param imgIn
+     * @return
+     */
+    bool checkInput(ImageVec &imgIn);
 
     /**
      * @brief f
@@ -71,6 +82,7 @@ protected:
         FilterFData f_data;
         f_data.src = src;
         f_data.dst = dst;
+        f_data.nSrc = int(src.size());
 
         for(int k = box->z0; k < box->z1; k++) {
             f_data.z = k;
@@ -89,15 +101,23 @@ protected:
     }
 
     /**
-     * @brief SetupAux
+     * @brief ProcessP
      * @param imgIn
      * @param imgOut
      * @return
      */
-    virtual Image *SetupAux(ImageVec imgIn, Image *imgOut);
+    Image *ProcessP(ImageVec imgIn, Image *imgOut);
+
+    /**
+     * @brief setupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    virtual Image *setupAux(ImageVec imgIn, Image *imgOut);
 
 public:
-    bool cachedOnly;
+    bool cachedOnly, bDelete;
     std::vector<Filter *> filters;
 
     /**
@@ -105,26 +125,37 @@ public:
      */
     Filter()
     {
+        bDelete = false;
+        minInputImages = 1;
         cachedOnly = false;
         scale = 1.0f;
     }
 
     ~Filter()
     {
+        release();
     }
 
     /**
-     * @brief ChangePass changes the pass direction.
+     * @brief release
+     */
+    virtual void release()
+    {
+
+    }
+
+    /**
+     * @brief changePass changes the pass direction.
      * @param pass
      * @param tPass
      */
-    virtual void ChangePass(int pass, int tPass) {}
+    virtual void changePass(int pass, int tPass) {}
 
     /**
-     * @brief Signature returns the signature for the filter.
+     * @brief signature returns the signature for the filter.
      * @return
      */
-    virtual std::string Signature()
+    virtual std::string signature()
     {
         return "FLT";
     }
@@ -144,11 +175,11 @@ public:
     }
 
     /**
-     * @brief GetOutPutName
+     * @brief getOutPutName
      * @param nameIn
      * @return
      */
-    std::string GetOutPutName(std::string nameIn);
+    std::string getOutPutName(std::string nameIn);
 
     /**
      * @brief CachedProcess
@@ -157,7 +188,7 @@ public:
      * @param nameIn
      * @return
      */
-    Image *CachedProcess(ImageVec imgIn, Image *imgOut,
+    Image *cachedProcess(ImageVec imgIn, Image *imgOut,
                             std::string nameIn);
 
     /**
@@ -168,22 +199,82 @@ public:
      * @param channels
      * @param frames
      */
-    virtual void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    virtual void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn->width;
-        height      = imgIn->height;
-        channels    = imgIn->channels;
-        frames      = imgIn->frames;
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
+        channels    = imgIn[0]->channels;
+        frames      = imgIn[0]->frames;
     }
 
     /**
-     * @brief SetFloatParameters sets float parameters.
+     * @brief allocateOutputMemory
+     * @param imgIn
+     * @param imgOut
+     * @param bDelete
+     * @return
+     */
+    Image *allocateOutputMemory(ImageVec imgIn, Image *imgOut, bool bDelete)
+    {
+        int w, h, c, f;
+        OutputSize(imgIn, w, h, c, f);
+
+        if(imgOut == NULL) {            
+            imgOut = new Image(f, w, h, c);
+        } else {
+            bool bSame = (imgOut->width == w) &&
+                         (imgOut->height == h) &&
+                         (imgOut->channels == c) &&
+                         (imgOut->frames == f);
+
+            if(!bSame) {
+                if(bDelete) {
+                    delete imgOut;
+                }
+
+                imgOut = new Image(f, w, h, c);
+            }
+        }
+
+        return imgOut;
+    }
+
+    /**
+     * @brief insertFilter
+     * @param flt
+     */
+    void insertFilter(Filter *flt, bool asSingle = false)
+    {
+        if(flt == NULL) {
+            return;
+        }
+
+        if(asSingle || flt->filters.empty()) {
+            filters.push_back(flt);
+        } else {
+            for(unsigned int i = 0; i < flt->filters.size(); i++) {
+                insertFilter(flt->filters[i]);
+            }
+        }
+    }
+
+    /**
+     * @brief setFloatParameters sets float parameters.
      * @param param_f
      */
-    void SetFloatParameters(std::vector< float > param_f)
+    void setFloatParameters(std::vector< float > param_f)
     {
         this->param_f.insert(this->param_f.begin(), param_f.begin(), param_f.end());
     }
+
+    /**
+     * @brief ProcessAux
+     * @param imgIn
+     * @param imgOut
+     * @param tiles
+     */
+    virtual void ProcessAux(ImageVec imgIn, Image *imgOut,
+                             TileList *tiles);
 
     /**
      * @brief Process
@@ -192,43 +283,14 @@ public:
      * @return
      */
     virtual Image *Process(ImageVec imgIn, Image *imgOut);
-
-    /**
-     * @brief ProcessPAux
-     * @param imgIn
-     * @param imgOut
-     * @param tiles
-     */
-    virtual void ProcessPAux(ImageVec imgIn, Image *imgOut,
-                             TileList *tiles);
-
-    /**
-     * @brief ProcessP
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    virtual Image *ProcessP(ImageVec imgIn, Image *imgOut);
 };
 
-PIC_INLINE Image *Filter::SetupAux(ImageVec imgIn, Image *imgOut)
+PIC_INLINE Image *Filter::setupAux(ImageVec imgIn, Image *imgOut)
 {
-    if(imgOut == NULL) {
-        imgOut = imgIn[0]->allocateSimilarOne();
-    } else {
-        if(!imgIn[0]->isSimilarType(imgOut)) {
-            if(!imgOut->isValid()) {
-                imgOut->allocateSimilarTo(imgIn[0]);
-            } else {
-                imgOut = imgIn[0]->allocateSimilarOne();
-            }
-        }
-    }
-
-    return imgOut;
+    return allocateOutputMemory(imgIn, imgOut, bDelete);
 }
 
-PIC_INLINE std::string Filter::GetOutPutName(std::string nameIn)
+PIC_INLINE std::string Filter::getOutPutName(std::string nameIn)
 {
     std::string outputName = nameIn;
 
@@ -239,24 +301,22 @@ PIC_INLINE std::string Filter::GetOutPutName(std::string nameIn)
     }
 
     outputName += "_filtered_";
-    outputName += Signature().c_str();
+    outputName += signature().c_str();
     outputName += ".pfm";
     return outputName;
 }
 
-PIC_INLINE Image *Filter::CachedProcess(ImageVec imgIn, Image *imgOut,
+PIC_INLINE Image *Filter::cachedProcess(ImageVec imgIn, Image *imgOut,
         std::string nameIn)
 {
-    std::string outputName = GetOutPutName(nameIn);
+    std::string outputName = getOutPutName(nameIn);
 
     //check if it is chaced
     Image *imgOut2 = new Image(outputName);
 
-    printf("%s\n", outputName.c_str());
-
     if(imgOut2->data == NULL) {
         if(!cachedOnly) {
-            imgOut = ProcessP(imgIn, imgOut);
+            imgOut = Process(imgIn, imgOut);
             imgOut->Write(outputName);
             return imgOut;
         } else {
@@ -272,32 +332,15 @@ PIC_INLINE Image *Filter::CachedProcess(ImageVec imgIn, Image *imgOut,
     }
 }
 
-PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return NULL;
-    }
-
-    imgOut = SetupAux(imgIn, imgOut);
-
-    //convolve
-    BBox tmpBox(imgOut->width, imgOut->height, imgOut->frames);
-    ProcessBBox(imgOut, imgIn, &tmpBox);
-
-    return imgOut;
-}
-
-PIC_INLINE void Filter::ProcessPAux(ImageVec imgIn, Image *imgOut,
+PIC_INLINE void Filter::ProcessAux(ImageVec imgIn, Image *imgOut,
                                     TileList *tiles)
 {
     bool state = true;
-    BBox box;
-
     while(state) {
         unsigned int currentTile = tiles->getNext();
 
         if(currentTile < tiles->tiles.size()) {
-            tiles->genBBox(currentTile, &box);
+            BBox box = tiles->getBBox(currentTile);
             box.z0 = 0;
             box.z1 = imgOut->frames;
             ProcessBBox(imgOut, imgIn, &box);
@@ -309,20 +352,9 @@ PIC_INLINE void Filter::ProcessPAux(ImageVec imgIn, Image *imgOut,
 
 PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
 {
-#ifndef PIC_DISABLE_THREAD
-    if(imgIn[0] == NULL) {
-        return NULL;
-    }
-
-    imgOut = SetupAux(imgIn, imgOut);
-
-    if(imgOut == NULL) {
-        return imgOut;
-    }
-
-    if((imgOut->width < TILE_SIZE) &&
+    if((imgOut->width  < TILE_SIZE) &&
        (imgOut->height < TILE_SIZE)) {
-        BBox box(imgOut->width, imgOut->height);
+        BBox box(imgOut->width, imgOut->height, imgOut->frames);
 
         ProcessBBox(imgOut, imgIn, &box);
         return imgOut;
@@ -336,7 +368,7 @@ PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
 
     for(int i = 0; i < numCores; i++) {
         thrd[i] = new std::thread(
-            std::bind(&Filter::ProcessPAux, this, imgIn, imgOut, &lst));
+            std::bind(&Filter::ProcessAux, this, imgIn, imgOut, &lst));
     }
 
     //join threads
@@ -344,19 +376,30 @@ PIC_INLINE Image *Filter::ProcessP(ImageVec imgIn, Image *imgOut)
         thrd[i]->join();
         delete thrd[i];
     }
+
     delete[] thrd;
 
     return imgOut;
-#else
-    return Process(imgIn, imgOut);
-#endif
 }
 
-PIC_INLINE std::string GenBilString(std::string type, float sigma_s,
-                                    float sigma_r)
+PIC_INLINE bool Filter::checkInput(ImageVec &imgIn)
 {
-    std::string ret = type + "_Ss_" + fromNumberToString(sigma_s) + "_Sr_" + fromNumberToString(sigma_r);
-    return ret;
+    return ImageVecCheck(imgIn, minInputImages);
+}
+
+PIC_INLINE Image *Filter::Process(ImageVec imgIn, Image *imgOut)
+{
+    if(!checkInput(imgIn)) {
+        return imgOut;
+    }
+
+    imgOut = setupAux(imgIn, imgOut);
+
+    if(imgOut == NULL) {
+        return imgOut;
+    }
+
+    return ProcessP(imgIn, imgOut);
 }
 
 } // end namespace pic

@@ -40,15 +40,15 @@ PIC_INLINE Image *binarization(Image *imgIn, bool bAdaptive = false)
     }
 
     Image *ret = NULL;
-    Image *imgIn_lum = FilterLuminance::Execute(imgIn, NULL);
+    Image *imgIn_lum = FilterLuminance::execute(imgIn, NULL);
 
     if(bAdaptive) {
         FilterThreshold flt_thr(0.0f, true);
 
         FilterGaussian2D flt_gauss(MAX(imgIn->widthf, imgIn->heightf) * 0.2f);
-        Image *imgIn_lum_flt = flt_gauss.ProcessP(Single(imgIn_lum), NULL);
+        Image *imgIn_lum_flt = flt_gauss.Process(Single(imgIn_lum), NULL);
 
-        ret = flt_thr.ProcessP(Double(imgIn_lum, imgIn_lum_flt), NULL);
+        ret = flt_thr.Process(Double(imgIn_lum, imgIn_lum_flt), NULL);
 
         delete imgIn_lum_flt;
     } else {
@@ -58,7 +58,7 @@ PIC_INLINE Image *binarization(Image *imgIn, bool bAdaptive = false)
 
         FilterThreshold flt_thr(mean_lum, false);
 
-        ret = flt_thr.ProcessP(Single(imgIn_lum), NULL);
+        ret = flt_thr.Process(Single(imgIn_lum), NULL);
     }
 
     return ret;

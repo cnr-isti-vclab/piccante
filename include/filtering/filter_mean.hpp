@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FILTERING_FILTER_MEAN_HPP
 
 #include "../filtering/filter_npasses.hpp"
+#include "../filtering/filter_conv_1d.hpp"
 
 namespace pic {
 
@@ -30,9 +31,9 @@ class FilterMean: public FilterNPasses
 protected:
 
 protected:
-    FilterConv1D    *filter;
-    float           *data;
-    int             size;    
+    FilterConv1D *filter;
+    float *data; //NOTE: we own this; so it can be deleted!
+    int size;
 
 public:
 
@@ -45,17 +46,17 @@ public:
         data = NULL;
         this->size = -1;
 
-        Update(size);
+        update(size);
 
         filter = new FilterConv1D(data, size);
 
-        InsertFilter(filter);
-        InsertFilter(filter);
+        insertFilter(filter);
+        insertFilter(filter);
     }
 
     ~FilterMean()
     {
-        Destroy();
+        release();
 
         if(filter != NULL) {
             delete filter;
@@ -67,37 +68,32 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param size
      */
-    void Update(int size)
+    void update(int size)
     {
-        if(size < 1)
-        {
-            size = 3;
-        }
+        size = size > 0 ? size : 3;
 
-        if(this->size != size)
-        {
+        if(this->size != size) {
             this->size = size;
-            if( data != NULL)
-                delete[] data;
 
+            data = delete_vec_s(data);
             data = FilterConv1D::getKernelMean(size);
         }        
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param size
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, int size)
+    static Image *execute(Image *imgIn, Image *imgOut, int size)
     {
         FilterMean filter(size);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

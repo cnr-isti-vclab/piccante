@@ -23,36 +23,86 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter.hpp"
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_drago_tmo.hpp"
+#include "../tone_mapping/tone_mapping_operator.hpp"
 
 namespace pic {
 
 /**
- * @brief DragoTMO tone maps an image using Drago et al. 2003 tone mapping
- * operator.
- * @param imgIn
- * @param Ld_Max
- * @param b
- * @param imgOut
- * @return
+ * @brief The DragoTMO class
  */
-PIC_INLINE Image *DragoTMO(Image *imgIn, float Ld_Max = 100.0f, float b = 0.95f, Image *imgOut = NULL)
+class DragoTMO: public ToneMappingOperator
 {
-    //Computing luminance and its statistics
-    FilterLuminance filterLum;
-    Image *imgLum = filterLum.ProcessP(Single(imgIn), NULL);
+protected:
+    float Ld_Max, b;
+    FilterLuminance flt_lum;
+    FilterDragoTMO flt_drg;
 
-    float Lw_Max = imgLum->getMaxVal()[0];
-    float Lw_a = imgLum->getMaxVal()[0];
+    /**
+     * @brief ProcessAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */    
+    Image *ProcessAux(ImageVec imgIn, Image *imgOut)
+    {
+        updateImage(imgIn[0]);
 
-    //tone mapping
-    FilterDragoTMO flt_drago(Ld_Max, b, Lw_Max, Lw_a);
-    imgOut = flt_drago.ProcessP(Double(imgIn, imgLum), imgOut);
+        //compute luminance and its statistics
+        images[0] = flt_lum.Process(imgIn, images[0]);
 
-    delete imgLum;
+        float Lw_Max, Lw_a;
+        images[0]->getMaxVal(NULL, &Lw_Max);
+        images[0]->getLogMeanVal(NULL, &Lw_a);
 
-    return imgOut;
-}
+        //tone map
+        flt_drg.update(Ld_Max, b, Lw_Max, Lw_a);
+        imgOut = flt_drg.Process(Double(imgIn[0], images[0]), imgOut);
 
+        return imgOut;
+    }
+
+public:
+
+    /**
+     * @brief DragoTMO
+     * @param Ld_Max
+     * @param b
+     */
+    DragoTMO(float Ld_Max = 100.0f, float b = 0.95f) : ToneMappingOperator()
+    {
+        images.push_back(NULL);
+        update(Ld_Max, b);
+    }
+
+    ~DragoTMO()
+    {
+        release();
+    }
+
+    /**
+     * @brief update
+     * @param Ld_Max
+     * @param b
+     */
+    void update(float Ld_Max = 100.0f, float b = 0.95f)
+    {
+        this->Ld_Max = Ld_Max;
+        this->b = b;
+
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image *execute(Image *imgIn, Image *imgOut)
+    {
+        DragoTMO dtmo(100.0f, 0.95f);
+        return dtmo.Process(Single(imgIn), imgOut);
+    }
+};
 } // end namespace pic
 
 #endif /* PIC_TONE_MAPPING_DRAGO_TMO_HPP */

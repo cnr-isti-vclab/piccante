@@ -18,7 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_HPP
 #define PIC_GL_FILTERING_FILTER_HPP
 
+#include "../../util/array.hpp"
+#include "../../util/std_util.hpp"
+#include "../../gl/image.hpp"
 #include "../../gl/image_vec.hpp"
+#include "../../util/array.hpp"
 #include "../../util/gl/technique.hpp"
 #include "../../util/gl/quad.hpp"
 
@@ -42,9 +46,11 @@ protected:
     GLenum target;
 
     ImageGLVec param;
+
 public:
 
-    std::vector<FilterGL *> filters;
+    bool bDelete;
+    std::vector< FilterGL* > filters;
 
     std::string vertex_source, geometry_source, fragment_source;
 
@@ -53,6 +59,8 @@ public:
      */
     FilterGL()
     {
+        bDelete = false;
+
         fbo = NULL;
 
         quad = NULL;
@@ -67,13 +75,26 @@ public:
 
     ~FilterGL()
     {
-        if(quad != NULL) {
-            delete quad;
-        }
+        release();
+    }
 
-        if(fbo != NULL) {
-            delete fbo;
-        }
+    /**
+     * @brief release
+     */
+    void release()
+    {
+        delete_s(quad);
+        delete_s(fbo);
+
+        releaseAux();
+    }
+
+    /**
+     * @brief releaseAux
+     */
+    virtual void releaseAux()
+    {
+
     }
 
     /**
@@ -89,9 +110,44 @@ public:
      * @brief getFbo
      * @return
      */
-    virtual Fbo  *getFbo()
+    virtual Fbo *getFbo()
     {
         return fbo;
+    }
+
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    virtual void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width    = imgIn[0]->width;
+        height   = imgIn[0]->height;
+        channels = imgIn[0]->channels;
+        frames   = imgIn[0]->frames;
+    }
+
+    /**
+     * @brief insertFilter
+     * @param flt
+     */
+    void insertFilter(FilterGL *flt)
+    {
+        if(flt == NULL) {
+            return;
+        }
+
+        if(!flt->filters.empty()) {
+            for(unsigned int i = 0; i < flt->filters.size(); i++) {
+                insertFilter(flt->filters[i]);
+            }
+        } else {
+            filters.push_back(flt);
+        }
     }
 
     /**
@@ -104,11 +160,11 @@ public:
     }
 
     /**
-     * @brief ChangePass
+     * @brief changePass
      * @param pass
      * @param tPass
      */
-    virtual void ChangePass(int pass, int tPass)
+    virtual void changePass(int pass, int tPass)
     {
     }
 
@@ -121,12 +177,12 @@ public:
     virtual ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
-     * @brief GammaCorrection
+     * @brief gammaCorrection
      * @param fragment_source
      * @param bGammaCorrection
      * @return
      */
-    static std::string GammaCorrection(std::string fragment_source,
+    static std::string gammaCorrection(std::string fragment_source,
                                        bool bGammaCorrection)
     {
         size_t processing_found = fragment_source.find("__GAMMA__CORRECTION__");
@@ -134,13 +190,56 @@ public:
         if(processing_found != std::string::npos) {
             if(bGammaCorrection) {
                 fragment_source.replace(processing_found, 21,
-                                        " color = pow(color,vec3(1.0/2.2)); ");
+                                        " color = pow(color, vec3(1.0 / 2.2)); ");
             } else {
                 fragment_source.replace(processing_found, 21, " ");
             }
         }
 
         return fragment_source;
+    }
+
+    /**
+     * @brief setupAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    virtual ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
+    {
+        return allocateOutputMemory(imgIn, imgOut, bDelete);
+    }
+
+    /**
+     * @brief allocateOutputMemory
+     * @param imgIn
+     * @param imgOut
+     * @param bDelete
+     * @return
+     */
+    ImageGL *allocateOutputMemory(ImageGLVec imgIn, ImageGL *imgOut, bool bDelete)
+    {
+        int w, h, c, f;
+        OutputSize(imgIn, w, h, c, f);
+
+        if(imgOut == NULL) {
+            imgOut = new ImageGL(f, w, h, c, IMG_GPU, imgIn[0]->getTarget());
+        } else {
+            bool bSame = imgOut->width == w &&
+                         imgOut->height == h &&
+                         imgOut->channels == c &&
+                         imgOut->frames == f;
+
+            if(!bSame) {
+                if(bDelete) {
+                    delete imgOut;
+                }
+
+                imgOut = new ImageGL(f, w, h, c, IMG_GPU, imgIn[0]->getTarget());
+            }
+        }
+
+        return imgOut;
     }
 };
 
@@ -157,16 +256,18 @@ PIC_INLINE ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
     int width = imgIn[0]->width;
     int height = imgIn[0]->height;
 
+    imgOut = setupAux(imgIn, imgOut);
+
     if(imgOut == NULL) {
-        imgOut = new ImageGL(imgIn[0]->frames, width, height, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+        return NULL;
     }
 
+    //create an FBO
     if(fbo == NULL) {
         fbo = new Fbo();
     }
 
-    //create an FBO
-    fbo->create(width, height, imgIn[0]->frames, false, imgOut->getTexture());
+    fbo->create(imgOut->width, imgOut->height, imgOut->frames, false, imgOut->getTexture());
 
     //bind the FBO
     fbo->bind();

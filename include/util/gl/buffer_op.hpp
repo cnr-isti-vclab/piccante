@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../base.hpp"
 
+#include "../../util/array.hpp"
+
 #include "../../util/string.hpp"
 #include "../../util/gl/quad.hpp"
 #include "../../util/gl/fbo.hpp"
@@ -44,13 +46,13 @@ protected:
     GLenum target;
 
     std::string op;
-    float		c0[4], c1[4];
-    bool		bTexelFetch;
+    float c0[4], c1[4];
+    bool bTexelFetch;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
 
@@ -66,18 +68,18 @@ public:
     BufferOpGL(std::string op, bool bTexelFetch, float *c0, float *c1);
 
     /**
-     * @brief Update
+     * @brief update
      * @param c0
      * @param c1
      */
-    void Update(float *c0, float *c1);
+    void update(const float *c0, const  float *c1);
 
     /**
-     * @brief Update
+     * @brief update
      * @param c0
      * @param c1
      */
-    void Update(float c0, float c1);
+    void update(float c0, float c1);
 
     /**
      * @brief Process
@@ -102,17 +104,13 @@ PIC_INLINE BufferOpGL::BufferOpGL(std::string op, bool bTexelFetch = false, floa
     if(c0 != NULL) {
         memcpy(this->c0, c0, 4 * sizeof(float));
     } else {
-        for(int i = 0; i < 4; i++) {
-            this->c0[i] = 1.0f;
-        }
+        Arrayf::assign(1.0f, this->c0, 4);
     }
 
     if(c1 != NULL) {
         memcpy(this->c1, c1, 4 * sizeof(float));
     } else {
-        for(int i = 0; i < 4; i++) {
-            this->c0[i] = 1.0f;
-        }
+        Arrayf::assign(1.0f, this->c1, 4);
     }
 
     this->op = op;
@@ -126,10 +124,10 @@ PIC_INLINE BufferOpGL::BufferOpGL(std::string op, bool bTexelFetch = false, floa
         quad = new QuadGL(true);
     }
 
-    InitShaders();
+    initShaders();
 }
 
-PIC_INLINE void BufferOpGL::InitShaders()
+PIC_INLINE void BufferOpGL::initShaders()
 {
     std::string strOp = "vec4 ret = ";
     strOp.append(op);
@@ -294,18 +292,14 @@ PIC_INLINE void BufferOpGL::InitShaders()
     technique.unbind();
 }
 
-PIC_INLINE void BufferOpGL::Update(float *c0, float *c1)
+PIC_INLINE void BufferOpGL::update(const float *c0, const float *c1 = NULL)
 {
     if(c0 != NULL) {
-        for(int i = 0; i < 4; i++) {
-            this->c0[i] = c0[i];
-        }
+        memcpy(this->c0, c0, sizeof(float) * 4);
     }
 
     if(c1 != NULL) {
-        for(int i = 0; i < 4; i++) {
-            this->c1[i] = c1[i];
-        }
+        memcpy(this->c1, c1, sizeof(float) * 4);
     }
 
     technique.bind();
@@ -316,15 +310,10 @@ PIC_INLINE void BufferOpGL::Update(float *c0, float *c1)
     technique.unbind();
 }
 
-PIC_INLINE void BufferOpGL::Update(float c0 = 0.0f, float c1 = 0.0f)
+PIC_INLINE void BufferOpGL::update(float c0 = 0.0f, float c1 = 0.0f)
 {
-    for(int i = 0; i < 4; i++) {
-        this->c0[i] = c0;
-    }
-
-    for(int i = 0; i < 4; i++) {
-        this->c1[i] = c1;
-    }
+    Arrayf::assign(c0, this->c0, 4);
+    Arrayf::assign(c1, this->c1, 4);
 
     technique.bind();
     technique.setUniform1i("u_tex_0",  0);

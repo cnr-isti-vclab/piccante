@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_ALGORITHMS_SUB_SAMPLE_STACK_HPP
 
 #include "../util/math.hpp"
+#include "../util/std_util.hpp"
 
 #include "../image.hpp"
 #include "../point_samplers/sampler_random.hpp"
@@ -34,10 +35,10 @@ class SubSampleStack
 protected:
 
     /**
-    * \brief This function creates a low resolution version of the stack using Grossberg and Nayar sampling.
+    * \brief sampleGrossberg creates a low resolution version of the stack using Grossberg and Nayar sampling.
     * \param stack is a stack of Image* at different exposures
     */
-    void Grossberg(ImageVec &stack)
+    void sampleGrossberg(ImageVec &stack)
     {
         #ifdef PIC_DEBUG
             printf("Computing histograms...");
@@ -94,11 +95,11 @@ protected:
     }
 
     /**
-     * @brief spatial creates a low resolution version of the stack.
+     * @brief sampleSpatial creates a low resolution version of the stack.
      * @param stack is a stack of Image* at different exposures
      * @param sub_type
      */
-    void spatial(ImageVec &stack, SAMPLER_TYPE sub_type = ST_MONTECARLO_S)
+    void sampleSpatial(ImageVec &stack, SAMPLER_TYPE sub_type = ST_MONTECARLO_S)
     {
         int width    = stack[0]->width;
         int height   = stack[0]->height;
@@ -166,7 +167,7 @@ public:
     }
 
     /**
-     * @brief Destroy
+     * @brief release
      */
     void release()
     {
@@ -174,10 +175,8 @@ public:
         channels = 0;
         nSamples = 0;
         total = 0;
-        if(samples != NULL) {
-            delete[] samples;
-            samples = NULL;
-        }
+
+        samples = delete_s(samples);
     }
 
     /**
@@ -200,9 +199,9 @@ public:
         this->exposures = int(stack.size());
 
         if(bSpatial) {
-            spatial(stack, sub_type);
+            sampleSpatial(stack, sub_type);
         } else {
-            Grossberg(stack);
+            sampleGrossberg(stack);
         }
 
         if (alpha < 0.f || alpha > 1.f)
@@ -217,7 +216,7 @@ public:
             int t_min = int(t_min_f * 255.0f);
             int t_max = int(t_max_f * 255.0f);
 
-            for(int i=0; i<total; i++) {
+            for(int i = 0; i < total; i++) {
                 if(samples[i] < t_min || samples[i] > t_max) {
                     samples[i] = -1;
                 }
@@ -234,13 +233,20 @@ public:
         return samples;
     }
 
+    /**
+     * @brief getNSamples
+     * @return
+     */
     int getNSamples() const {
         return nSamples;
     }
 
+    /**
+     * @brief print
+     */
     void print()
     {
-        for(int i=0;i<total;i++) {
+        for(int i = 0; i < total; i++) {
            printf("%d\n", samples[i]);
         }
 

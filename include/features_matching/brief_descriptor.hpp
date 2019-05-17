@@ -44,13 +44,13 @@ namespace pic {
 class BRIEFDescriptor
 {
 protected:
-    int                 S;
-    unsigned int        n;
-    float               sigma_sq_2, sigma_sq;
-    std::mt19937        *m;
+    int S;
+    unsigned int n;
+    float sigma_sq_2, sigma_sq;
+    std::mt19937 *m;
 
     //samples coordinates
-    int                 *x, *y;
+    int *x, *y;
 
     /**
      * @brief generateSample
@@ -58,9 +58,9 @@ protected:
      */
     void generateSample(int *sample)
     {
-        float theta = C_PI_2 * Random((*m)());
+        float theta = C_PI_2 * getRandom((*m)());
 
-        float u = Random((*m)());
+        float u = getRandom((*m)());
         float r = sqrtf(MAX(-logf(u) * sigma_sq_2, 0.0f));
 
         sample[0] = int(r * cosf(theta));
@@ -166,7 +166,8 @@ public:
         if(seed >= 0) {
             m = new std::mt19937(seed);
         } else {
-            m = new std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());
+            auto seed_time = std::chrono::system_clock::now().time_since_epoch().count();
+            m = new std::mt19937(int (seed_time));
         }
 
         this->S = S;
@@ -186,7 +187,6 @@ public:
      */
     void release()
     {
-
         if(m != NULL) {
             delete m;
             m = NULL;

@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
         pic::FilterDeformGrid flt_dg(grid_move);
 
-        pic::Image *out = flt_dg.ProcessP(Single(&img), NULL);
+        pic::Image *out = flt_dg.Process(Single(&img), NULL);
 
         bool bWrite = out->Write("../data/output/img_deformation.png", pic::LT_NOR);
 

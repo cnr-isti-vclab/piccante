@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../gl/filtering/filter.hpp"
 
+#include "../../util/array.hpp"
+
 namespace pic {
 
 /**
@@ -30,174 +32,117 @@ class FilterGLDownPP: public FilterGL
 protected:
 
     float threshold, *value;
+    int channels;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders()
+    {
+        fragment_source = MAKE_STRING
+                          (
+                              uniform sampler2D u_tex; \n
+                              uniform vec4    value; \n
+                              uniform float   threshold; \n
+                              out     vec4    f_color; \n
+
+        void main(void) { \n
+            ivec2 coords = ivec2(gl_FragCoord.xy) * ivec2(2); \n
+            vec3 color[4]; \n
+            color[0] = texelFetch(u_tex, coords              , 0).xyz; \n
+            color[1] = texelFetch(u_tex, coords + ivec2(1, 0), 0).xyz; \n
+            color[2] = texelFetch(u_tex, coords + ivec2(0, 1), 0).xyz; \n
+            color[3] = texelFetch(u_tex, coords + ivec2(1, 1), 0).xyz; \n
+
+            int counter = 0;
+            vec3 ret = vec3(0.0);
+
+            for(int i = 0; i < 4; i++) {
+                if(distance(color[i], value.xyz) > threshold) {
+                    ret += color[i];
+                    counter++;
+                }
+            }
+
+            if(counter > 0) {
+                ret /= vec3(counter);
+            } else {
+                ret = value.xyz;
+            }
+
+            f_color = vec4(ret.xyz, 1.0); \n
+        }
+                          );
+
+        technique.init("330", vertex_source, fragment_source);
+
+    #ifdef PIC_DEBUG
+        technique.printLog("FilterGLDownPP");
+    #endif
+
+        technique.bind();
+        technique.setAttributeIndex("a_position", 0);
+        technique.setOutputFragmentShaderIndex("f_color", 0);
+        technique.link();
+        technique.unbind();
+    }
 
 public:
     /**
      * @brief FilterGLDownPP
      * @param scale
      */
-    FilterGLDownPP(float *value, float threshold);
+    FilterGLDownPP(float *value, float threshold)
+    {
+        initShaders();
+        update(value, threshold);
+    }
 
     /**
-     * @brief Update
+     * @brief update
      * @param value
      * @param threshold
      */
-    void Update(float *value, float threshold);
+    void update(float *value, float threshold)
+    {
+        if(value == NULL) {
+            printf("ERROR in FilterGLDownPP");
+        }
+
+        this->value = value;
+
+        this->threshold = (threshold > 0.0f) ? threshold : 1e-6f;
+
+        technique.bind();
+        technique.setUniform1i("u_tex", 0);
+        technique.setUniform1f("threshold", this->threshold);
+        technique.setUniform4fv("value", this->value);
+        technique.unbind();
+    }
 
     /**
-     * @brief Process
+     * @brief OutputSize
      * @param imgIn
-     * @param imgOut
-     * @return
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
-};
-
-FilterGLDownPP::FilterGLDownPP(float *value, float threshold): FilterGL()
-{
-    value = NULL;
-
-    InitShaders();
-    Update(value, threshold);
-}
-
-void FilterGLDownPP::InitShaders()
-{
-    fragment_source = MAKE_STRING
-                      (
-                          uniform sampler2D u_tex; \n
-                          uniform vec4    value; \n
-                          uniform float   threshold; \n
-                          out     vec4    f_color; \n
-
-    void main(void) { \n
-        ivec2 coords = ivec2(gl_FragCoord.xy) * ivec2(2); \n
-        vec3 color[4]; \n
-        color[0] = texelFetch(u_tex, coords              , 0).xyz; \n
-        color[1] = texelFetch(u_tex, coords + ivec2(1, 0), 0).xyz; \n
-        color[2] = texelFetch(u_tex, coords + ivec2(0, 1), 0).xyz; \n
-        color[3] = texelFetch(u_tex, coords + ivec2(1, 1), 0).xyz; \n
-
-        int counter = 0;
-        vec3 ret = vec3(0.0);
-
-        for(int i=0; i<4; i++) {
-            if(distance(color[i], value.xyz) > threshold) {
-                ret += color[i];
-                counter++;
-            }
-        }
-
-        if(counter > 0) {
-            ret /= vec3(counter);
+    void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        if(imgIn.size() == 1) {
+            width       = imgIn[0]->width >> 1;
+            height      = imgIn[0]->height >> 1;
         } else {
-            ret = value.xyz;
+            width       = imgIn[1]->width;
+            height      = imgIn[1]->height;
+
         }
 
-        f_color = vec4(ret.xyz, 1.0); \n
+        channels    = imgIn[0]->channels;
+        frames      = imgIn[0]->frames;
     }
-                      );
-
-    technique.init("330", vertex_source, fragment_source);
-
-#ifdef PIC_DEBUG
-    technique.printLog("FilterGLDownPP");
-#endif
-
-    technique.bind();
-    technique.setAttributeIndex("a_position", 0);
-    technique.setOutputFragmentShaderIndex("f_color", 0);
-    technique.link();
-    technique.unbind();
-}
-
-/**
- * @brief Update
- * @param value
- * @param threshold
- */
-void FilterGLDownPP::Update(float *value, float threshold)
-{
-    if(value == NULL) {
-        this->value = new float[4];
-
-        for(int i = 0; i < 4; i++) {
-            this->value[i] = 0.0f;
-        }
-    } else {
-        this->value = value;
-    }
-
-    if(threshold > 0.0f) {
-        this->threshold = threshold;
-    } else {
-        this->threshold = 1e-4f;
-    }
-
-    technique.bind();
-    technique.setUniform1i("u_tex", 0);
-    technique.setUniform1f("threshold", this->threshold);
-    technique.setUniform4fv("value", this->value);
-    technique.unbind();
-}
-
-ImageGL *FilterGLDownPP::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return NULL;
-    }
-
-    if(imgIn.size() != 1) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width  >> 1;
-    int h = imgIn[0]->height >> 1;
-    int f = imgIn[0]->frames;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(f, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
-    }
-
-    //Fbo
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, f, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    technique.bind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    technique.unbind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
-}
+};
 
 } // end namespace pic
 

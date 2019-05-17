@@ -1,18 +1,26 @@
 /*
 
-PICCANTE
-The hottest HDR imaging library!
-http://piccantelib.net
+PICCANTE Examples
+The hottest examples of Piccante:
+http://vcg.isti.cnr.it/piccante
 
 Copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
+This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3.0 of the License, or
+    (at your option) any later version.
 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    See the GNU Lesser General Public License
+    ( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
 */
 
 /**
@@ -21,24 +29,21 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * a suggestion for running examples.
 */
 
-#ifdef _MSC_VER
-    #define PIC_DISABLE_OPENGL_NON_CORE
-    #include "../common_code/gl_core_4_0.h"
-#endif
-
-#include "../common_code/image_qimage_interop.hpp"
-
-#include "piccante.hpp"
+#include "../common_code/gl_include.hpp"
 
 #include <QKeyEvent>
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
 #include <QApplication>
-#include <QOpenGLFunctions>
 #include <QVBoxLayout>
 #include <QLabel>
 
-class GLWidget : public QGLWidget, protected QOpenGLFunctions
+#include "piccante.hpp"
+
+class GLWidget : public QGLWidget
+        #ifndef _MSC_VER
+        , protected QOpenGLFunctions
+        #endif
 {
 protected:
     pic::QuadGL *quad;
@@ -55,13 +60,15 @@ protected:
      */
     void initializeGL(){
 
+    #ifndef _MSC_VER
         initializeOpenGLFunctions();
+    #endif
 
-        #ifdef PIC_WIN32
-            if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
-                printf("OpenGL functions are not loaded!\n");
-            }
-        #endif
+    #ifdef _MSC_VER
+        if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+            printf("OpenGL functions are not loaded!\n");
+        }
+    #endif
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
@@ -77,10 +84,11 @@ protected:
         quad = new pic::QuadGL(true);
 
         //creating a rotation matrix
-        h.SetRotationMatrix(pic::Deg2Rad(float(degrees)));
+        h.setRotationMatrix(pic::Deg2Rad(float(degrees)));
 
         //allocating the warping filter
-        flt_warp = new pic::FilterGLWarp2D(h, true, true);
+        flt_warp = new pic::FilterGLWarp2D();
+        flt_warp->update(h, true, true);
 
          //allocating a new filter for simple tone mapping
         flt_tmo = new pic::FilterGLSimpleTMO();
@@ -109,8 +117,8 @@ protected:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //applying the warping filter
-        h.SetRotationMatrix(pic::Deg2Rad(float(degrees)));
-        flt_warp->Update(h, true, true);
+        h.setRotationMatrix(pic::Deg2Rad(float(degrees)));
+        flt_warp->update(h, true, true);
 
         img_flt = flt_warp->Process(SingleGL(&img), img_flt);
 

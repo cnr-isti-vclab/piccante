@@ -31,7 +31,7 @@ class FilterExposureFusionWeights: public Filter
 {
 protected:
     float wC, wE, wS;
-    float mu, sigma2;
+    float mu, sigma_sq_2;
 
     /**
      * @brief ProcessBBox
@@ -41,45 +41,37 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        int channels = src[1]->channels;
-        int width = src[1]->width;
-        int height = src[1]->height;
-        int tmp;
-
         for(int j = box->y0; j < box->y1; j++) {
-            int c = j * width;
 
             for(int i = box->x0; i < box->x1; i++) {
-                int ind = c + i;
 
-                //Saturation
-                float pSat = computeSaturation(&src[1]->data[ind * channels], channels);
+                float *pCur0 = (*src[0])(i, j);
+                float *pCur1 = (*src[1])(i, j);
 
-                //Contrast
-                float pCon = -4.0f * src[0]->data[ind];
+                //saturation
+                float pSat = computeSaturation(pCur1, src[1]->channels);
 
-                tmp   = CLAMP(i + 1, width);
-                pCon += src[0]->data[c + tmp];
+                //contrast
+                float *pCurN0 = (*src[0])(i, j + 1);
+                float *pCurS0 = (*src[0])(i, j - 1);
+                float *pCurE0 = (*src[0])(i + 1, j);
+                float *pCurW0 = (*src[0])(i - 1, j);
 
-                tmp   = CLAMP(i - 1, width);
-                pCon += src[0]->data[c + tmp];
+                float pCon = fabsf(-4.0f * pCur0[0] +
+                        pCurN0[0] + pCurS0[0] + pCurE0[0] + pCurW0[0]);
 
-                tmp   = CLAMP(j + 1, height);
-                pCon += src[0]->data[tmp * width + i];
+                //well-exposedness
+                float pExp = 0.0f;
+                for(int c = 0; c < src[1]->channels; c++) {
+                    float delta = pCur1[c] - mu;
+                    pExp += delta * delta;
+                }
+                pExp = expf(-pExp / sigma_sq_2);
 
-                tmp   = CLAMP(j - 1, height);
-                pCon += src[0]->data[tmp * width + i];
-
-                pCon = fabsf(pCon);
-
-                //Well-exposedness
-                float tmpL = src[0]->data[ind] - mu;
-                float pExp = expf(-(tmpL * tmpL) / sigma2);
-
-                //Final weights
-                dst->data[ind] =  powf(pCon, wC) *
-                                  powf(pExp, wE) *
-                                  powf(pSat, wS);
+                //final weights
+                float *out = (*dst)(i, j);
+                out[0] = powf(pCon, wC) * powf(pExp, wE) * powf(pSat, wS) + 1e-12f;
+                out[0] = CLAMPi(out[0], 0.0f, 1.0f);
             }
         }
     }
@@ -88,18 +80,32 @@ public:
 
     /**
      * @brief FilterExposureFusionWeights
-     * @param type
+     * @param wC
+     * @param wE
+     * @param wS
      */
-    FilterExposureFusionWeights(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
+    FilterExposureFusionWeights(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f) : Filter()
+    {
+        update(wC, wE, wS);
+        minInputImages = 2;
+    }
+
+    /**
+     * @brief update
+     * @param wC
+     * @param wE
+     * @param wS
+     */
+    void update(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
     {
         float sigma = 0.2f;
 
         mu = 0.5f;
-        sigma2 = 2.0f * sigma * sigma;
+        sigma_sq_2 = 2.0f * sigma * sigma;
 
-        this->wC = wC > 0.0f ? wC : 1.0f;
-        this->wE = wE > 0.0f ? wE : 1.0f;
-        this->wS = wS > 0.0f ? wS : 1.0f;
+        this->wC = wC > 0.0f ? MIN(wC, 1.0f) : 1.0f;
+        this->wE = wE > 0.0f ? MIN(wE, 1.0f) : 1.0f;
+        this->wS = wS > 0.0f ? MIN(wS, 1.0f) : 1.0f;
     }
 };
 

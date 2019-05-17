@@ -35,23 +35,23 @@ public:
      * @brief FilterLoG2D
      * @param sigma
      */
-    FilterLoG2D(float sigma) : FilterDiffGauss(sigma * sqrtf(2), sigma / sqrtf(2.0f))
+    FilterLoG2D(float sigma) : FilterDiffGauss(sigma * sqrtf(2.0f), sigma / sqrtf(2.0f))
     {
         this->sigma = sigma;
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma_1
      * @param sigma_2
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma)
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma)
     {
         FilterLoG2D filter(sigma);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

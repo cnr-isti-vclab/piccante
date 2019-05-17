@@ -24,66 +24,101 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter.hpp"
 #include "../filtering/filter_luminance.hpp"
 #include "../algorithms/bilateral_separation.hpp"
+#include "../tone_mapping/tone_mapping_operator.hpp"
 
 namespace pic {
 
 /**
- * @brief DurandTMO
- * @param imgIn
- * @param imgOut
- * @param target_contrast
- * @return
+ * @brief The DurandTMO class
  */
-PIC_INLINE Image *DurandTMO(Image *imgIn, Image *imgOut = NULL, float target_contrast = 5.0f)
+class DurandTMO: public ToneMappingOperator
 {
-    if(imgIn == NULL) {
-        return NULL;
+public:
+
+    FilterLuminance flt_lum;
+    float target_contrast;
+
+    /**
+     * @brief DurandTMO
+     */
+    DurandTMO(float target_contrast = 5.0f)
+    {
+        images.push_back(NULL);
+        images.push_back(NULL);
+        images.push_back(NULL);
+        update(target_contrast);
     }
 
-    if(imgOut == NULL) {
-        imgOut = imgIn->clone();
-    } else {
-        *imgOut = imgIn;
+    ~DurandTMO()
+    {
+        release();
     }
 
-    if(target_contrast <= 0.0f) {
-        target_contrast = 5.0f;
+    /**
+     * @brief update
+     * @param target_contrast
+     */
+    void update(float target_contrast = 5.0f)
+    {
+        if(target_contrast <= 0.0f) {
+            target_contrast = 5.0f;
+        }
+
+        this->target_contrast = target_contrast;
     }
 
-    //luminance image
-    Image *lum = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);
+    /**
+     * @brief ProcessAux
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *ProcessAux(ImageVec imgIn, Image *imgOut)
+    {
+        updateImage(imgIn[0]);
 
-    //bilateral filter seperation
-    ImageVec *sep = bilateralSeparation(lum);
+        //luminance image
+        images[2] = flt_lum.Process(imgIn, images[2]);
 
-    Image *base = sep->at(0);
-    Image *detail = sep->at(1);
+        //bilateral filter seperation
+        bilateralSeparation(images[2], images, -1.0f, 0.4f, true);
 
+        Image *base = images[0];
+        Image *detail = images[1];
 
-    base->applyFunction(log10fPlusEpsilon);
-    detail->applyFunction(log10fPlusEpsilon);
+        float min_log_base, max_log_base;
+        base->getMinVal(NULL, &min_log_base);
+        base->getMaxVal(NULL, &max_log_base);
 
-    float max_log_base = base->getMaxVal()[0];
-    float min_log_base = base->getMinVal()[0];
+        float compression_factor = log10fPlusEpsilon(target_contrast) / (max_log_base - min_log_base);
+        float log_absoulte = compression_factor * max_log_base;
 
-    float compression_factor =  log10fPlusEpsilon(target_contrast) / (max_log_base - min_log_base);
-    float log_absoulte = compression_factor * max_log_base;
+        *base *= compression_factor;
+        *base += detail;
+        *base -= log_absoulte;
+        base->applyFunction(powf10fMinusEpsilon);
 
-    *base *= compression_factor;
-    *base += detail;
-    *base -= log_absoulte;
-    base->applyFunction(powf10fe);
+        *imgOut = *imgIn[0];
+        *imgOut *= base;
+        *imgOut /= images[2];
 
-    imgOut = imgIn->clone();
-    *imgOut /= lum;
-    *imgOut *= base;
+        imgOut->removeSpecials();
 
-    delete base;
-    delete detail;
-    delete lum;
+        return imgOut;
+    }
 
-    return imgOut;
-}
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image *execute(Image *imgIn, Image *imgOut)
+    {
+        DurandTMO dtmo(5.0f);
+        return dtmo.Process(Single(imgIn), imgOut);
+    }
+};
 
 } // end namespace pic
 

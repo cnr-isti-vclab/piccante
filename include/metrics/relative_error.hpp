@@ -32,19 +32,24 @@ namespace pic {
  * @param ori is the original image.
  * @param cmp is the distorted image.
  * @param bLargeDifferences, if true, skips big differences for stability.
+ * @param type is the domain where to compute MSE (linear, logarithmic, and PU).
  * @return It returns the relative error value between ori and cmp.
  */
-PIC_INLINE double RelativeError(Image *ori, Image *cmp, bool bLargeDifferences = false)
+PIC_INLINE double RelativeError(Image *ori, Image *cmp, bool bLargeDifferences = false, METRICS_DOMAIN type = MD_LIN)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
+    }
+
+    if(!ori->isValid() || !cmp->isValid()) {
+        return -4.0;
     }
 
     if(!ori->isSimilarType(cmp)) {
         return -1.0;
     }
 
-    int size = ori->width * ori->height * ori->channels;
+    int size = ori->size();
 
     double relErr = 0.0f;
     int count = 0;
@@ -55,16 +60,16 @@ PIC_INLINE double RelativeError(Image *ori, Image *cmp, bool bLargeDifferences =
     }
 
     for(int i = 0; i < size; i++) {
-        double valO = double(ori->data[i]);
-        double valC = double(cmp->data[i]);
+        double o_val = double(changeDomain(ori->data[i], type));
+        double c_val = double(changeDomain(cmp->data[i], type));
 
-        double delta = fabs(valO - valC);
+        double delta = fabs(o_val - c_val);
 
         if(delta <= largeDifferences) {
             count++;
 
-            if(valO > C_SINGULARITY) { //to avoid singularities
-                relErr += delta / valO;
+            if(o_val > C_SINGULARITY) { //to avoid singularities
+                relErr += delta / o_val;
             }
         }
     }

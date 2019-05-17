@@ -37,9 +37,9 @@ protected:
     ImageGL *imageRand;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -59,13 +59,13 @@ public:
     ~FilterGLBilateral2DSE();
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_p
      * @param sigma_n
      * @param sigma_a
      */
-    void Update(float sigma_s, float sigma_p, float sigma_n, float sigma_a);
+    void update(float sigma_s, float sigma_p, float sigma_n, float sigma_a);
 
     /**
      * @brief Process
@@ -88,13 +88,13 @@ public:
             return 0;
         }
 
-        Execute(argv[1], float(atof(argv[2])), float(atof(argv[3])), float(atof(argv[4])), float(atof(argv[5])));
+        execute(argv[1], float(atof(argv[2])), float(atof(argv[3])), float(atof(argv[4])), float(atof(argv[5])));
 
         return 0;
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param sigma_s
      * @param sigma_p
@@ -103,7 +103,7 @@ public:
      * @param testing
      * @return
      */
-    static ImageGL *Execute( std::string nameIn, 
+    static ImageGL *execute( std::string nameIn,
                                 float sigma_s, float sigma_p, float sigma_n, float sigma_a, int testing = 1)
     {
 
@@ -199,12 +199,13 @@ FilterGLBilateral2DSE::FilterGLBilateral2DSE(float sigma_s, float sigma_p, float
     printf("Window: %d\n", halfKernelSize);
 #endif
 
-    ms = new MRSamplersGL<2>(ST_BRIDSON, halfKernelSize, 4*halfKernelSize, 1,
+    Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+    ms = new MRSamplersGL<2>(ST_BRIDSON, window, 4*halfKernelSize, 1,
                              nSamplers);
     ms->generateTexture();
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 FilterGLBilateral2DSE::~FilterGLBilateral2DSE()
@@ -272,7 +273,7 @@ void FilterGLBilateral2DSE::FragmentShader()
 
 }
 
-void FilterGLBilateral2DSE::InitShaders()
+void FilterGLBilateral2DSE::initShaders()
 {
 #ifdef PIC_DEBUG
     printf("Number of samples: %d\n", ms->nSamples);
@@ -280,10 +281,10 @@ void FilterGLBilateral2DSE::InitShaders()
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral2DSE");
 
-    Update(-1.0f, -1.0f, -1.0f, -1.0f);
+    update(-1.0f, -1.0f, -1.0f, -1.0f);
 }
 
-void FilterGLBilateral2DSE::Update(float sigma_s, float sigma_p, float sigma_n, float sigma_a)
+void FilterGLBilateral2DSE::update(float sigma_s, float sigma_p, float sigma_n, float sigma_a)
 {
 
     bool flag = false;
@@ -312,7 +313,8 @@ void FilterGLBilateral2DSE::Update(float sigma_s, float sigma_p, float sigma_n, 
     int halfKernelSize = kernelSize >> 1;
 
     if(flag) {
-        ms->updateGL(halfKernelSize, halfKernelSize);
+        Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+        ms->updateGL(window, halfKernelSize);
     }
     
     //shader update
@@ -322,21 +324,21 @@ void FilterGLBilateral2DSE::Update(float sigma_s, float sigma_p, float sigma_n, 
     float sigmaa2 = 2.0f * this->sigma_a * this->sigma_a;
 
     technique.bind();
-    technique.setUniform1i("u_tex",       0);
-    technique.setUniform1i("u_poisson",   1);
+    technique.setUniform1i("u_tex",     0);
+    technique.setUniform1i("u_poisson",  1);
     technique.setUniform1i("u_rand",	2);
 
     technique.setUniform1i("u_edge_pos",  3);
     technique.setUniform1i("u_edge_nor",  4);
     technique.setUniform1i("u_edge_alb",  5);
 
-    technique.setUniform1i("kernelSize",       kernelSize);
-    technique.setUniform1f("kernelSizef",      float(kernelSize));
-    technique.setUniform1f("sigma_s2",         sigmas2);
-    technique.setUniform1f("sigma_pos2",       sigmap2);
-    technique.setUniform1f("sigma_nor2",        sigman2);
-    technique.setUniform1f("sigma_alb2",        sigmaa2);
-    technique.setUniform1f("nSamples",          ms->nSamples >> 1);
+    technique.setUniform1i("kernelSize", kernelSize);
+    technique.setUniform1f("kernelSizef", float(kernelSize));
+    technique.setUniform1f("sigma_s2", sigmas2);
+    technique.setUniform1f("sigma_pos2", sigmap2);
+    technique.setUniform1f("sigma_nor2", sigman2);
+    technique.setUniform1f("sigma_alb2", sigmaa2);
+    technique.setUniform1i("nSamples", ms->nSamples >> 1);
     technique.unbind();
 }
 

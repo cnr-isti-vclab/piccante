@@ -120,9 +120,9 @@ PIC_INLINE Image *computeConnectedComponents(Image *img, std::vector<LabelOutput
             if((i - 1) > -1) {
                 int ind_img_prev = ind_img - channels;
 
-                float n1 = Array<float>::norm(&data[ind_img], channels);
-                float n2 = Array<float>::norm(&data[ind_img_prev], channels);
-                float dist = sqrtf(Array<float>::distanceSq(&data[ind_img], &data[ind_img_prev], channels));
+                float n1 = Arrayf::norm(&data[ind_img], channels);
+                float n2 = Arrayf::norm(&data[ind_img_prev], channels);
+                float dist = sqrtf(Arrayf::distanceSq(&data[ind_img], &data[ind_img_prev], channels));
 
                 if(dist <= (thr * MAX(n1, n2))) {
                     neighbors[0] = ind - 1;
@@ -133,9 +133,9 @@ PIC_INLINE Image *computeConnectedComponents(Image *img, std::vector<LabelOutput
             if((j - 1) > -1) {
                 int ind_img_prev = ind_img - (width * channels);
 
-                float n1 = Array<float>::norm(&data[ind_img], channels);
-                float n2 = Array<float>::norm(&data[ind_img_prev], channels);
-                float dist = sqrtf(Array<float>::distanceSq(&data[ind_img], &data[ind_img_prev], channels));
+                float n1 = Arrayf::norm(&data[ind_img], channels);
+                float n2 = Arrayf::norm(&data[ind_img_prev], channels);
+                float dist = sqrtf(Arrayf::distanceSq(&data[ind_img], &data[ind_img_prev], channels));
 
                 if(dist <= (thr * MAX(n1, n2))) {
                     neighbors[nNeighbors] = ind - width;

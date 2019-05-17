@@ -85,36 +85,21 @@ public:
     /**
      * @brief FilterRemoveInfNaN
      */
-    FilterRemoveInfNaN()
+    FilterRemoveInfNaN() : Filter()
     {
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param threshold_nuked
      * @return
      */
-    static Image* Execute(Image *imgIn, Image *imgOut)
+    static Image* execute(Image *imgIn, Image *imgOut)
     {
         FilterRemoveInfNaN filter;
-        imgOut = filter.ProcessP(Single(imgIn), imgOut);
-        return imgOut;
-    }
-
-    /**
-     * @brief Execute
-     * @param nameFileIn
-     * @param nameFileOut
-     * @return
-     */
-    static Image* Execute(std::string nameFileIn, std::string nameFileOut)
-    {
-        Image imgIn(nameFileIn);
-        Image *imgOut = Execute(&imgIn, NULL);
-        imgOut->Write(nameFileOut);
-
+        imgOut = filter.Process(Single(imgIn), imgOut);
         return imgOut;
     }
 };

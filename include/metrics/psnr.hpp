@@ -22,7 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 #include "../image.hpp"
-
+#include "../util/array.hpp"
 #include "../metrics/base.hpp"
 #include "../metrics/mse.hpp"
 
@@ -32,74 +32,49 @@ namespace pic {
  * @brief PSNR computes the peak signal to noise ratio (PSNR) between two images.
  * @param ori is the original image.
  * @param cmp is the distorted image.
+ * @param max_value is the maximum value of the domain of ori and cmp. If ori and comp
+ * are normalized 8-bit LDR/SDR images max_value MUST BE 1.0!
  * @param bLargeDifferences, if true, skips big differences for stability.
+ * @param type is the domain where to compute MSE (linear, logarithmic, and PU).
  * @return It returns the PSNR value between ori and cmp.
  */
-PIC_INLINE double PSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
+PIC_INLINE double PSNR(Image *ori, Image *cmp, double max_value = -1.0, bool bLargeDifferences = false, METRICS_DOMAIN type = MD_LIN)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
+    }
+
+    if(!ori->isValid() || !cmp->isValid()) {
+        return -4.0;
     }
 
     if(!ori->isSimilarType(cmp)) {
         return -1.0;
     }
 
-    double mse_value = MSE(ori, cmp, bLargeDifferences);
+    if(max_value <= 0.0) {
+        float *max_value_ori = ori->getMaxVal(NULL, NULL);
+        float *max_value_cmp = cmp->getMaxVal(NULL, NULL);
 
-    if(mse_value > 0.0) {
-        return 10.0 * log10(1.0 / mse_value);
+        int ind;
+        float m_ori = Arrayf::getMax(max_value_ori, ori->channels, ind);
+        float m_cmp = Arrayf::getMax(max_value_cmp, cmp->channels, ind);
+
+        max_value = double(MAX(m_ori, m_cmp));
+
+        delete[] max_value_ori;
+        delete[] max_value_cmp;
+    }
+
+    double rmse_value = RMSE(ori, cmp, bLargeDifferences, type);
+
+    max_value = double(changeDomain(float(max_value), type));
+
+    if(rmse_value > 0.0) {
+        return 20.0 * log10(max_value / rmse_value);
     } else {
         return -3.0;
     }
-}
-
-/**
- * @brief rPSNR computes the relateive peak signal to noise ratio (rPSNR) between two images.
- * @param ori is the original image.
- * @param cmp is the distorted image.
- * @param bLargeDifferences, if true, skips big differences for stability.
- * @return It returns the PSNR value between ori and cmp.
- */
-PIC_INLINE double rPSNR(Image *ori, Image *cmp, bool bLargeDifferences = false)
-{
-    if(ori == NULL || cmp == NULL) {
-        return -2.0;
-    }
-
-    if(!ori->isSimilarType(cmp)) {
-        return -1.0;
-    }
-
-    int size = ori->size();
-
-    double acc = 0.0;
-    int count = 0;
-
-    double largeDifferences = C_LARGE_DIFFERENCES;
-    if(!bLargeDifferences) {
-        largeDifferences = FLT_MAX;
-    }
-
-    for(int i = 0; i < size; i++) {
-        double valO = ori->data[i];
-        double valC = cmp->data[i];
-
-        double delta = valO - valC;
-        double maxOC = MAX(valO, valC);
-
-        if(delta <= largeDifferences) {
-            count++;
-
-            if(maxOC > pic::C_SINGULARITY) {
-                //to avoid singularities
-                double tmp = delta / maxOC;
-                acc += tmp * tmp;
-            }
-        }
-    }
-
-    return -10.0 * log10(acc / double(count));
 }
 
 } // end namespace pic

@@ -122,14 +122,14 @@ public:
     /**
      * @brief FilterGLNonLinear1D
      */
-    FilterGLNonLinear1D(int kernelSize, std::string acc_operator) : FilterGL1D(0, GL_TEXTURE_2D)
+    FilterGLNonLinear1D(int kernelSize, std::string acc_operator, GLenum target) : FilterGL1D(0, target)
     {
         this->acc_operator = acc_operator;
 
-        Setup(kernelSize);
+        update(kernelSize);
 
         FragmentShader(NULL, 0, GL_TEXTURE_2D);
-        InitShaders();
+        initShaders();
     }
 
     ~FilterGLNonLinear1D()
@@ -138,30 +138,28 @@ public:
     }
 
     /**
-     * @brief SetUniformAux
+     * @brief setUniformAux
      */
-    void SetUniformAux()
+    void setUniformAux()
     {
         technique.setUniform1i("halfKernelSize", halfKernelSize);
         technique.setUniform1i("kernelSize", kernelSize);
     }
 
     /**
-     * @brief Setup
+     * @brief update
      * @param kernelSize
      */
-    void Setup(int kernelSize)
+    void update(int kernelSize)
     {
-        if(kernelSize < 1) {
-            kernelSize = 3;
-        }
+        kernelSize = (kernelSize > 0) ? kernelSize : 3;
 
         if((kernelSize % 2) == 0) {
             kernelSize++;
         }
 
         this->kernelSize = kernelSize;
-        halfKernelSize = kernelSize >> 1;
+        this->halfKernelSize = kernelSize >> 1;
     }
 };
 

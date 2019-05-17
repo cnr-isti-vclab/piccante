@@ -49,17 +49,17 @@ public:
      * @param gamma
      * @param fstop
      */
-    FilterSimpleTMO(float gamma, float fstop)
+    FilterSimpleTMO(float gamma, float fstop) : Filter()
     {
-        Update(gamma, fstop);
+        update(gamma, fstop);
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param gamma
      * @param fstop
      */
-    void Update(float gamma, float fstop)
+    void update(float gamma, float fstop)
     {
         this->gamma = 1.0f / gamma;
         this->fstop = fstop;
@@ -67,35 +67,18 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param gamma
      * @param fstop
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float gamma,
+    static Image *execute(Image *imgIn, Image *imgOut, float gamma,
                              float fstop)
     {
         FilterSimpleTMO filter(gamma, fstop);
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param gamma
-     * @param fstop
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut, float gamma,
-                             float fstop)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, gamma, fstop);
-        imgOut->Write(nameOut, LT_NOR_GAMMA, 0);
-        return imgOut;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

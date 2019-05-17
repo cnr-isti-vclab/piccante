@@ -37,13 +37,12 @@ public:
      * @param sigma_s
      * @param sigma_r
      */
-    FilterBilateral2DSP(float sigma_s, float sigma_r)
+    FilterBilateral2DSP(float sigma_s, float sigma_r) : FilterNPasses()
     {
-        //Bilatearl 1D Filter
         bilateralFilter = new FilterBilateral1D(sigma_s, sigma_r);
 
-        InsertFilter(bilateralFilter);
-        InsertFilter(bilateralFilter);
+        insertFilter(bilateralFilter);
+        insertFilter(bilateralFilter);
     }
 
     ~FilterBilateral2DSP()
@@ -52,56 +51,38 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      */
-    void Update(float sigma_s, float sigma_r)
+    void update(float sigma_s, float sigma_r)
     {
-        bilateralFilter->Update(sigma_s, sigma_r);
+        bilateralFilter->update(sigma_s, sigma_r);
     }
     
     /**
-     * @brief Signature
+     * @brief signature
      * @return
      */
-    std::string Signature()
+    std::string signature()
     {
-        return GenBilString("SP", bilateralFilter->sigma_s, bilateralFilter->sigma_r);
+        return genBilString("SP", bilateralFilter->sigma_s, bilateralFilter->sigma_r);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma_s,
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma_s,
                              float sigma_r)
     {
         FilterBilateral2DSP filter(sigma_s, sigma_r);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma_s
-     * @param sigma_r
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut, float sigma_s,
-                             float sigma_r)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, sigma_s, sigma_r);
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
-
 };
 
 } // end namespace pic

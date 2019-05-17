@@ -69,7 +69,7 @@ protected:
 
                     for(int l = 0; l < areaKernel; l++) {
                         int index_l = l * in->channels;
-                        float d_sq = Array<float>::distanceSq(&values[index_k], &values[index_l], in->channels);
+                        float d_sq = Arrayf::distanceSq(&values[index_k], &values[index_l], in->channels);
                         dist += sqrtf(d_sq);
                     }
 
@@ -81,8 +81,10 @@ protected:
 
                 float *out = (*dst) (i, j);
 
+                int index = best * in->channels;
+
                 for(int ch = 0; ch < in->channels; ch++) {
-                    out[ch] = values[best * in->channels + ch];
+                    out[ch] = values[index + ch];
                 }
             }
         }
@@ -108,23 +110,23 @@ public:
     {
         this->halfSize = checkHalfSize(size);
 
-        int kernelSize = halfSize * 2 + 1;
+        int kernelSize = (halfSize << 1) + 1;
         this->areaKernel = kernelSize * kernelSize;
 
         this->midValue = areaKernel >> 1;
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param size
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, int size)
+    static Image *execute(Image *imgIn, Image *imgOut, int size)
     {
         FilterMedVec filter(size);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

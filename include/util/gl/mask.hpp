@@ -66,6 +66,7 @@ PIC_INLINE GLuint GenerateMask(int width, int height, bool *buffer = NULL,
     }
 
     if(bGen) {
+
         if(mipmap) {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         } else {

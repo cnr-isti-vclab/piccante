@@ -40,12 +40,12 @@ class FilterWLS: public Filter
 {
 protected:
     /**
-     * @brief SingleChannel applies WLS smoothing filter for gray-scale images.
+     * @brief singleChannel applies WLS smoothing filter for gray-scale images.
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SingleChannel(ImageVec imgIn, Image *imgOut)
+    Image *singleChannel(ImageVec imgIn, Image *imgOut)
     {
         Image *L = imgIn[0];
 
@@ -143,12 +143,12 @@ protected:
     }
 
     /**
-     * @brief MultiChannel applies WLS filter for color images.
+     * @brief multiChannel applies WLS filter for color images.
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *MultiChannel(ImageVec imgIn, Image *imgOut)
+    Image *multiChannel(ImageVec imgIn, Image *imgOut)
     {
         Image *img = imgIn[0];
 
@@ -291,9 +291,9 @@ public:
     /**
      * @brief FilterWLS
      */
-    FilterWLS()
+    FilterWLS() : Filter()
     {
-        Update(1.2f, 1.0f);
+        update(1.2f, 1.0f);
     }
 
     /**
@@ -301,17 +301,17 @@ public:
      * @param alpha
      * @param lambda
      */
-    FilterWLS(float alpha, float lambda)
+    FilterWLS(float alpha, float lambda) : Filter()
     {
-        Update(alpha, lambda);
+        update(alpha, lambda);
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param alpha
      * @param lambda
      */
-    void Update(float alpha, float lambda)
+    void update(float alpha, float lambda)
     {
         epsilon = 0.0001f;
 
@@ -335,7 +335,7 @@ public:
      */
     Image *Process(ImageVec imgIn, Image *imgOut)
     {
-        if(imgIn.size() < 1){
+        if(imgIn.empty()){
             return imgOut;
         }
 
@@ -343,25 +343,18 @@ public:
             return imgOut;
         }
 
-        imgOut = SetupAux(imgIn, imgOut);
+        imgOut = setupAux(imgIn, imgOut);
 
-        //Convolution
-        if(imgIn[0]->channels == 1) {
-            return SingleChannel(imgIn, imgOut);
-        } else {
-            return MultiChannel(imgIn, imgOut);
+        if(imgOut == NULL) {
+            return imgOut;
         }
-    }
 
-    /**
-     * @brief ProcessP
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *ProcessP(ImageVec imgIn, Image *imgOut)
-    {
-        return Process(imgIn, imgOut);
+        //convolution
+        if(imgIn[0]->channels == 1) {
+            return singleChannel(imgIn, imgOut);
+        } else {
+            return multiChannel(imgIn, imgOut);
+        }
     }
 
     /**

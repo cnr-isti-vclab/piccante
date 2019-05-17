@@ -60,7 +60,7 @@ PIC_INLINE unsigned char *ReadPGM(std::string nameFile, unsigned char *data,
         }
     }
 
-    unsigned tmpWidth, tmpHeight, bpp;
+    unsigned int tmpWidth, tmpHeight, bpp;
 
     ppm_in >> tmpWidth >> tmpHeight >> bpp;
 
@@ -70,8 +70,8 @@ PIC_INLINE unsigned char *ReadPGM(std::string nameFile, unsigned char *data,
     }
 
     channels = 1;
-    width = tmpWidth;
-    height = tmpHeight;
+    width = int(tmpWidth);
+    height = int(tmpHeight);
 
     //Allocate memory
     if(data == NULL) {

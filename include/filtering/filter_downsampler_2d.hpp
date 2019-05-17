@@ -35,17 +35,27 @@ protected:
     FilterSampler1D *flt[2];
 
     bool swh;
-    float scaleX, scaleY;
+    float scale[2];
     int width, height;
 
-
-    void Allocate()
+    /**
+     * @brief allocate
+     */
+    void allocate()
     {
-        flt[X_DIRECTION] = NULL;
-        flt[Y_DIRECTION] = NULL;
+        for(int i = 0; i < 2; i++) {
+            if(isg[i] == NULL) {
+                isg[i] = new ImageSamplerGaussian();
+            }
 
-        isg[X_DIRECTION] = new ImageSamplerGaussian();
-        isg[Y_DIRECTION] = new ImageSamplerGaussian();
+            if(flt[i] == NULL) {
+                flt[i] = new FilterSampler1D(scale[i], i, isg[i]);
+            } else {
+                flt[i]->update(scale[i], i, isg[i]);
+            }
+
+            insertFilter(flt[i]);
+        }
     }
 
 public:
@@ -67,9 +77,9 @@ public:
     ~FilterDownSampler2D();
 
     /**
-     * @brief Destroy
+     * @brief release
      */
-    void Destroy();
+    void release();
     
     /**
      * @brief PreProcess
@@ -79,76 +89,77 @@ public:
     void PreProcess(ImageVec imgIn, Image *imgOut);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param width
      * @param height
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, int width,
+    static Image *execute(Image *imgIn, Image *imgOut, int width,
                              int height)
     {
         FilterDownSampler2D flt(width, height);
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param scaleX
      * @param scaleY
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float scaleX,
+    static Image *execute(Image *imgIn, Image *imgOut, float scaleX,
                              float scaleY)
     {
         FilterDownSampler2D flt(scaleX, scaleY);
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param scaleXY
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float scaleXY)
+    static Image *execute(Image *imgIn, Image *imgOut, float scaleXY)
     {
         FilterDownSampler2D flt(scaleXY, scaleXY);
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 };
 
 PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(float scaleX, float scaleY = -1.0f) : FilterNPasses()
 {
-    this->scaleX = 1.0f;
-    this->scaleY = 1.0f;
+    for(int i = 0; i < 2; i++) {
+        this->isg[i] = NULL;
+        this->flt[i] = NULL;
+        this->scale[i] = 1.0f;
+    }
 
     if(scaleX > 0.0f) {
-        this->scaleX = scaleX;
-
-        if(scaleY > 0.0f) {
-            this->scaleY = scaleY;
-        } else {
-            this->scaleY = scaleX;
-        }
+        this->scale[0] = scaleX;
+        this->scale[1] = scaleY > 0.0f ? scaleY : scaleX;
     }
 
     width  = -1;
     height = -1;
 
-    Allocate();
+    allocate();
 
     swh = true;
 }
 
 PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(int width, int height) : FilterNPasses()
 {
-    this->scaleX = 1.0f;
-    this->scaleY = 1.0f;
+    for(int i = 0; i < 2; i++) {
+        this->isg[i] = NULL;
+        this->flt[i] = NULL;
+        this->scale[i] = 1.0f;
+    }
 
     if(width > 0) {
         this->width  = width;
@@ -158,20 +169,27 @@ PIC_INLINE FilterDownSampler2D::FilterDownSampler2D(int width, int height) : Fil
         this->height = height;
     }
 
-    Allocate();
+    allocate();
 
     swh = (width < 1 ||  height < 1);
 }
 
 PIC_INLINE FilterDownSampler2D::~FilterDownSampler2D()
 {
-    for(int i = 0; i < 2; i++) {
-        if(flt[i] != NULL) {
+    release();
+}
+
+PIC_INLINE void FilterDownSampler2D::release()
+{
+    for (int i = 0; i < 2; i++) {
+        if (flt[i] != NULL) {
             delete flt[i];
+            flt[i] = NULL;
         }
 
-        if(isg[i] != NULL) {
+        if (isg[i] != NULL) {
             delete isg[i];
+            isg[i] = NULL;
         }
     }
 }
@@ -180,27 +198,15 @@ PIC_INLINE void FilterDownSampler2D::PreProcess(ImageVec imgIn,
         Image *imgOut)
 {
     if(!swh) {
-        scaleX = float(width)  / imgIn[0]->widthf;
-        scaleY = float(height) / imgIn[0]->heightf;
+        scale[0] = float(width)  / imgIn[0]->widthf;
+        scale[1] = float(height) / imgIn[0]->heightf;
     }
 
-    isg[X_DIRECTION]->Update(1.0f / (5.0f * scaleX), X_DIRECTION);
-    isg[Y_DIRECTION]->Update(1.0f / (5.0f * scaleY), Y_DIRECTION);
-
-    if(flt[X_DIRECTION] == NULL) {
-        flt[X_DIRECTION] = new FilterSampler1D(scaleX, X_DIRECTION, isg[X_DIRECTION]);
-    } else {
-        flt[X_DIRECTION]->Update(scaleX, X_DIRECTION, isg[X_DIRECTION]);
+    for(int i = 0; i < 2; i++) {
+        isg[i]->update(1.0f / (5.0f * scale[i]), i);
+        flt[i]->update(scale[i], i, isg[i]);
     }
 
-    if(flt[Y_DIRECTION] == NULL) {
-        flt[Y_DIRECTION] = new FilterSampler1D(scaleY, Y_DIRECTION, isg[Y_DIRECTION]);
-    } else {
-        flt[Y_DIRECTION]->Update(scaleY, Y_DIRECTION, isg[Y_DIRECTION]);
-    }
-
-    InsertFilter(flt[X_DIRECTION]);
-    InsertFilter(flt[Y_DIRECTION]);
 }
 
 } // end namespace pic

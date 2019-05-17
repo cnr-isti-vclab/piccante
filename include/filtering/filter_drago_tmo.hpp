@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_DRAGO_TMO_HPP
 #define PIC_FILTERING_FILTER_DRAGO_TMO_HPP
 
+#include "../util/array.hpp"
 #include "../filtering/filter.hpp"
 #include "../filtering/filter_luminance.hpp"
 
@@ -40,14 +41,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
-
 public:
     /**
      * @brief FilterDragoTMO
@@ -64,77 +57,41 @@ public:
     FilterDragoTMO(float Ld_Max, float b, float Lw_Max, float Lwa);
 
     /**
-     * @brief Update
+     * @brief update
      * @param Ld_Max
      * @param b
      * @param Lw_Max
      * @param Lwa
      */
-    void Update(float Ld_Max, float b, float Lw_Max, float Lwa);
+    void update(float Ld_Max, float b, float Lw_Max, float Lwa);
 };
 
-PIC_INLINE FilterDragoTMO::FilterDragoTMO()
+PIC_INLINE FilterDragoTMO::FilterDragoTMO() : Filter()
 {
-    Update(100.0f, 0.95f, 1e6f, 0.5f);
+    update(100.0f, 0.95f, 1e6f, 0.5f);
 }
-
 
 PIC_INLINE FilterDragoTMO::FilterDragoTMO(float Ld_Max, float b, float Lw_Max,
-                               float Lw_a)
+                               float Lw_a) : Filter()
 {
-    Update(Ld_Max, b, Lw_Max, Lw_a);
+    update(Ld_Max, b, Lw_Max, Lw_a);
 }
 
-PIC_INLINE void FilterDragoTMO::Update(float Ld_Max, float b, float Lw_Max,
+PIC_INLINE void FilterDragoTMO::update(float Ld_Max, float b, float Lw_Max,
                             float Lw_a)
 {
     //protected values are assigned/computed
-    if(Ld_Max > 0.0f) {
-        this->Ld_Max = Ld_Max;
-    } else {
-        this->Ld_Max = 100.0f;
-    }
-
-    if(b > 0.0f) {
-        this->b = b;
-    } else {
-        this->b = 0.95f;
-    }
-
-    if(Lw_Max > 0.0f) {
-        this->Lw_Max = Lw_Max;
-    } else {
-        this->Lw_Max = 1e6f;
-    }
-
-    if(Lw_a > 0.0f) {
-        this->Lw_a = Lw_a;
-    } else {
-        this->Lw_a = 0.5f;
-    }
+    this->Ld_Max = (Ld_Max > 0.0f) ? Ld_Max : 100.0f;
+    this->b = (b > 0.0f) ? b : 0.95f;
+    this->Lw_Max = (Lw_Max > 0.0f) ? Lw_Max : 1e6f;
+    this->Lw_a = (Lw_a > 0.0f) ? Lw_a : 0.5f;
 
     //constants
-    Lw_a_scaled  = this->Lw_a / powf(1.0f + b - 0.85f, 5.0f);
+    Lw_a_scaled   = this->Lw_a / powf(1.0f + b - 0.85f, 5.0f);
     Lw_Max_scaled = this->Lw_Max / Lw_a_scaled;
 
     constant1 = logf(b) / logf(0.5f);
     constant2 = (Ld_Max / 100.0f) / (log10f(1.0f + Lw_Max_scaled));
-}
-
-PIC_INLINE Image *FilterDragoTMO::SetupAux(ImageVec imgIn, Image *imgOut)
-{
-    if(imgIn.size() < 2) {
-        #ifdef PIC_DEBUG
-            printf("ERROR: FilterDragoTMO::SetupAux");
-        #endif
-        return imgOut;
-    }
-
-    if(imgOut == NULL) {
-        imgOut = imgIn[0]->allocateSimilarOne();
-    }
-
-    return imgOut;
 }
 
 PIC_INLINE void FilterDragoTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
@@ -152,16 +109,14 @@ PIC_INLINE void FilterDragoTMO::ProcessBBox(Image *dst, ImageVec src, BBox *box)
             if(dataLum[0] > 0.0f) {
                 float L_scaled = dataLum[0] / Lw_a_scaled;
 
-                float tmp	= powf((L_scaled / Lw_Max_scaled), constant1);
-                float Ld	= constant2 * logf(1.0f + L_scaled) / logf(2.0f + 8.0f * tmp);
+                float tmp = powf((L_scaled / Lw_Max_scaled), constant1);
+                float Ld = constant2 * logf(1.0f + L_scaled) / logf(2.0f + 8.0f * tmp);
 
                 for(int k = 0; k < channels; k++) {
                     dataOut[k] = (dataIn[k] * Ld) / dataLum[0];
                 }
             } else {
-                for(int k = 0; k < src[0]->channels; k++) {
-                    dataOut[k] = 0.0f;
-                }
+                Array<float>::assign(0.0f, dataOut, src[0]->channels);
             }
         }
     }

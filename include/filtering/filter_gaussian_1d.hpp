@@ -32,7 +32,6 @@ protected:
     float               sigma;
     PrecomputedGaussian *pg;
     bool                bPgOwned;
-    int                 dirs[3];
 
 public:
     /**
@@ -56,11 +55,40 @@ public:
 
     ~FilterGaussian1D();
 
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma,
+    /**
+     * @brief update
+     * @param sigma
+     * @param direction
+     */
+    void update(float sigma, int direction = 0)
+    {
+        if(this->sigma != sigma) {
+            this->sigma = sigma;
+
+            if(pg != NULL) {
+                delete pg;
+            }
+
+            pg = new PrecomputedGaussian(sigma);
+        }
+
+        bPgOwned = true;
+        FilterConv1D::update(pg->coeff, pg->kernelSize, direction);
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @param sigma
+     * @param direction
+     * @return
+     */
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma,
                              int direction)
     {
         FilterGaussian1D filter(sigma, direction);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 
@@ -70,7 +98,7 @@ PIC_INLINE FilterGaussian1D::FilterGaussian1D()
     pg = new PrecomputedGaussian(sigma);
 
     bPgOwned = true;
-    Init(pg->coeff, pg->kernelSize, 0);
+    FilterConv1D::update(pg->coeff, pg->kernelSize, 0);
 }
 
 PIC_INLINE FilterGaussian1D::FilterGaussian1D(float sigma, int direction = 0)
@@ -79,7 +107,7 @@ PIC_INLINE FilterGaussian1D::FilterGaussian1D(float sigma, int direction = 0)
     pg = new PrecomputedGaussian(sigma);
 
     bPgOwned = true;
-    Init(pg->coeff, pg->kernelSize, direction);
+    FilterConv1D::update(pg->coeff, pg->kernelSize, direction);
 }
 
 PIC_INLINE FilterGaussian1D::FilterGaussian1D(PrecomputedGaussian *pg, int direction = 0)
@@ -93,11 +121,13 @@ PIC_INLINE FilterGaussian1D::FilterGaussian1D(PrecomputedGaussian *pg, int direc
 
     bPgOwned = false;
 
-    Init(pg->coeff, pg->kernelSize, direction);
+    FilterConv1D::update(pg->coeff, pg->kernelSize, direction);
 }
 
 PIC_INLINE FilterGaussian1D::~FilterGaussian1D()
 {
+    release();
+
     if(pg != NULL && bPgOwned) {
         delete pg;
         pg = NULL;

@@ -106,6 +106,8 @@ protected:
 
 public:
 
+    bool bCompiled;
+
     ProgramGL()
     {
         setNULL();
@@ -145,6 +147,7 @@ public:
      */
     void setNULL()
     {
+        this->bCompiled = false;
         this->bType = true;
         this->type = 0;
         this->object = 0;
@@ -182,7 +185,9 @@ public:
 
         glLinkProgram(object);
 
-        return checkProgramStatus();
+        bCompiled = checkProgramStatus();
+
+        return bCompiled;
     }
 
     /**

@@ -18,6 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_GL_FILTER_WARP_2D_HPP
 #define PIC_GL_FILTERING_GL_FILTER_WARP_2D_HPP
 
+#include "../../base.hpp"
+
+#include "../../util/gl/fbo.hpp"
+
 #include "../../util/matrix_3_x_3.hpp"
 #include "../../filtering/filter_warp_2d.hpp"
 #include "../../gl/filtering/filter.hpp"
@@ -37,9 +41,9 @@ protected:
     bool bSameSize, bCentroid;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
 
@@ -49,46 +53,94 @@ public:
      * @param bSameSize
      * @param bCentroid
      */
-    FilterGLWarp2D(Matrix3x3 h, bool bSameSize, bool bCentroid);
+    FilterGLWarp2D();
 
     /**
-     * @brief Update
+     * @brief update
      * @param h
      * @param bSameSize
      * @param bCentroid
      */
-    void Update(Matrix3x3 h, bool bSameSize, bool bCentroid);
+    void update(Matrix3x3 h, bool bSameSize, bool bCentroid);
 
     /**
-     * @brief Process
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        if(!bSameSize) {
+            FilterWarp2D::computeBoundingBox(h, bCentroid, imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax);
+        } else {
+            bmin[0] = 0;
+            bmin[1] = 0;
+
+            bmax[0] = imgIn[0]->width;
+            bmax[1] = imgIn[0]->height;
+        }
+
+        width = bmax[0] - bmin[0];
+        height = bmax[1] - bmin[1];
+        channels = imgIn[0]->channels;
+        frames = imgIn[0]->frames;
+    }
+
+    /**
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
+    ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
+    {       
+        imgOut = allocateOutputMemory(imgIn, imgOut, false);
+
+        //update the technique
+        float mid[2];
+
+        if(bCentroid) {
+            mid[0] = imgIn[0]->widthf  * 0.5f;
+            mid[1] = imgIn[0]->heightf * 0.5f;
+        } else {
+            mid[0] = 0.0f;
+            mid[1] = 0.0f;
+        }
+
+        technique.bind();
+        technique.setUniform2f("mid", mid[0], mid[1]);
+        technique.setUniform2f("inv_tSize", 1.0f / imgIn[0]->widthf, 1.0f / imgIn[0]->heightf);
+        technique.unbind();
+
+        return imgOut;
+    }
 };
 
-FilterGLWarp2D::FilterGLWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false) : FilterGL()
+PIC_INLINE FilterGLWarp2D::FilterGLWarp2D() : FilterGL()
 {
-    InitShaders();
+    initShaders();
 
-    Update(h, bSameSize, bCentroid);
+    Matrix3x3 h;
+    update(h, false, false);
 }
 
-void FilterGLWarp2D::Update(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
+PIC_INLINE void FilterGLWarp2D::update(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false)
 {
     this->bSameSize = bSameSize;
     this->bCentroid = bCentroid;
 
     this->h = h;
-    h.Inverse(&h_inv);
+    h.inverse(&h_inv);
 
     technique.bind();
     technique.setUniform3x3("h_inv", h_inv.data, true);
     technique.unbind();
 }
 
-void FilterGLWarp2D::InitShaders()
+PIC_INLINE void FilterGLWarp2D::initShaders()
 {
     //fragment program
     fragment_source = MAKE_STRING
@@ -119,85 +171,6 @@ void FilterGLWarp2D::InitShaders()
     technique.bind();
     technique.setUniform1i("u_tex", 0);
     technique.unbind();
-}
-
-ImageGL *FilterGLWarp2D::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn.empty()) {
-        return imgOut;
-    }
-
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int width = imgIn[0]->width;
-    int height = imgIn[0]->height;
-    int channels = imgIn[0]->channels;
-
-    if(imgOut == NULL) {
-        if(!bSameSize) {
-            FilterWarp2D::computeBoundingBox(h, bCentroid, imgIn[0]->widthf, imgIn[0]->heightf, bmin, bmax);
-            imgOut = new ImageGL(1, bmax[0] - bmin[0], bmax[1] - bmin[1], channels, IMG_GPU, GL_TEXTURE_2D);
-        } else {
-            bmin[0] = 0;
-            bmin[1] = 0;
-
-            bmax[0] = imgIn[0]->width;
-            bmax[1] = imgIn[0]->height;
-
-            imgOut = new ImageGL(1, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
-        }
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(width, height, 1, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-
-    glViewport(0, 0, (GLsizei)imgOut->width, (GLsizei)imgOut->height);
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    //Shaders
-    technique.bind();
-
-    float mid[2];
-
-    if(bCentroid) {
-        mid[0] = imgIn[0]->widthf  * 0.5f;
-        mid[1] = imgIn[0]->heightf * 0.5f;
-    } else {
-        mid[0] = 0.0f;
-        mid[1] = 0.0f;
-    }
-
-    technique.setUniform2f("mid", mid[0], mid[1]);
-    technique.setUniform2f("inv_tSize", 1.0f / imgIn[0]->widthf, 1.0f / imgIn[0]->heightf);
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    imgIn[0]->bindTexture();
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    technique.unbind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    imgIn[0]->unBindTexture();
-
-    return imgOut;
 }
 
 } // end namespace pic

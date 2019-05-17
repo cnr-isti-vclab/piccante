@@ -42,6 +42,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/algorithms/pushpull.hpp"
 #include "gl/algorithms/color_to_gray.hpp"
 #include "gl/algorithms/richardson_lucy_deconvolution.hpp"
+#include "gl/algorithms/grow_cut.hpp"
 
 #include "util/gl/buffer_op.hpp"
 #include "util/gl/buffer_ops.hpp"
@@ -58,7 +59,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/colors/color_conv_xyz_to_cielab.hpp"
 #include "gl/filtering/filter_color_conv.hpp"
 
-#include "gl/filtering/filter_anaglyph.hpp"
 #include "gl/filtering/filter_warp_2d.hpp"
 #include "gl/filtering/filter_anisotropic_diffusion.hpp"
 #include "gl/filtering/filter_bilateral_1d.hpp"
@@ -97,7 +97,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/filtering/filter_sigmoid_tmo.hpp"
 #include "gl/filtering/filter_simple_tmo.hpp"
 #include "gl/filtering/filter_slicer.hpp"
-#include "gl/filtering/filter_thresholding.hpp"
 #include "gl/filtering/filter_durand_tmo.hpp"
 #include "gl/filtering/filter_deform_grid.hpp"
 #include "gl/image.hpp"

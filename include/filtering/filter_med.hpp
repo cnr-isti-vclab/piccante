@@ -89,36 +89,22 @@ public:
     void update(int size)
     {
         this->halfSize = checkHalfSize(size);
-        this->areaKernel = (halfSize * 2 + 1) * (halfSize * 2 + 1);
+        size = (halfSize << 1) + 1;
+        this->areaKernel = size * size;
         this->midValue = areaKernel >> 1;
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param size
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, int size)
+    static Image *execute(Image *imgIn, Image *imgOut, int size)
     {
         FilterMed filter(size);
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param size
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut, int size)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, size);
-        imgOut->Write(nameOut);
-        return imgOut;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

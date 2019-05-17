@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 #include "../image.hpp"
+#include "../image_vec.hpp"
 #include "../filtering/filter_channel.hpp"
 #include "../tone_mapping/exposure_fusion.hpp"
 
@@ -44,18 +45,23 @@ PIC_INLINE Image *colorToGray(Image *imgIn, Image *imgOut)
     ImageVec img_vec;
     ImageVec input = Single(imgIn);
 
-    FilterChannel flt(0);
+    FilterChannel flt(SingleInt(0));
     int channels = imgIn->channels;
     for(int i = 0; i < channels; i++) {
-        img_vec.push_back(flt.ProcessP(input, NULL));
-        flt.setChannel(i + 1);
+        img_vec.push_back(flt.Process(input, NULL));
+        flt.update(SingleInt(i + 1));
     }
 
-    imgOut = ExposureFusion(img_vec, 1.0f, 1.0f, 0.0f, imgOut);
+    ExposureFusion ef(1.0f, 1.0f, 0.0f);
 
-    for(int i=0; i<channels; i++) {
+    imgOut = ef.Process(img_vec, imgOut);
+
+    for(int i = 0; i<channels; i++) {
         delete img_vec[i];
     }
+
+    stdVectorClear<Image>(img_vec);
+
     return imgOut;
 }
 

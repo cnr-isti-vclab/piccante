@@ -38,35 +38,38 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        int width = dst->width;
         int channels = dst->channels;
-
-        float *data = src[0]->data;
+        float *maxVal = new float[channels];
         
         for(int j = box->y0; j < box->y1; j++) {
-            int ind = j * width;
-
             for(int i = box->x0; i < box->x1; i++) {
-                //Central weight
-                int c = (ind + i) * channels;
 
-                for(int ch = 0; ch < channels; ch++) {
-                    float maxVal = -FLT_MAX;
+                float *dst_data = (*dst)(i, j);
+                float *src_data = (*src[0])(i, j);
 
-                    for(int k = -halfSize; k <= halfSize; k++) {
-                        int ci = CLAMP((i + k), dst->width);
+                for(int k = 0; k < channels; k++) {
+                    maxVal[k] = src_data[k];
+                }
 
-                        for(int l = -halfSize; l <= halfSize; l++) {
-                            int cj = CLAMP((j + l), dst->height);
-                            float tmp = data[(cj * width + ci) * channels + ch];
-                            maxVal = maxVal > tmp ? maxVal : tmp;
+                for(int k = -halfSize; k <= halfSize; k++) {
+                    for(int l = -halfSize; l <= halfSize; l++) {
+
+                        src_data = (*src[0])(i + l, j + k);
+
+                        for(int ch = 0; ch < channels; ch++) {
+                            maxVal[ch] = maxVal[ch] > src_data[ch] ?
+                                         maxVal[ch] : src_data[ch];
                         }
                     }
+                }
 
-                    dst->data[c + ch] = maxVal;
+                for(int k = 0; k < channels; k++) {
+                    dst_data[k] = maxVal[k];
                 }
             }
         }
+
+        delete[] maxVal;
     }
 
 public:
@@ -80,31 +83,16 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param size
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, int size)
+    static Image *execute(Image *imgIn, Image *imgOut, int size)
     {
         FilterMax filter(size);
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param size
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut, int size)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, size);
-        imgOut->Write(nameOut);
-        return imgOut;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

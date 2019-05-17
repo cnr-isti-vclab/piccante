@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 #include "../histogram.hpp"
 
+#include "../util/math.hpp"
 #include "../util/indexed_array.hpp"
 
 #include "../filtering/filter_luminance.hpp"
@@ -42,13 +43,11 @@ PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
     }
 
     Image *img_lum = NULL;
-    bool bAllocated = false;
 
     if(imgIn->channels == 1) {
         img_lum = imgIn;
     } else {
-        bAllocated = true;
-        img_lum = FilterLuminance::Execute(imgIn, NULL, LT_CIE_LUMINANCE);
+        img_lum = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);
     }
 
     int nData = img_lum->width * img_lum->height;
@@ -59,8 +58,8 @@ PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
     float commonMin = IndexedArray::min(img_lum->data, coord);
     float commonMax = IndexedArray::max(img_lum->data, coord);
 
-    float tminFstop = logf(commonMin) / logf(2.0f);
-    float tmaxFstop = logf(commonMax) / logf(2.0f);
+    float tminFstop = log2f(commonMin);
+    float tmaxFstop = log2f(commonMax);
 
     minFstop = int(lround(tminFstop));
     maxFstop = int(lround(tmaxFstop));
@@ -74,38 +73,65 @@ PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
         maxFstop++;
     }
 
-    if(bAllocated) {
+    if(imgIn->channels != 1) {
         delete img_lum;
     }
 }
 
 /**
- * @brief getAllExposures converts an image into a stack of exposure values which
- * generates all required exposure images for reconstructing the input image.
- * @param imgIn is an input image.
- * @return It returns an array of exposure values encoding the
+ * @brief getAllExposuresUniform computes all required exposure values for reconstructing the input image
+ * using uniform sampling
+ * @param imgIn is an input image
+ * @return It returns an std::vector<float> with all f-stops values encoding imgIn
+ */
+PIC_INLINE std::vector<float> getAllExposuresUniform(Image *imgIn)
+{
+    std::vector<float> ret;
+
+    int iMin, iMax;
+    getMinMaxFstops(imgIn, iMin, iMax);
+
+    for(int i = iMin; i <= iMax; i++) {
+        ret.push_back(float(i));
+    }
+
+    return ret;
+}
+
+/**
+ * @brief getAllExposures computes all required exposure values for reconstructing the input image
+ * using histogram sampling
+ * @param imgIn is an input image
+ * @return It returns an std::vector<float> with all exposure values encoding imgIn
  */
 PIC_INLINE std::vector<float> getAllExposures(Image *imgIn) {
-    std::vector<float> exposures;
+    std::vector<float> fstops;
 
     if(imgIn == NULL) {
-        return exposures;
+        return fstops;
     }
 
     if(!imgIn->isValid()) {
-        return exposures;
+        return fstops;
     }
 
-    Image *lum = FilterLuminance::Execute(imgIn, NULL);
+    Image *lum = NULL;
+
+    if(imgIn->channels == 1) {
+        lum = imgIn;
+    } else {
+        lum = FilterLuminance::execute(imgIn, NULL, LT_CIE_LUMINANCE);
+    }
 
     Histogram m(lum, VS_LOG_2, 1024);
-    exposures = m.exposureCovering();
+    fstops = m.exposureCovering();
 
-    delete lum;
+    if(imgIn->channels != 1) {
+        delete lum;
+    }
 
-    return exposures;
+    return fstops;
 }
-
 
 /**
  * @brief getAllExposuresImages converts an image into a stack of images.
@@ -123,10 +149,11 @@ PIC_INLINE ImageVec getAllExposuresImages(Image *imgIn, std::vector<float> &fsto
     ImageVec input = Single(imgIn);
 
     for(unsigned int i = 0; i < fstops.size(); i++) {
-        flt.Update(gamma, fstops[i]);
-        Image *expo = flt.ProcessP(input, NULL);
+        flt.update(gamma, fstops[i]);
+        Image *expo = flt.Process(input, NULL);
 
         expo->exposure = powf(2.0f, fstops[i]);
+        expo->clamp(0.0f, 1.0f);
 
         ret.push_back(expo);
     }

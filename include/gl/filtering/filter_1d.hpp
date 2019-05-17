@@ -30,15 +30,14 @@ namespace pic {
 class FilterGL1D: public FilterGL
 {
 protected:
-    ImageGL	*weights;
+    ImageGL *weights;
 
-    int			dirs[3];
-    int			slice;
+    int dirs[3], slice;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    virtual void initShaders();
 
     /**
      * @brief FragmentShader
@@ -58,24 +57,24 @@ public:
     FilterGL1D(int direction, GLenum target);
 
     /**
-     * @brief ChangePass
+     * @brief changePass
      * @param pass
      * @param tPass
      */
-    void ChangePass(int pass, int tPass);
+    void changePass(int pass, int tPass);
 
     /**
-     * @brief SetUniformAux
+     * @brief setUniformAux
      */
-    virtual void SetUniformAux()
+    virtual void setUniformAux()
     {
 
     }
 
     /**
-     * @brief SetUniform
+     * @brief setUniform
      */
-    void SetUniform();
+    void setUniform();
 
     /**
      * @brief setSlice
@@ -84,7 +83,7 @@ public:
     void setSlice(int slice)
     {
         this->slice = slice;
-        SetUniform();
+        setUniform();
     }
 
     /**
@@ -130,35 +129,30 @@ PIC_INLINE FilterGL1D::FilterGL1D(int direction, GLenum target): FilterGL()
         dirs[direction % 3] = 1;
         break;
     }
-
 }
 
-PIC_INLINE void FilterGL1D::ChangePass(int pass, int tPass)
+PIC_INLINE void FilterGL1D::changePass(int pass, int tPass)
 {
 
     if(target == GL_TEXTURE_2D) {
-        dirs[  pass % 2 ] = 1;
+        dirs[ pass % 2 ] = 1;
         dirs[(pass + 1) % 2 ] = 0;
+    } else {
+        if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY) {
+            dirs[ pass % 3 ] = 1;
+            dirs[(pass + 1) % 3 ] = 0;
+            dirs[(pass + 2) % 3 ] = 0;
+        }
     }
 
-    if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY) {
-        dirs[  pass % 3 ] = 1;
-        dirs[(pass + 1) % 3 ] = 0;
-        dirs[(pass + 2) % 3 ] = 0;
-    }
-
-#ifdef PIC_DEBUG
-//    printf("%d %d %d\n", dirs[0], dirs[1], dirs[2]);
-#endif
-
-    SetUniform();
+    setUniform();
 }
 
-PIC_INLINE void FilterGL1D::SetUniform()
+PIC_INLINE void FilterGL1D::setUniform()
 {
     technique.bind();
     technique.setUniform1i("u_tex", 0);
-    SetUniformAux();
+    setUniformAux();
 
     technique.setUniform1i("iX", dirs[0]);
     technique.setUniform1i("iY", dirs[1]);
@@ -171,11 +165,11 @@ PIC_INLINE void FilterGL1D::SetUniform()
     technique.unbind();
 }
 
-PIC_INLINE void FilterGL1D::InitShaders()
+PIC_INLINE void FilterGL1D::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLConv1D");
 
-    SetUniform();
+    setUniform();
 }
 
 PIC_INLINE ImageGL *FilterGL1D::Process(ImageGLVec imgIn, ImageGL *imgOut)

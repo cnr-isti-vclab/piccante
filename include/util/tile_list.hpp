@@ -33,21 +33,21 @@ namespace pic {
 class TileList
 {
 protected:
-    unsigned int    counter;
+    unsigned int counter;
 
 #ifndef PIC_DISABLE_THREAD
-    std::mutex      mutex;
+    std::mutex mutex;
 #endif
 
 public:
-    int             width, height;
-    int             h_tile, w_tile;
-    int             mod_h, mod_w;
+    int width, height;
+    int h_tile, w_tile;
+    int mod_h, mod_w;
 
     /**
      * @brief tiles a list of tiles
      */
-    std::vector<Tile>		tiles;
+    std::vector<Tile> tiles;
 
     /**
      * @brief TileList basic constructor
@@ -66,17 +66,22 @@ public:
 
     /**
      * @brief genBBox
-     * @param i
-     * @param box
+     * @param index
      * @return
      */
-    BBox *genBBox(int i, BBox *box);
+    BBox getBBox(int index);
 
     /**
      * @brief getNext returns the index of the next tile to process.
      * @return This function returns the index of the next tile to proces.
      */
     unsigned int getNext();
+
+    /**
+     * @brief size
+     * @return
+     */
+    unsigned int size();
 
     /**
      * @brief resetCounter sets the counter to zero.
@@ -134,24 +139,14 @@ PIC_INLINE TileList::TileList(int tileSize, int width, int height)
 
 PIC_INLINE TileList::~TileList()
 {
-    for(unsigned int i=0; i<tiles.size(); i++) {
-    }
+    tiles.clear();
 }
 
-PIC_INLINE BBox *TileList::genBBox(int i, BBox *box)
+PIC_INLINE BBox TileList::getBBox(int index)
 {
-    if(box == NULL) {
-        box = new BBox();
-    }
+    int i = index % tiles.size();
 
-    i = i % tiles.size();
-
-    box->SetBox(tiles[i].startX,
-                tiles[i].startX + tiles[i].width,
-                tiles[i].startY, tiles[i].startY + tiles[i].height,
-                0, 1, width, height, 1);
-
-    return box;
+    return tiles[i].getBBox(width, height);
 }
 
 PIC_INLINE unsigned int TileList::getNext()
@@ -165,6 +160,11 @@ PIC_INLINE unsigned int TileList::getNext()
         counter++;
     }
     return ret;
+}
+
+PIC_INLINE unsigned int TileList::size()
+{
+    return (unsigned int)(tiles.size());
 }
 
 PIC_INLINE void TileList::resetCounter()
@@ -181,7 +181,7 @@ PIC_INLINE void TileList::create(int tileSize, int width, int height)
 {
     resetCounter();
 
-    if(tiles.size() > 0) {
+    if(!tiles.empty()) {
         if((tiles[0].width == tileSize) && (this->width == width) &&
            (this->height == height)) {
             return;

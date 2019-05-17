@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../util/string.hpp"
 #include "../../util/math.hpp"
+#include "../../util/std_util.hpp"
 
 #include "../../gl/filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter_bilateral_2ds.hpp"
@@ -40,33 +41,46 @@ protected:
     FilterGLDurandTMO       *flt_durand;
     ImageGL                 *img_lum, *img_lum_base;
 
-    bool                    bStatisticsRecompute;
-    float                   min_log_base, max_log_base;
+    std::vector<FilterGL*> filters;
+
+    bool bAllocate, bStatisticsRecompute;
+    float min_log_base, max_log_base, target_contrast;
+
+    float sigma_s, sigma_r;
 
     /**
-     * @brief AllocateFilters
+     * @brief allocateFilters
      */
-    void AllocateFilters()
+    void allocateFilters()
     {
+        bAllocate = true;
+
         flt_lum = new FilterGLLuminance();
         flt_log10 = new FilterGLOp("log(I0) * " + fromNumberToString(1.0f / logf(10.0f)), true, NULL, NULL);
         flt_durand = new FilterGLDurandTMO();
+        flt_bil = new FilterGLBilateral2DS(sigma_s, sigma_r);
+
+        filters.push_back(flt_lum);
+        filters.push_back(flt_log10);
+        filters.push_back(flt_durand);
+        filters.push_back(flt_bil);
     }
 
 public:
+
     /**
      * @brief DurandTMOGL
      */
-    DurandTMOGL(bool bStatisticsRecompute = true)
+    DurandTMOGL(float target_contrast = 5.0f, bool bStatisticsRecompute = true)
     {
-        flt_lum = NULL;
-        flt_log10 = NULL;
+        bAllocate = false;
+
+        this->sigma_r = 0.4f;
+
+        update(target_contrast);
 
         img_lum = NULL;
         img_lum_base = NULL;
-
-        flt_bil = NULL;
-        flt_durand = NULL;
 
         min_log_base = -1e10f;
         max_log_base = -1e10f;
@@ -76,25 +90,7 @@ public:
 
     ~DurandTMOGL()
     {       
-        if(flt_lum != NULL) {
-            delete flt_lum;
-            flt_lum = NULL;
-        }
-
-        if(flt_log10 != NULL) {
-            delete flt_log10;
-            flt_log10 = NULL;
-        }
-
-        if(flt_bil != NULL) {
-            delete flt_bil;
-            flt_bil = NULL;
-        }
-
-        if(flt_durand != NULL) {
-            delete flt_durand;
-            flt_durand = NULL;
-        }
+        stdVectorClear<FilterGL>(filters);
 
         if(img_lum != NULL) {
             delete img_lum;
@@ -108,24 +104,32 @@ public:
     }
 
     /**
-     * @brief Process
+     * @brief update
+     * @param target_contrast
+     */
+    void update(float target_contrast)
+    {
+        this->target_contrast = target_contrast > 0.0f ? target_contrast : 5.0f;
+    }
+
+    /**
+     * @brief execute
      * @param imgIn
      * @param imgOut
-     * @param target_contrast
      * @return
      */
-    ImageGL *Process(ImageGL *imgIn, ImageGL *imgOut = NULL, float target_contrast = 5.0f)
+    ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut = NULL)
     {
         if(imgIn == NULL) {
             return imgOut;
         }
 
-        if(flt_bil == NULL) {
-            float sigma_s = MAX(imgIn->widthf, imgIn->heightf) * 0.02f;
-            float sigma_r = 0.4f;
-            flt_bil = new FilterGLBilateral2DS(sigma_s, sigma_r);
-            AllocateFilters();
+        if(!bAllocate) {
+            allocateFilters();
         }
+
+        this->sigma_s = MAX(imgIn->widthf, imgIn->heightf) * 0.02f;
+        flt_bil->update(sigma_s, sigma_r);
 
         img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
 
@@ -141,12 +145,10 @@ public:
         float compression_factor = log10fPlusEpsilon(target_contrast) / (max_log_base - min_log_base);
         float log_absoulte = compression_factor * max_log_base;
 
-        flt_durand->Update(compression_factor, log_absoulte);
+        flt_durand->update(compression_factor, log_absoulte);
 
         return flt_durand->Process(TripleGL(imgIn, img_lum, img_lum_base), imgOut);
     }
-
-
 };
 
 } // end namespace pic

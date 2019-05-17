@@ -41,7 +41,7 @@ protected:
         float *img_dataE = (*data->src[0])(data->x    , data->y + 1);
 
         for(int k = 0; k < data->src[0]->channels; k++) {
-            int tmp = k * 4;
+            int tmp = k << 2;
             data->out[tmp    ] = img_dataN[k] - img_data[k];
             data->out[tmp + 1] = img_dataS[k] - img_data[k];
             data->out[tmp + 2] = img_dataW[k] - img_data[k];
@@ -85,21 +85,14 @@ protected:
     }
     */
 
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height,
-                                  4 * imgIn[0]->channels);
-        }
-
-        return imgOut;
-    }
-
 public:
     /**
      * @brief FilterNSWE
      */
-    FilterNSWE() {}
+    FilterNSWE() : Filter()
+    {
+
+    }
 
     /**
      * @brief OutputSize
@@ -109,38 +102,24 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn->width;
-        height      = imgIn->height;
-        channels    = imgIn->channels * 4;
-        frames      = imgIn->frames;
+        width    = imgIn[0]->width;
+        height   = imgIn[0]->height;
+        channels = imgIn[0]->channels << 2;
+        frames   = imgIn[0]->frames;
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut)
+    static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterNSWE filter;
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param fileInput
-     * @param fileOutput
-     * @return
-     */
-    static Image *Execute(std::string fileInput, std::string fileOutput)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterNSWE::Execute(&imgIn, NULL);
-        out->Write(fileOutput);
-        return out;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

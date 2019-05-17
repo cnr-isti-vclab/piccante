@@ -75,59 +75,41 @@ protected:
         }
     }*/
 
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgIn.empty()) {
-            return NULL;
-        }
-
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height,
-                    2 * imgIn[0]->channels);
-        }
-
-        return imgOut;
-    }
-
 public:
     /**
      * @brief FilterBackwardDifference
      */
-    FilterBackwardDifference()
+    FilterBackwardDifference() : Filter()
     {
 
     }
 
     /**
-     * @brief Execute
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
+        channels    = imgIn[0]->channels * 2;
+        frames      = imgIn[0]->frames;
+    }
+
+    /**
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut)
+    static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterBackwardDifference filter;
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param fileInput
-     * @param fileOutput
-     * @return
-     */
-    static Image *Execute(std::string fileInput, std::string fileOutput)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterBackwardDifference::Execute(&imgIn, NULL);
-        out->Write(fileOutput);
-        return out;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

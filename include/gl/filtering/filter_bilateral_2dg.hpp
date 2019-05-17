@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_2DG_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_2DG_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../gl/filtering/filter_slicer.hpp"
 #include "../../gl/filtering/filter_scatter.hpp"
@@ -31,7 +33,7 @@ namespace pic {
 class FilterGLBilateral2DG: public FilterGL
 {
 protected:
-    float               sigma_s, sigma_r, s_S, s_R;
+    float sigma_s, sigma_r, s_S, s_R;
 
     FilterGLScatter     *scatter;
     FilterGLGaussian3D  *gauss3D;
@@ -58,13 +60,13 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static ImageGL *Execute(ImageGL *imgIn, float sigma_s, float sigma_r)
+    static ImageGL *execute(ImageGL *imgIn, float sigma_s, float sigma_r)
     {
         FilterGLBilateral2DG *filter = new FilterGLBilateral2DG(sigma_s, sigma_r);
         GLuint testTQ1 = glBeginTimeQuery();
@@ -77,7 +79,7 @@ public:
         return imgOut;
     }
 
-    static ImageGL *Execute(std::string nameIn, std::string nameOut,
+    static ImageGL *execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r, int testing = 1)
     {
         Image tmp_imgIn(nameIn);
@@ -113,7 +115,7 @@ public:
       //  double ms = double(timeVal) / (double(testing) * 1000000.0);
       //  printf("Bilateral Grid on the GPU time: %g ms\n", ms);
 
-        std::string sign = GenBilString("G", sigma_s, sigma_r);
+        std::string sign = genBilString("G", sigma_s, sigma_r);
 
         /*
         std::string nameTime = FileLister::FileNumber(sign, "txt");
@@ -134,7 +136,7 @@ public:
     }
 };
 
-FilterGLBilateral2DG::FilterGLBilateral2DG(float sigma_s, float sigma_r): FilterGL()
+PIC_INLINE FilterGLBilateral2DG::FilterGLBilateral2DG(float sigma_s, float sigma_r): FilterGL()
 {
     this->sigma_s = sigma_s;
     this->sigma_r = sigma_r;
@@ -150,7 +152,7 @@ FilterGLBilateral2DG::FilterGLBilateral2DG(float sigma_s, float sigma_r): Filter
     slicer  = new FilterGLSlicer(s_S, s_R);
 }
 
-ImageGL *FilterGLBilateral2DG::Process(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLBilateral2DG::Process(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgIn[0] == NULL || imgIn.size() > 1) {

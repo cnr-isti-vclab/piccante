@@ -4,7 +4,7 @@ PICCANTE
 The hottest HDR imaging library!
 http://vcg.isti.cnr.it/piccante
 
-Copyright (C) 2014
+copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
@@ -45,7 +45,7 @@ public:
     RAW(int nData)
     {
         data = NULL;
-        Allocate(nData);
+        allocate(nData);
     }
 
     /**
@@ -65,11 +65,11 @@ public:
     ~RAW();
 
     /**
-     * @brief Allocate
+     * @brief allocate
      * @param nData
      * @return
      */
-    bool Allocate(int nData)
+    bool allocate(int nData)
     {
         if(nData < 1) {
             return false;
@@ -109,7 +109,7 @@ public:
             nData = length / sizeof(T);
         }
 
-        bool bRet = Allocate(nData);
+        bool bRet = allocate(nData);
 
 
         file.read((char *)data, nData * sizeof(T) / sizeof(char));
@@ -128,21 +128,21 @@ public:
     bool Write(std::string nameFile);
 
     /**
-     * @brief Copy
+     * @brief copy
      * @return
      */
-    RAW<T> *Copy();
+    RAW<T> *copy();
 
     /**
-     * @brief Subtraction
+     * @brief sub
      * @param b
      */
-    void Subtraction(RAW<T> b);
+    void sub(RAW<T> b);
 
     /**
-     * @brief Release
+     * @brief release
      */
-    void Release();
+    void release();
 };
 
 template <class T> PIC_INLINE RAW<T>::RAW()
@@ -154,11 +154,10 @@ template <class T> PIC_INLINE RAW<T>::RAW()
 
 template <class T> PIC_INLINE RAW<T>::~RAW()
 {
-    Release();
+    release();
 }
 
-//Copy
-template <class T> PIC_INLINE RAW<T> *RAW<T>::Copy()
+template <class T> PIC_INLINE RAW<T> *RAW<T>::copy()
 {
     RAW<T> *out = new RAW<T>;
     out->data = new T[nData];
@@ -182,8 +181,7 @@ template <class T> PIC_INLINE bool RAW<T>::Write(std::string nameFile)
     }
 }
 
-//Subtraction
-template <class T> PIC_INLINE void RAW<T>::Subtraction(RAW<T> b)
+template <class T> PIC_INLINE void RAW<T>::sub(RAW<T> b)
 {
 
     for(int i = 0; i < nData; i++) {
@@ -192,8 +190,7 @@ template <class T> PIC_INLINE void RAW<T>::Subtraction(RAW<T> b)
     }
 }
 
-//Release Memory
-template <class T> PIC_INLINE void RAW<T>::Release()
+template <class T> PIC_INLINE void RAW<T>::release()
 {
     if(data != NULL) {
         data = NULL;
@@ -204,8 +201,7 @@ template <class T> PIC_INLINE void RAW<T>::Release()
     nData = 0;
 }
 
-//Calculate the mean RAW image
-template <class T> PIC_INLINE RAW<T> *MeanRAWStack(std::vector<RAW<T> > &stack)
+template <class T> PIC_INLINE RAW<T> *getMeanRAWStack(std::vector<RAW<T> > &stack)
 {
     if(stack.size() <= 0) {
         return NULL;
@@ -232,8 +228,7 @@ template <class T> PIC_INLINE RAW<T> *MeanRAWStack(std::vector<RAW<T> > &stack)
     return dataOut;
 }
 
-//Calculate the mean RAW image
-template <class T> PIC_INLINE unsigned long *MeanRAWIterative(RAW<T> *img,
+template <class T> PIC_INLINE unsigned long *getMeanRAWIterative(RAW<T> *img,
         unsigned long *dataAcc, bool bStart)
 {
 
@@ -254,7 +249,7 @@ template <class T> PIC_INLINE unsigned long *MeanRAWIterative(RAW<T> *img,
     return dataAcc;
 }
 
-template <class T> PIC_INLINE RAW<T> *CalculateRAWMeanFromFile(
+template <class T> PIC_INLINE RAW<T> *getMeanRAWFromFile(
     std::string nameDir,
     std::string nameFilter,
     int width,
@@ -270,10 +265,10 @@ template <class T> PIC_INLINE RAW<T> *CalculateRAWMeanFromFile(
 
     for(unsigned int i = 0; i < vec.size(); i++) {
         imgRAW.Read(vec[i], width * height);
-        dataAcc = MeanRAWIterative<T>(&imgRAW, dataAcc, i == 0);
+        dataAcc = getMeanRAWIterative<T>(&imgRAW, dataAcc, i == 0);
     }
 
-    RAW<T> *imgOut = imgRAW.Copy();
+    RAW<T> *imgOut = imgRAW.copy();
 
     for(int i = 0; i < imgOut->nData; i++) {
         imgOut->data[i] = dataAcc[i] / vec.size();
@@ -282,14 +277,14 @@ template <class T> PIC_INLINE RAW<T> *CalculateRAWMeanFromFile(
     return imgOut;
 }
 
-template <class T> PIC_INLINE void CalculateRAWMeanFromFile(
+template <class T> PIC_INLINE void getMeanRAWFromFile(
     std::string nameDir,
     std::string nameFilter,
     std::string nameOut,
     int width,
     int height)
 {
-    (CalculateRAWMeanFromFile<T>(nameDir, nameFilter, width,
+    (getMeanRAWFromFile<T>(nameDir, nameFilter, width,
                                  height))->Write(nameOut);
 }
 

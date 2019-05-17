@@ -41,32 +41,21 @@ public:
     /**
      * @brief FilterDivergence
      */
-    FilterDivergence() {}
+    FilterDivergence()
+    {
+
+    }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut)
+    static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterDivergence filter;
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL);
-        imgOut->Write(nameOut);
-        return imgOut;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

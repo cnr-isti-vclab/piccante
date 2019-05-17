@@ -18,6 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_BILATERAL_1D_HPP
 #define PIC_FILTERING_FILTER_BILATERAL_1D_HPP
 
+#include "../util/precomputed_gaussian.hpp"
+#include "../util/std_util.hpp"
+#include "../util/array.hpp"
+
 #include "../filtering/filter.hpp"
 
 namespace pic {
@@ -29,7 +33,8 @@ class FilterBilateral1D: public Filter
 {
 protected:
     PrecomputedGaussian *pg;
-    int					dirs[3];
+    int dirs[3];
+    float sigma_r_sq_2;
 
     /**
      * @brief ProcessBBox
@@ -40,6 +45,7 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
+
     float sigma_s, sigma_r;
 
     /**
@@ -50,51 +56,51 @@ public:
     FilterBilateral1D(float sigma_s, float sigma_r);
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      */
-    void Update(float sigma_s, float sigma_r);
+    void update(float sigma_s, float sigma_r);
 
     /**
-     * @brief Signature
+     * @brief signature
      * @return
      */
-    std::string Signature()
+    std::string signature()
     {
-        return GenBilString("1D", sigma_s, sigma_r);
+        return genBilString("1D", sigma_s, sigma_r);
     }
 
     /**
-     * @brief ChangePass
+     * @brief changePass
      * @param pass
      * @param tPass
      */
-    void ChangePass(int pass, int tPass);
+    void changePass(int pass, int tPass);
 };
 
-PIC_INLINE FilterBilateral1D::FilterBilateral1D(float sigma_s, float sigma_r)
+PIC_INLINE FilterBilateral1D::FilterBilateral1D(float sigma_s, float sigma_r) : Filter()
 {
     pg = NULL;
-    Update(sigma_s, sigma_r);
+    update(sigma_s, sigma_r);
 }
 
-PIC_INLINE void FilterBilateral1D::Update(float sigma_s, float sigma_r)
+PIC_INLINE void FilterBilateral1D::update(float sigma_s, float sigma_r)
 {
     //protected values are assigned/computed
-    this->sigma_s = sigma_s;
-    this->sigma_r = sigma_r;
+    this->sigma_s = sigma_s > 0.0f ? sigma_s : 1.0f;
+    this->sigma_r = sigma_r > 0.0f ? sigma_r : 0.01f;
+    this->sigma_r_sq_2 = this->sigma_r * this->sigma_r * 2.0f;
 
     //Precomputation of the Gaussian filter
     dirs[0] = dirs[1] = dirs[2] = 0;
 
-    if(pg!=NULL)
-        delete pg;
+    pg = delete_s(pg);
 
     pg = new PrecomputedGaussian(sigma_s);
 }
 
-PIC_INLINE void FilterBilateral1D::ChangePass(int pass, int tPass)
+PIC_INLINE void FilterBilateral1D::changePass(int pass, int tPass)
 {
     /*	tPass++;
     	dirs[ pass%tPass] = 1;
@@ -127,11 +133,6 @@ PIC_INLINE void FilterBilateral1D::ChangePass(int pass, int tPass)
 
 PIC_INLINE void FilterBilateral1D::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-    int channels = dst->channels;
-
-    float inv_sigma_r2 = 1.0f / (2.0f * sigma_r * sigma_r);
-
-    //Filtering
     Image *edge, *base;
 
     if(src.size() == 2) {
@@ -150,15 +151,13 @@ PIC_INLINE void FilterBilateral1D::ProcessBBox(Image *dst, ImageVec src, BBox *b
                 float *tmpDst  = (*dst )(i, j, m);
                 float *tmpEdge = (*edge)(i, j, m);
 
-                for(int l = 0; l < channels; l++) {
-                    tmpDst[l] = 0.0f;
-                }
+                Arrayf::assign(0.0f, tmpDst, dst->channels);
 
                 float sum = 0.0f;
 
                 for(int k = 0; k < pg->kernelSize; k++) {
                     //Spatial filtering
-                    float gauss1 = pg->coeff[k];
+                    float weight = pg->coeff[k];
 
                     int tmpCoord = k - pg->halfKernelSize;
 
@@ -169,33 +168,31 @@ PIC_INLINE void FilterBilateral1D::ProcessBBox(Image *dst, ImageVec src, BBox *b
                     //Address cm
                     int cm = m + tmpCoord * dirs[2];
 
+
                     //Range filtering
                     float *curEdge = (*edge)(ci, cj, cm); 
-                    float tmp = 0.0f;
-                    for(int l = 0; l < channels; l++) {
-                        float diff = curEdge[l] - tmpEdge[l];
-                        tmp += diff * diff;
-                    }
 
-                    float gauss2 = expf(-tmp * inv_sigma_r2);
+                    float edgeDist = Arrayf::distanceSq(curEdge, tmpEdge, dst->channels);
+                    edgeDist = expf(-edgeDist / sigma_r_sq_2);
 
                     //Weight
-                    tmp = gauss1 * gauss2;
+                    weight *= edgeDist;
 
-                    //Filtering
-                    float *curBase = (*base)(ci, cj, cm); 
-                    for(int l = 0; l < channels; l++) {
-                        tmpDst[l] += curBase[l] * tmp;
+                    //filter
+                    float *curBase = (*base)(ci, cj, cm);
+                    for(int l = 0; l < dst->channels; l++) {
+                        tmpDst[l] += curBase[l] * weight;
                     }
 
-                    sum += tmp;
+                    sum += weight;
                 }
 
                 //Normalization
-                bool sumTest = sum > 0.0f;
-
-                for(int l = 0; l < channels; l++) {
-                    tmpDst[l] = sumTest ? tmpDst[l] / sum : 0.0f;
+                if(sum > 0.0f) {
+                    Arrayf::div(tmpDst, dst->channels, sum);
+                } else {
+                    float *base = (*edge)(i, j, m);
+                    Arrayf::assign(base, dst->channels, tmpDst);
                 }
             }
         }

@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_SLICER_HPP
 #define PIC_GL_FILTERING_FILTER_SLICER_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -29,7 +31,7 @@ class FilterGLSlicer: public FilterGL
 {
 protected:
 
-    void InitShaders();
+    void initShaders();
     void FragmentShader();
 
     float s_S, s_R, mul_E;
@@ -43,23 +45,23 @@ public:
     FilterGLSlicer(float s_S, float s_R);
 
     /**
-     * @brief Update
+     * @brief update
      * @param s_S
      * @param s_R
      */
-    void Update(float s_S, float s_R);
+    void update(float s_S, float s_R);
 };
 
-FilterGLSlicer::FilterGLSlicer(float s_S, float s_R): FilterGL()
+PIC_INLINE FilterGLSlicer::FilterGLSlicer(float s_S, float s_R): FilterGL()
 {
     this->s_S = s_S;
     this->s_R = s_R;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLSlicer::FragmentShader()
+PIC_INLINE void FilterGLSlicer::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -91,14 +93,14 @@ void FilterGLSlicer::FragmentShader()
                       );
 }
 
-void FilterGLSlicer::InitShaders()
+PIC_INLINE void FilterGLSlicer::initShaders()
 {
     technique.initStandard("400", vertex_source, fragment_source, "FilterGLSlicer");
 
-    Update(s_S, s_R);
+    update(s_S, s_R);
 }
 
-void FilterGLSlicer::Update(float s_S, float s_R)
+PIC_INLINE void FilterGLSlicer::update(float s_S, float s_R)
 {
     this->s_S = s_S;
     this->s_R = s_R;

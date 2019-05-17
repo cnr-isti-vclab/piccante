@@ -136,7 +136,7 @@ protected:
                         indx = 3;
                     }
 
-                    //Final filtering
+                    //final filtering
                     switch(indx) {
                     case 0: {
                         for(int l = 0; l < channels; l++) {
@@ -187,14 +187,14 @@ public:
      */
     FilterKuwahara(int kernelSize = 3)
     {
-        Update(kernelSize);
+        update(kernelSize);
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param kernelSize
      */
-    void Update(int kernelSize)
+    void update(int kernelSize)
     {
         if(kernelSize < 3) {
             kernelSize = 3;
@@ -205,16 +205,16 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param kernelSize
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, int kernelSize)
+    static Image *execute(Image *imgIn, Image *imgOut, int kernelSize)
     {
         FilterKuwahara filter(kernelSize);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

@@ -59,7 +59,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/tile.hpp"
 #include "util/tile_list.hpp"
 #include "util/vec.hpp"
-#include "util/warp_square_circle.hpp"
+#include "util/warp_samples.hpp"
 #include "util/rasterizer.hpp"
 #include "util/polyline.hpp"
 

@@ -43,29 +43,6 @@ protected:
         }
     }
 
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgIn.size() < 2) {
-            return NULL;
-        }
-
-        if(imgOut == NULL) {
-            imgOut = imgIn[0]->allocateSimilarOne();
-        } else {
-            if(!imgIn[0]->isSimilarType(imgOut)) {
-                imgOut = imgIn[0]->allocateSimilarOne();
-            }
-        }
-
-        return imgOut;
-    }
-
 public:
 
     /**
@@ -77,33 +54,15 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn1
      * @param imgIn2
      * @return
      */
-    static Image *Execute(Image *imgIn1, Image *imgIn2)
+    static Image *execute(Image *imgIn1, Image *imgIn2)
     {
         FilterAbsoluteDifference filter;
         return filter.Process(Double(imgIn1, imgIn2), NULL);
-    }
-
-    /**
-     * @brief Execute
-     * @param name1
-     * @param name2
-     * @param nameOut
-     * @return
-     */
-    static Image *Execute(std::string name1, std::string name2,
-                             std::string nameOut)
-    {
-        Image imgIn1(name1);
-        Image imgIn2(name2);
-
-        Image *out = Execute(&imgIn1, &imgIn2);
-        out->Write(nameOut);
-        return out;
     }
 };
 

@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_GL_STROKE_HPP
 #define PIC_UTIL_GL_STROKE_HPP
 
+#include "../../util/rasterizer.hpp"
 #include "../../gl/image.hpp"
 #include "../../util/gl/quad.hpp"
 #include "../../util/gl/technique.hpp"
@@ -38,7 +39,7 @@ protected:
     float color[4];
     float tmpColor[3];
 
-    QuadGL              *quad;
+    QuadGL *quad;
 
     std::vector<float>	positions;
 
@@ -60,9 +61,9 @@ public:
     ~StrokeGL();
 
     /**
-     * @brief SetupShaders
+     * @brief initShaders
      */
-    void SetupShaders();
+    void initShaders();
 
     /**
      * @brief Resample
@@ -174,10 +175,10 @@ PIC_INLINE StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
     this->quad = new QuadGL(true, halfBrushSizeXf, halfBrushSizeYf);
 
     size = 4.0f;
-    rSize = size / float(max(width, height));
+    rSize = size / float(MAX(width, height));
 
     shape = new ImageGL(1, this->brushSize, this->brushSize, 1, IMG_CPU, GL_TEXTURE_2D);
-    EvaluateSolid(shape);
+    evaluateSolid(shape);
     shape->generateTextureGL(GL_TEXTURE_2D, false);
 
     if(color != NULL) {
@@ -188,7 +189,7 @@ PIC_INLINE StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
         this->color[0] = this->color[1] = this->color[2] = 1.0f;
     }
 
-    SetupShaders();
+    initShaders();
 }
 
 PIC_INLINE StrokeGL::~StrokeGL()
@@ -200,7 +201,7 @@ PIC_INLINE StrokeGL::~StrokeGL()
     shape = NULL;
 }
 
-PIC_INLINE void StrokeGL::SetupShaders()
+PIC_INLINE void StrokeGL::initShaders()
 {
     //common vertex program
     std::string vertex_source = MAKE_STRING
@@ -246,7 +247,7 @@ PIC_INLINE void StrokeGL::SetupShaders()
     brushProgram.setUniform4f("current_color", 1.0f, 1.0f, 1.0f, 1.0f);
     brushProgram.unbind();
 
-    //Annotation
+    //annotation
     std::string fragment_source_annotation = MAKE_STRING
                                   (
     uniform sampler2D   u_tex;
@@ -301,7 +302,7 @@ PIC_INLINE void StrokeGL::Resample()
         len += tmpLen;
     }
 
-    //Resampling
+    //resample
     std::vector<float> resampledPos;
     resampledPos.push_back(positions[0]);
     resampledPos.push_back(positions[1]);

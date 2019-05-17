@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_CONV_2D_HPP
 #define PIC_GL_FILTERING_FILTER_CONV_2D_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -45,15 +47,15 @@ public:
     FilterGLConv2D(GLenum target);
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
-     * @brief SetUniform
+     * @brief setUniform
      * @return
      */
-    void SetUniform()
+    void setUniform()
     {
         technique.bind();
         technique.setUniform1i("u_tex", 0);
@@ -67,22 +69,22 @@ public:
     }
 };
 
-FilterGLConv2D::FilterGLConv2D(GLenum target): FilterGL()
+PIC_INLINE FilterGLConv2D::FilterGLConv2D(GLenum target): FilterGL()
 {
     this->target = target;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLConv2D::InitShaders()
+PIC_INLINE void FilterGLConv2D::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLConv2D");
 
-    SetUniform();
+    setUniform();
 }
 
-void FilterGLConv2D::FragmentShader()
+PIC_INLINE void FilterGLConv2D::FragmentShader()
 {
     std::string fragment_source_2D = MAKE_STRING
                                      (
@@ -98,14 +100,15 @@ void FilterGLConv2D::FragmentShader()
         ivec2 coordsFrag = ivec2(gl_FragCoord.xy) - shift;
 
         vec4  color = vec4(0.0);
+
         for(int i = 0; i < kernelSize.y; i++) {
+
             for(int j = 0; j < kernelSize.x; j++) {
                 //do a texture fetch
                 vec4 tmpCol = texelFetch(u_tex, coordsFrag.xy + ivec2(j, i), 0);
 
                 //weight
-                float tmp = texelFetch(u_weights, ivec2(j, i), 0).x;
-                color += tmpCol * tmp;
+                color += tmpCol * texelFetch(u_weights, ivec2(j, i), 0);
             }
         }
 

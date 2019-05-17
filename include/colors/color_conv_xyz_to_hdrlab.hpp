@@ -31,8 +31,8 @@ class ColorConvXYZtoHDRLAB: public ColorConv
 {
 protected:
 
-    float		Yabs, Ys, two_e, epsilon;
-    float		whitePoint[3];
+    float Yabs, Ys, two_e, epsilon;
+    float whitePoint[3];
 
 public:
 
@@ -156,7 +156,7 @@ public:
 
         float sf = 1.25f - 0.25f * (Ys / 0.184f);
 
-        float lf = log(318.0f) / log(Yabs);
+        float lf = logf(318.0f) / logf(Yabs);
 
         return 0.58f / (sf * lf);
     }

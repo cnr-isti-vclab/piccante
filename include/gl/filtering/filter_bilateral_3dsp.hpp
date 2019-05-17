@@ -28,10 +28,10 @@ namespace pic {
 class FilterGLBilateral3DSP: public FilterGLNPasses
 {
 protected:
-    FilterGLBilateral1D		*filterS;
-    FilterGLBilateral1D		*filterT;
+    FilterGLBilateral1D *filterS;
+    FilterGLBilateral1D *filterT;
 
-    void InitShaders() {}
+    void initShaders() {}
     void FragmentShader() {}
 
 public:
@@ -61,15 +61,15 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      * @param sigma_t
      */
-    void Update(float sigma_s,  float sigma_r, float sigma_t);
+    void update(float sigma_s,  float sigma_r, float sigma_t);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma_s
@@ -77,41 +77,41 @@ public:
      * @param sigma_t
      * @return
      */
-    static ImageGL *Execute(std::string nameIn, std::string nameOut,
+    static ImageGL *execute(std::string nameIn, std::string nameOut,
                                float sigma_s, float sigma_r, float sigma_t)
     {
         return NULL;
     }
 };
 
-FilterGLBilateral3DSP::FilterGLBilateral3DSP(): FilterGLNPasses()
+PIC_INLINE FilterGLBilateral3DSP::FilterGLBilateral3DSP(): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D_ARRAY;
     filterS = filterT = NULL;
 }
 
-FilterGLBilateral3DSP::~FilterGLBilateral3DSP()
+PIC_INLINE FilterGLBilateral3DSP::~FilterGLBilateral3DSP()
 {
     delete filterS;
     delete filterT;
 }
 
-FilterGLBilateral3DSP::FilterGLBilateral3DSP(float sigma_s, float sigma_r,
+PIC_INLINE FilterGLBilateral3DSP::FilterGLBilateral3DSP(float sigma_s, float sigma_r,
         float sigma_t): FilterGLNPasses()
 {
     target = GL_TEXTURE_2D_ARRAY;
     filterS = new FilterGLBilateral1D(sigma_s, sigma_r, 0, target);
     filterT = new FilterGLBilateral1D(sigma_t, sigma_r, 0, target);
 
-    InsertFilter(filterS);
-    InsertFilter(filterS);
-    InsertFilter(filterT);
+    insertFilter(filterS);
+    insertFilter(filterS);
+    insertFilter(filterT);
 }
 
-void FilterGLBilateral3DSP::Update(float sigma_s, float sigma_r, float sigma_t)
+PIC_INLINE void FilterGLBilateral3DSP::update(float sigma_s, float sigma_r, float sigma_t)
 {
-    filterS->Update(sigma_s, sigma_r);
-    filterT->Update(sigma_t, sigma_r);
+    filterS->update(sigma_s, sigma_r);
+    filterT->update(sigma_t, sigma_r);
 }
 
 } // end namespace pic

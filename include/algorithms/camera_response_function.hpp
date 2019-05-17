@@ -54,7 +54,7 @@ protected:
     */
     float *gsolve(int *samples, std::vector< float > &log_exposure, float lambda, int nSamples)
     {
-		#ifndef PIC_DISABLE_EIGEN
+        #ifndef PIC_DISABLE_EIGEN
 
         int nExposure = int(log_exposure.size());
 
@@ -77,10 +77,10 @@ protected:
 
                 float w_ij = w[tmp];
 
-                A.coeffRef(k, tmp)   =  w_ij;
+                A.coeffRef(k, tmp) =  w_ij;
                 A.coeffRef(k, n + i) = -w_ij;
                 
-                b[k]                 =  w_ij * log_exposure[j];
+                b[k] =  w_ij * log_exposure[j];
 
                 k++;
             }
@@ -89,7 +89,7 @@ protected:
         A.coeffRef(k, 128) = 1.0f;
         k++;
 
-        //Smoothness term
+        //smoothness term
         for(int i = 0; i < (n - 2); i++) {
             float w_l = lambda * w[i + 1];
             A.coeffRef(k, i)     =         w_l;
@@ -108,7 +108,8 @@ protected:
         for(int i = 0; i < n; i++) {
             ret[i] = expf(x[i]);
         }
-		#else
+
+        #else
             float *ret = NULL;
         #endif
 
@@ -116,21 +117,23 @@ protected:
     }
 
     /**
-     * @brief Destroy frees memory.
+     * @brief release frees memory.
      */
-    void Destroy()
+    void release()
     {
         stackOut.release();
 
         for(unsigned int i = 0; i < icrf.size(); i++) {
             if(icrf[i] != NULL) {
                 delete[] icrf[i];
+                icrf[i] = NULL;
             }
         }
 
         for(unsigned int i = 0; i < crf.size(); i++) {
             if(crf[i] != NULL) {
                 delete[] crf[i];
+                crf[i] = NULL;
             }
         }
 
@@ -140,9 +143,9 @@ protected:
     }
 
     /**
-     * @brief CreateTabledICRF
+     * @brief createTabledICRF
      */
-    void CreateTabledICRF()
+    void createTabledICRF()
     {
         if(type_linearization != IL_POLYNOMIAL) {
             return;
@@ -162,23 +165,23 @@ protected:
             for(int j = 0; j < 256; j++) {
                 float x = float(j) / 255.0f;
 
-                tmp[j] = polynomialVal(poly[i], x);
+                tmp[j] = poly[i].eval(x);
             }
 
             crf.push_back(tmp);
         }
     }
 
-    SubSampleStack          stackOut;
-    IMG_LIN                 type_linearization;
-    float                   w[256];
+    SubSampleStack stackOut;
+    IMG_LIN type_linearization;
+    float w[256];
 
 public:
 
-    std::vector<float *>    icrf;
-    std::vector<float *>     crf;
+    std::vector<float *> icrf;
+    std::vector<float *> crf;
 
-    std::vector< std::vector<float> >  poly;
+    std::vector< Polynomial > poly;
     
     /**
      * @brief CameraResponseFunction
@@ -190,16 +193,16 @@ public:
 
     ~CameraResponseFunction()
     {
-        Destroy();
+        release();
     }
 
     /**
-     * @brief Remove linearizes a camera value using the inverse CRF.
+     * @brief remove linearizes a camera value using the inverse CRF.
      * @param x is an intensity value in [0,1].
      * @param channel
      * @return It returns x in the linear domain.
      */
-    inline float Remove(float x, int channel)
+    inline float remove(float x, int channel)
     {
         switch(type_linearization) {
             case IL_LIN: {
@@ -219,7 +222,7 @@ public:
             break;
 
             case IL_POLYNOMIAL: {
-                return polynomialVal(poly[channel], x);
+                return poly[channel].eval(x);
             }
             break;
 
@@ -231,12 +234,12 @@ public:
     }
 
     /**
-     * @brief Apply
+     * @brief apply
      * @param x a value in [0, 1]
      * @param channel
      * @return
      */
-    inline float Apply(float x, int channel)
+    inline float apply(float x, int channel)
     {
         switch(type_linearization) {
             case IL_LIN: {
@@ -300,7 +303,7 @@ public:
      * @param img_jpg is a JPEG compressed image.
      * @param filteringSize
      */
-    void FromRAWJPEG(Image *img_raw, Image *img_jpg, int filteringSize = 11)
+    void fromRAWJPEG(Image *img_raw, Image *img_jpg, int filteringSize = 11)
     {
         if((img_raw == NULL) || (img_jpg == NULL))
             return;
@@ -338,7 +341,7 @@ public:
             }
         }
        
-        //computing the result
+        //compute the result
         std::vector< int > coords;
 
         for(int k=0;k<channels;k++) {
@@ -358,7 +361,7 @@ public:
 
                 }
 
-                if(!coords.empty()) {//getting the median value
+                if(!coords.empty()) {//get the median value
                     std::sort (coords.begin(), coords.end());  
                     ret_c[j] = float(coords[coords.size() >> 1]) / 255.0f;
                 }
@@ -367,7 +370,7 @@ public:
             if(filteringSize > 0) {
                 Image toBeFiltered(1, 256, 1, 1, ret_c);
 
-                Image *filtered = FilterMean::Execute(&toBeFiltered, NULL, filteringSize);
+                Image *filtered = FilterMean::execute(&toBeFiltered, NULL, filteringSize);
                 
                 icrf.push_back(filtered->data);
 
@@ -388,7 +391,7 @@ public:
      */
     void DebevecMalik(ImageVec stack, CRF_WEIGHT type = CW_DEB97, int nSamples = 256, float lambda = 20.0f)
     {
-        Destroy();
+        release();
 
         if(!ImageVecCheckSimilarType(stack)) {
             return;
@@ -400,16 +403,16 @@ public:
 
         this->type_linearization = IL_LUT_8_BIT;
 
-        //Subsampling the image stack
+        //subsample the image stack
         stackOut.execute(stack, nSamples);
 
         int *samples = stackOut.get();
         nSamples = stackOut.getNSamples();
         
-        //Computing CRF using Debevec and Malik
+        //compute CRF using Debevec and Malik
         int channels = stack[0]->channels;
 
-        //pre-computing the weight function
+        //pre-compute the weight function
         for(int i = 0; i < 256; i++) {
             w[i] = weightFunction(float(i) / 255.0f, type);
         }
@@ -449,7 +452,7 @@ public:
                         const float alpha = 0.04f, const bool computeRatios = false, const float eps = 0.0001f,
                         const std::size_t max_iterations = 100)
     {
-        Destroy();
+        release();
 
         if(!ImageVecCheckSimilarType(stack)) {
             return false;
@@ -461,10 +464,10 @@ public:
 
         type_linearization = IL_POLYNOMIAL;
 
-        //Sort the array by exposure
+        //sort the array by exposure
         ImaveVecSortByExposureTime(stack);
 
-        //Subsampling the image stack
+        //subsample the image stack
         stackOut.execute(stack, nSamples, alpha);
         int *samples = stackOut.get();
         nSamples = stackOut.getNSamples();
@@ -473,7 +476,7 @@ public:
             return false;
         }
 
-        //Computing CRF using Mitsunaga and Nayar
+        //compute the CRF using Mitsunaga and Nayar
         int channels = stack[0]->channels;
 
         std::size_t nExposures = stack.size();
@@ -492,26 +495,27 @@ public:
         if (polynomial_degree > 0) {
             error = 0.f;
             for (int i = 0; i < channels; ++i) {
-                poly[i].assign(polynomial_degree + 1, 0.f);
+                poly[i].coeff.assign(polynomial_degree + 1, 0.f);
                 if (full) {
-                    error += MitsunagaNayarFull(&samples[i * stride], nSamples, exposures, poly[i], computeRatios, RR, eps, max_iterations);
+                    error += MitsunagaNayarFull(&samples[i * stride], nSamples, exposures, poly[i].coeff, computeRatios, RR, eps, max_iterations);
                 } else {
-                    error += MitsunagaNayarClassic(&samples[i * stride], nSamples, exposures, poly[i], computeRatios, R, eps, max_iterations);
+                    error += MitsunagaNayarClassic(&samples[i * stride], nSamples, exposures, poly[i].coeff, computeRatios, R, eps, max_iterations);
                 }
             }
         } else if (polynomial_degree < 0) {
             error = std::numeric_limits<float>::infinity();
-            std::vector<std::vector<float>> tmpCoefficients(channels);
+            std::vector<Polynomial> tmpCoefficients(channels);
             for (int degree = 1; degree <= -polynomial_degree; ++degree) {
                 float tmpError = 0.f;
                 for (int i = 0; i < channels; ++i) {
-                    tmpCoefficients[i].resize(degree + 1);
+                    tmpCoefficients[i].coeff.resize(degree + 1);
                     if (full) {
-                        tmpError += MitsunagaNayarFull(&samples[i * stride], nSamples, exposures, tmpCoefficients[i], computeRatios, RR, eps, max_iterations);
+                        tmpError += MitsunagaNayarFull(&samples[i * stride], nSamples, exposures, tmpCoefficients[i].coeff, computeRatios, RR, eps, max_iterations);
                     } else {
-                        tmpError += MitsunagaNayarClassic(&samples[i * stride], nSamples, exposures, tmpCoefficients[i], computeRatios, R, eps, max_iterations);
+                        tmpError += MitsunagaNayarClassic(&samples[i * stride], nSamples, exposures, tmpCoefficients[i].coeff, computeRatios, R, eps, max_iterations);
                     }
                 }
+
                 if (tmpError < error) {
                     error = tmpError;
                     poly = std::move(tmpCoefficients);
@@ -523,7 +527,7 @@ public:
         bool bOk = error < std::numeric_limits<float>::infinity();
 
         if(bOk) {
-            CreateTabledICRF();
+            createTabledICRF();
         }
 
         return bOk;
@@ -537,7 +541,7 @@ public:
      */
     void Robertson(ImageVec &stack, const size_t maxIterations = 50)
     {
-        Destroy();
+        release();
 
         if(!ImageVecCheckSimilarType(stack)) {
             return;
@@ -789,7 +793,7 @@ public:
         float maxV = -1.0f;
         for (int ch=0; ch<channels; ch++) {
             int ind;
-            maxV = std::max(Array<float>::getMax(this->icrf[ch], 256, ind), maxV);
+            maxV = std::max(Arrayf::getMax(this->icrf[ch], 256, ind), maxV);
         }
 
         for (int ch=0; ch<channels; ch++) {
@@ -806,21 +810,6 @@ public:
         delete[] higher;
     }
 };
-
-/**
- * @brief estimateAverageLuminance
- * @param shutter_speed
- * @param aperture_value
- * @param iso_value
- * @param K_value
- * @return
- */
-PIC_INLINE float estimateAverageLuminance(float shutter_speed, float aperture_value = 1.0f, float iso_value = 1.0f, float K_value = 12.5f)
-{
-    K_value = CLAMPi(K_value, 10.6f, 13.4f);
-
-    return (iso_value * shutter_speed) / (K_value * aperture_value * aperture_value);
-}
 
 } // end namespace pic
 

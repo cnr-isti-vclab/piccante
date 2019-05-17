@@ -50,7 +50,7 @@ public:
         memcpy(this->col0, col0, sizeof(float) * channels);
         memcpy(this->col1, col1, sizeof(float) * channels);
 
-        Array<float>::normalize(col0, channels);
+        Arrayf::normalize(col0, channels);
     }
 
     ~NelderMeadOptGrayMatch()
@@ -68,9 +68,9 @@ public:
      */
     float function(float *x, unsigned int n)
     {
-        Array<float>::mul(tmp, channels, x);
-        Array<float>::normalize(tmp, channels);
-        return Array<float>::distanceSq(col0, tmp, channels);
+        Arrayf::mul(x, channels, tmp);
+        Arrayf::normalize(tmp, channels);
+        return Arrayf::distanceSq(col0, tmp, channels);
     }
 };
 #endif

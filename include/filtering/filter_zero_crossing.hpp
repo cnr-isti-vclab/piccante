@@ -38,7 +38,7 @@ protected:
 
         float value;
 
-        float *data_src = (*data->src[0])(data->x, data->y);
+        float *data_src  = (*data->src[0])(data->x, data->y);
         float *data_src0 = (*data->src[0])(data->x, data->y + 1);
         float *data_src1 = (*data->src[0])(data->x + 1, data->y);
 
@@ -104,15 +104,15 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut)
+    static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterZeroCrossing flt;
-        return flt.ProcessP(Single(imgIn), imgOut);
+        return flt.Process(Single(imgIn), imgOut);
     }
 };
 

@@ -15,92 +15,128 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_GL_ALGORITHMS_RICHARDSON_LUCY_DECONVOLUTION_HPP
-#define PIC_GL_ALGORITHMS_RICHARDSON_LUCY_DECONVOLUTION_HPP
+#ifndef PIC_GL_ALGORITHMS_RICHARDSON_LUCY_DECONVOLUTION_GL_HPP
+#define PIC_GL_ALGORITHMS_RICHARDSON_LUCY_DECONVOLUTION_GL_HPP
 
 #include "../../gl/image.hpp"
+
+#include "../../gl/filtering/filter.hpp"
 #include "../../gl/filtering/filter_conv_2d.hpp"
 
 namespace pic {
 
-class RichardsonLucyDeconvolution
+class RichardsonLucyDeconvolutionGL
 {
 public:
-    FilterGLConv2D *flt_conv;
+    ImageGL *psf, *psf_hat;
+    ImageGL *img_est_conv;
+    ImageGL *img_err;
+    ImageGL *img_rel_blur;
 
-    RichardsonLucyDeconvolution()
+    FilterGLConv2D *flt_conv;
+    int nIterations;
+
+    RichardsonLucyDeconvolutionGL()
     {
         flt_conv = NULL;
+        psf_hat = NULL;
+
+        img_est_conv = NULL;
+        img_err = NULL;
+        img_rel_blur = NULL;
     }
 
-    ~RichardsonLucyDeconvolution()
+    ~RichardsonLucyDeconvolutionGL()
     {
-        delete flt_conv;
+        if(flt_conv != NULL) {
+            delete flt_conv;
+        }
+
+        if(psf_hat != NULL) {
+            delete psf_hat;
+        }
+
+        if(img_est_conv != NULL) {
+            delete img_est_conv;
+        }
+
+        if(img_err != NULL) {
+            delete img_err;
+        }
+
+        if(img_rel_blur != NULL) {
+            delete img_rel_blur;
+        }
     }
 
     /**
-     * @brief compute
-     * @param imgIn
+     * @brief setup
      * @param psf
      * @param nIterations
+     */
+    void setup(ImageGL *psf, int nIterations)
+    {
+        nIterations = MAX(nIterations, 16);
+        this->nIterations = nIterations;
+
+        if(psf != NULL) {
+            this->psf = psf;
+            psf_hat = psf->cloneGL();
+            psf_hat->flipHV();
+        }
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL *compute(ImageGL *imgIn, ImageGL *psf, int nIterations, ImageGL *imgOut);
+    ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut)
+    {
+        if((imgIn == NULL) || (psf == NULL)) {
+            return imgOut;
+        }
 
-};
+        if(flt_conv == NULL) {
+            flt_conv = new FilterGLConv2D(GL_TEXTURE_2D);
+        }
 
-PIC_INLINE ImageGL *RichardsonLucyDeconvolution::compute(ImageGL *imgIn, ImageGL *psf, int nIterations = 10, ImageGL *imgOut = NULL)
-{
-    if((imgIn == NULL) || (psf == NULL)) {
+        auto imgIn_vec = SingleGL(imgIn);
+        /*
+        imgOut = FilterGL::allocateOutputMemory(imgIn_vec, imgOut, false);
+        img_est_conv = FilterGL::allocateOutputMemory(imgIn_vec, img_est_conv, true);
+        img_err = FilterGL::allocateOutputMemory(imgIn_vec, img_err, true);
+        img_rel_blur = FilterGL::allocateOutputMemory(imgIn_vec, img_rel_blur, true);
+        */
+
+
+        ImageGLVec vec = DoubleGL(imgOut, psf);
+        ImageGLVec vec_err = DoubleGL(img_rel_blur, psf_hat);
+
+        *imgOut = 0.5f;
+
+        for(int i = 0; i < nIterations; i++) {
+
+            #ifdef PIC_DEBUG
+                printf("%d\n", i);
+            #endif
+
+            img_rel_blur = imgIn;
+
+            img_est_conv = flt_conv->Process(vec, img_est_conv);
+            *img_rel_blur /= *img_est_conv;
+
+            img_err = flt_conv->Process(vec_err, img_err);
+
+            *imgOut *= *img_err;
+        }
+
         return imgOut;
     }
 
-    if(flt_conv == NULL) {
-        flt_conv = new FilterGLConv2D(GL_TEXTURE_2D);
-    }
-
-    if(imgOut == NULL) {
-        imgOut = imgIn->allocateSimilarOneGL();
-    }
-
-    if(nIterations < 1) {
-        nIterations = 10;
-    }
-
-    ImageGL *psf_hat = psf->cloneGL();
-    psf_hat->flipHV();
-
-    *imgOut = 0.5f;
-
-    ImageGL *img_rel_blur = imgIn->allocateSimilarOneGL();
-
-    ImageGL *img_est_conv = NULL;
-    ImageGL *img_err = NULL;
-
-    ImageGLVec vec = DoubleGL(imgOut, psf);
-    ImageGLVec vec_err = DoubleGL(img_rel_blur, psf_hat);
-
-    for(int i = 0; i < nIterations; i++) {
-
-        #ifdef PIC_DEBUG
-            printf("%d\n", i);
-        #endif
-
-        img_est_conv = flt_conv->Process(vec, img_est_conv);
-
-        //img_rel_blur->assignGL(imgIn);
-
-        *img_rel_blur /= *img_est_conv;
-
-        img_err = flt_conv->Process(vec_err, img_err);
-
-        *imgOut *= *img_err;
-    }
-
-    return imgOut;
-}
+};
 
 }
 
-#endif //PIC_GL_ALGORITHMS_RICHARDSON_LUCY_DECONVOLUTION_HPP
+#endif //PIC_GL_ALGORITHMS_RICHARDSON_LUCY_DECONVOLUTION_GL_HPP

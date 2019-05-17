@@ -26,18 +26,19 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
 {
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
+    int n;
 
+    if(argc == 2) {
+        n = atoi(argv[1]);
+    } else {
+        n = 100000;
+    }
     std::mt19937 m;
 
-    int n = 100000;
     int nDim = 2;
     float *points = new float[nDim * n];
     for(int i = 0; i< n; i++) {
@@ -77,7 +78,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        ImageWrite(&img, "../data/output/s_kmeans.png");
+        img.Write("../data/output/s_kmeans.png");
     }
 
     return 0;

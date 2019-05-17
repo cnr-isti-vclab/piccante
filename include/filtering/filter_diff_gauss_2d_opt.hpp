@@ -43,13 +43,13 @@ public:
         //Gaussian filter
         flt_dog_1d = new FilterDiffGauss1D(sigma1, sigma2);
 
-        InsertFilter(flt_dog_1d);
-        InsertFilter(flt_dog_1d);
+        insertFilter(flt_dog_1d);
+        insertFilter(flt_dog_1d);
     }
 
     ~FilterDiffGaussOpt()
     {
-        Destroy();
+        release();
 
         if(flt_dog_1d != NULL) {
             delete flt_dog_1d;

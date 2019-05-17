@@ -18,7 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_CHANNEL_HPP
 #define PIC_GL_FILTERING_FILTER_CHANNEL_HPP
 
-#include "../../filtering/filter_luminance.hpp"
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -30,24 +31,11 @@ class FilterGLChannel: public FilterGL
 {
 protected:
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     int channel;
-
-    /**
-     * @brief setChannel
-     * @param channel
-     */
-    void setChannel(int channel)
-    {
-        if(channel > -1) {
-            this->channel = channel;
-        } else {
-            this->channel = 0;
-        }
-    }
 
 public:
 
@@ -58,27 +46,35 @@ public:
     FilterGLChannel(int channel);
 
     /**
-     * @brief Update
+     * @brief update
      * @param channel
      */
-    void Update(int channel);
+    void update(int channel);
 
     /**
-     * @brief Process
+     * @brief OutputSize
      * @param imgIn
-     * @param imgOut
-     * @return
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
+    void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
+        channels    = 1;
+        frames      = imgIn[0]->frames;
+    }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param channel
      * @return
      */
-    static Image *Execute(ImageGL *imgIn, ImageGL *imgOut, int channel = 0)
+    static ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut, int channel = 0)
     {
         FilterGLChannel flt(channel);
         return flt.Process(SingleGL(imgIn), imgOut);
@@ -91,7 +87,7 @@ public:
     {
         ImageGL imgIn(1, 512, 512, 3, IMG_GPU_CPU, GL_TEXTURE_2D);
 
-        for(int i=0;i<imgIn.size();i+=3) {
+        for(auto i = 0; i < imgIn.size(); i += 3) {
             imgIn.data[i    ] = 1.0f;
             imgIn.data[i + 1] = 0.5f;
             imgIn.data[i + 2] = 0.25f;
@@ -102,10 +98,10 @@ public:
         FilterGLChannel filter(0);
         ImageGL *outR = filter.Process(SingleGL(&imgIn), NULL);
 
-        filter.Update(1);
+        filter.update(1);
         ImageGL *outG = filter.Process(SingleGL(&imgIn), NULL);
 
-        filter.Update(2);
+        filter.update(2);
         ImageGL *outB = filter.Process(SingleGL(&imgIn), NULL);
 
         outR->loadToMemory();
@@ -117,14 +113,13 @@ public:
     }
 };
 
-FilterGLChannel::FilterGLChannel(int channel) : FilterGL()
+PIC_INLINE FilterGLChannel::FilterGLChannel(int channel) : FilterGL()
 {
-    setChannel(channel);
-
-    InitShaders();
+    initShaders();
+    update(channel);
 }
 
-void FilterGLChannel::InitShaders()
+PIC_INLINE void FilterGLChannel::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
@@ -136,79 +131,25 @@ void FilterGLChannel::InitShaders()
         \n
         ivec2 coords = ivec2(gl_FragCoord.xy); \n
         vec3 color = texelFetch(u_tex, coords, 0).xyz; \n
-        float output = color[channel]; \n
-        f_color = vec4(output, output, output, 1.0); \n
+        float v = color[channel]; \n
+        f_color = vec4(v, v, v, 1.0); \n
+
     }
                       );
 
-
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLChannel");
-
-    Update(channel);
 }
 
-void FilterGLChannel::Update(int channel)
+PIC_INLINE void FilterGLChannel::update(int channel)
 {
-    setChannel(channel);
+    this->channel = channel > -1 ? channel : 0;
 
-    technique.bind();
-    technique.setUniform1i("u_tex", 0);
-    technique.setUniform1i("channel", channel);
-    technique.unbind();
-}
-
-ImageGL *FilterGLChannel::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn.empty()) {
-        return imgOut;
+    if(technique.isValid()) {
+        technique.bind();
+        technique.setUniform1i("u_tex", 0);
+        technique.setUniform1i("channel", channel);
+        technique.unbind();
     }
-
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    if(imgIn[0]->channels != 3) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(1, w, h, 1, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, 1, false, imgOut->getTexture());
-
-    //bind the fbo
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //bind shaders
-    technique.bind();
-
-    //bind textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //render an aligned quad
-    quad->Render();
-
-    //unbind the fbo
-    fbo->unbind();
-
-    //unbind shaders
-    technique.unbind();
-
-    //unbind textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

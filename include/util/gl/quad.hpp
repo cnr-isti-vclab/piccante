@@ -43,7 +43,11 @@ public:
 
     QuadGL(bool bTextureCoordinates, float halfSizeX = 1.0f, float halfSizeY = 1.0f)
     {
-        Init(bTextureCoordinates, halfSizeX, halfSizeY);
+        vao = 0;
+        vbo[0] = 0;
+        vbo[1] = 0;
+
+        init(bTextureCoordinates, halfSizeX, halfSizeY);
     }
 
     ~QuadGL()
@@ -62,29 +66,29 @@ public:
     }
 
     /**
-     * @brief Init initializates the QuadGL by allocating memory on the GPU.
+     * @brief init initializates the QuadGL by allocating memory on the GPU.
      * @param bTextCoordinates
      */
-    void Init(bool bTexCoordinates, float halfSizeX = 1.0f, float halfSizeY = 1.0f)
+    void init(bool bTexCoordinates, float halfSizeX = 1.0f, float halfSizeY = 1.0f)
     {
-        float *data_pos = CreatePosCoord(halfSizeX, halfSizeY);
+        float *data_pos = createPosCoord(halfSizeX, halfSizeY);
 
         if(bTexCoordinates) {
-            float *data_tex = CreateTexCoord();
+            float *data_tex = createTexCoord();
 
-            //Init VBO 0
+            //init VBO 0
             glGenBuffers(1, &vbo[0]);
             glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
             glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), data_pos, GL_STATIC_DRAW);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-            //Init VBO 1
+            //init VBO 1
             glGenBuffers(1, &vbo[1]);
             glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
             glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), data_tex, GL_STATIC_DRAW);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-            //Init VAO
+            //init VAO
             glGenVertexArrays(1, &vao);
             glBindVertexArray(vao);
 
@@ -102,13 +106,13 @@ public:
 
             delete[] data_tex;
         } else {
-            //Init VBO
+            //init VBO
             glGenBuffers(1, &vbo[0]);
             glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
             glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), data_pos, GL_STATIC_DRAW);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-            //Init VAO
+            //init VAO
             glGenVertexArrays(1, &vao);
             glBindVertexArray(vao);
             glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
@@ -120,6 +124,7 @@ public:
             glDisableVertexAttribArray(0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
+
         delete[] data_pos;
     }
 
@@ -155,10 +160,10 @@ public:
     }
 
     /**
-     * @brief CreatePosCoord allocates memory for a position buffer.
+     * @brief createPosCoord allocates memory for a position buffer.
      * @return
      */
-    static float *CreatePosCoord(float halfSizeX = 1.0f, float halfSizeY = 1.0f)
+    static float *createPosCoord(float halfSizeX = 1.0f, float halfSizeY = 1.0f)
     {
         float *data = new float[8];
 
@@ -177,10 +182,10 @@ public:
     }
 
     /**
-     * @brief CreateTexCoord allocates memory for a texture coordinates buffer.
+     * @brief createTexCoord allocates memory for a texture coordinates buffer.
      * @return
      */
-    static float *CreateTexCoord()
+    static float *createTexCoord()
     {
         float *data = new float[8];
 
@@ -320,9 +325,11 @@ public:
 
         technique.bind();
         technique.setAttributeIndex("a_position", 0);
+
         if(bTextureCoordinates) {
             technique.setAttributeIndex("a_tex_coord", 1);
         }
+
         technique.setOutputFragmentShaderIndex("f_color", 0);
         technique.link();
         technique.unbind();

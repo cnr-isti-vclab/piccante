@@ -29,10 +29,9 @@ namespace pic {
 class FilterDiffGauss1D: public FilterConv1D
 {
 protected:
-    float               sigma1, sigma2;
+    float sigma1, sigma2;
     PrecomputedDiffOfGaussians *pdog;
-    bool                bpdogOwned;
-    int                 dirs[3];
+    bool bpdogOwned;
 
 public:
 
@@ -52,12 +51,12 @@ public:
 
     ~FilterDiffGauss1D();
 
-    static Image *Execute(Image *imgIn, Image *imgOut,
+    static Image *execute(Image *imgIn, Image *imgOut,
                           float sigma1, float sigma2,
                           int direction)
     {
         FilterDiffGauss1D filter(sigma1, sigma2, direction);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 
@@ -68,7 +67,7 @@ PIC_INLINE FilterDiffGauss1D::FilterDiffGauss1D(float sigma1, float sigma2, int 
     pdog = new PrecomputedDiffOfGaussians(sigma1, sigma2);
 
     bpdogOwned = true;
-    Init(pdog->coeff, pdog->kernelSize, direction);
+    update(pdog->coeff, pdog->kernelSize, direction);
 }
 
 PIC_INLINE FilterDiffGauss1D::FilterDiffGauss1D(PrecomputedDiffOfGaussians *pdog, int direction = 0)
@@ -82,7 +81,7 @@ PIC_INLINE FilterDiffGauss1D::FilterDiffGauss1D(PrecomputedDiffOfGaussians *pdog
 
     bpdogOwned = false;
 
-    Init(pdog->coeff, pdog->kernelSize, direction);
+    update(pdog->coeff, pdog->kernelSize, direction);
 }
 
 PIC_INLINE FilterDiffGauss1D::~FilterDiffGauss1D()

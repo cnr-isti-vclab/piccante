@@ -38,14 +38,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
-
 public:
 
     /**
@@ -55,10 +47,10 @@ public:
     FilterGradientHarrisOPT(int colorChannel);
 
     /**
-     * @brief Setup
+     * @brief update
      * @param colorChannel
      */
-    void Setup(int colorChannel);
+    void update(int colorChannel);
 
     /**
      * @brief OutputSize
@@ -68,46 +60,39 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn->width;
-        height      = imgIn->height;
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
         channels    = 3;
-        frames      = imgIn->frames;
+        frames      = imgIn[0]->frames;
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param colorChannel
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut = NULL, int colorChannel = 0)
+    static Image *execute(Image *imgIn, Image *imgOut = NULL, int colorChannel = 0)
     {
         FilterGradientHarrisOPT filter(colorChannel);
-        return filter.ProcessP(Single(imgIn), imgOut);
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 
 PIC_INLINE FilterGradientHarrisOPT::FilterGradientHarrisOPT(int colorChannel) : Filter()
 {
-    Setup(colorChannel);
+    this->colorChannel = 0;
+    update(colorChannel);
 }
 
-PIC_INLINE void FilterGradientHarrisOPT::Setup(int colorChannel)
+PIC_INLINE void FilterGradientHarrisOPT::update(int colorChannel)
 {
-    this->colorChannel = colorChannel;
-}
-
-PIC_INLINE Image *FilterGradientHarrisOPT::SetupAux(ImageVec imgIn,
-        Image *imgOut)
-{
-    if(imgOut == NULL) {
-        imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
+    if(colorChannel > -1) {
+        this->colorChannel = colorChannel;
     }
-
-    return imgOut;
 }
 
 PIC_INLINE void FilterGradientHarrisOPT::ProcessBBox(Image *dst, ImageVec src,

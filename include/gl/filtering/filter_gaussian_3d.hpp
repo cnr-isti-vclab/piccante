@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_GAUSSIAN_3D_HPP
 #define PIC_GL_FILTERING_FILTER_GAUSSIAN_3D_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter_npasses.hpp"
 #include "../../gl/filtering/filter_gaussian_1d.hpp"
 
@@ -26,10 +28,7 @@ namespace pic {
 class FilterGLGaussian3D: public FilterGLNPasses
 {
 protected:
-    FilterGLGaussian1D		*filter;
-
-    void InitShaders() {}
-    void FragmentShader() {}
+    FilterGLGaussian1D *filter;
 
 public:
     /**
@@ -44,30 +43,30 @@ public:
     FilterGLGaussian3D(float sigma);
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma
      */
-    void Update(float sigma);
+    void update(float sigma);
 };
 
-FilterGLGaussian3D::FilterGLGaussian3D(): FilterGLNPasses()
+PIC_INLINE FilterGLGaussian3D::FilterGLGaussian3D(): FilterGLNPasses()
 {
     target = GL_TEXTURE_3D;
 }
 
-FilterGLGaussian3D::FilterGLGaussian3D(float sigma): FilterGLNPasses()
+PIC_INLINE FilterGLGaussian3D::FilterGLGaussian3D(float sigma): FilterGLNPasses()
 {
     filter = new FilterGLGaussian1D(sigma, 0, GL_TEXTURE_3D);
     target = GL_TEXTURE_3D;
 
-    InsertFilter(filter);
-    InsertFilter(filter);
-    InsertFilter(filter);
+    insertFilter(filter);
+    insertFilter(filter);
+    insertFilter(filter);
 }
 
-void FilterGLGaussian3D::Update(float sigma)
+PIC_INLINE void FilterGLGaussian3D::update(float sigma)
 {
-    filter->Update(sigma);
+    filter->update(sigma);
 }
 
 } // end namespace pic

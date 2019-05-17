@@ -25,7 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 #include "../algorithms/white_balance.hpp"
 #include "../filtering/filter_radial_basis_function.hpp"
-#include "../tone_mapping/lischinski_minimization.hpp"
+#include "../algorithms/lischinski_minimization.hpp"
 #include "../util/mask.hpp"
 
 namespace pic {
@@ -71,11 +71,11 @@ PIC_INLINE bool *computeColorClassification(Image *img, float *white_pixel, floa
         img_wb->Write("../data/output/s_input_wb.bmp");
     #endif
 
-    Image *img_wb_rbf = flt_rbf.ProcessP(Single(img_wb), NULL);
+    Image *img_wb_rbf = flt_rbf.Process(Single(img_wb), NULL);
 
     img_wb_rbf->clamp(0.0f, 1.0f);
 
-    Image *img_L = FilterLuminance::Execute(img, NULL);
+    Image *img_L = FilterLuminance::execute(img, NULL);
 
     Image *opt = LischinskiMinimization(img_L, img_wb_rbf);
 

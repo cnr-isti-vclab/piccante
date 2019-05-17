@@ -47,15 +47,15 @@ public:
      */
     ImageSamplerGaussian(float sigma, unsigned int direction)
     {
-        Update(sigma, direction);
+        update(sigma, direction);
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma
      * @param direction
      */
-    void Update(float sigma, unsigned int direction)
+    void update(float sigma, unsigned int direction)
     {
         if(pg != NULL) {
             delete pg;

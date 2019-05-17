@@ -32,6 +32,7 @@ protected:
     FilterConv1D *conv1DFltX, *conv1DFltY;
 
 public:
+
     /**
      * @brief FilterConv2DSP
      * @param data
@@ -41,8 +42,8 @@ public:
     {
         conv1DFltX = new FilterConv1D(data, n);
 
-        InsertFilter(conv1DFltX);
-        InsertFilter(conv1DFltX);
+        insertFilter(conv1DFltX);
+        insertFilter(conv1DFltX);
     }
 
     /**
@@ -52,18 +53,18 @@ public:
      * @param dataY
      * @param nY
      */
-    FilterConv2DSP(float *dataX, int nX, float *dataY, int nY)
+    FilterConv2DSP(float *dataX, int nX, float *dataY, int nY) : FilterNPasses()
     {
         conv1DFltX = new FilterConv1D(dataX, nX);
-        InsertFilter(conv1DFltX);
+        insertFilter(conv1DFltX);
 
         conv1DFltY = new FilterConv1D(dataY, nY);
-        InsertFilter(conv1DFltY);
+        insertFilter(conv1DFltY);
     }
 
     ~FilterConv2DSP()
     {
-        Destroy();
+        release();
 
         if(conv1DFltX != NULL) {
             delete conv1DFltX;
@@ -78,19 +79,18 @@ public:
         conv1DFltY = NULL;
     }
 
-    static Image *Execute(Image *imgIn, Image *imgOut, float *data, int n)
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @param data
+     * @param n
+     * @return
+     */
+    static Image *execute(Image *imgIn, Image *imgOut, float *data, int n)
     {
         FilterConv2DSP filter(data, n);
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    static Image *Execute(std::string nameIn, std::string nameOut, float *data,
-                             int n)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, data, n);
-        imgOut->Write(nameOut);
-        return imgOut;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

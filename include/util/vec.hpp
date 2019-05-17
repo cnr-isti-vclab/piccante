@@ -23,6 +23,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../util/math.hpp"
 
+#include "../util/string.hpp"
+
 namespace pic {
 
 /**
@@ -39,21 +41,11 @@ public:
      */
     Vec<N, T>()
     {
-    }
-
-    /**
-     * @brief Vec<N, T>
-     * @param data0
-     */
-    Vec<N, T>(T data0)
-    {
-        assert(N >= 1);
-
         for(unsigned int i = 0; i < N; i++) {
-            data[i] = data0;
+            this->data[i] = T(0);
         }
     }
-
+    
     /**
      * @brief Vec<N, T>
      * @param data0
@@ -81,13 +73,14 @@ public:
     }
 
     /**
-     * @brief operator []
-     * @param index
-     * @return
-     */
-    T &operator[](int index)
+    * @brief Vec<N, T>
+    * @param data
+    */
+    Vec<N, T>(T *data)
     {
-        return data[index];
+        for (auto i = 0; i < N; i++) {
+            this->data[i] = data[i];
+        }
     }
 
     /**
@@ -95,97 +88,89 @@ public:
      */
     void setZero()
     {
-        for(unsigned int i=0; i<N; i++) {
+        for(auto i = 0; i < N; i++) {
             data[i] = T(0);
         }
     }
 
     /**
-     * @brief add
-     * @param a
+     * @brief setOne
      */
-    void add(Vec<N, T> a)
+    void setOne()
     {
-        for(unsigned int i = 0; i < N; i++) {
-            data[i] += a[i];
+        for(auto i = 0; i < N; i++) {
+            data[i] = T(1);
         }
-    }
-
-     Vec<N, T> operator +(const Vec<N, T> &a) const
-     {
-         Vec<N, T> ret = this->clone();
-         ret.add(a);
-         return ret;
-     }
-
-     void operator +=(const Vec<N, T> &a)
-     {
-         this->add(a);
-     }
-
-    /**
-     * @brief dot
-     * @param a
-     */
-    T dot(Vec<N, T> a)
-    {
-        T out = T(0);
-        for(unsigned int i=0; i<N; i++) {
-            out += data[i] * a[i];
-        }
-        return out;
     }
 
     /**
-     * @brief div
-     * @param value
+     * @brief inverse
+     * @return
      */
-    void div(T value)
+    Vec<N, T> inverse(T maxVal = T(-1))
     {
-        for(unsigned int i=0; i<N; i++) {
-            data[i] /= value;
+        if(maxVal <= T(0)) {
+            maxVal = this->getMax();
         }
-    }
 
-    void operator /=(const T &a)
-    {
-        this->div(a);
-    }
+        Vec<N, T> ret;
 
-    /**
-     * @brief sub
-     * @param value
-     */
-    void sub(Vec<N, T> a)
-    {
-        for(unsigned int i = 0; i < N; i++) {
-            data[i] -= a[i];
+        for (auto i = 0; i < N; i++) {
+            ret.data[i] = maxVal - this->data[i];
         }
-    }
 
-    Vec<N, T> operator +(const float &a) const
-    {
-        Vec<N, T> ret = this->clone();
-        ret.add(a);
         return ret;
     }
 
+    /**
+     * @brief convertToArray
+     * @param col
+     */
+    T *convertToArray(T *ret)
+    {
+        if(ret == NULL) {
+            ret = new T[N];
+        }
+
+        memcpy(ret, this->data, sizeof(T) * N);
+
+        return ret;
+    }
 
     /**
-     * @brief neg
-     * @param value
+     * @brief isGreaterThanZero
+     * @return
      */
-    void neg()
+    bool isGreaterThanZero()
     {
-        for(unsigned int i = 0; i < N; i++) {
-            data[i] = -data[i];
+        bool ret = true;
+        T zero = T(0);
+        for (auto i = 0; i < N; i++) {
+            ret = ret && (this->data[i] > zero);
         }
+
+        return ret;
+    }
+
+    /**
+    * @brief hasNegative
+    * @return
+    */
+    bool hasNegative()
+    {
+        bool ret = false;
+        T zero = T(0);
+        for (auto i = 0; i < N; i++) {
+            ret = ret || (this->data[i] < zero);
+        }
+
+        return ret;
     }
 
     Vec<N, T> clone()
     {
         Vec<N, T> ret;
-        memcpy(ret.data, this->data, N * sizeof(T));
+        memcpy(ret.data, data, N * sizeof(T));
         return ret;
     }
 
@@ -194,9 +179,19 @@ public:
      * @param index
      * @return
      */
-    const T &operator[](int index) const
+    const T &operator[](std::size_t i) const
     {
-        return data[index];
+        return data[i];
+    }
+
+    /**
+     * @brief operator []
+     * @param index
+     * @return
+     */
+    T &operator[](std::size_t i)
+    {
+        return data[i];
     }
 
     /**
@@ -206,13 +201,85 @@ public:
      */
     bool equal(Vec<N, T> a)
     {
-        for(unsigned int i = 0; i < N; i++) {
+        for(auto i = 0; i < N; i++) {
             if(a[i] != data[i]) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * @brief Mean
+     * @return
+     */
+    T getMean()
+    {
+        T ret = T(0);
+        for (auto i = 0; i < N; i++) {
+            ret += this->data[i];
+        }
+
+        return ret / T(N);
+    }
+
+    /**
+     * @brief getMax
+     * @return
+     */
+    T getMax()
+    {
+        T ret = this->data[0];
+        for (auto i = 1; i < N; i++) {
+            ret = this->data[i] > ret ? this->data[i] : ret;
+        }
+        return ret;
+    }
+
+    /**
+     * @brief getMaxChannel
+     * @return
+     */
+    int getMaxChannel()
+    {
+        float valMax = getMax();
+
+        for (auto i = 1; i < N; i++) {
+            if (valMax == this->data[i]) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * @brief dot
+     * @param a
+     */
+    T dot(Vec<N, T> a)
+    {
+        T out = T(0);
+        for(auto i=0; i<N; i++) {
+            out += data[i] * a[i];
+        }
+        return out;
+    }
+
+    /**
+     * @brief squaredSum
+     * @return
+     */
+    T squaredSum()
+    {
+        T ret = this->data[0] * this->data[0];
+
+        for(auto i = 1; i < N; i++) {
+            ret += this->data[i] * this->data[i];
+        }
+
+        return ret;
     }
 
     /**
@@ -225,12 +292,25 @@ public:
         T tmp = data[0] - x[0];
         T d2 = tmp * tmp;
 
-        for(unsigned int i = 1; i < N; i++) {
+        for(auto i = 1; i < N; i++) {
             tmp = data[i] - x[i];
             d2 += tmp * tmp;
         }
 
         return d2;
+    }
+
+    /**
+    * @brief clamp
+    * @param min
+    * @param max
+    * @return
+    */
+    void clamp(T min, T max)
+    {
+        for (auto i = 0; i < N; i++) {
+            data[i] = CLAMPi(data[i], min, max);
+        }
     }
 
     /**
@@ -241,12 +321,347 @@ public:
     {
         T out = data[0] * data[0];
 
-        for(unsigned int i = 1; i < N; i++) {
+        for(auto i = 1; i < N; i++) {
             out += data[i] * data[i];
         }
 
         return out;
     }
+
+    /**
+     * @brief toString
+     * @param x
+     * @return
+     */
+    std::string toString(Vec<N, T> &x)
+    {
+        std::string ret = "[";
+        for(auto i = 0; i < N; i++) {
+            ret += fromNumberToString(x[i]);
+        }
+        ret += "]";
+
+        return ret;
+    }
+
+    /**
+     * @brief print
+     */
+    void print()
+    {
+        printf("%s\n", toString().c_str());
+    }
+
+    /*
+    *
+    *	Scalar Operands
+    *
+    */
+
+    /**
+     * @brief operator =
+     * @param a
+     */
+    void operator =(const T &a)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] = a;
+        }
+    }
+
+    /**
+    * @brief operator =
+    * @param a
+    */
+    void operator =(const T *a)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] = a[i];
+        }
+    }
+
+    /**
+    * @brief operator =
+    * @param a
+    */
+    void operator =(const Vec<N, T> &a)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] = a.data[i];
+        }
+    }
+
+    /**
+     * @brief operator +=
+     * @param a
+     */
+    void operator +=(const T &a)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] += a;
+        }
+    }
+
+    /**
+     * @brief operator +=
+     * @param a
+     */
+    void operator +=(const T *a)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] = a[i];
+        }
+    }
+
+    /**
+     * @brief operator +
+     * @param a
+     * @return
+     */
+    Vec<N, T> operator +(const T &a) const
+    {
+        Vec<N, T> ret = this->clone();
+        ret += a;
+        return ret;
+    }
+
+    /**
+     * @brief operator -=
+     * @param a
+     */
+    void operator -=(const T &a)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] -= a;
+        }
+    }
+
+    /**
+     * @brief operator -
+     * @param a
+     * @return
+     */
+    Vec<N, T> operator -(const T &a) const
+    {
+        Vec<N, T> ret;
+        memcpy(ret.data, this->data, sizeof(T) * N);
+        ret -= a;
+        return ret;
+    }
+
+    void mul(const T &a)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] *= a;
+        }
+    }
+
+    /**
+     * @brief operator *=
+     * @param a
+     */
+    void operator *=(const T &a)
+    {
+        this->mul(a);
+    }
+
+    /**
+     * @brief operator *=
+     * @param a
+     */
+    void operator *=(const T *a)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] *= a[i];
+        }
+    }
+
+    /**
+     * @brief operator *
+     * @param a
+     * @return
+     */
+    Vec<N, T> operator *(const T &a) const
+    {
+        Vec<N, T> ret;
+        memcpy(ret.data, this->data, sizeof(T) * N);
+        ret.mul(a);
+        return ret;
+    }
+
+    /**
+     * @brief operator /=
+     * @param a
+     */
+    void operator /=(const float &a)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] /= a;
+        }
+    }
+
+    /**
+     * @brief operator /
+     * @param a
+     * @return
+     */
+    Vec<N, T> operator /(const float &a) const
+    {
+        Vec<N, T> ret;
+        memcpy(ret.data, this->data, sizeof(T) * N);
+        ret /= a;
+        return ret;
+    }
+
+    /*
+    *
+    *	Vec Operands
+    *
+    */
+
+    /**
+     * @brief operator +=
+     * @param col
+     */
+    void operator +=(const Vec<N, T> &col)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] += col.data[i];
+        }
+    }
+
+    /**
+     * @brief operator +
+     * @param col
+     * @return
+     */
+    Vec<N, T> operator +(const Vec<N, T> &col) const
+    {
+        Vec<N, T> ret;
+        memcpy(ret.data, this->data, sizeof(T) * N);
+        ret += col;
+        return ret;
+    }
+
+    /**
+     * @brief operator -=
+     * @param col
+     */
+    void operator -=(const Vec<N, T> &col)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] -= col.data[i];
+        }
+    }
+
+    /**
+     * @brief operator -
+     * @return
+     */
+    Vec<N, T> operator -() const
+    {
+        Vec<N, T> ret;
+        for (auto i = 0; i < N; i++) {
+            ret.data[i] = -this->data[i];
+        }
+
+        return ret;
+    }
+
+    /**
+     * @brief operator -
+     * @param col
+     * @return
+     */
+    Vec<N, T> operator -(const Vec<N, T> &col) const
+    {
+        Vec<N, T> ret;
+        memcpy(ret.data, this->data, sizeof(T) * N);
+        ret -= col;
+        return ret;
+    }
+
+    void mul(const Vec<N, T> &a)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] *= a.data[i];
+        }
+    }
+
+    /**
+     * @brief operator *=
+     * @param col
+     */
+    void operator *=(const Vec<N, T> &a)
+    {
+        this->mul(a);
+    }
+
+    /**
+     * @brief operator *
+     * @param col
+     * @return
+     */
+    Vec<N, T> operator *(const Vec<N, T> &a)
+    {
+        Vec<N, T> ret;
+        memcpy(ret.data, this->data, sizeof(T) * N);
+        ret.mul(a);
+        return ret;
+    }
+
+    /**
+     * @brief operator /=
+     * @param col
+     */
+    void operator /=(Vec<N, T> &a)
+    {
+        for (auto i = 0; i < N; i++) {
+            this->data[i] /= a.data[i];
+        }
+    }
+
+    /**
+     * @brief operator /
+     * @param col
+     * @return
+     */
+    Vec<N, T> operator /(Vec<N, T> &a) const
+    {
+        Vec<N, T> ret;
+        memcpy(ret.data, this->data, sizeof(T) * N);
+        ret /= a;
+        return ret;
+    }
+
+    /**
+     * @brief operator !=
+     * @param col
+     * @return
+     */
+    bool operator !=(Vec<N, T> &a)
+    {
+        bool ret = false;
+        for (auto i = 0; i < N; i++) {
+            ret = ret || (this->data[i] != a.data[i]);
+        }
+        return ret;
+    }
+
+    /**
+     * @brief operator ==
+     * @param col
+     * @return
+     */
+    bool operator ==(Vec<N, T> &a)
+    {
+        bool ret = true;
+        for (auto i = 0; i < N; i++) {
+            ret = ret && (this->data[i] == a.data[i]);
+        }
+        return ret;
+    }
+
 };
 
 /**
@@ -257,7 +672,7 @@ public:
 template<unsigned int N>
 PIC_INLINE bool insideVecBBox(const Vec<N, float> &sample)
 {
-    for(unsigned int i = 0; i < N; i++) {
+    for(auto i = 0; i < N; i++) {
         if((sample[i] < -1.0f) || (sample[i] > 1.0f)) {
             return false;
         }
@@ -269,11 +684,11 @@ PIC_INLINE bool insideVecBBox(const Vec<N, float> &sample)
 template<unsigned int N>
 PIC_INLINE Vec<N, float> normalize(Vec<N, float> x)
 {
-    float length = x.distanceSq();
+    float length = x.squaredSum();
 
     if(length > 0.0f) {
         length = sqrtf(length);
-        for(unsigned int i = 0; i < N; i++) {
+        for(auto i = 0; i < N; i++) {
             x[i] /= length;
         }
     }
@@ -291,21 +706,21 @@ PIC_INLINE Vec<N, float> randomPoint(std::mt19937 *m)
 {
     Vec<N, float> x;
 
-    for(unsigned int i = 0; i < N; i++) {
-        x[i] = Random((*m)()) * 2.0f - 1.0f;
+    for(auto i = 0; i < N; i++) {
+        x[i] = getRandom((*m)()) * 2.0f - 1.0f;
     }
 
     return x;
 }
 
 template<unsigned int N>
-PIC_INLINE void printVec(Vec<N, float> x)
+void vecrint(Vec<N, float> &ret)
 {
-    printf("[");
-    for(unsigned int i = 0; i < N; i++) {
-        printf("%f ", x[i]);
+    printf("\n Values :");
+    for(auto i = 0; i < N; i++) {
+        printf("%d ", ret.data[i]);
     }
-    printf("]\n");
+    printf("\n");
 }
 
 /**
@@ -321,8 +736,8 @@ PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, 
     Vec<N, float> x;
 
     while(true) {
-        for(unsigned int i = 0; i < N; i++) {
-            x[i] = Random((*m)()) * 4.0f - 2.0f;
+        for(auto i = 0; i < N; i++) {
+            x[i] = getRandom((*m)()) * 4.0f - 2.0f;
         }
 
         float t = x.lengthSq();
@@ -332,11 +747,38 @@ PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, 
         }
     }
 
-    for(unsigned int i = 0; i < N; i++) {
+    for(auto i = 0; i < N; i++) {
         x[i] = x[i] * radius + center[i];
     }
 
     return x;
+}
+
+template<unsigned int N>
+void vecGamma(Vec<N, float> &ret, float g)
+{
+    for (auto i = 0; i < N; i++) {
+        ret.data[i] = powf(ret.data[i], g);
+    }
+}
+
+template<unsigned int N>
+void vecSqrt(Vec<N, float> &ret)
+{
+    for (auto i = 0; i < N; i++) {
+        ret.data[i] = sqrtf(ret.data[i]);
+    }
+}
+
+template<unsigned int N>
+Vec<N, float> vecValOver(Vec<N, float> &in, float value)
+{
+    Vec<N, float> ret;
+    for (auto i = 0; i < N; i++) {
+        ret.data[i] = value / in.data[i];
+    }
+
+    return ret;
 }
 
 template<unsigned int N, class T>

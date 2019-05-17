@@ -31,12 +31,17 @@ namespace pic {
  * @param ori is the original image.
  * @param cmp is the distorted image.
  * @param bLargeDifferences, if true, skips big differences for stability.
+ * @param type is the domain where to compute RMSE (linear, logarithmic, and PU).
  * @return It returns the MAE value between ori and cmp.
  */
-PIC_INLINE double MAE(Image *ori, Image *cmp, bool bLargeDifferences = false)
+PIC_INLINE double MAE(Image *ori, Image *cmp, bool bLargeDifferences = false, METRICS_DOMAIN type = MD_LIN)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0;
+    }
+
+    if(!ori->isValid() || !cmp->isValid()) {
+        return -4.0;
     }
 
     if(!ori->isSimilarType(cmp)) {
@@ -45,30 +50,27 @@ PIC_INLINE double MAE(Image *ori, Image *cmp, bool bLargeDifferences = false)
 
     int size = ori->size();
 
-    double acc = 0.0;
-    int count = 0;
-
     double largeDifferences = C_LARGE_DIFFERENCES;
 
     if(!bLargeDifferences) {
         largeDifferences = FLT_MAX;
     }
 
+    double acc = 0.0;
+    int count = 0;
     for(int i = 0; i < size; i++) {
-        double valO = ori->data[i];
-        double valc = cmp->data[i];
+        double o_val = changeDomain(ori->data[i], type);
+        double c_val = changeDomain(cmp->data[i], type);
 
-        double delta = fabs(valO - valc);
+        double delta = fabs(o_val - c_val);
 
-        if(delta <= largeDifferences) {
-            count++;
+        if(delta < largeDifferences) {
             acc += delta;
+            count++;
         }
     }
 
-    acc /= double(count);
-
-    return float(acc);
+    return acc / double(count);
 }
 
 } // end namespace pic

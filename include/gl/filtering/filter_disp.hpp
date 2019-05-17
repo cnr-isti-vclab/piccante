@@ -36,9 +36,9 @@ protected:
     float sigma_r;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
 
@@ -48,24 +48,24 @@ public:
     FilterGLDisp();
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma
      * @param sigma_s
      * @param sigma_r
      * @param bUse
      * @param bLeft
      */
-    void Update(float sigma, float sigma_s, float sigma_r, bool bUse, bool bLeft);
+    void update(float sigma, float sigma_s, float sigma_r, bool bUse, bool bLeft);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameLeft
      * @param nameRight
      * @param nameDisp
      * @param nameOut
      * @return
      */
-    static ImageGL *Execute(std::string nameLeft,
+    static ImageGL *execute(std::string nameLeft,
                                std::string nameRight,
                                std::string nameDisp,
                                std::string nameOut)
@@ -74,9 +74,9 @@ public:
         ImageGL imgR(nameRight);
         ImageGL imgD(nameDisp);
 
-        imgL.generateTextureGL(false, GL_TEXTURE_2D);
-        imgR.generateTextureGL(false, GL_TEXTURE_2D);
-        imgD.generateTextureGL(false, GL_TEXTURE_2D);
+        imgL.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
+        imgR.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
+        imgD.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         FilterGLDisp filter;
 
@@ -92,23 +92,23 @@ FilterGLDisp::FilterGLDisp(): FilterGL()
     sigma = 2.0f;
     sigma_s = 2.0f;
     sigma_r = 0.05f;
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLDisp::InitShaders()
+void FilterGLDisp::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
                           uniform sampler2D u_texL; \n
                           uniform sampler2D u_texR; \n
                           uniform sampler2D u_texD; \n
-                          uniform int		  halfKernelSize; \n
-                          uniform float	  sigma; \n
-                          uniform float	  sigma_s2; \n
-                          uniform float	  sigma_r2; \n
-                          uniform float	  bUse; \n
-                          uniform	float     bLeft; \n
-                          out     vec4      f_color; \n
+                          uniform int halfKernelSize; \n
+                          uniform float	sigma; \n
+                          uniform float	sigma_s2; \n
+                          uniform float	sigma_r2; \n
+                          uniform float	bUse; \n
+                          uniform float bLeft; \n
+                          out     vec4 f_color; \n
 
     vec4 fetchDispCol(ivec2 coords) {
         float shiftf = texelFetch(u_texD, coords, 0).x;
@@ -203,7 +203,7 @@ void FilterGLDisp::InitShaders()
     technique.unbind();
 }
 
-void FilterGLDisp::Update(float sigma, float sigma_s, float sigma_r, bool bUse,
+void FilterGLDisp::update(float sigma, float sigma_s, float sigma_r, bool bUse,
                           bool bLeft)
 {
     this->sigma = sigma;

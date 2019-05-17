@@ -53,9 +53,9 @@ public:
     ~FilterDCT1D();
 
     /**
-     * @brief SetForward
+     * @brief setForward
      */
-    void SetForward()
+    void setForward()
     {
         this->bForward = true;
 
@@ -64,13 +64,13 @@ public:
             coeff = NULL;
         }
 
-        coeff = CreateCoefficientsTransform(nCoeff);
+        coeff = createCoefficientsTransform(nCoeff);
     }
 
     /**
-     * @brief SetInverse
+     * @brief setInverse
      */
-    void SetInverse()
+    void setInverse()
     {
         this->bForward = false;
 
@@ -79,15 +79,15 @@ public:
             coeff = NULL;
         }
 
-        coeff = CreateCoefficientsInverse(nCoeff);
+        coeff = createCoefficientsInverse(nCoeff);
     }
 
     /**
-     * @brief CreateCoefficientsTransform
+     * @brief createCoefficientsTransform
      * @param size
      * @return
      */
-    static float *CreateCoefficientsTransform(int size)
+    static float *createCoefficientsTransform(int size)
     {
         if(size < 1) {
             return NULL;
@@ -111,11 +111,11 @@ public:
     }
 
     /**
-     * @brief CreateCoefficientsInverse
+     * @brief createCoefficientsInverse
      * @param size
      * @return
      */
-    static float *CreateCoefficientsInverse(int size)
+    static float *createCoefficientsInverse(int size)
     {
         if(size < 1) {
             return NULL;
@@ -150,19 +150,19 @@ public:
     }
 
     /**
-     * @brief ChangePass
+     * @brief changePass
      * @param pass
      * @param tPass
      */
-    void ChangePass(int pass, int tPass);
+    void changePass(int pass, int tPass);
 
     /**
-     * @brief ChangePass
+     * @brief changePass
      * @param x
      * @param y
      * @param z
      */
-    void ChangePass(int x, int y, int z);
+    void changePass(int x, int y, int z);
 };
 
 PIC_INLINE FilterDCT1D::FilterDCT1D(int nCoeff, bool bForward)
@@ -171,9 +171,9 @@ PIC_INLINE FilterDCT1D::FilterDCT1D(int nCoeff, bool bForward)
     this->nCoeff = nCoeff;
 
     if(bForward) {
-        SetForward();
+        setForward();
     } else {
-        SetInverse();
+        setInverse();
     }
 
     sqr[0] = sqrtf(1.0f / float(nCoeff));
@@ -191,7 +191,7 @@ PIC_INLINE FilterDCT1D::~FilterDCT1D()
     }
 }
 
-PIC_INLINE void FilterDCT1D::ChangePass(int pass, int tPass)
+PIC_INLINE void FilterDCT1D::changePass(int pass, int tPass)
 {
     int tMod;
 
@@ -201,7 +201,7 @@ PIC_INLINE void FilterDCT1D::ChangePass(int pass, int tPass)
         if(tPass == 1) {
             tMod = 2;
         } else {
-            printf("ERROR: FilterDCT1D::ChangePass");
+            printf("ERROR: FilterDCT1D::changePass");
             return;
         }
     }
@@ -214,7 +214,7 @@ PIC_INLINE void FilterDCT1D::ChangePass(int pass, int tPass)
 
 }
 
-PIC_INLINE void FilterDCT1D::ChangePass(int x, int y, int z)
+PIC_INLINE void FilterDCT1D::changePass(int x, int y, int z)
 {
     dirs[0] = y;
     dirs[1] = x;

@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../filtering/filter.hpp"
 
+#include "../filtering/filter_channel.hpp"
+
 namespace pic {
 
 /**
@@ -30,11 +32,30 @@ class FilterCombine: public Filter
 protected:
 
     /**
+     * @brief f
+     * @param data
+     */
+    virtual void f(FilterFData *data)
+    {
+        int k2 = 0;
+
+        for(auto i = 0; i < data->nSrc; i++) {
+            float *tmp_src = (*data->src[i])(data->x, data->y);
+
+            for(int k = 0; k < data->src[i]->channels; k++) {
+                data->out[k2] = tmp_src[k];
+                k2++;
+            }
+        }
+    }
+
+    /**
      * @brief ProcessBBox
      * @param dst
      * @param src
      * @param box
      */
+    /*
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         for(int p = box->z0; p < box->z1; p++) {
@@ -54,25 +75,40 @@ protected:
                 }
             }
         }
-    }
+    }*/
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
-        if(imgOut == NULL) {
-            int channels = 0;
+        int channels = imgIn[0]->channels;
+        for(unsigned int i = 1; i < imgIn.size(); i++) {
+            channels += imgIn[i]->channels;
 
-            for(unsigned int i = 0; i < imgIn.size(); i++) {
-                channels += imgIn[i]->channels;
+            if(!imgIn[0]->isSimilarType(imgIn[i])) {
+                return NULL;
             }
+        }
 
+        if(imgOut == NULL) {
             imgOut = new Image(imgIn[0]->frames, imgIn[0]->width, imgIn[0]->height,
                                   channels);
+        } else {
+            bool bAllocate = false;
+            if(!imgOut->isValid()) {
+                bAllocate = true;
+            } else {
+                bAllocate = imgOut->channels != channels;
+            }
+
+            if(bAllocate) {
+                imgOut = new Image(imgIn[0]->frames, imgIn[0]->width, imgIn[0]->height,
+                        channels);
+            }
         }
 
         return imgOut;
@@ -83,19 +119,19 @@ public:
     /**
      * @brief FilterCombine
      */
-    FilterCombine()
+    FilterCombine() : Filter()
     {
 
     }
 
     /**
-     * @brief AddAlpha
+     * @brief addAlpha
      * @param imgIn
      * @param imgOut
      * @param value
      * @return
      */
-    static Image *AddAlpha(Image *imgIn, Image *imgOut, float value)
+    static Image *addAlpha(Image *imgIn, Image *imgOut, float value)
     {
         //create an alpha channel
         Image *alpha = new Image(imgIn->frames, imgIn->width, imgIn->height, 1);
@@ -114,41 +150,35 @@ public:
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    static Image *Execute(ImageVec imgIn, Image *imgOut)
+    static Image *execute(ImageVec imgIn, Image *imgOut)
     {
         FilterCombine filterC;
         return filterC.Process(imgIn, imgOut);
     }
 
     /**
-     * @brief ExecuteTest
+     * @brief getOnlyRGB
      * @param nameIn
      * @param nameOut
      * @return
      */
-    static Image *ExecuteTest(Image *imgIn, Image *imgOut)
+    static Image *getOnlyRGB(Image *imgIn, Image *imgOut)
     {
-        FilterChannel filter(0);
-        Image *outR = filter.Process(Single(imgIn), NULL);
-
-        filter.setChannel(1);
-        Image *outG = filter.Process(Single(imgIn), NULL);
-
-        filter.setChannel(2);
-        Image *outB = filter.Process(Single(imgIn), NULL);
-
         ImageVec src;
-        src.push_back(outR);
-        src.push_back(outG);
-        src.push_back(outB);
+        FilterChannel filter(SingleInt(0));
 
-        FilterCombine filterC;
-        imgOut = filterC.Process(src, NULL);
+        for(int i = 0; i < 3; i++) {
+            Image *out = filter.Process(Single(imgIn), NULL);
+            src.push_back(out);
+            filter.update(SingleInt(i + 1));
+        }
+
+        imgOut = execute(src, NULL);
 
         return imgOut;
     }

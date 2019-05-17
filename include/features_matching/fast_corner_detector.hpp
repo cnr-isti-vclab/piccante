@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../image.hpp"
 #include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_gaussian_2d.hpp"
 
 #include "../features_matching/general_corner_detector.hpp"
 
@@ -42,11 +43,11 @@ namespace pic {
 class FastCornerDetector: public GeneralCornerDetector
 {
 protected:
-    Image     *lum_flt;
-    bool      bexecuteThreshold;
+    Image *lum_flt;
+    bool bexecuteThreshold;
 
-    float     sigma, threshold;
-    int       radius;
+    float sigma, threshold;
+    int radius;
 
 public:
     /**
@@ -87,23 +88,9 @@ public:
      */
     void update(float sigma = 1.0f, int radius = 1, float threshold = 0.001f)
     {
-        if(sigma > 0.0f) {
-            this->sigma = sigma;
-        } else {
-            this->sigma = 1.0f;
-        }
-
-        if(radius > 0) {
-            this->radius = radius;
-        } else {
-            this->radius = 1;
-        }
-
-        if(threshold > 0.0f) {
-            this->threshold = threshold;
-        } else {
-            this->threshold = 0.001f;
-        }
+        this->sigma = sigma > 0.0f ? sigma : 1.0f;
+        this->radius = radius > 0 ? radius : 1;
+        this->threshold = threshold > 0.001f ? threshold : 0.001f;
     }
 
     /**
@@ -122,7 +109,7 @@ public:
             lum = img;
         } else {
             bLum = true;
-            lum = FilterLuminance::Execute(img, lum, LT_CIE_LUMINANCE);
+            lum = FilterLuminance::execute(img, lum, LT_CIE_LUMINANCE);
         }
 
         corners->clear();
@@ -131,7 +118,7 @@ public:
 
         //filter the input image
         FilterGaussian2D flt(sigma);
-        lum_flt = flt.ProcessP(Single(lum), lum_flt);
+        lum_flt = flt.Process(Single(lum), lum_flt);
 
         int x[] = {0, 1, 2, 3, 3,  3,  2,  1,  0, -1, -2, -3, -3, -3, -2, -1};
         int y[] = {3, 3, 2, 1, 0, -1, -2, -3, -3, -3, -2, -1,  0,  1,  2,  3};
@@ -293,6 +280,8 @@ public:
         }
 
         sortCornersAndTransfer(&corners_w_quality, corners);
+
+        delete[] indices;
     }
 };
 

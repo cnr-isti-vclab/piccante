@@ -68,60 +68,27 @@ public:
      */
     Image *Process(ImageVec imgIn, Image *imgOut)
     {
-        imgOut = filter_1->Process(imgIn, imgOut, false);
+        imgOut = filter_1->Process(imgIn, imgOut);
 
         //MEMORY-LEAK: to check
-        tmp = filter_2->Process(imgIn, tmp, false);
+        tmp = filter_2->Process(imgIn, tmp);
         *imgOut -= *tmp;
         return imgOut;
     }
 
     /**
-     * @brief ProcessP
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *ProcessP(ImageVec imgIn, Image *imgOut)
-    {
-        imgOut = filter_1->ProcessP(imgIn, imgOut);
-
-        //MEMORY-LEAK: to check
-        tmp = filter_2->ProcessP(imgIn, tmp);
-        *imgOut = *imgOut - *tmp;
-        return imgOut;
-    }
-
-    /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma_1
      * @param sigma_2
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma_1,
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma_1,
                              float sigma_2)
     {
         FilterDiffGauss filter(sigma_1, sigma_2);
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma_1
-     * @param sigma_2
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut, float sigma_1,
-                             float sigma_2)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, sigma_1, sigma_2);
-        imgOut->Write(nameOut);
-        return imgOut;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

@@ -21,6 +21,20 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iostream>
+#include <fstream>
+
+#include "../base.hpp"
+
+
+#ifdef PIC_WIN32
+    #include <direct.h>
+#endif
+
+#ifndef PIC_WIN32
+    #include <unistd.h>
+#endif
+
 
 namespace pic {
 
@@ -65,8 +79,8 @@ inline std::string stdStringRep(std::string str, std::string strSub,
 inline std::string stdStringRepAll(std::string str, std::string strSub,
                                    std::string strRep)
 {
-    int n_sub  = int(strSub.size());
-    int n_rep = int(strRep.size());
+    auto n_sub = strSub.size();
+    auto n_rep = strRep.size();
 
     std::string ret = str;
     std::string::size_type pos = ret.find(strSub);
@@ -93,22 +107,21 @@ inline std::string fromNumberToString(T num)
 }
 
 /**
- * @brief whichPath determines the kind of path of the string.
+ * @brief getSeparatorChar returns the folder separator in path as a char.
  * @param path
  * @return
  */
-inline std::string whichPath(std::string path)
+inline char getSeparatorChar(std::string path)
 {
-    std::string toFind = "";
     if(path.find("/") != std::string::npos) {
-        toFind = "/";
+        return '/';
     } else {
         if(path.find("\\") != std::string::npos) {
-            toFind = "\\";
+            return '\\';
+        } else {
+            return '/';
         }
     }
-
-    return toFind;
 }
 
 /**
@@ -137,7 +150,7 @@ inline std::string removeExtension(std::string name)
  */
 inline std::string removeLocalPath(std::string name)
 {
-    std::string toFind = whichPath(name);
+    std::string toFind(1, getSeparatorChar(name));
 
     if(toFind.empty()) {
         return name;
@@ -179,7 +192,7 @@ inline std::string getExtension(std::string name)
     std::string ext = "";
 
     if(pos != std::string::npos) {
-        int n = int(name.length() - pos);
+        auto n = name.length() - pos;
         ext = name.substr(n, n);
     }
 
@@ -247,7 +260,7 @@ inline std::string getLocaDirectory(std::string path)
 {
     std::string ret = path;
 
-    std::string toFind = whichPath(path);
+    std::string toFind(1, getSeparatorChar(path));
 
     if(toFind.empty()) {
         return ret;
@@ -265,24 +278,6 @@ inline std::string getLocaDirectory(std::string path)
     }
 
     return ret;
-}
-
-/**
- * @brief getSeparatorChar returns the folder separator in path as a char.
- * @param path
- * @return
- */
-inline char getSeparatorChar(std::string path)
-{
-    if(path.find("/") != std::string::npos) {
-        return '/';
-    } else {
-        if(path.find("\\") != std::string::npos) {
-            return '\\';
-        } else {
-            return '/';
-        }
-    }
 }
 
 /**
@@ -359,6 +354,163 @@ inline void parseStringToStdVector(std::string str, char delim,
         std::getline(ss, tmpStr, delim);
         str_vec->push_back(tmpStr);
     }
+}
+
+/**
+ * @brief genBilString
+ * @param type
+ * @param sigma_s
+ * @param sigma_r
+ * @return
+ */
+inline std::string genBilString(std::string type, float sigma_s,
+                                    float sigma_r)
+{
+    std::string ret = type +
+            "_Ss_" + fromNumberToString(sigma_s) +
+            "_Sr_" + fromNumberToString(sigma_r);
+    return ret;
+}
+
+/**
+ * @brief fromFileToStdString writes a file into a std::string.
+ * @param nameFile
+ * @return
+ */
+inline std::string fromFileToStdString(std::string nameFile)
+{
+    std::ifstream infile;
+    infile.open(nameFile.c_str(), std::ios::in);
+
+    std::string ret;
+
+    if((!infile.is_open()) || (!infile.good())) {
+        return ret;
+    }
+
+    int c = infile.get();
+    while (infile.good()) {
+        ret += c;
+        c = infile.get();
+    }
+
+    infile.close();
+
+    return ret;
+}
+
+/**
+ * @brief checkAbsolutePath checks if the path is absolute or not.
+ * @param path
+ * @return
+ */
+inline bool checkAbsolutePath(std::string path)
+{
+    //win32 absolute path
+    if(path.find(":\\") != std::string::npos) {
+        return true;
+    }
+
+    if(path.find(":/") != std::string::npos) {
+        return true;
+    }
+
+    if(path.find("\\\\\"") != std::string::npos) {
+        return true;
+    }
+
+    //unix/mac path
+    return (path.at(0) == '/');
+}
+
+/**
+ * @brief fromStdStringToChar converts from a std::string to a char*.
+ * @param str
+ * @return
+ */
+inline char *fromStdStringToChar(std::string str)
+{
+    char *cstr = new char [str.size() + 1];
+    strcpy (cstr, str.c_str());
+    return cstr;
+}
+
+/**
+ * @brief checkPath
+ * @param name
+ * @return
+ */
+inline std::string checkPath(std::string name)
+{
+    if(name.length() < 3) {
+        return "";
+    }
+
+    if((name.at(0) == '.') && (name.at(0) == '.')) {
+        #ifdef PIC_WIN32
+            char *path = _getcwd(NULL, 0);
+        #endif
+
+        #ifndef PIC_WIN32
+            char *path = getcwd(NULL, 0);
+        #endif
+
+        std::string dsepName = getSeparator(name);
+        std::string dsepPath = getSeparator(path);
+
+        name = stdStringRepAll(name, dsepName, dsepPath);
+        if(name.at(2) == '\\' || name.at(2) == '/') {
+            name = name.substr(3);
+        } else {
+            name = name.substr(2);
+        }
+
+        std::string newPath  = path + dsepPath + name;
+        return newPath;
+    } else {
+        return "";
+    }
+}
+
+/**
+ * @brief adjustPath modifies the path if it is not global.
+ * @param nameFile
+ * @param pathFolder
+ * @return
+ */
+std::string adjustPath(std::string nameFile, std::string pathFolder)
+{
+    if(!checkAbsolutePath(nameFile)) {
+        std::string fullPath = checkPath(nameFile);
+
+        if(fullPath.empty()) {
+            std::string ret = pathFolder + getSeparator(pathFolder) + nameFile;
+            return ret;
+        } else {
+            return fullPath;
+        }
+    } else {
+        return nameFile;
+    }
+}
+
+/**
+ * @brief removeInitialSpaces removes spaces at the beginning of a string.
+ * @param name
+ * @return
+ */
+inline std::string removeInitialSpaces(char name[])
+{
+    size_t pos;
+    std::string ret = name;
+
+    pos = ret.find(' ');
+    ret.erase(pos, 1);
+
+    pos = ret.find('\n');
+    ret.erase(pos, 1);
+
+    return ret;
 }
 
 } // end namespace pic

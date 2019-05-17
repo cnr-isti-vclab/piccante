@@ -128,19 +128,9 @@ public:
      */
     void update(float sigma = 1.0f, int radius = 3, float threshold = 0.001f)
     {
-        if(sigma > 0.0f) {
-            this->sigma = sigma;
-        } else {
-            this->sigma = 1.0f;
-        }
-
-        if(radius > 0) {
-            this->radius = radius;
-        } else {
-            this->radius = 1;
-        }
-
-        this->threshold = threshold;
+        this->sigma = sigma > 0.0f ? sigma : 1.0f;
+        this->radius = radius > 0 ? radius : 1;
+        this->threshold = threshold > 0.0f ? threshold : 0.001f;
     }
 
     /**
@@ -164,11 +154,12 @@ public:
         if(img->channels == 1) {
             lum = img->clone();
         } else {
-            lum = FilterLuminance::Execute(img, lum, LT_CIE_LUMINANCE);
+            lum = FilterLuminance::execute(img, lum, LT_CIE_LUMINANCE);
         }
 
-        float maxL = lum->getMaxVal(NULL, NULL)[0];
-        float minL = lum->getMinVal(NULL, NULL)[0];
+        float minL, maxL;
+        lum->getMinVal(NULL, &minL);
+        lum->getMaxVal(NULL, &maxL);
 
         float delta = maxL - minL;
 
@@ -180,13 +171,13 @@ public:
         std::vector< Eigen::Vector3f > corners_w_quality;
 
         //compute gradients
-        I_grad = FilterGradientHarrisOPT::Execute(lum, I_grad, 0);
+        I_grad = FilterGradientHarrisOPT::execute(lum, I_grad, 0);
 
         float eps = 2.2204e-16f;
 
         //filter gradient values
         FilterGaussian2D flt(sigma);
-        I_grad_flt = flt.ProcessP(Single(I_grad), I_grad_flt);
+        I_grad_flt = flt.Process(Single(I_grad), I_grad_flt);
 
         if(ret == NULL) {
             ret = lum->allocateSimilarOne();
@@ -208,7 +199,7 @@ public:
         }
 
         //non-maximal supression
-        lum = FilterMax::Execute(ret, lum, radius * 2 + 1);
+        lum = FilterMax::execute(ret, lum, radius * 2 + 1);
         Image* ret_flt = lum;
 
         float w = 1.0f;

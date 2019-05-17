@@ -37,6 +37,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_bilateral_2dg.hpp"
 #include "filtering/filter_bilateral_2ds.hpp"
 #include "filtering/filter_bilateral_2dsp.hpp"
+#include "filtering/filter_non_local_means_f.hpp"
+#include "filtering/filter_non_local_means_s.hpp"
 #include "filtering/filter_channel.hpp"
 #include "filtering/filter_color_conv.hpp"
 #include "filtering/filter_color_distance.hpp"
@@ -59,6 +61,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_gaussian_3d.hpp"
 #include "filtering/filter_gradient.hpp"
 #include "filtering/filter_gradient_harris_opt.hpp"
+#include "filtering/filter_guided_a_b.hpp"
 #include "filtering/filter_guided.hpp"
 #include "filtering/filter_iterative.hpp"
 #include "filtering/filter_kuwahara.hpp"
@@ -91,6 +94,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_deform_grid.hpp"
 #include "filtering/filter_radial_basis_function.hpp"
 #include "filtering/filter_disparity.hpp"
+#include "filtering/filter_deconvolution.hpp"
+#include "filtering/filter_noise_estimation.hpp"
+#include "filtering/filter_tmqi.hpp"
 
 #endif /* PIC_FILTERING_HPP */
 

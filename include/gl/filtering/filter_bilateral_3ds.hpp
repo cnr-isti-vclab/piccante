@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_3DS_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_3DS_HPP
 
+#include "../../util/vec.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -37,9 +39,9 @@ protected:
     ImageGL *imageRand;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -57,17 +59,17 @@ public:
     FilterGLBilateral3DS(float sigma_s, float sigma_r, float sigma_t);
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      * @param sigma_t
      */
-    void Update(float sigma_s, float sigma_r, float sigma_t);
+    void update(float sigma_s, float sigma_r, float sigma_t);
 
     /**
-     * @brief UpdateUniform
+     * @brief setUniform
      */
-    void UpdateUniform();
+    void setUniform();
 
     /**
      * @brief setFrame
@@ -104,7 +106,7 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
+PIC_INLINE FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
         float sigma_t): FilterGL()
 {
     //protected values are assigned/computed
@@ -115,7 +117,7 @@ FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
     int nRand = 32;
     imageRand = new ImageGL(1, 256, 256, 1, IMG_CPU, GL_TEXTURE_2D);
     imageRand->setRand();
-    imageRand->generateTextureGL(false, GL_TEXTURE_2D);
+    imageRand->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
     *imageRand *= float(nRand - 1);
 
     //Precomputation of the Gaussian Kernel
@@ -129,8 +131,7 @@ FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
     frame = halfKernelSizeTime;
 
     //Poisson samples
-    Vec<3, int> window = Vec<3, int>(halfKernelSize, halfKernelSize,
-                                     halfKernelSizeTime);
+    Vec3i window = Vec3i(halfKernelSize, halfKernelSize, halfKernelSizeTime);
     ms = new MRSamplersGL<3>(ST_BRIDSON, window, 2 * kernelSize, 1, nRand);
     ms->generateTexture();
 
@@ -141,10 +142,10 @@ FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma_r,
 #endif
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLBilateral3DS::FragmentShader()
+PIC_INLINE void FilterGLBilateral3DS::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -191,17 +192,17 @@ void FilterGLBilateral3DS::FragmentShader()
                       );
 }
 
-void FilterGLBilateral3DS::InitShaders()
+PIC_INLINE void FilterGLBilateral3DS::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral3DS");
 
     sigmas2 = 2.0f * sigma_s * sigma_s;
     sigmat2 = 2.0f * sigma_t * sigma_t;
     sigmar2 = 2.0f * sigma_r * sigma_r;
-    UpdateUniform();
+    setUniform();
 }
 
-void FilterGLBilateral3DS::Update(float sigma_s, float sigma_r, float sigma_t)
+PIC_INLINE void FilterGLBilateral3DS::update(float sigma_s, float sigma_r, float sigma_t)
 {
 
     bool flag = false;
@@ -227,16 +228,18 @@ void FilterGLBilateral3DS::Update(float sigma_s, float sigma_r, float sigma_t)
     int kernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s);
     int halfKernelSize = kernelSize >> 1;
 
-    ms->updateGL(halfKernelSize, halfKernelSize);
+    Vec3i window = Vec3i(halfKernelSize, halfKernelSize, halfKernelSize);
+    ms->updateGL(window, halfKernelSize);
 
     //shader update
     sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
     sigmat2 = 2.0f * this->sigma_t *this->sigma_t;
     sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
-    UpdateUniform();
+
+    setUniform();
 }
 
-void FilterGLBilateral3DS::UpdateUniform()
+PIC_INLINE void FilterGLBilateral3DS::setUniform()
 {
     technique.bind();
     technique.setUniform1i("u_tex",      0);
@@ -252,7 +255,7 @@ void FilterGLBilateral3DS::UpdateUniform()
     technique.unbind();
 }
 
-ImageGL *FilterGLBilateral3DS::Process(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLBilateral3DS::Process(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
@@ -263,7 +266,7 @@ ImageGL *FilterGLBilateral3DS::Process(ImageGLVec imgIn,
     int h = imgIn[0]->height;
 
     if(imgOut == NULL) {
-        imgOut = new ImageGL(w, h, 1, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
+        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, imgIn[0]->getTarget());
     }
 
     if(fbo == NULL) {

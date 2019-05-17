@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_DOWN_PP_HPP
 #define PIC_FILTERING_FILTER_DOWN_PP_HPP
 
+#include "../util/array.hpp"
+
 #include "../filtering/filter.hpp"
 
 namespace pic {
@@ -51,54 +53,28 @@ protected:
                 tmp[3] = (*src[0])(j + 1, i + 1);
 
                 int counter = 0;
-                float *tmp_ret = (*dst)(j2, i2);
+                float *out = (*dst)(j2, i2);
 
-                for(int l = 0; l < channels; l++) {
-                    tmp_ret[l] = 0.0f;
-                }
+                Arrayf::assign(0.0f, out, channels);
 
-                for(unsigned k = 0; k < 4; k++) {
-                    if(distance(tmp[k], value, channels) > threshold) {
+                for(int k = 0; k < 4; k++) {
+                    if(Arrayf::distanceSq(tmp[k], value, channels) > threshold) {
                         counter++;
 
                         for(int l = 0; l < channels; l++) {
-                            tmp_ret[l] += tmp[k][l];
+                            out[l] += tmp[k][l];
                         }
                     }
                 }
 
                 if(counter > 0) {
-                    float counter_f = float(counter);
-                    for(int l = 0; l < channels; l++) {
-                        tmp_ret[l] /= counter_f;
-                    }
+                    float counter_f = float(counter);                    
+                    Arrayf::div(out, channels, counter_f);
                 } else {
-                    for(int l = 0; l < channels; l++) {
-                        tmp_ret[l] = value[l];
-                    }
+                    Arrayf::assign(value, channels, out);
                 }
             }
         }
-    }
-
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width >> 1, imgIn[0]->height >> 1, imgIn[0]->channels);
-        } else {
-            if(((imgIn[0]->width >> 1)  != imgOut->width )  ||
-               ((imgIn[0]->height >> 1) != imgOut->height) ) {
-                imgOut = new Image(1, imgIn[0]->width >> 1, imgIn[0]->height >> 1, imgIn[0]->channels);
-            }
-        }
-
-        return imgOut;
     }
 
     float *value, threshold;
@@ -110,9 +86,9 @@ public:
      * @param value
      * @param threshold
      */
-    FilterDownPP(float *value, float threshold)
+    FilterDownPP(float *value, float threshold) : Filter()
     {
-        Update(value, threshold);
+        update(value, threshold);
     }
 
     ~FilterDownPP()
@@ -120,45 +96,19 @@ public:
     }
 
     /**
-     * @brief distance
-     * @param a
-     * @param b
-     * @param channels
-     * @return
-     */
-    static inline float distance(float *a, float *b, int channels)
-    {
-        float dist = 0.0f;
-        for(int i = 0; i < channels; i++) {
-            float tmp = a[i] - b[i];
-            dist += tmp * tmp;
-        }
-
-        return dist;
-    }
-
-    /**
-     * @brief Update
+     * @brief update
      * @param value
      * @param threshold
      */
-    void Update(float *value, float threshold)
+    void update(float *value, float threshold)
     {
+        this->value = value;
+
         if(value == NULL) {
-            this->value = new float[3];
-
-            for(int i = 0; i < 3; i++) {
-                this->value[i] = 0.0f;
-            }
-        } else {
-            this->value = value;
+            printf("ERROR in FilterDownPP");
         }
 
-        if(threshold > 0.0f) {
-            this->threshold = threshold;
-        } else {
-            this->threshold = 1e-4f;
-        }
+        this->threshold = (threshold > 0.0f) ? threshold : 1e-4f;
     }
 
     /**
@@ -169,39 +119,19 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn->width  >> 1;
-        height      = imgIn->height >> 1;
-        channels    = imgIn->channels;
-        frames      = imgIn->frames;
-    }
+        if(imgIn.size() == 1) {
+            width       = imgIn[0]->width >> 1;
+            height      = imgIn[0]->height >> 1;
+        } else {
+            width       = imgIn[1]->width;
+            height      = imgIn[1]->height;
 
-    /**
-     * @brief Execute
-     * @param imgIn
-     * @param imgOut
-     * @param type
-     * @return
-     */
-    static Image *Execute(Image *imgIn, Image *imgOut)
-    {
-        FilterDownPP flt(NULL, 1e-3f);
-        return flt.ProcessP(Single(imgIn), imgOut);
-    }
+        }
 
-    /**
-     * @brief Execute
-     * @param fileInput
-     * @param fileOutput
-     * @return
-     */
-    static Image *Execute(std::string fileInput, std::string fileOutput)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterDownPP::Execute(&imgIn, NULL);
-        out->Write(fileOutput);
-        return out;
+        channels    = imgIn[0]->channels;
+        frames      = imgIn[0]->frames;
     }
 };
 

@@ -501,8 +501,8 @@ PIC_INLINE Eigen::Vector2f estimateCoordinatesWhitePointFromCheckerBoard(Image *
 
             auto pMid = (p0 + p1) / 2.0f;
 
-            int x = pMid[0];
-            int y = pMid[1];
+            int x = int(pMid[0]);
+            int y = int(pMid[1]);
             float *color = (*img)(x, y);
 
             float meanColor = 0.0f;

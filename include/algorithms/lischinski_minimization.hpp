@@ -15,8 +15,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_TONE_MAPPING_LISCHINSKI_MINIMIZATION_HPP
-#define PIC_TONE_MAPPING_LISCHINSKI_MINIMIZATION_HPP
+#ifndef PIC_ALGORITHMS_LISCHINSKI_MINIMIZATION_HPP
+#define PIC_ALGORITHMS_LISCHINSKI_MINIMIZATION_HPP
 
 #ifndef PIC_DISABLE_EIGEN
 
@@ -72,6 +72,8 @@ inline float LischinskiFunctionGauss(float Lcur, float Lref, float param[2])
  * @param L
  * @param g
  * @param omega
+ * @param omega_global
+ * @param gOut
  * @param alpha
  * @param lambda
  * @param LISCHINSKI_EPSILON
@@ -80,19 +82,18 @@ inline float LischinskiFunctionGauss(float Lcur, float Lref, float param[2])
 PIC_INLINE Image *LischinskiMinimization(Image *L,
                               Image *g,
                               Image *omega = NULL,
+                              float omega_global = 1.0f,
+                              Image *gOut = NULL,
                               float alpha = 1.0f,
                               float lambda = 0.4f,
                               float LISCHINSKI_EPSILON = 1e-4f)
 {
     if(L == NULL || g == NULL) {
-        return NULL;
+        return gOut;
     }
 
 #ifndef PIC_DISABLE_EIGEN
-    if(omega == NULL) {
-        omega = L->allocateSimilarOne();
-        *omega = 1.0f;
-    }
+    bool bOmega = (omega == NULL);
 
     int width = L->width;
     int height = L->height;
@@ -122,7 +123,14 @@ PIC_INLINE Image *LischinskiMinimization(Image *L,
             int indI = tmpInd + j;
             float Lref = L->data[indI];
 
-            b[indI] = omega->data[indI] * g->data[indI];
+            float omega_val;
+            if(bOmega) {
+                omega_val = omega_global;
+            } else {
+                omega_val = omega->data[indI];
+            }
+
+            b[indI] = omega_val * g->data[indI];
 
             if((i - 1) >= 0) {
                 indJ = indI - width;
@@ -152,7 +160,7 @@ PIC_INLINE Image *LischinskiMinimization(Image *L,
                 sum += tmp;
             }
 
-            tL.push_back(Eigen::Triplet< double > (indI, indI, omega->data[indI] - sum));
+            tL.push_back(Eigen::Triplet< double > (indI, indI, omega_val - sum));
         }
     }
 
@@ -177,23 +185,29 @@ PIC_INLINE Image *LischinskiMinimization(Image *L,
         printf("SOLVER SUCCESS!\n");
     #endif
 
-    Image *ret = L->allocateSimilarOne();
+    if(gOut == NULL) {
+        gOut = g->allocateSimilarOne();
+    } else {
+        if(!gOut->isSimilarType(g)) {
+            gOut = g->allocateSimilarOne();
+        }
+    }
 
     for(int i = 0; i < height; i++) {
         int counter = i * width;
 
         for(int j = 0; j < width; j++) {
-            (*ret)(j, i)[0] = float(x(counter + j));
+            (*gOut)(j, i)[0] = float(x(counter + j));
         }
     }
 
-    return ret;
+    return gOut;
 #else
-    return NULL;
+    return gOut;
 #endif
 }
 
 } // end namespace pic
 
-#endif /* PIC_TONE_MAPPING_LISCHINSKI_MINIMIZATION_HPP */
+#endif /* PIC_ALGORITHMS_LISCHINSKI_MINIMIZATION_HPP */
 

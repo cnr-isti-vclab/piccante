@@ -22,6 +22,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "colors/color_3.hpp"
 
+#include "colors/matrix_from_primaries.hpp"
+
 #include "colors/color_conv.hpp"
 #include "colors/color_conv_rgb_to_srgb.hpp"
 #include "colors/color_conv_rgb_to_xyz.hpp"

@@ -33,9 +33,9 @@ protected:
     float sigma_s, sigma_r;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -57,55 +57,36 @@ public:
     FilterGLBilateral2DF(float sigma_s, float sigma_r);
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      */
-    void Update(float sigma_s, float sigma_r);
+    void update(float sigma_s, float sigma_r);
 
     /**
-     * @brief Process
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma_s
-     * @param sigma_r
-     * @return
-     */
-    static ImageGL *Execute(std::string nameIn,
-                               std::string nameOut,
-                               float sigma_s, float sigma_r)
+    ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
     {
-        //Load the image
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
+        imgOut = allocateOutputMemory(imgIn, imgOut, false);
 
-        //Filtering
-        FilterGLBilateral2DF filter(sigma_s, sigma_r);
+        if(imgIn.size() == 1) {
+            param.clear();
+            param.push_back(imgIn[0]);
+        }
 
-        long t0 = timeGetTime();
-        ImageGL *imgRet = filter.Process(SingleGL(&imgIn), NULL);
-        long t1 = timeGetTime();
-        printf("Full Bilateral Filter time: %ld\n", t1 - t0);
-
-        imgRet->loadToMemory();
-        imgRet->Write(nameOut);
-        return imgRet;
+        return imgOut;
     }
 };
 
-FilterGLBilateral2DF::FilterGLBilateral2DF(): FilterGL()
+PIC_INLINE FilterGLBilateral2DF::FilterGLBilateral2DF(): FilterGL()
 {
 }
 
-FilterGLBilateral2DF::FilterGLBilateral2DF(float sigma_s,
+PIC_INLINE FilterGLBilateral2DF::FilterGLBilateral2DF(float sigma_s,
         float sigma_r): FilterGL()
 {
     //protected values are assigned/computed
@@ -113,10 +94,10 @@ FilterGLBilateral2DF::FilterGLBilateral2DF(float sigma_s,
     this->sigma_r = sigma_r;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLBilateral2DF::FragmentShader()
+PIC_INLINE void FilterGLBilateral2DF::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -156,14 +137,14 @@ void FilterGLBilateral2DF::FragmentShader()
                       );
 }
 
-void FilterGLBilateral2DF::InitShaders()
+PIC_INLINE void FilterGLBilateral2DF::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral2DF");
 
-    Update(-1.0f, -1.0f);
+    update(-1.0f, -1.0f);
 }
 
-void FilterGLBilateral2DF::Update(float sigma_s, float sigma_r)
+PIC_INLINE void FilterGLBilateral2DF::update(float sigma_s, float sigma_r)
 {
     if(sigma_s > 0.0f) {
         this->sigma_s = sigma_s;
@@ -185,64 +166,6 @@ void FilterGLBilateral2DF::Update(float sigma_s, float sigma_r)
     technique.setUniform1f("sigmar2", sigmar2);
     technique.setUniform1i("halfKernelSize", halfKernelSize);
     technique.unbind();
-}
-
-ImageGL *FilterGLBilateral2DF::Process(ImageGLVec imgIn,
-        ImageGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, 1, false, imgOut->getTexture());
-
-    ImageGL *edge, *base;
-
-    if(imgIn.size() == 2) {
-        //Joint/Cross Bilateral Filtering
-        base = imgIn[0];
-        edge = imgIn[1];
-    } else {
-        base = imgIn[0];
-        edge = imgIn[0];
-    }
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    technique.bind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, base->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    technique.unbind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

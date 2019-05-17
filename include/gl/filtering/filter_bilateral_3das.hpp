@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_3DAS_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_3DAS_HPP
 
+#include "../../util/vec.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -41,7 +43,7 @@ protected:
     ImageGL			*imgFrame;
     ImageGL			*imgTmp;
 
-    void InitShaders();
+    void initShaders();
     void FragmentShader();
 
 public:
@@ -62,12 +64,12 @@ public:
     ~FilterGLBilateral3DAS();
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma_s
      * @param sigma_r
      * @param sigma_t
      */
-    void Update(float sigma_s, float sigma_r, float sigma_t);
+    void update(float sigma_s, float sigma_r, float sigma_t);
 
     /**
      * @brief setFrame
@@ -76,7 +78,7 @@ public:
     void setFrame(int frame)
     {
         this->frame = frame;
-        Update(-1.0f, -1.0f, -1.0f);
+        update(-1.0f, -1.0f, -1.0f);
     }
 
     /**
@@ -88,8 +90,7 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-//Basic constructor
-FilterGLBilateral3DAS::FilterGLBilateral3DAS(): FilterGL()
+PIC_INLINE FilterGLBilateral3DAS::FilterGLBilateral3DAS(): FilterGL()
 {
     ms = NULL;
     imageRand = NULL;
@@ -97,7 +98,7 @@ FilterGLBilateral3DAS::FilterGLBilateral3DAS(): FilterGL()
     imgTmp = NULL;
 }
 
-FilterGLBilateral3DAS::~FilterGLBilateral3DAS()
+PIC_INLINE FilterGLBilateral3DAS::~FilterGLBilateral3DAS()
 {
     delete ms;
     delete imageRand;
@@ -105,8 +106,7 @@ FilterGLBilateral3DAS::~FilterGLBilateral3DAS()
     delete imgTmp;
 }
 
-//Init constructors
-FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
+PIC_INLINE FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
         float sigma_t): FilterGL()
 {
     //protected values are assigned/computed
@@ -130,7 +130,7 @@ FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
 
     //Precomputation of the Gaussian Kernel
     int kernelSize = PrecomputedGaussian::getKernelSize(sigma_s);
-    int kernelSizeTime  = PrecomputedGaussian::getKernelSize(sigma_t);
+    int kernelSizeTime = PrecomputedGaussian::getKernelSize(sigma_t);
 
     int halfKernelSize = kernelSize >> 1;
     int halfKernelSizeTime = kernelSizeTime >> 1;
@@ -140,18 +140,17 @@ FilterGLBilateral3DAS::FilterGLBilateral3DAS(float sigma_s, float sigma_r,
     printf("Window: %d\n", halfKernelSize);
 #endif
 
-    Vec<3, int> window = Vec<3, int>(halfKernelSize, halfKernelSize,
-                                     halfKernelSizeTime);
+    Vec3i window = Vec3i(halfKernelSize, halfKernelSize, halfKernelSizeTime);
     ms = new MRSamplersGL<3>(ST_BRIDSON, window, halfKernelSize, 3, nRand);
 
     ms->generateTexture();
     ms->generateLevelsRTexture();
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLBilateral3DAS::FragmentShader()
+PIC_INLINE void FilterGLBilateral3DAS::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -227,17 +226,16 @@ void FilterGLBilateral3DAS::FragmentShader()
                       );
 }
 
-void FilterGLBilateral3DAS::InitShaders()
+PIC_INLINE void FilterGLBilateral3DAS::initShaders()
 {
     printf("Number of samples: %d\n", ms->nSamples / 2);
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral3DAS");
 
-    Update(-1.0f, -1.0f, -1.0f);
+    update(-1.0f, -1.0f, -1.0f);
 }
 
-//Change parameters
-void FilterGLBilateral3DAS::Update(float sigma_s, float sigma_r, float sigma_t)
+PIC_INLINE void FilterGLBilateral3DAS::update(float sigma_s, float sigma_r, float sigma_t)
 {
 
     bool flag = false;
@@ -264,7 +262,8 @@ void FilterGLBilateral3DAS::Update(float sigma_s, float sigma_r, float sigma_t)
     int kernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s);
     int halfKernelSize = kernelSize >> 1;
 
-    ms->updateGL(halfKernelSize, halfKernelSize);
+    Vec3i window = Vec3i(halfKernelSize, halfKernelSize, halfKernelSize);
+    ms->updateGL(window, halfKernelSize);
 
     //shader update
     float sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
@@ -285,7 +284,7 @@ void FilterGLBilateral3DAS::Update(float sigma_s, float sigma_r, float sigma_t)
     technique.unbind();
 }
 
-ImageGL *FilterGLBilateral3DAS::Process(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLBilateral3DAS::Process(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {
@@ -306,7 +305,7 @@ ImageGL *FilterGLBilateral3DAS::Process(ImageGLVec imgIn,
 
     if(imgTmp == NULL) {
         float scale = fGLsm->getScale();
-        imgFrame->generateTextureGL(false, GL_TEXTURE_2D);
+        imgFrame->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         imgTmp = new ImageGL(    1,
                                     int(imgIn[0]->widthf  * scale),

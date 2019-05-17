@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 #include "../image.hpp"
+#include "../util/math.hpp"
 #include "../metrics/base.hpp"
 
 namespace pic {
@@ -38,6 +39,10 @@ PIC_INLINE double logRMSE(Image *ori, Image *cmp)
         return -2.0;
     }
 
+    if(!ori->isValid() || !cmp->isValid()) {
+        return -4.0;
+    }
+
     if(!ori->isSimilarType(cmp)) {
         return -1.0;
     }
@@ -46,15 +51,11 @@ PIC_INLINE double logRMSE(Image *ori, Image *cmp)
     int counter = 0;
 
     double acc = 0.0;
-    double val;
-
-    for(int i = 0; i < size; i += ori->channels) {
-        for(int j = 0; j < ori->channels; j++) {
-            if(ori->data[i + j] > 0.0f && cmp->data[i + j] > 0.0f) {
-                val  = log(ori->data[i + j] / cmp->data[i + j]);
-                acc += val * val;
-                counter++;
-            }
+    for(int i = 0; i < size; i++) {
+        if(ori->data[i] > 0.0f && cmp->data[i] > 0.0f) {
+            double val = log2(ori->data[i] / cmp->data[i]);
+            acc += val * val;
+            counter++;
         }
     }
 

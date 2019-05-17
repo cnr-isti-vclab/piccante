@@ -33,6 +33,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/buffer.hpp"
 #include "util/low_dynamic_range.hpp"
 #include "util/math.hpp"
+#include "util/array.hpp"
+#include "util/indexed_array.hpp"
+#include "util/std_util.hpp"
 
 //IO formats
 #include "io/bmp.hpp"
@@ -46,9 +49,25 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "io/tga.hpp"
 #include "io/vol.hpp"
 #include "io/stb.hpp"
+#include "io/exif.hpp"
 #include "util/io.hpp"
 
 namespace pic {
+
+/**
+ * @brief estimateAverageLuminance
+ * @param shutter_speed
+ * @param aperture_value
+ * @param iso_value
+ * @param K_value
+ * @return
+ */
+PIC_INLINE float estimateAverageLuminance(float shutter_speed, float aperture_value = 1.0f, float iso_value = 1.0f, float K_value = 12.5f)
+{
+    K_value = CLAMPi(K_value, 10.6f, 13.4f);
+
+    return (iso_value * shutter_speed) / (K_value * aperture_value * aperture_value);
+}
 
 /**
  * @brief The Image class stores an image as buffer of float.
@@ -56,17 +75,6 @@ namespace pic {
 class Image
 {
 protected:
-
-    /**
-     * @brief Destroy makes allocated buffers free.
-     */
-    void Destroy();
-
-    /**
-     * @brief allocateAux computes extra information after allocation;
-     * e.g. strides.
-     */
-    void allocateAux();
 
     /**
      * @brief setNULL sets buffers values to NULL.
@@ -185,6 +193,17 @@ public:
     void allocate(int width, int height, int channels, int frames);
 
     /**
+     * @brief allocateAux computes extra information after allocation;
+     * e.g. strides.
+     */
+    void allocateAux();
+
+    /**
+     * @brief release frees allocated buffers.
+     */
+    void release();
+
+    /**
      * @brief copySubImage copies imgIn in the current image.
      * The current image is written from (startX, startY).
      * @param imgIn the image to be copied.
@@ -252,6 +271,15 @@ public:
     }
 
     /**
+     * @brief getDiagonalSize
+     * @return
+     */
+    float getDiagonalSize()
+    {
+        return sqrtf(widthf * widthf + heightf * heightf);
+    }
+
+    /**
      * @brief setZero sets data to 0.0f.
      */
     void setZero();
@@ -277,7 +305,7 @@ public:
      * @return This function returns true if the two images are similar,
      * otherwise false.
      */
-    bool isSimilarType(const Image *img);
+    bool isSimilarType(const Image *img);    
 
     /**
      * @brief assign
@@ -313,6 +341,18 @@ public:
      * an input function to all values in data.
      */
     void applyFunction(float(*func)(float));
+
+    /**
+     * @brief applyFunctionParam
+     * @param param
+     */
+    void applyFunctionParam(float(*func)(float, std::vector<float>&), std::vector<float> &param);
+
+    /**
+     * @brief getFullBox computes a full BBox for this image.
+     * @return This function returns a full BBox for this image.
+     */
+    BBox getFullBox();
 
     /**
      * @brief getMaxVal computes the maximum value for the current Image.
@@ -417,11 +457,12 @@ public:
     float getMedVal();
 
     /**
-     * @brief getGT finds the first value greater than val.
-     * @param val is the reference value.
-     * @return This function returns the first value greater than val.
+     * @brief getDynamicRange computes the dynamic range of the image.
+     * @param bRobust is a value that enables robust computation of the dynamic range using percentile.
+     * @param percentile is the percentile value used when computing the dynamic range in a robust way.
+     * @return
      */
-    float getGT(float val);
+    float getDynamicRange(bool bRobust, float percentile);
 
     /**
      * @brief sort sorts values in data and stores them into dataTMP.
@@ -637,7 +678,7 @@ public:
      * @brief allocateSimilarTo allocate an Image with similar size
      * of the passed by.
      */
-    void *allocateSimilarTo(Image *img);
+    void allocateSimilarTo(Image *img);
 
     /**
      * @brief Clone creates a deep copy of the calling instance.
@@ -866,6 +907,12 @@ PIC_INLINE Image::Image(Image *imgIn, bool deepCopy = true)
         height = imgIn->height;
         channels = imgIn->channels;
         frames = imgIn->frames;
+
+        widthf = imgIn->widthf;
+        heightf = imgIn->heightf;
+        channelsf = imgIn->channelsf;
+        framesf = imgIn->framesf;
+
         data = imgIn->data;
 
         notOwned = true;
@@ -923,12 +970,12 @@ PIC_INLINE Image::Image(float *color, int channels)
 
 PIC_INLINE Image::~Image()
 {
-    Destroy();
+    release();
 }
 
-PIC_INLINE void Image::Destroy()
+PIC_INLINE void Image::release()
 {
-    //Destroy the allocated resources
+    //release all allocated resources
     if(data != NULL && (!notOwned)) {
         delete[] data;
     }
@@ -984,8 +1031,7 @@ PIC_INLINE void Image::allocate(int width, int height, int channels, int frames)
 
 PIC_INLINE void Image::allocateAux()
 {
-    this->fullBox.SetBox(0, width, 0, height, 0, frames, width,
-                         height, frames);
+    this->fullBox = getFullBox();
 
     this->depth    = frames;
     this->widthf   = float(width);
@@ -999,6 +1045,15 @@ PIC_INLINE void Image::allocateAux()
     calculateStrides();
 }
 
+PIC_INLINE BBox Image::getFullBox()
+{
+    BBox fullBox;
+    fullBox.setBox(0, width, 0, height, 0, frames, width,
+                             height, frames);
+
+    return fullBox;
+}
+
 PIC_INLINE void Image::assign(const Image *imgIn)
 {
     if(imgIn == NULL) {
@@ -1006,7 +1061,7 @@ PIC_INLINE void Image::assign(const Image *imgIn)
     }
 
     if(!isSimilarType(imgIn)) {
-        Destroy();
+        release();
         allocate(imgIn->width, imgIn->height, imgIn->channels, imgIn->frames);
     }
 
@@ -1078,14 +1133,16 @@ PIC_INLINE void Image::copySubImage(Image *imgIn, int startX, int startY)
         return;
     }
 
-    if(imgIn->channels != channels) {
+    if(!this->isValid() ||
+            !imgIn->isValid() ||
+            (imgIn->channels != channels)) {
         return;
     }
 
-    //Checking bounds
+    //check bounds
     int sX, sY, eX, eY, dX, dY, shiftX, shiftY;
 
-    //Start
+    //start
     sX = MIN(startX, width);
     sX = MAX(sX, 0);
 
@@ -1100,7 +1157,7 @@ PIC_INLINE void Image::copySubImage(Image *imgIn, int startX, int startY)
         shiftX = -sX;
     }
 
-    //End
+    //end
     eX = MIN(startX + imgIn->width, width);
     eX = MAX(eX, 0);
 
@@ -1123,9 +1180,7 @@ PIC_INLINE void Image::copySubImage(Image *imgIn, int startX, int startY)
             float *curr_data = (*this)(i, j);
             float *imgIn_data = (*imgIn)(i + shiftX, j + shiftY);
 
-            for(int k = 0; k < channels; k++) {
-                curr_data[k] = imgIn_data[k];
-            }
+            Arrayf::assign(imgIn_data, channels, curr_data);
         }
     }
 }
@@ -1156,11 +1211,25 @@ PIC_INLINE void Image::applyFunction(float(*func)(float))
         return;
     }
 
-    int size = width * height * channels;
-    #pragma omp parallel for
+    int size = frames * width * height * channels;
 
+    #pragma omp parallel for
     for(int i = 0; i < size; i++) {
         data[i] = (*func)(data[i]);
+    }
+}
+
+PIC_INLINE void Image::applyFunctionParam(float(*func)(float, std::vector<float>&), std::vector<float> &param)
+{
+    if(!isValid()) {
+        return;
+    }
+
+    int size = frames * width * height * channels;
+
+    #pragma omp parallel for
+    for(int i = 0; i < size; i++) {
+        data[i] = (*func)(data[i], param);
     }
 }
 
@@ -1202,25 +1271,62 @@ PIC_INLINE float Image::getMedVal()
     return getPercentileVal(0.5f);
 }
 
-PIC_INLINE float Image::getGT(float val)
+PIC_INLINE float Image::getDynamicRange(bool bRobust = false, float percentile = 0.99f)
 {
     if(!isValid()) {
         return -1.0f;
     }
 
-    if(dataTMP == NULL) {
-        sort();
-    }
-
-    int size = frames * width * height * channels;
-
-    for(int i = 0; i < size; i++) {
-        if(dataTMP[i] > val) {
-            return dataTMP[i];
+    if(bRobust) {
+        if(percentile <= 0.5f) {
+            percentile = 0.99f;
         }
-    }
 
-    return -1.0f;
+        float percentile_low = 1.0f - percentile;
+
+        float min_val = getPercentileVal(percentile_low);
+        float max_val = getPercentileVal(percentile);
+
+        if(min_val > 0.0f) {
+            return max_val / min_val;
+        } else {
+            if(percentile > 0.5f) {
+                return getDynamicRange(true, percentile * 0.99f);
+            } else {
+                return 0.0f;
+            }
+        }
+    } else {
+        float ret = -1.0f;
+
+        float *min_val_v = getMinVal(NULL, NULL);
+        float *max_val_v = getMaxVal(NULL, NULL);
+
+        int ind;
+        float min_val = Arrayf::getMin(min_val_v, channels, ind);
+        float max_val = Arrayf::getMax(max_val_v, channels, ind);
+
+        if(min_val <= 0.0f) {
+            IntCoord coord;
+            IndexedArray::findSimple(data, size(), IndexedArray::bFuncNotNeg, coord);
+            min_val = IndexedArray::min(data, coord);
+
+            if(min_val != max_val) {
+                if(max_val > min_val) {
+                    ret = max_val / min_val;
+                } else {
+                    ret = -2.0f;
+                }
+            } else {
+                ret = 0.0f;
+            }
+        }
+
+        delete_vec_s(min_val_v);
+        delete_vec_s(max_val_v);
+
+        return ret;
+    }
 }
 
 PIC_INLINE void Image::blend(Image *img, Image *weight)
@@ -1260,11 +1366,11 @@ PIC_INLINE void Image::minimum(Image *img)
         return;
     }
 
-    int size = height * width * channels;
+    int n = size();
 
     #pragma omp parallel for
 
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < n; i++) {
         data[i] = data[i] > img->data[i] ? img->data[i] : data[i];
     }
 }
@@ -1275,10 +1381,10 @@ PIC_INLINE void Image::maximum(Image *img)
         return;
     }
 
-    int size = height * width * channels;
+    int n = size();
 
     #pragma omp parallel for
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < n; i++) {
         data[i] = data[i] < img->data[i] ? img->data[i] : data[i];
     }
 }
@@ -1289,12 +1395,11 @@ PIC_INLINE void Image::setZero()
         return;
     }
 
-    int size = frames * height * width * channels;
-//	memset(data, 0, size * sizeof(float));
+    int n = size();
 
     #pragma omp parallel for
 
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < n; i++) {
         data[i] = 0.0f;
     }
 }
@@ -1306,9 +1411,9 @@ PIC_INLINE void Image::setRand(unsigned int seed = 1)
     }
 
     std::mt19937 m(seed);
-    int size = frames * height * width * channels;
+    int n = size();
 
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < n; i++) {
         data[i] = float(m()) / 4294967295.0f;
     }
 }
@@ -1386,25 +1491,21 @@ PIC_INLINE float *Image::getSumVal(BBox *box = NULL, float *ret = NULL)
     }
 
     if(box == NULL) {
-        box = new BBox(width, height, frames);
+        box = &fullBox;
     }
 
     if(ret == NULL) {
         ret = new float[channels];
     }
 
-    for(int l = 0; l < channels; l++) {
-        ret[l] = 0.0f;
-    }
+    Arrayf::assign(0.0f, ret, channels);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
             for(int i = box->x0; i < box->x1; i++) {
                 float *tmp_data = (*this)(i, j, k);
 
-                for(int l = 0; l < channels; l++) {
-                    ret[l] += tmp_data[l];
-                }
+                Arrayf::add(tmp_data, channels, ret);
             }
         }
     }
@@ -1426,9 +1527,7 @@ PIC_INLINE float *Image::getMeanVal(BBox *box = NULL, float *ret = NULL)
 
     float totf = float(box->Size());
 
-    for(int l = 0; l < channels; l++) {
-        ret[l] /= totf;
-    }
+    Arrayf::div(ret, channels, totf);
 
     return ret;
 }
@@ -1439,15 +1538,13 @@ PIC_INLINE float *Image::getMomentsVal(int x0, int y0, int radius, float *ret = 
         return ret;
     }
 
-    int channels_2 = channels * 2;
+    int channels_2 = channels << 1;
 
     if(ret == NULL) {
         ret = new float[channels_2];
     }
 
-    for(int l = 0; l < channels_2; l++) {
-        ret[l] = 0.0f;
-    }
+    Arrayf::assign(0.0f, ret, channels_2);
 
     for(int j = -radius; j <= radius; j++) {
         int y = y0 + j;
@@ -1478,17 +1575,18 @@ PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL, BBox *box = NULL,
         box = &fullBox;
     }
 
+    bool bDeleteMeanVal = false;
+
     if(meanVal == NULL) {
-        meanVal = getMeanVal(box);
+        meanVal = getMeanVal(box, NULL);
+        bDeleteMeanVal = true;
     }
 
     if(ret == NULL) {
         ret = new float[channels];
     }
 
-    for(int l = 0; l < channels; l++) {
-        ret[l] = 0.0f;
-    }
+    Arrayf::assign(0.0f, ret, channels);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
@@ -1505,8 +1603,10 @@ PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL, BBox *box = NULL,
 
     float totf = float(box->Size() - 1);
 
-    for(int l = 0; l < channels; l++) {
-        ret[l] /= totf;
+    Arrayf::div(ret, channels, totf);
+
+    if(bDeleteMeanVal) {
+        delete[] meanVal;
     }
 
     return ret;
@@ -1523,8 +1623,11 @@ PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
         box = &fullBox;
     }
 
+    bool bMeanValAllocated = false;
+
     if(meanVal == NULL) {
-        meanVal = getMeanVal(box);
+        meanVal = getMeanVal(box, NULL);
+        bMeanValAllocated = true;
     }
 
     int n = channels * channels;
@@ -1533,9 +1636,7 @@ PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
         ret = new float[n];
     }
 
-    for(int l = 0; l < n; l++) {
-        ret[l] = 0.0f;
-    }
+    Arrayf::assign(0.0f, ret, n);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
@@ -1557,8 +1658,10 @@ PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
 
     float totf = float(box->Size() - 1);
 
-    for(int l = 0; l < n; l++) {
-        ret[l] /= totf;
+    Arrayf::div(ret, n, totf);
+
+    if(bMeanValAllocated) {
+        delete[] meanVal;
     }
 
     return ret;
@@ -1578,9 +1681,7 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
         ret = new float[channels];
     }
 
-    for(int l = 0; l < channels; l++) {
-        ret[l] = 0.0f;
-    }
+    Arrayf::assign(0.0f, ret, channels);
 
     for(int k = box->z0; k < box->z1; k++) {
         for(int j = box->y0; j < box->y1; j++) {
@@ -1594,10 +1695,10 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
         }
     }
 
-    float tot = float(box->Size());
+    float totf = float(box->Size());
 
     for(int l = 0; l < channels; l++) {
-        ret[l] = expf(ret[l] / tot);
+        ret[l] = expf(ret[l] / totf);
     }
 
     return ret;
@@ -1635,9 +1736,7 @@ PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.2
         bColorAllocated = true;
         color = new float[channels];
 
-        for(int i = 0; i < channels; i++) {
-            color[i] = 0.0f;
-        }
+        Arrayf::assign(0.0f, color, channels);
     }
 
     int n = width * height;
@@ -1762,32 +1861,39 @@ PIC_INLINE bool Image::Read(std::string nameFile,
         }
 
         switch(label) {
-        case IO_BMP:
+        case IO_BMP: {
             tmp = ReadBMP(nameFile, dataReader, width, height, channels);
-            break;
+        } break;
 
-        case IO_PPM:
+        case IO_PPM: {
             tmp = ReadPPM(nameFile, dataReader, width, height, channels);
-            break;
+        } break;
 
-        case IO_PGM:
+        case IO_PGM: {
             tmp = ReadPGM(nameFile, dataUC, width, height, channels);
-            break;
+        } break;
 
-        case IO_TGA:
+        case IO_TGA: {
             tmp = ReadTGA(nameFile, dataReader, width, height, channels);
-            break;
+        } break;
 
-        case IO_JPG:
+        case IO_JPG: {
             bExt = true;
-            break;
 
-        case IO_PNG:
+            EXIFInfo info;
+            readEXIF(nameFile, info);
+            exposure = estimateAverageLuminance(info.exposureTime, info.aperture, info.iso);
+
+        } break;
+
+        case IO_PNG: {
             bExt = true;
-            break;
+        } break;
 
-        default:
+        default: {
             tmp = NULL;
+        } break;
+
         }
 
          if(bExt) {
@@ -1946,10 +2052,12 @@ PIC_INLINE Image *Image::allocateSimilarOne()
 {
     Image *ret = new Image(frames, width, height, channels);
     ret->flippedEXR = flippedEXR;
+    ret->exposure = exposure;
+    ret->alpha = alpha;
     return ret;
 }
 
-PIC_INLINE void *Image::allocateSimilarTo(Image *img)
+PIC_INLINE void Image::allocateSimilarTo(Image *img)
 {
     if(img != NULL) {
         if(img->isValid()) {
@@ -1962,6 +2070,7 @@ PIC_INLINE Image *Image::clone() const
 {
     Image *ret = new Image(frames, width, height, channels);
 
+    ret->fullBox = fullBox;
     ret->flippedEXR = flippedEXR;
     ret->exposure = exposure;
     ret->nameFile = nameFile;
@@ -1995,6 +2104,7 @@ PIC_INLINE float* Image::getColorSamples(float *samples,
     for(int i = 0; i < nSamples; i++) {
         int index = i * channels;
         int index_d = index * shift;
+
         for(int j = 0; j < channels; j++) {
             samples[index + j] = data[index_d + j];
         }

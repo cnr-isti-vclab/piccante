@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_RECONSTRUCT_HPP
 #define PIC_FILTERING_FILTER_RECONSTRUCT_HPP
 
+#include "../util/array.hpp"
+
 #include "../filtering/filter.hpp"
 
 namespace pic {
@@ -34,10 +36,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        if(src.size() < 2) {
-            return;
-        }
-
         int channels = src[0]->channels;
 
         for(int j = box->y0; j < box->y1; j++) {
@@ -50,52 +48,47 @@ protected:
                 float *tmp_dst = (*dst)(i, j);
                 float *tmp_src = (*src[0])(x, y);
 
-                for(int k = 0; k < channels; k++) {
-                    tmp_dst[k] = tmp_src[k];
-                }
+                Arrayf::assign(tmp_src, channels, tmp_dst);
             }
         }
     }
-
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgIn.size() < 2) {
-            return imgOut;
-        }
-
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[1]->width, imgIn[1]->height, imgIn[0]->channels);
-        }
-
-        return imgOut;
-    }
-
 
 public:
     /**
      * @brief FilterReconstruct
      */
-    FilterReconstruct()
+    FilterReconstruct() : Filter()
     {
+        minInputImages = 2;
     }
 
     /**
-     * @brief Execute
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    virtual void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width       = imgIn[1]->width;
+        height      = imgIn[1]->height;
+        channels    = imgIn[1]->channels;
+        frames      = imgIn[1]->frames;
+    }
+
+    /**
+     * @brief execute
      * @param imgIn
      * @param ann
      * @param imgOut
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *ann, Image *imgOut = NULL)
+    static Image *execute(Image *imgIn, Image *ann, Image *imgOut = NULL)
     {
         FilterReconstruct fltRec;
-        return fltRec.ProcessP(Double(imgIn, ann), imgOut);
+        return fltRec.Process(Double(imgIn, ann), imgOut);
     }
 };
 

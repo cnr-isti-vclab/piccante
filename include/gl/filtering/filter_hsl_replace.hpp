@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_HSL_REPLACE_HPP
 #define PIC_GL_FILTERING_FILTER_HSL_REPLACE_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/colors/color_conv_rgb_to_hsl.hpp"
 #include "../../gl/filtering/filter.hpp"
 
@@ -29,13 +31,12 @@ namespace pic {
 class FilterGLHSLReplace: public FilterGL
 {
 protected:
-    float delta_hue;
-    float delta_saturation;
+    float delta_hue, delta_saturation;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
     /**
@@ -55,16 +56,15 @@ public:
     }
 };
 
-//Basic constructor
-FilterGLHSLReplace::FilterGLHSLReplace(float delta_hue,
+PIC_INLINE FilterGLHSLReplace::FilterGLHSLReplace(float delta_hue,
                                        float delta_saturation): FilterGL()
 {
     this->delta_hue = delta_hue;
     this->delta_saturation = delta_saturation;
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLHSLReplace::InitShaders()
+PIC_INLINE void FilterGLHSLReplace::initShaders()
 {
     fragment_source = MAKE_STRING
                       (

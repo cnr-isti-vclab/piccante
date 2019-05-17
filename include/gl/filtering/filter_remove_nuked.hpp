@@ -31,9 +31,9 @@ protected:
     float threshold;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -48,21 +48,21 @@ public:
     FilterGLRemoveNuked(float threshold);
 
     /**
-     * @brief Update
+     * @brief update
      * @param threshold
      */
-    void Update(float threshold);
+    void update(float threshold);
 };
 
-FilterGLRemoveNuked::FilterGLRemoveNuked(float threshold): FilterGL()
+PIC_INLINE FilterGLRemoveNuked::FilterGLRemoveNuked(float threshold): FilterGL()
 {
     this->threshold = threshold;
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLRemoveNuked::FragmentShader()
+PIC_INLINE void FilterGLRemoveNuked::FragmentShader()
 {
     fragment_source = MAKE_STRING
                       (
@@ -109,14 +109,14 @@ void FilterGLRemoveNuked::FragmentShader()
                       );
 }
 
-void FilterGLRemoveNuked::InitShaders()
+PIC_INLINE void FilterGLRemoveNuked::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLRemoveNuked");
 
-    Update(-1.0f);
+    update(-1.0f);
 }
 
-void FilterGLRemoveNuked::Update(float threshold)
+PIC_INLINE void FilterGLRemoveNuked::update(float threshold)
 {
     if(threshold > 0.0f) {
         this->threshold = threshold;

@@ -69,7 +69,7 @@ PIC_INLINE std::vector<int> extractCheckerBoardJNI(std::string imageInPath, std:
             printf("Down scale factor: %f\n", scale);
 #endif
 
-            work = FilterDownSampler2D::Execute(&in, NULL, scale);
+            work = FilterDownSampler2D::execute(&in, NULL, scale);
 
             bScale = true;
         } else {
@@ -105,11 +105,14 @@ PIC_INLINE std::vector<int> extractCheckerBoardJNI(std::string imageInPath, std:
         Image* img_wb;
         if(bScale) {
             int patchSize = 5;
-            BBox patch(pw[0] - patchSize, pw[0] + patchSize, pw[1] - patchSize, pw[1] + patchSize);
+            BBox patch(int(pw[0]) - patchSize, 
+                       int(pw[0]) + patchSize,
+                       int(pw[1]) - patchSize,
+                       int(pw[1]) + patchSize);
             float *white_color = work->getMeanVal(&patch, NULL);
             img_wb = applyWhiteBalance(&in, white_color);
         } else {
-            img_wb = applyWhiteBalance(&in, pw[0], pw[1], true);
+            img_wb = applyWhiteBalance(&in, int(pw[0]), int(pw[1]), true);
         }
 
         if(img_wb != NULL) {

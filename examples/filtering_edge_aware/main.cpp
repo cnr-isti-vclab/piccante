@@ -26,8 +26,6 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 
-#include "../common_code/image_qimage_interop.hpp"
-
 #include "piccante.hpp"
 
 int main(int argc, char *argv[])
@@ -42,29 +40,59 @@ int main(int argc, char *argv[])
 
     printf("Reading an image...");
     pic::Image img;
-    img.Read(img_str);
+    img.Read(img_str, pic::LT_NOR_GAMMA);
     printf("Ok\n");
 
     printf("Is it valid? ");
     if(img.isValid()) {
         printf("Ok\n");
 
+        printf("Estimated noise:\n");
+        float *noise = pic::FilterNoiseEstimation::getNoiseEstimation(&img, NULL);
+        for(int i = 0; i < img.channels; i++) {
+            printf("Channel i-th: %f\n", noise[i]);
+        }
+
         pic::ImageVec input = pic::Single(&img);
         pic::Image *output = NULL;
 
         bool bWritten;
 
-        //the median filter
-        printf("Filtering the image with the Median filter (radius of 3);\n");
+        std::string name = pic::removeExtension(img_str);
+        name = pic::removeLocalPath(name);
 
-        pic::FilterMed fltM(7);
-        output = fltM.ProcessP(input, output);
+        //the bilateral filter
+        printf("Filtering the image with a Fast Bilateral filter;\n");
+        printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
+
+        pic::FilterBilateral2DS flt(8.0f, 0.05f);
+        output = flt.Process(input, output);
+
+        //output = pic::FilterBilateral2DAS::execute(&img, output, 8.0f, 0.05f);
 
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
 
-        bWritten = output->Write("../data/output/filtered_median.png");
+        bWritten = output->Write("../data/output/" + name + "_filtered_bilateral.png", pic::LT_NOR_GAMMA);
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+
+        //the median filter
+        printf("Filtering the image with the Median filter (radius of 3);\n");
+
+        pic::FilterMed fltM(7);
+        output = fltM.Process(input, output);
+
+        printf("Ok!\n");
+
+        printf("Writing the file to disk...");
+
+        bWritten = output->Write("../data/output/" + name + "_filtered_median.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -76,13 +104,13 @@ int main(int argc, char *argv[])
         printf("Filtering the image with the Vector Median filter (radius of 3);\n");
 
         pic::FilterMedVec fltMV(7);
-        output = fltMV.ProcessP(input, output);
+        output = fltMV.Process(input, output);
 
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
 
-        bWritten = output->Write("../data/output/filtered_median_vec.png");
+        bWritten = output->Write("../data/output/" + name + "filtered_median_vec.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -90,33 +118,33 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
-        //the bilateral filter
-        printf("Filtering the image with a Fast Bilateral filter;\n");
-        printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
+        //the non-local means filter
+        printf("Filtering the image with Non-Local Means filter;\n");
 
-        pic::FilterBilateral2DS flt(8.0f, 0.05f);
-        output = flt.ProcessP(input, output);
+        pic::FilterNonLocalMeansF fltNLM(31, 5, 0.05f);
+        output = fltNLM.Process(input, output);
 
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
 
-        bWritten = output->Write("../data/output/filtered_bilateral.png");
+        bWritten = output->Write("../data/output/" + name + "_filtered_non_local_means.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
         } else {
             printf("Writing had some issues!\n");
         }
+
 
         //the Anisotropic Diffusion
         printf("Filtering the image with the Anisotropic Diffusion;\n");
         printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
-        output = pic::FilterAnsiotropicDiffusion::AnisotropicDiffusion(input, output, 8.0f, 0.05f);
+        output = pic::FilterAnsiotropicDiffusion::execute(input, output, 8.0f, 0.05f);
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_anisotropic_diffusion.png");
+        bWritten = output->Write("../data/output/" + name + "_filtered_anisotropic_diffusion.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -127,10 +155,10 @@ int main(int argc, char *argv[])
         //the Guided Filter
         printf("Filtering the image with the Guided filter...");
         pic::FilterGuided fltG;
-        output = fltG.ProcessP(input, output);//filtering the image
+        output = fltG.Process(input, output);//filtering the image
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_guided.png");
+        bWritten = output->Write("../data/output/" + name + "_filtered_guided.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -141,11 +169,11 @@ int main(int argc, char *argv[])
         //WLS
         printf("Filtering the image with the WLS filter...");
         pic::FilterWLS fltWLS;//creating the filter
-        output = fltWLS.ProcessP(input, output);
+        output = fltWLS.Process(input, output);
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_wls.png");
+        bWritten = output->Write("../data/output/" + name + "_filtered_wls.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
@@ -156,10 +184,10 @@ int main(int argc, char *argv[])
         //Kuwahara
         printf("Filtering the image with the Kuwahara filter...");
         pic::FilterKuwahara fltK(11);
-        output = fltK.ProcessP(input, output);
+        output = fltK.Process(input, output);
 
         printf("Writing the file to disk...");
-        bWritten = output->Write("../data/output/filtered_kuwahara.png");
+        bWritten = output->Write("../data/output/" + name + "filtered_kuwahara.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");

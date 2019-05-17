@@ -1,4 +1,4 @@
-/*
+ /*
 
 PICCANTE Examples
 The hottest examples of Piccante:
@@ -49,26 +49,16 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         printf("OK\n");
 
-        printf("Extracting exposures from the HDR image...");
-        pic::ImageVec stack = pic::getAllExposuresImages(&img);
-
-        for(unsigned int i = 0; i < stack.size(); i++) {
-            std::string img_str_out = "../data/output/exposure_" + pic::fromNumberToString(i) + ".png";
-            stack[i]->clamp(0.0f, 1.0f);
-
-            //write the extraced exposure image
-            stack[i]->Write(img_str_out, pic::LT_NOR);
-        }
-
-        printf("Ok\n");
-
         printf("Tone mapping using Exposure Fusion...");
 
-        pic::Image *imgToneMapped = pic::ExposureFusion(stack, 0.2f, 1.0f, 0.2f, NULL);
+        pic::Image *img_ef = pic::ExposureFusion::execute(&img, NULL);
         printf("Ok\n");
 
         printf("Writing the tone mapped image to disk...\n");
-        bool bWritten = imgToneMapped->Write("../data/output/exposure_fusion_tmo.png", pic::LT_NOR);
+
+        std::string name = pic::removeLocalPath(img_str);
+
+        bool bWritten = img_ef->Write("../data/output/"+ pic::removeExtension(name)  + "_ef.png", pic::LT_NOR);
 
         if(bWritten) {
             printf("Ok\n");
@@ -76,6 +66,17 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
+        printf("Tone mapping using Raman Fusion Operator...");
+
+        pic::Image *img_rf = pic::RamanTMO::execute(&img, NULL);
+
+        bWritten = img_rf->Write("../data/output/"+ pic::removeExtension(name)  + "_rf.png", pic::LT_NOR);
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
     } else {
         printf("No it is not a valid file!\n");
     }

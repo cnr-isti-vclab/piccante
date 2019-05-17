@@ -36,26 +36,27 @@ namespace pic {
 class HybridTMOGL
 {
 protected:
-    SegmentationGL      seg;
-    FilterGLRemapping   remap;
+    SegmentationGL seg;
+    FilterGLRemapping remap;
     ReduxGL*check;
-    ImageGL             *seg_map;
-    ImageGL             *imgDrago, *imgReinhard, *remapped;
-    PyramidGL           *pyrA, *pyrB, *pyrWeight;
-    float               Ld_Max, b;
-    bool                bFirst;
+    ImageGL *seg_map;
+    ImageGL *imgDrago, *imgReinhard, *remapped;
+    PyramidGL *pyrA, *pyrB, *pyrWeight;
+    float Ld_Max, b;
+    bool bFirst, bAllocate;
 
-    DragoTMOGL          *flt_drago;
-    ReinhardTMOGL       *flt_reinhard;
+    DragoTMOGL *flt_drago;
+    ReinhardTMOGL *flt_reinhard;
 
     /**
-     * @brief AllocateFilters
+     * @brief allocateFilters
      */
-    void AllocateFilters()
+    void allocateFilters()
     {
-        flt_drago    = new DragoTMOGL();
+        bAllocate = true;
+        flt_drago = new DragoTMOGL();
         flt_reinhard = new ReinhardTMOGL();
-        check = ReduxGL::CreateCheck();
+        check = ReduxGL::createCheck();
     }
 
 public:
@@ -65,6 +66,7 @@ public:
      */
     HybridTMOGL()
     {
+        bAllocate = false;
         bFirst = true;
 
         flt_reinhard = NULL;
@@ -109,18 +111,18 @@ public:
                                     IMG_GPU, GL_TEXTURE_2D);
         }
 
-        if(flt_drago == NULL) {
-            AllocateFilters();
+        if(bAllocate) {
+            allocateFilters();
         }
 
-        //Compute segmentation map
+        //compute segmentation map
 #ifdef PIC_DEBUG
         float ms, tot_ms;
         GLuint testTQ1 = glBeginTimeQuery();
 #endif
 
-        //Compute segmentation map
-        seg_map = seg.Compute(imgIn, seg_map);
+        //compute segmentation map
+        seg_map = seg.execute(imgIn, seg_map);
 
 
 #ifdef PIC_DEBUG
@@ -156,25 +158,26 @@ public:
 
         switch(value) {
         case 0: {
-            imgOut = flt_drago->Process(imgIn, imgOut, Ld_Max, b);
+            imgOut = flt_drago->execute(imgIn, imgOut);
         }
         break;
 
         case 1: {
-            imgOut = flt_reinhard->ProcessLocal(imgIn, imgOut, 0.18f, 8.0f, NULL);
+            flt_reinhard->update(-1.0f, -1.0f, true);
+            imgOut = flt_reinhard->execute(imgIn, imgOut);
         }
         break;
 
         case 10: {
             //Drago TMO
-            imgDrago = flt_drago->Process(imgIn, imgDrago, Ld_Max, b);
+            imgDrago = flt_drago->execute(imgIn, imgDrago);
             imgDrago->loadToMemory();
             imgDrago->Write("tmp.pfm");
 
             //Reinhard TMO
-            imgReinhard = flt_reinhard->ProcessLocal(imgIn, imgReinhard, 0.18f, 8.0f, NULL);
+            imgReinhard = flt_reinhard->execute(imgIn, imgReinhard);
 
-            //Genarating/updating pryamids
+            //generate/update pryamids
             if(pyrA == NULL) {
                 pyrA = new PyramidGL(imgDrago, true);
             } else {

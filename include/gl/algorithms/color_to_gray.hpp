@@ -88,20 +88,20 @@ public:
         if(img_vec.empty()) {
             for(int i = 0; i < channels; i++) {
                 img_vec.push_back(flt->Process(input, NULL));
-                flt->Update(i + 1);
+                flt->update(i + 1);
             }
         } else {
             for(int i = 0; i < channels; i++) {
                 flt->Process(input, img_vec[i]);
-                flt->Update(i + 1);
+                flt->update(i + 1);
             }
         }
 
         if(ef == NULL) {
-            ef = new ExposureFusionGL();
+            ef = new ExposureFusionGL(1.0f, 1.0f, 0.0f);
         }
 
-        imgOut = ef->Process(img_vec, imgOut, 1.0f, 1.0f, 0.0f);
+        imgOut = ef->ProcessStack(img_vec, imgOut);
 
         return imgOut;
     }

@@ -42,14 +42,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
-
 public:
     /**
      * @brief FilterGradient
@@ -64,11 +56,11 @@ public:
     FilterGradient(int colorChannel, GRADIENT_TYPE type);
 
     /**
-     * @brief Setup
+     * @brief update
      * @param colorChannel
      * @param type
      */
-    void Setup(int colorChannel, GRADIENT_TYPE type);
+    void update(int colorChannel, GRADIENT_TYPE type);
 
     /**
      * @brief OutputSize
@@ -78,56 +70,42 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn->width;
-        height      = imgIn->height;
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
         channels    = 3;
-        frames      = imgIn->frames;
-    }
+        frames      = imgIn[0]->frames;
+    }   
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param type
      * @param colorChannel
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut = NULL,
+    static Image *execute(Image *imgIn, Image *imgOut = NULL,
                              GRADIENT_TYPE type = G_SOBEL, int colorChannel = 0)
     {
         FilterGradient filter(colorChannel, type);
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param fileInput
-     * @param fileOutput
-     * @return
-     */
-    static Image *Execute(std::string fileInput, std::string fileOutput)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterGradient::Execute(&imgIn, NULL);
-        out->Write(fileOutput);
-        return out;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 
-PIC_INLINE FilterGradient::FilterGradient()
+PIC_INLINE FilterGradient::FilterGradient() : Filter()
 {
-    Setup(0, G_NORMAL);
+    update(0, G_NORMAL);
 }
 
 PIC_INLINE FilterGradient::FilterGradient(int colorChannel,
-        GRADIENT_TYPE type = G_NORMAL)
+        GRADIENT_TYPE type = G_NORMAL) : Filter()
 {
-    Setup(colorChannel, type);
+    update(colorChannel, type);
 }
 
-PIC_INLINE void FilterGradient::Setup(int colorChannel,
+PIC_INLINE void FilterGradient::update(int colorChannel,
                                            GRADIENT_TYPE type = G_NORMAL)
 {
     this->colorChannel = colorChannel;
@@ -156,16 +134,6 @@ PIC_INLINE void FilterGradient::Setup(int colorChannel,
     break;
 
     }
-}
-
-PIC_INLINE Image *FilterGradient::SetupAux(ImageVec imgIn,
-        Image *imgOut)
-{
-    if(imgOut == NULL) {
-        imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
-    }
-
-    return imgOut;
 }
 
 PIC_INLINE void FilterGradient::ProcessBBox(Image *dst, ImageVec src,

@@ -98,8 +98,8 @@ PIC_INLINE ImageVec *computeImageRectificationWarp(Image *img0,
         }
     }
 
-    warp0.SetBoundingBox(bmin0, bmax0);
-    warp1.SetBoundingBox(bmin1, bmax1);
+    warp0.setBoundingBox(bmin0, bmax0);
+    warp1.setBoundingBox(bmin1, bmax1);
 
     Image *img0_r = NULL;
     Image *img1_r = NULL;
@@ -110,8 +110,8 @@ PIC_INLINE ImageVec *computeImageRectificationWarp(Image *img0,
         img1_r = out->at(1);
     }
 
-    img0_r = warp0.ProcessP(Single(img0), img0_r);
-    img1_r = warp1.ProcessP(Single(img1), img1_r);
+    img0_r = warp0.Process(Single(img0), img0_r);
+    img1_r = warp1.Process(Single(img1), img1_r);
 
     if(!bTest) {
         out->push_back(img0_r);

@@ -1,18 +1,26 @@
 /*
 
-PICCANTE
-The hottest HDR imaging library!
-http://piccantelib.net
+PICCANTE Examples
+The hottest examples of Piccante:
+http://vcg.isti.cnr.it/piccante
 
 Copyright (C) 2014
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
+This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3.0 of the License, or
+    (at your option) any later version.
 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    See the GNU Lesser General Public License
+    ( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
 */
 
 /**
@@ -21,22 +29,21 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * a suggestion for running examples.
 */
 
-#ifdef _MSC_VER
-    #define PIC_DISABLE_OPENGL_NON_CORE
-    #include "../opengl_common_code/gl_core_4_0.h"
-#endif
+#include "../common_code/gl_include.hpp"
 
 #include <QKeyEvent>
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
 #include <QApplication>
-#include <QOpenGLFunctions>
 #include <QVBoxLayout>
 #include <QLabel>
 
 #include "piccante.hpp"
 
-class GLWidget : public QGLWidget, protected QOpenGLFunctions
+class GLWidget : public QGLWidget
+        #ifndef _MSC_VER
+        , protected QOpenGLFunctions
+        #endif
 {
 protected:
     pic::QuadGL *quad;
@@ -55,15 +62,20 @@ protected:
      */
     void initializeGL(){
 
+    #ifndef _MSC_VER
         initializeOpenGLFunctions();
+    #endif
 
-        #ifdef PIC_WIN32
-            if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
-                printf("OpenGL functions are not loaded!\n");
-            }
-        #endif
+    #ifdef _MSC_VER
+        if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+            printf("OpenGL functions are not loaded!\n");
+        }
+    #endif
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
+
+        img_tmo_with_sRGB = NULL;
+        img_tmo = NULL;
 
         //read an input image
         img.Read("../data/input/bottles.hdr");
@@ -77,7 +89,8 @@ protected:
         quad = new pic::QuadGL(true);
 
         //allocate a new filter for simple tone mapping
-        tmo = new pic::FilterGLColorConv(new pic::ColorConvGLRGBtosRGB());
+        auto conv_sRGB = new pic::ColorConvGLRGBtosRGB(true);
+        tmo = new pic::FilterGLColorConv((pic::ColorConvGL*)conv_sRGB, true);
 
         //allocate Drago et al.'s TMO
         drago_tmo = new pic::DragoTMOGL();
@@ -112,25 +125,27 @@ protected:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         switch(method) {
-        case 0:
+        case 0: {
             //apply Reinhard et al.'s TMO (local version)
-            img_tmo = reinhard_tmo->ProcessLocal(&img, img_tmo, 0.18f, 8.0f, NULL);
-            break;
+            reinhard_tmo->update(-1.0f, -1.0f, false);
+            img_tmo = reinhard_tmo->execute(&img, img_tmo);
+        } break;
 
-        case 1:
+        case 1: {
             //apply Reinhard et al.'s TMO (global version)
-            img_tmo = reinhard_tmo->ProcessGlobal(&img, img_tmo, 0.18f);
-            break;
+            reinhard_tmo->update(-1.0f, -1.0f, true);
+            img_tmo = reinhard_tmo->execute(&img, img_tmo);
+        } break;
 
-        case 2:
+        case 2: {
             //apply Drago et al.'s TMO
-            img_tmo = drago_tmo->Process(&img, img_tmo, 100.0f, 0.95f);
-            break;
+            img_tmo = drago_tmo->execute(&img, img_tmo);
+        } break;
 
-        case 3:
+        case 3: {
             //apply Durand et al.'s TMO
-            img_tmo = durand_tmo->Process(&img, img_tmo, 5.0f);
-            break;
+            img_tmo = durand_tmo->execute(&img, img_tmo);
+        } break;
         }
 
         //convert the image color space from linear RGB to sRGB

@@ -29,6 +29,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "io/tmp.hpp"
 #include "io/vol.hpp"
 #include "io/stb.hpp"
+#include "io/exif.hpp"
 
 #endif /* PIC_IO_HPP */
 

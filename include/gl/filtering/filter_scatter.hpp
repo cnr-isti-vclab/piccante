@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_SCATTER_HPP
 #define PIC_GL_FILTERING_FILTER_SCATTER_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -31,21 +33,21 @@ class FilterGLScatter: public FilterGL
 {
 protected:
 
-    GLfloat		*vertex_array;
-    int			nVertex_array;
-    GLuint		vbo, vao;
+    GLfloat *vertex_array;
+    int nVertex_array;
+    GLuint vbo, vao;
 
     /**
-     * @brief GenerateVA
+     * @brief generateVertexArray
      * @param width
      * @param height
      */
-    void GenerateVA(int width, int height);
+    void generateVertexArray(int width, int height);
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -68,11 +70,11 @@ public:
     ~FilterGLScatter();
 
     /**
-     * @brief Update
+     * @brief update
      * @param s_S
      * @param s_R
      */
-    void Update(float s_S, float s_R);
+    void update(float s_S, float s_R);
 
     /**
      * @brief Process
@@ -83,18 +85,18 @@ public:
     ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
 };
 
-FilterGLScatter::FilterGLScatter(float s_S, float s_R, int width, int height)
+PIC_INLINE FilterGLScatter::FilterGLScatter(float s_S, float s_R, int width, int height)
 {
     this->s_S = s_S;
     this->s_R = s_R;
 
-    GenerateVA(width, height);
+    generateVertexArray(width, height);
 
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
-FilterGLScatter::~FilterGLScatter()
+PIC_INLINE FilterGLScatter::~FilterGLScatter()
 {
     if(vertex_array != NULL) {
         delete[] vertex_array;
@@ -112,7 +114,7 @@ FilterGLScatter::~FilterGLScatter()
     }
 }
 
-void FilterGLScatter::GenerateVA(int width, int height)
+PIC_INLINE void FilterGLScatter::generateVertexArray(int width, int height)
 {
     vertex_array = new GLfloat[2 * width * height];
     nVertex_array = width * height;
@@ -148,7 +150,7 @@ void FilterGLScatter::GenerateVA(int width, int height)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void FilterGLScatter::FragmentShader()
+PIC_INLINE void FilterGLScatter::FragmentShader()
 {
     vertex_source = MAKE_STRING(
 
@@ -207,14 +209,14 @@ void FilterGLScatter::FragmentShader()
                       );
 }
 
-void FilterGLScatter::InitShaders()
+PIC_INLINE void FilterGLScatter::initShaders()
 {
     technique.initStandard("410", vertex_source, fragment_source, geometry_source, "FilterGLScatter");
 
-    Update(s_S, s_R);
+    update(s_S, s_R);
 }
 
-void FilterGLScatter::Update(float s_S, float s_R)
+PIC_INLINE void FilterGLScatter::update(float s_S, float s_R)
 {
     this->s_S = s_S;
     this->s_R = s_R;
@@ -232,7 +234,7 @@ void FilterGLScatter::Update(float s_S, float s_R)
     technique.unbind();
 }
 
-ImageGL *FilterGLScatter::Process(ImageGLVec imgIn, ImageGL *imgOut)
+PIC_INLINE ImageGL *FilterGLScatter::Process(ImageGLVec imgIn, ImageGL *imgOut)
 {
     if(imgIn.size() < 1 && imgIn[0] == NULL) {
         return imgOut;

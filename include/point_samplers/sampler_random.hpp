@@ -43,9 +43,9 @@ template <unsigned int N>
 class RandomSampler
 {
 protected:
-    SAMPLER_TYPE		type;
-    std::mt19937		*m;
-    std::set<int>		track;
+    SAMPLER_TYPE type;
+    std::mt19937 *m;
+    std::set<int> track;
 
 public:
     //Samples
@@ -56,13 +56,16 @@ public:
     std::vector<int>	levels;
     std::vector<int>	levelsR;
 
-    Vec<N, int>			window;
-    int					nSamples;
+    Vec<N, int> window;
+    int nSamples;
 
     /**
      * @brief RandomSampler
      */
-    RandomSampler() {}
+    RandomSampler()
+    {
+
+    }
 
     /**
      * @brief RandomSampler
@@ -74,30 +77,30 @@ public:
     RandomSampler(SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels, unsigned int seed);
 
     /**
-     * @brief Update
+     * @brief update
      * @param type
      * @param window
      * @param nSamples
      * @param nLevels
      */
-    void Update(SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels);
+    void update(SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels);
 
     /**
-     * @brief Render2Int
+     * @brief render2Int
      */
-    void Render2Int();
+    void render2Int();
 
     /**
-     * @brief Warp
+     * @brief wrap
      * @param alpha
      */
-    void Warp(float alpha);
+    void wrap(float alpha);
 
     /**
-     * @brief CutRescale
+     * @brief cutRescale
      * @param cutDim
      */
-    void CutRescale(unsigned int cutDim);
+    void cutRescale(unsigned int cutDim);
 
     /**
      * @brief getSamplesPerLevel
@@ -123,17 +126,18 @@ public:
     void Write(std::string name, int level);
 
     /**
-     * @brief GenerateFigureRS
+     * @brief generateFigureRS
      * @param nameOut
      * @param type
      * @param window
      * @param nSamples
      * @param nLevels
      */
-    static void GenerateFigureRS(std::string nameOut, SAMPLER_TYPE type, int window,
+    static void generateFigureRS(std::string nameOut, SAMPLER_TYPE type, int window,
                                  int nSamples, int nLevels)
     {
-        RandomSampler<2> *p2Ds = new RandomSampler<2>(type, window, nSamples, nLevels, 0);
+        Vec<2, int> w = Vec<2, int>(window, window);
+        RandomSampler<2> *p2Ds = new RandomSampler<2>(type, w, nSamples, nLevels, 0);
 
         for(int i = 0; i < p2Ds->levelsR.size(); i++) {
             std::string str = nameOut;
@@ -172,15 +176,15 @@ template <unsigned int N> PIC_INLINE RandomSampler<N>::RandomSampler(
     SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels, unsigned int seed)
 {
     m = new std::mt19937(seed);
-    Update(type, window, nSamples, nLevels);
+    update(type, window, nSamples, nLevels);
 }
 
-template <unsigned int N> PIC_INLINE void RandomSampler<N>::CutRescale(
+template <unsigned int N> PIC_INLINE void RandomSampler<N>::cutRescale(
     unsigned int cutDim)
 {
     if(cutDim >= N) {
 #ifdef PIC_DEBUG
-        printf("CutRescale: not cuts.\n");
+        printf("cutRescale: not cuts.\n");
 #endif
         return;
     }
@@ -233,7 +237,7 @@ template <unsigned int N> PIC_INLINE void RandomSampler<N>::CutRescale(
     levels.insert(levels.begin(), tmpCutLevels.begin(), tmpCutLevels.end());
 }
 
-template <unsigned int N> PIC_INLINE void RandomSampler<N>::Warp(float alpha)
+template <unsigned int N> PIC_INLINE void RandomSampler<N>::wrap(float alpha)
 {
     float x, y, ang, r, r2;
 
@@ -248,7 +252,7 @@ template <unsigned int N> PIC_INLINE void RandomSampler<N>::Warp(float alpha)
     }
 }
 
-template <unsigned int N> PIC_INLINE void RandomSampler<N>::Update(
+template <unsigned int N> PIC_INLINE void RandomSampler<N>::update(
     SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels)
 {
     //Resetting vectors
@@ -271,23 +275,23 @@ template <unsigned int N> PIC_INLINE void RandomSampler<N>::Update(
 
         switch(type) {
         case ST_BRIDSON:
-            BridsonSampler< N >(m, tmpRadius, samples);
+            getBridsonSamples< N >(m, tmpRadius, samples);
             break;
 
         case ST_DARTTHROWING:
-            DartThrowingSampler< N >(m, tmpRadius * tmpRadius, nSamples, samples);
+            getDartThrowingSamples< N >(m, tmpRadius * tmpRadius, nSamples, samples);
             break;
 
         case ST_MONTECARLO:
-            MonteCarloSampler< N >(m, nSamples, samples);
+            getMonteCarloSamples< N >(m, nSamples, samples);
             break;
 
         case ST_MONTECARLO_S:
-            MonteCarloStratifiedSampler< N >(m, nSamples, samples);
+            getMonteCarloStratifiedSamples< N >(m, nSamples, samples);
             break;
 
         case ST_PATTERN:
-            PatternMethodSampler< N >(nSamples, samples);
+            getPatternMethodSamples< N >(nSamples, samples);
             break;
         }
 
@@ -295,11 +299,11 @@ template <unsigned int N> PIC_INLINE void RandomSampler<N>::Update(
     }
 
     //generate integer addresses
-    CutRescale(2);
-    Render2Int();
+    cutRescale(2);
+    render2Int();
 }
 
-template <unsigned int N>  PIC_INLINE void RandomSampler<N>::Render2Int()
+template <unsigned int N>  PIC_INLINE void RandomSampler<N>::render2Int()
 {
     if(samplesR.size() > 0 || samples.size() > 0) {
         samplesR.clear();
@@ -350,7 +354,7 @@ template <unsigned int N>  PIC_INLINE void RandomSampler<N>::Render2Int()
     }
 
 #ifdef PIC_DEBUG
-    printf("Render2Int: Original: %ld \t Rendered: %ld\n", samples.size() / N,
+    printf("render2Int: Original: %ld \t Rendered: %ld\n", samples.size() / N,
            track.size());
 #endif
 }

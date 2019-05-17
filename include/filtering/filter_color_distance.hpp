@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FILTERING_FILTER_COLOR_DISTANCE_HPP
 
 #include "../filtering/filter.hpp"
+#include "../util/array.hpp"
 
 namespace pic {
 
@@ -28,8 +29,20 @@ namespace pic {
 class FilterColorDistance: public Filter
 {
 protected:
-    float	*refColor;
-    float	sigma;
+    float *color, sigma, sigma_sq_2;
+
+    /**
+     * @brief f
+     * @param data
+     */
+    void f(FilterFData *data)
+    {
+        float *in = (*data->src[0])(data->x, data->y);
+
+        float sum = Arrayf::distanceSq(in, color, data->dst->channels);
+
+        data->out[0] = expf(- sum / sigma_sq_2);
+    }
 
     /**
      * @brief ProcessBBox
@@ -37,13 +50,12 @@ protected:
      * @param src
      * @param box
      */
+    /*
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int width = dst->width;
         int channels = src[0]->channels;
         float *data = src[0]->data;
-
-        float sigma2 = sigma * sigma * 2.0f;
 
         for(int j = box->y0; j < box->y1; j++) {
             int c = j * width;
@@ -54,24 +66,16 @@ protected:
 
                 float sum = 0.0f;
 
-                for(int i = 0; i < channels; i++) {
-                    float tmp = data[c2 + i] - refColor[i];
+                for(int k = 0; k < channels; k++) {
+                    float tmp = data[c2 + k] - color[k];
                     sum += tmp * tmp;
                 }
 
-                dst->data[c1] = expf(-sum / sigma2);
+                dst->data[c1] = expf(-sum / sigma_sq_2);
             }
         }
     }
-
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
-        }
-
-        return imgOut;
-    }
+    */
 
 public:
 
@@ -80,42 +84,56 @@ public:
      * @param color
      * @param sigma
      */
-    FilterColorDistance(float *color, float sigma)
+    FilterColorDistance(float *color, float sigma) : Filter()
     {
-        refColor    = color;
-        this->sigma = sigma;
+        update(color, sigma);
     }
 
     /**
-     * @brief Execute
+     * @brief update
+     * @param color
+     * @param sigma
+     */
+    void update(float *color, float sigma)
+    {
+        if(color != NULL) {
+            this->color = color;
+        }
+
+        sigma = sigma > 0.0f ? sigma : 1.0f;
+        this->sigma = sigma;
+        sigma_sq_2 = sigma * sigma * 2.0f;
+    }
+
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width = imgIn[0]->width;
+        height = imgIn[0]->height;
+        channels = 1;
+        frames = imgIn[0]->frames;
+    }
+
+    /**
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param color
      * @param sigma
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float *color,
+    static Image *execute(Image *imgIn, Image *imgOut, float *color,
                              float sigma)
     {
         FilterColorDistance fltColDst(color, sigma);
-        return fltColDst.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param fileInput
-     * @param fileOutput
-     * @param color
-     * @param sigma
-     * @return
-     */
-    static Image *Execute(std::string fileInput, std::string fileOutput,
-                             float *color, float sigma)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterColorDistance::Execute(&imgIn, NULL, color, sigma);
-        out->Write(fileOutput);
-        return out;
+        return fltColDst.Process(Single(imgIn), imgOut);
     }
 };
 

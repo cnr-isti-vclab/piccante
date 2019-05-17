@@ -56,7 +56,7 @@ protected:
                 int maxX = MIN(i + halfMaxDisparity, src[1]->width);
 
                 for(int x = minX; x < maxX; x++) {
-                     pc->improveStereo(i, j, x, prevL, prevU, maxDisparity, xB, dB);
+                     pc->improveStereo(i, j, x, prevL, prevU, float(maxDisparity), xB, dB);
                 }
 
                 float *out = (*dst)(i, j);
@@ -68,12 +68,12 @@ protected:
     }
 
     /**
-     * @brief SetupAux
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
+    Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() == 4) {
             pc = new PatchComp(imgIn[0], imgIn[1], imgIn[2], imgIn[3], patchSize, 0.05f, 0.9f);
@@ -105,11 +105,19 @@ public:
 
     /**
      * @brief FilterDisparity
+     */
+    FilterDisparity()
+    {
+        update(200, 7);
+    }
+
+    /**
+     * @brief FilterDisparity
      * @param type
      */
     FilterDisparity(int maxDisparity, int patchSize) : Filter()
     {
-        init(maxDisparity, patchSize);
+        update(maxDisparity, patchSize);
     }
 
     ~FilterDisparity()
@@ -120,10 +128,10 @@ public:
     }
 
     /**
-     * @brief init
+     * @brief update
      * @param maxDisparity
      */
-    void init(int maxDisparity, int patchSize)
+    void update(int maxDisparity, int patchSize)
     {
         this->maxDisparity = maxDisparity;
         this->halfMaxDisparity = maxDisparity >> 1;

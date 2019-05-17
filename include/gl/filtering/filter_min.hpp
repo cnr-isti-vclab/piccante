@@ -40,12 +40,12 @@ public:
      * @brief FilterGLMin
      * @param kernelSize
      */
-    FilterGLMin(int kernelSize)
+    FilterGLMin(int kernelSize) : FilterGLNPasses()
     {
-        filter = new FilterGLNonLinear1D(kernelSize, "min");
+        filter = new FilterGLNonLinear1D(kernelSize, "min", GL_TEXTURE_2D);
 
-        InsertFilter(filter);
-        InsertFilter(filter);
+        insertFilter(filter);
+        insertFilter(filter);
     }
 
     ~FilterGLMin()
@@ -58,33 +58,16 @@ public:
 
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
-     * @param size
+     * @param kernelSize
      * @return
      */
-    static ImageGL *Execute(ImageGL *imgIn, ImageGL *imgOut, int size)
+    static ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut, int kernelSize)
     {
-        FilterGLMin filter(size);
+        FilterGLMin filter(kernelSize);
         return filter.Process(SingleGL(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param size
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut, int size)
-    {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-        ImageGL *imgOut = Execute(&imgIn, NULL, size);
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
     }
 };
 

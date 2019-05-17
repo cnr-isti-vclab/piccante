@@ -29,9 +29,9 @@ class FilterGLGradient: public FilterGL
 {
 protected:
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
     /**
      * @brief FragmentShader
@@ -44,37 +44,13 @@ public:
      * @brief FilterGLGradient
      */
     FilterGLGradient();
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @return
-     */
-    static ImageGL *Execute(std::string nameIn, std::string nameOut)
-    {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-
-        FilterGLGradient filter;
-
-        GLuint testTQ1 = glBeginTimeQuery();
-        ImageGL *imgOut = filter.Process(SingleGL(&imgIn), NULL);
-        GLuint64EXT timeVal = glEndTimeQuery(testTQ1);
-        printf("Gradient Filter on GPU time: %g ms\n", double(timeVal) / 100000000.0);
-
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-
-        return imgOut;
-    }
 };
 
 FilterGLGradient::FilterGLGradient(): FilterGL()
 {
     //protected values are assigned/computed
     FragmentShader();
-    InitShaders();
+    initShaders();
 }
 
 void FilterGLGradient::FragmentShader()
@@ -98,7 +74,7 @@ void FilterGLGradient::FragmentShader()
                       );
 }
 
-void FilterGLGradient::InitShaders()
+void FilterGLGradient::initShaders()
 {
     FragmentShader();
 

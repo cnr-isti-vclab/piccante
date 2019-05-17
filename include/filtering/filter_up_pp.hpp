@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_UP_PP_HPP
 #define PIC_FILTERING_FILTER_UP_PP_HPP
 
+#include "../util/array.hpp"
+
 #include "../filtering/filter.hpp"
 #include "../filtering/filter_down_pp.hpp"
 #include "../image_samplers/image_sampler_bilinear.hpp"
@@ -51,26 +53,13 @@ protected:
 
                 float *data = (*dst)(j, i);
 
-                if(FilterDownPP::distance(data, value, dst->channels) < threshold) {
+                float dist = Arrayf::distanceSq(data, value, src[0]->channels);
+
+                if(dist <= threshold) {
                     isb.SampleImage(src[0], x, y, data);
                 }
             }
         }
-    }
-
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width << 1, imgIn[0]->height << 1, imgIn[0]->channels);
-        }
-
-        return imgOut;
     }
 
 public:
@@ -80,9 +69,9 @@ public:
      * @param value
      * @param threshold
      */
-    FilterUpPP(float *value, float threshold)
+    FilterUpPP(float *value, float threshold) : Filter()
     {
-        Update(value, threshold);
+        update(value, threshold);
     }
 
     ~FilterUpPP()
@@ -90,54 +79,43 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param value
      * @param threshold
      */
-    void Update(float *value, float threshold)
+    void update(float *value, float threshold)
     {
+        this->value = value;
+
         if(value == NULL) {
-            this->value = new float[3];
-
-            for(int i = 0; i < 3; i++) {
-                this->value[i] = 0.0f;
-            }
-        } else {
-            this->value = value;
+            printf("ERROR in FilterUpPP");
         }
 
-        if(threshold > 0.0f) {
-            this->threshold = threshold;
-        } else {
-            this->threshold = 1e-4f;
-        }
+        this->value = value;
+
+        this->threshold = (threshold > 0.0f) ? threshold : 1e-6f;
     }
 
     /**
-     * @brief Execute
+     * @brief OutputSize
      * @param imgIn
-     * @param imgOut
-     * @param type
-     * @return
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
      */
-    static Image *Execute(Image *imgIn, Image *imgOut)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        FilterUpPP flt(NULL, 1e-6f);
-        return flt.ProcessP(Single(imgIn), imgOut);
-    }
+        if(imgIn.size() == 1) {
+            width       = imgIn[0]->width << 1;
+            height      = imgIn[0]->height << 1;
+        } else {
+            width       = imgIn[1]->width;
+            height      = imgIn[1]->height;
+        }
 
-    /**
-     * @brief Execute
-     * @param fileInput
-     * @param fileOutput
-     * @return
-     */
-    static Image *Execute(std::string fileInput, std::string fileOutput)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterUpPP::Execute(&imgIn, NULL);
-        out->Write(fileOutput);
-        return out;
+        channels    = imgIn[0]->channels;
+        frames      = imgIn[0]->frames;
     }
 };
 

@@ -31,10 +31,10 @@ class FilterGLMean: public FilterGLNPasses
 protected:
 
 protected:
-    FilterGLConv1D  *filter;
-    ImageGL      *weights;
-    float           *data;
-    int             kernelSize;
+    FilterGLConv1D *filter;
+    ImageGL *weights;
+    float *data;
+    int kernelSize;
 
 public:
 
@@ -42,18 +42,18 @@ public:
      * @brief FilterMean
      * @param kernelSize
      */
-    FilterGLMean(int kernelSize)
+    FilterGLMean(int kernelSize) : FilterGLNPasses()
     {
         data = NULL;
         weights = NULL;
         this->kernelSize = -1;
 
-        Update(kernelSize);
+        update(kernelSize);
 
         filter = new FilterGLConv1D(weights, 0, GL_TEXTURE_2D);
 
-        InsertFilter(filter);
-        InsertFilter(filter);
+        insertFilter(filter);
+        insertFilter(filter);
     }
 
     ~FilterGLMean()
@@ -70,15 +70,12 @@ public:
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param size
      */
-    void Update(int kernelSize)
+    void update(int kernelSize)
     {
-        if(kernelSize < 1)
-        {
-            kernelSize = 3;
-        }
+        kernelSize = kernelSize > 0 ? kernelSize : 3;
 
         if(this->kernelSize != kernelSize)
         {
@@ -96,37 +93,20 @@ public:
         }
 
         weights = new ImageGL(1, kernelSize, 1, 1, data);
-        weights->generateTextureGL(false, GL_TEXTURE_2D);
+        weights->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param kernelSize
      * @return
      */
-    static ImageGL *Execute(ImageGL *imgIn, ImageGL *imgOut, int kernelSize)
+    static ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut, int kernelSize)
     {
         FilterGLMean filter(kernelSize);
         return filter.Process(SingleGL(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param kernelSize
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut, int kernelSize)
-    {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-        ImageGL *imgOut = Execute(&imgIn, NULL, kernelSize);
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
     }
 };
 

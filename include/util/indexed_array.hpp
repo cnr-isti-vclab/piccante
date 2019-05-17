@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
+#include "../util/math.hpp"
+
 namespace pic {
 
 /**
@@ -44,7 +46,7 @@ public:
      */
     static bool bFuncNotNeg(float val)
     {
-        return (val > 0.0f);
+        return val > 0.0f;
     }
 
     /**
@@ -108,13 +110,39 @@ public:
      */
     static float mean(float *data, IntCoord &coord)
     {
+        if(coord.empty()) {
+            return FLT_MAX;
+        }
+
         float ret = 0.0f;
 
-        for(unsigned int i = 0; i < coord.size(); i++) {
+        for(auto i = 0; i < coord.size(); i++) {
             ret += data[coord[i]];
         }
 
         return ret / float(coord.size());
+    }
+
+    /**
+     * @brief min computes the min value.
+     * @param data
+     * @param coord
+     * @return
+     */
+    static float min(float *data, IntCoord &coord)
+    {
+        if(coord.empty()) {
+            return FLT_MAX;
+        }
+
+        float ret = data[coord[0]];
+
+        for(auto i = 1; i < coord.size(); i++) {
+            int j = coord[i];
+            ret = MIN(ret, data[j]);
+        }
+
+        return ret;
     }
 
     /**
@@ -125,45 +153,60 @@ public:
      */
     static float max(float *data, IntCoord &coord)
     {
-        float ret = -FLT_MAX;
-        int tmp;
+        if(coord.empty()) {
+            return -FLT_MAX;
+        }
 
-        for(unsigned int i = 0; i < coord.size(); i++) {
-            tmp = coord[i];
-            ret = ret < data[tmp] ? data[tmp] : ret;
+        float ret = data[coord[0]];
+
+        for(auto i = 1; i < coord.size(); i++) {
+            int j = coord[i];
+            ret = MAX(ret, data[j]);
         }
 
         return ret;
     }
 
     /**
-     * @brief minCoord computes the min value.
+     * @brief percentile
      * @param data
      * @param coord
+     * @param percent
      * @return
      */
-    static float min(float *data, IntCoord &coord)
+    static float percentile(float *data, IntCoord &coord, float percent)
     {
-        float ret = FLT_MAX;
-        int tmp;
-
-        for(unsigned int i = 0; i < coord.size(); i++) {
-            tmp = coord[i];
-            ret = ret > data[tmp] ? data[tmp] : ret;
+        if(coord.empty()) {
+            return FLT_MAX;
         }
+
+        auto n = coord.size();
+        float *tmp = new float[n];
+
+        for(auto i = 0; i < n; i++) {
+            int j = coord[i];
+            tmp[i] = data[j];
+        }
+
+        std::sort(tmp, tmp + n);
+
+        percent = CLAMPi(percent, 0.0f, 1.0f);
+
+        float ret = tmp[int(float(n - 1) * percent)];
+        delete[] tmp;
 
         return ret;
     }
 
     /**
-     * @brief scalingAddress scales values.
+     * @brief scale scales values.
      * @param coord
      * @param scaling
      */
-    static void scalingAddress(IntCoord &coord, int scaling)
+    static void scale(IntCoord &coord, int scale)
     {
-        for(unsigned int i = 0; i < coord.size(); i++) {
-            coord.at(i) = coord.at(i) * scaling;
+        for(auto i = 0; i < coord.size(); i++) {
+            coord.at(i) = coord.at(i) * scale;
         }
     }
 
@@ -175,12 +218,16 @@ public:
      */
     static float log10Mean(float *data, IntCoord &coord)
     {
+        if(coord.empty()) {
+            return FLT_MAX;
+        }
+
         float delta = 1e-6f;
         float ret = 0.0f;
 
-        for(unsigned int i = 0; i < coord.size(); i++) {
-            int tmp = coord[i];
-            ret += log10f(data[tmp] + delta);
+        for(auto i = 0; i < coord.size(); i++) {
+            int j = coord[i];
+            ret += log10f(data[j] + delta);
         }
 
         return ret / float(coord.size());
@@ -194,13 +241,17 @@ public:
      */
     static float log2Mean(float *data, IntCoord &coord)
     {
+        if(coord.empty()) {
+            return FLT_MAX;
+        }
+
         float delta = 1e-6f;
         float ret = 0.0f;
         float log2f = logf(2.0f);
 
-        for(unsigned int i = 0; i < coord.size(); i++) {
-            int tmp = coord[i];
-            ret += logf(data[tmp] + delta) / log2f;
+        for(auto i = 0; i < coord.size(); i++) {
+            int j = coord[i];
+            ret += logf(data[j] + delta) / log2f;
         }
 
         return ret / float(coord.size());
@@ -215,8 +266,8 @@ public:
     static void negative(float *data, IntCoord &coord, float referencePoint = 1.0f)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
-            int tmp = coord[i];
-            data[tmp] = referencePoint - data[tmp];
+            int j = coord[i];
+            data[j] = referencePoint - data[j];
         }
     }
 
@@ -226,11 +277,11 @@ public:
      * @param coord
      * @param val
      */
-    static void Add(float *data, IntCoord &coord, float val)
+    static void add(float *data, IntCoord &coord, float val)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
-            int tmp = coord[i];
-            data[tmp] += val;
+            int j = coord[i];
+            data[j] += val;
         }
     }
 
@@ -243,8 +294,8 @@ public:
     static void sub(float *data, IntCoord &coord, float val)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
-            int tmp = coord[i];
-            data[tmp] -= val;
+            int j = coord[i];
+            data[j] -= val;
         }
     }
 
@@ -254,11 +305,11 @@ public:
      * @param coord
      * @param val
      */
-    static void Mul(float *data, IntCoord &coord, float val)
+    static void mul(float *data, IntCoord &coord, float val)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
-            int tmp = coord[i];
-            data[tmp] *= val;
+            int j = coord[i];
+            data[j] *= val;
         }
     }
 
@@ -271,8 +322,8 @@ public:
     static void div(float *data, IntCoord &coord, float val)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
-            int tmp = coord[i];
-            data[tmp] /= val;
+            int j = coord[i];
+            data[j] /= val;
         }
     }
 
@@ -282,25 +333,25 @@ public:
      * @param coord
      * @param val
      */
-    static void assign(float *dataDst, float dataSrc, IntCoord &coord)
+    static void assign(float *data, IntCoord &coord, float val)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
-            int tmp = coord[i];
-            dataDst[tmp] *= dataSrc;
+            int j = coord[i];
+            data[j] = val;
         }
     }
 
     /**
      * @brief Assign
      * @param dataDst
-     * @param dataSrc
      * @param coord
+     * @param dataSrc
      */
-    static void assign(float *dataDst, float *dataSrc, IntCoord &coord)
+    static void assign(float *dataDst, IntCoord &coord, float *dataSrc)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
-            int tmp = coord[i];
-            dataDst[tmp] = dataSrc[tmp];
+            int j = coord[i];
+            dataDst[j] = dataSrc[j];
         }
     }
 };

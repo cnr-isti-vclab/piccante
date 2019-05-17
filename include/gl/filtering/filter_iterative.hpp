@@ -18,28 +18,37 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_ITERATIVE_HPP
 #define PIC_GL_FILTERING_FILTER_ITERATIVE_HPP
 
-#include "../../gl/filtering/filter.hpp"
+#include "../../base.hpp"
+
+#include "../../util/gl/fbo.hpp"
+
+#include "../../gl/filtering/filter_npasses.hpp"
 
 namespace pic {
 
 /**
  * @brief The FilterGLIterative class
  */
-class FilterGLIterative: public FilterGL
+class FilterGLIterative: public FilterGLNPasses
 {
 protected:
-    ImageGL *imgTmp[2];
-    int			iterations;
-
-    void InitShaders() {}
-    void FragmentShader() {}
-
-public:
+    int iterations;
 
     /**
-     * @brief FilterGLIterative
+     * @brief getFilter
+     * @param i
+     * @return
      */
-    FilterGLIterative();
+    FilterGL* getFilter(int i);
+
+    /**
+     * @brief getFilter
+     * @param i
+     * @return
+     */
+    int getIterations();
+
+public:
 
     /**
      * @brief FilterGLIterative
@@ -48,55 +57,27 @@ public:
      */
     FilterGLIterative(FilterGL *flt, int iterations);
 
-    /**
-     * @brief SetupAuxN
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    virtual ImageGL *SetupAuxN(ImageGLVec imgIn, ImageGL *imgOut);
+    ~FilterGLIterative();
 
     /**
-     * @brief Update
+     * @brief update
      * @param flt
      * @param iterations
      */
-    void Update(FilterGL *flt, int iterations);
-
-    /**
-     * @brief getFbo
-     * @return
-     */
-    Fbo  *getFbo()
-    {
-        return filters.back()->getFbo();
-    }
-
-    /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
+    void update(FilterGL *flt, int iterations);
 };
 
-FilterGLIterative::FilterGLIterative(): FilterGL()
+PIC_INLINE FilterGLIterative::FilterGLIterative(FilterGL *flt, int iterations) : FilterGLNPasses()
 {
-    imgTmp[0] = imgTmp[1] = NULL;
-    iterations = 0;
-    target = GL_TEXTURE_2D;
+    update(flt, iterations);
 }
 
-FilterGLIterative::FilterGLIterative(FilterGL *flt, int iterations): FilterGL()
+PIC_INLINE FilterGLIterative::~FilterGLIterative()
 {
-    imgTmp[0] = imgTmp[1] = NULL;
-    target = GL_TEXTURE_2D;
-
-    Update(flt, iterations);
+    release();
 }
 
-void FilterGLIterative::Update(FilterGL *flt, int iterations)
+PIC_INLINE void FilterGLIterative::update(FilterGL *flt, int iterations)
 {
     if(iterations > 0) {
         this->iterations = iterations;
@@ -106,61 +87,21 @@ void FilterGLIterative::Update(FilterGL *flt, int iterations)
         return;
     }
 
-    if(filters.size() > 0) {
+    if(!filters.empty()) {
         filters.clear();
     }
 
     filters.push_back(flt);
 }
 
-ImageGL *FilterGLIterative::SetupAuxN(ImageGLVec imgIn,
-        ImageGL *imgOut)
+PIC_INLINE FilterGL* FilterGLIterative::getFilter(int i)
 {
-    if(imgOut == NULL) {
-        imgOut = imgIn[0]->allocateSimilarOneGL();
-    }
-
-    /*
-    if(fbo==NULL)
-    	fbo = new Fbo();
-
-    fbo->create(imgOut->width,imgOut->height,imgOut->frames, false, imgOut->getTexture());
-    filters[0]->setFbo(fbo);*/
-
-    if((iterations % 2) == 0) {
-        imgTmp[1] = imgOut;
-
-        if(imgTmp[0] == NULL) {
-            imgTmp[0] = imgOut->allocateSimilarOneGL();
-        }
-    } else {
-        imgTmp[0] = imgOut;
-
-        if(imgTmp[1] == NULL) {
-            imgTmp[1] = imgOut->allocateSimilarOneGL();
-        }
-    }
-
-    return imgOut;
+    return filters[0];
 }
 
-ImageGL *FilterGLIterative::Process(ImageGLVec imgIn, ImageGL *imgOut)
+PIC_INLINE int FilterGLIterative::getIterations()
 {
-    if(imgIn.size() < 1 || imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    //Allocate FBOs
-    imgOut = SetupAuxN(imgIn, imgOut);
-
-    filters[0]->Process(imgIn, imgTmp[0]);
-
-    for(int i = 1; i < iterations; i++) {
-        imgIn[0] = imgTmp[(i + 1) % 2];
-        filters[0]->Process(imgIn, imgTmp[i % 2]);
-    }
-
-    return imgOut;
+    return iterations;
 }
 
 } // end namespace pic

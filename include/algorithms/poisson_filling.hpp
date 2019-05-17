@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../util/buffer.hpp"
 #include "../util/mask.hpp"
+#include "../util/array.hpp"
+#include "../util/math.hpp"
 #include "../image.hpp"
 
 namespace pic {
@@ -30,12 +32,11 @@ namespace pic {
 class PoissonFilling
 {
 protected:
-    int			maxIter;
-    float		threshold, value;
+    int maxIter;
+    float threshold, value;
 
-    bool		*mask;
-    bool		*maskPoisson;
-    Image       *imgTmp;
+    bool *mask, *maskPoisson;
+    Image *imgTmp;
 
 
     /**
@@ -57,28 +58,6 @@ protected:
             delete imgTmp;
             imgTmp = NULL;
         }
-    }
-
-public:
-
-    /**
-     * @brief PoissonFilling
-     */
-    PoissonFilling()
-    {
-        imgTmp = NULL;
-        mask = NULL;
-        maskPoisson = NULL;
-
-        value = 0.0f;
-        threshold = 1e-4f;
-
-        maxIter = 1000;
-    }
-
-    ~PoissonFilling()
-    {
-        release();
     }
 
     /**
@@ -168,14 +147,41 @@ public:
         }
     }
 
+public:
+
+    /**
+     * @brief PoissonFilling
+     */
+    PoissonFilling(float value)
+    {
+        imgTmp = NULL;
+        mask = NULL;
+        maskPoisson = NULL;
+
+        this->value = value;
+        threshold = 1e-4f;
+
+        maxIter = 1000;
+    }
+
+    ~PoissonFilling()
+    {
+        release();
+    }
+
+    void setup(float value)
+    {
+        this->value = value;
+    }
+
     /**
      * @brief execute
      * @param imgIn
      * @param imgOut
-     * @param value
+     * @param mask
      * @return
      */
-    Image *execute(Image *imgIn, Image *imgOut, float value)
+    Image *execute(Image *imgIn, Image *imgOut, bool *mask = NULL)
     {
         if(imgIn == NULL) {
             return NULL;
@@ -200,17 +206,15 @@ public:
             imgOut->assign(imgIn);
         }
 
-        this->value = value;
+        if(mask == NULL) {
+            float *color = Arrayf::genValue(value, 3, NULL);
 
-        float *color = new float[imgIn->channels];
+            mask = imgIn->convertToMask(color, threshold, false, NULL);
 
-        for(int i = 0; i < imgIn->channels; i++) {
-            color[i] = value;
+            delete[] color;
         }
 
-        mask = imgIn->convertToMask(color, threshold, false);
-
-        maskPoisson = Mask::clone(maskPoisson, mask, imgIn->width * imgIn->height, 1);
+        maskPoisson = Mask::clone(maskPoisson, mask, imgIn->nPixels(), 1);
 
         Image *work[2];
         work[0] = imgTmp;
@@ -231,7 +235,6 @@ public:
             imgOut->assign(imgTmp);
         }
 
-        delete[] color;
         return imgOut;
     }
 };

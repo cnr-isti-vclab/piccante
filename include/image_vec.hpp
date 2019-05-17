@@ -112,7 +112,7 @@ PIC_INLINE void ImaveVecGetExposureTimesAsArray(ImageVec &stack, std::vector<flo
 {
     output.clear();
 
-    for(unsigned int i = 0; i < stack.size(); i++) {
+    for(auto i = 0; i < stack.size(); i++) {
         float tmp = bLog ? logf(stack[i]->exposure) : stack[i]->exposure;
         output.push_back(tmp);
     }
@@ -129,9 +129,41 @@ PIC_INLINE bool ImageVecCheckSimilarType(ImageVec &stack)
         return false;
     }
 
-    for (size_t i=1; i<stack.size(); i++) {
+    for (auto i = 1; i < stack.size(); i++) {
         if (!stack[0]->isSimilarType(stack[i])) {
             return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * @brief ImageVecCheck
+ * @param vec
+ * @param minInputImages
+ * @return
+ */
+PIC_INLINE bool ImageVecCheck(ImageVec &imgIn, int minInputImages)
+{
+    int n;
+    if(minInputImages < 0) {
+        n = int(imgIn.size());
+    } else {
+        if(imgIn.size() < minInputImages) {
+            return false;
+        }
+
+        n = minInputImages;
+    }
+
+    for(int i = 0; i < n; i ++) {
+        if(imgIn[i] == NULL) {
+            return false;
+        } else {
+            if(!imgIn[i]->isValid()) {
+                return false;
+            }
         }
     }
 

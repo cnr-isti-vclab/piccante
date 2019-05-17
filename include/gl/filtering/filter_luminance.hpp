@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_LUMINANCE_HPP
 #define PIC_GL_FILTERING_FILTER_LUMINANCE_HPP
 
+#include "../../base.hpp"
 #include "../../filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter.hpp"
 
@@ -34,11 +35,12 @@ protected:
     float weights[3];
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
+
     /**
      * @brief FilterGLLuminance
      */
@@ -50,26 +52,18 @@ public:
     FilterGLLuminance(LUMINANCE_TYPE type);
 
     /**
-     * @brief Update
+     * @brief update
      * @param type
      */
-    void Update(LUMINANCE_TYPE type);
+    void update(LUMINANCE_TYPE type);
 
     /**
-     * @brief Process
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
-
-    /**
-     * @brief Execute
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    static ImageGL *Execute(ImageGL *imgIn, ImageGL *imgOut)
+    static ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut)
     {
         FilterGLLuminance filter(LT_CIE_LUMINANCE);
         imgOut = filter.Process(SingleGL(imgIn), imgOut);
@@ -77,152 +71,66 @@ public:
     }
 
     /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @return
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
      */
-    static ImageGL *Execute(std::string nameIn, std::string nameOut)
+    void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-
-        ImageGL *imgOut = Execute(&imgIn, NULL);
-
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
+        channels    = 1;
+        frames      = imgIn[0]->frames;
     }
 };
 
-FilterGLLuminance::FilterGLLuminance(): FilterGL()
+PIC_INLINE FilterGLLuminance::FilterGLLuminance(): FilterGL()
 {
     this->type = LT_CIE_LUMINANCE;
 
-    InitShaders();
+    initShaders();
 }
 
-FilterGLLuminance::FilterGLLuminance(LUMINANCE_TYPE type): FilterGL()
+PIC_INLINE FilterGLLuminance::FilterGLLuminance(LUMINANCE_TYPE type): FilterGL()
 {
     this->type = type;
 
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLLuminance::InitShaders()
+PIC_INLINE void FilterGLLuminance::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
     uniform sampler2D u_tex; \n
     uniform vec3 weights; \n
     out     vec4 f_color; \n
-    \n
-    void main(void) {
-        \n
+    void main(void) {\n
         ivec2 coords = ivec2(gl_FragCoord.xy); \n
         vec3 color = texelFetch(u_tex, coords, 0).xyz; \n
         float L = dot(color, weights); \n
         f_color = vec4(L, L, L, 1.0); \n
-        \n
     }
-                      );
+    );
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLLuminance");
 
-    Update(type);
+    update(type);
 }
 
-void FilterGLLuminance::Update(LUMINANCE_TYPE type)
+PIC_INLINE void FilterGLLuminance::update(LUMINANCE_TYPE type)
 {
     this->type = type;
 
-    switch(type)
-    {
-    case LT_WARD_LUMINANCE:
-        {
-            weights[0] = 54.0f  / 256.0f;
-            weights[1] = 183.0f / 256.0f;
-            weights[2] = 19.0f  / 256.0f;
-        }
-        break;
-
-    case LT_CIE_LUMINANCE:
-        {
-            weights[0] = 0.2126f;
-            weights[1] = 0.7152f;
-            weights[2] = 0.0722f;
-        }
-        break;
-
-    case LT_MEAN:
-        {
-            float inv_3 = 1.0f / 3.0f;
-            weights[0] = inv_3;
-            weights[1] = inv_3;
-            weights[2] = inv_3;
-        }
-        break;
-
-    default:
-        {
-
-        } break;
-    }
+    FilterLuminance::computeWeights(type, 3, weights);
 
     technique.bind();
     technique.setUniform1i("u_tex", 0);
     technique.setUniform3f("weights", weights[0], weights[1], weights[2]);
     technique.unbind();
-}
-
-ImageGL *FilterGLLuminance::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn.empty()) {
-        return imgOut;
-    }
-
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(1, w, h, 1, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, 1, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    technique.bind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imgIn[0]->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    technique.unbind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

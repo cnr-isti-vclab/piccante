@@ -37,7 +37,7 @@ class ColorConvXYZtoCIELAB: public ColorConv
 {
 protected:
 
-    float		white_point[3];
+    float white_point[3];
 
 public:
 

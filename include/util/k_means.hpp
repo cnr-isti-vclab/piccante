@@ -37,7 +37,7 @@ namespace pic{
  * @return
  */
 template<class T>
-PIC_INLINE unsigned int kMeansAssignLabel( T* sample_j, int nDim,
+PIC_INLINE unsigned int kMeansAssignLabel(T* sample_j, int nDim,
                                 T* centers, unsigned int k)
 {
     T dist = Array<T>::distanceSq(sample_j, &centers[0], nDim);
@@ -68,12 +68,12 @@ PIC_INLINE unsigned int kMeansAssignLabel( T* sample_j, int nDim,
 template<class T>
 PIC_INLINE T* kMeansComputeMean(T *samples, T *out, int nDim, std::set<unsigned int> *cluster)
 {
-    Array<T>::set(out, nDim, T(0));
+    Array<T>::assign(T(0), out, nDim);
 
     int count = 0;
-     for (std::set<unsigned int>::iterator it = cluster->begin(); it != cluster->end(); it++) {
+     for (auto it = cluster->begin(); it != cluster->end(); it++) {
          int i = *it;
-         Array<T>::add(&samples[i * nDim], out, nDim);
+         Array<T>::add(&samples[i * nDim], nDim, out);
          count++;
      }
 
@@ -101,34 +101,39 @@ PIC_INLINE T* kMeanscomputeRandomCenters(T *samples, int nSamples, int nDim, int
 
     centers = new T[k * nDim];
 
-        std::mt19937 m(std::chrono::system_clock::now().time_since_epoch().count());
+    std::mt19937 m(std::chrono::system_clock::now().time_since_epoch().count());
 
-        T *tMax = new T[nDim];
-        T *tMin = new T[nDim];
+    T *tMax = new T[nDim];
+    T *tMin = new T[nDim];
 
+    for(int j = 0; j < nDim; j++) {
+        T s = samples[j];
+        tMin[j] = s;
+        tMax[j] = s;
+    }
+
+    for(int i = 1; i < nSamples; i++) {
+        int index = i * nDim;
         for(int j = 0; j < nDim; j++) {
-            tMax[j] = -FLT_MAX;
-            tMin[j] =  FLT_MAX;
-        }
+            T s = samples[index + j];
 
-        for(int i = 0; i < nSamples; i++) {
-            int index = i * nDim;
-            for(int j = 0; j < nDim; j++) {
-                T s = samples[index + j];
-                tMax[j] = MAX(tMax[j], s);
-                tMin[j] = MIN(tMin[j], s);
-            }
+            tMin[j] = MIN(tMin[j], s);
+            tMax[j] = MAX(tMax[j], s);
         }
+    }
 
-        for(int i = 0; i < k; i++) {
-            for(int j = 0; j < nDim; j++) {
-                 centers[i * nDim + j] = T(Random(m()) * (tMax[j] - tMin[j]) + tMin[j]);
-            }
+    for(int i = 0; i < k; i++) {
+        int index = i * nDim;
+        for(int j = 0; j < nDim; j++) {
+            centers[index + j] = T(getRandom(m()) * (tMax[j] - tMin[j]) + tMin[j]);
         }
+    }
+
+    delete[] tMin;
+    delete[] tMax;
 
     return centers;
 }
-
 
 /**
  * @brief KMeans
@@ -175,9 +180,9 @@ PIC_INLINE T* kMeans(T *samples, int nSamples, int nDim,
             kMeansComputeMean(samples, &mean[index], nDim, tmp);
 
             //update centers
-            float dist = Array<float>::distanceSq(&centers[index], &mean[index], nDim);
+            float dist = Arrayf::distanceSq(&centers[index], &mean[index], nDim);
 
-            Array<float>::assign(&mean[index], &centers[index], nDim);
+            Arrayf::assign(&mean[index], nDim, &centers[index]);
 
             if(dist > 1e-6f) {
                 bNoChanges = false;
@@ -203,6 +208,8 @@ PIC_INLINE T* kMeans(T *samples, int nSamples, int nDim,
             }
         }
     }
+
+    delete[] mean;
 
     return centers;
 }
@@ -233,7 +240,11 @@ PIC_INLINE  T* kMeansSelect(T *samples, int nSamples, int nDim,
     bool bFlag = true;
     while(bFlag) {
         k++;
-        printf("k: %d\n", k);
+
+        #ifdef PIC_DEBUG
+            printf("k: %d\n", k);
+        #endif
+
         labels.clear();
         if(centers != NULL) {
             delete[] centers;
@@ -255,7 +266,11 @@ PIC_INLINE  T* kMeansSelect(T *samples, int nSamples, int nDim,
 
         if(k > 2) {
             float relErr = fabsf(float(err - prevErr)) / float(prevErr);
-            printf("%f %f %f\n", err, prevErr, relErr);
+
+             #ifdef PIC_DEBUG
+                printf("%f %f %f\n", err, prevErr, relErr);
+            #endif
+
             if(relErr < threshold) {
                 bFlag = false;
             }

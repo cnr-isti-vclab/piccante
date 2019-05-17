@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_OP_HPP
 #define PIC_GL_FILTERING_FILTER_OP_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../util/string.hpp"
 
@@ -27,10 +29,10 @@ class FilterGLOp: public FilterGL
 {
 protected:
     std::string op;
-    float		c0[4], c1[4];
-    bool		bTexelFetch;
+    float c0[4], c1[4];
+    bool bTexelFetch;
 
-    void InitShaders();
+    void initShaders();
 
 public:
 
@@ -44,11 +46,11 @@ public:
     FilterGLOp(std::string op, bool bTexelFetch, float *c0, float *c1);
 
     /**
-     * @brief Update
+     * @brief update
      * @param c0
      * @param c1
      */
-    void Update(float *c0, float *c1);
+    void update(float *c0, float *c1);
 
     /**
      * @brief CreateOpSetZero
@@ -165,23 +167,19 @@ public:
     }
 };
 
-FilterGLOp::FilterGLOp(std::string op, bool bTexelFetch = false,
+PIC_INLINE FilterGLOp::FilterGLOp(std::string op, bool bTexelFetch = false,
                        float *c0 = NULL, float *c1 = NULL): FilterGL()
 {
     if(c0 != NULL) {
         memcpy(this->c0, c0, 4 * sizeof(float));
     } else {
-        for(int i = 0; i < 4; i++) {
-            this->c0[i] = 1.0f;
-        }
+        Arrayf::assign(1.0f, this->c0, 4);
     }
 
     if(c1 != NULL) {
         memcpy(this->c1, c1, 4 * sizeof(float));
     } else {
-        for(int i = 0; i < 4; i++) {
-            this->c0[i] = 1.0f;
-        }
+        Arrayf::assign(1.0f, this->c1, 4);
     }
 
     this->op = op;
@@ -197,10 +195,10 @@ FilterGLOp::FilterGLOp(std::string op, bool bTexelFetch = false,
         vertex_source = QuadGL::getVertexProgramWithTexCoordinates();
     }
 
-    InitShaders();
+    initShaders();
 }
 
-void FilterGLOp::InitShaders()
+PIC_INLINE void FilterGLOp::initShaders()
 {
     std::string strOp = "ret = ";
     strOp.append(op);
@@ -319,7 +317,7 @@ void FilterGLOp::InitShaders()
     technique.unbind();
 }
 
-void FilterGLOp::Update(float *c0, float *c1)
+PIC_INLINE void FilterGLOp::update(float *c0, float *c1)
 {
     if(c0 != NULL) {
         for(int i = 0; i < 4; i++) {

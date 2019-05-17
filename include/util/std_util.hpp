@@ -42,6 +42,90 @@ inline void filterInliers(std::vector< T > &vec, std::vector< unsigned int > &in
     }
 }
 
+/**
+ * @brief stdVectorClear
+ * @param vec
+ */
+template<class T>
+inline void stdVectorClear(std::vector<T *> &vec)
+{
+    for(unsigned int i = 0; i < vec.size(); i++) {
+        T *tmp = vec[i];
+
+        if(tmp != NULL) {
+            delete tmp;
+        }
+
+        vec[i] = NULL;
+    }
+
+    vec.clear();
+}
+
+/**
+ * @brief setToANullVector
+ * @param vec
+ * @param n
+ */
+template<class T>
+inline void setToANullVector(std::vector< T* > &vec, unsigned int n)
+{
+    if(!vec.empty()) {
+        return;
+    }
+
+    for(unsigned int i = 0; i < n; i++) {
+        vec.push_back(NULL);
+    }
+}
+
+/**
+ * @brief release
+ * @param data
+ * @return
+ */
+template<class T>
+inline T* releasePtr(T *data)
+{
+    if(data != NULL) {
+        delete data;
+        data = NULL;
+    }
+
+    return data;
+}
+
+/**
+ * @brief delete_s
+ * @param data
+ * @return
+ */
+template<class T>
+inline T* delete_s(T *data)
+{
+    if(data != NULL) {
+        delete data;
+        data = NULL;
+    }
+    return data;
+}
+
+/**
+ * @brief delete_vec_s
+ * @param data
+ * @return
+ */
+template<class T>
+inline T* delete_vec_s(T *data)
+{
+    if(data != NULL) {
+        delete[] data;
+        data = NULL;
+    }
+    return data;
+}
+
+
 } // end namespace pic
 
 #endif // PIC_UTIL_STD_UTIL_HPP

@@ -19,9 +19,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_UTIL_MATH_HPP
 
 #include <math.h>
+#include <cmath>
 #include <random>
 #include <stdlib.h>
 #include <set>
+#include <limits>
 
 #include "../base.hpp"
 
@@ -31,7 +33,8 @@ namespace pic {
 const float C_LOG_NAT_2         = 0.69314718055994530941723212145818f;
 
 //Reciprocal natural logarithm of 2
-const float C_INV_LOG_NAT_2     = 1.4426950408889634073599246810019f;
+const float  C_INV_LOG_NAT_2    = 1.4426950408889634073599246810019f;
+const double C_INV_LOG_NAT_2_D  = 1.4426950408889634073599246810019;
 
 //Epsilon
 const float C_EPSILON           = 1e-6f;
@@ -75,7 +78,7 @@ const float C_PI_OVER_ONE_80    = 0.017453292519943295769236907685f;
 #endif
 
 #ifndef CLAMPi
-    #define CLAMPi(x, a, b)     (x <  a ? a       : (x > b ? b : x))
+    #define CLAMPi(x, a, b)     (x <  a ? a : (x > b ? b : x))
 #endif
 
 
@@ -86,15 +89,11 @@ const float C_PI_OVER_ONE_80    = 0.017453292519943295769236907685f;
  * @param value
  * @return
  */
-template< typename T > PIC_INLINE bool isnan(T value)
+template< typename T >
+PIC_INLINE bool isnan(T value)
 {
     return value != value ;
 }
-
-#endif
-
-
-#ifndef isnan
 
 /**
  * @brief isinf is it a Inf value?
@@ -126,7 +125,7 @@ PIC_INLINE bool equalf(float a, float b)
  * @brief Randombase returns a number in [0, 1] based on rand().
  * @return It returns a random number in [0, 1].
  */
-PIC_INLINE float Randombase()
+PIC_INLINE float getRandombase()
 {
     return float(rand() % RAND_MAX) / float(RAND_MAX);
 }
@@ -136,19 +135,19 @@ PIC_INLINE float Randombase()
  * @param n is a 32-bit unsigned integer number.
  * @return It returns n as a normalized float in [0, 1].
  */
-PIC_INLINE float Random(unsigned int n)
+PIC_INLINE float getRandom(unsigned int n)
 {
     return float(n) / 4294967295.0f;
 }
 
 /**
- * @brief RandomInt
+ * @brief getRandomInt
  * @param n
  * @param a
  * @param b
  * @return
  */
-PIC_INLINE int RandomInt(unsigned int n, int a, int b)
+PIC_INLINE int getRandomInt(int n, int a, int b)
 {
     if(a < b) {
         return n % (b - a);
@@ -158,22 +157,22 @@ PIC_INLINE int RandomInt(unsigned int n, int a, int b)
 }
 
 /**
- * @brief SFunction evaluates a cubic s-function.
+ * @brief sFunction evaluates a cubic s-function.
  * @param x is a value in [0.0, 1.0]
  * @return it returns 3 x^2 - 2 x^3
  */
-PIC_INLINE float SFunction(float x)
+PIC_INLINE float sFunction(float x)
 {
     float x2 = x * x;
     return 3.0f * x2 - 2.0f * x2 * x;
 }
 
 /**
- * @brief SCurve5 evaluates a quintic S-Shape: 6x^5-15x^4+10x^3
+ * @brief sCurve5 evaluates a quintic S-Shape: 6x^5-15x^4+10x^3
  * @param x is a value in [0.0, 1.0]
  * @return
  */
-PIC_INLINE float SCurve5(float x)
+PIC_INLINE float sCurve5(float x)
 {
     float x2 = x * x;
     float x4 = x2 * x2;
@@ -186,9 +185,19 @@ PIC_INLINE float SCurve5(float x)
  * @param x a value.
  * @return It return x^2.
  */
-PIC_INLINE float Square(float x)
+PIC_INLINE float square(float x)
 {
     return x * x;
+}
+
+/**
+ * @brief sqrtf_s
+ * @param x
+ * @return
+ */
+PIC_INLINE float sqrtf_s(float x)
+{
+    return sqrtf(MAX(x, 0.0f));
 }
 
 /**
@@ -318,21 +327,21 @@ PIC_INLINE int pow2(int n)
 }
 
 /**
- * @brief log10Plus computes log10 of a value plus 1.
+ * @brief logf10PlusOne computes log10 of a value plus 1.
  * @param x is a value for which the log10 needs to be computed.
  * @return It returns log10(x + 1).
  */
-PIC_INLINE float log10Plus(float x)
+PIC_INLINE float log10PlusOne(float x)
 {
     return log10f(x + 1.0f);
 }
 
 /**
- * @brief expMinus
+ * @brief expMinusOne
  * @param x
  * @return
  */
-PIC_INLINE float expMinus(float x)
+PIC_INLINE float expfMinusOne(float x)
 {
     float tmp = powf(10.0f, x) - 1.0f;
     return MAX(tmp, 0.0f);
@@ -345,7 +354,17 @@ PIC_INLINE float expMinus(float x)
  */
 PIC_INLINE float log10fPlusEpsilon(float x)
 {
-    return log10f(x + 1e-6f);
+    return log10f(x + 1e-7f);
+}
+
+/**
+ * @brief powf10fMinusEpsilon
+ * @param x
+ * @return
+ */
+PIC_INLINE float powf10fMinusEpsilon(float x)
+{
+    return MAX(powf(10.0f, x) - 1e-7f, 0.0f);
 }
 
 /**
@@ -356,6 +375,16 @@ PIC_INLINE float log10fPlusEpsilon(float x)
 PIC_INLINE float log2f(float x)
 {
     return logf(x) * C_INV_LOG_NAT_2;
+}
+
+/**
+ * @brief log2
+ * @param x
+ * @return
+ */
+PIC_INLINE double log2(double x)
+{
+    return log(x) * C_INV_LOG_NAT_2_D;
 }
 
 /**
@@ -402,14 +431,14 @@ PIC_INLINE int powint(int x, int b)
  * @param nPerm is the size of perm.
  * @param n is the number of object to permutate.
  */
-PIC_INLINE void getRandomPermutation(std::mt19937 &m, unsigned int *perm, int nPerm, int n)
+PIC_INLINE void getRandomPermutation(std::mt19937 &m, unsigned int *perm, unsigned int nPerm, unsigned int n)
 {
-    std::set< int > checker;
+    std::set< unsigned int > checker;
 
-    int tmp = m() % n;
+    unsigned int tmp = m() % n;
     checker.insert(tmp);
     perm[0] = tmp;
-    int index = 1;
+    unsigned int index = 1;
 
     while(index < nPerm) {
         tmp = m() % n;
@@ -419,6 +448,126 @@ PIC_INLINE void getRandomPermutation(std::mt19937 &m, unsigned int *perm, int nP
             index++;
         }
     }
+}
+
+/**
+ * @brief normalDistribution
+ * @param x
+ * @param mu
+ * @param sigma
+ * @return
+ */
+PIC_INLINE float normalDistribution(float x, float mu = 0.0f, float sigma = 1.0f)
+{
+    float ret;
+
+    float sigma_sq_2 = sigma * sigma * 2.0f;
+    float d = x - mu;
+    ret = exp(-(d * d) / sigma_sq_2) / sqrtf(sigma_sq_2 * C_PI);
+
+    return ret;
+}
+
+/**
+ * @brief normalCDF
+ * @param x
+ * @param mu
+ * @param sigma
+ * @return
+ */
+float normalCDF(float x, float mu, float sigma)
+{
+    float t = (x - mu) / (sigma * C_SQRT_2);
+    return (1.0f + std::erf(t)) * 0.5f;
+}
+
+/**
+ * @brief betaFunction
+ * @param A
+ * @param B
+ * @return
+ */
+PIC_INLINE float betaFunction(float A, float B, float step = 1e-4)
+{
+    if(step <= 0.0f || step >= 1.0f) {
+        step = 1e-4f;
+    }
+
+    float A1 = A - 1.0f;
+    float B1 = B - 1.0f;
+
+    float ret = 0.0f;
+
+    int tot = 0;
+    for(float x = 0.0f; x <= 1.0f; x += step) {
+        ret += powf(x, A1) * powf(1.0f - x, B1);
+        tot++;
+    }
+
+    return ret / float(tot);
+}
+
+/**
+ * @brief betaPDFwithBeta
+ * @param x
+ * @param A
+ * @param B
+ * @param betaAB
+ * @return
+ */
+PIC_INLINE float betaPDFwithBeta(float x, float A, float B, float betaAB)
+{
+    if(x < 0.0f || x > 1.0f) {
+        return -1.0f;
+    }
+
+    float ret = powf(x, A - 1.0f) * powf(1.0f - x, B - 1.0f);
+
+    return ret / betaAB;
+}
+
+/**
+ * @brief betaPDF
+ * @param x
+ * @param A
+ * @param B
+ * @return
+ */
+PIC_INLINE float betaPDF(float x, float A, float B)
+{
+    return betaPDFwithBeta(x, A, B, betaFunction(A, B));
+}
+
+/**
+ * @brief sigmoid
+ * @param x
+ * @return
+ */
+PIC_INLINE float sigmoid(float x)
+{
+    return x / (x + 1.0f);
+}
+
+/**
+ * @brief sigmoidInv
+ * @param x
+ * @return
+ */
+PIC_INLINE float sigmoidInv(float x)
+{
+    return x / (1.0f - x);
+}
+
+/**
+ * @brief simple8bitWithGamma
+ * @param x
+ * @return
+ */
+PIC_INLINE float simple8bitWithGamma(float x)
+{
+    float t0 = powf(x, 1.0f / 2.2f) * 255.0f;
+    float t1 = CLAMPi(t0, 0.0f, 255.0f);
+    return float(int(t1));
 }
 
 } // end namespace pic

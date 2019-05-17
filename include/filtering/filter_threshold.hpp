@@ -71,27 +71,6 @@ protected:
         }
     }
 
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
-        } else {
-            if((imgIn[0]->width  != imgOut->width)  ||
-               (imgIn[0]->height != imgOut->height) ||
-               (imgOut->channels != 1)) {
-                imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
-            }
-        }
-
-        return imgOut;
-    }
-
 public:
 
     /**
@@ -99,17 +78,17 @@ public:
      * @param threshold
      * @param bAdaptive
      */
-    FilterThreshold(float threshold = 0.5f, bool bAdaptive = false)
+    FilterThreshold(float threshold = 0.5f, bool bAdaptive = false) : Filter()
     {
-        Update(threshold, bAdaptive);
+        update(threshold, bAdaptive);
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param threshold
      * @param bAdaptive
      */
-    void Update(float threshold, bool bAdaptive)
+    void update(float threshold, bool bAdaptive)
     {
         this->threshold = threshold;
         this->bAdaptive = bAdaptive;
@@ -123,12 +102,12 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn->width;
-        height      = imgIn->height;
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
         channels    = 1;
-        frames      = imgIn->frames;
+        frames      = imgIn[0]->frames;
     }
 };
 

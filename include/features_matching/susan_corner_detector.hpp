@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../image.hpp"
 #include "../filtering/filter_luminance.hpp"
+#include "../filtering/filter_gaussian_2d.hpp"
 
 #include "../features_matching/general_corner_detector.hpp"
 
@@ -92,29 +93,10 @@ public:
      */
     void update(float sigma = 1.0f, int radius_maxima = 5, int radius = 3, float threshold = 0.001f)
     {
-        if(sigma > 0.0f) {
-            this->sigma = sigma;
-        } else {
-            this->sigma = 1.0f;
-        }
-
-        if(radius > 0) {
-            this->radius = radius;
-        } else {
-            this->radius = 3;
-        }
-
-        if(threshold > 0.0f) {
-            this->threshold = threshold;
-        } else {
-            this->threshold = 0.001f;
-        }
-
-        if(radius_maxima > 0){
-            this->radius_maxima = radius_maxima;
-        } else {
-            this->radius_maxima = 5;
-        }
+        this->sigma = sigma > 0.0f ? sigma : 1.0f;
+        this->radius = radius > 0 ? radius : 3;
+        this->threshold = threshold > 0.0f ? threshold : 0.001f;
+        this->radius_maxima = radius_maxima > 0 ? radius_maxima : 5;
     }
 
     /**
@@ -133,7 +115,7 @@ public:
             lum = img;
         } else {
             bLum = true;
-            lum = FilterLuminance::Execute(img, lum, LT_CIE_LUMINANCE);
+            lum = FilterLuminance::execute(img, lum, LT_CIE_LUMINANCE);
         }
 
         corners->clear();
@@ -142,7 +124,7 @@ public:
 
         //filter the input image
         FilterGaussian2D flt(sigma);
-        lum_flt = flt.ProcessP(Single(lum), NULL);
+        lum_flt = flt.Process(Single(lum), NULL);
 
         //"rasterizing" a circle
         std::vector< int > x, y;
@@ -202,11 +184,11 @@ public:
         int side = radius_maxima * 2 + 1;
         int *indices = new int [side * side];
 
-        for(int i=radius_maxima; i<(height - radius_maxima - 1); i++) {
+        for(int i = radius_maxima; i< (height - radius_maxima - 1); i++) {
 
             int tmp = i * width;
 
-            for(int j=radius_maxima; j<(width - radius_maxima - 1); j++) {
+            for(int j = radius_maxima; j < (width - radius_maxima - 1); j++) {
                 int ind = tmp + j;
 
                 if(R.data[ind] <= 0.0f) {
@@ -216,12 +198,12 @@ public:
                 indices[0] = ind;
                 int counter = 1;
 
-                for(int k=-radius_maxima; k<=radius_maxima; k++) {
+                for(int k = -radius_maxima; k <= radius_maxima; k++) {
                     int yy = CLAMP(i + k, height);
 
-                    for(int l=-radius_maxima; l<=radius_maxima; l++) {
+                    for(int l = -radius_maxima; l <= radius_maxima; l++) {
 
-                        if((l==0)&&(k==0)) {
+                        if((l == 0) && (k == 0)) {
                             continue;
                         }
 
@@ -243,7 +225,7 @@ public:
                     float R_value = R.data[indices[0]];
                     int index = 0;
 
-                    for(int k=1; k<counter; k++){
+                    for(int k = 1; k < counter; k++){
                         if(R.data[indices[k]] > R_value) {
                             R_value = R.data[indices[k]];
                             index = k;
@@ -260,6 +242,11 @@ public:
         }
 
         sortCornersAndTransfer(&corners_w_quality, corners);
+
+        if(indices != NULL) {
+            delete[] indices;
+            indices = NULL;
+        }
     }
 };
 

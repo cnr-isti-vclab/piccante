@@ -22,6 +22,8 @@ namespace pic {
 
 #include "../algorithms/radial_basis_function.hpp"
 
+#include "../filtering/filter.hpp"
+
 /**
  * @brief The FilterRadialBasisFunction class
  */
@@ -39,7 +41,7 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        if(rbf == NULL || src.size() < 1) {
+        if(rbf == NULL) {
             return;
         }
 
@@ -56,31 +58,9 @@ protected:
                 float *dataIn  = (*src[0]) (i, j);
                 float *dataOut = (*dst)    (i, j);
 
-                float out = rbf->eval(dataIn);
-                dataOut[0] = out;
+                dataOut[0] = rbf->eval(dataIn);
             }
         }
-    }
-
-    /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
-        } else {
-            if((imgIn[0]->width  != imgOut->width)  ||
-               (imgIn[0]->height != imgOut->height) ||
-               (imgOut->channels != 1)) {
-                imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 1);
-            }
-        }
-
-        return imgOut;
     }
 
 public:
@@ -91,6 +71,22 @@ public:
     FilterRadialBasisFunction() : Filter()
     {
         rbf = NULL;
+    }
+
+    /**
+     * @brief OutputSize
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
+     */
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
+    {
+        width    = imgIn[0]->width;
+        height   = imgIn[0]->height;
+        channels = 1;
+        frames   = imgIn[0]->frames;
     }
 
     /**

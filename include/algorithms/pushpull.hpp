@@ -32,9 +32,9 @@ class PushPull
 {
 protected:
 
-    FilterDownPP    *flt_down;
-    FilterUpPP      *flt_up;
-    ImageVec        stack;
+    FilterDownPP *flt_down;
+    FilterUpPP *flt_up;
+    ImageVec stack;
 
     /**
      * @brief release
@@ -56,8 +56,7 @@ public:
      */
     PushPull()
     {
-        flt_down = NULL;
-        flt_up = NULL;
+
     }
 
     ~PushPull()
@@ -66,12 +65,32 @@ public:
     }
 
     /**
+     * @brief update
+     * @param value
+     * @param threshold
+     */
+    void update(float *value, float threshold)
+    {
+        if(flt_down == NULL) {
+            flt_down = new FilterDownPP(value, threshold);
+        } else {
+            flt_down->update(value, threshold);
+        }
+
+        if(flt_up == NULL) {
+            flt_up = new FilterUpPP(value, threshold);
+        } else {
+            flt_up->update(value, threshold);
+        }
+    }
+
+    /**
      * @brief process computes push-pull.
      * @param img
-     * @param value
+     * @param imgOut
      * @return
      */
-    Image *process(Image *imgIn, Image *imgOut, float *value = NULL, float threshold = 1e-6f)
+    Image *Process(Image *imgIn, Image *imgOut)
     {
         if(imgIn == NULL) {
             return imgOut;
@@ -83,21 +102,9 @@ public:
             *imgOut = *imgIn;
         }
 
-        if(flt_down == NULL) {
-            flt_down = new FilterDownPP(value, threshold);
-        } else {
-            flt_down->Update(value, threshold);
-        }
-
-        if(flt_up == NULL) {
-            flt_up = new FilterUpPP(value, threshold);
-        } else {
-            flt_up->Update(value, threshold);
-        }
-
         Image *work = imgOut;
 
-        if(stack.empty()) { //creating the pyramid: Pull
+        if(stack.empty()) { //create the pyramid: Pull
             stack.push_back(imgOut);
 
             while(MIN(work->width, work->height) > 1) {
@@ -108,10 +115,10 @@ public:
                     work = tmp;
                 }
             }
-        } else { //updating previously created pyramid: Pull
+        } else { //update previously created pyramid: Pull
             int c = 1;
             while(MIN(work->width, work->height) > 1) {
-                flt_down->Process(Single(work), stack[c]);
+                flt_down->Process(Double(work, stack[c]), stack[c]);
                 work = stack[c];
                 c++;
             }
@@ -121,7 +128,7 @@ public:
         int n = int(stack.size()) - 2;
 
         for(int i = n; i >= 0; i--) {
-            flt_up->ProcessP(Single(stack[i + 1]), stack[i]);
+            flt_up->Process(Double(stack[i + 1], stack[i]), stack[i]);
         }
 
         return imgOut;
@@ -130,10 +137,11 @@ public:
     /**
      * @brief execute
      * @param img
+     * @param imgOut
      * @param value
      * @return
      */
-    static Image *execute(Image *img, float value)
+    static Image *execute(Image *img, Image *imgOut, float value)
     {
         PushPull pp;
 
@@ -142,9 +150,12 @@ public:
             tmp_value[i] = value;
         }
 
-        return pp.process(img, NULL, tmp_value);
+        pp.update(tmp_value, 1e-4f);
+        imgOut = pp.Process(img, imgOut);
 
         delete[] tmp_value;
+
+        return imgOut;
     }
 };
 

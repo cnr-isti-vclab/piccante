@@ -27,30 +27,30 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- * @brief MonteCarloSampler
+ * @brief getMonteCarloSamples
  * @param m
  * @param nSamples
  * @param samples
  */
 template <unsigned int N> PIC_INLINE
-void MonteCarloSampler(std::mt19937 *m, int nSamples, std::vector<float> &samples)
+void getMonteCarloSamples(std::mt19937 *m, int nSamples, std::vector<float> &samples)
 {
     for(int i = 0; i < nSamples; i++) {
         for(unsigned int j = 0; j < N; j++) {
-            float val = Random((*m)()) * 2.0f - 1.0f;
+            float val = getRandom((*m)()) * 2.0f - 1.0f;
             samples.push_back(val);
         }
     }
 }
 
 /**
- * @brief MonteCarloStratifiedSampler
+ * @brief getMonteCarloStratifiedSamples
  * @param m
  * @param nSamples
  * @param samples
  */
 template <unsigned int N> PIC_INLINE
-void MonteCarloStratifiedSampler(std::mt19937 *m, int nSamples,
+void getMonteCarloStratifiedSamples(std::mt19937 *m, int nSamples,
                                  std::vector<float> &samples)
 {
     int n = int(powf(float(nSamples), 1 / float(N))) + 1; //int(sqrtf(nSamples))+1;
@@ -66,7 +66,7 @@ void MonteCarloStratifiedSampler(std::mt19937 *m, int nSamples,
 
         for(unsigned int j = 0; j < N; j++) {
             int k = (i / div) % n;
-            float val = ((Random((*m)()) + k) / n_f) * 2.0f - 1.0f;
+            float val = ((getRandom((*m)()) + k) / n_f) * 2.0f - 1.0f;
             samples.push_back(val);
             div *= n;
         }
@@ -74,12 +74,12 @@ void MonteCarloStratifiedSampler(std::mt19937 *m, int nSamples,
 }
 
 /**
- * @brief PatternMethodSampler
+ * @brief getPatternMethodSampler
  * @param nSamples
  * @param samples
  */
 template <unsigned int N> PIC_INLINE
-void PatternMethodSampler(int nSamples, std::vector<float> &samples)
+void getPatternMethodSamples(int nSamples, std::vector<float> &samples)
 {
     int n = int(powf(float(nSamples), 1 / float(N))) + 1; //int(sqrtf(nSamples))+1;
     nSamples = n;

@@ -46,14 +46,15 @@ protected:
             for(int i = box->x0; i < box->x1; i++) {
                 int ind = (c + i) *  channels;
 
-                float mu1_sq = src[0]->data[ind];
-                mu1_sq *= mu1_sq;
-                float mu2_sq = src[1]->data[ind];
-                mu2_sq *= mu2_sq;
+                float mu1 = src[0]->data[ind];
+                float mu1_sq = mu1 * mu1;
+
+                float mu2 = src[1]->data[ind];
+                float mu2_sq = mu2 * mu2;
 
                 float sigma1_sq = src[2]->data[ind] - mu1_sq;
                 float sigma2_sq = src[3]->data[ind] - mu2_sq;
-                float mu1_mu2 = src[0]->data[ind] * src[1]->data[ind];
+                float mu1_mu2 = mu1 * mu2;
                 float sigma1_sigma2 = src[4]->data[ind] - mu1_mu2;
 
                 //numerator
@@ -77,7 +78,27 @@ public:
      * @brief FilterSSIM
      * @param type
      */
-    FilterSSIM(float C0, float C1)
+    FilterSSIM() : Filter()
+    {
+        minInputImages = 5;
+    }
+
+    /**
+     * @brief FilterSSIM
+     * @param type
+     */
+    FilterSSIM(float C0, float C1) : Filter()
+    {
+        minInputImages = 5;
+        update(C0, C1);
+    }
+
+    /**
+     * @brief update
+     * @param C0
+     * @param C1
+     */
+    void update(float C0, float C1)
     {
         this->C0 = C0;
         this->C1 = C1;

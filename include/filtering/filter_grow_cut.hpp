@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FILTERING_FILTER_GROW_CUT_HPP
 
 #include "../filtering/filter.hpp"
+#include "../util/array.hpp"
 
 namespace pic {
 
@@ -65,11 +66,7 @@ protected:
                     float *s_cur_k = (*state_cur)(x, y);
                     float *col_k = (*img)(x, y);
 
-                    float dist = 0.0f;
-                    for(int c = 0; c < channels; c++) {
-                        float tmp = col[c] - col_k[c];
-                        dist += tmp * tmp;
-                    }
+                    float dist = Arrayf::distanceSq(col, col_k, channels);
 
                     float g_theta = 1.0f - (dist / C);
                     g_theta *= s_cur_k[1];

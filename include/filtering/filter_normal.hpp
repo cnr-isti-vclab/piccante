@@ -31,14 +31,6 @@ protected:
     int colorChannel;
 
     /**
-     * @brief SetupAux
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut);
-
-    /**
      * @brief ProcessBBox
      * @param dst
      * @param src
@@ -59,10 +51,10 @@ public:
     FilterNormal(int colorChannel);
 
     /**
-     * @brief Update
+     * @brief update
      * @param colorChannel
      */
-    void Update(int colorChannel); 
+    void update(int colorChannel);
 
     /**
      * @brief OutputSize
@@ -72,41 +64,32 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn->width;
-        height      = imgIn->height;
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
         channels    = 3;
-        frames      = imgIn->frames;
+        frames      = imgIn[0]->frames;
     }
 };
 
-PIC_INLINE FilterNormal::FilterNormal()
+PIC_INLINE FilterNormal::FilterNormal() : Filter()
 {
-    Update(0);
+    update(0);
 }
 
-PIC_INLINE FilterNormal::FilterNormal(int colorChannel)
+PIC_INLINE FilterNormal::FilterNormal(int colorChannel) : Filter()
 {
-    Update(colorChannel);
+    update(colorChannel);
 }
 
-PIC_INLINE void FilterNormal::Update(int colorChannel)
+PIC_INLINE void FilterNormal::update(int colorChannel)
 {
     if(colorChannel<0) {
         colorChannel = 0;
     }
 
     this->colorChannel = colorChannel;
-}
-
-PIC_INLINE Image *FilterNormal::SetupAux(ImageVec imgIn, Image *imgOut)
-{
-    if(imgOut == NULL) {
-        imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
-    }
-
-    return imgOut;
 }
 
 PIC_INLINE void FilterNormal::ProcessBBox(Image *dst, ImageVec src, BBox *box)

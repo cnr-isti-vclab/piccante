@@ -35,22 +35,22 @@ protected:
     //FBO
     Fbo *fbo;
 
-    //Quad
+    //quad
     QuadGL *quad;
 
     bool bDomainTransform;
     int  counter;
 
-    //Shaders
+    //shaders
     std::string vertex_source, geometry_source, fragment_source, fragment_source_domain_transform;
     TechniqueGL techinques[2];
 
     std::string reduxOperation;
 
     /**
-     * @brief InitShaders
+     * @brief initShaders
      */
-    void InitShaders();
+    void initShaders();
 
 public:
     /**
@@ -83,7 +83,7 @@ public:
      */
     GLuint Redux(GLuint texIn, int width, int height, int channels, std::vector<GLuint> &stack)
     {
-        if(stack.empty()) {
+        if(stack.empty() || (texIn == 0)) {
             return 0;
         }
 
@@ -99,14 +99,14 @@ public:
             texFlt = stack[i];
         }
 
-        return stack[stack.size() - 1];
+        return texFlt;
     }
 
     /**
-     * @brief CreateMean
+     * @brief createMean
      * @return
      */
-    static ReduxGL *CreateMean()
+    static ReduxGL *createMean()
     {
         ReduxGL *filter = new
         ReduxGL("color = (color00 + color10 + color01 + color11) / 4.0;", false);
@@ -114,10 +114,21 @@ public:
     }
 
     /**
-     * @brief CreateLogMean
+     * @brief createSum
      * @return
      */
-    static ReduxGL *CreateLogMean()
+    static ReduxGL *createSum()
+    {
+        ReduxGL *filter = new
+        ReduxGL("color = color00 + color10 + color01 + color11;", false);
+        return filter;
+    }
+
+    /**
+     * @brief createLogMean
+     * @return
+     */
+    static ReduxGL *createLogMean()
     {
         ReduxGL *filter = new
         ReduxGL("color = (color00 + color10 + color01 + color11) / 4.0;", true);
@@ -125,53 +136,65 @@ public:
     }
 
     /**
-     * @brief CreateMax
+     * @brief createMin
      * @return
      */
-    static ReduxGL *CreateMax()
+    static ReduxGL *createMin()
     {
         ReduxGL *filter = new
-        ReduxGL("color = max(color00, color10);\n color = max(color, color01);\n color = max(color, color11);\n", false);
+        ReduxGL("color = min(color00, color10);\n "
+                "color = min(color, color01);\n "
+                "color = min(color, color11);\n", false);
         return filter;
     }
 
     /**
-     * @brief CreateMin
+     * @brief createMax
      * @return
      */
-    static ReduxGL *CreateMin()
+    static ReduxGL *createMax()
     {
         ReduxGL *filter = new
-        ReduxGL("color = min(color00, color10);\n color = min(color, color01);\n color = min(color, color11);\n", false);
+        ReduxGL("color = max(color00, color10);\n "
+                "color = max(color, color01);\n "
+                "color = max(color, color11);\n", false);
         return filter;
     }
 
     /**
-     * @brief CreateMinPos
+     * @brief createMinPos
      * @return
      */
-    static ReduxGL *CreateMinPos()
+    static ReduxGL *createMinPos()
     {
         ReduxGL *filter = new
-        ReduxGL("vec4 maxVal = vec4(1e-6); if(color00.x>0.0f) color = color00; if(color01.x>0.0f) color = min(color,color01); if(color10.x>0.0f) color = min(color,color10); if(color11.x>0.0f) color = min(color,color11);\n", false);
+        ReduxGL("vec4 maxVal = vec4(1e-6); "
+                "if(color00.x>0.0f) color = color00; "
+                "if(color01.x>0.0f) color = min(color,color01); "
+                "if(color10.x>0.0f) color = min(color,color10); "
+                "if(color11.x>0.0f) color = min(color,color11);\n", false);
         return filter;
     }
 
     /**
-     * @brief CreateCheck
+     * @brief createCheck
      * @return
      */
-    static ReduxGL *CreateCheck()
+    static ReduxGL *createCheck()
     {
         ReduxGL *filter = new
-        ReduxGL("vec4 sum = color00 + color01 + color10 + color11; color = sum.x<0.5? vec4(0.0) : sum; color = ((sum.x>0.5)&&sum.x<3.5)? vec4(10.0) : color; color = ((sum.x>3.5)&&sum.x<4.5)? vec4(1.0) : color; color = sum.x>4.5 ? vec4(10.0) : color;\n", false);
+        ReduxGL("vec4 sum = color00 + color01 + color10 + color11; "
+                "color = sum.x < 0.5? vec4(0.0) : sum; "
+                "color = ((sum.x > 0.5) && (sum.x < 3.5))? vec4(10.0) : color; "
+                "color = ((sum.x > 3.5) && (sum.x < 4.5))? vec4(1.0) : color; "
+                "color = sum.x > 4.5 ? vec4(10.0) : color;\n", false);
         return filter;
     }
 
     /**
-     * @brief divideByTwoWithEvenDividend if x is even it computes x/2 otherwise (x+1)/2.
+     * @brief divideByTwoWithEvenDividend if x is even it computes x / 2 otherwise (x + 1) / 2.
      * @param x is an input value.
-     * @return If x is even it returns x/2; otherwise it returns (x+1)/2.
+     * @return If x is even it returns x/2; otherwise it returns (x + 1) / 2.
      */
     static int divideByTwoWithEvenDividend(int x)
     {
@@ -183,14 +206,14 @@ public:
     }
 
     /**
-     * @brief AllocateReduxData allocates a pyramid for computing the Redux operator.
+     * @brief allocateReduxData allocates a pyramid for computing the Redux operator.
      * @param width
      * @param height
      * @param channels
      * @param minSize
      * @return
      */
-    static void AllocateReduxData(int width, int height, int channels,
+    static void allocateReduxData(int width, int height, int channels,
                            std::vector<GLuint> &stack, int minSize = 2)
     {
         int checkSize = divideByTwoWithEvenDividend(MIN(width, height));
@@ -224,11 +247,11 @@ PIC_INLINE ReduxGL::ReduxGL(std::string reduxOperation, bool bDomainTransform)
 
     quad = new QuadGL(false);
 
-    //getting a vertex program for screen aligned quad
+    //get a vertex program for screen aligned quad
     vertex_source = QuadGL::getVertexProgramV3();
 
     this->reduxOperation = reduxOperation;
-    InitShaders();
+    initShaders();
 }
 
 PIC_INLINE ReduxGL::~ReduxGL()
@@ -244,12 +267,12 @@ PIC_INLINE ReduxGL::~ReduxGL()
     }
 }
 
-PIC_INLINE void ReduxGL::InitShaders()
+PIC_INLINE void ReduxGL::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
-                          uniform sampler2D u_tex; \n
-                          out     vec4      f_color; \n
+    uniform sampler2D u_tex; \n
+    out     vec4      f_color; \n
 
     void main(void) {
         \n
@@ -267,11 +290,11 @@ PIC_INLINE void ReduxGL::InitShaders()
         vec4  color;
         \n
         ___REDUX_OPERATION___ \n
-        f_color = ((texSize - coords) == ivec2(0, 0)) ? color00 : color;
         f_color = vec4(color.xyz, 1.0);
         \n
     }
                       );
+//    f_color = ((texSize - coords) == ivec2(0, 0)) ? color00 : color;
 
     fragment_source_domain_transform = fragment_source;
 
@@ -286,7 +309,11 @@ PIC_INLINE void ReduxGL::InitShaders()
 
     if(bDomainTransform) {
         size_t processing_found = fragment_source_domain_transform.find("___REDUX_OPERATION___");
-        std::string domain_transform = "float eps = 1e-6; color00 = log(color00 + eps); color01 = log(color01 + eps); color10 = log(color10 + eps) ; color11 = log(color11 + eps);";
+        std::string domain_transform = "float eps = 1e-6; "
+                                       "color00 = log(color00 + eps); "
+                                       "color01 = log(color01 + eps); "
+                                       "color10 = log(color10 + eps) ; "
+                                       "color11 = log(color11 + eps);";
         domain_transform += reduxOperation;
         fragment_source_domain_transform.replace(processing_found, 21, domain_transform);
 

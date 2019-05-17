@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../image.hpp"
 #include "../util/vec.hpp"
+#include "../util/string.hpp"
 #include "../image_samplers/image_sampler_bilinear.hpp"
 #include "../filtering/filter_downsampler_2d.hpp"
 #include "../filtering/filter_luminance.hpp"
@@ -115,7 +116,7 @@ public:
             bDelete = false;
             L = img;
         } else {
-            L = FilterLuminance::Execute(img, L, LT_WARD_LUMINANCE);
+            L = FilterLuminance::execute(img, L, LT_WARD_LUMINANCE);
         }
 
         int n = L->nPixels();
@@ -150,7 +151,7 @@ public:
                                    int shift_bits = 6)
     {
         if(img1 == NULL || img2 == NULL) {
-            return Vec2i(0, 0.0);
+            return Vec2i(0, 0);
         }
 
         if(!img1->isSimilarType(img2)) {
@@ -162,14 +163,14 @@ public:
         if(img1->channels == 1) {
             L1 = img1;
         } else {
-            L1 = FilterLuminance::Execute(img1, NULL, LT_WARD_LUMINANCE);
+            L1 = FilterLuminance::execute(img1, NULL, LT_WARD_LUMINANCE);
             luminance.push_back(L1);
         }
 
         if(img2->channels == 1) {
             L2 = img2;
         } else {
-            L2 = FilterLuminance::Execute(img2, NULL, LT_WARD_LUMINANCE);
+            L2 = FilterLuminance::execute(img2, NULL, LT_WARD_LUMINANCE);
             luminance.push_back(L2);
         }
 
@@ -186,9 +187,9 @@ public:
         //downsample
         Image *tmp_1 = L1;
         Image *tmp_2 = L2;
-        for(int i=0; i< shift_bits; i++) {
-            Image* sml_img1 = FilterDownSampler2D::Execute(tmp_1, NULL, 0.5f);
-            Image* sml_img2 = FilterDownSampler2D::Execute(tmp_2, NULL, 0.5f);
+        for(int i = 0; i < shift_bits; i++) {
+            Image* sml_img1 = FilterDownSampler2D::execute(tmp_1, NULL, 0.5f);
+            Image* sml_img2 = FilterDownSampler2D::execute(tmp_2, NULL, 0.5f);
 
             img1_v.push_back(sml_img1);
             img2_v.push_back(sml_img2);
@@ -282,7 +283,7 @@ public:
             return NULL;
         }
 
-        Image *ret = imgTarget->allocateSimilarOne();
+        Image *ret = imgSource->allocateSimilarOne();
         ret->setZero();
 
         shift = wa.getExpShift(imgTarget, imgSource);

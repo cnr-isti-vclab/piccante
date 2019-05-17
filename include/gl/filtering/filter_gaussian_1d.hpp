@@ -43,19 +43,19 @@ public:
     ~FilterGLGaussian1D();
 
     /**
-     * @brief Update
+     * @brief update
      * @param sigma
      */
-    void Update(float sigma);
+    void update(float sigma);
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param nameIn
      * @param nameOut
      * @param sigma
      * @return
      */
-    static ImageGL *Execute(std::string nameIn, std::string nameOut, float sigma)
+    static ImageGL *execute(std::string nameIn, std::string nameOut, float sigma)
     {
         ImageGL imgIn(nameIn);
         imgIn.generateTextureGL(GL_TEXTURE_2D, false);
@@ -81,7 +81,7 @@ FilterGLGaussian1D::FilterGLGaussian1D(float sigma, int direction = 0,
 
     this->sigma = -1.0f;
 
-    Update(sigma);
+    update(sigma);
 }
 
 FilterGLGaussian1D::~FilterGLGaussian1D()
@@ -90,13 +90,14 @@ FilterGLGaussian1D::~FilterGLGaussian1D()
         delete weights;
         weights = NULL;
     }
+
     if(pg != NULL) {
         delete pg;
         pg = NULL;
     }
 }
 
-void FilterGLGaussian1D::Update(float sigma)
+void FilterGLGaussian1D::update(float sigma)
 {
     bool bChanges = false;
 
@@ -107,9 +108,12 @@ void FilterGLGaussian1D::Update(float sigma)
 
     if(pg != NULL) {
         delete pg;
+        pg = NULL;
     }
 
-    pg = new PrecomputedGaussian(this->sigma);
+    if(pg == NULL) {
+        pg = new PrecomputedGaussian(this->sigma);
+    }
 
     if(bChanges || weights == NULL) {
         if(weights != NULL) {
@@ -120,7 +124,7 @@ void FilterGLGaussian1D::Update(float sigma)
         weights->generateTextureGL();
     }
 
-    SetUniform();
+    setUniform();
 }
 
 } // end namespace pic

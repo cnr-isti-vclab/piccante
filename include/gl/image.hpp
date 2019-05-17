@@ -52,9 +52,9 @@ protected:
     std::vector<GLuint> stack;
 
     /**
-     * @brief destroyGL
+     * @brief releaseGL
      */
-    void destroyGL();
+    void releaseGL();
 
     /**
      * @brief assignGL assigns an (r, g, b, a) value to an image using glClearColor.
@@ -91,7 +91,23 @@ protected:
     {
         BufferOpsGL *ops = BufferOpsGL::getInstance();
 
-        ops->list[op]->Update(a);
+        ops->list[op]->update(a);
+        ops->list[op]->Process(getTexture(), 0, getTexture(), width, height);
+    }
+
+    /**
+     * @brief thisOperatorConstColor
+     * @param a
+     * @param op
+     */
+    inline void thisOperatorConstColor(const Arrayf &a, BOGL op)
+    {
+        BufferOpsGL *ops = BufferOpsGL::getInstance();
+
+        float c0[4];
+        Arrayf::assign(a.data, MIN(a.nData, 4), c0);
+
+        ops->list[op]->update(c0);
         ops->list[op]->Process(getTexture(), 0, getTexture(), width, height);
     }
 
@@ -114,7 +130,27 @@ protected:
     }
 
     /**
-     * @brief newOperatorImage
+     * @brief newOperatorConstColor
+     * @param a
+     * @param op
+     * @return
+     */
+    inline ImageGL newOperatorConstColor(const Arrayf &a, BOGL op)
+    {
+        ImageGL ret(frames, width, height, channels, IMG_GPU, target);
+        BufferOpsGL *ops = BufferOpsGL::getInstance();
+
+        float c0[4];
+        Arrayf::assign(a.data, MIN(a.nData, 4), c0);
+
+        ops->list[op]->update(c0);
+        ops->list[op]->Process(getTexture(), 0, ret.getTexture(), width, height);
+
+        return ret;
+    }
+
+    /**
+     * @brief newOperatorConst
      * @param a
      * @param op
      * @return
@@ -124,7 +160,7 @@ protected:
         ImageGL ret(frames, width, height, channels, IMG_GPU, target);
         BufferOpsGL *ops = BufferOpsGL::getInstance();
 
-        ops->list[op]->Update(a);
+        ops->list[op]->update(a);
         ops->list[op]->Process(getTexture(), 0, ret.getTexture(), width, height);
 
         return ret;
@@ -362,17 +398,21 @@ public:
      */
     float *getVal(float *ret, ReduxGL *flt)
     {
+        if(texture == 0) {
+            return ret;
+        }
+
         if(ret == NULL) {
             ret = new float [channels];
         }
 
         if(stack.empty()) {
-            ReduxGL::AllocateReduxData(width, height, channels, stack, 1);
+            ReduxGL::allocateReduxData(width, height, channels, stack, 1);
         }
 
         GLuint output = flt->Redux(texture, width, height, channels, stack);
 
-        //copying data from GPU to main memory
+        //copy data from GPU to main memory
         int mode, modeInternalFormat;
         getModesGL(channels, mode, modeInternalFormat);
 
@@ -407,6 +447,18 @@ public:
     }
 
     /**
+     * @brief getSumVal
+     * @param imgIn
+     * @param ret
+     * @return
+     */
+    float *getSumVal(float *ret = NULL)
+    {
+        ReduxOpsGL *ops = ReduxOpsGL::getInstance();
+        return getVal(ret, ops->list[REDGL_SUM]);
+    }
+
+    /**
      * @brief getMeanVal
      * @param imgIn
      * @return
@@ -428,7 +480,7 @@ public:
 
         ret = getVal(ret, ops->list[REDGL_LOG_MEAN]);
 
-        for(int i=0; i<channels; i++) {
+        for(int i = 0; i < channels; i++) {
             ret[i] = expf(ret[i]);
         }
 
@@ -545,6 +597,12 @@ public:
     void operator /=(const float &a);
 
     /**
+     * @brief operator /=
+     * @param a
+     */
+    void operator /=(const Arrayf &a);
+
+    /**
      * @brief operator /
      * @param a
      * @return
@@ -604,7 +662,7 @@ PIC_INLINE ImageGL::ImageGL(Image *img, GLenum target, bool mipmap, bool transfe
     channels = img->channels;
     data     = img->data;
 
-    calculateStrides();
+    allocateAux();
 
     texture = 0;
 
@@ -632,7 +690,7 @@ PIC_INLINE ImageGL::ImageGL(Image *img, bool transferOwnership = false) : Image(
     channels = img->channels;
     data     = img->data;
 
-    calculateStrides();
+    allocateAux();
 
     texture = 0;
 
@@ -687,8 +745,8 @@ PIC_INLINE ImageGL::ImageGL(int frames, int width, int height, int channels,
 
 PIC_INLINE ImageGL::~ImageGL()
 {   
-    destroyGL();
-    Destroy();
+    releaseGL();
+    release();
 }
 
 /**
@@ -762,11 +820,11 @@ PIC_INLINE ImageGL *ImageGL::cloneGL()
     //call Image clone function
     Image *tmp = this->clone();
 
-    //wrapping tmp into an ImageGL
+    //wrap tmp into an ImageGL
     return new ImageGL(tmp, target, false, true);
 }
 
-PIC_INLINE void ImageGL::destroyGL()
+PIC_INLINE void ImageGL::releaseGL()
 {
     if(notOwnedGL) {
         return;
@@ -778,7 +836,8 @@ PIC_INLINE void ImageGL::destroyGL()
         target = 0;
     }
 
-    for(unsigned int i=0; i<stack.size(); i++) {
+    auto n = stack.size();
+    for(auto i = 0; i < n; i++) {
         if(stack[i] != 0) {
             glDeleteTextures(1, &stack[i]);
             stack[i] = 0;
@@ -789,7 +848,7 @@ PIC_INLINE void ImageGL::destroyGL()
 PIC_INLINE ImageGL *ImageGL::allocateSimilarOneGL()
 {
 #ifdef PIC_DEBUG
-    printf("%d %d %d %d %d\n", frames, width, height, channels, mode);
+    printf("ImageGL::allocateSimilarOneGL -- %d %d %d %d %d\n", frames, width, height, channels, mode);
 #endif
 
     ImageGL *ret = new ImageGL(frames, width, height, channels, mode, target);
@@ -932,7 +991,7 @@ PIC_INLINE void ImageGL::unBindTexture()
 PIC_INLINE void ImageGL::clamp(float a = 0.0f, float b = 1.0f)
 {
     BufferOpsGL *ops = BufferOpsGL::getInstance();
-    ops->list[BOGL_CLAMP]->Update(a, b);
+    ops->list[BOGL_CLAMP]->update(a, b);
     ops->list[BOGL_CLAMP]->Process(getTexture(), 0, getTexture(), width, height);
 }
 
@@ -1014,6 +1073,11 @@ PIC_INLINE void ImageGL::operator /=(const ImageGL &a)
 PIC_INLINE void ImageGL::operator /=(const float &a)
 {
     thisOperatorConst(a, BOGL_DIV_CONST);
+}
+
+PIC_INLINE void ImageGL::operator /=(const Arrayf &a)
+{
+    thisOperatorConstColor(a, BOGL_DIV_CONST);
 }
 
 PIC_INLINE ImageGL ImageGL::operator /(const ImageGL &a)

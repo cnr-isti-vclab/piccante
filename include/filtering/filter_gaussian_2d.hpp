@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_GAUSSIAN_2D_HPP
 #define PIC_FILTERING_FILTER_GAUSSIAN_2D_HPP
 
+#include "../util/std_util.hpp"
+
 #include "../filtering/filter_npasses.hpp"
 #include "../filtering/filter_gaussian_1d.hpp"
 
@@ -29,57 +31,60 @@ namespace pic {
 class FilterGaussian2D: public FilterNPasses
 {
 protected:
-    FilterGaussian1D *gaussianFilter;
+    FilterGaussian1D *filter;
 
 public:
+
+    /**
+     * @brief FilterGaussian2D
+     */
+    FilterGaussian2D() : FilterNPasses()
+    {
+        filter = new FilterGaussian1D(1.0f);
+
+        insertFilter(filter);
+        insertFilter(filter);
+    }
+
     /**
      * @brief FilterGaussian2D
      * @param sigma
      */
-    FilterGaussian2D(float sigma)
+    FilterGaussian2D(float sigma) : FilterNPasses()
     {
-        //Gaussian filter
-        gaussianFilter = new FilterGaussian1D(sigma);
+        filter = new FilterGaussian1D(sigma);
 
-        InsertFilter(gaussianFilter);
-        InsertFilter(gaussianFilter);
+        insertFilter(filter);
+        insertFilter(filter);
     }
 
     ~FilterGaussian2D()
     {
-        Destroy();
+        release();
 
-        if(gaussianFilter != NULL) {
-            delete gaussianFilter;
-        }
+        filter = delete_s(filter);
     }
 
     /**
-     * @brief Execute
+     * @brief update
+     * @param sigma
+     */
+    void update(float sigma)
+    {
+        filter->update(sigma, 0);
+    }
+
+    /**
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma)
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma)
     {
         FilterGaussian2D filter(sigma);
-        return filter.ProcessP(Single(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut, float sigma)
-    {
-        Image imgIn(nameIn);
-        Image *imgOut = Execute(&imgIn, NULL, sigma);
-        imgOut->Write(nameOut);
-        return imgOut;
+        return filter.Process(Single(imgIn), imgOut);
     }
 };
 

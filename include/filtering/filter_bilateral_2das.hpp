@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 
 #include "../util/precomputed_gaussian.hpp"
+#include "../util/std_util.hpp"
 
 #include "../filtering/filter_sampling_map.hpp"
 
@@ -34,13 +35,20 @@ namespace pic {
 class FilterBilateral2DAS: public Filter
 {
 protected:
-    float					sigma_s, sigma_r;
-    PrecomputedGaussian		*pg;
-    int                     seed;
+    float sigma_s, sigma_r, sigma_r_sq_2;
+    PrecomputedGaussian *pg;
+    ImageSamplerBilinear isb;
 
-    MRSamplers<2>			*ms;
+    int seed;
 
-    //Process in a box
+    MRSamplers<2> *ms;
+
+    /**
+     * @brief ProcessBBox
+     * @param dst
+     * @param src
+     * @param box
+     */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
@@ -56,7 +64,7 @@ public:
      * @param sigma_r
      * @param mult
      */
-    FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s, float sigma_r, int mult);
+    FilterBilateral2DAS(float sigma_s, float sigma_r, int mult, SAMPLER_TYPE type);
 
     ~FilterBilateral2DAS();
 
@@ -64,81 +72,68 @@ public:
      * @brief Signature
      * @return
      */
-    std::string Signature()
+    std::string signature()
     {
-        return GenBilString("AS", sigma_s, sigma_r);
+        return genBilString("AS", sigma_s, sigma_r);
     }
 
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param sigma_s
      * @param sigma_r
      * @return
      */
-    static Image *Execute(Image *imgIn, Image *imgOut, float sigma_s, float sigma_r)
+    static Image *execute(Image *imgIn, Image *imgOut, float sigma_s, float sigma_r)
     {
         FilterSamplingMap fsm(sigma_s);
-        Image *samplingMap = fsm.ProcessP(Single(imgIn), NULL);
-        *samplingMap /= samplingMap->getMaxVal(NULL, NULL)[0];
+        Image *samplingMap = fsm.Process(Single(imgIn), NULL);
+        float maxVal;
+        samplingMap->getMaxVal(NULL, &maxVal);
 
-        FilterBilateral2DAS fltBil2DAS(ST_DARTTHROWING, sigma_s, sigma_r, 1);
+        *samplingMap /= maxVal;
+
+        samplingMap->Write("../sampling_map.png");
+
+        FilterBilateral2DAS fltBil2DAS(sigma_s, sigma_r, 1, ST_DARTTHROWING);
         imgOut = fltBil2DAS.Process(Double(imgIn, samplingMap), imgOut);
 
         delete samplingMap;
 
         return imgOut;
     }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param sigma_s
-     * @param sigma_r
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut, float sigma_s,
-                             float sigma_r)
-    {
-        Image imgIn(nameIn);
-        
-        long t0 = timeGetTime();
-        Image *imgOut = Execute(&imgIn, NULL, sigma_s, sigma_r);
-        long t1 = timeGetTime();
-        printf("Stochastic Adaptive Bilateral Filter time: %ld\n", t1 - t0);
-
-        imgOut->Write(nameOut);
-        return imgOut;
-    }
 };
 
-PIC_INLINE FilterBilateral2DAS::FilterBilateral2DAS()
+PIC_INLINE FilterBilateral2DAS::FilterBilateral2DAS() : Filter()
 {
+    minInputImages = 2;
     seed = 1;
     pg = NULL;
     ms = NULL;
 }
 
-PIC_INLINE FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sigma_s,
-        float sigma_r, int mult = 1)
+PIC_INLINE FilterBilateral2DAS::FilterBilateral2DAS(float sigma_s,
+        float sigma_r, int mult = 1, SAMPLER_TYPE type = ST_BRIDSON) : Filter()
 {
-    //protected values are assigned/computed
-    this->sigma_s = sigma_s;
-    this->sigma_r = sigma_r;
+    minInputImages = 2;
 
-    //Precomputation of the Gaussian Kernel
+    //protected values are assigned/computed
+    this->sigma_s = sigma_s > 0.0f ? sigma_s : 1.0f;
+    this->sigma_r = sigma_r > 0.0f ? sigma_r : 0.01f;
+    this->sigma_r_sq_2 = this->sigma_r * this->sigma_r * 2.0f;
+
+    //precompute the Gaussian Kernel
     pg = new PrecomputedGaussian(sigma_s);
 
     //Poisson samples
+    Vec2i window = Vec2i(pg->halfKernelSize, pg->halfKernelSize);
+
     if(mult > 0) {
-        ms = new MRSamplers<2>(type, pg->halfKernelSize, pg->halfKernelSize * mult, 3,
-                               64);
+        ms = new MRSamplers<2>(type, window, pg->halfKernelSize * mult, 3, 64);
     } else if(mult < 0) {
         mult = -mult;
-        ms = new MRSamplers<2>(type, pg->halfKernelSize, pg->halfKernelSize / mult, 3,
-                               64);
+        ms = new MRSamplers<2>(type, window, pg->halfKernelSize / mult, 3, 64);
     }
 
     seed = 1;
@@ -146,42 +141,32 @@ PIC_INLINE FilterBilateral2DAS::FilterBilateral2DAS(SAMPLER_TYPE type, float sig
 
 PIC_INLINE FilterBilateral2DAS::~FilterBilateral2DAS()
 {
-    if(pg != NULL) {
-        delete pg;
-    }
-
-    if(ms != NULL) {
-        delete ms;
-    }
+    pg = delete_s(pg);
+    ms = delete_s(ms);
 }
 
 PIC_INLINE void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
-    int width = dst->width;
-    int height = dst->height;
     int channels = dst->channels;
 
-    //Filtering
-    float Gauss1, Gauss2;
-    float  tmp, tmp2, tmp3, sum;
-    int c2, ci, cj;
-
+    //filter
     Image *edge, *base, *samplingMap;
 
-    if(src.size() == 3) {//Joint/Cross Bilateral Filtering
-        base = src[0];
-        edge = src[1];
-        samplingMap = src[2]; 
-    } else {
-        base = src[0];
-        edge = src[0];
-        samplingMap = src[1];    
+    switch(src.size()) {
+
+        case 2: {
+            base = src[0];
+            edge = src[0];
+            samplingMap = src[1];
+        } break;
+
+        default: {
+            base = src[0];
+            edge = src[1];
+            samplingMap = src[2];
+        } break;
+
     }
-
-    ImageSamplerBilinear	isb;
-
-    float sigma_r2 = (sigma_r * sigma_r * 2.0f);
-    bool sumTest;
 
     RandomSampler<2> *ps;
     float valOut[3];
@@ -189,24 +174,21 @@ PIC_INLINE void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox 
     //Mersenne Twister
     std::mt19937 m(seed);
 
-    for(int i = box->x0; i < box->x1; i++) {
-        float x = float(i) / float(width);
+    for(int i = box->y0; i < box->y1; i++) {
+        float x = float(i) / dst->heightf;
 
-        for(int j = box->y0; j < box->y1; j++) {
+        for(int j = box->x0; j < box->x1; j++) {
 
-            //Convolution kernel
-            float *tmp_dst  = (*dst)(j, i);
-            float *tmp_base = (*base)(j, i);
-            float *tmp_edge = (*edge)(j, i);
+            //convolve with the kernel
+            float *dst_data = (*dst)(j, i);
+            float *edge_data = (*edge)(j, i);
 
-            for(int l = 0; l < channels; l++) {
-                tmp_dst[l] = 0.0f;
-            }
+            Arrayf::assign(0.0f, dst_data, channels);
 
             ps = ms->getSampler(&m);
 
-            //Calculating the number of samples
-            float y = float(j) / float(height);
+            //calculate the number of samples
+            float y = float(j) / dst->widthf;
             isb.SampleImage(samplingMap, x, y, valOut);
 
             float tmpValOut = 1.0f - valOut[0]; //+valOut[1]+valOut[2])/3.0f;
@@ -229,43 +211,45 @@ PIC_INLINE void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox 
 
             nSamples = MIN(nSamples, pg->halfKernelSize * pg->halfKernelSize * 2);
 
-            sum = 0.0f;
-
+            float sum = 0.0f;
             for(int k = 0; k < nSamples; k += 2) {
+                //fetch addresses
+                int cj = j + ps->samplesR[k    ];
+                int ci = i + ps->samplesR[k + 1];
+
+                //
                 //Spatial Gaussian kernel
-                Gauss1 =	pg->coeff[ps->samplesR[k    ] + pg->halfKernelSize] *
-                            pg->coeff[ps->samplesR[k + 1] + pg->halfKernelSize];
+                //
+                float G1 = pg->coeff[ps->samplesR[k    ] + pg->halfKernelSize] *
+                           pg->coeff[ps->samplesR[k + 1] + pg->halfKernelSize];
 
-                //Address
-                ci = CLAMP(i + ps->samplesR[k    ], width);
-                cj = CLAMP(j + ps->samplesR[k + 1], height);
-                c2 = (cj * width + ci) * channels;
 
+                float *cur_edge = (*edge)(cj, ci);
+
+                //
                 //Range Gaussian Kernel
-                tmp = 0.0f;
-
-                for(int l = 0; l < channels; l++) {
-                    tmp3 = edge->data[c2 + l] - tmp_edge[l];
-                    tmp += tmp3 * tmp3;
-                }
-
-                Gauss2 = expf(-tmp / sigma_r2);
+                //
+                float tmp = Arrayf::distanceSq(cur_edge, edge_data, channels);
+                float G2 = expf(-tmp / sigma_r_sq_2);
 
                 //Weight
-                tmp2 = Gauss1 * Gauss2;
-                sum += tmp2;
+                float weight = G1 * G2;
+                sum += weight;
 
-                //Filtering
+                //filter
+                float *base_data_ci_cj = (*base)(cj, ci);
+
                 for(int l = 0; l < channels; l++) {
-                    tmp_dst[l] += base->data[c2 + l] * tmp2;
+                    dst_data[l] += base_data_ci_cj[l] * weight;
                 }
             }
 
-            //Normalization
-            sumTest = sum > 0.0f;
-
-            for(int l = 0; l < channels; l++) {
-                tmp_dst[l] = sumTest ? tmp_dst[l] / sum : tmp_base[l];
+            //normalization
+            if(sum > 0.0f) {
+                Arrayf::div(dst_data, channels, sum);
+            } else {
+                float *base_data = (*base)(j, i);
+                Arrayf::assign(base_data, channels, dst_data);
             }
         }
     }

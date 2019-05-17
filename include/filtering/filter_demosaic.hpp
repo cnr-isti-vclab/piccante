@@ -30,21 +30,10 @@ class FilterDemosaic: public Filter
 protected:
 
     /**
-     * @brief SetupAux
+     * @brief LinearUpSamplingGCGreen this upsamples the green channel with gradient correction
      * @param imgIn
      * @param imgOut
-     * @return
      */
-    Image *SetupAux(ImageVec imgIn, Image *imgOut)
-    {
-        if(imgOut == NULL) {
-            imgOut = new Image(1, imgIn[0]->width, imgIn[0]->height, 3);
-        }
-
-        return imgOut;
-    }
-
-    //Linear upsampling of green channel with gradient correction
     void LinearUpSamplingGCGreen(Image *imgIn, Image *imgOut)
     {
         int height = imgIn->height;
@@ -53,7 +42,7 @@ protected:
         float *dataIn = imgIn->data;
         float *dataOut = imgOut->data;
 
-        //Copying the original Green pixels into the U16RGB buffer
+        //copy the original Green pixels into the U16RGB buffer
         for(int j = 0; j < height; j++) {
             int tmp = j * width;
             for(int i = ((j + 1) % 2); i < width; i += 2) {
@@ -62,7 +51,7 @@ protected:
             }
         }
 
-        //Edge-aware interpolation for the missing Green pixels
+        //edge-aware interpolation for the missing Green pixels
         //#pragma omp parallel for
         for(int k = 0; k < 2; k++) {
             for(int j = k; j < (height); j += 2) {
@@ -99,7 +88,13 @@ protected:
         }
     }
 
-    //Linear UpSampling with gradients: Red and Blue channels
+    /**
+     * @brief LinearUpSamplingGCRB this linearly upsamples Red and Blue channels
+     * @param imgIn
+     * @param imgOut
+     * @param sx
+     * @param sy
+     */
     void LinearUpSamplingGCRB(Image *imgIn, Image *imgOut, int sx,
                                          int sy)
     {
@@ -111,7 +106,7 @@ protected:
         float *dataIn = imgIn->data;
         float *data = imgOut->data;
 
-        //Copying the original pixels!
+        //copy the original pixels!
         //#pragma omp parallel for
         for(j = sy; j < height; j += 2) {
             for(i = sx; i < width; i += 2) {
@@ -141,11 +136,11 @@ protected:
 
             for(i = ssx; i < (width); i += 2) {
                 //
-                //		    0.5
+                //          0.5
                 //      -1   0  -1
                 //  -1   4   5   4   -1
                 //      -1   0  -1
-                //		    0.5
+                //          0.5
                 //
                 int current = j * width + i;
 
@@ -181,11 +176,11 @@ protected:
 
             for(i = ssx; i < (width); i += 2) {
                 //
-                //		     -1
+                //           -1
                 //       -1   4  -1
                 //  0.5   0   5   0   0.5
                 //       -1   4  -1
-                //		     -1
+                //           -1
                 //
                 int current = j * width + i;
 
@@ -222,11 +217,11 @@ protected:
 
             for(i = ssx; i < (width); i += 2) {
                 //
-                //		     -3/2
+                //           -3/2
                 //         2   0   2
                 //  -3/2   0   6   0   -3/2
                 //         2   0   2
-                //		     -3/2
+                //           -3/2
                 //
                 int current = j * width + i;
                 tmp =	6.0f *	dataIn[current] +
@@ -262,14 +257,13 @@ public:
      * @param channels
      * @param frames
      */
-    void OutputSize(Image *imgIn, int &width, int &height, int &channels, int &frames)
+    void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        width       = imgIn->width;
-        height      = imgIn->height;
+        width       = imgIn[0]->width;
+        height      = imgIn[0]->height;
         channels    = 3;
-        frames      = imgIn->frames;
+        frames      = imgIn[0]->frames;
     }
-
 
     /**
       * @brief Filter::Process
@@ -287,8 +281,7 @@ public:
             return imgOut;
         }
 
-        imgOut = SetupAux(imgIn, imgOut);
-
+        imgOut = setupAux(imgIn, imgOut);
 
         LinearUpSamplingGCGreen(imgIn[0], imgOut);
         LinearUpSamplingGCRB(imgIn[0], imgOut, 0, 0);
@@ -298,23 +291,12 @@ public:
     }
 
     /**
-     * @brief ProcessP
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @return
      */
-    Image *ProcessP(ImageVec imgIn, Image *imgOut)
-    {
-        return Process(imgIn, imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    static Image *Execute(Image *imgIn, Image *imgOut)
+    static Image *execute(Image *imgIn, Image *imgOut)
     {
         FilterDemosaic flt;
         return flt.Process(Single(imgIn), imgOut);

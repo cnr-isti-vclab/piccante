@@ -41,43 +41,43 @@ int main(int argc, char *argv[])
         img0_str = argv[1];
         img1_str = argv[2];
     } else {
-        img0_str = "../data/input/singapore.png";
+        img0_str = "../data/input/bottles.hdr";
         bCreate = true;
     }
 
-    //load  values in [0, 255]; note: no gamma removal or normalization in [0, 1]
     pic::Image img0, img1;
     img0.Read(img0_str, pic::LT_NOR);
 
+    bool bLoaded = false;
     if(!bCreate) {
-        img1.Read(img1_str, pic::LT_NOR);
+        //this an LDR image with values in [0,255]!
+        bLoaded = img1.Read(img1_str, pic::LT_NONE);
     }
 
     printf("Is it valid? ");
-    if(img0.isValid()) {
+    if(img0.isValid() && (bCreate || bLoaded)) {
         printf("OK\n");
 
-        pic::Image *tmp;
+        std::string name = pic::removeLocalPath(img0_str);
+        name = pic::removeExtension(name);
+
+        pic::Image *tmp = NULL;
         if(bCreate) {
-            printf("Filtering the input image (blurring)...");
-            tmp = pic::FilterGaussian2D::Execute(&img0, NULL, 12.0f);
+            printf("Tone mapping the input image...");
+            pic::DragoTMO dtmo;
+            tmp = dtmo.Process(&img0, tmp);
             printf("Ok\n");
-        }
+            tmp->Write("../data/output/" + name + "_flt.png");
 
-        tmp->Write("../data/output/metrics_img_flt.hdr");
+            tmp->applyFunction(pic::simple8bitWithGamma);
+        } else {
+            tmp = &img1;
+        }        
 
-        printf("Computing the SSIM index...");
-        float ssim_index;
-
-        pic::Image *ssim_map = pic::SSIMIndex(&img0, tmp, ssim_index, NULL, 0.01f, 0.03f, 1.5f, 255.0f);
-        printf("Ok\n");
-
-        if(ssim_map != NULL) {
-            ssim_map->Write("../data/output/metrics_ssim_map.hdr");
-        }
-
-        printf("SSIM index: %f\n", ssim_index);
-
+        float Q, N, S;
+        pic::TMQI tmqi;
+        tmqi.execute(pic::Double(&img0, tmp), Q, N, S, NULL);
+        printf("TMQI -- Q: %f N: %f S: %f\n", Q, N, S);
     } else {
         printf("No, the file is not valid!\n");
     }

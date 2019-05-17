@@ -56,7 +56,7 @@ PIC_INLINE std::vector< int > executeLiveWireMultipleJNI(std::string imageInPath
 
         if(bDownsample) {
             ImageSamplerBilinear isb;
-            in_sub = FilterSampler2D::Execute(&in, NULL, 0.25f, &isb);
+            in_sub = FilterSampler2D::execute(&in, NULL, 0.25f, &isb);
             lw = new LiveWire(in_sub);
         } else {
             lw = new LiveWire(&in);
@@ -64,7 +64,7 @@ PIC_INLINE std::vector< int > executeLiveWireMultipleJNI(std::string imageInPath
 
         std::vector< Vec2i > out_tmp;
 
-        int n = controlPoints.size() >> 1;
+        int n = int(controlPoints.size()) >> 1;
         for(auto i = 0; i < (n - 1); i++) {
             int indexS = i << 1;
             int indexE = (i + 1) << 1;

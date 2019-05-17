@@ -35,7 +35,10 @@ public:
     /**
      * @brief BBox is a basic constructor. It does nothing.
      */
-    BBox() {}
+    BBox()
+    {
+
+    }
 
     /**
      * @brief BBox is a constructor setting the BBox up.
@@ -46,7 +49,7 @@ public:
      */
     BBox(int width, int height)
     {
-        SetBox(0, width, 0, height, 0, 1, width, height, 1);
+        setBox(0, width, 0, height, 0, 1, width, height, 1);
     }
 
     /**
@@ -60,7 +63,7 @@ public:
      */
     BBox(int width, int height, int frames)
     {
-        SetBox(0, width, 0, height, 0, frames, width, height, frames);
+        setBox(0, width, 0, height, 0, frames, width, height, frames);
     }
 
     /**
@@ -72,7 +75,7 @@ public:
      */
     BBox(int x0, int x1, int y0, int y1)
     {
-        SetBox(x0, x1, y0, y1, 0, 1, -1, -1, 1);
+        setBox(x0, x1, y0, y1, 0, 1, -1, -1, 1);
     }
 
     /**
@@ -86,7 +89,7 @@ public:
      */
     BBox(int x0, int x1, int y0, int y1, int width, int height)
     {
-        SetBox(x0, x1, y0, y1, 0, 1, width, height, 1);
+        setBox(x0, x1, y0, y1, 0, 1, width, height, 1);
     }
 
     /**
@@ -99,7 +102,7 @@ public:
      */
     BBox(int x0, int y0, int size, int width, int height)
     {
-        SetCentered(x0, y0, size, width, height);
+        setCentered(x0, y0, size, width, height);
     }
 
     /**
@@ -112,7 +115,7 @@ public:
     }
 
     /**
-     * @brief SetBox sets a BBox up.
+     * @brief setBox sets a BBox up.
      * @param x0 is the minimum horizontal coordinate in pixels.
      * @param x1 is the maximum horizontal coordinate in pixels.
      * @param y0 is the minimum vertical coordinate in pixels.
@@ -123,7 +126,7 @@ public:
      * @param height is the original height of the image.
      * @param frames is the original length of the image.
      */
-    void SetBox(int x0, int x1, int y0, int y1, int z0, int z1, int width,
+    void setBox(int x0, int x1, int y0, int y1, int z0, int z1, int width,
                 int height, int frames)
     {
         this->x0 = x0;
@@ -147,7 +150,7 @@ public:
      * @param width is the original width of the image.
      * @param height is the original height of the image.
      */
-    void SetCentered(int x0, int y0, int size, int width, int height)
+    void setCentered(int x0, int y0, int size, int width, int height)
     {
         this->z0 = 0;
         this->z1 = 1;
@@ -166,12 +169,12 @@ public:
     }
 
     /**
-     * @brief FourBlocks sets the BBox as a quadrant of a given size.
+     * @brief getFourBlocks sets the BBox as a quadrant of a given size.
      * @param width is horizontal size in pixels.
      * @param height is the vertical size in pixels.
      * @param i is the i-th quadrant.
      */
-    void FourBlocks(int width, int height, int i)
+    void getFourBlocks(int width, int height, int i)
     {
         int halfWidth  = width >> 1;
         int halfHeight = height >> 1;
@@ -187,7 +190,7 @@ public:
             halfHeight++;
         }
 
-        SetBox(dataX[i], dataX[i] + halfWidth,
+        setBox(dataX[i], dataX[i] + halfWidth,
                dataY[i], dataY[i] + halfHeight,
                0, 1,
                width, height, 1);

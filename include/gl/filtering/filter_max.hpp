@@ -32,7 +32,7 @@ protected:
 
 protected:
     FilterGLNonLinear1D *filter;
-    int                 kernelSize;
+    int kernelSize;
 
 public:
 
@@ -40,12 +40,12 @@ public:
      * @brief FilterMax
      * @param kernelSize
      */
-    FilterGLMax(int kernelSize)
+    FilterGLMax(int kernelSize) : FilterGLNPasses()
     {
-        filter = new FilterGLNonLinear1D(kernelSize, "max");
+        filter = new FilterGLNonLinear1D(kernelSize, "max", GL_TEXTURE_2D);
 
-        InsertFilter(filter);
-        InsertFilter(filter);
+        insertFilter(filter);
+        insertFilter(filter);
     }
 
     ~FilterGLMax()
@@ -56,35 +56,17 @@ public:
         }
     }
 
-
     /**
-     * @brief Execute
+     * @brief execute
      * @param imgIn
      * @param imgOut
      * @param size
      * @return
      */
-    static ImageGL *Execute(ImageGL *imgIn, ImageGL *imgOut, int size)
+    static ImageGL *execute(ImageGL *imgIn, ImageGL *imgOut, int size)
     {
         FilterGLMax filter(size);
         return filter.Process(SingleGL(imgIn), imgOut);
-    }
-
-    /**
-     * @brief Execute
-     * @param nameIn
-     * @param nameOut
-     * @param size
-     * @return
-     */
-    static Image *Execute(std::string nameIn, std::string nameOut, int size)
-    {
-        ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
-        ImageGL *imgOut = Execute(&imgIn, NULL, size);
-        imgOut->loadToMemory();
-        imgOut->Write(nameOut);
-        return imgOut;
     }
 };
 

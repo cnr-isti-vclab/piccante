@@ -32,9 +32,6 @@ This program is free software: you can redistribute it and/or modify
 
 #include "piccante.hpp"
 
-
-
-
 int main(int argc, char *argv[])
 {   
     printf("Reading an LDR images...");

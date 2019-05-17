@@ -24,6 +24,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief edgeEnhancement
+ * @param imgIn
+ * @param sigma_s
+ * @param sigma_r
+ * @return
+ */
 PIC_INLINE Image *edgeEnhancement(Image *imgIn, float sigma_s = 4.0f,
                                  float sigma_r = 0.05f)
 {
@@ -39,12 +46,13 @@ PIC_INLINE Image *edgeEnhancement(Image *imgIn, float sigma_s = 4.0f,
         sigma_r = 0.05f;
     }
 
-    Image *imgBase = FilterBilateral2DS::Execute(imgIn, sigma_s, sigma_r);
+    Image *imgBase = FilterBilateral2DS::execute(imgIn, sigma_s, sigma_r);
     Image *detail = imgIn->clone();
 
     *detail /= *imgBase;
     imgBase->assign(imgIn);
     *imgBase *= *detail;
+
     return imgBase;
 }
 
