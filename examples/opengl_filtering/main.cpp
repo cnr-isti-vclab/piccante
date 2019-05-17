@@ -21,10 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * a suggestion for running examples.
 */
 
-#ifdef _MSC_VER
-    #define PIC_DISABLE_OPENGL_NON_CORE
-    #include "../common_code/gl_core_4_0.h"
-#endif
+#include "../common_code/gl_include.hpp"
 
 #include <QKeyEvent>
 #include <QtCore/QCoreApplication>
@@ -33,11 +30,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QVBoxLayout>
 #include <QLabel>
 
-#define PIC_DEBUG
-
 #include "piccante.hpp"
 
 class GLWidget : public QGLWidget
+        #ifndef _MSC_VER
+        , protected QOpenGLFunctions
+        #endif
 {
 protected:
     pic::QuadGL *quad;
@@ -59,19 +57,21 @@ protected:
      */
     void initializeGL(){
 
-        ogl_LoadFunctions();
+    #ifndef _MSC_VER
+        initializeOpenGLFunctions();
+    #endif
 
-        #ifdef PIC_WIN32
-            if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
-                printf("OpenGL functions are not loaded!\n");
-            }
-        #endif
+    #ifdef _MSC_VER
+        if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+            printf("OpenGL functions are not loaded!\n");
+        }
+    #endif
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
         //read an input image
         img = new pic::ImageGL();
-        bool bRead = img->Read("../data/input/yellow_flowers.png", pic::LT_NOR_GAMMA);
+        img->Read("../data/input/yellow_flowers.png", pic::LT_NOR_GAMMA);
         img->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         #ifdef PIC_DEBUG
