@@ -23,8 +23,6 @@ This program is free software: you can redistribute it and/or modify
     ( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
 */
 
-#include "../common_code/image_qimage_interop.hpp"
-
 //This means that we disable Eigen; some functionalities cannot be used.
 //For example, estimating the camera response function
 #define PIC_DISABLE_EIGEN
