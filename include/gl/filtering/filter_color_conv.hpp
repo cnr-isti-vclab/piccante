@@ -34,15 +34,28 @@ protected:
     /**
      * @brief initShaders
      */
-    void initShaders();
+    void initShaders()
+    {
+        color_conv->generatePrograms(vertex_source);
+    }
 
 public:
     /**
      * @brief FilterGLColorConv
      */
-    FilterGLColorConv(ColorConvGL *color_conv, bool direct);
+    FilterGLColorConv(ColorConvGL *color_conv, bool direct) : FilterGL()
+    {
+        this->color_conv = color_conv;
 
-    void setTransform(bool direct);
+        initShaders();
+        setup(direct);
+    }
+
+    void setup(bool direct)
+    {
+        color_conv->setTransform(direct);
+        color_conv->setUniforms();
+    }
 
     /**
      * @brief Process
@@ -50,86 +63,66 @@ public:
      * @param imgOut
      * @return
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut)
+    {
+        if(imgIn.empty()) {
+            return imgOut;
+        }
+
+        if(imgIn[0] == NULL) {
+            return imgOut;
+        }
+
+        if(imgIn[0]->channels != 3) {
+            #ifdef PIC_DEBUG
+                printf("FilterGLColorConv::Process - it has to be a three color channles image.\n");
+            #endif
+            return imgOut;
+        }
+
+        int w = imgIn[0]->width;
+        int h = imgIn[0]->height;
+        int f = imgIn[0]->frames;
+
+        if(imgOut == NULL) {
+            imgOut = new ImageGL(f, w, h, 3, IMG_GPU, GL_TEXTURE_2D);
+        }
+
+        //create an FBO
+        if(fbo == NULL) {
+            fbo = new Fbo();
+        }
+
+        fbo->create(imgOut->width, imgOut->height, imgOut->frames, false, imgOut->getTexture());
+
+        //bind the FBO
+        fbo->bind();
+        glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+
+        //bind shaders
+        color_conv->bindProgram();
+
+        //bind textures
+        glActiveTexture(GL_TEXTURE0);
+        imgIn[0]->bindTexture();
+
+        //render an aligned quad
+        quad->Render();
+
+        //unbind the FBO
+        fbo->unbind();
+
+        //unbind shaders
+        color_conv->unbindProgram();
+
+        //unbind textures
+        glActiveTexture(GL_TEXTURE0);
+        imgIn[0]->unBindTexture();
+
+        return imgOut;
+    }
 
 };
-
-PIC_INLINE FilterGLColorConv::FilterGLColorConv(ColorConvGL *color_conv, bool direct = true): FilterGL()
-{
-    this->color_conv = color_conv;
-
-    initShaders();
-    setTransform(direct);
-}
-
-PIC_INLINE void FilterGLColorConv::initShaders()
-{
-    color_conv->generatePrograms(vertex_source);
-}
-
-PIC_INLINE void FilterGLColorConv::setTransform(bool direct)
-{
-    color_conv->setTransform(direct);
-    color_conv->setUniforms();
-}
-
-PIC_INLINE ImageGL *FilterGLColorConv::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn.empty()) {
-        return imgOut;
-    }
-
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    if(imgIn[0]->channels != 3) {
-        #ifdef PIC_DEBUG
-        printf("FilterGLColorConv::Process - it has to be a three color channles image.\n");
-        #endif
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-    int f = imgIn[0]->frames;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(f, w, h, 3, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, f, false, imgOut->getTexture());
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    color_conv->bindProgram();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    imgIn[0]->bindTexture();
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    color_conv->unbindProgram();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE0);
-    imgIn[0]->unBindTexture();
-
-    return imgOut;
-}
 
 } // end namespace pic
 

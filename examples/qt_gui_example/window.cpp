@@ -258,7 +258,7 @@ void Window::zoom_fit()
 
 void Window::gaussian_blur()
 {
-    pic::Image *output = pic::FilterGaussian2D::Execute(image, NULL, 4.0f);
+    pic::Image *output = pic::FilterGaussian2D::execute(image, NULL, 4.0f);
     delete image;
     image = output;
     update_pixmap();

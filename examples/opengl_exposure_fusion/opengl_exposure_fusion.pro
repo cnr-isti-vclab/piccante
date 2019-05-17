@@ -18,11 +18,11 @@ INCLUDEPATH += ../../include
 
 win32-msvc*{
     DEFINES += _CRT_SECURE_NO_DEPRECATE
-    SOURCES += ../opengl_common_code/gl_core_4_0.c
+    SOURCES += ../common_code/gl_core_4_0.c
 }
 
 win32{
-        DEFINES += NOMINMAX
+    DEFINES += NOMINMAX
 }
 
 linux-g++*{
