@@ -80,9 +80,9 @@ This program is free software: you can redistribute it and/or modify
 #endif /* qt version selection */
 
 #ifndef PIC_DISABLE_OPENGL
-#include <QtGui/QOpenGLFunctions>
-#include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLPaintDevice>
+    #include <QtGui/QOpenGLFunctions>
+    #include <QtGui/QOpenGLContext>
+    #include <QtGui/QOpenGLPaintDevice>
 #endif
 
 #endif /* PIC_QT_HPP */

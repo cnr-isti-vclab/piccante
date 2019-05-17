@@ -30,7 +30,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
 #include <QApplication>
-#include <QOpenGLFunctions>
 #include <QVBoxLayout>
 #include <QLabel>
 
@@ -38,7 +37,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "piccante.hpp"
 
-class GLWidget : public QGLWidget, protected QOpenGLFunctions
+class GLWidget : public QGLWidget
 {
 protected:
     pic::QuadGL *quad;
@@ -60,7 +59,7 @@ protected:
      */
     void initializeGL(){
 
-        initializeOpenGLFunctions();
+        ogl_LoadFunctions();
 
         #ifdef PIC_WIN32
             if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {

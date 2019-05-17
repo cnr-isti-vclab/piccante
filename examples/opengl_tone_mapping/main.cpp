@@ -23,7 +23,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifdef _MSC_VER
     #define PIC_DISABLE_OPENGL_NON_CORE
-    #include "../opengl_common_code/gl_core_4_0.h"
+    #include "../common_code/gl_core_4_0.h"
 #endif
 
 #include <QKeyEvent>
