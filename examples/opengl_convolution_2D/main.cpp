@@ -21,21 +21,21 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * a suggestion for running examples.
 */
 
-#ifdef _MSC_VER
-    #include "../common_code/gl_core_4_0.h"
-#endif
+#include "../common_code/gl_include.hpp"
 
 #include <QKeyEvent>
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
 #include <QApplication>
-#include <QOpenGLFunctions>
 #include <QVBoxLayout>
 #include <QLabel>
 
 #include "piccante.hpp"
 
-class GLWidget : public QGLWidget, protected QOpenGLFunctions
+class GLWidget : public QGLWidget
+        #ifndef _MSC_VER
+        , protected QOpenGLFunctions
+        #endif
 {  
 protected:
     pic::QuadGL *quad;
@@ -50,13 +50,15 @@ protected:
      */
     void initializeGL(){
 
+    #ifndef _MSC_VER
         initializeOpenGLFunctions();
+    #endif
 
-        #ifdef PIC_WIN32
-            if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
-                printf("OpenGL functions are not loaded!\n");
-            }
-        #endif
+    #ifdef _MSC_VER
+        if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
+            printf("OpenGL functions are not loaded!\n");
+        }
+    #endif
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
@@ -70,10 +72,8 @@ protected:
 
         float *sum = weights.getSumVal();
 
-
-        pic::Arrayf sump(sum, weights.channels, true);
-
         if(sum != NULL) {
+            pic::Arrayf sump(sum, weights.channels, true);
             weights /= sump;
         }
 
