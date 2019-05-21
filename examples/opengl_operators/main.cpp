@@ -47,10 +47,8 @@ class GLWidget : public QGLWidget
         #endif
 {
 protected:
-    pic::QuadGL *quad;
-    pic::FilterGLSimpleTMO *tmo;
-
-    pic::ImageGL img, *imgRand, *img_flt_tmo;
+    pic::DisplayGL *display;
+    pic::ImageGL img, *imgRand;
     pic::TechniqueGL technique;
 
     int method;
@@ -72,24 +70,18 @@ protected:
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
-        //reading an input image
+        //read an input image
         img.Read("../data/input/bottles.hdr");
         img.generateTextureGL();
 
-        //creating a random image
+        //create a random image
         imgRand = new pic::ImageGL(img.frames, img.width, img.height, 1, pic::IMG_CPU_GPU, GL_TEXTURE_2D);
         imgRand->setRand();
         imgRand->loadFromMemory();
         *imgRand *= 0.1f;
 
-        //creating a screen aligned quad
-        pic::QuadGL::getTechnique(technique,
-                                pic::QuadGL::getVertexProgramV3(),
-                                pic::QuadGL::getFragmentProgramForView());
-        quad = new pic::QuadGL(true);
-
-        //allocating a new filter for simple tone mapping
-        tmo = new pic::FilterGLSimpleTMO();
+        //create a display
+        display = new pic::DisplayGL();
     }
 
     /**
@@ -114,11 +106,7 @@ protected:
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        //simple tone mapping: gamma + exposure correction
-        img_flt_tmo = tmo->Process(SingleGL(&img), img_flt_tmo);
-
-        //img_flt_tmo visualization
-        quad->Render(technique, img_flt_tmo->getTexture());
+        display->Process(&img);
     }
 
 public:
@@ -132,9 +120,6 @@ public:
     {
         setFixedWidth(912);
         setFixedHeight(684);
-
-        tmo = NULL;
-        img_flt_tmo = NULL;
         method = 0;
     }
 
@@ -144,7 +129,6 @@ public:
     void update()
     {
         method = (method + 1) % 2;
-
         img += *imgRand;
     }
 };

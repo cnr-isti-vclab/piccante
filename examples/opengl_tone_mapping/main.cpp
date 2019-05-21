@@ -46,14 +46,11 @@ class GLWidget : public QGLWidget
         #endif
 {
 protected:
-    pic::QuadGL *quad;
-    pic::FilterGLColorConv *tmo;
-    pic::DragoTMOGL        *drago_tmo;
-    pic::ReinhardTMOGL     *reinhard_tmo;
-    pic::DurandTMOGL       *durand_tmo;
-
-    pic::ImageGL img, *img_tmo, *img_tmo_with_sRGB;
-    pic::TechniqueGL technique;
+    pic::DragoTMOGL *drago_tmo;
+    pic::ReinhardTMOGL *reinhard_tmo;
+    pic::DurandTMOGL *durand_tmo;
+    pic::DisplayGL *display;
+    pic::ImageGL img, *img_tmo;
 
     int method;
 
@@ -74,7 +71,6 @@ protected:
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f );
 
-        img_tmo_with_sRGB = NULL;
         img_tmo = NULL;
 
         //read an input image
@@ -82,15 +78,7 @@ protected:
         img.generateTextureGL();
 
         //create a screen aligned quad
-        pic::QuadGL::getTechnique(technique,
-                                pic::QuadGL::getVertexProgramV3(),
-                                pic::QuadGL::getFragmentProgramForView());
-
-        quad = new pic::QuadGL(true);
-
-        //allocate a new filter for simple tone mapping
-        auto conv_sRGB = new pic::ColorConvGLRGBtosRGB(true);
-        tmo = new pic::FilterGLColorConv((pic::ColorConvGL*)conv_sRGB, true);
+        display = new pic::DisplayGL();
 
         //allocate Drago et al.'s TMO
         drago_tmo = new pic::DragoTMOGL();
@@ -148,11 +136,7 @@ protected:
         } break;
         }
 
-        //convert the image color space from linear RGB to sRGB
-        img_tmo_with_sRGB = tmo->Process(SingleGL(img_tmo), img_tmo_with_sRGB);
-
-        //img_tmo_with_sRGB visualization
-        quad->Render(technique, img_tmo_with_sRGB->getTexture());
+        display->Process(img_tmo);
     }
 
 public:
@@ -167,10 +151,7 @@ public:
         setFixedWidth(912);
         setFixedHeight(684);
 
-        tmo = NULL;
         img_tmo = NULL;
-        img_tmo_with_sRGB = NULL;
-
         method = 0;
     }
 

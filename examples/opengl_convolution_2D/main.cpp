@@ -46,11 +46,9 @@ class GLWidget : public QGLWidget
         #endif
 {  
 protected:
-    pic::QuadGL *quad;
-    pic::FilterGLSimpleTMO *tmo;
     pic::FilterGLConv2D *conv2D;
-    pic::ImageGL img, weights, *imgRec, *img_flt_tmo;
-    pic::TechniqueGL technique;
+    pic::ImageGL img, weights, *imgRec;
+    pic::DisplayGL *display;
     int method;
 
     /**
@@ -85,18 +83,10 @@ protected:
             weights /= sump;
         }
 
-        //create a screen aligned quad
-        pic::QuadGL::getTechnique(technique,
-                            pic::QuadGL::getVertexProgramV3(),
-                            pic::QuadGL::getFragmentProgramForView());
-
-        quad = new pic::QuadGL(true);
-
-        //allocate a new filter for simple tone mapping
-        tmo = new pic::FilterGLSimpleTMO();
-        tmo->update(2.2f, 0.0f);
-
         conv2D = new pic::FilterGLConv2D(GL_TEXTURE_2D);
+
+        //create a screen aligned quad
+        display = new pic::DisplayGL();
     }
 
     /**
@@ -122,15 +112,16 @@ protected:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //simple tone mapping: gamma + exposure correction
+        pic::ImageGL *img_out;
         if(method == 1) {
             imgRec = conv2D->Process(DoubleGL(&img, &weights), imgRec);
-            img_flt_tmo = tmo->Process(pic::SingleGL(imgRec), img_flt_tmo);
+            img_out = imgRec;
         } else {
-            img_flt_tmo = tmo->Process(pic::SingleGL(&img), img_flt_tmo);
+            img_out = &img;
         }
 
         //visualization
-        quad->Render(technique, img_flt_tmo->getTexture());
+        display->Process(img_out);
     }
 
 public:
@@ -148,9 +139,6 @@ public:
         method = 0;
 
         imgRec = NULL;
-        img_flt_tmo = NULL;
-        imgRec = NULL;
-        quad = NULL;
     }
 
     /**
@@ -187,7 +175,7 @@ public:
         layout->addWidget(window_gl);
 
         label = new QLabel(
-        "Pease hit the space bar in order to switch from the original image (with a black hole) to the reconstructed one using Push-Pull.", this);
+        "Pease hit the space bar in order to filter the image with a 2D filter; i.e., a star-lie shape.", this);
         label->setFixedWidth(912);
         label->setFixedHeight(64);
 

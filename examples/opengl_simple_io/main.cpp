@@ -46,10 +46,8 @@ class GLWidget : public QGLWidget
         #endif
 {
 protected:
-    pic::QuadGL *quad;
-    pic::FilterGLColorConv *tmo;
-    pic::ImageGL img, *imgOut;
-    pic::TechniqueGL technique;
+    pic::ImageGL img;
+    pic::DisplayGL *display;
 
     /**
      * @brief initializeGL sets variables up.
@@ -70,18 +68,10 @@ protected:
 
         //read an input image
         img.Read("../data/input/bottles.hdr");
-
         img.generateTextureGL();
 
         //create a screen aligned quad
-        pic::QuadGL::getTechnique(technique,
-                                pic::QuadGL::getVertexProgramV3(),
-                                pic::QuadGL::getFragmentProgramForView());
-
-        quad = new pic::QuadGL(true);
-
-        //allocate a new filter for simple tone mapping
-        tmo = new pic::FilterGLColorConv(new pic::ColorConvGLRGBtosRGB(true), true);
+        display = new pic::DisplayGL();
     }
 
     /**
@@ -107,10 +97,7 @@ protected:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //simple tone mapping: gamma + exposure correction
-        imgOut = tmo->Process(SingleGL(&img), imgOut);
-
-        //visualization
-        quad->Render(technique, imgOut->getTexture());
+        display->Process(&img);
     }
 
 public:
@@ -124,9 +111,6 @@ public:
     {
         setFixedWidth(912);
         setFixedHeight(684);
-
-        imgOut = NULL;
-        quad = NULL;
     }
 };
 

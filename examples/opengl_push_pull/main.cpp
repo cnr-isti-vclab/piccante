@@ -46,10 +46,8 @@ class GLWidget : public QGLWidget
         #endif
 {
 protected:
-    pic::QuadGL *quad;
-    pic::FilterGLSimpleTMO *tmo;
-    pic::ImageGL img, *imgRec, *img_flt_tmo;
-    pic::TechniqueGL technique;
+    pic::DisplayGL *display;
+    pic::ImageGL img, *imgRec;
     int method;
     pic::PushPullGL *pp;
 
@@ -82,14 +80,9 @@ protected:
         img.generateTextureGL();
 
         //create a screen aligned quad
-        pic::QuadGL::getTechnique(technique,
-                            pic::QuadGL::getVertexProgramV3(),
-                            pic::QuadGL::getFragmentProgramForView());
-        quad = new pic::QuadGL(true);
+        display = new pic::DisplayGL();
 
-        //allocate a new filter for simple tone mapping
-        tmo = new pic::FilterGLSimpleTMO();
-
+        //create push pull method
         pp = new pic::PushPullGL();
     }
 
@@ -116,20 +109,25 @@ protected:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //simple tone mapping: gamma + exposure correction
+        pic::ImageGL *img_out;
         if(method == 1) {
             pp->update(pic::Arrayf::zeros(img.channels), 1e-4f);
 
             imgRec = pp->Process(&img, imgRec);
-            img_flt_tmo = tmo->Process(pic::SingleGL(imgRec), img_flt_tmo);
+
+            img_out = imgRec;
+            window_ext->setWindowTitle(tr("PushPull Example: Reconstructed Image"));
+
         } else {
-            img_flt_tmo = tmo->Process(pic::SingleGL(&img), img_flt_tmo);
+            window_ext->setWindowTitle(tr("PushPull Example: Input Image with a Hole (black square)"));
+            img_out = &img;
         }
 
-        //visualization
-        quad->Render(technique, img_flt_tmo->getTexture());
+        display->Process(img_out);
     }
 
 public:
+    QWidget *window_ext;
 
     /**
      * @brief GLWidget
@@ -142,11 +140,7 @@ public:
         setFixedHeight(684);
 
         method = 0;
-
         imgRec = NULL;
-        img_flt_tmo = NULL;
-        imgRec = NULL;
-        quad = NULL;
     }
 
     /**
@@ -177,6 +171,7 @@ public:
         resize(912, 684 + 64);
 
         window_gl = new GLWidget(format, this);
+        window_gl->window_ext = this;
 
         layout = new QVBoxLayout();
 

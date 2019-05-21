@@ -46,12 +46,9 @@ class GLWidget : public QGLWidget
         #endif
 {
 protected:
-    pic::QuadGL *quad;
-    pic::FilterGLSimpleTMO *tmo;
     pic::FilterGLDeformGrid *fltDeformGrid;
-
-    pic::ImageGL *img, *img_flt, *img_flt_tmo;
-    pic::TechniqueGL technique;
+    pic::DisplayGL *display;
+    pic::ImageGL *img, *img_flt;
 
     int method;
 
@@ -78,14 +75,7 @@ protected:
         img->generateTextureGL();
 
         //create a screen aligned quad
-        pic::QuadGL::getTechnique(technique,
-                                pic::QuadGL::getVertexProgramV3(),
-                                pic::QuadGL::getFragmentProgramForView());
-
-        quad = new pic::QuadGL(true);
-
-        //allocate a new filter for simple tone mapping
-        tmo = new pic::FilterGLSimpleTMO();
+        display = new pic::DisplayGL();
 
         //allocate a new deform grid filter
         pic::Image *grid_move = pic::FilterDeformGrid::getUniformGrid(17, 17);
@@ -119,19 +109,17 @@ protected:
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+        pic::ImageGL *img_out;
         if(method == 1) {
             //apply the deformation filter
             img_flt = fltDeformGrid->Process(SingleGL(img), img_flt);
-
-            //simple tone mapping: gamma + exposure correction
-            img_flt_tmo = tmo->Process(SingleGL(img_flt), img_flt_tmo);
+            img_out = img_flt;
         } else {
-            //simple tone mapping: gamma + exposure correction
-            img_flt_tmo = tmo->Process(SingleGL(img), img_flt_tmo);
+            img_out = img;
         }
 
         //visualization
-        quad->Render(technique, img_flt_tmo->getTexture());
+        display->Process(img_out);
     }
 
 public:
@@ -146,9 +134,7 @@ public:
         setFixedWidth(512);
         setFixedHeight(512);
 
-        tmo = NULL;
         img_flt = NULL;
-        img_flt_tmo = NULL;
         method = 0;
     }
 
