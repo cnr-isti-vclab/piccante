@@ -46,8 +46,6 @@ class GLWidget : public QGLWidget
         #endif
 {
 protected:
-    pic::QuadGL *quad;
-    pic::FilterGLSimpleTMO *tmo;
     pic::FilterGLBilateral2DF *fltBilF;
     pic::FilterGLBilateral2DG *fltBilG;
     pic::FilterGLBilateral2DSP *fltBilSP;
@@ -55,8 +53,8 @@ protected:
     pic::FilterGLGaussian2D *fltGauss;
     pic::FilterGLAnisotropicDiffusion *fltAD;
 
-    pic::ImageGL *img, *img_flt, *img_flt_tmo;
-    pic::TechniqueGL technique;
+    pic::DisplayGL *display;
+    pic::ImageGL *img, *img_flt;
 
     int method;
 
@@ -86,16 +84,6 @@ protected:
             printf("Image is read: %d\n", bRead);
         #endif
 
-        //create a screen aligned quad
-        pic::QuadGL::getTechnique(technique,
-                                pic::QuadGL::getVertexProgramV3(),
-                                pic::QuadGL::getFragmentProgramForView());
-
-        quad = new pic::QuadGL(true);
-
-        //allocate a new filter for simple tone mapping
-        tmo = new pic::FilterGLSimpleTMO();
-
         float sigma_s = 16.0f;
         float sigma_r = 0.1f;
 
@@ -115,15 +103,9 @@ protected:
 
         //allocate a new anisotropic diffusion filter
         fltAD = new pic::FilterGLAnisotropicDiffusion(sigma_s, sigma_r);
-
-        /*
-        auto *out = pic::FilterGLSamplingMap::execute(img, NULL, 16.0f);
-        out->loadToMemory();
-        out->Write("testSampling.png");
-        */
-
-        img_flt_tmo = NULL;
         img_flt = NULL;
+
+        display = new pic::DisplayGL();
     }
 
     /**
@@ -210,11 +192,7 @@ protected:
             break;
         }
 
-        //simple tone mapping: gamma + exposure correction
-        img_flt_tmo = tmo->Process(SingleGL(img_out), img_flt_tmo);
-
-        //visualization
-        quad->Render(technique, img_flt_tmo->getTexture());
+        display->Process(img_out);
     }
 
 public:
@@ -231,9 +209,7 @@ public:
         setFixedWidth(800);
         setFixedHeight(533);
 
-        tmo = NULL;
         img_flt = NULL;
-        img_flt_tmo = NULL;
         method = 0;
     }
 

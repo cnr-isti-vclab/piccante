@@ -112,6 +112,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/tone_mapping/get_all_exposures.hpp"
 #include "gl/tone_mapping/exposure_fusion.hpp"
 
+//Display
+#include "util/gl/display.hpp"
+
 #endif /* PIC_DISABLE_OPENGL */
 
 #endif /* PIC_GL_HPP */
