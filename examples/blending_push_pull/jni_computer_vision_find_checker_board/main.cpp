@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     if(argc == 2) {
         img_str = argv[1];
     } else {
-        img_str = "../data/input/checker_board_photo_2.png";
+        img_str = "../data/input/checkerboards/checker_board_photo_2.png";
     }
 
     auto start = std::chrono::system_clock::now();
