@@ -336,7 +336,7 @@ bool readEXIF(std::string name, EXIFInfo &info)
 
         //printf("nIFD: %d\n", nIFD);
 
-        unsigned int offset;
+        unsigned int offset = 0;
         for(int i = 0; i < nIFD; i++) {
             unsigned char tag[2];
             fread(tag, 1, 2, file); //TAG
@@ -416,7 +416,7 @@ bool readEXIF(std::string name, EXIFInfo &info)
 
             int id = getTagID(tag, bMotorola);
 
-            float data_value;
+            float data_value = 0;
             if(total_data_byte > 4) {
                 int offset = fourByteToValue(data, bMotorola);
 
