@@ -38,15 +38,15 @@ int main(int argc, char *argv[])
 
     pic::Image img_source, img_target;
 
-    img_source.Read("../data/input/histogram_matching/source.png");
-    img_target.Read("../data/input/histogram_matching/target.png");
+    img_source.Read("../data/input/histogram_matching/source.png", pic::LT_NOR_GAMMA);
+    img_target.Read("../data/input/histogram_matching/target.png", pic::LT_NOR_GAMMA);
 
     printf("Ok\n");
 
     printf("Are these valid? ");
     if(img_source.isValid() && img_target.isValid()) {
 
-        pic::Image *out = pic::matchHistograms(&img_source, &img_target);
+        pic::Image *out = pic::HistogramMatching::execute(&img_source, &img_target, NULL);
 
         out->Write("../data/output/histogram_matching.png");
     } else {

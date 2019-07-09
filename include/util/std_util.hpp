@@ -62,6 +62,25 @@ inline void stdVectorClear(std::vector<T *> &vec)
     vec.clear();
 }
 
+
+/**
+ * @brief stdVectorArrayClear
+ * @param vec
+ */
+template<class T>
+inline void stdVectorArrayClear(std::vector<T *> &vec)
+{
+    for(unsigned int i = 0; i < vec.size(); i++) {
+        T *tmp = vec[i];
+
+        if(tmp != NULL) {
+            delete[] tmp;
+        }
+    }
+
+    vec.clear();
+}
+
 /**
  * @brief setToANullVector
  * @param vec

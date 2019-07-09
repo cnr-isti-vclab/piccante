@@ -45,6 +45,10 @@ int main(int argc, char *argv[])
         img_str = "../data/input/bottles.hdr";
     }
 
+    pic::JSONFile tmp;
+    pic::JSONNumber ret;
+    tmp.testParserNumbers();
+
     printf("Reading an HDR file...");
 
     pic::Image img;

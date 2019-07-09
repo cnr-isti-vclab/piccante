@@ -296,6 +296,8 @@ public:
         int   trimmings = 0;
         bool  bFlag = true;
 
+        std::vector<bool> trimmed_vec;
+
         while((trimmings <= tolerance) && bFlag) {
             trimmings = 0;
             float T = float(Array<unsigned int>::sum(bin, nBin));
@@ -303,13 +305,27 @@ public:
             if(T < tolerance) {
                 bFlag = false;
             } else {
+                bool bTrimmed = false;
                 unsigned int ceiling = int(T * k);
 
                 for(int i = 0; i < nBin; i++) {
                     if(bin[i] > ceiling) {
                         trimmings += (bin[i] - ceiling);
                         bin[i] = ceiling;
+                        bTrimmed = true;
                     }
+                }
+
+                trimmed_vec.push_back(bTrimmed);
+
+            }
+
+            int tvSize = trimmed_vec.size();
+            if(tvSize >= 2) {
+                bool b0 = !trimmed_vec[tvSize - 1];
+                bool b1 = !trimmed_vec[tvSize - 2];
+                if(b0 && b1) {
+                    bFlag = false;
                 }
             }
         }
