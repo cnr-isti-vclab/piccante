@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_ALGORITHMS_COLOR_TO_GRAY_HPP
 #define PIC_GL_ALGORITHMS_COLOR_TO_GRAY_HPP
 
+#include "../../util/std_util.hpp"
+
 #include "../../gl/image.hpp"
 #include "../../gl/filtering/filter_channel.hpp"
 #include "../../gl/tone_mapping/exposure_fusion.hpp"
@@ -46,15 +48,8 @@ public:
 
     ~ColorToGrayGL()
     {
-        if(flt != NULL) {
-            delete flt;
-            flt = NULL;
-        }
-
-        if(ef != NULL) {
-            delete ef;
-            ef = NULL;
-        }
+        delete_s(flt);
+        delete_s(ef);
     }
 
     /**

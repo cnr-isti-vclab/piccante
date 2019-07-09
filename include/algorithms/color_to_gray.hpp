@@ -26,44 +26,65 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-/**
- * @brief colorToGray
- * @param imgIn
- * @param imgOut
- * @return
- */
-PIC_INLINE Image *colorToGray(Image *imgIn, Image *imgOut)
+
+class ColorToGray
 {
-    if(imgIn == NULL){
+protected:
+    ExposureFusion ef;
+    FilterChannel *flt;
+
+public:
+
+    ColorToGray()
+    {
+        ef.update(1.0f, 1.0f, 0.0f);
+        flt = new FilterChannel(SingleInt(0));
+    }
+
+    ~ColorToGray()
+    {
+        delete_s(flt);
+    }
+
+    Image* Process(Image *imgIn, Image *imgOut)
+    {
+        if(imgIn == NULL){
+            return imgOut;
+        }
+
+        if(imgOut == NULL){
+            imgOut = new Image(1, imgIn->width, imgIn->height, 1);
+        }
+
+        ImageVec img_vec;
+        ImageVec input = Single(imgIn);
+
+        int channels = imgIn->channels;
+        for(int i = 0; i < channels; i++) {
+            img_vec.push_back(flt->Process(input, NULL));
+            flt->update(SingleInt(i + 1));
+        }
+
+        imgOut = ef.Process(img_vec, imgOut);
+
+        for(int i = 0; i < channels; i++) {
+            delete img_vec[i];
+        }
+
+        stdVectorClear<Image>(img_vec);
+
         return imgOut;
     }
 
-    if(imgOut == NULL){
-        imgOut = new Image(1, imgIn->width, imgIn->height, 1);
+    static Image* execute(Image* imgIn, Image *imgOut)
+    {
+        ColorToGray c2g;
+        imgOut = c2g.Process(imgIn, imgOut);
+
+        return imgOut;
     }
+};
 
-    ImageVec img_vec;
-    ImageVec input = Single(imgIn);
-
-    FilterChannel flt(SingleInt(0));
-    int channels = imgIn->channels;
-    for(int i = 0; i < channels; i++) {
-        img_vec.push_back(flt.Process(input, NULL));
-        flt.update(SingleInt(i + 1));
-    }
-
-    ExposureFusion ef(1.0f, 1.0f, 0.0f);
-
-    imgOut = ef.Process(img_vec, imgOut);
-
-    for(int i = 0; i<channels; i++) {
-        delete img_vec[i];
-    }
-
-    stdVectorClear<Image>(img_vec);
-
-    return imgOut;
-}
 
 } // end namespace pic
 
