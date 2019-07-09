@@ -38,8 +38,20 @@ int main(int argc, char *argv[])
 
     pic::Image img_source, img_target;
 
-    img_source.Read("../data/input/histogram_matching/source.png", pic::LT_NOR_GAMMA);
-    img_target.Read("../data/input/histogram_matching/target.png", pic::LT_NOR_GAMMA);
+    std::string img_source_str, img_target_str, img_out_str;
+
+    if(argc == 4) {
+        img_source_str = argv[1];
+        img_target_str = argv[2];
+        img_out_str = argv[3];
+    } else {
+        img_source_str = "../data/input/histogram_matching/source.png";
+        img_target_str = "../data/input/histogram_matching/target.png";
+        img_out_str = "../data/output/histogram_matching.png";
+    }
+
+    img_source.Read(img_source_str, pic::LT_NOR_GAMMA);
+    img_target.Read(img_target_str, pic::LT_NOR_GAMMA);
 
     printf("Ok\n");
 
@@ -48,7 +60,7 @@ int main(int argc, char *argv[])
 
         pic::Image *out = pic::HistogramMatching::execute(&img_source, &img_target, NULL);
 
-        out->Write("../data/output/histogram_matching.png");
+        out->Write(img_out_str);
     } else {
         printf("No, the files are not valid!\n");
     }
