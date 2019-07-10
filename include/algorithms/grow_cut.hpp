@@ -31,6 +31,8 @@ class GrowCut
 {
 protected:
     FilterGrowCut flt;
+    FilterMax *fltMax;
+    Image *img_max, *state_cur, *state_next;
 
 public:
 
@@ -39,7 +41,19 @@ public:
      */
     GrowCut()
     {
+        state_cur = NULL;
+        state_next = NULL;
+        img_max = NULL;
 
+        fltMax = new FilterMax(5);
+    }
+
+    ~GrowCut()
+    {
+        delete_s(img_max);
+        delete_s(fltMax);
+        delete_s(state_cur);
+        delete_s(state_next);
     }
 
     /**
@@ -97,26 +111,30 @@ public:
     }
 
     /**
-     * @brief execute
-     * @param img
-     * @param seeds
-     * @param state_cur
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
      * @return
      */
-    Image *execute(Image *img, Image *seeds, Image *state_cur = NULL)
+    Image *Process(ImageVec imgIn, Image *imgOut)
     {
-        if(img == NULL || seeds == NULL) {
-            return NULL;
+        if(!ImageVecCheck(imgIn, 2)) {
+            return imgOut;
         }
+
+        auto img = imgIn[0];
+        auto seeds = imgIn[1];
 
         if(state_cur == NULL) {
             state_cur = new Image(img->width, img->height, 2);
         }
 
-        Image *state_next = state_cur->allocateSimilarOne();
+        if(state_next == NULL) {
+            state_next = state_cur->allocateSimilarOne();
+        }
 
         //compute max
-        Image *img_max = FilterMax::execute(img, NULL, 5);
+        img_max = fltMax->Process(Single(img), img_max);
 
         for(int i = 0; i < state_cur->nPixels(); i++) {
             //init state_cur
@@ -148,12 +166,14 @@ public:
             output = tmp;
         }
 
-        delete output;
-        delete img_max;
-
         return input[0];
     }
 
+    static Image *execute(Image *img, Image *seeds, Image *imgOut)
+    {
+        GrowCut gc;
+        return gc.Process(Double(img, seeds), imgOut);
+    }
 };
 
 } // end namespace pic

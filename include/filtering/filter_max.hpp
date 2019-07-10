@@ -73,11 +73,21 @@ protected:
     }
 
 public:
+
     /**
      * @brief FilterMax
      * @param size
      */
     FilterMax(int size)
+    {
+        update(size);
+    }
+
+    /**
+     * @brief update
+     * @param size
+     */
+    void update(int size)
     {
         this->halfSize = checkHalfSize(size);
     }

@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../base.hpp"
 
+#include "../../util/std_util.hpp"
+
 #include "../../gl/image.hpp"
 #include "../../gl/filtering/filter_max.hpp"
 #include "../../gl/filtering/filter_grow_cut.hpp"
@@ -49,25 +51,10 @@ public:
 
     ~GrowCutGL()
     {
-        if(flt != NULL) {
-            delete flt;
-            flt = NULL;
-        }
-
-        if(fltMax != NULL) {
-            delete fltMax;
-            fltMax = NULL;
-        }
-
-        if(img_max != NULL) {
-            delete img_max;
-            img_max = NULL;
-        }
-
-        if(state_next != NULL) {
-            delete state_next;
-            state_next = NULL;
-        }
+        delete_s(flt);
+        delete_s(fltMax);
+        delete_s(img_max);
+        delete_s(state_next);
     }
 
     /**

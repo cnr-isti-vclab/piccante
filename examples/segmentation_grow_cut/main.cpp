@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
         pic::Image *seeds = pic::GrowCut::fromStrokeImageToSeeds(&strokes, NULL);
 
         if(seeds != NULL) {
-            pic::Image *gc_seg = gc.execute(&img, seeds);
+            pic::Image *gc_seg = gc.execute(&img, seeds, NULL);
 
             std::string name = pic::getFileNameOnly(img_str);
 

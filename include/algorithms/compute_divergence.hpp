@@ -20,46 +20,103 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 
+#include "../util/std_util.hpp"
+
 #include "../filtering/filter_conv_1d.hpp"
 
 namespace pic {
 
 /**
- * @brief computeDivergence calculates divergence of the gradient of an image.
+ * @brief DivergenceOperator calculates divergence of the gradient of an image.
  * @param img is an input image.
  * @param div is the output divergence of the gradient of img; i.e. Laplacian.
  * @return
  */
-PIC_INLINE Image *computeDivergence(Image *img, Image *div = NULL)
+class DivergenceOperator
 {
-    if(img == NULL) {
-        return div;
+protected:
+    FilterConv1D flt;
+    float kernelGrad[3];
+    float kernelDiv[3];
+    Image *img_dx, *img_dy;
+
+public:
+
+    /**
+     * @brief DivergenceOperator
+     */
+    DivergenceOperator()
+    {
+        kernelGrad[0] = -0.5f;
+        kernelGrad[1] =  0.0f;
+        kernelGrad[2] =  0.5f;
+
+        kernelDiv[0] = -1.0f;
+        kernelDiv[1] =  1.0f;
+        kernelDiv[2] =  0.0f;
+
+        img_dx = NULL;
+        img_dy = NULL;
     }
 
-    if(div == NULL) {
-        div = img->allocateSimilarOne();
+    ~DivergenceOperator()
+    {
+        delete_s(img_dx);
+        delete_s(img_dy);
     }
 
-    Image *img_dx2, *img_dy2;
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    Image *Process(Image *imgIn, Image *imgOut)
+    {
+        if(imgIn == NULL) {
+            return imgOut;
+        }
 
-    float kernelGrad[] = { -0.5f, 0.0f, 0.5f};
-    float kernelDiv[] = { -1.0f, 1.0f, 0.0f};
+        if(imgOut == NULL) {
+            imgOut = imgIn->clone();
+        } else {
+            if(!imgOut->isSimilarType(imgIn)) {
+                imgOut = imgIn->allocateSimilarOne();
+            }
+        }
 
-    //compute the gradient of img
-    Image *img_dx = FilterConv1D::execute(img, NULL, kernelGrad, 3, true);
-    Image *img_dy = FilterConv1D::execute(img, NULL, kernelGrad, 3, false);
+        //compute gradient dx
+        flt.update(kernelGrad, 3, true);
+        img_dx = flt.Process(Single(imgIn), img_dx);
 
-    //compute the divergence using backward differences
-    img_dx2 = FilterConv1D::execute(img_dx, div ,   kernelDiv, 3, true);
-    img_dy2 = FilterConv1D::execute(img_dy, img_dx, kernelDiv, 3, false);
+        //compute gradient dy
+        flt.update(kernelGrad, 3, false);
+        img_dy = flt.Process(Single(imgIn), img_dy);
 
-    *div += *img_dy2;
+        //compute the divergence using backward differences
+        flt.update(kernelDiv, 3, true);
+        imgOut = flt.Process(Single(img_dx), imgOut);
 
-    delete img_dx;
-    delete img_dy;
+        flt.update(kernelDiv, 3, false);
+        auto img_dy2 = flt.Process(Single(img_dy), img_dx);
 
-    return div;
-}
+        *imgOut += *img_dy2;
+
+        return imgOut;
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    static Image *execute(Image *imgIn, Image *imgOut)
+    {
+        DivergenceOperator divOp;
+        return divOp.Process(imgIn, imgOut);
+    }
+};
 
 } // end namespace pic
 

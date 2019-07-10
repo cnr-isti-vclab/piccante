@@ -32,7 +32,7 @@ namespace pic {
  */
 PIC_INLINE std::set<int> *setBorder(Image *img, std::set<int> *coordsBorder)
 {
-    //Second border
+    //second border
     int ind, c, x, y;
     std::set<int> *ret = new std::set<int>;
     std::set<int>::iterator it;
@@ -84,7 +84,8 @@ PIC_INLINE std::set<int> *setBorderNth(Image *img, std::set<int> *coordsBorder,
                             int widthBorder)
 {
     std::set<int> *ret = new std::set<int>;
-    //Insert initial border
+
+    //insert initial border
     ret->insert(coordsBorder->begin(), coordsBorder->end());
 
     for(int i = 0; i < widthBorder; i++) {
