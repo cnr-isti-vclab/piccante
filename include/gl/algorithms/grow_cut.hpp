@@ -25,6 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../../gl/image.hpp"
 #include "../../gl/image_vec.hpp"
 
+#include "../../gl/filtering/filter_op.hpp"
 #include "../../gl/filtering/filter_max.hpp"
 #include "../../gl/filtering/filter_grow_cut.hpp"
 #include "../../gl/filtering/filter_channel.hpp"
@@ -36,6 +37,7 @@ class GrowCutGL
 protected:
     FilterGLGrowCut *flt;
     FilterGLMax *fltMax;
+    FilterGLOp *fltSeeds;
     ImageGL *img_max, *state_next;
 
 public:
@@ -49,6 +51,7 @@ public:
         fltMax = NULL;
         img_max = NULL;
         state_next = NULL;
+        fltSeeds = NULL;
     }
 
     ~GrowCutGL()
@@ -57,6 +60,35 @@ public:
         delete_s(fltMax);
         delete_s(img_max);
         delete_s(state_next);
+    }
+
+    /**
+     * @brief fromStrokeImageToSeeds
+     * @param strokes
+     * @param out
+     * @return
+     */
+    ImageGL *fromStrokeImageToSeeds(ImageGL *strokes, ImageGL *out)
+    {
+        if(strokes == NULL) {
+            return out;
+        }
+
+        if(strokes->channels < 3) {
+            return out;
+        }
+
+        //red  --> +1
+        //blue --> -1
+
+        if(fltSeeds == NULL) {
+            float red[]  = {1.0f, 0.0f, 0.0f, 1.0f};
+            float blue[] = {0.0f, 0.0f, 1.0f, 1.0f};
+            fltSeeds = new FilterGLOp("vec4(vec3(dot(I0.xyz, C0.xyz) - dot(I0.xyz, C1.xyz)), 1.0)",
+                                        false, red, blue);
+        }
+
+        return fltSeeds->Process(SingleGL(strokes), out);
     }
 
     /**

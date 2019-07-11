@@ -47,7 +47,7 @@ class GLWidget : public QGLWidget
 {
 protected:
     pic::DisplayGL *display;
-    pic::ImageGL *img, *img_strokes, *seeds, *imgGC;
+    pic::ImageGL *img, *img_strokes, *seeds, *imgGC, *img_seeds;
     int method;
     pic::GrowCutGL *gcGL;
 
@@ -85,6 +85,7 @@ protected:
         gcGL = new pic::GrowCutGL();
 
         imgGC = NULL;
+        img_seeds = NULL;
 
         method = 0;
     }
@@ -130,7 +131,9 @@ protected:
 
         case 2:
         {
-
+            img_seeds = gcGL->fromStrokeImageToSeeds(img_strokes, img_seeds);
+            img_out = img_seeds;
+            //img_out = NULL;
         } break;
 
         default:
@@ -179,7 +182,7 @@ public:
      */
     void update()
     {
-        method = (method + 1) % 2;
+        method = (method + 1) % 3;
     }
 };
 
