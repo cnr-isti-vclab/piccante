@@ -21,6 +21,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../base.hpp"
 
 #include "../image.hpp"
+#include "../image_vec.hpp"
+
+#include "../util/std_util.hpp"
+
 #include "../filtering/filter_max.hpp"
 #include "../filtering/filter_grow_cut.hpp"
 #include "../filtering/filter_channel.hpp"
@@ -32,7 +36,7 @@ class GrowCut
 protected:
     FilterGrowCut flt;
     FilterMax *fltMax;
-    Image *img_max, *state_cur, *state_next;
+    Image *img_max, *state_next;
 
 public:
 
@@ -41,7 +45,6 @@ public:
      */
     GrowCut()
     {
-        state_cur = NULL;
         state_next = NULL;
         img_max = NULL;
 
@@ -52,8 +55,22 @@ public:
     {
         delete_s(img_max);
         delete_s(fltMax);
-        delete_s(state_cur);
         delete_s(state_next);
+    }
+
+    /**
+     * @brief checkImage
+     * @param img
+     * @param width
+     * @param height
+     * @param channels
+     * @return
+     */
+    static bool checkImage(Image *img, int width, int height, int channels)
+    {
+        return (img->channels != channels) ||
+               (img->width    != width) ||
+               (img->height   != height);
     }
 
     /**
@@ -64,17 +81,25 @@ public:
      */
     static Image *fromStrokeImageToSeeds(Image *strokes, Image *out)
     {
+        if(strokes == NULL) {
+            return out;
+        }
+
         if(strokes->channels < 3) {
             return out;
         }
 
         if(out == NULL) {
             out = new Image(1, strokes->width, strokes->height, 1);
+        } else {
+            if(checkImage(out, strokes->width, strokes->height, 1)) {
+                out = new Image(1, strokes->width, strokes->height, 1);
+            }
         }
 
         //red  --> +1
         //blue --> -1
-        float red[] = {1.0f, 0.0f, 0.0f};
+        float red[]  = {1.0f, 0.0f, 0.0f};
         float blue[] = {0.0f, 0.0f, 1.0f};
 
         for(int i = 0; i < strokes->nPixels(); i++) {
@@ -125,12 +150,22 @@ public:
         auto img = imgIn[0];
         auto seeds = imgIn[1];
 
-        if(state_cur == NULL) {
-            state_cur = new Image(img->width, img->height, 2);
+        if(imgOut == NULL) {
+            imgOut = new Image(img->width, img->height, 2);
+        } else {
+            if(checkImage(imgOut, img->width, img->height, 2)) {
+                imgOut = new Image(img->width, img->height, 2);
+            }
         }
+
+        auto state_cur = imgOut;
 
         if(state_next == NULL) {
             state_next = state_cur->allocateSimilarOne();
+        } else {
+            if(checkImage(state_cur, img->width, img->height, 2)) {
+                state_next = state_cur->allocateSimilarOne();
+            }
         }
 
         //compute max
@@ -139,9 +174,9 @@ public:
         for(int i = 0; i < state_cur->nPixels(); i++) {
             //init state_cur
             int j  = i * state_cur->channels;
-            int j2 = i * seeds->channels;
-            state_cur->data[j] = seeds->data[j2];
-            state_cur->data[j + 1] = fabsf(seeds->data[j2]) > 0.0f ? 1.0f : 0.0f;
+            int j_seeds = i * seeds->channels;
+            state_cur->data[j] = seeds->data[j_seeds];
+            state_cur->data[j + 1] = fabsf(seeds->data[j_seeds]) > 0.0f ? 1.0f : 0.0f;
 
             //fix max
             j = i * img_max->channels;
@@ -166,7 +201,7 @@ public:
             output = tmp;
         }
 
-        return input[0];
+        return imgOut;
     }
 
     static Image *execute(Image *img, Image *seeds, Image *imgOut)

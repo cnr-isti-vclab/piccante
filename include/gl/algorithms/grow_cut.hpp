@@ -23,6 +23,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../../util/std_util.hpp"
 
 #include "../../gl/image.hpp"
+#include "../../gl/image_vec.hpp"
+
 #include "../../gl/filtering/filter_max.hpp"
 #include "../../gl/filtering/filter_grow_cut.hpp"
 #include "../../gl/filtering/filter_channel.hpp"
@@ -58,74 +60,22 @@ public:
     }
 
     /**
-     * @brief fromStrokeImageToSeeds
-     * @param strokes
-     * @param out
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
      * @return
      */
-    static Image *fromStrokeImageToSeeds(Image *strokes, Image *out)
+    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut = NULL)
     {
-        if(strokes->channels < 3) {
-            return out;
+        if(!ImageGLVecCheck(imgIn, 2)) {
+            return imgOut;
         }
 
-        if(out == NULL) {
-            out = new Image(1, strokes->width, strokes->height, 1);
-        }
+        auto img = imgIn[0];
+        auto seeds = imgIn[1];
 
-        //red  --> +1
-        //blue --> -1
-        float red[] = {1.0f, 0.0f, 0.0f};
-        float blue[] = {0.0f, 0.0f, 1.0f};
-
-        for(int i = 0; i < strokes->nPixels(); i++) {
-            int ind = i * strokes->channels;
-
-            float d_red  = sqrtf(Arrayf::distanceSq(red,  &strokes->data[ind], 3));
-            float d_blue = sqrtf(Arrayf::distanceSq(blue, &strokes->data[ind], 3));
-
-            out->data[i] = 0.0f;
-
-            out->data[i] = d_red  < 0.5f ?  1.0f : out->data[i];
-            out->data[i] = d_blue < 0.5f ? -1.0f : out->data[i];
-        }
-
-        return out;
-    }
-
-    /**
-     * @brief getMaskAsImage
-     * @param state
-     * @return
-     */
-    static Image* getMaskAsImage(Image *state, Image *out)
-    {
-        if(state == NULL) {
-            return out;
-        }
-
-        if(out == NULL) {
-            out = new Image(1, state->width, state->height, 1);
-        }
-
-        return FilterChannel::execute(state, out, 0);
-    }
-
-    /**
-     * @brief execute
-     * @param img
-     * @param seeds
-     * @param state_cur
-     * @return
-     */
-    ImageGL *execute(ImageGL *img, ImageGL *seeds, ImageGL *state_cur = NULL)
-    {
-        if(img == NULL || seeds == NULL) {
-            return NULL;
-        }
-
-        if(state_cur == NULL) {
-            state_cur = new ImageGL(1, img->width, img->height, 2, IMG_GPU, GL_TEXTURE_2D);
+        if(imgOut == NULL) {
+            imgOut = new ImageGL(1, img->width, img->height, 2, IMG_GPU, GL_TEXTURE_2D);
         }
 
         if(fltMax == NULL) {
@@ -135,6 +85,8 @@ public:
         if(flt == NULL) {
             flt = new FilterGLGrowCut();
         }
+
+        auto state_cur = imgOut;
 
         ImageGL *state_next = state_cur->allocateSimilarOneGL();
 

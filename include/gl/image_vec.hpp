@@ -73,6 +73,38 @@ PIC_INLINE ImageGLVec TripleGL(ImageGL *img1, ImageGL *img2, ImageGL *img3)
     return ret;
 }
 
+/**
+ * @brief ImageGLVecCheck
+ * @param vec
+ * @param minInputImages
+ * @return
+ */
+PIC_INLINE bool ImageGLVecCheck(ImageGLVec &imgIn, int minInputImages)
+{
+    int n;
+    if(minInputImages < 0) {
+        n = int(imgIn.size());
+    } else {
+        if(imgIn.size() < minInputImages) {
+            return false;
+        }
+
+        n = minInputImages;
+    }
+
+    for(int i = 0; i < n; i ++) {
+        if(imgIn[i] == NULL) {
+            return false;
+        } else {
+            if(!imgIn[i]->isValid()) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 } // end namespace pic
 
 #endif /* PIC_GL_IMAGE_RAW_VEC_HPP */
