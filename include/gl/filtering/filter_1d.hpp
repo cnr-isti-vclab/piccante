@@ -117,17 +117,17 @@ PIC_INLINE FilterGL1D::FilterGL1D(int direction, GLenum target): FilterGL()
     dirs[0] = dirs[1] = dirs[2] = 0;
 
     switch(target) {
-    case GL_TEXTURE_2D:
+    case GL_TEXTURE_2D: {
         dirs[direction % 2] = 1;
-        break;
+    } break;
 
-    case GL_TEXTURE_2D_ARRAY:
+    case GL_TEXTURE_2D_ARRAY: {
         dirs[direction % 3] = 1;
-        break;
+    } break;
 
-    case GL_TEXTURE_3D:
+    case GL_TEXTURE_3D: {
         dirs[direction % 3] = 1;
-        break;
+    } break;
     }
 }
 

@@ -138,6 +138,8 @@ protected:
 
         default:
         {
+            img_seeds = gcGL->fromStrokeImageToSeeds(img_strokes, img_seeds);
+
             img_out = img;
         } break;
         }

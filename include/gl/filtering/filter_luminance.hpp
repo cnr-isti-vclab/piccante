@@ -46,6 +46,11 @@ public:
      */
     FilterGLLuminance();
 
+    ~FilterGLLuminance()
+    {
+        release();
+    }
+
     /**
      * @brief FilterGLLuminance
      */

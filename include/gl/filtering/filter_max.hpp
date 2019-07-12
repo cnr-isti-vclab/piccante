@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_GL_MAX_HPP
 #define PIC_FILTERING_FILTER_GL_MAX_HPP
 
+#include "../../util/std_util.hpp"
+
 #include "../../gl/filtering/filter_npasses.hpp"
 #include "../../gl/filtering/filter_non_linear_1d.hpp"
 
@@ -50,10 +52,7 @@ public:
 
     ~FilterGLMax()
     {
-        if(filter != NULL) {
-            delete filter;
-            filter = NULL;
-        }
+        delete_s(filter);
     }
 
     /**

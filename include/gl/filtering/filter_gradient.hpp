@@ -31,59 +31,58 @@ protected:
     /**
      * @brief initShaders
      */
-    void initShaders();
+    void initShaders()
+    {
+        FragmentShader();
+
+        technique.initStandard("330", vertex_source, fragment_source, "FilterGLGradient");
+
+        technique.bind();
+        technique.setUniform1i("u_tex", 0);
+        technique.unbind();
+    }
 
     /**
      * @brief FragmentShader
      */
-    void FragmentShader();
+    void FragmentShader()
+    {
+        fragment_source = MAKE_STRING
+                          (
+                              uniform sampler2D u_tex; \n
+                              out vec4      f_color;	\n
+
+        void main(void) {
+            \n
+            ivec2 coords = ivec2(gl_FragCoord.xy); \n
+            vec3  c0 = texelFetch(u_tex, coords + ivec2(1, 0), 0).xyz; \n
+            vec3  c1 = texelFetch(u_tex, coords - ivec2(1, 0), 0).xyz; \n
+            vec3  c2 = texelFetch(u_tex, coords + ivec2(0, 1), 0).xyz; \n
+            vec3  c3 = texelFetch(u_tex, coords - ivec2(0, 1), 0).xyz; \n
+            vec3 Gx = c1 - c0; \n
+            vec3 Gy = c2 - c3; \n
+            f_color = vec4(sqrt(Gx.xyz * Gx.xyz + Gy.xyz * Gy.xyz), 1.0); //Magnitude
+        }\n
+                          );
+    }
 
 public:
 
     /**
      * @brief FilterGLGradient
      */
-    FilterGLGradient();
+    FilterGLGradient() : FilterGL()
+    {
+        //protected values are assigned/computed
+        FragmentShader();
+        initShaders();
+    }
+
+    ~FilterGLGradient()
+    {
+        release();
+    }
 };
-
-FilterGLGradient::FilterGLGradient(): FilterGL()
-{
-    //protected values are assigned/computed
-    FragmentShader();
-    initShaders();
-}
-
-void FilterGLGradient::FragmentShader()
-{
-    fragment_source = MAKE_STRING
-                      (
-                          uniform sampler2D u_tex; \n
-                          out vec4      f_color;	\n
-
-    void main(void) {
-        \n
-        ivec2 coords = ivec2(gl_FragCoord.xy); \n
-        vec3  c0 = texelFetch(u_tex, coords + ivec2(1, 0), 0).xyz; \n
-        vec3  c1 = texelFetch(u_tex, coords - ivec2(1, 0), 0).xyz; \n
-        vec3  c2 = texelFetch(u_tex, coords + ivec2(0, 1), 0).xyz; \n
-        vec3  c3 = texelFetch(u_tex, coords - ivec2(0, 1), 0).xyz; \n
-        vec3 Gx = c1 - c0; \n
-        vec3 Gy = c2 - c3; \n
-        f_color = vec4(sqrt(Gx.xyz * Gx.xyz + Gy.xyz * Gy.xyz), 1.0); //Magnitude
-    }\n
-                      );
-}
-
-void FilterGLGradient::initShaders()
-{
-    FragmentShader();
-
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGLGradient");
-
-    technique.bind();
-    technique.setUniform1i("u_tex", 0);
-    technique.unbind();
-}
 
 } // end namespace pic
 

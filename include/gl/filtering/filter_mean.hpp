@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_GL_MEAN_HPP
 #define PIC_FILTERING_FILTER_GL_MEAN_HPP
 
+#include "../../util/std_util.hpp"
+
 #include "../../gl/filtering/filter_npasses.hpp"
 #include "../../gl/filtering/filter_conv_1d.hpp"
 
@@ -58,15 +60,8 @@ public:
 
     ~FilterGLMean()
     {
-        if(filter != NULL) {
-            delete filter;
-            filter = NULL;
-        }
-
-        if( data != NULL) {
-            delete[] data;
-            data = NULL;
-        }
+        delete_s(filter);
+        delete_vec_s(data);
     }
 
     /**
@@ -80,17 +75,12 @@ public:
         if(this->kernelSize != kernelSize)
         {
             this->kernelSize = kernelSize;
-            if( data != NULL) {
-                delete[] data;
-                data = NULL;
-            }
 
+            data = delete_vec_s(data);
             data = FilterConv1D::getKernelMean(kernelSize);
         }
 
-        if(weights != NULL) {
-            delete weights;
-        }
+        weights = delete_s(weights);
 
         weights = new ImageGL(1, kernelSize, 1, 1, data);
         weights->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);

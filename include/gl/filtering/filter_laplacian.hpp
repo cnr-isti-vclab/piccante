@@ -65,11 +65,16 @@ public:
     /**
      * @brief FilterGLLaplacian
      */
-    FilterGLLaplacian()
+    FilterGLLaplacian() : FilterGL()
     {
         //protected values are assigned/computed
         FragmentShader();
         initShaders();
+    }
+
+    ~FilterGLLaplacian()
+    {
+        release();
     }
 };
 

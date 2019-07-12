@@ -34,40 +34,39 @@ public:
     /**
      * @brief FilterGLGaussian3D
      */
-    FilterGLGaussian3D();
+    FilterGLGaussian3D() : FilterGLNPasses()
+    {
+        target = GL_TEXTURE_3D;
+    }
+
+    ~FilterGLGaussian3D()
+    {
+        delete_s(filter);
+    }
 
     /**
      * @brief FilterGLGaussian3D
      * @param sigma
      */
-    FilterGLGaussian3D(float sigma);
+    FilterGLGaussian3D(float sigma) : FilterGLNPasses()
+    {
+        filter = new FilterGLGaussian1D(sigma, 0, GL_TEXTURE_3D);
+        target = GL_TEXTURE_3D;
+
+        insertFilter(filter);
+        insertFilter(filter);
+        insertFilter(filter);
+    }
 
     /**
      * @brief update
      * @param sigma
      */
-    void update(float sigma);
+    void update(float sigma)
+    {
+        filter->update(sigma);
+    }
 };
-
-PIC_INLINE FilterGLGaussian3D::FilterGLGaussian3D(): FilterGLNPasses()
-{
-    target = GL_TEXTURE_3D;
-}
-
-PIC_INLINE FilterGLGaussian3D::FilterGLGaussian3D(float sigma): FilterGLNPasses()
-{
-    filter = new FilterGLGaussian1D(sigma, 0, GL_TEXTURE_3D);
-    target = GL_TEXTURE_3D;
-
-    insertFilter(filter);
-    insertFilter(filter);
-    insertFilter(filter);
-}
-
-PIC_INLINE void FilterGLGaussian3D::update(float sigma)
-{
-    filter->update(sigma);
-}
 
 } // end namespace pic
 

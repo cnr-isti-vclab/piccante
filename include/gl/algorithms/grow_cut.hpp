@@ -58,6 +58,7 @@ public:
     {
         delete_s(flt);
         delete_s(fltMax);
+        delete_s(fltSeeds);
         delete_s(img_max);
         delete_s(state_next);
     }
@@ -68,14 +69,14 @@ public:
      * @param out
      * @return
      */
-    ImageGL *fromStrokeImageToSeeds(ImageGL *strokes, ImageGL *out)
+    ImageGL *fromStrokeImageToSeeds(ImageGL *strokes, ImageGL *imgOut)
     {
         if(strokes == NULL) {
-            return out;
+            return imgOut;
         }
 
-        if(strokes->channels < 3) {
-            return out;
+        if(!strokes->isValid() && strokes->channels < 3) {
+            return imgOut;
         }
 
         //red  --> +1
@@ -88,7 +89,7 @@ public:
                                         false, red, blue);
         }
 
-        return fltSeeds->Process(SingleGL(strokes), out);
+        return fltSeeds->Process(SingleGL(strokes), imgOut);
     }
 
     /**

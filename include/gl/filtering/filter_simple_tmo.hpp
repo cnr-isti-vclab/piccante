@@ -32,80 +32,72 @@ class FilterGLSimpleTMO: public FilterGL
 protected:
     float fstop, gamma;
 
-    void initShaders();
+    void initShaders()
+    {
+        fragment_source = MAKE_STRING
+                          (
+                              uniform sampler2D u_tex; \n
+                              uniform float	  tn_gamma; \n
+                              uniform float	  tn_exposure; \n
+                              out     vec4      f_color;	\n
+
+        void main(void) { \n
+            ivec2 coords = ivec2(gl_FragCoord.xy); \n
+            vec3  color = texelFetch(u_tex, coords, 0).xyz; \n
+            color = pow(color * tn_exposure, vec3(tn_gamma));
+            f_color = vec4(color, 1.0);
+            \n
+        }\n
+                          );
+
+        technique.initStandard("330", vertex_source, fragment_source, "FilterGLSimpleTMO");
+    }
 
 public:
     /**
      * @brief FilterGLSimpleTMO
      */
-    FilterGLSimpleTMO();
+    FilterGLSimpleTMO(): FilterGL()
+    {
+        initShaders();
+        update(2.2f, 0.0f);
+    }
 
     /**
      * @brief FilterGLSimpleTMO
      * @param fstop
      * @param gamma
      */
-    FilterGLSimpleTMO(float gamma, float fstop);
+    FilterGLSimpleTMO(float gamma, float fstop) : FilterGL()
+    {
+        initShaders();
+        update(gamma, fstop);
+    }
 
     /**
      * @brief update
      * @param fstop
      * @param gamma
      */
-    void update(float gamma, float fstop);
-};
+    void update(float gamma, float fstop)
+    {
+        gamma = gamma > 0.0f ? gamma : 2.2f;
 
-PIC_INLINE FilterGLSimpleTMO::FilterGLSimpleTMO(): FilterGL()
-{
-    initShaders();
-    update(2.2f, 0.0f);
-}
+        this->gamma = gamma;
+        this->fstop = fstop;
 
-PIC_INLINE FilterGLSimpleTMO::FilterGLSimpleTMO(float gamma, float fstop): FilterGL()
-{
-    initShaders();
-    update(gamma, fstop);
-}
+        float invGamma = 1.0f / gamma;
+        float exposure = powf(2.0f, fstop);
 
-PIC_INLINE void FilterGLSimpleTMO::initShaders()
-{
-    fragment_source = MAKE_STRING
-                      (
-                          uniform sampler2D u_tex; \n
-                          uniform float	  tn_gamma; \n
-                          uniform float	  tn_exposure; \n
-                          out     vec4      f_color;	\n
-
-    void main(void) { \n
-        ivec2 coords = ivec2(gl_FragCoord.xy); \n
-        vec3  color = texelFetch(u_tex, coords, 0).xyz; \n
-        color = pow(color * tn_exposure, vec3(tn_gamma));
-        f_color = vec4(color, 1.0);
-        \n
-    }\n
-                      );
-
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGLSimpleTMO");
-}
-
-PIC_INLINE void FilterGLSimpleTMO::update(float gamma, float fstop)
-{
-    gamma = gamma > 0.0f ? gamma : 2.2f;
-
-    this->gamma = gamma;
-    this->fstop = fstop;
-
-    float invGamma = 1.0f / gamma;
-    float exposure = powf(2.0f, fstop);
-
-    if(technique.isValid()) {
-        technique.bind();
-        technique.setUniform1i("u_tex", 0);
-        technique.setUniform1f("tn_gamma", invGamma);
-        technique.setUniform1f("tn_exposure", exposure);
-        technique.unbind();
+        if(technique.isValid()) {
+            technique.bind();
+            technique.setUniform1i("u_tex", 0);
+            technique.setUniform1f("tn_gamma", invGamma);
+            technique.setUniform1f("tn_exposure", exposure);
+            technique.unbind();
+        }
     }
-}
+};
 
 } // end namespace pic
 

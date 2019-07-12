@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_GAUSSIAN_1D_HPP
 #define PIC_GL_FILTERING_FILTER_GAUSSIAN_1D_HPP
 
+#include "../../util/std_util.hpp"
+
 #include "../../util/precomputed_gaussian.hpp"
 
 #include "../../gl/filtering/filter_conv_1d.hpp"
@@ -86,15 +88,8 @@ FilterGLGaussian1D::FilterGLGaussian1D(float sigma, int direction = 0,
 
 FilterGLGaussian1D::~FilterGLGaussian1D()
 {
-    if(weights != NULL) {
-        delete weights;
-        weights = NULL;
-    }
-
-    if(pg != NULL) {
-        delete pg;
-        pg = NULL;
-    }
+    delete_s(weights);
+    delete_s(pg);
 }
 
 void FilterGLGaussian1D::update(float sigma)
