@@ -38,6 +38,7 @@ This program is free software: you can redistribute it and/or modify
 #include <QVBoxLayout>
 #include <QLabel>
 
+#define PIC_DEBUG
 #include "piccante.hpp"
 
 class GLWidget : public QGLWidget
@@ -133,14 +134,18 @@ protected:
         {
             img_seeds = gcGL->fromStrokeImageToSeeds(img_strokes, img_seeds);
             img_out = img_seeds;
+            window_ext->setWindowTitle(tr("GrowCut Example: Seeds images"));
+
             //img_out = NULL;
         } break;
 
-        default:
+        case 3:
         {
             img_seeds = gcGL->fromStrokeImageToSeeds(img_strokes, img_seeds);
 
-            img_out = img;
+            imgGC = gcGL->Process(pic::DoubleGL(img, img_seeds), imgGC);
+            img_out = imgGC;
+            window_ext->setWindowTitle(tr("GrowCut Example: Segmentation"));
         } break;
         }
 
@@ -184,7 +189,7 @@ public:
      */
     void update()
     {
-        method = (method + 1) % 3;
+        method = (method + 1) % 4;
     }
 };
 

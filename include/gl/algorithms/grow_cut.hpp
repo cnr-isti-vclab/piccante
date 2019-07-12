@@ -108,7 +108,7 @@ public:
         auto seeds = imgIn[1];
 
         if(imgOut == NULL) {
-            imgOut = new ImageGL(1, img->width, img->height, 2, IMG_GPU, GL_TEXTURE_2D);
+            imgOut = new ImageGL(1, img->width, img->height, 3, IMG_GPU, GL_TEXTURE_2D);
         }
 
         if(fltMax == NULL) {
@@ -126,6 +126,7 @@ public:
         //compute max
         img_max = fltMax->Process(SingleGL(img), img_max);
 
+        /*
         for(int i = 0; i < state_cur->nPixels(); i++) {
             //init state_cur
             int j  = i * state_cur->channels;
@@ -133,6 +134,7 @@ public:
             state_cur->data[j] = seeds->data[j2];
             state_cur->data[j + 1] = fabsf(seeds->data[j2]) > 0.0f ? 1.0f : 0.0f;
         }
+        */
 
         //iterative filtering...
         int iterations = int(img->getDiagonalSize());
@@ -141,6 +143,7 @@ public:
             iterations++;
         }
 
+        iterations = 2;
         ImageGLVec input = TripleGL(state_cur, img, img_max);
         ImageGL *output = state_next;
 

@@ -78,9 +78,14 @@ public:
      * @brief FilterMax
      * @param size
      */
-    FilterMax(int size)
+    FilterMax(int size) : Filter()
     {
         update(size);
+    }
+
+    ~FilterMax()
+    {
+        release();
     }
 
     /**

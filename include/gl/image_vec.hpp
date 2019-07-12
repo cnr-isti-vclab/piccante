@@ -96,9 +96,10 @@ PIC_INLINE bool ImageGLVecCheck(ImageGLVec &imgIn, int minInputImages)
         if(imgIn[i] == NULL) {
             return false;
         } else {
-            if(!imgIn[i]->isValid()) {
+           /*
+            *  if(!imgIn[i]->isValid()) {
                 return false;
-            }
+            }*/
         }
     }
 

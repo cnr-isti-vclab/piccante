@@ -31,8 +31,43 @@ protected:
     /**
      * @brief initShaders
      */
-    void initShaders();
+    void initShaders()
+    {
+        fragment_source = MAKE_STRING
+                          (
+        uniform sampler2D u_tex; \n
+        uniform sampler2D u_max; \n
+        uniform sampler2D u_state_cur; \n
+        const int dx[8] = int[](-1, 0, 1, -1, 1, -1,  0,  1); \n
+        const int dy[8] = int[]( 1, 1, 1,  0, 0, -1, -1, -1); \n
+        out  vec4 f_color; \n
+        \n
+        void main(void) { \n
+            \n
+            ivec2 coords = ivec2(gl_FragCoord.xy); \n
+            vec3 col = texelFetch(u_tex, coords, 0).xyz; \n
+            vec2 cur = texelFetch(u_state_cur, coords, 0).xy; \n
+            float C = length(texelFetch(u_max, coords, 0).xyz); \n
+            vec2 next = cur; \n
+            \n
+            for(int k = 0; k < 8; k++) {\n
+                ivec2 coords_k = coords + ivec2(dx[k], dy[k]);\n
 
+                vec2 cur_k = texelFetch(u_state_cur, coords_k, 0).xy; \n
+                vec3 col_k = texelFetch(u_tex, coords_k, 0).xyz; \n
+                float dist = length(col - col_k);\n
+                float g_theta = (1.0 - (dist / C)) * cur_k.y;\n
+                if(g_theta > cur.y) {\n
+                    next.x = cur_k.x;\n
+                    next.y = g_theta;\n
+                 }\n
+            }\n
+            f_color = vec4(next.x, next.y, 0.0, 1.0); \n
+        }
+                          );
+
+        technique.initStandard("330", vertex_source, fragment_source, "FilterGLGrowCut");
+    }
 
 public:
 
@@ -40,46 +75,28 @@ public:
      * @brief FilterGLGrowCut
      * @param channel
      */
-    FilterGLGrowCut();
+    FilterGLGrowCut() : FilterGL()
+    {
+        initShaders();
+    }
+
+    ~FilterGLGrowCut()
+    {
+        release();
+    }
 
     /**
      * @brief update
      */
-    void update();
-};
-
-FilterGLGrowCut::FilterGLGrowCut() : FilterGL()
-{
-    initShaders();
-}
-
-void FilterGLGrowCut::initShaders()
-{
-    fragment_source = MAKE_STRING
-                      (
-    uniform sampler2D u_tex; \n
-    uniform int channel; \n
-    out     vec4 f_color; \n
-    \n
-    void main(void) {
-        \n
-        ivec2 coords = ivec2(gl_FragCoord.xy); \n
-        vec3 color = texelFetch(u_tex, coords, 0).xyz; \n
-        float output = color[channel]; \n
-        f_color = vec4(output, output, output, 1.0); \n
+    void update()
+    {
+        technique.bind();
+        technique.setUniform1i("u_tex", 0);
+        technique.setUniform1i("u_max", 1);
+        technique.setUniform1i("u_state_cur", 2);
+        technique.unbind();
     }
-                      );
-
-
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGLGrowCut");
-}
-
-void FilterGLGrowCut::update()
-{
-    technique.bind();
-    technique.setUniform1i("u_tex", 0);
-    technique.unbind();
-}
+};
 
 } // end namespace pic
 
