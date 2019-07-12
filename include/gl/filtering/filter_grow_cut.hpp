@@ -47,7 +47,8 @@ protected:
             ivec2 coords = ivec2(gl_FragCoord.xy); \n
             vec3 col = texelFetch(u_tex, coords, 0).xyz; \n
             vec2 cur = texelFetch(u_state_cur, coords, 0).xy; \n
-            float C = length(texelFetch(u_max, coords, 0).xyz); \n
+            vec3 col_max = texelFetch(u_max, coords, 0).xyz; \n
+            float C = dot(col_max, col_max); \n
             vec2 next = cur; \n
             \n
             for(int k = 0; k < 8; k++) {\n
@@ -55,8 +56,9 @@ protected:
 
                 vec2 cur_k = texelFetch(u_state_cur, coords_k, 0).xy; \n
                 vec3 col_k = texelFetch(u_tex, coords_k, 0).xyz; \n
-                float dist = length(col - col_k);\n
-                float g_theta = (1.0 - (dist / C)) * cur_k.y;\n
+                vec3 delta_col = col - col_k;\n
+                float g_theta = 1.0 - (dot(delta_col, delta_col) / C);
+                g_theta *= cur_k.y;\n
                 if(g_theta > cur.y) {\n
                     next.x = cur_k.x;\n
                     next.y = g_theta;\n
@@ -67,6 +69,8 @@ protected:
                           );
 
         technique.initStandard("330", vertex_source, fragment_source, "FilterGLGrowCut");
+
+        update();
     }
 
 public:
@@ -91,9 +95,9 @@ public:
     void update()
     {
         technique.bind();
-        technique.setUniform1i("u_tex", 0);
-        technique.setUniform1i("u_max", 1);
-        technique.setUniform1i("u_state_cur", 2);
+        technique.setUniform1i("u_state_cur", 0);
+        technique.setUniform1i("u_tex", 1);
+        technique.setUniform1i("u_max", 2);
         technique.unbind();
     }
 };

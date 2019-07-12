@@ -150,22 +150,6 @@ protected:
         }
 
         display->Process(img_out);
-
-        /*
-        if(method == 1) {
-            pp->update(pic::Arrayf::zeros(img.channels), 1e-4f);
-
-            imgGC = imgRec = gcGL->Process(DoubleGL(&img, seeds), imgGC);
-
-            img_out = imgRec;
-            window_ext->setWindowTitle(tr("PushPull Example: Reconstructed Image"));
-
-        } else {
-            window_ext->setWindowTitle(tr("PushPull Example: Input Image with a Hole (black square)"));
-            img_out = &img;
-        }
-        */
-
     }
 
 public:

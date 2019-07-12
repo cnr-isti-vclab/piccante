@@ -38,6 +38,7 @@ protected:
     FilterGLGrowCut *flt;
     FilterGLMax *fltMax;
     FilterGLOp *fltSeeds;
+    FilterGLOp *fltAssign;
     ImageGL *img_max, *state_next;
 
 public:
@@ -52,6 +53,7 @@ public:
         img_max = NULL;
         state_next = NULL;
         fltSeeds = NULL;
+        fltAssign = NULL;
     }
 
     ~GrowCutGL()
@@ -61,6 +63,7 @@ public:
         delete_s(fltSeeds);
         delete_s(img_max);
         delete_s(state_next);
+        delete_s(fltAssign);
     }
 
     /**
@@ -121,20 +124,18 @@ public:
 
         auto state_cur = imgOut;
 
-        ImageGL *state_next = state_cur->allocateSimilarOneGL();
+        if(state_next == NULL) {
+            state_next = state_cur->allocateSimilarOneGL();
+        }
 
         //compute max
         img_max = fltMax->Process(SingleGL(img), img_max);
 
-        /*
-        for(int i = 0; i < state_cur->nPixels(); i++) {
-            //init state_cur
-            int j  = i * state_cur->channels;
-            int j2 = i * seeds->channels;
-            state_cur->data[j] = seeds->data[j2];
-            state_cur->data[j + 1] = fabsf(seeds->data[j2]) > 0.0f ? 1.0f : 0.0f;
+        if(fltAssign == NULL) {
+            fltAssign = new FilterGLOp("vec4(I0.x, abs(I0.x) > 0.0 ? 1.0 : 0.0, 0.0, 1.0)", false, NULL, NULL);
         }
-        */
+
+        state_cur = fltAssign->Process(SingleGL(seeds), state_cur);
 
         //iterative filtering...
         int iterations = int(img->getDiagonalSize());
@@ -143,19 +144,18 @@ public:
             iterations++;
         }
 
-        iterations = 2;
         ImageGLVec input = TripleGL(state_cur, img, img_max);
         ImageGL *output = state_next;
 
         for(int i = 0; i < iterations; i++) {
             output = flt->Process(input, output);
 
-            ImageGL *tmp = input[0];
+            auto tmp = input[0];
             input[0] = output;
             output = tmp;
         }
 
-        return input[0];
+        return imgOut;
     }
 
 };
