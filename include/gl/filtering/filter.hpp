@@ -169,14 +169,6 @@ public:
     }
 
     /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    virtual ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
-
-    /**
      * @brief gammaCorrection
      * @param fragment_source
      * @param bGammaCorrection
@@ -241,77 +233,90 @@ public:
 
         return imgOut;
     }
+
+    virtual void bindTechnique()
+    {
+        technique.bind();
+    }
+
+    virtual void unbindTechnique()
+    {
+        technique.unbind();
+    }
+
+    /**
+     * @brief Process
+     * @param imgIn
+     * @param imgOut
+     * @return
+     */
+    virtual ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut)
+    {
+        if(imgIn.empty()) {
+            return imgOut;
+        }
+
+        if(imgIn[0] == NULL) {
+            return imgOut;
+        }
+
+        imgOut = setupAux(imgIn, imgOut);
+
+        if(imgOut == NULL) {
+            return NULL;
+        }
+
+        //create an FBO
+        if(fbo == NULL) {
+            fbo = new Fbo();
+        }
+
+        fbo->create(imgOut->width, imgOut->height, imgOut->frames, false, imgOut->getTexture());
+
+        //bind the FBO
+        fbo->bind();
+        glViewport(0, 0, (GLsizei)imgIn[0]->width, (GLsizei)imgIn[0]->height);
+
+        //bind shaders
+        bindTechnique();
+
+        //bind textures
+        int n = int(imgIn.size());
+        for(auto i = 0; i < n; i++) {
+            glActiveTexture(GL_TEXTURE0 + i);
+            imgIn[i]->bindTexture();
+        }
+
+        //bind texture internal filter parameters
+        int m = int(param.size());
+        for(auto i = 0; i < m; i++) {
+            glActiveTexture(GL_TEXTURE0 + n + i);
+            param[i]->bindTexture();
+        }
+
+        //render an aligned quad
+        quad->Render();
+
+        //unbind the FBO
+        fbo->unbind();
+
+        //unbind shaders
+        unbindTechnique();
+
+        //unbind textures
+        for(auto i = 0; i< n; i++) {
+            glActiveTexture(GL_TEXTURE0 + i);
+            imgIn[i]->unBindTexture();
+        }
+
+        for(auto i = 0; i < m; i++) {
+            glActiveTexture(GL_TEXTURE0 + n + i);
+            param[i]->unBindTexture();
+        }
+
+        return imgOut;
+    }
 };
-
-PIC_INLINE ImageGL *FilterGL::Process(ImageGLVec imgIn, ImageGL *imgOut)
-{
-    if(imgIn.empty()) {
-        return imgOut;
-    }
-
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int width = imgIn[0]->width;
-    int height = imgIn[0]->height;
-
-    imgOut = setupAux(imgIn, imgOut);
-
-    if(imgOut == NULL) {
-        return NULL;
-    }
-
-    //create an FBO
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(imgOut->width, imgOut->height, imgOut->frames, false, imgOut->getTexture());
-
-    //bind the FBO
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)width, (GLsizei)height);
-
-    //bind shaders
-    technique.bind();
-
-    //bind textures
-    int n = int(imgIn.size());
-    for(auto i = 0; i < n; i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        imgIn[i]->bindTexture();
-    }
-
-    //bind texture internal filter parameters
-    int m = int(param.size());
-    for(auto i = 0; i < m; i++) {
-        glActiveTexture(GL_TEXTURE0 + n + i);
-        param[i]->bindTexture();
-    }
-
-    //render an aligned quad
-    quad->Render();
-
-    //unbind the FBO
-    fbo->unbind();
-
-    //unbind shaders
-    technique.unbind();
-
-    //unbind textures
-    for(auto i = 0; i< n; i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        imgIn[i]->unBindTexture();
-    }
-
-    for(auto i = 0; i < m; i++) {
-        glActiveTexture(GL_TEXTURE0 + n + i);
-        param[i]->unBindTexture();
-    }
-
-    return imgOut;
-}
 
 } // end namespace pic
 

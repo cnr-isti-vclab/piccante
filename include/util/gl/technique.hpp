@@ -28,7 +28,8 @@ namespace pic {
 /**
  * @brief The TechniqueGL class
  */
-class TechniqueGL{
+class TechniqueGL
+{
 protected:
     std::vector<ProgramGL*> shaders;
     ProgramGL main;

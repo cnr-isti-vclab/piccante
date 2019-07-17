@@ -135,8 +135,6 @@ protected:
             img_seeds = gcGL->fromStrokeImageToSeeds(img_strokes, img_seeds);
             img_out = img_seeds;
             window_ext->setWindowTitle(tr("GrowCut Example: Seeds images"));
-
-            //img_out = NULL;
         } break;
 
         case 3:

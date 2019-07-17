@@ -51,6 +51,20 @@ public:
         setup(direct);
     }
 
+    ~FilterGLColorConv()
+    {
+        release();
+    }
+
+    void releaseAux()
+    {
+        delete_s(color_conv);
+    }
+
+    /**
+     * @brief setup
+     * @param direct
+     */
     void setup(bool direct)
     {
         color_conv->setTransform(direct);
@@ -58,70 +72,30 @@ public:
     }
 
     /**
-     * @brief Process
+     * @brief OutputSize
      * @param imgIn
-     * @param imgOut
-     * @return
+     * @param width
+     * @param height
+     * @param channels
+     * @param frames
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut)
+    void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
     {
-        if(imgIn.empty()) {
-            return imgOut;
-        }
-
-        if(imgIn[0] == NULL) {
-            return imgOut;
-        }
-
-        if(imgIn[0]->channels != 3) {
-            #ifdef PIC_DEBUG
-                printf("FilterGLColorConv::Process - it has to be a three color channles image.\n");
-            #endif
-            return imgOut;
-        }
-
-        int w = imgIn[0]->width;
-        int h = imgIn[0]->height;
-        int f = imgIn[0]->frames;
-
-        if(imgOut == NULL) {
-            imgOut = new ImageGL(f, w, h, 3, IMG_GPU, GL_TEXTURE_2D);
-        }
-
-        //create an FBO
-        if(fbo == NULL) {
-            fbo = new Fbo();
-        }
-
-        fbo->create(imgOut->width, imgOut->height, imgOut->frames, false, imgOut->getTexture());
-
-        //bind the FBO
-        fbo->bind();
-        glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-        //bind shaders
-        color_conv->bindProgram();
-
-        //bind textures
-        glActiveTexture(GL_TEXTURE0);
-        imgIn[0]->bindTexture();
-
-        //render an aligned quad
-        quad->Render();
-
-        //unbind the FBO
-        fbo->unbind();
-
-        //unbind shaders
-        color_conv->unbindProgram();
-
-        //unbind textures
-        glActiveTexture(GL_TEXTURE0);
-        imgIn[0]->unBindTexture();
-
-        return imgOut;
+        width    = imgIn[0]->width;
+        height   = imgIn[0]->height;
+        channels = 3;
+        frames   = imgIn[0]->frames;
     }
 
+    void bindTechnique()
+    {
+        color_conv->bindProgram();
+    }
+
+    void unbindTechnique()
+    {
+        color_conv->unbindProgram();
+    }
 };
 
 } // end namespace pic
