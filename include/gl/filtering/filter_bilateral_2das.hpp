@@ -304,14 +304,6 @@ PIC_INLINE ImageGL *FilterGLBilateral2DAS::Process(ImageGLVec imgIn,
         fbo->create(w, h, 1, false, imgOut->getTexture());
     }
 
-    if(imgTmp == NULL) {
-        float scale = fGLsm->getScale();
-        imgTmp = new ImageGL(    1,
-                                    int(imgIn[0]->widthf  * scale),
-                                    int(imgIn[0]->heightf * scale),
-                                    1, IMG_GPU, GL_TEXTURE_2D);
-    }
-
     ImageGL *edge, *base;
 
     if(imgIn.size() == 2) {
