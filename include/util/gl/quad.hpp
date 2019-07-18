@@ -29,10 +29,11 @@ namespace pic {
  */
 class QuadGL
 {
-public:
-
+protected:
     GLuint vao;		//vertex array object
     GLuint vbo[2];	//vertex buffer object
+
+public:
 
     QuadGL()
     {
@@ -54,14 +55,19 @@ public:
     {
         if(vao > 0) {
             glDeleteBuffers(1, &vao);
+            vao = 0;
         }
 
         if(vbo[0] > 0) {
             glDeleteBuffers(1, &vbo[0]);
+
+            vbo[0] = 0;
         }
 
         if(vbo[1] > 0) {
             glDeleteBuffers(1, &vbo[1]);
+
+            vbo[1] = 0;
         }
     }
 

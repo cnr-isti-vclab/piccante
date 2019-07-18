@@ -72,10 +72,15 @@ public:
      * @brief FilterGLUpPP
      * @param scale
      */
-    FilterGLUpPP(float *value, float threshold)
+    FilterGLUpPP(float *value, float threshold) : FilterGL()
     {
         initShaders();
         update(value, threshold);
+    }
+
+    ~FilterGLUpPP()
+    {
+        release();
     }
 
     /**
@@ -112,15 +117,15 @@ public:
     void OutputSize(ImageGLVec imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(imgIn.size() == 1) {
-            width       = imgIn[0]->width << 1;
-            height      = imgIn[0]->height << 1;
+            width = imgIn[0]->width << 1;
+            height = imgIn[0]->height << 1;
         } else {
-            width       = imgIn[1]->width;
-            height      = imgIn[1]->height;
+            width = imgIn[1]->width;
+            height = imgIn[1]->height;
         }
 
-        channels    = imgIn[0]->channels;
-        frames      = imgIn[0]->frames;
+        channels = imgIn[0]->channels;
+        frames = imgIn[0]->frames;
     }
 };
 

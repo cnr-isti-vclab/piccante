@@ -86,7 +86,6 @@ PIC_INLINE FilterGLConv1D::~FilterGLConv1D()
     release();
 }
 
-
 PIC_INLINE void FilterGLConv1D::FragmentShader()
 {
     std::string fragment_source_2D = MAKE_STRING

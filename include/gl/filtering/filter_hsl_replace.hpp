@@ -36,7 +36,56 @@ protected:
     /**
      * @brief initShaders
      */
-    void initShaders();
+    void initShaders()
+    {
+        fragment_source = MAKE_STRING
+                          (
+                              uniform float	  delta_hue; \n
+                              uniform float	  delta_saturation; \n
+                              uniform sampler2D u_tex; \n
+                              uniform sampler2D u_change; \n
+                              out     vec4      f_color; \n
+
+        void main(void) {
+            \n
+            ivec2 coords = ivec2(gl_FragCoord.xy);
+            \n
+            vec3  color = texelFetch(u_tex, coords, 0).xyz;
+            \n
+            float weight = texelFetch(u_change, coords, 0).x;
+            weight = min(max(weight, 0.0), 1.0);
+
+            if(weight > 0.0) {
+                color = RGB2HSL(color);
+                \n
+                color.x += delta_hue * weight;
+                \n
+                color.z += max(delta_saturation * weight, 0.0);
+                \n
+                color = HSL2RGB(color);
+                \n
+            }
+
+            f_color = vec4(color.xyz, 1.0);
+            \n
+        }
+                          );
+
+        //Final fragment source
+        std::string final_fragment_source;
+        final_fragment_source  = ColorConvGLRGBtoHSL::getDirect();
+        final_fragment_source += ColorConvGLRGBtoHSL::getInverse();
+        final_fragment_source += fragment_source;
+
+        technique.initStandard("330", vertex_source, final_fragment_source, "FilterGLGradient");
+
+        technique.bind();
+        technique.setUniform1i("u_tex",      0);
+        technique.setUniform1i("u_change",   1);
+        technique.setUniform1f("delta_hue",  delta_hue);
+        technique.setUniform1f("delta_saturation",  delta_saturation);
+        technique.unbind();
+    }
 
 public:
     /**
@@ -44,7 +93,17 @@ public:
      * @param delta_hue
      * @param delta_saturation
      */
-    FilterGLHSLReplace(float delta_hue, float delta_saturation);
+    FilterGLHSLReplace(float delta_hue, float delta_saturation) : FilterGL()
+    {
+        this->delta_hue = delta_hue;
+        this->delta_saturation = delta_saturation;
+        initShaders();
+    }
+
+    ~FilterGLHSLReplace()
+    {
+        release();
+    }
 
     /**
      * @brief setDeltaHue
@@ -55,65 +114,6 @@ public:
         this->delta_hue = delta_hue;
     }
 };
-
-PIC_INLINE FilterGLHSLReplace::FilterGLHSLReplace(float delta_hue,
-                                       float delta_saturation): FilterGL()
-{
-    this->delta_hue = delta_hue;
-    this->delta_saturation = delta_saturation;
-    initShaders();
-}
-
-PIC_INLINE void FilterGLHSLReplace::initShaders()
-{
-    fragment_source = MAKE_STRING
-                      (
-                          uniform float	  delta_hue; \n
-                          uniform float	  delta_saturation; \n
-                          uniform sampler2D u_tex; \n
-                          uniform sampler2D u_change; \n
-                          out     vec4      f_color; \n
-
-    void main(void) {
-        \n
-        ivec2 coords = ivec2(gl_FragCoord.xy);
-        \n
-        vec3  color = texelFetch(u_tex, coords, 0).xyz;
-        \n
-        float weight = texelFetch(u_change, coords, 0).x;
-        weight = min(max(weight, 0.0), 1.0);
-
-        if(weight > 0.0) {
-            color = RGB2HSL(color);
-            \n
-            color.x += delta_hue * weight;
-            \n
-            color.z += max(delta_saturation * weight, 0.0);
-            \n
-            color = HSL2RGB(color);
-            \n
-        }
-
-        f_color = vec4(color.xyz, 1.0);
-        \n
-    }
-                      );
-
-    //Final fragment source
-    std::string final_fragment_source;
-    final_fragment_source  = ColorConvGLRGBtoHSL::getDirect();
-    final_fragment_source += ColorConvGLRGBtoHSL::getInverse();
-    final_fragment_source += fragment_source;
-
-    technique.initStandard("330", vertex_source, final_fragment_source, "FilterGLGradient");
-
-    technique.bind();
-    technique.setUniform1i("u_tex",      0);
-    technique.setUniform1i("u_change",   1);
-    technique.setUniform1f("delta_hue",  delta_hue);
-    technique.setUniform1f("delta_saturation",  delta_saturation);
-    technique.unbind();
-}
 
 } // end namespace pic
 

@@ -42,7 +42,7 @@ protected:
     float alpha;
 
     //Random numbers tile
-    ImageGL *imageRand;
+    ImageGL *imageRand, *img_ms;
 
     void initShaders();
     void FragmentShader();
@@ -63,6 +63,7 @@ public:
     {
         delete_s(imageRand);
         delete_s(ms);
+        delete_s(img_ms);
     }
 
     /**
@@ -106,7 +107,7 @@ PIC_INLINE FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, f
     int nSamplers;
 
     imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
-    imageRand->setRand();
+    imageRand->setRand(1);
     imageRand->loadFromMemory();
     *imageRand -= 0.5f;
     nSamplers = 1;
@@ -121,6 +122,11 @@ PIC_INLINE FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, f
     ms = new MRSamplersGL<2>(ST_BRIDSON, window, halfKernelSize, 1,
                              nSamplers);
     ms->generateTexture();
+
+    param.push_back(imageRand);
+
+    img_ms = new ImageGL(ms->getTexture(), GL_TEXTURE_2D);
+    param.push_back(img_ms);
 
     FragmentShader();
     initShaders();
@@ -237,9 +243,9 @@ PIC_INLINE void FilterGLReinhardSinglePass::update(float sigma_s, float sigma_r,
 
     technique.bind();
     technique.setUniform1i("u_tex",       0);
-    technique.setUniform1i("u_poisson",   1);
+    technique.setUniform1i("u_tex_col",   1);
     technique.setUniform1i("u_rand",      2);
-    technique.setUniform1i("u_tex_col",   3);
+    technique.setUniform1i("u_poisson",   3);
 
     technique.setUniform1f("sigmas2",         sigmas2);
     technique.setUniform1f("a",               alpha / Lwa);
@@ -250,77 +256,6 @@ PIC_INLINE void FilterGLReinhardSinglePass::update(float sigma_s, float sigma_r,
     technique.setUniform1f("kernelSizef",     float(kernelSize));
     technique.setUniform1i("nSamples",        ms->nSamples >> 1);
     technique.unbind();
-}
-
-PIC_INLINE ImageGL *FilterGLReinhardSinglePass::Process(ImageGLVec imgIn,
-        ImageGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    //TODO: check if other have height and frames swapped
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(imgIn[0]->frames, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-    }
-
-    fbo->create(w, h, imgIn[0]->frames, false, imgOut->getTexture());
-
-    ImageGL *edge, *base;
-
-    edge = imgIn[0];
-    base = imgIn[1];
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    technique.bind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, edge->getTexture());
-
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, imageRand->getTexture());
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, ms->getTexture());
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, base->getTexture());
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    technique.unbind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return imgOut;
 }
 
 } // end namespace pic

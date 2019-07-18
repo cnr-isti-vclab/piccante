@@ -179,7 +179,7 @@ PIC_INLINE void FilterGLBilateral2DAS::FragmentShader()
                           //Calculate the number of samples
     int CalculateSamples(int shifter, ivec2 tSize) {
         //Fetch to the sampling map
-        float levelVal = 2.0 * texture(u_sample, gl_FragCoord.xy / tSize.xy).x;
+        float levelVal = dot(texture(u_sample, gl_FragCoord.xy / tSize.xy).xyz, vec3(1.0)) / 3.0;
         levelVal = clamp(1.0f - levelVal, 0.0, 1.0) * float(levelsR_Size);
 
         int levelInt = int(floor(levelVal));
@@ -324,7 +324,7 @@ PIC_INLINE ImageGL *FilterGLBilateral2DAS::Process(ImageGLVec imgIn,
     }
 
     //Calculating the sampling map
-    fGLsm->Process(imgIn, imgTmp);
+    imgTmp = fGLsm->Process(imgIn, imgTmp);
 
     //Rendering
     fbo->bind();

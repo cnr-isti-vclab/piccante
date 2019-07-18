@@ -33,20 +33,6 @@ protected:
      */
     void initShaders()
     {
-        FragmentShader();
-
-        technique.initStandard("330", vertex_source, fragment_source, "FilterGLGradient");
-
-        technique.bind();
-        technique.setUniform1i("u_tex", 0);
-        technique.unbind();
-    }
-
-    /**
-     * @brief FragmentShader
-     */
-    void FragmentShader()
-    {
         fragment_source = MAKE_STRING
                           (
                               uniform sampler2D u_tex; \n
@@ -64,6 +50,16 @@ protected:
             f_color = vec4(sqrt(Gx.xyz * Gx.xyz + Gy.xyz * Gy.xyz), 1.0); //Magnitude
         }\n
                           );
+
+        //
+        //
+        //
+
+        technique.initStandard("330", vertex_source, fragment_source, "FilterGLGradient");
+
+        technique.bind();
+        technique.setUniform1i("u_tex", 0);
+        technique.unbind();
     }
 
 public:
@@ -74,7 +70,6 @@ public:
     FilterGLGradient() : FilterGL()
     {
         //protected values are assigned/computed
-        FragmentShader();
         initShaders();
     }
 

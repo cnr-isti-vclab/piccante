@@ -33,15 +33,6 @@ protected:
      */
     void initShaders()
     {
-        FragmentShader();
-        technique.initStandard("330", vertex_source, fragment_source, "FilterGLLaplacian");
-    }
-
-    /**
-     * @brief FragmentShader
-     */
-    void FragmentShader()
-    {
         fragment_source = MAKE_STRING
                           (
                               uniform sampler2D u_tex; \n
@@ -58,6 +49,12 @@ protected:
             f_color = vec4(color, 1.0);
         }\n
                           );
+
+        //
+        //
+        //
+
+        technique.initStandard("330", vertex_source, fragment_source, "FilterGLLaplacian");
     }
 
 public:
@@ -68,7 +65,6 @@ public:
     FilterGLLaplacian() : FilterGL()
     {
         //protected values are assigned/computed
-        FragmentShader();
         initShaders();
     }
 

@@ -56,6 +56,8 @@ public:
      */
     FilterGLDragoTMO();
 
+    ~FilterGLDragoTMO();
+
     /**
      * @brief update
      * @param Ld_Max
@@ -78,6 +80,12 @@ PIC_INLINE FilterGLDragoTMO::FilterGLDragoTMO(): FilterGL()
     FragmentShader();
     initShaders();
 }
+
+PIC_INLINE FilterGLDragoTMO::~FilterGLDragoTMO()
+{
+    release();
+}
+
 
 PIC_INLINE void FilterGLDragoTMO::FragmentShader()
 {

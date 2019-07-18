@@ -38,6 +38,8 @@ This program is free software: you can redistribute it and/or modify
 #include <QVBoxLayout>
 #include <QLabel>
 
+#define PIC_DEBUG
+
 #include "piccante.hpp"
 
 class GLWidget : public QGLWidget
@@ -50,6 +52,7 @@ protected:
     pic::FilterGLBilateral2DG *fltBilG;
     pic::FilterGLBilateral2DSP *fltBilSP;
     pic::FilterGLBilateral2DS *fltBilS;
+    pic::FilterGLBilateral2DAS *fltBilAS;
     pic::FilterGLGaussian2D *fltGauss;
     pic::FilterGLAnisotropicDiffusion *fltAD;
 
@@ -80,10 +83,6 @@ protected:
         img->Read("../data/input/yellow_flowers.png", pic::LT_NOR_GAMMA);
         img->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
-        #ifdef PIC_DEBUG
-            printf("Image is read: %d\n", bRead);
-        #endif
-
         float sigma_s = 16.0f;
         float sigma_r = 0.1f;
 
@@ -97,6 +96,9 @@ protected:
 
         //allocate a new bilateral filter
         fltBilS = new pic::FilterGLBilateral2DS(sigma_s, sigma_r);
+
+        //allocate a new bilateral filter
+        fltBilAS = new pic::FilterGLBilateral2DAS(sigma_s, sigma_r);
 
         //allocate a new bilateral filter
         fltBilF = new pic::FilterGLBilateral2DF(sigma_s, sigma_r);
@@ -180,6 +182,13 @@ protected:
             break;
 
             case 6:
+                //apply the sampling bilateral filter
+                img_flt = fltBilAS->Process(SingleGL(img), img_flt);
+                img_out = img_flt;
+                window_ext->setWindowTitle(tr("Filtering Example: Sub-Sampled Adaptive Bilateral"));
+            break;
+
+            case 7:
                 //apply the anisotropic diffusion filter
                 img_flt = fltAD->AnisotropicDiffusion(SingleGL(img), img_flt);
                 img_out = img_flt;
@@ -218,7 +227,7 @@ public:
      */
     void update()
     {
-        method = (method + 1) % 7;
+        method = (method + 1) % 8;
     }
 };
 

@@ -48,6 +48,7 @@ protected:
 
     ImageGLVec param;
 
+    bool bFboOwn;
 public:
 
     bool bDelete;
@@ -64,9 +65,8 @@ public:
 
         fbo = NULL;
 
-        quad = NULL;
-
-        quad = new QuadGL(false);
+        this->bFboOwn = true;
+        quad = new QuadGL(false, 1.0f, 1.0f);
 
         target = GL_TEXTURE_2D;
 
@@ -84,8 +84,11 @@ public:
      */
     void release()
     {
-        delete_s(quad);
-        delete_s(fbo);
+        quad = delete_s(quad);
+
+        if(bFboOwn) {
+            fbo = delete_s(fbo);
+        }
 
         releaseAux();
     }
@@ -105,6 +108,7 @@ public:
     void setFbo(Fbo *fbo)
     {
         this->fbo = fbo;
+        this->bFboOwn = false;
     }
 
     /**
@@ -270,6 +274,7 @@ public:
         //create an FBO
         if(fbo == NULL) {
             fbo = new Fbo();
+            bFboOwn = true;
         }
 
         fbo->create(imgOut->width, imgOut->height, imgOut->frames, false, imgOut->getTexture());

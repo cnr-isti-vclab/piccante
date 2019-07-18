@@ -63,11 +63,6 @@ public:
         release();
     }
 
-    void releaseAux()
-    {
-        delete_s(weights);
-    }
-
     /**
      * @brief changePass
      * @param pass

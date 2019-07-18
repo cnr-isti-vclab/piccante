@@ -33,6 +33,7 @@ class FilterGLGaussian1D: public FilterGLConv1D
 protected:
     float sigma;
     PrecomputedGaussian *pg;
+    bool bWeightsOwn;
 
 public:
 
@@ -51,8 +52,11 @@ public:
      */
     void releaseAux()
     {
-        delete_s(weights);
-        delete_s(pg);
+        pg = delete_s(pg);
+
+        if(bWeightsOwn) {
+            weights = delete_s(weights);
+        }
     }
 
     /**
@@ -91,7 +95,7 @@ FilterGLGaussian1D::FilterGLGaussian1D(float sigma, int direction = 0,
                                        GLenum target = GL_TEXTURE_2D): FilterGLConv1D(NULL, direction, target)
 {
     pg = NULL;
-
+    bWeightsOwn = false;
     this->sigma = -1.0f;
 
     update(sigma);
@@ -120,14 +124,12 @@ void FilterGLGaussian1D::update(float sigma)
     }
 
     if(bChanges || weights == NULL) {
-        if(weights != NULL) {
-            delete weights;
-        }
+        weights = delete_s(weights);
 
         weights = new ImageGL(1, pg->kernelSize, 1, 1, pg->coeff);
-        weights->generateTextureGL();
+        weights->generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
+        bWeightsOwn = true;
     }
-
     setUniform();
 }
 
