@@ -94,6 +94,17 @@ public:
     }
 
     /**
+     * @brief getImageLevelsR
+     * @return
+     */
+    ImageGL *getImageLevelsR()
+    {
+        ImageGL *ret = new ImageGL(levelsRtexture, GL_TEXTURE_2D);
+
+        return ret;
+    }
+
+    /**
      * @brief generateTexture
      * @return
      */

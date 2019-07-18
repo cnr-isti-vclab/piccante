@@ -42,7 +42,7 @@ protected:
     float alpha;
 
     //Random numbers tile
-    ImageGL *imageRand, *img_ms;
+    ImageGL *imageRand;
 
     void initShaders();
     void FragmentShader();
@@ -59,11 +59,13 @@ public:
 
     ~FilterGLReinhardSinglePass();
 
+    /**
+     * @brief releaseAux
+     */
     void releaseAux()
     {
         delete_s(imageRand);
         delete_s(ms);
-        delete_s(img_ms);
     }
 
     /**
@@ -125,8 +127,7 @@ PIC_INLINE FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, f
 
     param.push_back(imageRand);
 
-    img_ms = new ImageGL(ms->getTexture(), GL_TEXTURE_2D);
-    param.push_back(img_ms);
+    param.push_back(ms->getImage());
 
     FragmentShader();
     initShaders();

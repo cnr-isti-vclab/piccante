@@ -73,7 +73,6 @@ public:
         delete_s(ms);
     }
 
-\
     /**
      * @brief execute
      * @param imgIn
@@ -105,7 +104,7 @@ public:
                                float sigma_s, float sigma_r, int testing = 1)
     {
         ImageGL imgIn(nameFile);
-        imgIn.generateTextureGL(false, GL_TEXTURE_2D);
+        imgIn.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         FilterGLBilateral2DS *filter = new FilterGLBilateral2DS(sigma_s, sigma_r,
                 BF_CLASSIC);
@@ -184,7 +183,7 @@ PIC_INLINE FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma
 //    if(BF_CLASSIC) {
 
     imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
-    imageRand->setRand();
+    imageRand->setRand(1);
     imageRand->loadFromMemory();
     *imageRand -= 0.5f;
     nSamplers = 1;

@@ -32,9 +32,6 @@ protected:
     FilterGLBilateral1D *filterS;
     FilterGLBilateral1D *filterT;
 
-    void initShaders() {}
-    void FragmentShader() {}
-
 public:
     /**
      * @brief FilterGLBilateral3DSP
