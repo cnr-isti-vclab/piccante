@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../base.hpp"
 
+#include "../../util/std_util.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../gl/filtering/filter_iterative.hpp"
 
@@ -61,6 +63,11 @@ public:
     FilterGLAnisotropicDiffusion(float sigma_s, float sigma_r);
 
     ~FilterGLAnisotropicDiffusion();
+
+    void releaseAux()
+    {
+        delete_s(flt);
+    }
 
     /**
      * @brief update
@@ -126,11 +133,6 @@ PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigm
 PIC_INLINE FilterGLAnisotropicDiffusion::~FilterGLAnisotropicDiffusion()
 {
     release();
-
-    if(flt != NULL) {
-        delete flt;
-        flt = NULL;
-    }
 }
 
 PIC_INLINE void FilterGLAnisotropicDiffusion::FragmentShader()

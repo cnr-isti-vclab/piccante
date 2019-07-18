@@ -56,6 +56,8 @@ public:
      */
     FilterGLBilateral2DF(float sigma_s, float sigma_r);
 
+    ~FilterGLBilateral2DF();
+
     /**
      * @brief update
      * @param sigma_s
@@ -84,6 +86,11 @@ public:
 
 PIC_INLINE FilterGLBilateral2DF::FilterGLBilateral2DF(): FilterGL()
 {
+}
+
+PIC_INLINE FilterGLBilateral2DF::~FilterGLBilateral2DF()
+{
+    release();
 }
 
 PIC_INLINE FilterGLBilateral2DF::FilterGLBilateral2DF(float sigma_s,

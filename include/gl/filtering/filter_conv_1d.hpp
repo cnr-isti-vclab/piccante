@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_CONV_1D_HPP
 #define PIC_GL_FILTERING_FILTER_CONV_1D_HPP
 
+#include "../../base.hpp"
 #include "../../gl/filtering/filter_1d.hpp"
 
 namespace pic {
@@ -49,6 +50,8 @@ public:
      */
     FilterGLConv1D(ImageGL *weights, int direction, GLenum target);
 
+    ~FilterGLConv1D();
+
     /**
      * @brief setUniformAux
      * @return
@@ -69,7 +72,7 @@ public:
     }
 };
 
-FilterGLConv1D::FilterGLConv1D(ImageGL *weights, int direction,
+PIC_INLINE FilterGLConv1D::FilterGLConv1D(ImageGL *weights, int direction,
                                        GLenum target): FilterGL1D(direction, target)
 {
     this->weights = weights;
@@ -78,7 +81,13 @@ FilterGLConv1D::FilterGLConv1D(ImageGL *weights, int direction,
     initShaders();
 }
 
-void FilterGLConv1D::FragmentShader()
+PIC_INLINE FilterGLConv1D::~FilterGLConv1D()
+{
+    release();
+}
+
+
+PIC_INLINE void FilterGLConv1D::FragmentShader()
 {
     std::string fragment_source_2D = MAKE_STRING
                                      (

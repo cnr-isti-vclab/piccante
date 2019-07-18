@@ -68,6 +68,11 @@ public:
         update(channel);
     }
 
+    ~FilterGLChannel()
+    {
+        release();
+    }
+
     /**
      * @brief update
      * @param channel

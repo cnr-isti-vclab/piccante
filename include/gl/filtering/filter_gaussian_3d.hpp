@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../base.hpp"
 
+#include "../../util/std_util.hpp"
+
 #include "../../gl/filtering/filter_npasses.hpp"
 #include "../../gl/filtering/filter_gaussian_1d.hpp"
 
@@ -41,6 +43,8 @@ public:
 
     ~FilterGLGaussian3D()
     {
+        release();
+
         delete_s(filter);
     }
 

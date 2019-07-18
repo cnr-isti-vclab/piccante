@@ -92,10 +92,15 @@ public:
      * @brief FilterGLDownPP
      * @param scale
      */
-    FilterGLDownPP(float *value, float threshold)
+    FilterGLDownPP(float *value, float threshold) : FilterGL()
     {
         initShaders();
         update(value, threshold);
+    }
+
+    ~FilterGLDownPP()
+    {
+        release();
     }
 
     /**

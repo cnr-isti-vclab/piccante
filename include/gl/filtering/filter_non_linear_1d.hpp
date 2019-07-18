@@ -134,7 +134,7 @@ public:
 
     ~FilterGLNonLinear1D()
     {
-
+        release();
     }
 
     /**

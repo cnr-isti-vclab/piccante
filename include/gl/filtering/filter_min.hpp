@@ -52,9 +52,9 @@ public:
 
     ~FilterGLMin()
     {
+        release();
         delete_s(filter);
     }
-
 
     /**
      * @brief execute

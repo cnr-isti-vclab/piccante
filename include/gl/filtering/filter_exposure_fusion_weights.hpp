@@ -62,9 +62,12 @@ public:
         this->wS = wS >= 0.0f ? wS : 1.0f;
 
         //protected values are assigned/computed
-        FragmentShader();
-
         initShaders();
+    }
+
+    ~FilterGLExposureFusionWeights()
+    {
+        release();
     }
 
     /**

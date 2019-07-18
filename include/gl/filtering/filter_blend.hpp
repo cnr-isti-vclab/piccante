@@ -28,63 +28,54 @@ namespace pic {
 class FilterGLBlend: public FilterGL
 {
 protected:
+
     /**
      * @brief initShaders
      */
-    void initShaders();
+    void initShaders()
+    {
+        fragment_source = MAKE_STRING
+                          (
+                              uniform sampler2D u_tex0; \n
+                              uniform sampler2D u_tex1; \n
+                              uniform sampler2D u_texMask; \n
+                              out vec4      f_color;	\n
 
-    /**
-     * @brief FragmentShader
-     */
-    void FragmentShader();
+        void main(void) {
+            \n
+            ivec2 coords = ivec2(gl_FragCoord.xy);\n
+            vec4  color0 = texelFetch(u_tex0, coords, 0);\n
+            vec4  color1 = texelFetch(u_tex1, coords, 0);\n
+            float weight = texelFetch(u_texMask, coords, 0).x;\n
+            f_color = mix(color0, color1, weight);
+        }\n
+                          );
+
+        technique.initStandard("330", vertex_source, fragment_source, "FilterGLBlend");
+
+        technique.bind();
+        technique.setUniform1i("u_tex0", 0);
+        technique.setUniform1i("u_tex1", 1);
+        technique.setUniform1i("u_texMask", 2);
+        technique.unbind();
+    }
 
 public:
 
     /**
      * @brief FilterGLBlend
      */
-    FilterGLBlend();
+    FilterGLBlend() : FilterGL()
+    {
+        //protected values are assigned/computed
+        initShaders();
+    }
+
+    ~FilterGLBlend()
+    {
+        release();
+    }
 };
-
-PIC_INLINE FilterGLBlend::FilterGLBlend(): FilterGL()
-{
-    //protected values are assigned/computed
-    FragmentShader();
-    initShaders();
-}
-
-PIC_INLINE void FilterGLBlend::FragmentShader()
-{
-    fragment_source = MAKE_STRING
-                      (
-                          uniform sampler2D u_tex0; \n
-                          uniform sampler2D u_tex1; \n
-                          uniform sampler2D u_texMask; \n
-                          out vec4      f_color;	\n
-
-    void main(void) {
-        \n
-        ivec2 coords = ivec2(gl_FragCoord.xy);\n
-        vec4  color0 = texelFetch(u_tex0, coords, 0);\n
-        vec4  color1 = texelFetch(u_tex1, coords, 0);\n
-        float weight = texelFetch(u_texMask, coords, 0).x;\n
-        f_color = mix(color0, color1, weight);
-    }\n
-                      );
-}
-
-PIC_INLINE void FilterGLBlend::initShaders()
-{
-    FragmentShader();
-
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGLBlend");
-
-    technique.bind();
-    technique.setUniform1i("u_tex0", 0);
-    technique.setUniform1i("u_tex1", 1);
-    technique.setUniform1i("u_texMask", 2);
-    technique.unbind();
-}
 
 } // end namespace pic
 

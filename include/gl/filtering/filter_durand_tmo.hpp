@@ -60,6 +60,8 @@ public:
     FilterGLDurandTMO(float compression_factor, float log_absolute,
                      bool bGammaCorrection);
 
+    ~FilterGLDurandTMO();
+
     /**
      * @brief update
      * @param compression_factor
@@ -89,6 +91,11 @@ PIC_INLINE FilterGLDurandTMO::FilterGLDurandTMO(float compression_factor, float 
 
     FragmentShader();
     initShaders();
+}
+
+PIC_INLINE FilterGLDurandTMO::~FilterGLDurandTMO()
+{
+    release();
 }
 
 PIC_INLINE void FilterGLDurandTMO::FragmentShader()

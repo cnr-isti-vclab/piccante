@@ -52,6 +52,7 @@ public:
 
     ~FilterGLMax()
     {
+        release();
         delete_s(filter);
     }
 

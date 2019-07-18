@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_FROM_STROKE_TO_MASK_HPP
 #define PIC_GL_FILTERING_FILTER_FROM_STROKE_TO_MASK_HPP
 
+#include "../../base.hpp"
 #include "../../filtering/filter_luminance.hpp"
 #include "../../gl/filtering/filter.hpp"
 
@@ -46,6 +47,8 @@ public:
      */
     FilterGLFromStrokeToMask(LUMINANCE_TYPE type);
 
+    ~FilterGLFromStrokeToMask();
+
     /**
      * @brief update
      * @param type
@@ -66,21 +69,26 @@ public:
     }
 };
 
-FilterGLFromStrokeToMask::FilterGLFromStrokeToMask(): FilterGL()
+PIC_INLINE FilterGLFromStrokeToMask::FilterGLFromStrokeToMask(): FilterGL()
 {
     this->type = LT_CIE_LUMINANCE;
 
     initShaders();
 }
 
-FilterGLFromStrokeToMask::FilterGLFromStrokeToMask(LUMINANCE_TYPE type): FilterGL()
+PIC_INLINE FilterGLFromStrokeToMask::FilterGLFromStrokeToMask(LUMINANCE_TYPE type): FilterGL()
 {
     this->type = type;
 
     initShaders();
 }
 
-void FilterGLFromStrokeToMask::initShaders()
+PIC_INLINE FilterGLFromStrokeToMask::~FilterGLFromStrokeToMask()
+{
+    release();
+}
+
+PIC_INLINE void FilterGLFromStrokeToMask::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
@@ -103,7 +111,7 @@ void FilterGLFromStrokeToMask::initShaders()
     update(type);
 }
 
-void FilterGLFromStrokeToMask::update()
+PIC_INLINE void FilterGLFromStrokeToMask::update()
 {
     technique.bind();
     technique.setUniform1i("u_tex", 0);

@@ -230,7 +230,7 @@ PIC_INLINE ImageGL *FilterGLNPasses::setupAuxNGen(ImageGLVec imgIn,
            imgOut->width != width ||
            imgOut->channels != channels ||
            imgOut->frames != frames) {
-            imgOut = new ImageGL(frames, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
+           imgOut = new ImageGL(frames, width, height, channels, IMG_GPU, GL_TEXTURE_2D);
         }
     }
 

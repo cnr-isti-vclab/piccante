@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_GL_FILTERING_FILTER_BILATERAL_2DAS_HPP
 
 #include "../../util/vec.hpp"
+#include "../../util/std_util.hpp"
 #include "../../gl/filtering/filter.hpp"
 #include "../../gl/filtering/filter_sampling_map.hpp"
 #include "../../gl/point_samplers/sampler_random_m.hpp"
@@ -56,6 +57,17 @@ public:
     FilterGLBilateral2DAS();
 
     ~FilterGLBilateral2DAS();
+
+    /**
+     * @brief releaseAux
+     */
+    void releaseAux()
+    {
+        delete_s(ms);
+        delete_s(imageRand);
+        delete_s(fGLsm);
+        delete_s(imgTmp);
+    }
 
     /**
      * @brief FilterGLBilateral2DAS
@@ -109,10 +121,7 @@ PIC_INLINE FilterGLBilateral2DAS::FilterGLBilateral2DAS(): FilterGL()
 
 PIC_INLINE FilterGLBilateral2DAS::~FilterGLBilateral2DAS()
 {
-    delete ms;
-    delete imageRand;
-    delete fGLsm;
-    delete imgTmp;
+    release();
 }
 
 PIC_INLINE FilterGLBilateral2DAS::FilterGLBilateral2DAS(float sigma_s,
@@ -128,11 +137,11 @@ PIC_INLINE FilterGLBilateral2DAS::FilterGLBilateral2DAS(float sigma_s,
     int nRand = 32;
 
     Image tmp_image_rand(1, 128, 128, 1);
-    tmp_image_rand.setRand();
+    tmp_image_rand.setRand(1);
     tmp_image_rand *= float(nRand - 1);
 
     imageRand = new ImageGL(&tmp_image_rand, true);
-    imageRand->generateTextureGL(GL_TEXTURE_2D, GL_INT);
+    imageRand->generateTextureGL(GL_TEXTURE_2D, GL_INT, false);
 
     //Precomputation of the Gaussian Kernel
     int kernelSize = PrecomputedGaussian::getKernelSize(sigma_s);

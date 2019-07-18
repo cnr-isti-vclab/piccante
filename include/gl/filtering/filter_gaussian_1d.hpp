@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_GAUSSIAN_1D_HPP
 #define PIC_GL_FILTERING_FILTER_GAUSSIAN_1D_HPP
 
+#include "../../base.hpp"
+
 #include "../../util/std_util.hpp"
 
 #include "../../util/precomputed_gaussian.hpp"
@@ -45,6 +47,15 @@ public:
     ~FilterGLGaussian1D();
 
     /**
+     * @brief releaseAux
+     */
+    void releaseAux()
+    {
+        delete_s(weights);
+        delete_s(pg);
+    }
+
+    /**
      * @brief update
      * @param sigma
      */
@@ -60,7 +71,7 @@ public:
     static ImageGL *execute(std::string nameIn, std::string nameOut, float sigma)
     {
         ImageGL imgIn(nameIn);
-        imgIn.generateTextureGL(GL_TEXTURE_2D, false);
+        imgIn.generateTextureGL(GL_TEXTURE_2D, GL_FLOAT, false);
 
         FilterGLGaussian1D filter(sigma, true, GL_TEXTURE_2D);
 
@@ -88,8 +99,7 @@ FilterGLGaussian1D::FilterGLGaussian1D(float sigma, int direction = 0,
 
 FilterGLGaussian1D::~FilterGLGaussian1D()
 {
-    delete_s(weights);
-    delete_s(pg);
+    release();
 }
 
 void FilterGLGaussian1D::update(float sigma)
@@ -102,11 +112,10 @@ void FilterGLGaussian1D::update(float sigma)
     }
 
     if(pg != NULL) {
-        delete pg;
-        pg = NULL;
+        pg = delete_s(pg);
     }
 
-    if(pg == NULL) {
+    if(pg == NULL) {        
         pg = new PrecomputedGaussian(this->sigma);
     }
 

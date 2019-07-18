@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../base.hpp"
 
+#include "../../util/std_util.hpp"
+
 #include "../../util/gl/fbo.hpp"
 
 #include "../../gl/filtering/filter_npasses.hpp"
@@ -43,32 +45,66 @@ protected:
     FilterGLSampler2D *filterD;
     FilterGLGaussian2D *filterG2D;
 
-    void initShaders() {}
-
-    void FragmentShader() {}
-
     /**
      * @brief update
      * @param sigma
      * @param scale
      */
-    void update(float sigma, float scale);
+    void update(float sigma, float scale)
+    {
+        this->sigma = sigma;
+        this->scale = scale;
+
+        filterD = new FilterGLSampler2D(scale);
+        filterS = new FilterGLSigmoidTMO();
+        filterG = new FilterGLGradient();
+        filterG2D = new FilterGLGaussian2D(sigma);
+
+        insertFilter(filterD);
+        insertFilter(filterS);
+        insertFilter(filterG);
+        insertFilter(filterG2D);
+    }
 
 public:
     /**
      * @brief FilterGLSamplingMap
      * @param sigma
      */
-    FilterGLSamplingMap(float sigma);
+    FilterGLSamplingMap(float sigma) : FilterGLNPasses()
+    {
+        target = GL_TEXTURE_2D;
+        float rateScale = 2.0f;
+        update(rateScale, rateScale / sigma);
+    }
+
 
     /**
      * @brief FilterGLSamplingMap
      * @param sigma
      * @param scale
      */
-    FilterGLSamplingMap(float sigma, float scale);
+    FilterGLSamplingMap(float sigma, float scale) : FilterGLNPasses()
+    {
+        target = GL_TEXTURE_2D;
+        update(sigma * scale, scale);
+    }
 
-    ~FilterGLSamplingMap();
+    ~FilterGLSamplingMap()
+    {
+        release();
+    }
+
+    /**
+     * @brief releaseAux
+     */
+    void releaseAux()
+    {
+        delete_s(filterD);
+        delete_s(filterS);
+        delete_s(filterG);
+        delete_s(filterG2D);
+    }
 
     /**
      * @brief getScale
@@ -83,7 +119,14 @@ public:
      * @brief getFbo
      * @return
      */
-    Fbo *getFbo();
+    Fbo *getFbo()
+    {
+        if(filters.empty()) {
+            return NULL;
+        }
+
+        return filters[filters.size() - 1]->getFbo();
+    }
 
     /**
      * @brief execute
@@ -101,66 +144,6 @@ public:
         return imgOut;
     }
 };
-
-PIC_INLINE FilterGLSamplingMap::FilterGLSamplingMap(float sigma): FilterGLNPasses()
-{
-    target = GL_TEXTURE_2D;
-    float rateScale = 2.0f;
-    update(rateScale, rateScale / sigma);
-}
-
-PIC_INLINE FilterGLSamplingMap::FilterGLSamplingMap(float sigma,
-        float scale): FilterGLNPasses()
-{
-    target = GL_TEXTURE_2D;
-    update(sigma * scale, scale);
-}
-
-PIC_INLINE void FilterGLSamplingMap::update(float sigma, float scale)
-{
-    this->sigma = sigma;
-    this->scale = scale;
-
-    filterD = new FilterGLSampler2D(scale);
-    filterS = new FilterGLSigmoidTMO();
-    filterG = new FilterGLGradient();
-    filterG2D = new FilterGLGaussian2D(sigma);
-
-    insertFilter(filterD);
-    insertFilter(filterS);
-    insertFilter(filterG);
-    insertFilter(filterG2D);
-}
-
-PIC_INLINE FilterGLSamplingMap::~FilterGLSamplingMap()
-{
-    release();
-
-    if(filterD != NULL) {
-        delete filterD;
-    }
-
-    if(filterS != NULL) {
-        delete filterS;
-    }
-
-    if(filterG != NULL) {
-        delete filterG;
-    }
-
-    if(filterG2D != NULL) {
-        delete filterG2D;
-    }
-}
-
-PIC_INLINE Fbo *FilterGLSamplingMap::getFbo()
-{
-    if(filters.empty()) {
-        return NULL;
-    }
-
-    return filters[filters.size() - 1]->getFbo();
-}
 
 } // end namespace pic
 

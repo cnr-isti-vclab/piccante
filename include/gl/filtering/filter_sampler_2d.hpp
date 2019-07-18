@@ -62,6 +62,11 @@ public:
         update(scale);
     }
 
+    ~FilterGLSampler2D()
+    {
+        release();
+    }
+
     /**
      * @brief OutputSize
      * @param imgIn

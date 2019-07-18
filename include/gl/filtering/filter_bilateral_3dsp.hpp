@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_3DSP_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_3DSP_HPP
 
+#include "../../util/std_util.hpp"
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -49,6 +50,15 @@ public:
     FilterGLBilateral3DSP(float sigma_s, float sigma_r, float sigma_t);
 
     ~FilterGLBilateral3DSP();
+
+    /**
+     * @brief releaseAux
+     */
+    void releaseAux()
+    {
+        delete_s(filterS);
+        delete_s(filterT);
+    }
 
     /**
      * @brief setFrame
@@ -92,8 +102,7 @@ PIC_INLINE FilterGLBilateral3DSP::FilterGLBilateral3DSP(): FilterGLNPasses()
 
 PIC_INLINE FilterGLBilateral3DSP::~FilterGLBilateral3DSP()
 {
-    delete filterS;
-    delete filterT;
+    release();
 }
 
 PIC_INLINE FilterGLBilateral3DSP::FilterGLBilateral3DSP(float sigma_s, float sigma_r,

@@ -60,6 +60,7 @@ public:
 
     ~FilterGLMean()
     {
+        release();
         delete_s(filter);
         delete_vec_s(data);
     }

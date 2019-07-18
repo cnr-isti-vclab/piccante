@@ -39,16 +39,13 @@ protected:
      */
     void initShaders();
 
-    /**
-     * @brief FragmentShader
-     */
-    void FragmentShader();
-
 public:
     /**
      * @brief FilterGLSigmoidTMO
      */
     FilterGLSigmoidTMO();
+
+    ~FilterGLSigmoidTMO();
 
     /**
      * @brief FilterGLSigmoidTMO
@@ -75,6 +72,11 @@ PIC_INLINE FilterGLSigmoidTMO::FilterGLSigmoidTMO(): FilterGL()
     initShaders();
 }
 
+PIC_INLINE FilterGLSigmoidTMO::~FilterGLSigmoidTMO()
+{
+    release();
+}
+
 PIC_INLINE FilterGLSigmoidTMO::FilterGLSigmoidTMO(float alpha, bool bLocal,
                                        bool bGammaCorrection): FilterGL()
 {
@@ -86,7 +88,7 @@ PIC_INLINE FilterGLSigmoidTMO::FilterGLSigmoidTMO(float alpha, bool bLocal,
     initShaders();
 }
 
-PIC_INLINE void FilterGLSigmoidTMO::FragmentShader()
+PIC_INLINE void FilterGLSigmoidTMO::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
@@ -133,11 +135,10 @@ PIC_INLINE void FilterGLSigmoidTMO::FragmentShader()
     }
 
     fragment_source = gammaCorrection(fragment_source, bGammaCorrection);
-}
 
-PIC_INLINE void FilterGLSigmoidTMO::initShaders()
-{
-    FragmentShader();
+    //
+    //
+    //
 
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLSigmoidTMO");
 

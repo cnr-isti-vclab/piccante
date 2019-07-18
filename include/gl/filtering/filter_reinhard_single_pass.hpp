@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../../base.hpp"
 
 #include "../../util/vec.hpp"
+#include "../../util/std_util.hpp"
 
 #include "../../gl/filtering/filter.hpp"
 #include "../../util/file_lister.hpp"
@@ -57,6 +58,12 @@ public:
     FilterGLReinhardSinglePass(float alpha, float phi);
 
     ~FilterGLReinhardSinglePass();
+
+    void releaseAux()
+    {
+        delete_s(imageRand);
+        delete_s(ms);
+    }
 
     /**
      * @brief update
@@ -121,10 +128,7 @@ PIC_INLINE FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, f
 
 PIC_INLINE FilterGLReinhardSinglePass::~FilterGLReinhardSinglePass()
 {
-    delete imageRand;
-    delete ms;
-
-    //free shader etc...
+    release();
 }
 
 PIC_INLINE void FilterGLReinhardSinglePass::FragmentShader()

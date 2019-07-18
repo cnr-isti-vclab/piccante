@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_2DS_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_2DS_HPP
 
+#include "../../util/std_util.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../util/file_lister.hpp"
 #include "../../gl/point_samplers/sampler_random_m.hpp"
@@ -61,6 +63,16 @@ public:
      * @param sigma_r
      */
     void update(float sigma_s, float sigma_r);
+
+    /**
+     * @brief releaseAux
+     */
+    void releaseAux()
+    {
+        delete_s(imageRand);
+        delete_s(ms);
+    }
+
 \
     /**
      * @brief execute
@@ -196,16 +208,13 @@ PIC_INLINE FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma
                              nSamplers);
     ms->generateTexture();
 
-
-
     FragmentShader();
     initShaders();
 }
 
 PIC_INLINE FilterGLBilateral2DS::~FilterGLBilateral2DS()
 {
-    delete imageRand;
-    delete ms;
+    release();
 
     //free shader etc...
 }

@@ -45,7 +45,7 @@ public:
     /**
      * @brief FilterGLGaussian2D
      */
-    FilterGLGaussian2D()
+    FilterGLGaussian2D() : FilterGLNPasses()
     {
         target = GL_TEXTURE_2D;
 

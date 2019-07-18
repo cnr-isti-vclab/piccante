@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../base.hpp"
 
+#include "../../util/std_util.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -55,6 +57,16 @@ public:
      * @param target
      */
     FilterGL1D(int direction, GLenum target);
+
+    ~FilterGL1D()
+    {
+        release();
+    }
+
+    void releaseAux()
+    {
+        delete_s(weights);
+    }
 
     /**
      * @brief changePass

@@ -36,10 +36,13 @@ protected:
      */
     void initShaders()
     {
-        /*	0 ---> Drago et al. 2003
-            1 ---> Reinhard et al. 2002
-            LumZone     = [-2, -1, 0, 1, 2, 3, 4];
-            TMOForZone =  [ 0,  0, 1, 0, 1, 0, 0];	*/
+        /*
+         *
+         * 0 ---> Drago et al. 2003
+         * 1 ---> Reinhard et al. 2002
+         * LumZone     = [-2, -1, 0, 1, 2, 3, 4];
+         * TMOForZone =  [ 0,  0, 1, 0, 1, 0, 0];
+        */
 
         fragment_source = MAKE_STRING
                           (
@@ -65,9 +68,14 @@ public:
     /**
      * @brief FilterGLRemapping
      */
-    FilterGLRemapping()
+    FilterGLRemapping() : FilterGL()
     {
         initShaders();
+    }
+
+    ~FilterGLRemapping()
+    {
+        release();
     }
 };
 

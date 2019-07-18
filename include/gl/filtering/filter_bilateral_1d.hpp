@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_1D_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_1D_HPP
 
+#include "../../base.hpp"
+
 #include "../../gl/filtering/filter_1d.hpp"
 
 namespace pic {
@@ -44,6 +46,8 @@ public:
     FilterGLBilateral1D(float sigma_s, float sigma_r, int direction,
                         GLenum target);
 
+    ~FilterGLBilateral1D();
+
     /**
      * @brief setUniformAux
      */
@@ -57,7 +61,7 @@ public:
     void update(float sigma_s, float sigma_r);
 };
 
-FilterGLBilateral1D::FilterGLBilateral1D(float sigma_s, float sigma_r,
+PIC_INLINE FilterGLBilateral1D::FilterGLBilateral1D(float sigma_s, float sigma_r,
         int direction, GLenum target): FilterGL1D(direction, target)
 {
     //protected values are assigned/computed
@@ -68,17 +72,22 @@ FilterGLBilateral1D::FilterGLBilateral1D(float sigma_s, float sigma_r,
     initShaders();
 }
 
-void FilterGLBilateral1D::FragmentShader()
+PIC_INLINE FilterGLBilateral1D::~FilterGLBilateral1D()
+{
+    release();
+}
+
+PIC_INLINE void FilterGLBilateral1D::FragmentShader()
 {
     std::string fragment_source_2D = MAKE_STRING
                                      (
-                                         uniform sampler2D	u_tex;
-                                         uniform float		sigma_s2;
-                                         uniform float		sigma_r2;
-                                         uniform int		iX;
-                                         uniform int		iY;
+                                         uniform sampler2D  u_tex;
+                                         uniform float      sigma_s2;
+                                         uniform float      sigma_r2;
+                                         uniform int        iX;
+                                         uniform int        iY;
                                          uniform int        halfKernelSize;
-                                         out     vec4		f_color;
+                                         out     vec4       f_color;
 
     void main(void) {
         vec3  color = vec3(0.0);
@@ -108,16 +117,16 @@ void FilterGLBilateral1D::FragmentShader()
     std::string fragment_source_3D = MAKE_STRING
                                      (
                                          uniform sampler2DArray	u_tex;
-                                         uniform float		    sigma_s2;
-                                         uniform float		    sigma_r2;
-                                         uniform int		    slice;
-                                         uniform int		    iX;
-                                         uniform int		    iY;
-                                         uniform int		    iZ;
-                                         out     vec4		    f_color;
+                                         uniform float		sigma_s2;
+                                         uniform float		sigma_r2;
+                                         uniform int		slice;
+                                         uniform int		iX;
+                                         uniform int		iY;
+                                         uniform int		iZ;
+                                         out     vec4		f_color;
 
     void main(void) {
-        vec3  color = vec3(0.0);
+        vec3 color = vec3(0.0);
         ivec3 coordsFrag = ivec3(ivec2(gl_FragCoord.xy), slice);
         vec3 tmpCol;
         float weight = 0.0;
@@ -159,7 +168,7 @@ void FilterGLBilateral1D::FragmentShader()
     }
 }
 
-void FilterGLBilateral1D::setUniformAux()
+PIC_INLINE void FilterGLBilateral1D::setUniformAux()
 {
     float sigma_s_sq2 = 2.0f * sigma_s * sigma_s;
     float sigma_r_sq2 = 2.0f * sigma_r * sigma_r;
@@ -172,7 +181,7 @@ void FilterGLBilateral1D::setUniformAux()
     technique.setUniform1i("halfKernelSize", halfKernelSize);
 }
 
-void FilterGLBilateral1D::update(float sigma_s, float sigma_r)
+PIC_INLINE void FilterGLBilateral1D::update(float sigma_s, float sigma_r)
 {
     this->sigma_s = sigma_s;
     this->sigma_r = sigma_r;
