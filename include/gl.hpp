@@ -68,7 +68,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "gl/filtering/filter_bilateral_2ds.hpp"
 #include "gl/filtering/filter_bilateral_2ds_e.hpp"
 #include "gl/filtering/filter_bilateral_2dsp.hpp"
-#include "gl/filtering/filter_bilateral_3das.hpp"
 #include "gl/filtering/filter_bilateral_3ds.hpp"
 #include "gl/filtering/filter_bilateral_3dsp.hpp"
 #include "gl/filtering/filter_disp.hpp"

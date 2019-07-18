@@ -18,8 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_3DS_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_3DS_HPP
 
+#include "../../base.hpp"
 #include "../../util/vec.hpp"
-
+#include "../../util/std_util.hpp"
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -57,6 +58,8 @@ public:
      * @param sigma_t
      */
     FilterGLBilateral3DS(float sigma_s, float sigma_r, float sigma_t);
+
+    ~FilterGLBilateral3DS();
 
     /**
      * @brief update
@@ -143,6 +146,11 @@ PIC_INLINE FilterGLBilateral3DS::FilterGLBilateral3DS(float sigma_s, float sigma
 
     FragmentShader();
     initShaders();
+}
+
+PIC_INLINE FilterGLBilateral3DS::~FilterGLBilateral3DS()
+{
+    release();
 }
 
 PIC_INLINE void FilterGLBilateral3DS::FragmentShader()

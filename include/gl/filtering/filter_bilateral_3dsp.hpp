@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_GL_FILTERING_FILTER_BILATERAL_3DSP_HPP
 #define PIC_GL_FILTERING_FILTER_BILATERAL_3DSP_HPP
 
+#include "../../base.hpp"
 #include "../../util/std_util.hpp"
 #include "../../gl/filtering/filter.hpp"
 
