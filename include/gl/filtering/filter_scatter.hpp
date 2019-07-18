@@ -19,7 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_GL_FILTERING_FILTER_SCATTER_HPP
 
 #include "../../base.hpp"
-
+#include "../../util/std_util.hpp"
 #include "../../gl/filtering/filter.hpp"
 
 namespace pic {
@@ -70,6 +70,24 @@ public:
     ~FilterGLScatter();
 
     /**
+     * @brief releaseAux
+     */
+    void releaseAux()
+    {
+        vertex_array = delete_vec_s(vertex_array);
+
+        if(vbo != 0) {
+            glDeleteBuffers(1, &vbo);
+            vbo = 0;
+        }
+
+        if(vao != 0) {
+            glDeleteVertexArrays(1, &vao);
+            vao = 0;
+        }
+    }
+
+    /**
      * @brief update
      * @param s_S
      * @param s_R
@@ -90,6 +108,8 @@ PIC_INLINE FilterGLScatter::FilterGLScatter(float s_S, float s_R, int width, int
     this->s_S = s_S;
     this->s_R = s_R;
 
+    vertex_array = NULL;
+
     generateVertexArray(width, height);
 
     FragmentShader();
@@ -98,24 +118,13 @@ PIC_INLINE FilterGLScatter::FilterGLScatter(float s_S, float s_R, int width, int
 
 PIC_INLINE FilterGLScatter::~FilterGLScatter()
 {
-    if(vertex_array != NULL) {
-        delete[] vertex_array;
-        vertex_array = NULL;
-    }
-
-    if(vbo != 0) {
-        glDeleteBuffers(1, &vbo);
-        vbo = 0;
-    }
-
-    if(vao != 0) {
-        glDeleteVertexArrays(1, &vao);
-        vao = 0;
-    }
+    release();
 }
 
 PIC_INLINE void FilterGLScatter::generateVertexArray(int width, int height)
 {
+    vertex_array = delete_vec_s(vertex_array);
+
     vertex_array = new GLfloat[2 * width * height];
     nVertex_array = width * height;
 

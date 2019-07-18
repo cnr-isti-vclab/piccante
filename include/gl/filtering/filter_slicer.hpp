@@ -44,6 +44,8 @@ public:
      */
     FilterGLSlicer(float s_S, float s_R);
 
+    ~FilterGLSlicer();
+
     /**
      * @brief update
      * @param s_S
@@ -59,6 +61,11 @@ PIC_INLINE FilterGLSlicer::FilterGLSlicer(float s_S, float s_R): FilterGL()
 
     FragmentShader();
     initShaders();
+}
+
+PIC_INLINE FilterGLSlicer::~FilterGLSlicer()
+{
+    release();
 }
 
 PIC_INLINE void FilterGLSlicer::FragmentShader()
