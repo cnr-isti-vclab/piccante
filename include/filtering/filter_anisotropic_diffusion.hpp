@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_ANISOTROPIC_DIFFUSION_HPP
 #define PIC_FILTERING_FILTER_ANISOTROPIC_DIFFUSION_HPP
 
+#include "../base.hpp"
 #include "../filtering/filter.hpp"
 #include "../filtering/filter_iterative.hpp"
 
@@ -79,7 +80,6 @@ public:
     static Image *execute(ImageVec imgIn, Image *imgOut,
                                           float sigma_s, float sigma_r, int maxIterations = -1)
     {
-
         if(sigma_s <= 0.0f) {
             sigma_s = 1.0f;
         }

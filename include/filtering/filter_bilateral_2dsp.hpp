@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_BILATERAL_2DSP_HPP
 #define PIC_FILTERING_FILTER_BILATERAL_2DSP_HPP
 
+#include "../util/std_util.hpp"
 #include "../filtering/filter_bilateral_1d.hpp"
 #include "../filtering/filter_npasses.hpp"
 
@@ -47,7 +48,8 @@ public:
 
     ~FilterBilateral2DSP()
     {
-        delete bilateralFilter;
+        release();
+        delete_s(bilateralFilter);
     }
 
     /**

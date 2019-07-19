@@ -22,6 +22,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+/**
+ * @brief SingleInt
+ * @param v0
+ * @return
+ */
 PIC_INLINE std::vector<int> SingleInt(int v0)
 {
     std::vector<int> ret;
@@ -29,6 +34,13 @@ PIC_INLINE std::vector<int> SingleInt(int v0)
     return ret;
 }
 
+/**
+ * @brief TripleInt
+ * @param v0
+ * @param v1
+ * @param v2
+ * @return
+ */
 PIC_INLINE std::vector<int> TripleInt(int v0, int v1, int v2)
 {
     std::vector<int> ret;
