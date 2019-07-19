@@ -129,7 +129,7 @@ public:
         }
 
         this->sigma_s = MAX(imgIn->widthf, imgIn->heightf) * 0.02f;
-        flt_bil->update(sigma_s, sigma_r);
+        flt_bil->update(sigma_s, sigma_r, BF_CLASSIC);
 
         img_lum = flt_lum->Process(SingleGL(imgIn), img_lum);
 

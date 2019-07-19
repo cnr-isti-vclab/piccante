@@ -37,7 +37,7 @@ protected:
 
     //Sampling map
     FilterGLSamplingMap *fGLsm;
-    ImageGL *imgTmp;
+    ImageGL *sampleMap;
 
     /**
      * @brief initShaders
@@ -48,6 +48,35 @@ protected:
      * @brief FragmentShader
      */
     void FragmentShader();
+
+    /**
+     * @brief updateParam
+     */
+    void updateParam()
+    {
+        param.clear();
+
+        param.push_back(ms->getImage());
+        param.push_back(ms->getImageLevelsR());
+        param.push_back(imageRand);
+
+        if(sampleMap != NULL) {
+            param.push_back(sampleMap);
+        }
+    }
+
+    /**
+     * @brief setNULL
+     */
+    void setNULL()
+    {
+        ms = NULL;
+        imageRand = NULL;
+        fGLsm = NULL;
+        sampleMap = NULL;
+        sigma_s = -1.0f;
+        sigma_r = -1.0f;
+    }
 
 public:
 
@@ -66,7 +95,7 @@ public:
         delete_s(ms);
         delete_s(imageRand);
         delete_s(fGLsm);
-        delete_s(imgTmp);
+        delete_s(sampleMap);
     }
 
     /**
@@ -84,13 +113,22 @@ public:
     void update(float sigma_s, float sigma_r);
 
     /**
-     * @brief Process
+     * @brief setupAux
      * @param imgIn
      * @param imgOut
      * @return
      */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
+    ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
+    {
+        //calculate the sampling map
+        sampleMap = fGLsm->Process(imgIn, sampleMap);
 
+        if(param.size() == 3) {
+            param.push_back(sampleMap);
+        }
+
+        return allocateOutputMemory(imgIn, imgOut, bDelete);
+    }
 
     /**
      * @brief execute
@@ -108,15 +146,11 @@ public:
         delete filter;
         return imgOut;
     }
-
 };
 
 PIC_INLINE FilterGLBilateral2DAS::FilterGLBilateral2DAS(): FilterGL()
 {
-    ms = NULL;
-    imageRand = NULL;
-    fGLsm = NULL;
-    imgTmp = NULL;
+    setNULL();
 }
 
 PIC_INLINE FilterGLBilateral2DAS::~FilterGLBilateral2DAS()
@@ -127,39 +161,13 @@ PIC_INLINE FilterGLBilateral2DAS::~FilterGLBilateral2DAS()
 PIC_INLINE FilterGLBilateral2DAS::FilterGLBilateral2DAS(float sigma_s,
         float sigma_r): FilterGL()
 {
-    //protected values are assigned/computed
-    this->sigma_s = sigma_s;
-    this->sigma_r = sigma_r;
-
-    fGLsm = new FilterGLSamplingMap(sigma_s);
-    imgTmp = NULL;
-
-    int nRand = 32;
-
-    Image tmp_image_rand(1, 128, 128, 1);
-    tmp_image_rand.setRand(1);
-    tmp_image_rand *= float(nRand - 1);
-
-    imageRand = new ImageGL(&tmp_image_rand, true);
-    imageRand->generateTextureGL(GL_TEXTURE_2D, GL_INT, false);
-
-    //Precomputation of the Gaussian Kernel
-    int kernelSize = PrecomputedGaussian::getKernelSize(sigma_s);
-    int halfKernelSize = kernelSize >> 1;
-
-    //Poisson samples
-#ifdef PIC_DEBUG
-    printf("Window: %d\n", halfKernelSize);
-#endif
-
-    Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
-    ms = new MRSamplersGL<2>(ST_BRIDSON, window, halfKernelSize, 3, nRand);
-
-    ms->generateTexture();
-    ms->generateLevelsRTexture();
+    setNULL();
 
     FragmentShader();
+
     initShaders();
+
+    update(sigma_s, sigma_r);
 }
 
 PIC_INLINE void FilterGLBilateral2DAS::FragmentShader()
@@ -236,13 +244,7 @@ PIC_INLINE void FilterGLBilateral2DAS::FragmentShader()
 
 PIC_INLINE void FilterGLBilateral2DAS::initShaders()
 {
-#ifdef PIC_DEBUG
-    printf("Number of samples: %d\n", ms->nSamples / 2);
-#endif
-
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLBilateral2DAS");
-
-    update(-1.0f, -1.0f);
 }
 
 PIC_INLINE void FilterGLBilateral2DAS::update(float sigma_s, float sigma_r)
@@ -250,24 +252,54 @@ PIC_INLINE void FilterGLBilateral2DAS::update(float sigma_s, float sigma_r)
     bool flag = false;
 
     if(sigma_s > 0.0f) {
-        flag = (this->sigma_s == sigma_s);
         this->sigma_s = sigma_s;
+        flag = (this->sigma_s == sigma_s);
     }
 
     if(sigma_r > 0.0f) {
-        flag = flag || (this->sigma_r == sigma_r);
         this->sigma_r = sigma_r;
+        flag = flag || (this->sigma_r == sigma_r);
     }
 
-    if(!flag) {
+    if(fGLsm == NULL) {
+        fGLsm = new FilterGLSamplingMap(sigma_s);
     }
 
-    //shader update
-    int kernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s);
-    int halfKernelSize = kernelSize >> 1;
+    int nRand = 32;
 
-    Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
-    ms->updateGL(window, halfKernelSize);
+    if(imageRand == NULL) {
+        Image tmp_image_rand(1, 128, 128, 1);
+        tmp_image_rand.setRand(1);
+        tmp_image_rand *= float(nRand - 1);
+
+        imageRand = new ImageGL(&tmp_image_rand, true);
+        imageRand->generateTextureGL(GL_TEXTURE_2D, GL_INT, false);
+    }
+
+    if(flag) {
+        //shader update
+        int kernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s);
+        int halfKernelSize = kernelSize >> 1;
+        Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
+
+        //Poisson samples
+        #ifdef PIC_DEBUG
+            printf("Window: %d\n", halfKernelSize);
+        #endif
+
+        if(ms == NULL) {
+            ms = new MRSamplersGL<2>(ST_BRIDSON, window, halfKernelSize, 3, nRand);
+            ms->generateTexture();
+            ms->generateLevelsRTexture();
+            #ifdef PIC_DEBUG
+                printf("Number of samples: %d\n", ms->nSamples >> 1);
+            #endif
+        } else {
+            ms->updateGL(window, halfKernelSize);
+        }
+
+        updateParam();
+    }
 
     //shader update
     float sigmas2 = 2.0f * this->sigma_s * this->sigma_s;
@@ -276,61 +308,22 @@ PIC_INLINE void FilterGLBilateral2DAS::update(float sigma_s, float sigma_r)
     technique.bind();
     technique.setUniform1i("u_tex",      0);
     technique.setUniform1i("u_poisson",  1);
-    technique.setUniform1i("u_rand",	 2);
-    technique.setUniform1i("u_sample",	 3);
-    technique.setUniform1i("u_levelsR",	 4);
+    technique.setUniform1i("u_levelsR",	 2);
+    technique.setUniform1i("u_rand",	 3);
+    technique.setUniform1i("u_sample",	 4);
     technique.setUniform1f("sigmas2",  sigmas2);
     technique.setUniform1f("sigmar2",  sigmar2);
     technique.setUniform1i("levelsR_Size", ms->nLevels);
-    technique.unbind();
+    technique.unbind();    
 }
-
-PIC_INLINE ImageGL *FilterGLBilateral2DAS::Process(ImageGLVec imgIn,
-        ImageGL *imgOut)
-{
-    if(imgIn[0] == NULL) {
-        return imgOut;
-    }
-
-    int w = imgIn[0]->width;
-    int h = imgIn[0]->height;
-
-    if(imgOut == NULL) {
-        imgOut = new ImageGL(1, w, h, imgIn[0]->channels, IMG_GPU, GL_TEXTURE_2D);
-    }
-
-    if(fbo == NULL) {
-        fbo = new Fbo();
-        fbo->create(w, h, 1, false, imgOut->getTexture());
-    }
-
-    ImageGL *edge, *base;
-
-    if(imgIn.size() == 2) {
-        //Joint/Cross Bilateral Filtering
-        base = imgIn[0];
-        edge = imgIn[1];
-    } else {
-        base = imgIn[0];
-        edge = imgIn[0];
-    }
-
-    //Calculating the sampling map
-    imgTmp = fGLsm->Process(imgIn, imgTmp);
-
-    //Rendering
-    fbo->bind();
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-
-    //Shaders
-    technique.bind();
-
+/*
     //Textures
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, ms->getLevelsRTexture());
 
     glActiveTexture(GL_TEXTURE3);
     imgTmp->bindTexture();
+
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, ms->getLevelsRTexture());
 
     glActiveTexture(GL_TEXTURE2);
     imageRand->bindTexture();
@@ -340,34 +333,7 @@ PIC_INLINE ImageGL *FilterGLBilateral2DAS::Process(ImageGLVec imgIn,
 
     glActiveTexture(GL_TEXTURE0);
     base->bindTexture();
-
-    //Rendering aligned quad
-    quad->Render();
-
-    //Fbo
-    fbo->unbind();
-
-    //Shaders
-    technique.unbind();
-
-    //Textures
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE3);
-    imgTmp->unBindTexture();
-
-    glActiveTexture(GL_TEXTURE2);
-    imageRand->unBindTexture();
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE0);
-    base->unBindTexture();
-
-    return imgOut;
-}
+ */
 
 } // end namespace pic
 

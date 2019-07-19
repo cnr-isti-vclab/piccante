@@ -29,16 +29,45 @@ namespace pic {
 enum BF_TYPE {BF_CLASSIC, BF_CROSS, BF_BRUSH};
 
 /**
+ * @brief getValueBF
+ * @param type
+ * @return
+ */
+PIC_INLINE int getValueBF(BF_TYPE type)
+{
+    int ret = -1;
+    switch(type) {
+    case BF_CLASSIC:
+        ret = 0;
+        break;
+
+    case BF_CROSS:
+        ret = 1;
+        break;
+
+    case BF_BRUSH:
+        ret = 2;
+        break;
+
+    default:
+        ret = 0;
+        break;
+    }
+
+    return ret;
+}
+
+/**
  * @brief The FilterGLBilateral2DS class
  */
 class FilterGLBilateral2DS: public FilterGL
 {
 protected:
     float sigma_s, sigma_r;
-    MRSamplersGL<2> *ms;
     BF_TYPE type;
 
     //Random numbers tile
+    MRSamplersGL<2> *ms;
     ImageGL *imageRand;
     //Fragment Brush
     std::vector<std::string> fragment_sources;
@@ -61,8 +90,9 @@ public:
      * @brief update
      * @param sigma_s
      * @param sigma_r
+     * @param type
      */
-    void update(float sigma_s, float sigma_r);
+    void update(float sigma_s, float sigma_r, BF_TYPE type);
 
     /**
      * @brief releaseAux
@@ -157,10 +187,6 @@ public:
     ImageGL *setupAux(ImageGLVec imgIn, ImageGL *imgOut)
     {
         imgOut = allocateOutputMemory(imgIn, imgOut, false);
-
-        param.push_back(ms->getImage());
-        param.push_back(imageRand);
-
         return imgOut;
     }
 };
@@ -168,54 +194,21 @@ public:
 PIC_INLINE FilterGLBilateral2DS::FilterGLBilateral2DS(float sigma_s, float sigma_r,
         BF_TYPE type = BF_CLASSIC): FilterGL()
 {
-    //protected values are assigned/computed
-    this->sigma_s = sigma_s;
-    this->sigma_r = sigma_r;
+    ms = NULL;
+    imageRand = NULL;
+
     this->type = type;
 
-    //Precomputation of the Gaussian Kernel
-    int kernelSize = PrecomputedGaussian::getKernelSize(sigma_s);//,sigma_r);
-    int halfKernelSize = kernelSize >> 1;
-
-    //Random numbers
-    int nSamplers;
-
-//    if(BF_CLASSIC) {
-
-    imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
-    imageRand->setRand(1);
-    imageRand->loadFromMemory();
-    *imageRand -= 0.5f;
-    nSamplers = 1;
-
- /*   } else {
-    int nRand = 32;
-        imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
-        imageRand->SetRand();
-        *imageRand *= float(nRand - 1);
-        imageRand->generateTexture2DU32GL();
-        nSamplers = nRand;
-    }*/
-
-    //Poisson samples
-#ifdef PIC_DEBUG
-    printf("Window: %d\n", halfKernelSize);
-#endif
-
-    Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
-    ms = new MRSamplersGL<2>(ST_BRIDSON, window, halfKernelSize, 1,
-                             nSamplers);
-    ms->generateTexture();
-
     FragmentShader();
+
     initShaders();
+
+    update(sigma_s, sigma_r, type);
 }
 
 PIC_INLINE FilterGLBilateral2DS::~FilterGLBilateral2DS()
 {
     release();
-
-    //free shader etc...
 }
 
 PIC_INLINE void FilterGLBilateral2DS::FragmentShader()
@@ -352,51 +345,61 @@ PIC_INLINE void FilterGLBilateral2DS::FragmentShader()
 
 PIC_INLINE void FilterGLBilateral2DS::initShaders()
 {
-#ifdef PIC_DEBUG
-    printf("Number of samples: %d\n", ms->nSamples);
-#endif
-
-    int value = -1;
-
-    switch(type) {
-    case BF_CLASSIC:
-        value = 0;
-        break;
-
-    case BF_CROSS:
-        value = 1;
-        break;
-
-    case BF_BRUSH:
-        value = 2;
-        break;
-    }
-
-    technique.initStandard("330", vertex_source, fragment_sources[value], "FilterGLBilateral2DS");
-
-    update(-1.0f, -1.0f);
+    technique.initStandard("330", vertex_source, fragment_sources[getValueBF(type)], "FilterGLBilateral2DS");
 }
 
-PIC_INLINE void FilterGLBilateral2DS::update(float sigma_s, float sigma_r)
+PIC_INLINE void FilterGLBilateral2DS::update(float sigma_s, float sigma_r, BF_TYPE type)
 {
+    this->type = type;
+
     bool flag = false;
 
     if(sigma_s > 0.0f) {
-        flag = (this->sigma_s == sigma_s);
         this->sigma_s = sigma_s;
+        flag = (this->sigma_s == sigma_s);
     }
 
     if(sigma_r > 0.0f) {
-        flag = flag || (this->sigma_r == sigma_r);
         this->sigma_r = sigma_r;
+        flag = flag || (this->sigma_r == sigma_r);
     }
 
     int kernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s);
     int halfKernelSize = kernelSize >> 1;
 
+    //Poisson samples
+#ifdef PIC_DEBUG
+    printf("Window: %d\n", halfKernelSize);
+#endif
+
+    if(imageRand == NULL) {
+        imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
+        imageRand->setRand(1);
+        imageRand->loadFromMemory();
+        *imageRand -= 0.5f;
+    }
+
+
     if(flag) {
+        int nSamplers = 1;
         Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
-        ms->updateGL(window, halfKernelSize);
+
+        if(ms == NULL) {
+            ms = new MRSamplersGL<2>(ST_BRIDSON, window, halfKernelSize, 1,
+                                     nSamplers);
+            ms->generateTexture();
+        } else {
+            ms->updateGL(window, halfKernelSize);
+        }
+
+    #ifdef PIC_DEBUG
+        printf("Number of samples: %d\n", ms->nSamples);
+    #endif
+
+        if(param.empty()) {
+            param.push_back(ms->getImage());
+            param.push_back(imageRand);
+        }
     }
 
     //shader update
