@@ -20,7 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <random>
 
+#include "../base.hpp"
 #include "../util/string.hpp"
+#include "../util/std_util.hpp"
 
 #include "../filtering/filter.hpp"
 #include "../util/precomputed_gaussian.hpp"
@@ -58,6 +60,12 @@ public:
         seed = 1;
         pg = NULL;
         ms = NULL;
+    }
+
+    ~FilterBilateral2DS()
+    {
+        delete_s(pg);
+        delete_s(ms);
     }
 
     /**
@@ -207,6 +215,8 @@ public:
 PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(std::string nameFile,
         float sigma_r) : Filter()
 {
+    ms = NULL;
+    pg = NULL;
     Read(nameFile);
     this->sigma_r = sigma_r;
 }
@@ -214,6 +224,8 @@ PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(std::string nameFile,
 PIC_INLINE FilterBilateral2DS::FilterBilateral2DS(
         float sigma_s, float sigma_r, int mult = 1, SAMPLER_TYPE type = ST_BRIDSON) : Filter()
 {
+    pg = NULL;
+    ms = NULL;
     update(sigma_s, sigma_r, mult, type);
 }
 
@@ -226,6 +238,7 @@ PIC_INLINE void FilterBilateral2DS::update( float sigma_s,
     this->sigma_r_sq_2 = this->sigma_r * this->sigma_r * 2.0f;
 
     //Precomputation of the Gaussian Kernel
+    pg = delete_s(pg);
     pg = new PrecomputedGaussian(sigma_s);//, sigma_r);
 
     //Poisson samples
@@ -241,6 +254,8 @@ PIC_INLINE void FilterBilateral2DS::update( float sigma_s,
 #endif
 
     Vec2i window = Vec2i(pg->halfKernelSize, pg->halfKernelSize);
+
+    ms = delete_s(ms);
     ms = new MRSamplers<2>(type, window, nSamples, 1, 64);
 
     seed = 1;
@@ -275,7 +290,6 @@ PIC_INLINE void FilterBilateral2DS::ProcessBBox(Image *dst, ImageVec src,
             float *edge_data = (*edge)(i, j);
 
             Array<float>::assign(0.0f, dst_data, channels);
-
 
             RandomSampler<2> *ps = ms->getSampler(&m);
             int nSamples = int(ps->samplesR.size());
@@ -337,12 +351,10 @@ PIC_INLINE bool FilterBilateral2DS::Read(std::string filename)
 {
     //TODO: add the reading of (sigms_s, sigma_r)
     //Precomputation of the Gaussian Kernel
+    pg = delete_s(pg);
     pg = new PrecomputedGaussian(sigma_s);
 
-    if( ms != NULL) {
-        delete ms;
-    }
-
+    ms = delete_s(ms);
     ms = new MRSamplers<2>();
     return ms->Read(filename);
 }

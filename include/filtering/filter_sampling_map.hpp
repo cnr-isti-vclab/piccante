@@ -119,30 +119,12 @@ PIC_INLINE FilterSamplingMap::FilterSamplingMap(float sigma, float scale) : Filt
 
 PIC_INLINE FilterSamplingMap::~FilterSamplingMap()
 {
-    if(fltL != NULL) {
-        delete fltL;
-    }
-
-    if(fltD != NULL) {
-        delete fltD;
-    }
-
-    if(fltS != NULL) {
-        delete fltS;
-    }
-
-    if(fltC != NULL) {
-        delete fltC;
-    }
-
-    if(fltG != NULL) {
-        delete fltG;
-    }
-
-    if(fltG2D != NULL) {
-        delete fltG2D;
-    }
-
+    delete_s(fltL);
+    delete_s(fltD);
+    delete_s(fltS);
+    delete_s(fltC);
+    delete_s(fltG);
+    delete_s(fltG2D);
 }
 
 PIC_INLINE void FilterSamplingMap::update(float sigma, float scale)
