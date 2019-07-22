@@ -355,13 +355,13 @@ PIC_INLINE void FilterGLBilateral2DS::update(float sigma_s, float sigma_r, BF_TY
     bool flag = false;
 
     if(sigma_s > 0.0f) {
+        flag = (this->sigma_s != sigma_s);
         this->sigma_s = sigma_s;
-        flag = (this->sigma_s == sigma_s);
     }
 
     if(sigma_r > 0.0f) {
+        flag = flag || (this->sigma_r != sigma_r);
         this->sigma_r = sigma_r;
-        flag = flag || (this->sigma_r == sigma_r);
     }
 
     int kernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s);
@@ -379,7 +379,6 @@ PIC_INLINE void FilterGLBilateral2DS::update(float sigma_s, float sigma_r, BF_TY
         *imageRand -= 0.5f;
     }
 
-
     if(flag) {
         int nSamplers = 1;
         Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
@@ -390,6 +389,7 @@ PIC_INLINE void FilterGLBilateral2DS::update(float sigma_s, float sigma_r, BF_TY
             ms->generateTexture();
         } else {
             ms->updateGL(window, halfKernelSize);
+            param.clear();
         }
 
     #ifdef PIC_DEBUG

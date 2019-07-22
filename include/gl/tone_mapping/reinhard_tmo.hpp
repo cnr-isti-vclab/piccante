@@ -44,7 +44,6 @@ protected:
     float Lwa, alpha, phi;
     bool bStatisticsRecompute, bGlobal, bAllocate;
 
-
     FilterGLReinhardSinglePass *fTMO;
 
     /**

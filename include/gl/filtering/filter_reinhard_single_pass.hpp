@@ -79,8 +79,9 @@ public:
 
 PIC_INLINE FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, float phi = 8.0f): FilterGL()
 {
+    this->sigma_s = -1.0f;
+    this->sigma_r = -1.0f;
     this->alpha = alpha;
-
     float epsilon = 0.05f;
     float s_max = 8.0f;
     float sigma_s = 1.6f;
@@ -88,40 +89,13 @@ PIC_INLINE FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, f
 
     this->sigmoid_constant = (powf(2.0f, phi) * alpha / (s_max * s_max)) * epsilon;
 
-    //protected values are assigned/computed
-    this->sigma_s = sigma_s;
-    this->sigma_r = sigma_r;
-
-    //Precomputation of the Gaussian Kernel
-    int kernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s);//,sigma_r);
-    int halfKernelSize = kernelSize >> 1;
-
-    //Random numbers
-    int nSamplers;
-
-    imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
-    imageRand->setRand(1);
-    imageRand->loadFromMemory();
-    *imageRand -= 0.5f;
-    nSamplers = 1;
-
-
-    //Poisson samples
-#ifdef PIC_DEBUG
-    printf("Window: %d\n", halfKernelSize);
-#endif
-
-    Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
-    ms = new MRSamplersGL<2>(ST_BRIDSON, window, halfKernelSize, 1,
-                             nSamplers);
-    ms->generateTexture();
-
-    param.push_back(imageRand);
-
-    param.push_back(ms->getImage());
+    ms = NULL;
+    imageRand = NULL;
 
     FragmentShader();
     initShaders();
+
+    update(sigma_s, sigma_r, 1.0f);
 }
 
 PIC_INLINE FilterGLReinhardSinglePass::~FilterGLReinhardSinglePass()
@@ -154,16 +128,15 @@ PIC_INLINE void FilterGLReinhardSinglePass::FragmentShader()
 
         colRef = colRef / (colRef + sigmoid_constant);
 
-
         float shifter = texture(u_rand, gl_FragCoord.xy).x;
         float  color = 0.0;
         float weight = 0.0;
 
         for(int i = 0; i < nSamples; i++) {
-            //Coordinates
+            //coordinates
             ivec3 coords = texelFetch(u_poisson, ivec2(i, shifter), 0).xyz;
 
-            //Texture fetch
+            //texture fetch
             float tmpCol = texelFetch(u_tex, coordsFrag.xy + coords.xy, 0).x;
             tmpCol = tmpCol / (tmpCol + sigmoid_constant);
 
@@ -188,19 +161,13 @@ PIC_INLINE void FilterGLReinhardSinglePass::FragmentShader()
 
         f_color = vec4(color_hdr * Ld, 1.0);
     }
-                                          );
+    );
 
 }
 
 PIC_INLINE void FilterGLReinhardSinglePass::initShaders()
 {
-#ifdef PIC_DEBUG
-    printf("Number of samples: %d\n", ms->nSamples);
-#endif
-
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLReinhardSinglePass");
-
-    update(-1.0f, -1.0f, 1.0f);
 }
 
 PIC_INLINE void FilterGLReinhardSinglePass::update(float sigma_s, float sigma_r, float Lwa)
@@ -208,25 +175,50 @@ PIC_INLINE void FilterGLReinhardSinglePass::update(float sigma_s, float sigma_r,
     bool flag = false;
 
     if(sigma_s > 0.0f) {
-        flag = (this->sigma_s == sigma_s);
+        flag = (this->sigma_s != sigma_s);
         this->sigma_s = sigma_s;
     }
 
     if(sigma_r > 0.0f) {
-        flag = flag || (this->sigma_r == sigma_r);
+        flag = flag || (this->sigma_r != sigma_r);
         this->sigma_r = sigma_r;
     }
 
-    if(Lwa > 0.0f) {
-        this->Lwa = Lwa;
-    }
+    this->Lwa = Lwa > 0.0f ? Lwa : this->Lwa;
 
+    //precomputation of the Gaussian Kernel
     int kernelSize = PrecomputedGaussian::getKernelSize(this->sigma_s);
     int halfKernelSize = kernelSize >> 1;
 
+    if(imageRand == NULL) {
+        imageRand = new ImageGL(1, 128, 128, 1, IMG_CPU, GL_TEXTURE_2D);
+        imageRand->setRand(1);
+        imageRand->loadFromMemory();
+        *imageRand -= 0.5f;
+    }
+
     if(flag) {
         Vec2i window = Vec2i(halfKernelSize, halfKernelSize);
-        ms->updateGL(window, halfKernelSize);
+
+        if(ms == NULL) {
+            int nSamplers = 1;
+
+            //Poisson samples
+        #ifdef PIC_DEBUG
+            printf("Window: %d\n", halfKernelSize);
+        #endif
+            ms = new MRSamplersGL<2>(ST_BRIDSON, window, halfKernelSize, 1,
+                                     nSamplers);
+            ms->generateTexture();
+        } else {
+            ms->updateGL(window, halfKernelSize);
+            param.clear();
+        }
+
+        if(param.empty()) {
+            param.push_back(imageRand);
+            param.push_back(ms->getImage());
+        }
     }
 
     //shader update
@@ -234,8 +226,8 @@ PIC_INLINE void FilterGLReinhardSinglePass::update(float sigma_s, float sigma_r,
     float sigmar2 = 2.0f * this->sigma_r * this->sigma_r;
 
     technique.bind();
-    technique.setUniform1i("u_tex",       0);
-    technique.setUniform1i("u_tex_col",   1);
+    technique.setUniform1i("u_tex_col",   0);
+    technique.setUniform1i("u_tex",       1);
     technique.setUniform1i("u_rand",      2);
     technique.setUniform1i("u_poisson",   3);
 

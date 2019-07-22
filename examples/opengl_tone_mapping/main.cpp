@@ -38,6 +38,8 @@ This program is free software: you can redistribute it and/or modify
 #include <QVBoxLayout>
 #include <QLabel>
 
+#define PIC_DEBUG
+
 #include "piccante.hpp"
 
 class GLWidget : public QGLWidget
