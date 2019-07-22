@@ -84,13 +84,12 @@ PIC_INLINE FilterGLDurandTMO::FilterGLDurandTMO() : FilterGL()
 PIC_INLINE FilterGLDurandTMO::FilterGLDurandTMO(float compression_factor, float log_absolute,
                                    bool bGammaCorrection = false): FilterGL()
 {
-    this->compression_factor = compression_factor;
-    this->log_absolute = log_absolute;
-
     this->bGammaCorrection = bGammaCorrection;
 
     FragmentShader();
     initShaders();
+
+    update(compression_factor, log_absolute);
 }
 
 PIC_INLINE FilterGLDurandTMO::~FilterGLDurandTMO()
@@ -105,23 +104,23 @@ PIC_INLINE void FilterGLDurandTMO::FragmentShader()
     uniform sampler2D u_tex;        \n
     uniform sampler2D u_lum_log;    \n
     uniform sampler2D u_base;       \n
-    uniform float	  compression_factor;\n
-    uniform float	  log_absolute;\n
+    uniform float     compression_factor;\n
+    uniform float     log_absolute;\n
     out     vec4      f_color;	\n
 
-    void main(void) {
+    void main(void) {\n
         \n
         ivec2 coords = ivec2(gl_FragCoord.xy);\n
-        vec3  color  = texelFetch(u_tex, coords, 0).xyz;\n
-        float L      = dot(vec3(0.213, 0.715, 0.072), color);
+        vec3 color = texelFetch(u_tex, coords, 0).xyz;\n
+        float L = dot(vec3(0.213, 0.715, 0.072), color);\n
         float L_log  = texelFetch(u_lum_log, coords, 0).x;\n
-        float base   = texelFetch(u_base, coords, 0).x;\n
+        float base = texelFetch(u_base, coords, 0).x;\n
         float detail = L_log - base;\n
         float L_comp = (base * compression_factor + detail) -  log_absolute;\n
         L_comp = pow(10.0, L_comp);\n
         color = (color * L_comp / L);\n
         __GAMMA__CORRECTION__ \n
-        f_color        = vec4(color, 1.0);\n
+        f_color = vec4(color, 1.0);\n
         \n
     }\n
                       );
@@ -132,8 +131,6 @@ PIC_INLINE void FilterGLDurandTMO::FragmentShader()
 PIC_INLINE void FilterGLDurandTMO::initShaders()
 {
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLDurandTMO");
-
-    update(compression_factor, log_absolute);
 }
 
 PIC_INLINE void FilterGLDurandTMO::update(float compression_factor, float log_absolute)

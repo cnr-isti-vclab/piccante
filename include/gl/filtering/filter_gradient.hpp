@@ -39,7 +39,7 @@ protected:
                               out vec4      f_color;	\n
 
         void main(void) {
-            \n
+            \n d
             ivec2 coords = ivec2(gl_FragCoord.xy); \n
             vec3  c0 = texelFetch(u_tex, coords + ivec2(1, 0), 0).xyz; \n
             vec3  c1 = texelFetch(u_tex, coords - ivec2(1, 0), 0).xyz; \n
@@ -47,7 +47,7 @@ protected:
             vec3  c3 = texelFetch(u_tex, coords - ivec2(0, 1), 0).xyz; \n
             vec3 Gx = c1 - c0; \n
             vec3 Gy = c2 - c3; \n
-            f_color = vec4(sqrt(Gx.xyz * Gx.xyz + Gy.xyz * Gy.xyz), 1.0); //Magnitude
+            f_color = vec4(sqrt(Gx.xyz * Gx.xyz + Gy.xyz * Gy.xyz), 1.0);\n d d
         }\n
                           );
 

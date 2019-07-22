@@ -35,12 +35,6 @@ class FilterGLGaussian2D: public FilterGLNPasses
 protected:
     FilterGLGaussian1D *filter;
 
-    /**
-     * @brief init
-     * @param sigma
-     */
-    void init(float sigma);
-
 public:
     /**
      * @brief FilterGLGaussian2D

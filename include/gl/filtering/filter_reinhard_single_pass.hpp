@@ -49,6 +49,7 @@ protected:
 
 public:
     float Lwa;
+
     /**
      * @brief FilterGLReinhardSinglePass
      * @param sigma_s
@@ -74,16 +75,6 @@ public:
      * @param sigma_r
      */
     void update(float sigma_s, float sigma_r, float Lwa);
-
-    /**
-     * @brief Process
-     * @param imgIn
-     * @param imgOut
-     * @return
-     */
-    ImageGL *Process(ImageGLVec imgIn, ImageGL *imgOut);
-\
-
 };
 
 PIC_INLINE FilterGLReinhardSinglePass::FilterGLReinhardSinglePass(float alpha, float phi = 8.0f): FilterGL()

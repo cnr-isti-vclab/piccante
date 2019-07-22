@@ -94,10 +94,6 @@ public:
 PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float k,
         unsigned int iterations): FilterGL()
 {
-    if(k <= 0.0f) {
-        k = 0.11f;
-    }
-
     if(iterations < 1) {
         iterations = 1;
     }
@@ -105,12 +101,13 @@ PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float k,
     flt = NULL;
 
     this->k = k;
-    this->delta_t = 1.0f / 7.0f;
     this->iterations = iterations;
 
     //protected values are assigned/computed
     FragmentShader();
     initShaders();
+
+    update(k);
 }
 
 PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigma_s,
@@ -120,14 +117,14 @@ PIC_INLINE FilterGLAnisotropicDiffusion::FilterGLAnisotropicDiffusion(float sigm
 
     flt = NULL;
 
-    this->k = sigma_r;
-    this->delta_t = 1.0f / 7.0f;
-
     iterations = int(ceilf(5.0f * sigma_s));
 
     //protected values are assigned/computed
     FragmentShader();
     initShaders();
+
+    update(sigma_r);
+
 }
 
 PIC_INLINE FilterGLAnisotropicDiffusion::~FilterGLAnisotropicDiffusion()
@@ -180,13 +177,14 @@ PIC_INLINE void FilterGLAnisotropicDiffusion::initShaders()
 {
     FragmentShader();
     technique.initStandard("330", vertex_source, fragment_source, "FilterGLAnisotropicDiffusion");
-    update(k);
 }
 
 PIC_INLINE void FilterGLAnisotropicDiffusion::update(float k)
 {
-    this->k = k > 0.0f ? k : this->k;
+    this->k = k > 0.0f ? this->k : 0.11f;
     float k_sq = this->k * this->k;
+
+    this->delta_t = 1.0f / 7.0f;
 
     technique.bind();
     technique.setUniform1i("u_tex", 0);
