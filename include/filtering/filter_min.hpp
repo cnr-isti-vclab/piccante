@@ -78,7 +78,7 @@ public:
      * @brief FilterMin
      * @param size
      */
-    FilterMin(int size)
+    FilterMin(int size) : Filter()
     {
         this->halfSize = checkHalfSize(size);
     }

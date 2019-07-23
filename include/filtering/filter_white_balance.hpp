@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_WHITE_BALANCE_HPP
 #define PIC_FILTERING_FILTER_WHITE_BALANCE_HPP
 
+#include "../util/std_util.hpp"
+
 #include "../filtering/filter.hpp"
 #include "../util/array.hpp"
 
@@ -93,10 +95,7 @@ public:
 
     ~FilterWhiteBalance()
     {
-        if(white != NULL) {
-            delete[] white;
-        }
-
+        delete_vec_s(white);
         nWhite = -1;
     }
 
@@ -137,9 +136,7 @@ public:
     {
         this->nWhite = nWhite;
 
-        if(this->white != NULL) {
-            delete [] this->white;
-        }
+        delete_vec_s(this->white);
 
         if(bComputeScalingFactors) {
              this->white = getScalingFactors(white, nWhite);

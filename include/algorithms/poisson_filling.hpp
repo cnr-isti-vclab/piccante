@@ -62,11 +62,11 @@ protected:
 
         for(int i = 0; i < imgIn->height; i++) {
             for(int j = 0; j < imgIn->width; j++) {
-                float *src =	(*imgIn)(j, i);
-                float *n0  =	(*imgIn)(j + 1, i);
-                float *n1  =	(*imgIn)(j - 1, i);
-                float *n2  =	(*imgIn)(j, i + 1);
-                float *n3  =	(*imgIn)(j, i - 1);
+                float *src = (*imgIn)(j, i);
+                float *n0  = (*imgIn)(j + 1, i);
+                float *n1  = (*imgIn)(j - 1, i);
+                float *n2  = (*imgIn)(j, i + 1);
+                float *n3  = (*imgIn)(j, i - 1);
 
                 int ind = i * imgIn->width + j;
 

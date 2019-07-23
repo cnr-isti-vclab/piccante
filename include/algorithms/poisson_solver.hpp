@@ -155,21 +155,20 @@ PIC_INLINE Image *computePoissonSolverIterative(Image *img, Image *laplacian,
     #endif
 
     if(maxSteps < 1) {
-        maxSteps = 20000;
+        maxSteps = 100;
     }
 
     Image *tmpImg = img->clone();
     Image *tmpSwap = NULL;
 
-    int c, coord, x, y;
-    float workValue;
+    int c, x, y;
 
     for(int i = 0; i < maxSteps; i++) {
         for(unsigned int j = 0; j < coords.size(); j++) {
-            coord = coords[j];
+            int coord = coords[j];
             img->reverseAddress(coord, x, y);
 
-            workValue = -laplacian->data[coord];
+            float workValue = -laplacian->data[coord];
 
             c = img->getAddress(x + 1, y);
             workValue += img->data[c];

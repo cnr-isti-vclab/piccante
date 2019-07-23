@@ -97,7 +97,7 @@ public:
      * @brief FilterMedVec
      * @param size
      */
-    FilterMedVec(int size)
+    FilterMedVec(int size) : Filter()
     {
         update(size);
     }

@@ -18,6 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_RADIAL_BASIS_FUNCTION
 #define PIC_ALGORITHMS_RADIAL_BASIS_FUNCTION
 
+#include <math.h>
+
+#include "../util/std_util.hpp"
+
 namespace pic {
 
 /**
@@ -40,6 +44,11 @@ public:
         nCenters = 0;
     }
 
+    ~RadialBasisFunction()
+    {
+        this->centers = delete_vec_s(this->centers);
+    }
+
     /**
      * @brief update
      * @param centers
@@ -54,11 +63,7 @@ public:
         this->var = var;
 
         if(centers != NULL) {
-            if(this->centers != NULL) {
-                delete[] centers;
-                centers = NULL;
-            }
-
+            this->centers = delete_vec_s(this->centers);
             this->centers = new float[nCenters * nDim];
             memcpy(this->centers, centers, sizeof(float) * nCenters * nDim);
         }
@@ -73,7 +78,7 @@ public:
     {
         float ret = 0.0f;
 
-        float sigma_sq_2 = var * 2;
+        float sigma_sq_2 = var * 2.0f;
         for(int i = 0; i < nCenters; i++) {
             int index_i = i * nDim;
 

@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_CONV_1D_HPP
 #define PIC_FILTERING_FILTER_CONV_1D_HPP
 
+#include "../base.hpp"
 #include "../util/std_util.hpp"
 #include "../util/array.hpp"
 #include "../filtering/filter.hpp"

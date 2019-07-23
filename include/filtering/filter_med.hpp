@@ -77,7 +77,7 @@ public:
      * @brief FilterMed
      * @param size
      */
-    FilterMed(int size)
+    FilterMed(int size) : Filter()
     {
         update(size);
     }
