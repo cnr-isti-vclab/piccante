@@ -18,8 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_POISSON_IMAGE_EDITING_HPP
 #define PIC_ALGORITHMS_POISSON_IMAGE_EDITING_HPP
 
+#include <vector>
+
 #include "../base.hpp"
 #include "../image.hpp"
+#include "../util/std_util.hpp"
 #include "../filtering/filter_laplacian.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
@@ -51,7 +54,7 @@ PIC_INLINE Image *computePoissonImageEditing(Image *source, Image *target, bool 
         return NULL;
     }
 
-    //Allocating the output
+    //allocate the output
     if(ret == NULL) {
         ret = target->clone();
     }
@@ -94,33 +97,26 @@ PIC_INLINE Image *computePoissonImageEditing(Image *source, Image *target, bool 
             int indI = tmpI + j;
 
             if(mask[indI]) {
-
-                float n = 0.0f;
-
                 if((j + 1) < (width - 1)) {
                     if(mask[indI + 1]) {
-                        n += 1.0f;
                         tL.push_back(Eigen::Triplet< double > (count, index[indI + 1], -1.0));
                     }
                 }
 
                 if((j - 1) > -1) {
                     if(mask[indI - 1]) {
-                        n += 1.0f;
                         tL.push_back(Eigen::Triplet< double > (count, index[indI - 1], -1.0));
                     }
                 }
 
                 if((i + 1) < (height - 1)) {
                     if(mask[indI + width]) {
-                        n += 1.0f;
                         tL.push_back(Eigen::Triplet< double > (count, index[indI + width], -1.0));
                     }
                 }
 
                 if((i - 1) > -1) {
                     if(mask[indI - width]) {
-                        n += 1.0f;
                         tL.push_back(Eigen::Triplet< double > (count, index[indI - width], -1.0));
                     }
                 }
@@ -218,6 +214,9 @@ PIC_INLINE Image *computePoissonImageEditing(Image *source, Image *target, bool 
             }
         }
     }
+
+    delete_s(lap_source);
+    delete_vec_s(index);
 
     return ret;
 }

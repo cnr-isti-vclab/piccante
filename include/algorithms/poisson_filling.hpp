@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_POISSON_FILLING_HPP
 #define PIC_ALGORITHMS_POISSON_FILLING_HPP
 
+#include "../util/std_util.hpp"
 #include "../util/buffer.hpp"
 #include "../util/mask.hpp"
 #include "../util/array.hpp"
@@ -38,26 +39,14 @@ protected:
     bool *mask, *maskPoisson;
     Image *imgTmp;
 
-
     /**
      * @brief release
      */
     void release()
     {
-        if(mask != NULL) {
-            delete[] mask;
-            mask = NULL;
-        }
-
-        if(maskPoisson != NULL) {
-            delete[] maskPoisson;
-            maskPoisson = NULL;
-        }
-
-        if(imgTmp != NULL) {
-            delete imgTmp;
-            imgTmp = NULL;
-        }
+        mask = delete_vec_s(mask);
+        maskPoisson = delete_vec_s(maskPoisson);
+        imgTmp = delete_s(imgTmp);
     }
 
     /**
@@ -169,6 +158,10 @@ public:
         release();
     }
 
+    /**
+     * @brief setup
+     * @param value
+     */
     void setup(float value)
     {
         this->value = value;
@@ -211,7 +204,7 @@ public:
 
             mask = imgIn->convertToMask(color, threshold, false, NULL);
 
-            delete[] color;
+            delete_vec_s(color);
         }
 
         maskPoisson = Mask::clone(maskPoisson, mask, imgIn->nPixels(), 1);

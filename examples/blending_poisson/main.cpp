@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         float color[] = {1.0f, 1.0f, 1.0f};
-        bool *mask = mask_source.convertToMask(color, 0.1f, false);
+        bool *mask = mask_source.convertToMask(color, 0.1f, false, NULL);
 
         pic::Image *imgOut = pic::computePoissonImageEditing(&img_source, &img_target, mask);
 

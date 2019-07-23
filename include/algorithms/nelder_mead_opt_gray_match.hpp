@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_COMPUTER_VISION_NELDER_MEAD_OPT_GRAY_MATCH_HPP
 #define PIC_COMPUTER_VISION_NELDER_MEAD_OPT_GRAY_MATCH_HPP
 
+#include "../util/std_util.hpp"
 #include "../util/nelder_mead_opt_base.hpp"
 #include "../util/array.hpp"
 
@@ -55,9 +56,9 @@ public:
 
     ~NelderMeadOptGrayMatch()
     {
-        delete[] col0;
-        delete[] col1;
-        delete[] tmp;
+        delete_vec_s(col0);
+        delete_vec_s(col1);
+        delete_vec_s(tmp);
     }
 
     /**
