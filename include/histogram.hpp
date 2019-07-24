@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_HISTOGRAM_HPP
 
 #include "image.hpp"
+#include "util/std_util.hpp"
 #include "util/array.hpp"
 #include "util/math.hpp"
 
@@ -33,13 +34,13 @@ enum VALUE_SPACE {VS_LDR, VS_LIN, VS_LOG_2, VS_LOG_E, VS_LOG_10};
 class Histogram
 {
 protected:
-    float           *bin_c;
-    float           *bin_nor;
-    int             nBin;
-    VALUE_SPACE     type;
-    float           fMin, fMax;
-    float           deltaMaxMin, nBinf;
-    float           epsilon;
+    float *bin_c;
+    float *bin_nor;
+    int nBin;
+    VALUE_SPACE type;
+    float fMin, fMax;
+    float deltaMaxMin, nBinf;
+    float epsilon;
 
     /**
      * @brief projectDomain applies the histogram domain to x.
@@ -167,25 +168,10 @@ public:
      */
     void release()
     {
-        if(bin != NULL) {
-            delete [] bin;
-            bin = NULL;
-        }
-
-        if(bin_c != NULL) {
-            delete [] bin_c;
-            bin_c = NULL;
-        }
-
-        if(bin_nor != NULL) {
-            delete [] bin;
-            bin_nor = NULL;
-        }
-
-        if(bin_work != NULL) {
-            delete[] bin_work;
-            bin_work = NULL;
-        }
+        bin = delete_vec_s(bin);
+        bin_c = delete_vec_s(bin_c);
+        bin_nor = delete_vec_s(bin_nor);
+        bin_work = delete_vec_s(bin_work);
     }
 
     /**
@@ -344,7 +330,7 @@ public:
         bin_c = Array<float>::cumsum(bin_nor, nBin, bin_c);
 
         if(bNormalized) {
-            for(int i=0; i<nBin; i++) {
+            for(int i = 0; i < nBin; i++) {
                 bin_c[i] /= bin_c[nBin - 1];
             }
         }
