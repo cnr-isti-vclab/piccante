@@ -100,7 +100,8 @@ public:
         rotateSamples();
     }
 
-    ~ORBDescriptor() {
+    ~ORBDescriptor()
+    {
         release();
     }
 

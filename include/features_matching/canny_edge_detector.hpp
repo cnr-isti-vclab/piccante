@@ -19,7 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FEATURES_MATCHING_CANNY_EDGE_DETECTOR_HPP
 
 #include "../util/vec.hpp"
-
+#include "../util/std_util.hpp"
 #include "../image.hpp"
 
 #include "../filtering/filter_luminance.hpp"
@@ -44,9 +44,8 @@ protected:
      */
     void release()
     {
-        if(bLum && lum != NULL) {
-            delete lum;
-            lum = NULL;
+        if(bLum) {
+            lum = delete_s(lum);
         }
 
         bLum = false;

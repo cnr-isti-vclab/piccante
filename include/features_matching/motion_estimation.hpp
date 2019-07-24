@@ -21,7 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <functional>
 
 #include "../image.hpp"
-
+#include "../util/std_util.hpp"
 #include "../features_matching/patch_comp.hpp"
 
 namespace pic {
@@ -32,9 +32,9 @@ namespace pic {
 class MotionEstimation
 {
 protected:
-    int         shift, blockSize, halfBlockSize;
-    int         width, height;
-    PatchComp   *pmc;
+    int shift, blockSize, halfBlockSize;
+    int width, height;
+    PatchComp *pmc;
 
     /**
      * @brief processAux
@@ -114,9 +114,7 @@ public:
 
     ~MotionEstimation()
     {
-        if(pmc != NULL) {
-            delete pmc;
-        }
+        delete_s(pmc);
     }
 
     /**

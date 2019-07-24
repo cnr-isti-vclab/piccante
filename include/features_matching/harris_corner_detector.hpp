@@ -19,7 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FEATURES_MATCHING_HARRIS_CORNER_DETECTOR_HPP
 
 #include "../util/vec.hpp"
-
+#include "../util/std_util.hpp"
 #include "../image.hpp"
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_gaussian_2d.hpp"
@@ -53,7 +53,7 @@ protected:
 
     //Harris Corners detector parameters
     float sigma, threshold;
-    int   radius;
+    int radius;
 
     //previous values
     int width, height;
@@ -63,29 +63,10 @@ protected:
      */
     void release()
     {
-        if(lum != NULL) {
-            delete lum;
-        }
-
-        lum = NULL;
-
-        if(I_grad != NULL) {
-            delete I_grad;
-        }
-
-        I_grad = NULL;
-
-        if(I_grad_flt != NULL) {
-            delete I_grad_flt;
-        }
-
-        I_grad_flt = NULL;
-
-        if(ret != NULL) {
-            delete ret;
-        }
-
-        ret = NULL;
+        lum = delete_s(lum);
+        I_grad = delete_s(I_grad);
+        I_grad_flt = delete_s(I_grad_flt);
+        ret = delete_s(ret);
     }
 
     /**

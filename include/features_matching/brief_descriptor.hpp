@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <chrono>
 
+#include "../util/std_util.hpp"
 #include "../util/math.hpp"
 #include "../image.hpp"
 
@@ -187,20 +188,9 @@ public:
      */
     void release()
     {
-        if(m != NULL) {
-            delete m;
-            m = NULL;
-        }
-
-        if(x != NULL) {
-            delete[] x;
-            x = NULL;
-        }
-
-        if(y != NULL) {
-            delete[] y;
-            y = NULL;
-        }
+        m = delete_s(m);
+        y = delete_s(x);
+        y = delete_s(y);
     }
 
     /**

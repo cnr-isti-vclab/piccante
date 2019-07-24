@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FEATURES_MATCHING_FAST_CORNER_DETECTOR_HPP
 
 #include "../util/vec.hpp"
+#include "../util/std_util.hpp"
 
 #include "../image.hpp"
 #include "../filtering/filter_luminance.hpp"
@@ -67,17 +68,8 @@ public:
 
     ~FastCornerDetector()
     {
-        if(lum != NULL) {
-            delete lum;
-        }
-
-        lum = NULL;
-
-        if(lum_flt != NULL) {
-            delete lum_flt;
-        }
-
-        lum_flt = NULL;
+        lum = delete_s(lum);
+        lum_flt = delete_s(lum_flt);
     }
 
     /**
@@ -151,7 +143,7 @@ public:
                     sum += value;
                 }
 
-                //computing the threshold
+                //compute the threshold
                 float thr;
                 if(bexecuteThreshold) {
                     thr = 0.2f * sum / 16.0f;
@@ -161,7 +153,7 @@ public:
                     thr = threshold;
                 }
 
-                //testing
+                //test
                 float p_thr_dark   = p - thr;
                 float p_thr_bright = p + thr;
 
