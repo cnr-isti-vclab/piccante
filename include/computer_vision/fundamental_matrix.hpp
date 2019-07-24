@@ -32,6 +32,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../util/math.hpp"
 #include "../util/eigen_util.hpp"
 
+#include "../features_matching/orb_descriptor.hpp"
+#include "../features_matching/binary_feature_matcher.hpp"
+#include "../features_matching/binary_feature_lsh_matcher.hpp"
 #include "../computer_vision/nelder_mead_opt_fundamental.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
@@ -381,7 +384,7 @@ PIC_INLINE  Eigen::Matrix3d estimateFundamentalFromImages(Image *img0,
     BinaryFeatureMatcher::filterMatches(corners_from_img0, corners_from_img1, matches, m0, m1);
 
     //estimate the fundamental matrix
-    F = estimateFundamentalWithNonLinearRefinement(m0, m1, inliers, 1000000, 0.5, 1, 10000, 1e-4f);
+    F = estimateFundamentalWithNonLinearRefinement(m0, m1, inliers, 1000, 0.5, 1, 1000, 1e-4f);
 
     delete L0;
     delete L1;

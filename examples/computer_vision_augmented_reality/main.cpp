@@ -66,8 +66,8 @@ int main(int argc, char *argv[])
         std::vector< Eigen::Vector2f > corners_from_img1;
 
         //compute the luminance images
-        pic::Image *L0 = pic::FilterLuminance::Execute(&img0, NULL, pic::LT_CIE_LUMINANCE);
-        pic::Image *L1 = pic::FilterLuminance::Execute(&img1, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *L0 = pic::FilterLuminance::execute(&img0, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *L1 = pic::FilterLuminance::execute(&img1, NULL, pic::LT_CIE_LUMINANCE);
 
         //get corners
         printf("Extracting corners...\n");
@@ -80,8 +80,8 @@ int main(int argc, char *argv[])
 
         //compute ORB descriptors for each corner and image
         //compute luminance images
-        pic::Image *L0_flt = pic::FilterGaussian2D::Execute(L0, NULL, 2.5f);
-        pic::Image *L1_flt = pic::FilterGaussian2D::Execute(L1, NULL, 2.5f);
+        pic::Image *L0_flt = pic::FilterGaussian2D::execute(L0, NULL, 2.5f);
+        pic::Image *L1_flt = pic::FilterGaussian2D::execute(L1, NULL, 2.5f);
 
         printf("Computing ORB descriptors...\n");
 
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
         printf("Matching...");
         std::vector< Eigen::Vector3i > matches;
         bfm.getAllMatches(descs0, matches);
-        printf(" we found %d matches ", matches.size());
+        printf(" we found %d matches ", int(matches.size()));
         printf("Ok\n");
 
         //filter
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
         img1 *= 0.25f;
 
-        //Augmentation: drawing a 3D grid
+        //augmentation: drawing a 3D grid
         int res = 10;
         for(int i=1;i<(res + 1);i++) {
             float u = float(i) / 50.0f;
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 
         }
 
-        //Augmentation: drawing 3D axis
+        //augmentation: drawing 3D axis
         Eigen::Vector4d p0(0.0, 0.0, 0.0, 1.0);
         Eigen::Vector2i coord0 = pic::cameraMatrixProject(cam, p0);
 

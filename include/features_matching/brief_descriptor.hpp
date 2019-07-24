@@ -189,7 +189,7 @@ public:
     void release()
     {
         m = delete_s(m);
-        y = delete_s(x);
+        x = delete_s(x);
         y = delete_s(y);
     }
 
