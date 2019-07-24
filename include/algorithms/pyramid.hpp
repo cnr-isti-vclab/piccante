@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_ALGORITHMS_PYRAMID_HPP
 #define PIC_ALGORITHMS_PYRAMID_HPP
 
+#include "../base.hpp"
 #include "../image.hpp"
 #include "../image_vec.hpp"
 #include "../util/std_util.hpp"

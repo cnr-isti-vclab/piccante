@@ -151,6 +151,58 @@ public:
             }
         }
     }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param white_color
+     * @param out
+     * @return
+     */
+    static Image* execute(Image *imgIn, float *white_color, Image *out)
+    {
+        if(imgIn == NULL || white_color == NULL) {
+            return NULL;
+        }
+
+        FilterWhiteBalance flt_wb(white_color, imgIn->channels, true);
+        out = flt_wb.Process(Single(imgIn), out);
+
+        return out;
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param x
+     * @param y
+     * @param bRobust
+     * @param out
+     * @return
+     */
+    static Image* execute(Image *imgIn, int x, int y, bool bRobust = true, Image *out = NULL)
+    {
+        if(imgIn == NULL) {
+            return NULL;
+        }
+
+        float *white_color = NULL;
+
+        int patchSize = 5;
+
+        if(!bRobust) {
+            white_color = (*imgIn)(x, y);
+        } else {
+            BBox patch(x - patchSize, x + patchSize, y - patchSize, y + patchSize);
+            white_color = imgIn->getMeanVal(&patch, NULL);
+        }
+
+        out = execute(imgIn, white_color, out);
+
+        if(bRobust) {
+            delete[] white_color;
+        }
+    }
 };
 
 } // end namespace pic

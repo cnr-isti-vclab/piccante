@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         if(bCreate) {
             printf("Tone mapping the input image...");
             pic::DragoTMO dtmo;
-            tmp = dtmo.Process(&img0, tmp);
+            tmp = dtmo.Process(Single(&img0), tmp);
             printf("Ok\n");
             tmp->Write("../data/output/" + name + "_flt.png");
 
