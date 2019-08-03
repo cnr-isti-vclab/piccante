@@ -24,6 +24,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #define TINYEXR_IMPLEMENTATION
 
+#include "../util/std_util.hpp"
+
 #include "../externals/tinyexr/tinyexr.h"
 
 namespace pic {
@@ -76,6 +78,9 @@ PIC_INLINE float *ReadEXR(std::string nameFile, float *data, int &width, int &he
         data[index + 1] = images[1][i];
         data[index + 2] = images[0][i];
     }
+
+    delete_vec_s(image.pixel_types);
+    delete_vec_s(image.requested_pixel_types);
 
     return data;
 }
