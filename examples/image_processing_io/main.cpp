@@ -26,7 +26,6 @@ This program is free software: you can redistribute it and/or modify
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 #define PIC_DISABLE_EIGEN
-#define PIC_DISABLE_TINY_EXR
 #define PIC_ENABLE_INLINING
 
 #include "piccante.hpp"
@@ -44,7 +43,7 @@ int main(int argc, char *argv[])
     printf("Reading a .hdr file...");
 
     pic::Image img;
-    img.Read(img_str, pic::LT_NONE);
+    img.Read(img_str);
     printf("Ok\n");
 
     printf("Is it valid? ");
@@ -64,7 +63,7 @@ int main(int argc, char *argv[])
         for(unsigned int i = 0; i < outputFormats.size(); i++) {
             std::string text = "Writing the file to disk as " + outputFormats[i] + " file... ";
             printf("%s", text.c_str());
-            bool bWritten = img.Write("../data/output/image." + outputFormats[i], pic::LT_NONE, 0);
+            bool bWritten = img.Write("../data/output/image." + outputFormats[i]);
 
             if(bWritten) {
                 printf("Ok\n");
@@ -72,9 +71,6 @@ int main(int argc, char *argv[])
                 printf("Writing had some issues!\n");
             }
         }
-
-        pic::Image *tmp = new pic::Image("../data/output/bottles.exr");
-        delete tmp;
 
     } else {
         printf("No, the file is not valid!\n");

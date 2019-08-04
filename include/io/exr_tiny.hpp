@@ -142,8 +142,8 @@ PIC_INLINE bool WriteEXR(std::string nameFile, float *data, int width,
          return false;
      }
 
-     free(image.pixel_types);
-     free(image.requested_pixel_types);
+     delete_vec_s(image.pixel_types);
+     delete_vec_s(image.requested_pixel_types);
 
      return true;
 }

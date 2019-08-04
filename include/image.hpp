@@ -977,28 +977,16 @@ PIC_INLINE void Image::release()
 {
     //release all allocated resources
     if(data != NULL && (!notOwned)) {
-        delete[] data;
+        delete_vec_s(data);
     }
 
-    if(dataTMP != NULL) {
-        delete[] dataTMP;
-    }
-
-    if(dataUC != NULL) {
-        delete[] dataUC;
-    }
-
-    if(dataRGBE != NULL) {
-        delete[] dataRGBE;
-    }
+    delete_vec_s(dataTMP);
+    delete_vec_s(dataUC);
+    delete_vec_s(dataRGBE);
 
     #ifdef PIC_ENABLE_OPEN_EXR
-        if(dataEXR != NULL) {
-            delete[] dataEXR;
-        }
+        delete_vec_s(dataEXR);
     #endif
-
-    setNULL();
 }
 
 PIC_INLINE void Image::allocate(int width, int height, int channels, int frames)
