@@ -200,8 +200,10 @@ public:
         out = execute(imgIn, white_color, out);
 
         if(bRobust) {
-            delete[] white_color;
+            delete_vec_s(white_color);
         }
+
+        return out;
     }
 };
 

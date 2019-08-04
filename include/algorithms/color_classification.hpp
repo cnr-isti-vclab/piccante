@@ -23,7 +23,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../util/math.hpp"
 
 #include "../image.hpp"
-#include "../algorithms/white_balance.hpp"
 #include "../filtering/filter_radial_basis_function.hpp"
 #include "../algorithms/lischinski_minimization.hpp"
 #include "../util/mask.hpp"

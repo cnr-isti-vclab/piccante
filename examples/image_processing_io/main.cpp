@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     printf("Reading a .hdr file...");
 
     pic::Image img;
-    img.Read(img_str);
+    img.Read(img_str, pic::LT_NONE);
     printf("Ok\n");
 
     printf("Is it valid? ");
@@ -61,10 +61,10 @@ int main(int argc, char *argv[])
         outputFormats.push_back("hdr");
         outputFormats.push_back("exr");
 
-        for(unsigned int i=0; i<outputFormats.size(); i++) {
+        for(unsigned int i = 0; i < outputFormats.size(); i++) {
             std::string text = "Writing the file to disk as " + outputFormats[i] + " file... ";
             printf("%s", text.c_str());
-            bool bWritten = img.Write("../data/output/bottles." + outputFormats[i]);
+            bool bWritten = img.Write("../data/output/image." + outputFormats[i], pic::LT_NONE, 0);
 
             if(bWritten) {
                 printf("Ok\n");
@@ -72,6 +72,10 @@ int main(int argc, char *argv[])
                 printf("Writing had some issues!\n");
             }
         }
+
+        pic::Image *tmp = new pic::Image("../data/output/bottles.exr");
+        delete tmp;
+
     } else {
         printf("No, the file is not valid!\n");
     }

@@ -26,8 +26,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../features_matching/orb_descriptor.hpp"
 
-#include "../algorithms/white_balance.hpp"
-
 #include "../computer_vision/find_checker_board.hpp"
 
 #include "../algorithms/binarization.hpp"

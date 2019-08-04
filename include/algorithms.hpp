@@ -39,7 +39,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "algorithms/grow_cut.hpp"
 #include "algorithms/live_wire.hpp"
 #include "algorithms/radial_basis_function.hpp"
-#include "algorithms/white_balance.hpp"
 #include "algorithms/color_classification.hpp"
 #include "algorithms/binarization.hpp"
 #include "algorithms/segmentation_tmo_approx.hpp"

@@ -22,8 +22,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../filtering/filter_white_balance.hpp"
 
-#include "../algorithms/white_balance.hpp"
-
 namespace pic {
 
 /**
@@ -45,7 +43,7 @@ PIC_INLINE int applyWhiteBalanceJNI(std::string imageInPath, std::string imageOu
     bool bRead = in.Read(imageInPath, LT_NOR_GAMMA);
 
     if(bRead) {
-        Image *out = applyWhiteBalance(&in, x, y, bRobust);
+        Image *out = FilterWhiteBalance::execute(&in, x, y, bRobust);
 
         bool bWrite = out->Write(imageOutPath.c_str(), LT_NOR_GAMMA, 0);
 
