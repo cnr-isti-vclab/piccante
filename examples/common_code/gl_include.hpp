@@ -27,11 +27,19 @@ This program is free software: you can redistribute it and/or modify
 #define PIC_INIT_GL_HPP
 
 #ifdef _MSC_VER
+    #define PIC_INCLUDE_GL
+#endif
+
+#ifdef __unix__
+    #define PIC_INCLUDE_GL
+#endif
+
+#ifdef PIC_INCLUDE_GL
     #define PIC_DISABLE_OPENGL_NON_CORE
     #include "../common_code/gl_core_4_0.h"
 #endif
 
-#ifndef _MSC_VER
+#ifndef PIC_INCLUDE_GL
     #include <QOpenGLFunctions>
 #endif
 

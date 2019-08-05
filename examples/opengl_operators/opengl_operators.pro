@@ -28,4 +28,5 @@ win32{
 linux-g++*{
     QMAKE_CXXFLAGS += -fopenmp -pthread
     QMAKE_LFLAGS += -fopenmp
+    SOURCES += ../common_code/gl_core_4_0.c
 }

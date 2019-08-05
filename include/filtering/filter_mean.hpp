@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_MEAN_HPP
 #define PIC_FILTERING_FILTER_MEAN_HPP
 
+#include "../util/std_util.hpp"
 #include "../filtering/filter_npasses.hpp"
 #include "../filtering/filter_conv_1d.hpp"
 
@@ -58,13 +59,8 @@ public:
     {
         release();
 
-        if(filter != NULL) {
-            delete filter;
-        }
-
-        if( data != NULL) {
-            delete[] data;
-        }
+        delete_s(filter);
+        delete_vec_s(data);
     }
 
     /**

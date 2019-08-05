@@ -38,12 +38,10 @@ This program is free software: you can redistribute it and/or modify
 #include <QVBoxLayout>
 #include <QLabel>
 
-#define PIC_DEBUG
-
 #include "piccante.hpp"
 
 class GLWidget : public QGLWidget
-        #ifndef _MSC_VER
+        #ifndef PIC_INCLUDE_GL
         , protected QOpenGLFunctions
         #endif
 {
@@ -66,11 +64,11 @@ protected:
      */
     void initializeGL(){
 
-    #ifndef _MSC_VER
+    #ifndef PIC_INCLUDE_GL
         initializeOpenGLFunctions();
     #endif
 
-    #ifdef _MSC_VER
+    #ifdef PIC_INCLUDE_GL
         if(ogl_LoadFunctions() == ogl_LOAD_FAILED) {
             printf("OpenGL functions are not loaded!\n");
         }

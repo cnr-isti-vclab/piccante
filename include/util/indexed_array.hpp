@@ -137,7 +137,7 @@ public:
 
         float ret = data[coord[0]];
 
-        for(auto i = 1; i < coord.size(); i++) {
+        for(unsigned int i = 1; i < coord.size(); i++) {
             int j = coord[i];
             ret = MIN(ret, data[j]);
         }
@@ -159,7 +159,7 @@ public:
 
         float ret = data[coord[0]];
 
-        for(auto i = 1; i < coord.size(); i++) {
+        for(unsigned int i = 1; i < coord.size(); i++) {
             int j = coord[i];
             ret = MAX(ret, data[j]);
         }
@@ -183,7 +183,7 @@ public:
         auto n = coord.size();
         float *tmp = new float[n];
 
-        for(auto i = 0; i < n; i++) {
+        for(unsigned int i = 0; i < n; i++) {
             int j = coord[i];
             tmp[i] = data[j];
         }
@@ -205,7 +205,7 @@ public:
      */
     static void scale(IntCoord &coord, int scale)
     {
-        for(auto i = 0; i < coord.size(); i++) {
+        for(unsigned int i = 0; i < coord.size(); i++) {
             coord.at(i) = coord.at(i) * scale;
         }
     }
@@ -225,7 +225,7 @@ public:
         float delta = 1e-6f;
         float ret = 0.0f;
 
-        for(auto i = 0; i < coord.size(); i++) {
+        for(unsigned int i = 0; i < coord.size(); i++) {
             int j = coord[i];
             ret += log10f(data[j] + delta);
         }
@@ -249,7 +249,7 @@ public:
         float ret = 0.0f;
         float log2f = logf(2.0f);
 
-        for(auto i = 0; i < coord.size(); i++) {
+        for(unsigned int i = 0; i < coord.size(); i++) {
             int j = coord[i];
             ret += logf(data[j] + delta) / log2f;
         }
