@@ -116,7 +116,7 @@ public:
 
         float ret = 0.0f;
 
-        for(auto i = 0; i < coord.size(); i++) {
+        for(unsigned int i = 0; i < coord.size(); i++) {
             ret += data[coord[i]];
         }
 
@@ -180,7 +180,7 @@ public:
             return FLT_MAX;
         }
 
-        auto n = coord.size();
+        unsigned int n = coord.size();
         float *tmp = new float[n];
 
         for(unsigned int i = 0; i < n; i++) {
