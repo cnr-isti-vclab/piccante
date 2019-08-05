@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     printf("Is the image valid? ");
 
     if(img.isValid()) {
-        pic::Image *out = pic::applyWhiteBalance(&img, 200, 200, true);
+        pic::Image *out = pic::FilterWhiteBalance::execute(&img, 200, 200, true);
 
         std::string name = pic::removeExtension(img_str);
         name = pic::removeLocalPath(name);

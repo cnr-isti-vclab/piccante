@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
         float *color = pic::estimateWhitePointFromCheckerBoard(&img, corners);
 
-        pic::Image *img_wb = pic::applyWhiteBalance(&img, color);
+        pic::Image *img_wb = pic::FilterWhiteBalance::execute(&img, color, NULL);
 
         std::string name = pic::removeExtension(img_str);
         name = pic::removeLocalPath(name);

@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_downsampler_2d.hpp"
+#include "../filtering/filter_white_balance.hpp"
 
 #include "../computer_vision/iterative_closest_point_2D.hpp"
 #include "../computer_vision/nelder_mead_opt_ICP_2D.hpp"
@@ -108,9 +109,9 @@ PIC_INLINE std::vector<int> extractCheckerBoardJNI(std::string imageInPath, std:
                        int(pw[1]) - patchSize,
                        int(pw[1]) + patchSize);
             float *white_color = work->getMeanVal(&patch, NULL);
-            img_wb = applyWhiteBalance(&in, white_color);
+            img_wb = FilterWhiteBalance::execute(&in, white_color, NULL);
         } else {
-            img_wb = applyWhiteBalance(&in, int(pw[0]), int(pw[1]), true);
+            img_wb = FilterWhiteBalance::execute(&in, int(pw[0]), int(pw[1]), true, NULL);
         }
 
         if(img_wb != NULL) {

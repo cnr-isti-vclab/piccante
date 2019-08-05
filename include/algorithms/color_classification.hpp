@@ -24,6 +24,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../image.hpp"
 #include "../filtering/filter_radial_basis_function.hpp"
+#include "../filtering/filter_white_balance.hpp"
+#include "../filtering/filter_luminance.hpp"
 #include "../algorithms/lischinski_minimization.hpp"
 #include "../util/mask.hpp"
 
@@ -60,7 +62,7 @@ PIC_INLINE bool *computeColorClassification(Image *img, float *white_pixel, floa
 
     bool bFlag = true;
     if(white_pixel != NULL) {
-       img_wb = applyWhiteBalance(img, white_pixel);
+       img_wb = FilterWhiteBalance::execute(img, white_pixel, NULL);
     } else {
         img_wb = img;
         bFlag = false;
