@@ -53,8 +53,12 @@ PIC_INLINE float *ReadTMP(std::string nameFile, float *data, int &width,
         return NULL;
     }
 
-    //reading the header
-	TMP_IMG_HEADER header = {0};
+    //read the header
+    TMP_IMG_HEADER header;
+    header.channels = -1;
+    header.frames = -1;
+    header.width = -1;
+    header.height = -1;
 
     if(bHeader) {
         fread(&header, sizeof(TMP_IMG_HEADER), 1, file);
