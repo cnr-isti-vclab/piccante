@@ -61,6 +61,7 @@ including piccante.hpp in your project:
 **Answer:**  Yes, you can do it. You just need to add these two lines of code before
 including piccante.hpp in your project:
 #define PIC_DISABLE_TINY_EXR
+
 #define PIC_ENABLE_OPEN_EXR
 
 SCREENSHOTS:
