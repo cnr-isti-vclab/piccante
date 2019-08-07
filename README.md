@@ -50,9 +50,9 @@ FREQUENTLY ASKED QUESTIONS (FAQs):
 ==================================
 
 
-**Question:** I do not want to use OpenGL. How can I remove it?
+**Question:** Can I disable OpenGL?
 
-**Answer:** You need to add this line of code before
+**Answer:** Yes, you can do it. You need to add this line of code before
 including piccante.hpp in your project:
 ``` C
 #define PIC_DISABLE_OPENGL
