@@ -53,16 +53,21 @@ FREQUENTLY ASKED QUESTIONS (FAQs):
 
 **Answer:** Yes, you can do it. You just need to add this line of code before
 including piccante.hpp in your project:
+``` C
 #define PIC_EIGEN_NOT_BUNDLED
+#include "piccante.hpp"
+```
 
 ##
 **Question:** Can I use OpenEXR instead of TinyEXR?
 
 **Answer:**  Yes, you can do it. You just need to add these two lines of code before
 including piccante.hpp in your project:
+``` C
 #define PIC_DISABLE_TINY_EXR
-
 #define PIC_ENABLE_OPEN_EXR
+#include "piccante.hpp"
+```
 
 SCREENSHOTS:
 ============
