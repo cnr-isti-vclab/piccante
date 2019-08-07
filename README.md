@@ -49,6 +49,17 @@ If you use PICCANTE in your work, please cite it using this reference:
 FREQUENTLY ASKED QUESTIONS (FAQs):
 ==================================
 
+
+**Question:** I do not want to use OpenGL. How can I remove it?
+
+**Answer:** You need to add this line of code before
+including piccante.hpp in your project:
+``` C
+#define PIC_DISABLE_OPENGL
+#include "piccante.hpp"
+```
+
+##
 **Question:** Can I use my version of Eigen instead of the one in the bundle?
 
 **Answer:** Yes, you can do it. You just need to add this line of code before
