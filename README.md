@@ -45,6 +45,20 @@ If you use PICCANTE in your work, please cite it using this reference:
 
  Howpublished = {\url{http://vcg.isti.cnr.it/piccante}
  }
+ 
+FREQUENTLY ASKED QUESTIONS (FAQs):
+==================================
+
+Q: Can I use my version of Eigen instead of the one in the bundle?
+A: Yes, you can do it. You just need to add this line of code before
+including piccante.hpp in your project:
+#define PIC_EIGEN_NOT_BUNDLED
+
+Q: Can I use OpenEXR instead of TinyEXR?
+A: Yes, you can do it. You just need to add these two lines of code before
+including piccante.hpp in your project:
+#define PIC_DISABLE_TINY_EXR
+#define PIC_ENABLE_OPEN_EXR
 
 SCREENSHOTS:
 ============
