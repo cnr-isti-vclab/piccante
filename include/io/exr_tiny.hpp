@@ -79,9 +79,7 @@ PIC_INLINE float *ReadEXR(std::string nameFile, float *data, int &width, int &he
         data[index + 2] = images[0][i];
     }
 
-    delete_vec_s(image.pixel_types);
-    delete_vec_s(image.requested_pixel_types);
-
+    FreeEXRImage(&image);
     return data;
 }
 
@@ -104,24 +102,25 @@ PIC_INLINE bool WriteEXR(std::string nameFile, float *data, int width,
 
      const char* channel_names[] = {"B", "G", "R"}; // "B", "G", "R", "A" for RGBA image
 
-     std::vector<float> images[3];
-     images[0].resize(width * height);
-     images[1].resize(width * height);
-     images[2].resize(width * height);
+     std::vector< float* > images;
+     for(int i = 0; i < channels; i++) {
+         float *tmp = new float[width * height];
+         images.push_back(tmp);
+     }
 
      int nPixels = width * height;
      for (int i = 0; i < nPixels; i++){
          int index = i * channels;
 
-         images[0][i] = data[index    ];
-         images[1][i] = data[index + 1];
-         images[2][i] = data[index + 2];
+         for(int j = 0; j < channels; j++) {
+             images[j][i] = data[index + j];
+         }
      }
 
-     float* image_ptr[3];
-     image_ptr[0] = &(images[2].at(0)); // B
-     image_ptr[1] = &(images[1].at(0)); // G
-     image_ptr[2] = &(images[0].at(0)); // R
+     float *image_ptr[3];
+     image_ptr[0] = &(images[2][0]); // B
+     image_ptr[1] = &(images[1][0]); // G
+     image_ptr[2] = &(images[0][0]); // R
 
      image.channel_names = channel_names;
      image.images = (unsigned char**)image_ptr;
@@ -141,6 +140,11 @@ PIC_INLINE bool WriteEXR(std::string nameFile, float *data, int width,
          printf("Save EXR err: %s\n", err);
          return false;
      }
+
+     for(int i = 0; i < channels; i++) {
+         delete_vec_s(images[i]);
+     }
+     images.clear();
 
      delete_vec_s(image.pixel_types);
      delete_vec_s(image.requested_pixel_types);

@@ -976,13 +976,13 @@ PIC_INLINE Image::~Image()
 PIC_INLINE void Image::release()
 {
     //release all allocated resources
-    if(data != NULL && (!notOwned)) {
-        delete_vec_s(data);
+    if(!notOwned) {
+        data = delete_vec_s(data);
     }
 
-    delete_vec_s(dataTMP);
-    delete_vec_s(dataUC);
-    delete_vec_s(dataRGBE);
+    dataTMP = delete_vec_s(dataTMP);
+    dataUC = delete_vec_s(dataUC);
+    dataRGBE = delete_vec_s(dataRGBE);
 
     #ifdef PIC_ENABLE_OPEN_EXR
         delete_vec_s(dataEXR);
