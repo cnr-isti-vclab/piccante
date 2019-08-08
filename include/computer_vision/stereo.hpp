@@ -72,19 +72,14 @@ public:
      */
     void init(int kernel_size, int max_disparity, int max_cross_check)
     {
+        kernel_size = kernel_size > 0 ? kernel_size : 7;
+        max_cross_check = max_cross_check > 0 ? max_cross_check : 4;
+
         this->kernel_size = kernel_size;
         this->max_disparity = max_disparity;
         this->max_cross_check = max_cross_check;
 
-        if(kernel_size < 0) {
-            kernel_size = 7;
-        }
-
-        if(max_cross_check < 0) {
-            max_cross_check = 8;
-        }
-
-        flt_disp.update(max_disparity, kernel_size);
+        flt_disp.update(max_disparity, kernel_size, 0.05f);
     }
 
     /**

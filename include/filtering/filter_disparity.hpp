@@ -32,6 +32,7 @@ class FilterDisparity: public Filter
 protected:
 
     int maxDisparity, halfMaxDisparity, patchSize;
+    float lambda;
     PatchComp *pc;
 
     /**
@@ -42,6 +43,9 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
+        float maxDisparityf = float(maxDisparity);
+        float patchSize_sq = float (patchSize * patchSize);
+
         for(int j = box->y0; j < box->y1; j++) {
 
             for(int i = box->x0; i < box->x1; i++) {
@@ -56,7 +60,28 @@ protected:
                 int maxX = MIN(i + halfMaxDisparity, src[1]->width);
 
                 for(int x = minX; x < maxX; x++) {
-                     pc->improveStereo(i, j, x, prevL, prevU, float(maxDisparity), xB, dB);
+
+                    float dist = pc->getSSDSmooth(i, j, x, j) / patchSize_sq;
+
+                    //regularization
+                    float reg = 0.0f;//float(x1 - x0);
+
+                    if(prevL[1] >= 0.0f) {
+                        float deltaL = fabsf(prevL[0] - x);
+                        reg += deltaL / maxDisparityf;
+                    }
+
+                    if(prevU[1] >= 0.0f) {
+                        float deltaU = fabsf(prevU[0] - x);
+                        reg += deltaU / maxDisparityf;
+                    }
+
+                    dist += lambda * reg;
+
+                    if(dist < dB) {
+                        xB = x;
+                        dB = dist;
+                    }
                 }
 
                 float *out = (*dst)(i, j);
@@ -76,7 +101,7 @@ protected:
     Image *setupAux(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.size() == 4) {
-            pc = new PatchComp(imgIn[0], imgIn[1], imgIn[2], imgIn[3], patchSize, 0.05f, 0.9f);
+            pc = new PatchComp(imgIn[0], imgIn[1], imgIn[2], imgIn[3], patchSize, 0.9f);
         } else {
             return NULL;
         }
@@ -108,35 +133,41 @@ public:
      */
     FilterDisparity()
     {
-        update(200, 7);
+        update(200, 7, 0.05f);
     }
 
     /**
      * @brief FilterDisparity
-     * @param type
+     * @param maxDisparity
+     * @param patchSize
+     * @param lambda
      */
-    FilterDisparity(int maxDisparity, int patchSize) : Filter()
+    FilterDisparity(int maxDisparity, int patchSize, float lambda) : Filter()
     {
-        update(maxDisparity, patchSize);
+        pc = NULL;
+        update(maxDisparity, patchSize, lambda);
     }
 
     ~FilterDisparity()
     {
-        if(pc != NULL) {
-            delete pc;
-        }
+        delete_s(pc);
     }
 
     /**
      * @brief update
      * @param maxDisparity
      */
-    void update(int maxDisparity, int patchSize)
+    void update(int maxDisparity, int patchSize, float lambda)
     {
+        if(this->patchSize != patchSize) {
+            delete_s(pc);
+        }
+
+        this->lambda = lambda > 0.0f ? lambda : 0.05f;
+
         this->maxDisparity = maxDisparity;
         this->halfMaxDisparity = maxDisparity >> 1;
         this->patchSize = patchSize;
-        pc = NULL;
     }
 
     /**

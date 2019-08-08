@@ -20,7 +20,6 @@
 
 TARGET = ip_io
 
-QT       += core
 TEMPLATE = app
 CONFIG   += console
 CONFIG   -= app_bundle
