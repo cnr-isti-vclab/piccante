@@ -29,6 +29,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "algorithms/poisson_image_editing.hpp"
 #include "algorithms/pushpull.hpp"
 #include "algorithms/pyramid.hpp"
+#include "algorithms/multi_resolution_operator.hpp"
 #include "algorithms/quadtree.hpp"
 #include "algorithms/region_border.hpp"
 #include "algorithms/superpixels_oracle.hpp"
