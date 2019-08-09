@@ -44,7 +44,9 @@ protected:
         float db = FLT_MAX;
         for(int i = halfPatchSize; i < height_ps; i+= stride) {
             for(int j = halfPatchSize; j < width_ps; j+= stride) {
+
                 float tmp_d = pc->getSSD(data->x, data->y, j, i);
+
                 if(tmp_d < db) {
                     db = tmp_d;
                     xb = j;
