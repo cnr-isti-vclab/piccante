@@ -36,7 +36,6 @@ namespace pic {
 class PatchComp
 {
 protected:
-    float *VALUES_COS, *VALUES_SIN;
     ImageSamplerBilinear isb;
 
     Image *img0, *img1, *img0_g, *img1_g;
@@ -86,20 +85,6 @@ public:
         setup(img0, img1, img0_g, img1_g, patchSize, alpha);
     }
 
-    ~PatchComp()
-    {
-        release();
-    }
-
-    /**
-     * @brief release
-     */
-    void release()
-    {
-        delete_vec_s(VALUES_COS);
-        delete_vec_s(VALUES_SIN);
-    }
-
     /**
      * @brief setNULL
      */
@@ -111,11 +96,6 @@ public:
         img1_g = NULL;
 
         alpha = -1.0f;
-
-        VALUES_COS = NULL;
-        VALUES_SIN = NULL;
-
-        release();
 
         patchSize = -1;
         halfPatchSize = -1;
@@ -146,10 +126,6 @@ public:
             this->patchSize_sq = float(patchSize * patchSize);
             this->halfPatchSize = patchSize >> 1;
             this->patchSize = (halfPatchSize << 1) + 1;
-
-            release();
-            VALUES_SIN = new float[this->patchSize];
-            VALUES_COS = new float[this->patchSize];
         }
     }
 
@@ -184,7 +160,7 @@ public:
                 //err term
                 ret += alpha_i * err_col + alpha * err_grad;
 
-            }
+            }            
         }
 
         return ret;

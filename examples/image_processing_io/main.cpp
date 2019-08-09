@@ -30,19 +30,8 @@ This program is free software: you can redistribute it and/or modify
 
 #include "piccante.hpp"
 
-void test()
-{
-    pic::Image *img = new pic::Image("../data/output/image.exr");
-    delete img;
-
-}
-
 int main(int argc, char *argv[])
 {
-
-    test();
-
-
     std::string img_str = "";
 
     if(argc == 2) {
