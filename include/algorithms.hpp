@@ -23,7 +23,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "algorithms/camera_response_function.hpp"
 #include "algorithms/connected_components.hpp"
 #include "algorithms/discrete_cosine_transform.hpp"
-#include "algorithms/edge_enhancement.hpp"
 #include "algorithms/poisson_filling.hpp"
 #include "algorithms/poisson_solver.hpp"
 #include "algorithms/poisson_image_editing.hpp"
