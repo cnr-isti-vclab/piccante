@@ -180,10 +180,10 @@ public:
             return FLT_MAX;
         }
 
-        unsigned int n = coord.size();
+        int n = int(coord.size());
         float *tmp = new float[n];
 
-        for(unsigned int i = 0; i < n; i++) {
+        for(int i = 0; i < n; i++) {
             int j = coord[i];
             tmp[i] = data[j];
         }

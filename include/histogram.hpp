@@ -306,7 +306,7 @@ public:
 
             }
 
-            int tvSize = trimmed_vec.size();
+            int tvSize = int(trimmed_vec.size());
             if(tvSize >= 2) {
                 bool b0 = !trimmed_vec[tvSize - 1];
                 bool b1 = !trimmed_vec[tvSize - 2];
@@ -473,7 +473,7 @@ public:
             printf("Histogram [%f %f] %d\n", fMin, fMax, range_size_hist);
         #endif
 
-        int count = 0;
+        int count = -1;
         int index = 0;
 
         for(int i = 0; i < (nBin - range_size_hist); i++) {
@@ -489,10 +489,8 @@ public:
             }
         }
 
-        int mid = range_size_hist >> 1;
-
-        float fstop_index = (float(index + mid) * dMM) + fMin;
-        return -fstop_index - 1.0f;
+        float fstop_index = (float(index + range_size_hist) * dMM) + fMin;
+        return -fstop_index;
     }
 };
 
