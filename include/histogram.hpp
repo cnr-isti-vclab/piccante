@@ -413,11 +413,9 @@ public:
             return ret;
         }
 
-        //NOTE: this code assumes to extract 8-bit images
-        float halfnBits = float( nBits >> 1 );
-
         float dMM = deltaMaxMin / nBinf;
-        int removingBins = MAX(int(lround((halfnBits - overlap) / dMM)), 1);
+
+        int removingBins = int(float(nBits) /dMM + overlap);
 
         if( bin_work == NULL) {
             bin_work = new unsigned int [nBin];
@@ -425,19 +423,57 @@ public:
 
         memcpy(bin_work, bin, sizeof(unsigned int) * nBin);
 
+        int countIndex = 0;
         while(Array<unsigned int>::sum(bin_work, nBin) > 0) {
+
+
+            int count = -1;
+            int index = 0;
+
+            for(int i = 0; i < (nBin - removingBins); i++) {
+                int tmpCount = 0;
+
+                for(int j = i; j < (i + removingBins); j++) {
+                    tmpCount += bin_work[j];
+                }
+
+                if(tmpCount > count) {
+                    count = tmpCount;
+                    index = i;
+                }
+            }
+
+            if(index == 0) {
+                countIndex++;
+            }
+
+            if(countIndex > 2) {
+                break;
+            }
+
+            for(int j = index; j < (index + removingBins); j++) {
+                bin_work[j] = 0;
+            }
+
+            float fstop = (float(index + removingBins) * dMM) + fMin;
+
+
+            /*
             int ind;
             Array<unsigned int>::getMax(bin_work, nBin, ind);
 
-            int indMin = MAX(ind - removingBins, 0);
-            int indMax = MIN(ind + removingBins, nBin);
+            int indMin = MAX(ind - removingBins_half, 0);
+            int indMax = MIN(ind + removingBins_half, nBin);
 
             for(int i = indMin; i < indMax; i++) {
                 bin_work[i] = 0;
             }
 
-            float fstop = -float(ind + removingBins) * dMM + fMin;
+            float fstop = -float(ind - removingBins_half) * dMM + fMin;*/
+
+            printf("%f\n", fstop);
             ret.push_back(fstop);
+
         }
 
         return ret;
