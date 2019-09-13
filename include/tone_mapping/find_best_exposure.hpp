@@ -50,7 +50,7 @@ PIC_INLINE float findBestExposureHistogram(Image *img)
         lum = FilterLuminance::execute(img, NULL, LT_CIE_LUMINANCE);
     }
 
-    Histogram hist(lum, VS_LOG_2, 256, 0);
+    Histogram hist(lum, VS_LOG_2, 4096, 0);
 
     float fstop = hist.getBestExposure(8);
 

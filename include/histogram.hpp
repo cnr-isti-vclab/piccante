@@ -417,7 +417,6 @@ public:
         float halfnBits = float( nBits >> 1 );
 
         float dMM = deltaMaxMin / nBinf;
-
         int removingBins = MAX(int(lround((halfnBits - overlap) / dMM)), 1);
 
         if( bin_work == NULL) {
@@ -437,9 +436,7 @@ public:
                 bin_work[i] = 0;
             }
 
-            float fstop_ind = float(ind) * dMM + fMin;
-            float fstop = -fstop_ind - 1.0f;
-
+            float fstop = -float(ind + removingBins) * dMM + fMin;
             ret.push_back(fstop);
         }
 
@@ -463,11 +460,9 @@ public:
             return 0.0f;
         }
 
-        float n_values_f = float(1 << nBits);
         float dMM = deltaMaxMin / nBinf;
-        int range_size_hist = int(float(nBits) / (1.0f / (n_values_f * dMM)) + overlap);
-
-        range_size_hist = range_size_hist < 1 ? 2 : range_size_hist;
+        int range_size_hist = int(float(nBits) /dMM + overlap);
+        range_size_hist = (range_size_hist < 1) ? 2 : range_size_hist;
 
         #ifdef PIC_DEBUG
             printf("Histogram [%f %f] %d\n", fMin, fMax, range_size_hist);
