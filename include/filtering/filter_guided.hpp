@@ -24,7 +24,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../util/matrix_3_x_3.hpp"
 
-#include "filtering/filter_guided_a_b.hpp"
+#include "../filtering/filter_guided_a_b.hpp"
 
 #include "../util/math.hpp"
 

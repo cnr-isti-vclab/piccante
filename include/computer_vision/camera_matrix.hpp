@@ -35,8 +35,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #include "../externals/Eigen/Geometry"
     #include "../externals/Eigen/Geometry"
     #include "../externals/Eigen/QR"
-
-
 #else
     #include <Eigen/Dense>
     #include <Eigen/SVD>
