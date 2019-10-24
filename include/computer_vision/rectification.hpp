@@ -29,6 +29,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image_vec.hpp"
 
 #include "../filtering/filter_warp_2d.hpp"
+#include "../filtering/filter_rotation.hpp"
 
 #include "../computer_vision/camera_matrix.hpp"
 
@@ -38,8 +39,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef PIC_EIGEN_NOT_BUNDLED
     #include "../externals/Eigen/Dense"
+    #include "../externals/Eigen/SVD"
+    #include "../externals/Eigen/Geometry"
 #else
     #include <Eigen/Dense>
+    #include <Eigen/SVD>
+    #include <Eigen/Geometry>
 #endif
 
 #endif
@@ -220,6 +225,101 @@ PIC_INLINE ImageVec *computeImageRectification(Image *img0,
     cameraRectify(K0, R0, t0, K1, R1, t1, M0_r, M1_r, T0, T1);
 
     out = computeImageRectificationWarp(img0, img1, T0, T1, out, bPartial);
+
+    return out;
+}
+
+/**
+ * @brief computeImageRectificationPanoramicLL
+ * @param img0
+ * @param img1
+ * @param R0
+ * @param t0
+ * @param R1
+ * @param t1
+ * @param out
+ * @return
+ */
+PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(Image *img0,
+                                               Image *img1,
+                                               Eigen::Matrix3d &R0,
+                                               Eigen::Vector3d &t0,
+                                               Eigen::Matrix3d &R1,
+                                               Eigen::Vector3d &t1,
+                                               ImageVec *out = NULL)
+{
+    //NOTE: we should check that img0 and img1 are valid...
+    if(img0 == NULL || img1 == NULL) {
+        return out;
+    }
+
+    if(out == NULL) {
+        out = new ImageVec();
+    }
+
+    Eigen::Matrix3d rot3;
+    rot3(0, 0) = 1.0;
+    rot3(0, 1) = 0.0;
+    rot3(0, 2) = 0.0;
+
+    rot3(1, 0) = 0.0;
+    rot3(1, 1) = 0.0;
+    rot3(1, 2) = -1.0;
+
+    rot3(2, 0) = 0.0;
+    rot3(2, 1) = 1.0;
+    rot3(2, 2) = 0.0;
+
+    Eigen::Matrix3d R0_t = R0;
+    Eigen::Matrix3d R1_t = R1;
+
+    R0 = Eigen::Transpose< Eigen::Matrix3d >(R0_t);
+    R1 = Eigen::Transpose< Eigen::Matrix3d >(R1_t);
+
+    Eigen::Vector3d deltaT;
+    deltaT = t1 - t0;
+    deltaT.normalize();
+    Eigen::Vector3d X(1.0, 0.0, 0.0);
+
+    //img0
+    Eigen::Vector3d x0 = R0 * X;
+    Eigen::Vector3d n0;
+    n0 = x0.cross(deltaT);
+    n0.normalize();
+    double alpha0 = acos(x0.dot(deltaT));
+
+    Eigen::Matrix3d rot00, absrot00, rotation0;
+    rot00 = Eigen::AngleAxisd(alpha0, R0_t * n0);
+    absrot00 = Eigen::AngleAxisd(alpha0, n0);
+
+    rotation0 = rot00 * rot3;
+
+    Eigen::Matrix3f rotation0f;
+    rotation0f = rotation0.cast<float>();
+    out->push_back(FilterRotation::execute(img0, NULL, rotation0f));
+
+    //img1
+    Eigen::Vector3d x1 = R1 * X;
+    Eigen::Vector3d n1;
+    n1 = x1.cross(deltaT);
+    n1.normalize();
+    double alpha1 = acos(x1.dot(deltaT));
+    Eigen::Matrix3d rot01, rot11, absrot01, rotation1;
+    rot01 = Eigen::AngleAxisd(alpha1, R1_t * n1);
+    absrot01 = Eigen::AngleAxisd(alpha1, n1);
+
+    Eigen::Matrix3d tmp0, tmp0t, tmp1, tmp1t;
+    tmp0 = absrot00 * R0;
+    tmp1 = absrot01 * R1;
+    tmp0t = Eigen::Transpose< Eigen::Matrix3d >(tmp0);
+    tmp1t = Eigen::Transpose< Eigen::Matrix3d >(tmp1);
+
+    rot11 =  tmp0t * tmp1t;
+    rotation1 = rot01 * rot11 * rot3;
+
+    Eigen::Matrix3f rotation1f;
+    rotation1f = rotation1.cast<float>();
+    out->push_back(FilterRotation::execute(img1, NULL, rotation1f));
 
     return out;
 }

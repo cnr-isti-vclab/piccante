@@ -89,7 +89,6 @@ protected:
 
 public:
 
-
     /**
      * @brief FilterRotation
      * @param theta
@@ -101,8 +100,19 @@ public:
     }
 
     /**
+     * @brief FilterRotation
+     * @param theta
+     * @param phi
+     */
+    FilterRotation(Eigen::Matrix3f mtxRot) : Filter()
+    {
+        update(mtxRot);
+    }
+
+    /**
      * @brief update
-     * @param type
+     * @param theta
+     * @param phi
      */
     void update(float theta, float phi)
     {
@@ -118,6 +128,16 @@ public:
     }
 
     /**
+     * @brief update
+     * @param theta
+     * @param phi
+     */
+    void update(Eigen::Matrix3f mtxRot)
+    {
+        matRot_inv = mtxRot.transpose();
+    }
+
+    /**
      * @brief execute
      * @param imgIn
      * @param imgOut
@@ -128,6 +148,19 @@ public:
     static Image *execute(Image *imgIn, Image *imgOut, float theta, float phi)
     {
         FilterRotation fltRot(theta, phi);
+        return fltRot.Process(Single(imgIn), imgOut);
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @param mtxRot
+     * @return
+     */
+    static Image *execute(Image *imgIn, Image *imgOut, Eigen::Matrix3f &mtxRot)
+    {
+        FilterRotation fltRot(mtxRot);
         return fltRot.Process(Single(imgIn), imgOut);
     }
 };
