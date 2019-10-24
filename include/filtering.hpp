@@ -99,5 +99,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_tmqi.hpp"
 #include "filtering/filter_nearest_neighbors.hpp"
 
+//360 panoramic images
+#include "filtering/filter_rotation.hpp"
+
 #endif /* PIC_FILTERING_HPP */
 

@@ -25,8 +25,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef PIC_EIGEN_NOT_BUNDLED
     #include "../externals/Eigen/Dense"
+    #include "../externals/Eigen/Geometry"
 #else
     #include <Eigen/Dense>
+    #include <Eigen/Geometry>
 #endif
 
 #endif
@@ -43,7 +45,11 @@ protected:
 
     ImageSamplerBilinear isb;
 
-    Eigen::Matrix3f matRot;
+    //rotation
+    float theta, phi;
+
+    //inverse rotation matrix of (theta, phi)
+    Eigen::Matrix3f matRot_inv;
 
     /**
      * @brief ProcessBBox
@@ -53,21 +59,24 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
+        float c1 = C_PI   / dst->heightf;
+        float c2 = C_PI_2 / dst->widthf;
+
         for(int j = box->y0; j < box->y1; j++) {
-            float theta = (C_PI   * float(j) ) / dst->heightf;
+            float theta = float(j) * c1;
             float sinTheta = sinf(theta);
             float cosTheta = cosf(theta);
 
             Eigen::Vector3f d;
 
             for(int i = box->x0; i < box->x1; i++) {
-                float phi   = (C_PI_2 * float(i)) / dst->widthf;
+                float phi = float(i) * c2;
 
                 d[0] = sinTheta * cosf(phi);
                 d[1] = cosTheta;
                 d[2] = sinTheta * sinf(phi);
 
-                auto d_new = matRot * d;
+                auto d_new = (matRot_inv * d).normalized();
 
                 float xt = 1.0f - ((atan2f(d_new[2], -d_new[0]) * C_INV_PI) * 0.5f + 0.5f);
                 float yt = (acosf(d_new[1]) * C_INV_PI);
@@ -83,22 +92,43 @@ public:
 
     /**
      * @brief FilterRotation
-     * @param phi
      * @param theta
+     * @param phi
      */
-    FilterRotation(float phi, float theta) : Filter()
+    FilterRotation(float theta, float phi) : Filter()
     {
-        update(phi, theta);
+        update(theta, phi);
     }
 
     /**
      * @brief update
      * @param type
      */
-    void update(float phi, float theta)
+    void update(float theta, float phi)
     {
         this->phi = phi;
         this->theta = theta;
+
+        Eigen::Matrix3f mat;
+        mat = Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitX()) *
+              Eigen::AngleAxisf(phi,   Eigen::Vector3f::UnitY()) *
+              Eigen::AngleAxisf(0.0f,   Eigen::Vector3f::UnitZ());
+
+        matRot_inv = mat.transpose();
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @param theta
+     * @param phi
+     * @return
+     */
+    static Image *execute(Image *imgIn, Image *imgOut, float theta, float phi)
+    {
+        FilterRotation fltRot(theta, phi);
+        return fltRot.Process(Single(imgIn), imgOut);
     }
 };
 
