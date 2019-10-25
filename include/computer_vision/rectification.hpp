@@ -270,11 +270,11 @@ PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(Image *img0,
     rot3(2, 1) = 1.0;
     rot3(2, 2) = 0.0;
 
-    Eigen::Matrix3d R0_t = R0;
-    Eigen::Matrix3d R1_t = R1;
+    Eigen::Matrix3d R0_t;
+    Eigen::Matrix3d R1_t;
 
-    R0 = Eigen::Transpose< Eigen::Matrix3d >(R0_t);
-    R1 = Eigen::Transpose< Eigen::Matrix3d >(R1_t);
+    R0_t = Eigen::Transpose< Eigen::Matrix3d >(R0);
+    R1_t = Eigen::Transpose< Eigen::Matrix3d >(R1);
 
     Eigen::Vector3d deltaT;
     deltaT = t1 - t0;
@@ -282,14 +282,14 @@ PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(Image *img0,
     Eigen::Vector3d X(1.0, 0.0, 0.0);
 
     //img0
-    Eigen::Vector3d x0 = R0 * X;
+    Eigen::Vector3d x0 = R0_t * X;
     Eigen::Vector3d n0;
     n0 = x0.cross(deltaT);
     n0.normalize();
     double alpha0 = acos(x0.dot(deltaT));
 
     Eigen::Matrix3d rot00, absrot00, rotation0;
-    rot00 = Eigen::AngleAxisd(alpha0, R0_t * n0);
+    rot00 = Eigen::AngleAxisd(alpha0, R0 * n0);
     absrot00 = Eigen::AngleAxisd(alpha0, n0);
 
     rotation0 = rot00 * rot3;
@@ -305,12 +305,12 @@ PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(Image *img0,
     n1.normalize();
     double alpha1 = acos(x1.dot(deltaT));
     Eigen::Matrix3d rot01, rot11, absrot01, rotation1;
-    rot01 = Eigen::AngleAxisd(alpha1, R1_t * n1);
+    rot01 = Eigen::AngleAxisd(alpha1, R1 * n1);
     absrot01 = Eigen::AngleAxisd(alpha1, n1);
 
     Eigen::Matrix3d tmp0, tmp0t, tmp1, tmp1t;
-    tmp0 = absrot00 * R0;
-    tmp1 = absrot01 * R1;
+    tmp0 = absrot00 * R0_t;
+    tmp1 = absrot01 * R1_t;
     tmp0t = Eigen::Transpose< Eigen::Matrix3d >(tmp0);
     tmp1t = Eigen::Transpose< Eigen::Matrix3d >(tmp1);
 

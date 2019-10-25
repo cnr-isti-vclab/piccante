@@ -103,9 +103,7 @@ public:
 
     ICP2DTransform()
     {
-        R.setZero();
-        R(0,0) = 1.0f;
-        R(1,1) = 1.0f;
+        R.setIdentity();
 
         t.setZero();
 

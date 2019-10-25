@@ -118,12 +118,7 @@ PIC_INLINE Eigen::Matrix34d getCameraMatrixFromHomography(Eigen::Matrix3d &H, Ei
 PIC_INLINE Eigen::Matrix34d getCameraMatrixIdentity(Eigen::Matrix3d &K)
 {
     Eigen::Matrix34d m;
-    m.setZero();
-
-    m(0, 0) = 1.0;
-    m(1, 1) = 1.0;
-    m(2, 2) = 1.0;
-
+    m.setIdentity();
     return K * m;
 }
 
