@@ -258,6 +258,7 @@ PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(Image *img0,
     }
 
     Eigen::Matrix3d rot3;
+
     rot3(0, 0) = 1.0;
     rot3(0, 1) = 0.0;
     rot3(0, 2) = 0.0;
@@ -276,22 +277,24 @@ PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(Image *img0,
     R0_t = Eigen::Transpose< Eigen::Matrix3d >(R0);
     R1_t = Eigen::Transpose< Eigen::Matrix3d >(R1);
 
-    Eigen::Vector3d deltaT;
-    deltaT = t1 - t0;
-    deltaT.normalize();
+    Eigen::Vector3d t;
+    t = t1 - t0;
+    t.normalize();
     Eigen::Vector3d X(1.0, 0.0, 0.0);
 
     //img0
     Eigen::Vector3d x0 = R0_t * X;
+    x0.normalize();
     Eigen::Vector3d n0;
-    n0 = x0.cross(deltaT);
+    n0 = x0.cross(t);
     n0.normalize();
-    double alpha0 = acos(x0.dot(deltaT));
 
+    double alpha0 = acos(x0.dot(t));
     Eigen::Matrix3d rot00, absrot00, rotation0;
     rot00 = Eigen::AngleAxisd(alpha0, R0 * n0);
     absrot00 = Eigen::AngleAxisd(alpha0, n0);
 
+    std::cout<<rot00;
     rotation0 = rot00 * rot3;
 
     Eigen::Matrix3f rotation0f;
@@ -300,21 +303,22 @@ PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(Image *img0,
 
     //img1
     Eigen::Vector3d x1 = R1 * X;
+    x1.normalize();
     Eigen::Vector3d n1;
-    n1 = x1.cross(deltaT);
+    n1 = x1.cross(t);
     n1.normalize();
-    double alpha1 = acos(x1.dot(deltaT));
+
+    double alpha1 = acos(x1.dot(t));
     Eigen::Matrix3d rot01, rot11, absrot01, rotation1;
-    rot01 = Eigen::AngleAxisd(alpha1, R1 * n1);
+    rot01 = Eigen::AngleAxisd(alpha1, R1 * n1 );
     absrot01 = Eigen::AngleAxisd(alpha1, n1);
 
-    Eigen::Matrix3d tmp0, tmp0t, tmp1, tmp1t;
-    tmp0 = absrot00 * R0_t;
-    tmp1 = absrot01 * R1_t;
-    tmp0t = Eigen::Transpose< Eigen::Matrix3d >(tmp0);
-    tmp1t = Eigen::Transpose< Eigen::Matrix3d >(tmp1);
+    Eigen::Matrix3d tmp, tmp_t;
+    tmp = absrot00 * R0_t;
+    tmp_t = Eigen::Transpose< Eigen::Matrix3d >(tmp);
+    tmp = tmp_t * (absrot01 * R1_t);
+    rot11 = Eigen::Transpose< Eigen::Matrix3d >(tmp);
 
-    rot11 =  tmp0t * tmp1t;
     rotation1 = rot01 * rot11 * rot3;
 
     Eigen::Matrix3f rotation1f;

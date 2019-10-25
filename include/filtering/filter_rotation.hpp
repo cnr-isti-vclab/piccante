@@ -48,8 +48,8 @@ protected:
     //rotation
     float theta, phi;
 
-    //inverse rotation matrix of (theta, phi)
-    Eigen::Matrix3f matRot_inv;
+    //the rotation matrix of (theta, phi)
+    Eigen::Matrix3f mtxRot;
 
     /**
      * @brief ProcessBBox
@@ -76,10 +76,10 @@ protected:
                 d[1] = cosTheta;
                 d[2] = sinTheta * sinf(phi);
 
-                auto d_new = (matRot_inv * d).normalized();
+                auto Rd = (mtxRot * d).normalized();
 
-                float xt = 1.0f - ((atan2f(d_new[2], -d_new[0]) * C_INV_PI) * 0.5f + 0.5f);
-                float yt = (acosf(d_new[1]) * C_INV_PI);
+                float xt = 1.0f - ((atan2f(Rd[2], -Rd[0]) * C_INV_PI) * 0.5f + 0.5f);
+                float yt = (acosf(Rd[1]) * C_INV_PI);
 
                 float *data_dst = (*dst)(i, j);
                 isb.SampleImage(src[0], xt, yt, data_dst);
@@ -119,12 +119,14 @@ public:
         this->phi = phi;
         this->theta = theta;
 
-        Eigen::Matrix3f mat;
-        mat = Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitX()) *
-              Eigen::AngleAxisf(phi,   Eigen::Vector3f::UnitY()) *
-              Eigen::AngleAxisf(0.0f,   Eigen::Vector3f::UnitZ());
+        Eigen::Matrix3f mtx;
+        mtx = Eigen::AngleAxisf(phi,   Eigen::Vector3f::UnitY());
+        std::cout<< mtx;
+                //Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitX());// *
+             // Eigen::AngleAxisf(phi,   Eigen::Vector3f::UnitY()) *
+             // Eigen::AngleAxisf(0.0f,  Eigen::Vector3f::UnitZ());
 
-        matRot_inv = mat.transpose();
+        update(mtx);
     }
 
     /**
@@ -132,9 +134,9 @@ public:
      * @param theta
      * @param phi
      */
-    void update(Eigen::Matrix3f mtxRot)
+    void update(Eigen::Matrix3f mtx)
     {
-        matRot_inv = mtxRot.transpose();
+        this->mtxRot = Eigen::Transpose< Eigen::Matrix3f >(mtx);
     }
 
     /**
