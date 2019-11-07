@@ -403,7 +403,7 @@ PIC_INLINE Matrix3x3 MatrixConvert(Eigen::Matrix3d &mat)
  */
 PIC_INLINE float *getLinearArrayFromMatrix(Eigen::Matrix3d &mat)
 {
-    int n = mat.cols() * mat.rows();
+    int n = int(mat.cols() * mat.rows());
 
     float *ret = new float[n];
     int c = 0;
@@ -424,7 +424,7 @@ PIC_INLINE float *getLinearArrayFromMatrix(Eigen::Matrix3d &mat)
  */
 PIC_INLINE float *getLinearArrayFromMatrix(Eigen::Matrix3f &mat)
 {
-    int n = mat.cols() * mat.rows();
+    int n = int(mat.cols() * mat.rows());
 
     float *ret = new float[n];
     int c = 0;

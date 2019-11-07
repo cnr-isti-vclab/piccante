@@ -115,7 +115,7 @@ PIC_INLINE Eigen::Vector4d triangulationHartleySturm(Eigen::Vector3d &point_0, E
 
         Eigen::JacobiSVD< Eigen::MatrixXd > svdA(A, Eigen::ComputeFullV);
         Eigen::MatrixXd V = svdA.matrixV();
-        int n = V.cols() - 1;
+        int n = int(V.cols()) - 1;
 
         x[0] = V(0, n);
         x[1] = V(1, n);
