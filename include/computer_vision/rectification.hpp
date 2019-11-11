@@ -233,19 +233,15 @@ PIC_INLINE ImageVec *computeImageRectification(Image *img0,
  * @brief computeImageRectificationPanoramicLL
  * @param img0
  * @param img1
- * @param R0
- * @param t0
- * @param R1
- * @param t1
+ * @param R01
+ * @param t01
  * @param out
  * @return
  */
 PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(Image *img0,
                                                Image *img1,
-                                               Eigen::Matrix3d &R0,
-                                               Eigen::Vector3d &t0,
-                                               Eigen::Matrix3d &R1,
-                                               Eigen::Vector3d &t1,
+                                               Eigen::Matrix3d &R01,
+                                               Eigen::Vector3d &t01,
                                                ImageVec *out = NULL)
 {
     //NOTE: we should check that img0 and img1 are valid...
@@ -271,60 +267,26 @@ PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(Image *img0,
     rot3(2, 1) = 1.0;
     rot3(2, 2) = 0.0;
 
-    Eigen::Matrix3d R0_t;
-    Eigen::Matrix3d R1_t;
+    //rotation 1
+    Eigen::Matrix3d R01_t = Eigen::Transpose< Eigen::Matrix3d >(R01);
 
-    R0_t = Eigen::Transpose< Eigen::Matrix3d >(R0);
-    R1_t = Eigen::Transpose< Eigen::Matrix3d >(R1);
+    //rotation 2
+    Eigen::Vector3d X(0.0, 1.0, 0.0);
+    Eigen::Vector3d n;
+    n = t01.cross(X);
+    n.normalize();
 
-    Eigen::Vector3d t;
-    t = t1 - t0;
-    t.normalize();
-    Eigen::Vector3d X(1.0, 0.0, 0.0);
+    double alpha = std::acos(t01.dot(X));
+    R01 = Eigen::AngleAxisd(alpha, n);
 
-    //img0
-    Eigen::Vector3d x0 = R0_t * X;
-    x0.normalize();
-    Eigen::Vector3d n0;
-    n0 = x0.cross(t);
-    n0.normalize();
+    auto rotation1 =  R01 * R01_t;
 
-    double alpha0 = acos(x0.dot(t));
-    Eigen::Matrix3d rot00, absrot00, rotation0;
-    rot00 = Eigen::AngleAxisd(alpha0, R0 * n0);
-    absrot00 = Eigen::AngleAxisd(alpha0, n0);
-
-    std::cout<<rot00;
-    rotation0 = rot00 * rot3;
-
-    Eigen::Matrix3f rotation0f;
-    rotation0f = rotation0.cast<float>();
-    out->push_back(FilterRotation::execute(img0, NULL, rotation0f));
-
-    //img1
-    Eigen::Vector3d x1 = R1 * X;
-    x1.normalize();
-    Eigen::Vector3d n1;
-    n1 = x1.cross(t);
-    n1.normalize();
-
-    double alpha1 = acos(x1.dot(t));
-    Eigen::Matrix3d rot01, rot11, absrot01, rotation1;
-    rot01 = Eigen::AngleAxisd(alpha1, R1 * n1 );
-    absrot01 = Eigen::AngleAxisd(alpha1, n1);
-
-    Eigen::Matrix3d tmp, tmp_t;
-    tmp = absrot00 * R0_t;
-    tmp_t = Eigen::Transpose< Eigen::Matrix3d >(tmp);
-    tmp = tmp_t * (absrot01 * R1_t);
-    rot11 = Eigen::Transpose< Eigen::Matrix3d >(tmp);
-
-    rotation1 = rot01 * rot11 * rot3;
-
-    Eigen::Matrix3f rotation1f;
+    Eigen::Matrix3f rotation0f, rotation1f;
+    rotation0f = R01.cast<float>();
     rotation1f = rotation1.cast<float>();
-    out->push_back(FilterRotation::execute(img1, NULL, rotation1f));
 
+    out->push_back(FilterRotation::execute(img0, NULL, rotation0f));
+    out->push_back(FilterRotation::execute(img1, NULL, rotation1f));
     return out;
 }
 
