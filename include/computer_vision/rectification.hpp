@@ -55,11 +55,11 @@ namespace pic {
 
 /**
  * @brief computeImageRectificationWarp
- * @param img0
- * @param img1
- * @param T0
- * @param T1
- * @param out
+ * @param img0 is the first image to rectify
+ * @param img1 is the second image to rectify
+ * @param T0 is the homography for img0
+ * @param T1 is the homography for img0
+ * @param out is the output as an ImageVec with two images; i.e., rectified versions of img0 and img1
  * @return
  */
 PIC_INLINE ImageVec *computeImageRectificationWarp(Image *img0,
@@ -127,12 +127,14 @@ PIC_INLINE ImageVec *computeImageRectificationWarp(Image *img0,
 }
 
 /**
- * @brief computeImageRectification
- * @param img0
- * @param img1
- * @param M0
- * @param M1
- * @return
+ * @brief computeImageRectification this function rectifies two images
+ * @param img0 is the first image to rectify
+ * @param img1 is the second image to rectify
+ * @param M0 is the camera matrix (3x4) of img0
+ * @param M1 is the camera matrix (3x4) of img1
+ * @param out is the output as an ImageVec with two images; i.e., rectified versions of img0 and img1
+ * @return is the output as an ImageVec with two images; i.e., rectified versions of img0 and img1
+
  */
 PIC_INLINE ImageVec *computeImageRectification(Image *img0,
                                                Image *img1,
@@ -187,17 +189,17 @@ PIC_INLINE ImageVec *computeImageRectification(Image *img0,
 }
 
 /**
- * @brief computeImageRectification
- * @param img0
- * @param img1
- * @param K0
- * @param R0
- * @param t0
- * @param K1
- * @param R1
- * @param t1
- * @param out
- * @return
+ * @brief computeImageRectification this function rectifies two images
+ * @param img0 is the first image to rectify
+ * @param img1 is the second image to rectify
+ * @param K0 is the intrisic matrix of img0
+ * @param R0 is the rotation matrix of img0
+ * @param t0 is the translation vector of img0
+ * @param K1 is the intrisic matrix of im1
+ * @param R1 is the rotation matrix of img1
+ * @param t1 is the translation vector of img1
+ * @param out is the output as an ImageVec with two images; i.e., rectified versions of img0 and img1
+ * @return is the output as an ImageVec with two images; i.e., rectified versions of img0 and img1
  */
 PIC_INLINE ImageVec *computeImageRectification(Image *img0,
                                                Image *img1,
@@ -230,6 +232,29 @@ PIC_INLINE ImageVec *computeImageRectification(Image *img0,
 }
 
 /**
+ * @brief alignPanoramicLL
+ * @param R0
+ * @param t0
+ * @param R1
+ * @param t1
+ * @param R01
+ * @param t01
+ */
+PIC_INLINE void alignPanoramicLL(Eigen::Matrix3d &R0, Eigen::Vector3d &t0,
+                                 Eigen::Matrix3d &R1, Eigen::Vector3d &t1,
+                                 Eigen::Matrix3d &R01, Eigen::Vector3d &t01)
+{
+    t01 = t1 - t0;
+    Eigen::Matrix3d R0_t = Eigen::Transpose< Eigen::Matrix3d >(R0);
+
+    //R0 --> I
+    //t0 --> 0
+
+    R01 = R0_t * R1;
+    t01 = R0_t * t01;
+}
+
+/**
  * @brief computeImageRectificationPanoramicLL
  * @param img0
  * @param img1
@@ -238,7 +263,8 @@ PIC_INLINE ImageVec *computeImageRectification(Image *img0,
  * @param out
  * @return
  */
-PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(Image *img0,
+PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(
+                                               Image *img0,
                                                Image *img1,
                                                Eigen::Matrix3d &R01,
                                                Eigen::Vector3d &t01,
@@ -253,20 +279,6 @@ PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(Image *img0,
         out = new ImageVec();
     }
 
-    Eigen::Matrix3d rot3;
-
-    rot3(0, 0) = 1.0;
-    rot3(0, 1) = 0.0;
-    rot3(0, 2) = 0.0;
-
-    rot3(1, 0) = 0.0;
-    rot3(1, 1) = 0.0;
-    rot3(1, 2) = -1.0;
-
-    rot3(2, 0) = 0.0;
-    rot3(2, 1) = 1.0;
-    rot3(2, 2) = 0.0;
-
     //rotation 1
     Eigen::Matrix3d R01_t = Eigen::Transpose< Eigen::Matrix3d >(R01);
 
@@ -277,12 +289,13 @@ PIC_INLINE ImageVec *computeImageRectificationPanoramicLL(Image *img0,
     n.normalize();
 
     double alpha = std::acos(t01.dot(X));
-    R01 = Eigen::AngleAxisd(alpha, n);
+    Eigen::Matrix3d rot, rotation1;
 
-    auto rotation1 =  R01 * R01_t;
+    rot = Eigen::AngleAxisd(alpha, n);
+    rotation1 = rot * R01_t;
 
     Eigen::Matrix3f rotation0f, rotation1f;
-    rotation0f = R01.cast<float>();
+    rotation0f = rot.cast<float>();
     rotation1f = rotation1.cast<float>();
 
     out->push_back(FilterRotation::execute(img0, NULL, rotation0f));
