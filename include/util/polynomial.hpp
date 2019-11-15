@@ -57,6 +57,7 @@ public:
         for(int i = 0; i < nCoeff; i++) {
             coeff.push_back(0.0f);
         }
+
         all_coeff_positive = true;
     }
 
@@ -343,10 +344,10 @@ public:
             x_p = x_n;
             counter++;
 
-            notConverged = (fabsf(E_x_p) > 1e-4f) && (counter < 200);
+            notConverged = (fabsf(E_x_p) > 1e-6f) && (counter < 500);
         }
 
-        if(counter >= 200) {
+        if(counter >= 500) {
             return false;
         } else {
             *x = x_n;
@@ -399,35 +400,23 @@ public:
     static bool getQuarticRoots(float *p, float *x)
     {
 #ifndef PIC_DISABLE_EIGEN
-        Eigen::Matrix4f m;
+        Eigen::Matrix4d m;
 
         m << -p[3], -p[2], -p[1], -p[0],
-            1.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f;
+             1.0f, 0.0f, 0.0f, 0.0f,
+             0.0f, 1.0f, 0.0f, 0.0f,
+             0.0f, 0.0f, 1.0f, 0.0f;
 
-        Eigen::EigenSolver<Eigen::Matrix4f> es(m);
-        Eigen::Vector4cf e = es.eigenvalues();
+        Eigen::EigenSolver<Eigen::Matrix4d> es(m);
+        Eigen::Vector4cd e = es.eigenvalues();
 
         bool bOut = false;
-        if(fabsf(e(0).imag()) < 1e-6f) {
-            x[0] = e(0).real();
-            bOut = true;
-        }
 
-        if(fabsf(e(1).imag()) < 1e-6f) {
-            x[1] = e(1).real();
-            bOut = true;
-        }
-
-        if(fabsf(e(2).imag()) < 1e-6f) {
-            x[2] = e(2).real();
-            bOut = true;
-        }
-
-        if(fabsf(e(3).imag()) < 1e-6f) {
-            x[3] = e(3).real();
-            bOut = true;
+        for (int i = 0; i < 4; i++) {
+            if (fabs(e(i).imag()) <= 0.0) {
+                x[i] = float(e(i).real());
+                bOut = true;
+            }
         }
 
         return bOut;
