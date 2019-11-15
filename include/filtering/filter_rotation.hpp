@@ -46,10 +46,10 @@ protected:
     ImageSamplerBilinear isb;
 
     //rotation
-    float theta, phi;
+    float angleX, angleY, angleZ;
 
     //the rotation matrix of (theta, phi)
-    Eigen::Matrix3f mtxRot;
+    Eigen::Matrix3f mtxRot, mtxRot_inv;
 
     /**
      * @brief ProcessBBox
@@ -76,7 +76,14 @@ protected:
                 d[1] = cosTheta;
                 d[2] = sinTheta * sinf(phi);
 
-                auto Rd = (mtxRot * d).normalized();
+                auto Rd = (mtxRot_inv * d).normalized();
+
+
+          /*    printf("\nwrong: %f correct: %f Rd: %f\n",
+                       sinTheta * cosf(phi + this->phi),
+                       sinTheta * cosf(phi - this->phi),
+                       Rd[0]
+                       );*/
 
                 float xt = 1.0f - ((atan2f(Rd[2], -Rd[0]) * C_INV_PI) * 0.5f + 0.5f);
                 float yt = (acosf(Rd[1]) * C_INV_PI);
@@ -87,56 +94,93 @@ protected:
         }
     }
 
+    /**
+     * @brief fromAnglesToVector
+     * @param theta
+     * @param phi
+     * @return
+     */
+    Eigen::Vector3f fromAnglesToVector(float theta, float phi)
+    {
+        Eigen::Vector3f ret;
+        float sinTheta = sinf(theta);
+        float cosTheta = cosf(theta);
+
+        ret[0] = sinTheta * cosf(phi);
+        ret[1] = cosTheta;
+        ret[2] = sinTheta * sinf(phi);
+
+        return ret;
+    }
+
 public:
 
     /**
      * @brief FilterRotation
-     * @param theta
-     * @param phi
      */
-    FilterRotation(float theta, float phi) : Filter()
+    FilterRotation() : Filter()
     {
-        update(theta, phi);
+        update(0.0f, 0.0f, 0.0f);
     }
 
     /**
      * @brief FilterRotation
-     * @param theta
-     * @param phi
+     * @param angleX
+     * @param angleY
+     * @param angleZ
      */
-    FilterRotation(Eigen::Matrix3f mtxRot) : Filter()
+    FilterRotation(float angleX, float angleY, float angleZ) : Filter()
     {
-        update(mtxRot);
+        update(angleX, angleY, angleZ);
     }
 
     /**
-     * @brief update
-     * @param theta
-     * @param phi
+     * @brief FilterRotation
+     * @param mtx
      */
-    void update(float theta, float phi)
+    FilterRotation(Eigen::Matrix3f mtx) : Filter()
     {
-        this->phi = phi;
-        this->theta = theta;
-
-        Eigen::Matrix3f mtx;
-        mtx = Eigen::AngleAxisf(phi,   Eigen::Vector3f::UnitY());
-        std::cout<< mtx;
-                //Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitX());// *
-             // Eigen::AngleAxisf(phi,   Eigen::Vector3f::UnitY()) *
-             // Eigen::AngleAxisf(0.0f,  Eigen::Vector3f::UnitZ());
-
         update(mtx);
     }
 
     /**
      * @brief update
+     * @param angleX
+     * @param angleY
+     * @param angleZ
+     */
+    void update(float angleX, float angleY, float angleZ)
+    {
+        this->angleX = angleX;
+        this->angleY = angleY;
+        this->angleZ = angleZ;
+
+        Eigen::Matrix3f mtx;
+        mtx = Eigen::AngleAxisf(angleZ, Eigen::Vector3f::UnitZ()) *
+              Eigen::AngleAxisf(angleY, Eigen::Vector3f::UnitY()) *
+              Eigen::AngleAxisf(angleX, Eigen::Vector3f::UnitX());
+
+        update(mtx);
+    }
+
+    /**
      * @param theta
+     * @brief update
      * @param phi
      */
     void update(Eigen::Matrix3f mtx)
     {
-        this->mtxRot = Eigen::Transpose< Eigen::Matrix3f >(mtx);
+        this->mtxRot = mtx;
+        this->mtxRot_inv = Eigen::Transpose< Eigen::Matrix3f >(mtx);
+    }
+
+    /**
+     * @brief getMtxRot
+     * @return
+     */
+    Eigen::Matrix3f getMtxRot()
+    {
+        return mtxRot;
     }
 
     /**
@@ -147,9 +191,9 @@ public:
      * @param phi
      * @return
      */
-    static Image *execute(Image *imgIn, Image *imgOut, float theta, float phi)
+    static Image *execute(Image *imgIn, Image *imgOut, float angleX, float angleY, float angleZ)
     {
-        FilterRotation fltRot(theta, phi);
+        FilterRotation fltRot(angleX, angleY, angleZ);
         return fltRot.Process(Single(imgIn), imgOut);
     }
 
@@ -157,12 +201,12 @@ public:
      * @brief execute
      * @param imgIn
      * @param imgOut
-     * @param mtxRot
+     * @param mtx
      * @return
      */
-    static Image *execute(Image *imgIn, Image *imgOut, Eigen::Matrix3f &mtxRot)
+    static Image *execute(Image *imgIn, Image *imgOut, Eigen::Matrix3f &mtx)
     {
-        FilterRotation fltRot(mtxRot);
+        FilterRotation fltRot(mtx);
         return fltRot.Process(Single(imgIn), imgOut);
     }
 };
