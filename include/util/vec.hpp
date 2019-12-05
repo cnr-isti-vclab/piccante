@@ -343,15 +343,18 @@ public:
     }
 
     /**
-     * @brief toString
-     * @param x
-     * @return
-     */
-    std::string toString(Vec<N, T> &x)
+    * @brief toString
+    * @param x
+    * @return
+    */
+    std::string toString()
     {
         std::string ret = "[";
-        for(auto i = 0; i < N; i++) {
-            ret += fromNumberToString(x[i]);
+        for (auto i = 0; i < N; i++) {
+            ret += fromNumberToString(data[i]);
+            if (i != (N - 1)) {
+                ret += ", ";
+            }
         }
         ret += "]";
 
@@ -363,7 +366,8 @@ public:
      */
     void print()
     {
-        printf("%s\n", toString().c_str());
+        std::string vec_str = toString();
+        printf("%s\n", vec_str.c_str());
     }
 
     /*
