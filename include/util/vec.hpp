@@ -225,6 +225,20 @@ public:
     }
 
     /**
+    * @brief getSum
+    * @return
+    */
+    T getSum()
+    {
+        T ret = T(0);
+        for (auto i = 0; i < N; i++) {
+            ret += this->data[i];
+        }
+
+        return ret;
+    }
+
+    /**
      * @brief getMax
      * @return
      */
