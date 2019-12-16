@@ -91,7 +91,7 @@ public:
                                       img->data[ind2 + i],
                                       img->data[ind3 + i],
                                       dx, dy);
-        }        \
+        }       
     }
 
     /**
