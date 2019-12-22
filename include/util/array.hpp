@@ -576,7 +576,7 @@ public:
      * @param high
      * @return
      */
-    int binSearchLeft(T *data, T key, int low, int high)
+    static inline int binSearchLeft(T *data, T key, int low, int high)
     {
         if( (high < low) ||
             (key > data[high - 1]) ||
