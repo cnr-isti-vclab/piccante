@@ -567,6 +567,41 @@ public:
         }
 
     }
+
+    /**
+     * @brief binSearchLeft
+     * @param data
+     * @param key
+     * @param low
+     * @param high
+     * @return
+     */
+    static inline int binSearchLeft(T *data, T key, int low, int high)
+    {
+        if( (high < low) ||
+            (key > data[high - 1]) ||
+            (key < data[low]) ) {
+            return -1;
+        }
+
+        int mid;
+        while(low < high) {
+            mid = low + ((high - low) / 2);
+
+            if(data[mid] < key) {
+                low = mid + 1;
+            } else {
+                high = mid;
+            }
+
+        }
+
+        if((data[mid] > key) && (mid > 0)) {
+            mid--;
+        }
+
+        return mid;
+    }
 };
 
 /**

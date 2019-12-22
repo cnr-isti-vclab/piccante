@@ -611,6 +611,26 @@ public:
     }
 
     /**
+     * @brief getLL returns a pointer to a pixel given a normalized
+     * direction and assuming longituted-latitude mapping of the image.
+     * @param x the x-coordinate of the unit-vector
+     * @param y the y-coordinate of the unit-vector
+     * @param z the z-coordinate of the unit-vector
+     * @return This function returns a pointer to data at location (x, y, z)
+     * that is normalized; i.e., sqrt(x^2+y^2+z^2) == 1.
+     */
+    float *getLL(float x, float y, float z)
+    {
+        float xf = 1.0f - ((atan2f(z, -x) * C_INV_PI) * 0.5f + 0.5f);
+        float yf = (acosf(y) * C_INV_PI);
+
+        int ix = CLAMP(int(floorf(x * width)), width);
+        int iy = CLAMP(int(floorf(y * height)), height);
+
+        return data + ix * xstride + iy * ystride;
+    }
+
+    /**
      * @brief getNormalizedCoords computes normalized coordinates
      * (nx, ny) of (x, y).
      * @param x is the horizontal coordinate in pixels
