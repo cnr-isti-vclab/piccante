@@ -43,7 +43,8 @@ If you use PICCANTE in your work, please cite it using this reference:
 
  Year  = {2014},
 
- Howpublished = {\url{http://vcg.isti.cnr.it/piccante}}
+ Howpublished = {\url{ http://vcg.isti.cnr.it/piccante }}
+ }
  
 FREQUENTLY ASKED QUESTIONS (FAQs):
 ==================================
