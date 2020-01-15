@@ -354,8 +354,8 @@ template <unsigned int N>  PIC_INLINE void RandomSampler<N>::render2Int()
     }
 
 #ifdef PIC_DEBUG
-    printf("render2Int: Original: %ld \t Rendered: %ld\n", samples.size() / N,
-           track.size());
+    printf("render2Int: Original: %d \t Rendered: %d\n", int(samples.size() / N),
+           int(track.size()));
 #endif
 }
 

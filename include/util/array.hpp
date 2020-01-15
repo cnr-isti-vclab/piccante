@@ -581,12 +581,16 @@ public:
         if( (high < low) ||
             (key > data[high - 1]) ||
             (key < data[low]) ) {
+
+            #ifdef PIC_DEBUG
+                printf("\nbinSearchLeft: bounds error!\n");
+            #endif
             return -1;
         }
 
         int mid;
         while(low < high) {
-            mid = low + ((high - low) / 2);
+            mid = (low + high) / 2;
 
             if(data[mid] < key) {
                 low = mid + 1;
@@ -596,11 +600,11 @@ public:
 
         }
 
-        if((data[mid] > key) && (mid > 0)) {
-            mid--;
+        if (low > 0) {
+            low--;
         }
 
-        return mid;
+        return low;
     }
 };
 

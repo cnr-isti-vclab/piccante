@@ -266,7 +266,7 @@ PIC_INLINE void PyramidGL::create(ImageGL *img, bool lapGauss, int limitLevel = 
     }
 
 #ifdef PIC_DEBUG
-    printf("PyramidGL size: %lu\n", stack.size());
+    printf("PyramidGL size: %d\n", int(stack.size()));
 #endif
 }
 
