@@ -189,9 +189,24 @@ int main(int argc, char *argv[])
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.
-          Note that pic::WardTMO tone maps an HDR image
+          Note that pic::LischinskiTMO tone maps an HDR image
           but it does not apply gamma.*/
         bWritten = image_tmo->Write("../data/output/" + nameOut + "_lischinski_tmo.png", pic::LT_NOR_GAMMA);
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+
+        printf("Tone mapping using Tumblin et al. 1999 TMO...");
+        image_tmo = pic::TumblinTMO::execute(&img, image_tmo);
+
+        /*pic::LT_NOR_GAMMA implies that when we save the image,
+          this is quantized at 8-bit and gamma is applied.
+          Note that pic::LischinskiTMO tone maps an HDR image
+          but it does not apply gamma.*/
+        bWritten = image_tmo->Write("../data/output/" + nameOut + "_tumblin_tmo.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
