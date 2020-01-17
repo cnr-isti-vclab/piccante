@@ -22,7 +22,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../filtering/filter.hpp"
 #include "../filtering/filter_luminance.hpp"
-#include "../filtering/filter_drago_tmo.hpp"
 #include "../tone_mapping/tone_mapping_operator.hpp"
 
 namespace pic {
@@ -120,8 +119,10 @@ public:
 
     /**
      * @brief update
+     * @param Ld_a
      * @param Ld_Max
-     * @param b
+     * @param C_Max
+     * @param Lw_a
      */
     void update(float Ld_a = 20.0f, float Ld_Max = 100.0f, float C_Max = 100.0f, float Lw_a = 1.0f)
     {
