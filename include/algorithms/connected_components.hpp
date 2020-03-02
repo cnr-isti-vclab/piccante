@@ -267,8 +267,9 @@ public:
 
         Buffer<unsigned int>::assign(imgOut, n, 0);
 
-        //First pass: assigning basics labels
-        // and generating the list of neighbors
+        //First pass:
+        // 1) assign basics labels
+        // 2) generate the list of neighbors
         int label = 1;
         std::set<LabelInfo> labelEq;
         for(int j = 0; j < height; j++) {
