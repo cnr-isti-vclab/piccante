@@ -47,11 +47,14 @@ int main(int argc, char *argv[])
         printf("Computing connected components...");
 
         std::vector<pic::LabelOutput> ret;
-        pic::Image *comp = pic::computeConnectedComponents(&img, ret, NULL, 0.05f);
+        pic::ConnectedComponents cc;
+
+        auto img_cc = cc.execute(&img, NULL, ret);
+
         printf("Ok!\n");
 
         unsigned int areaMin = img.nPixels();
-        for(unsigned int i=0; i<ret.size(); i++) {
+        for(unsigned int i = 0; i < ret.size(); i++) {
             unsigned int areaTmp = ret[i].coords.size();
             if(areaMin > areaTmp) {
                 areaMin = areaTmp;
@@ -62,6 +65,8 @@ int main(int argc, char *argv[])
         printf("%s", out.c_str());
 
         printf("Writing the connected component labeling results to a file on the disk...");
+
+        pic::Image *comp = pic::ConnectedComponents::convertFromIntegerToImage(img_cc, NULL, img.width, img.height);
         bool bWritten = comp->Write("../data/output/connected_components.pfm");
 
         if(bWritten) {

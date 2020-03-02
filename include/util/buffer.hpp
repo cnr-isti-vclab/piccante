@@ -50,8 +50,8 @@ public:
                 return buffer;
             }
         }
-        #pragma omp parallel for
 
+        #pragma omp parallel for
         for(int i = 0; i < n; i++) {
             buffer[i] = value;
         }

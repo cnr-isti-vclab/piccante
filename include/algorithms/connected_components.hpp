@@ -25,6 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../base.hpp"
 
 #include "../image.hpp"
+#include "../util/buffer.hpp"
 #include "../filtering/filter_luminance.hpp"
 
 namespace pic {
@@ -32,9 +33,10 @@ namespace pic {
 //Connected components on a single channel image
 typedef std::vector<int> ConnectComp;
 
-struct LabelInfo {
-    float id;
-    float minLabel;
+struct LabelInfo
+{
+    unsigned int id;
+    unsigned int minLabel;
 
     friend bool operator<(LabelInfo const &a, LabelInfo const &b)
     {
@@ -45,14 +47,14 @@ struct LabelInfo {
 class LabelOutput
 {
 public:
-    float id;
-    std::vector<int> coords;
+    unsigned int id;
+    std::vector< int > coords;
 
     LabelOutput()
     {
     }
 
-    LabelOutput(float id, int i)
+    LabelOutput(unsigned int id, int i)
     {
         this->id = id;
         coords.push_back(i);
@@ -70,224 +72,278 @@ public:
 };
 
 
-/**
- * @brief computeConnectedComponents computes connected components in an image
- * @param img
- * @param ret
- * @param comp
- * @param channel
- * @return
- */
-PIC_INLINE Image *computeConnectedComponents(Image *img, std::vector<LabelOutput> &ret,
-                              Image *comp = NULL, float thr = 0.05f)
+class ConnectedComponents
 {
-    //Check input paramters
-    if(img == NULL) {
-        return NULL;
-    }
+protected:
+    float thr;
 
-    float *data  = img->data;
-    int width    = img->width;
-    int height   = img->height;
-    int channels = img->channels;
-    int n = height * width;
+    /**
+     * @brief secondPass
+     * @param imgOut
+     * @param labelEq
+     */
+    void secondPass(unsigned int *imgOut, std::vector<LabelOutput> &ret, std::set<LabelInfo> &labelEq, int n)
+    {
+        //Label Search
+        LabelInfo tmpLI;
+        std::set<LabelInfo> labelEq_new;
 
-    if(comp == NULL) {
-        comp = new Image(1, width, height, 1);
-    }
+        for(auto it2 = labelEq.begin() ; it2 != labelEq.end(); it2++) {
+            auto minVal = it2->minLabel;
+            bool test = true;
 
-    comp->setZero();
+            while(test) {
+                test = false;
+                tmpLI.id = minVal;
+                auto it = labelEq.find(tmpLI);
 
-    //First pass: assigning basics labels
-    // and generating the list of neighbors
-    int label = 1;
+                if(it != labelEq.end()) {
+                    auto tmpMinLabel = (*it).minLabel;
 
-    std::set<LabelInfo> labelEq;
-    std::set<LabelInfo>::iterator it;
-
-    for(int j = 0; j < height; j++) {
-        int indY = j * width;
-
-        for(int i = 0; i < width; i++) {
-            int ind = (indY + i);
-
-            int ind_img = ind * channels;
-
-            //neighbors
-            int neighbors[2];
-            int nNeighbors = 0;
-
-            if((i - 1) > -1) {
-                int ind_img_prev = ind_img - channels;
-
-                float n1 = Arrayf::norm(&data[ind_img], channels);
-                float n2 = Arrayf::norm(&data[ind_img_prev], channels);
-                float dist = sqrtf(Arrayf::distanceSq(&data[ind_img], &data[ind_img_prev], channels));
-
-                if(dist <= (thr * MAX(n1, n2))) {
-                    neighbors[0] = ind - 1;
-                    nNeighbors++;
-                }
-            }
-
-            if((j - 1) > -1) {
-                int ind_img_prev = ind_img - (width * channels);
-
-                float n1 = Arrayf::norm(&data[ind_img], channels);
-                float n2 = Arrayf::norm(&data[ind_img_prev], channels);
-                float dist = sqrtf(Arrayf::distanceSq(&data[ind_img], &data[ind_img_prev], channels));
-
-                if(dist <= (thr * MAX(n1, n2))) {
-                    neighbors[nNeighbors] = ind - width;
-                    nNeighbors++;
-                }
-            }
-
-            //No neighbors?
-            if(nNeighbors == 0) {
-                comp->data[ind] = float(label);
-                label++;
-            }
-
-            if(nNeighbors == 1) {
-                comp->data[ind] = comp->data[neighbors[0]];
-            }
-
-            if(nNeighbors == 2) {
-                //Assigning the label of neighbors
-                float minVal, t1, t2;
-                t1 = comp->data[neighbors[0]];
-                t2 = comp->data[neighbors[1]];
-                minVal = MIN(t1, t2);
-
-                //Tracking neighbors
-                LabelInfo tmpLI;
-                bool test = true;
-
-                while(test) {
-                    test = false;
-                    tmpLI.id = minVal;
-                    it = labelEq.find(tmpLI);
-
-                    if(it != labelEq.end()) {
-                        float tmpMinLabel = it->minLabel;
-
-                        if(minVal > tmpMinLabel) {
-                            minVal = tmpMinLabel;
-                            test = true;
-                        }
+                    if(minVal > tmpMinLabel) {
+                        minVal = tmpMinLabel;
+                        test = true;
                     }
                 }
+            }
 
-                comp->data[ind] = minVal;
+            LabelInfo tmp_it;
+            tmp_it.id = it2->id;
+            tmp_it.minLabel = minVal;
+            labelEq_new.insert(tmp_it);
+        }
 
-                //Tracking T1
-                test = true;
-                tmpLI.id = t1;
-                it = labelEq.find(tmpLI);
+        //Second pass: using tracked neighbors
+        //for assigning the correct labels
+        //TO DO: optimizing outside this loop
+        std::set<unsigned int> unique;
+        //std::set<unsigned int>::iterator uniqueIt;
+        std::map<unsigned int, int> mapping;
 
-                if(it != labelEq.end()) {
-                    LabelInfo tmp_it;
-                    tmp_it.id = it->id;
-                    tmp_it.minLabel = minVal;
+        int counter = 0;
 
-                    labelEq.erase(it);
-                    labelEq.insert(tmp_it);
-                } else {
-                    LabelInfo tmpLabelInfo;
-                    tmpLabelInfo.id = t1;
-                    tmpLabelInfo.minLabel = minVal;
-                    labelEq.insert(tmpLabelInfo);
-                }
+        for(int i = 0; i < n; i++) {
+            tmpLI.id = imgOut[i];
+            auto it = labelEq_new.find(tmpLI);
 
-                //T2
-                tmpLI.id = t2;
-                it = labelEq.find(tmpLI);
+            if(it != labelEq_new.end()) {
+                imgOut[i] = it->minLabel;
+            }
 
-                if(it != labelEq.end()) {
-                    LabelInfo tmp_it;
-                    tmp_it.id = it->id;
-                    tmp_it.minLabel = minVal;
+            //store coordiantes of the connected components
+            auto id = imgOut[i];
+            auto uniqueIt = unique.find(id);
 
-                    labelEq.erase(it);
-                    labelEq.insert(tmp_it);
-                } else {
-                    LabelInfo tmpLabelInfo;
-                    tmpLabelInfo.id = t2;
-                    tmpLabelInfo.minLabel = minVal;
-                    labelEq.insert(tmpLabelInfo);
-                }
+            if(uniqueIt != unique.end()) {
+                ret[mapping[id]].add(i);
+            } else {
+                std::pair<unsigned int, int> tmp = std::make_pair(id, counter);
+                mapping.insert(tmp);
+
+                LabelOutput tmpRet(id, i);
+                ret.push_back(tmpRet);
+
+                unique.insert(id);
+                counter++;
             }
         }
     }
 
-    //Label Search
-    LabelInfo tmpLI;
-    std::set<LabelInfo>::iterator it2;
+    void track(unsigned int *imgOut, int &label, std::set<LabelInfo> &labelEq,
+               int neighbors[2], int nNeighbors, int ind)
+    {
+        std::set<LabelInfo>::iterator it;
+        //No neighbors?
+        if(nNeighbors == 0) {
+            imgOut[ind] = label;
+            label++;
+        }
 
-    std::set<LabelInfo> labelEq_new;
+        if(nNeighbors == 1) {
+            imgOut[ind] = imgOut[neighbors[0]];
+        }
 
-    for(it2 = labelEq.begin() ; it2 != labelEq.end(); it2++) {
-        float minVal = it2->minLabel;
-        bool test = true;
+        if(nNeighbors == 2) {
+            //Assign the label of neighbors
+            unsigned int minVal, t1, t2;
+            t1 = imgOut[neighbors[0]];
+            t2 = imgOut[neighbors[1]];
+            minVal = MIN(t1, t2);
 
-        while(test) {
-            test = false;
-            tmpLI.id = minVal;
+            //Track neighbors
+            LabelInfo tmpLI;
+            bool test = true;
+
+            while(test) {
+                test = false;
+                tmpLI.id = minVal;
+                it = labelEq.find(tmpLI);
+
+                if(it != labelEq.end()) {
+                    float tmpMinLabel = it->minLabel;
+
+                    if(minVal > tmpMinLabel) {
+                        minVal = tmpMinLabel;
+                        test = true;
+                    }
+                }
+            }
+
+            imgOut[ind] = minVal;
+
+            //Track T1
+            test = true;
+            tmpLI.id = t1;
             it = labelEq.find(tmpLI);
 
             if(it != labelEq.end()) {
-                float tmpMinLabel = (*it).minLabel;
+                LabelInfo tmp_it;
+                tmp_it.id = it->id;
+                tmp_it.minLabel = minVal;
 
-                if(minVal > tmpMinLabel) {
-                    minVal = tmpMinLabel;
-                    test = true;
+                labelEq.erase(it);
+                labelEq.insert(tmp_it);
+            } else {
+                LabelInfo tmpLabelInfo;
+                tmpLabelInfo.id = t1;
+                tmpLabelInfo.minLabel = minVal;
+                labelEq.insert(tmpLabelInfo);
+            }
+
+            //Track T2
+            tmpLI.id = t2;
+            it = labelEq.find(tmpLI);
+
+            if(it != labelEq.end()) {
+                LabelInfo tmp_it;
+                tmp_it.id = it->id;
+                tmp_it.minLabel = minVal;
+
+                labelEq.erase(it);
+                labelEq.insert(tmp_it);
+            } else {
+                LabelInfo tmpLabelInfo;
+                tmpLabelInfo.id = t2;
+                tmpLabelInfo.minLabel = minVal;
+                labelEq.insert(tmpLabelInfo);
+            }
+        }
+    }
+
+public:
+
+    /**
+     * @brief ConnectedComponents
+     * @param thr
+     */
+    ConnectedComponents(float thr = 0.05f)
+    {
+        this->thr  = thr > 0.0f ? thr : 0.05f;
+    }
+
+    /**
+     * @brief execute
+     * @param imgIn
+     * @param imgOut
+     * @param ret
+     */
+    unsigned int *execute(Image *imgIn, unsigned int *imgOut, std::vector<LabelOutput> &ret)
+    {
+        //Check input paramters
+        if(imgIn == NULL) {
+            return imgOut;
+        }
+
+        float *data  = imgIn->data;
+        int width    = imgIn->width;
+        int height   = imgIn->height;
+        int channels = imgIn->channels;
+
+        int n = width * height;
+
+        if(imgOut == NULL) {
+            imgOut = new unsigned int[n];
+        }
+
+        Buffer<unsigned int>::assign(imgOut, n, 0);
+
+        //First pass: assigning basics labels
+        // and generating the list of neighbors
+        int label = 1;
+        std::set<LabelInfo> labelEq;
+        for(int j = 0; j < height; j++) {
+            int indY = j * width;
+
+            for(int i = 0; i < width; i++) {
+                int ind = (indY + i);
+
+                int ind_img = ind * channels;
+
+                //neighbors
+                int neighbors[2];
+                int nNeighbors = 0;
+
+                if((i - 1) > -1) {
+                    int ind_img_prev = ind_img - channels;
+
+                    float n1 = Arrayf::norm(&data[ind_img], channels);
+                    float n2 = Arrayf::norm(&data[ind_img_prev], channels);
+                    float dist = sqrtf(Arrayf::distanceSq(&data[ind_img], &data[ind_img_prev], channels));
+
+                    if(dist <= (thr * MAX(n1, n2))) {
+                        neighbors[0] = ind - 1;
+                        nNeighbors++;
+                    }
                 }
+
+                if((j - 1) > -1) {
+                    int ind_img_prev = ind_img - (width * channels);
+
+                    float n1 = Arrayf::norm(&data[ind_img], channels);
+                    float n2 = Arrayf::norm(&data[ind_img_prev], channels);
+                    float dist = sqrtf(Arrayf::distanceSq(&data[ind_img], &data[ind_img_prev], channels));
+
+                    if(dist <= (thr * MAX(n1, n2))) {
+                        neighbors[nNeighbors] = ind - width;
+                        nNeighbors++;
+                    }
+                }
+
+                track(imgOut, label, labelEq, neighbors, nNeighbors, ind);
             }
         }
 
-        LabelInfo tmp_it;
-        tmp_it.id = it2->id;
-        tmp_it.minLabel = minVal;
-        labelEq_new.insert(tmp_it);
+        secondPass(imgOut, ret, labelEq, n);
+        return imgOut;
     }
 
-    //Second pass: using tracked neighbors
-    //for assigning the correct labels
-    //TO DO: optimizing outside this loop
-    std::set<float> unique;
-    std::set<float>::iterator uniqueIt;
-    std::map<float, int> mapping;
-
-    int counter = 0;
-
-    for(int i=0; i < n; i++) {
-        tmpLI.id = comp->data[i];
-        it = labelEq_new.find(tmpLI);
-
-        if(it != labelEq_new.end()) {
-            comp->data[i] = it->minLabel;
+    /**
+     * @brief convertFromIntegerToImage
+     * @param imgLabel
+     * @param imgOut
+     * @param width
+     * @param height
+     * @return
+     */
+    static Image* convertFromIntegerToImage(unsigned int *imgLabel, Image *imgOut, int width, int height)
+    {
+        if(imgLabel == NULL) {
+            return imgOut;
         }
 
-        //store coordiantes of the connected components
-        float id = comp->data[i];
-        uniqueIt = unique.find(id);
-
-        if(uniqueIt != unique.end()) {
-            ret[mapping[id]].add(i);
-        } else {
-            std::pair<float, int> tmp = std::make_pair(id, counter);
-            mapping.insert(tmp);
-
-            LabelOutput tmpRet(id, i);
-            ret.push_back(tmpRet);
-
-            unique.insert(id);
-            counter++;
+        if(imgOut == NULL) {
+            imgOut = new Image(1, width, height, 1);
         }
+
+        int n = width * height;
+        for(int i = 0; i < n; i++) {
+            imgOut->data[i] = float(imgLabel[i]);
+        }
+
+        return imgOut;
     }
-    return comp;
-}
+};
+
 
 } // end namespace pic
 
