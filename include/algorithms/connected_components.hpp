@@ -319,6 +319,70 @@ public:
     }
 
     /**
+     * @brief execute
+     * @param imgIn
+     * @param width
+     * @param height
+     * @param imgOut
+     * @param ret
+     * @return
+     */
+    unsigned int *execute(bool *imgIn, int width, int height, unsigned int *imgOut, std::vector<LabelOutput> &ret)
+    {
+        //Check input paramters
+        if(imgIn == NULL) {
+            return imgOut;
+        }
+
+        int n = width * height;
+
+        if(imgOut == NULL) {
+            imgOut = new unsigned int[n];
+        }
+
+        Buffer<unsigned int>::assign(imgOut, n, 0);
+
+        bool *data = imgIn;
+        //First pass:
+        // 1) assign basics labels
+        // 2) generate the list of neighbors
+        int label = 1;
+        std::set<LabelInfo> labelEq;
+        for(int j = 0; j < height; j++) {
+            int indY = j * width;
+
+            for(int i = 0; i < width; i++) {
+                int ind = (indY + i);
+
+                //neighbors
+                int neighbors[2];
+                int nNeighbors = 0;
+
+                if((i - 1) > -1) {
+                    int ind_prev = ind - 1;
+                    if(data[ind] == data[ind_prev]) {
+                        neighbors[0] = ind_prev;
+                        nNeighbors++;
+                    }
+                }
+
+                if((j - 1) > -1) {
+                    int ind_prev = ind - width;
+                    if(data[ind] == data[ind_prev]) {
+                        neighbors[nNeighbors] = ind_prev;
+                        nNeighbors++;
+                    }
+                }
+
+                track(imgOut, label, labelEq, neighbors, nNeighbors, ind);
+            }
+        }
+
+        secondPass(imgOut, ret, labelEq, n);
+        return imgOut;
+    }
+
+    /**
      * @brief convertFromIntegerToImage
      * @param imgLabel
      * @param imgOut

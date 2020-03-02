@@ -1756,7 +1756,6 @@ PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.2
     float tmpThreshold = threshold * float(channels);
 
     #pragma omp parallel for
-
     for(int i = 0; i < n; i++) {
         int ind = i * channels;
 
