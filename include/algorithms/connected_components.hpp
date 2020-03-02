@@ -21,17 +21,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <vector>
 #include <set>
 #include <map>
+#include <utility>
 
 #include "../base.hpp"
 
 #include "../image.hpp"
 #include "../util/buffer.hpp"
-#include "../filtering/filter_luminance.hpp"
 
 namespace pic {
-
-//Connected components on a single channel image
-typedef std::vector<int> ConnectComp;
 
 struct LabelInfo
 {

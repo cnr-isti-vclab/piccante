@@ -33,10 +33,18 @@ This program is free software: you can redistribute it and/or modify
 
 int main(int argc, char *argv[])
 {
+    std::string img_name_str;
+
+    if(argc > 1) {
+        img_name_str = argv[1];
+    } else {
+        img_name_str = "../data/input/connected_test.png";
+    }
+
     printf("Reading an LDR file...");
 
     pic::Image img;
-    img.Read("../data/input/connected_test.png", pic::LT_NOR);
+    img.Read(img_name_str, pic::LT_NOR);
 
     printf("Ok\n");
 
@@ -49,7 +57,13 @@ int main(int argc, char *argv[])
         std::vector<pic::LabelOutput> ret;
         pic::ConnectedComponents cc;
 
-        auto img_cc = cc.execute(&img, NULL, ret);
+        float color[] = {0.0f, 0.0f, 0.0f};
+        auto mask = img.convertToMask(color, 0.0f, true, NULL);
+
+        pic::Image tmp;
+        tmp.convertFromMask(mask, img.width, img.height);
+
+        auto img_cc = cc.execute(mask, img.width, img.height, NULL, ret);
 
         printf("Ok!\n");
 
