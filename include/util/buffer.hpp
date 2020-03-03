@@ -716,6 +716,20 @@ public:
 
         return bufferOut;
     }
+
+    /**
+     * @brief unique
+     * @param buffer
+     * @param n
+     * @param uniqueValues
+     * @return
+     */
+    static void *unique(T *buffer, int n, std::set<T> &uniqueValues)
+    {
+        for(int i = 0; i < n; i++) {
+            uniqueValues.insert(buffer[i]);
+        }
+    }
 };
 
 } // end namespace pic
