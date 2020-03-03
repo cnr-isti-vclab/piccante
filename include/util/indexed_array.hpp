@@ -111,13 +111,13 @@ public:
      */
     static T mean(T *data, IntCoord &coord)
     {
-        T ret = T(0);
-
         if(coord.empty()) {
-            return ret;
+            return T(0);
         }
 
-        for(unsigned int i = 0; i < coord.size(); i++) {
+        T ret = data[coord[0]];
+
+        for(unsigned int i = 1; i < coord.size(); i++) {
             ret += data[coord[i]];
         }
 
@@ -264,7 +264,7 @@ public:
      * @param coord
      * @param referencePoint
      */
-    static void negative(float *data, IntCoord &coord, float referencePoint = 1.0f)
+    static void negative(T *data, IntCoord &coord, T referencePoint = T(1))
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
             int j = coord[i];
@@ -278,7 +278,7 @@ public:
      * @param coord
      * @param val
      */
-    static void add(float *data, IntCoord &coord, float val)
+    static void add(T *data, IntCoord &coord, T val)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
             int j = coord[i];
@@ -292,7 +292,7 @@ public:
      * @param coord
      * @param val
      */
-    static void sub(float *data, IntCoord &coord, float val)
+    static void sub(T *data, IntCoord &coord, T val)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
             int j = coord[i];
@@ -306,7 +306,7 @@ public:
      * @param coord
      * @param val
      */
-    static void mul(float *data, IntCoord &coord, float val)
+    static void mul(T *data, IntCoord &coord, T val)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
             int j = coord[i];
@@ -320,7 +320,7 @@ public:
      * @param coord
      * @param val
      */
-    static void div(float *data, IntCoord &coord, float val)
+    static void div(T *data, IntCoord &coord, T val)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
             int j = coord[i];
@@ -334,7 +334,7 @@ public:
      * @param coord
      * @param val
      */
-    static void assign(float *data, IntCoord &coord, float val)
+    static void assign(T *data, IntCoord &coord, T val)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
             int j = coord[i];
@@ -348,7 +348,7 @@ public:
      * @param coord
      * @param dataSrc
      */
-    static void assign(float *dataDst, IntCoord &coord, float *dataSrc)
+    static void assign(T *dataDst, IntCoord &coord, T *dataSrc)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
             int j = coord[i];
