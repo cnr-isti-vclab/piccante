@@ -57,8 +57,8 @@ protected:
         images[0] = flt_lum.Process(imgIn, images[0]);
 
         IntCoord ret;
-        IndexedArray::findSimple(images[0]->data, images[0]->size(), IndexedArray::bFuncNotNeg, ret, 1);
-        LMin = IndexedArray::percentile(images[0]->data, ret, 0.01f);
+        IndexedArray<float>::findSimple(images[0]->data, images[0]->size(), IndexedArray<float>::bFuncNotNeg, ret, 1);
+        LMin = IndexedArray<float>::percentile(images[0]->data, ret, 0.01f);
 
         images[0]->getMaxVal(NULL, &LMax);
 

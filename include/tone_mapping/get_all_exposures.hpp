@@ -53,10 +53,10 @@ PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
     int nData = img_lum->width * img_lum->height;
 
     IntCoord coord;
-    IndexedArray::findSimple(img_lum->data, nData, IndexedArray::bFuncNotNeg, coord);
+    IndexedArray<float>::findSimple(img_lum->data, nData, IndexedArray<float>::bFuncNotNeg, coord);
 
-    float commonMin = IndexedArray::min(img_lum->data, coord);
-    float commonMax = IndexedArray::max(img_lum->data, coord);
+    float commonMin = IndexedArray<float>::min(img_lum->data, coord);
+    float commonMax = IndexedArray<float>::max(img_lum->data, coord);
 
     float tminFstop = log2f(commonMin);
     float tmaxFstop = log2f(commonMax);

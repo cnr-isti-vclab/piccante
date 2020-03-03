@@ -1316,8 +1316,8 @@ PIC_INLINE float Image::getDynamicRange(bool bRobust = false, float percentile =
 
         if(min_val <= 0.0f) {
             IntCoord coord;
-            IndexedArray::findSimple(data, size(), IndexedArray::bFuncNotNeg, coord);
-            min_val = IndexedArray::min(data, coord);
+            IndexedArray<float>::findSimple(data, size(), IndexedArray<float>::bFuncNotNeg, coord);
+            min_val = IndexedArray<float>::min(data, coord);
 
             if(min_val != max_val) {
                 if(max_val > min_val) {

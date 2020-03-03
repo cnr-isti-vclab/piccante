@@ -32,6 +32,7 @@ typedef std::vector<int> IntCoord;
 /**
  * @brief The IndexedArray class
  */
+template <class T>
 class IndexedArray
 {
 public:
@@ -44,9 +45,9 @@ public:
      * @param val
      * @return
      */
-    static bool bFuncNotNeg(float val)
+    static bool bFuncNotNeg(T val)
     {
-        return val > 0.0f;
+        return val > T(0);
     }
 
     /**
@@ -54,9 +55,9 @@ public:
      * @param val
      * @return
      */
-    static bool bFuncNotZero(float val)
+    static bool bFuncNotZero(T val)
     {
-        return (val < 0.0f) || (val > 0.0f);
+        return (val < T(0)) || (val > T(0));
     }
 
     /**
@@ -64,9 +65,9 @@ public:
      * @param val
      * @return
      */
-    static bool bFuncNeg(float val)
+    static bool bFuncNeg(T val)
     {
-        return (val < 0.0f);
+        return (val < T(0));
     }
 
     /**
@@ -76,7 +77,7 @@ public:
      * @param ret
      * @param stride
      */
-    static void findSimple(float *data, int nData, bool(*func)(float), IntCoord &ret, int stride = 1)
+    static void findSimple(T *data, int nData, bool(*func)(float), IntCoord &ret, int stride = 1)
     {
         for(int i = 0; i < nData; i += stride) {
             if(func(data[i])) {
@@ -108,19 +109,19 @@ public:
      * @param coord
      * @return
      */
-    static float mean(float *data, IntCoord &coord)
+    static T mean(T *data, IntCoord &coord)
     {
-        if(coord.empty()) {
-            return FLT_MAX;
-        }
+        T ret = T(0);
 
-        float ret = 0.0f;
+        if(coord.empty()) {
+            return ret;
+        }
 
         for(unsigned int i = 0; i < coord.size(); i++) {
             ret += data[coord[i]];
         }
 
-        return ret / float(coord.size());
+        return ret / T(coord.size());
     }
 
     /**
@@ -129,10 +130,10 @@ public:
      * @param coord
      * @return
      */
-    static float min(float *data, IntCoord &coord)
+    static T min(T *data, IntCoord &coord)
     {
         if(coord.empty()) {
-            return FLT_MAX;
+            return T(0);
         }
 
         float ret = data[coord[0]];
@@ -151,13 +152,13 @@ public:
      * @param coord
      * @return
      */
-    static float max(float *data, IntCoord &coord)
+    static T max(T *data, IntCoord &coord)
     {
         if(coord.empty()) {
-            return -FLT_MAX;
+            return T(0);
         }
 
-        float ret = data[coord[0]];
+        T ret = data[coord[0]];
 
         for(unsigned int i = 1; i < coord.size(); i++) {
             int j = coord[i];
@@ -174,14 +175,14 @@ public:
      * @param percent
      * @return
      */
-    static float percentile(float *data, IntCoord &coord, float percent)
+    static T percentile(T *data, IntCoord &coord, float percent)
     {
         if(coord.empty()) {
-            return FLT_MAX;
+            return T(0);
         }
 
         int n = int(coord.size());
-        float *tmp = new float[n];
+        T *tmp = new T[n];
 
         for(int i = 0; i < n; i++) {
             int j = coord[i];
@@ -192,7 +193,7 @@ public:
 
         percent = CLAMPi(percent, 0.0f, 1.0f);
 
-        float ret = tmp[int(float(n - 1) * percent)];
+        T ret = tmp[int(float(n - 1) * percent)];
         delete[] tmp;
 
         return ret;
