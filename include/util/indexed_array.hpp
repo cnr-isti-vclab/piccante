@@ -118,7 +118,8 @@ public:
         T ret = data[coord[0]];
 
         for(unsigned int i = 1; i < coord.size(); i++) {
-            ret += data[coord[i]];
+            int j = coord[i];
+            ret += data[];
         }
 
         return ret / T(coord.size());
