@@ -68,7 +68,7 @@ public:
     }
 };
 
-
+template<class T>
 class ConnectedComponents
 {
 protected:
@@ -324,7 +324,7 @@ public:
      * @param ret
      * @return
      */
-    unsigned int *execute(bool *imgIn, int width, int height, unsigned int *imgOut, std::vector<LabelOutput> &ret)
+    unsigned int *execute(T *imgIn, int width, int height, unsigned int *imgOut, std::vector<LabelOutput> &ret)
     {
         //Check input paramters
         if(imgIn == NULL) {
@@ -339,7 +339,7 @@ public:
 
         Buffer<unsigned int>::assign(imgOut, n, 0);
 
-        bool *data = imgIn;
+        T *data = imgIn;
         //First pass:
         // 1) assign basics labels
         // 2) generate the list of neighbors
