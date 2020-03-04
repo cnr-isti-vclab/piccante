@@ -119,10 +119,12 @@ public:
 
         for(unsigned int i = 1; i < coord.size(); i++) {
             int j = coord[i];
-            ret += data[];
+            ret += data[j];
         }
 
-        return ret / T(coord.size());
+        ret /= T(coord.size());
+
+        return ret;
     }
 
     /**
@@ -317,15 +319,15 @@ public:
 
     /**
      * @brief div is the division operator.
-     * @param data
+     * @param dataDst
      * @param coord
      * @param val
      */
-    static void div(T *data, IntCoord &coord, T val)
+    static void div(T *dataDst, IntCoord &coord, T val)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
             int j = coord[i];
-            data[j] /= val;
+            dataDst[j] /= val;
         }
     }
 
@@ -333,13 +335,13 @@ public:
      * @brief assign
      * @param dataDst
      * @param coord
-     * @param val
+     * @param dataSrc
      */
-    static void assign(T *data, IntCoord &coord, T val)
+    static void assign(T *dataDst, IntCoord &coord, T dataSrc)
     {
         for(unsigned int i = 0; i < coord.size(); i++) {
             int j = coord[i];
-            data[j] = val;
+            dataDst[j] = dataSrc;
         }
     }
 
@@ -357,6 +359,12 @@ public:
         }
     }
 };
+
+typedef IndexedArray<float> IndexedArrayf;
+
+typedef IndexedArray<int> IndexedArrayi;
+
+typedef IndexedArray<unsigned int> IndexedArrayui;
 
 } // end namespace pic
 

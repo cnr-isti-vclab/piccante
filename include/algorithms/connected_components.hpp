@@ -380,6 +380,27 @@ public:
     }
 
     /**
+     * @brief reCount
+     * @param imgLabel
+     * @param ret
+     * @return
+     */
+    static unsigned int *reCount(unsigned int *imgLabel, std::vector<LabelOutput> &ret)
+    {
+        if(imgLabel == NULL) {
+            return NULL;
+        }
+
+        for(unsigned int i = 0; i < ret.size(); i++) {
+            ret[i].id = i;
+
+            IndexedArrayui::assign(imgLabel, ret[i].coords, i);
+        }
+
+        return imgLabel;
+    }
+
+    /**
      * @brief convertFromIntegerToImage
      * @param imgLabel
      * @param imgOut
