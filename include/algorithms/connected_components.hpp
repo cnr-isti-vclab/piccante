@@ -47,6 +47,7 @@ class LabelOutput
 public:
     unsigned int id;
     std::vector< int > coords;
+    std::set< int > neighbors;
 
     LabelOutput()
     {
@@ -490,6 +491,50 @@ public:
         }
 
         return labels;
+    }
+
+    static void computeNeighbors(unsigned int *labels, int width, int height, std::vector<LabelOutput> &labelsList)
+    {
+        std::map<unsigned int, int> labels_map;
+        for(unsigned int i = 0; i < labelsList.size(); i++) {
+            labels_map[labelsList[i].id] = i;
+        }
+
+        for(int i = 0; i < height; i++) {
+            int shift = i * width;
+            for(int j = 0; j < width; j++) {
+                int ind = shift + j;
+
+                unsigned int l_ind = labels[ind];
+                int ind2 = labels_map[l_ind];
+
+                if(i > 0) {
+                    if(l_ind != labels[ind - width]) {
+                        labelsList[ind2].neighbors.insert(labels[ind - width]);
+                    }
+                }
+
+                if(j > 0) {
+                    if(l_ind != labels[ind - 1]) {
+                        labelsList[ind2].neighbors.insert(labels[ind - 1]);
+                    }
+                }
+
+                if(i < (height - 1)) {
+                    if(l_ind != labels[ind + width]) {
+                        labelsList[ind2].neighbors.insert(labels[ind + width]);
+                    }
+                }
+
+                if(j < (width - 1)) {
+                    if(l_ind != labels[ind + 1]) {
+                        labelsList[ind2].neighbors.insert(labels[ind + 1]);
+                    }
+                }
+
+            }
+        }
+
     }
 };
 
