@@ -26,6 +26,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../base.hpp"
 
 #include "../image.hpp"
+
 #include "../util/buffer.hpp"
 
 namespace pic {
@@ -424,6 +425,71 @@ public:
         }
 
         return imgOut;
+    }
+
+    /**
+     * @brief computeLabelsList
+     * @param labels
+     * @param n
+     * @param labelsList
+     */
+    static void computeLabelsListFromImageLabels(unsigned int *labels, int n,  std::vector<LabelOutput> &labelsList)
+    {
+        if(labels == NULL || n < 1) {
+            return;
+        }
+
+        labelsList.clear();
+
+        std::set<unsigned int> labels_tracker;
+
+        std::map<unsigned int, int> labels_map;
+
+        int c = 0;
+        for(int i = 0; i < n; i++) {
+
+            unsigned int j = labels[i];
+            auto search = labels_tracker.find(j);
+            if (search != labels_tracker.end()) {
+                labels_tracker.insert(j);
+                labels_map[j] = c;
+
+                LabelOutput tmp;
+                tmp.id = j;
+                labelsList.push_back(tmp);
+
+                c++;
+            }
+
+            labelsList[labels_map[j]].add(i);
+        }
+    }
+
+    /**
+     * @brief computeImageLabelsFromLabelsList
+     * @param labelsList
+     * @param labels
+     * @param n
+     * @return
+     */
+    static unsigned int *computeImageLabelsFromLabelsList(std::vector<LabelOutput> &labelsList, unsigned int *labels, int n)
+    {
+        if(n < 1 || labelsList.empty()) {
+            return labels;
+        }
+
+        if(labels == NULL) {
+            labels = new unsigned int[n];
+        }
+
+        for(unsigned int i = 0; i < labelsList.size(); i++) {
+            for(unsigned int j = 0; j < labelsList[i].coords.size(); j++) {
+                int k = labelsList[i].coords[j];
+                labels[k] = labelsList[i].id;
+            }
+        }
+
+        return labels;
     }
 };
 
