@@ -724,7 +724,7 @@ public:
      * @param uniqueValues
      * @return
      */
-    static void *unique(T *buffer, int n, std::set<T> &uniqueValues)
+    static void unique(T *buffer, int n, std::set<T> &uniqueValues)
     {
         for(int i = 0; i < n; i++) {
             uniqueValues.insert(buffer[i]);
