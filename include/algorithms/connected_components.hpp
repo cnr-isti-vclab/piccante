@@ -391,19 +391,36 @@ public:
      * @param ret
      * @return
      */
-    static unsigned int *reCount(unsigned int *imgLabel, std::vector<LabelOutput> &ret)
+    static unsigned int *reCount(unsigned int *imgLabel, std::vector<LabelOutput> &labelsList)
     {
         if(imgLabel == NULL) {
             return NULL;
         }
 
-        for(unsigned int i = 0; i < ret.size(); i++) {
-            ret[i].id = i;
-
-            IndexedArrayui::assign(imgLabel, ret[i].coords, i);
+        unsigned int c = 0;
+        for(unsigned int i = 0; i < labelsList.size(); i++) {
+            if(labelsList[i].bValid) {
+                labelsList[i].id = c;
+                IndexedArrayui::assign(imgLabel, labelsList[i].coords, c);
+                c++;
+            }
         }
 
         return imgLabel;
+    }
+
+    /**
+     * @brief clean
+     * @param labelsList
+     */
+    static void clean(std::vector<LabelOutput> &labelsList)
+    {
+        auto it = labelsList.begin();
+
+        while(it != labelsList.end()) {
+
+            it++;
+        }
     }
 
     /**
