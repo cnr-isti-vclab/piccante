@@ -136,8 +136,8 @@ public:
 
             for(unsigned int j_ui = 0; j_ui < labelsList.size(); j_ui++) {
                 //mean luminance
-                 float La_j_ui = IndexedArrayf::mean(lum->data, labelsList[j_ui].coords);
-                 IndexedArrayf::add(imgOut->data, labelsList[j_ui].coords, La_j_ui);
+                float La_j_ui = IndexedArrayf::mean(lum->data, labelsList[j_ui].coords);
+                IndexedArrayf::add(imgOut->data, labelsList[j_ui].coords, La_j_ui);
             }
         }
         (*imgOut) /= float (maxLayers);
