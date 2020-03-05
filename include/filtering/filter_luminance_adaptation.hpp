@@ -120,6 +120,7 @@ public:
         for(int i = 0; i < maxLayers; i++) {
             float bin_size = bin_size_1 + (float(i) * delta_bin_size / maxLayer_m_1);
 
+            #pragma omp parallel for
             for(int j = 0; j < n; j++) {
                 category[j] = int(lround((lum->data[j] - lum_min) / bin_size));
                 category[j]++;

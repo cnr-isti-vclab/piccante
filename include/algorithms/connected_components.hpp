@@ -418,7 +418,8 @@ public:
         auto it = labelsList.begin();
 
         while(it != labelsList.end()) {
-
+            if((*it)->bValid) {
+            }
             it++;
         }
     }
