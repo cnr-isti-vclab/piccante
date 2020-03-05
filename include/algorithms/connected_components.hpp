@@ -48,18 +48,22 @@ public:
     unsigned int id;
     std::vector< int > coords;
     std::set< int > neighbors;
+    bool bValid;
 
     LabelOutput()
     {
+        id = 0;
+        bValid = true;
     }
 
     LabelOutput(unsigned int id, int i)
     {
         this->id = id;
         coords.push_back(i);
+        bValid = true;
     }
 
-    void add(int i)
+    void push_back(int i)
     {
         coords.push_back(i);
     }
@@ -134,7 +138,7 @@ protected:
             auto uniqueIt = unique.find(id);
 
             if(uniqueIt != unique.end()) {
-                ret[mapping[id]].add(i);
+                ret[mapping[id]].push_back(i);
             } else {
                 std::pair<unsigned int, int> tmp = std::make_pair(id, counter);
                 mapping.insert(tmp);
@@ -448,7 +452,6 @@ public:
 
         int c = 0;
         for(int i = 0; i < n; i++) {
-
             unsigned int j = labels[i];
             auto search = labels_tracker.find(j);
             if (search != labels_tracker.end()) {
@@ -462,7 +465,7 @@ public:
                 c++;
             }
 
-            labelsList[labels_map[j]].add(i);
+            labelsList[labels_map[j]].push_back(i);
         }
     }
 
@@ -484,24 +487,48 @@ public:
         }
 
         for(unsigned int i = 0; i < labelsList.size(); i++) {
-            for(unsigned int j = 0; j < labelsList[i].coords.size(); j++) {
-                int k = labelsList[i].coords[j];
-                labels[k] = labelsList[i].id;
+            if(labelsList[i].bValid) {
+                for(unsigned int j = 0; j < labelsList[i].coords.size(); j++) {
+                    int k = labelsList[i].coords[j];
+                    labels[k] = labelsList[i].id;
+                }
             }
         }
 
         return labels;
     }
 
-    static void computeNeighbors(unsigned int *labels, int width, int height, std::vector<LabelOutput> &labelsList)
+
+    /**
+     * @brief getMappingLabelsList
+     * @param labelsList
+     * @param labels_map
+     */
+    static void getMappingLabelsList(std::vector<LabelOutput> &labelsList, std::map<unsigned int, int> &labels_map)
     {
-        std::map<unsigned int, int> labels_map;
         for(unsigned int i = 0; i < labelsList.size(); i++) {
             labels_map[labelsList[i].id] = i;
         }
+    }
+
+    /**
+     * @brief computeNeighbors
+     * @param labels
+     * @param width
+     * @param height
+     * @param labelsList
+     */
+    static void computeNeighbors(unsigned int *labels, int width, int height, std::vector<LabelOutput> &labelsList)
+    {
+        std::map<unsigned int, int> labels_map;
+        getMappingLabelsList(labelsList, labels_map);
+
+        int width_m_1 = width - 1;
+        int height_m_1 = height - 1;
 
         for(int i = 0; i < height; i++) {
             int shift = i * width;
+
             for(int j = 0; j < width; j++) {
                 int ind = shift + j;
 
@@ -520,13 +547,13 @@ public:
                     }
                 }
 
-                if(i < (height - 1)) {
+                if(i < height_m_1) {
                     if(l_ind != labels[ind + width]) {
                         labelsList[ind2].neighbors.insert(labels[ind + width]);
                     }
                 }
 
-                if(j < (width - 1)) {
+                if(j < width_m_1) {
                     if(l_ind != labels[ind + 1]) {
                         labelsList[ind2].neighbors.insert(labels[ind + 1]);
                     }
@@ -534,8 +561,79 @@ public:
 
             }
         }
-
     }
+
+    /**
+     * @brief mergeIsolatedAreasWithThreshold
+     * @param labels
+     * @param width
+     * @param height
+     * @param labelsList
+     * @param threshold
+     */
+    static void mergeIsolatedAreasWithThreshold(unsigned int *labels, int width, int height, std::vector<LabelOutput> &labelsList, int threshold = 1)
+    {
+        if(threshold < 1 || labels == NULL || labelsList.empty()) {
+            return;
+        }
+
+        if(labelsList[0].neighbors.empty()) {
+            computeNeighbors(labels, width, height, labelsList);
+        }
+
+        std::map<unsigned int, int> labels_map;
+        getMappingLabelsList(labelsList, labels_map);
+
+        for(unsigned int i = 0; i < labelsList.size(); i++) {
+            if(!labelsList[i].bValid || labelsList[i].neighbors.empty()) {
+                continue;
+            }
+
+            if(labelsList[i].neighbors.size() == 1) {
+                unsigned int id = *labelsList[i].neighbors.begin();
+                int index = labels_map[id];
+
+                if(labelsList[index].bValid) {
+
+                    if(labelsList[i].coords.size() > labelsList[index].coords.size()) {
+                        labelsList[index].bValid = false;
+
+                        //update coordinates
+                        labelsList[i].coords.insert(labelsList[i].coords.begin(),
+                                                    labelsList[index].coords.begin(),
+                                                    labelsList[index].coords.end());
+
+                        //update neighbors
+                        if(labelsList[index].neighbors.size() > 1) {
+                            labelsList[i].neighbors.insert(labelsList[index].neighbors.begin(), labelsList[index].neighbors.end());
+
+                            //update all neighbors removing index and adding i!
+                            for (auto it = labelsList[index].neighbors.begin(); it != labelsList[index].neighbors.end(); it++) {
+                                unsigned int id2 = *it;
+                                int index2 = labels_map[id2];
+
+                                labelsList[index2].neighbors.erase(index);
+                                labelsList[index2].neighbors.insert(i);
+                            }
+                        }
+                    } else {
+                        labelsList[i].bValid = false;
+
+                        //update coordinates
+                        labelsList[index].coords.insert(labelsList[index].coords.begin(),
+                                                        labelsList[i].coords.begin(),
+                                                        labelsList[i].coords.end());
+
+                        //it does not have anymore this neighbor because it has been merged
+                        labelsList[index].neighbors.erase(i);
+                    }
+                }
+            }
+        }
+
+        computeImageLabelsFromLabelsList(labelsList, labels, width * height);
+    }
+
 };
 
 
