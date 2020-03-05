@@ -410,21 +410,6 @@ public:
     }
 
     /**
-     * @brief clean
-     * @param labelsList
-     */
-    static void clean(std::vector<LabelOutput> &labelsList)
-    {
-        auto it = labelsList.begin();
-
-        while(it != labelsList.end()) {
-            if((*it)->bValid) {
-            }
-            it++;
-        }
-    }
-
-    /**
      * @brief convertFromIntegerToImage
      * @param imgLabel
      * @param imgOut
