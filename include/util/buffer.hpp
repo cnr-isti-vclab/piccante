@@ -35,11 +35,11 @@ public:
     }
 
     /**
-     * @brief assign
-     * @param buffer
-     * @param n
-     * @param value
-     * @return
+     * @brief assign assigns value to buffer
+     * @param buffer is the output buffer
+     * @param n is the number of elements of the buffer
+     * @param value is the value to be assigned to all values of buffer
+     * @return it returns the pointer to buffer
      */
     static T *assign(T *buffer, int n, T value)
     {
@@ -60,11 +60,12 @@ public:
     }
 
     /**
-     * @brief assign
-     * @param bufferOut
-     * @param bufferIn
-     * @param n
-     * @return
+     * @brief assign assigns bufferIn to bufferOut
+     * @param bufferOut is the output buffer
+     * @param bufferIn is the input buffer
+     * @param n is the number of elements of bufferIn and bufferOut
+     * (they have to be of same length)
+     * @return it returns the pointer to buffer
      */
     static T *assign(T *bufferOut, T *bufferIn, int n)
     {
@@ -73,11 +74,11 @@ public:
     }
 
     /**
-     * @brief add
-     * @param buffer
-     * @param n
-     * @param value
-     * @return
+     * @brief add peforms addition
+     * @param buffer is the output buffer
+     * @param n is the number of elements of the buffer
+     * @param value is the value to be added to all values of buffer
+     * @return it returns the pointer to buffer
      */
     static T *add(T *buffer, int n, T value)
     {
