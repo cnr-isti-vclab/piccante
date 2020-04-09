@@ -62,6 +62,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/warp_samples.hpp"
 #include "util/rasterizer.hpp"
 #include "util/polyline.hpp"
+#include "util/dynamic_range.hpp"
 
 //optimization
 #include "util/k_means.hpp"

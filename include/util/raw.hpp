@@ -18,7 +18,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_RAW_HPP
 #define PIC_UTIL_RAW_HPP
 
+#include <string>
+#include <iostream>
+#include <vector>
+
 #include "../base.hpp"
+#include "../util/array.hpp"
 #include "../util/file_lister.hpp"
 #include "../util/string.hpp"
 
@@ -26,26 +31,29 @@ namespace pic {
 
 enum RAW_type { RAW_U16_RGGB, RAW_U8_RGGB, RAW_DOUBLE, RAW_FLOAT};
 
-template <class T> class RAW
+template <class T>
+class RAW: public Array<T>
 {
+protected:
+    bool valid;
+
 public:
-    T			*data;
-    int			nData;
-    bool		valid;
 
     /**
      * @brief RAW
      */
-    RAW();
+    RAW() : Array<T>()
+    {
+        valid = false;
+    }
 
     /**
      * @brief RAW
      * @param nData
      */
-    RAW(int nData)
+    RAW(int n): Array<T>(n)
     {
-        data = NULL;
-        allocate(nData);
+        valid = true;
     }
 
     /**
@@ -56,33 +64,15 @@ public:
     RAW(std::string nameFile, int nData = -1)
     {
         valid = false;
-        data = NULL;
+        this->data = NULL;
         nData = 0;
 
         Read(nameFile, nData);
     }
 
-    ~RAW();
-
-    /**
-     * @brief allocate
-     * @param nData
-     * @return
-     */
-    bool allocate(int nData)
+    ~RAW()
     {
-        if(nData < 1) {
-            return false;
-        }
-
-        if(data != NULL) {
-            delete[] data;
-        }
-
-        this->nData = nData;
-        data = new T[nData];
-
-        return true;
+        this->release();
     }
 
     /**
@@ -109,15 +99,13 @@ public:
             nData = length / sizeof(T);
         }
 
-        bool bRet = allocate(nData);
+        this->allocate(nData);
 
-
-        file.read((char *)data, nData * sizeof(T) / sizeof(char));
+        file.read((char *)this->data, this->nData * sizeof(T) / sizeof(char));
         file.close();
 
         valid = true;
-        return bRet;
-
+        return true;
     }
 
     /**
@@ -125,168 +113,129 @@ public:
      * @param nameFile
      * @return
      */
-    bool Write(std::string nameFile);
+    bool Write(std::string nameFile)
+    {
+        std::ofstream file;
+        file.open(nameFile.c_str(), std::ios::binary);
+
+        if(file.is_open()) {
+            file.write((char *)this->data, this->nData * sizeof(T) / sizeof(char));
+            file.close();
+            valid = true;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
-     * @brief copy
+     * @brief getMeanRAWStack
+     * @param stack
      * @return
      */
-    RAW<T> *copy();
+    static RAW<T> *getMeanRAWStack(std::vector<RAW<T> > &stack)
+    {
+        if(stack.size() <= 0) {
+            return NULL;
+        }
+
+        int nData = stack[0].nData;
+        RAW<T> *dataOut = new RAW<T>();
+        dataOut->data = new T[nData];
+        dataOut->nData = nData;
+
+        int stackSize = stack.size();
+
+        for(int i = 0; i < nData; i++) {
+            unsigned long tmpData = 0;
+
+            for(int j = 0; j < stackSize; j++) {
+                tmpData += stack[j].data[i];
+            }
+
+            dataOut->data[i] = tmpData / stackSize;
+        }
+
+        dataOut->valid = true;
+        return dataOut;
+    }
+
+    static unsigned long *getMeanRAWIterative(RAW<T> *img,
+            unsigned long *dataAcc, bool bStart)
+    {
+
+        if(dataAcc == NULL) {
+            dataAcc = new unsigned long[img->nData];
+        }
+
+        if(bStart) {
+            for(int i = 0; i < img->nData; i++) {
+                dataAcc[i] = img->data[i];
+            }
+        } else {
+            for(int i = 0; i < img->nData; i++) {
+                dataAcc[i] += img->data[i];
+            }
+        }
+
+        return dataAcc;
+    }
 
     /**
-     * @brief sub
-     * @param b
+     * @brief getMeanRAWFromFile
+     * @param nameDir
+     * @param nameFilter
+     * @param width
+     * @param height
+     * @return
      */
-    void sub(RAW<T> b);
+    static RAW<T> *getMeanRAWFromFile(
+        std::string nameDir,
+        std::string nameFilter,
+        int width,
+        int height)
+    {
+        StringVec vec;
+
+        FileLister::getList(nameDir, nameFilter, &vec);
+
+        RAW<T> imgRAW;
+        unsigned long *dataAcc = NULL;
+
+        for(unsigned int i = 0; i < vec.size(); i++) {
+            imgRAW.Read(vec[i], width * height);
+            dataAcc = getMeanRAWIterative(&imgRAW, dataAcc, i == 0);
+        }
+
+        RAW<T> *imgOut = imgRAW.copy();
+
+        for(int i = 0; i < imgOut->nData; i++) {
+            imgOut->data[i] = dataAcc[i] / vec.size();
+        }
+
+        return imgOut;
+    }
 
     /**
-     * @brief release
+     * @brief getMeanRAWFromFile
+     * @param nameDir
+     * @param nameFilter
+     * @param nameOut
+     * @param width
+     * @param height
      */
-    void release();
+    static void getMeanRAWFromFile(
+        std::string nameDir,
+        std::string nameFilter,
+        std::string nameOut,
+        int width,
+        int height)
+    {
+        (getMeanRAWFromFile(nameDir, nameFilter, width,
+                            height))->Write(nameOut);
+    }
 };
 
-template <class T> PIC_INLINE RAW<T>::RAW()
-{
-    valid = false;
-    data = NULL;
-    nData = 0;
-}
-
-template <class T> PIC_INLINE RAW<T>::~RAW()
-{
-    release();
-}
-
-template <class T> PIC_INLINE RAW<T> *RAW<T>::copy()
-{
-    RAW<T> *out = new RAW<T>;
-    out->data = new T[nData];
-    out->valid = valid;
-    out->nData = nData;
-    return out;
-}
-
-template <class T> PIC_INLINE bool RAW<T>::Write(std::string nameFile)
-{
-    std::ofstream file;
-    file.open(nameFile.c_str(), std::ios::binary);
-
-    if(file.is_open()) {
-        file.write((char *)data, nData * sizeof(T) / sizeof(char));
-        file.close();
-        valid = true;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-template <class T> PIC_INLINE void RAW<T>::sub(RAW<T> b)
-{
-
-    for(int i = 0; i < nData; i++) {
-        int tmp = data[i] - b.data[i];
-        data[i] = tmp >= 0 ? tmp : 0;
-    }
-}
-
-template <class T> PIC_INLINE void RAW<T>::release()
-{
-    if(data != NULL) {
-        data = NULL;
-    }
-
-    //	delete[] data;
-    valid = false;
-    nData = 0;
-}
-
-template <class T> PIC_INLINE RAW<T> *getMeanRAWStack(std::vector<RAW<T> > &stack)
-{
-    if(stack.size() <= 0) {
-        return NULL;
-    }
-
-    int nData = stack[0].nData;
-    RAW<T> *dataOut = new RAW<T>();
-    dataOut->data = new T[nData];
-    dataOut->nData = nData;
-
-    int stackSize = stack.size();
-
-    for(int i = 0; i < nData; i++) {
-        unsigned long tmpData = 0;
-
-        for(int j = 0; j < stackSize; j++) {
-            tmpData += stack[j].data[i];
-        }
-
-        dataOut->data[i] = tmpData / stackSize;
-    }
-
-    dataOut->valid = true;
-    return dataOut;
-}
-
-template <class T> PIC_INLINE unsigned long *getMeanRAWIterative(RAW<T> *img,
-        unsigned long *dataAcc, bool bStart)
-{
-
-    if(dataAcc == NULL) {
-        dataAcc = new unsigned long[img->nData];
-    }
-
-    if(bStart) {
-        for(int i = 0; i < img->nData; i++) {
-            dataAcc[i] = img->data[i];
-        }
-    } else {
-        for(int i = 0; i < img->nData; i++) {
-            dataAcc[i] += img->data[i];
-        }
-    }
-
-    return dataAcc;
-}
-
-template <class T> PIC_INLINE RAW<T> *getMeanRAWFromFile(
-    std::string nameDir,
-    std::string nameFilter,
-    int width,
-    int height)
-{
-
-    StringVec vec;
-
-    FileLister::getList(nameDir, nameFilter, &vec);
-
-    RAW<T> imgRAW;
-    unsigned long *dataAcc = NULL;
-
-    for(unsigned int i = 0; i < vec.size(); i++) {
-        imgRAW.Read(vec[i], width * height);
-        dataAcc = getMeanRAWIterative<T>(&imgRAW, dataAcc, i == 0);
-    }
-
-    RAW<T> *imgOut = imgRAW.copy();
-
-    for(int i = 0; i < imgOut->nData; i++) {
-        imgOut->data[i] = dataAcc[i] / vec.size();
-    }
-
-    return imgOut;
-}
-
-template <class T> PIC_INLINE void getMeanRAWFromFile(
-    std::string nameDir,
-    std::string nameFilter,
-    std::string nameOut,
-    int width,
-    int height)
-{
-    (getMeanRAWFromFile<T>(nameDir, nameFilter, width,
-                                 height))->Write(nameOut);
-}
 
 } // end namespace pic
 

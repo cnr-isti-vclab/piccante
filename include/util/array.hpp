@@ -29,6 +29,9 @@ namespace pic {
 template<class T>
 class Array
 {
+protected:
+    bool bShallow;
+
 public:
     T *data;
     int nData;
@@ -38,6 +41,9 @@ public:
      */
     Array()
     {
+        bShallow = false;
+        data = NULL;
+        nData = -1;
     }
 
     /**
@@ -46,6 +52,8 @@ public:
      */
     Array(int n)
     {
+        bShallow = false;
+        data = NULL;
         allocate(n);
     }
 
@@ -61,10 +69,16 @@ public:
 
         if(bShallow) {
             this->data = data;
+            this->bShallow = bShallow;
         } else {
             this->data = new T[nData];
             memcpy(this->data, data, sizeof(T) * nData);
         }
+    }
+
+    ~Array()
+    {
+        release();
     }
 
     /**
@@ -77,8 +91,13 @@ public:
             return;
         }
 
+        if((data != NULL) && (!bShallow)) {
+            delete[] data;
+        }
+
         data = new T[n];
         this->nData = n;
+        bShallow = false;
     }
 
     /**
@@ -86,11 +105,21 @@ public:
      */
     void release()
     {
-        if(nData > 0 && data != NULL) {
+        if(nData > 0 && data != NULL && !bShallow) {
             delete[] data;
             data = NULL;
             nData = -1;
         }
+    }
+
+    /**
+     * @brief clone
+     * @return
+     */
+    Array<T> *clone()
+    {
+        Array<T> *out = new Array<T>(nData);
+        memcpy(this->data, data, sizeof(T) * nData);
     }
 
 

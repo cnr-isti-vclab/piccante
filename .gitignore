@@ -267,3 +267,5 @@ examples/data/output/image.pfm
 examples/data/output/image.pgm
 examples/data/output/image.ppm
 examples/data/output/image.tga
+examples/build-hdr_generation_alignment-Desktop_Qt_5_8_0_clang_64bit-Release/hdr_generation_alignment
+examples/build-hdr_generation_alignment-Desktop_Qt_5_8_0_clang_64bit-Release/Makefile

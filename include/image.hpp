@@ -31,7 +31,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/compability.hpp"
 #include "util/bbox.hpp"
 #include "util/buffer.hpp"
-#include "util/low_dynamic_range.hpp"
+#include "util/dynamic_range.hpp"
 #include "util/math.hpp"
 #include "util/array.hpp"
 #include "util/indexed_array.hpp"
@@ -53,21 +53,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "util/io.hpp"
 
 namespace pic {
-
-/**
- * @brief estimateAverageLuminance
- * @param shutter_speed
- * @param aperture_value
- * @param iso_value
- * @param K_value
- * @return
- */
-PIC_INLINE float estimateAverageLuminance(float shutter_speed, float aperture_value = 1.0f, float iso_value = 1.0f, float K_value = 12.5f)
-{
-    K_value = CLAMPi(K_value, 10.6f, 13.4f);
-
-    return (iso_value * shutter_speed) / (K_value * aperture_value * aperture_value);
-}
 
 /**
  * @brief The Image class stores an image as buffer of float.
@@ -104,11 +89,6 @@ public:
      * @brief data is the main buffer where pixel values are stored.
      */
     float *data;
-
-    /**
-     * @brief dataTMP is a temporary buffer used for robust statistics.
-     */
-    float *dataTMP;
 
     /**
      * @brief dataUC is a buffer for rendering 8-bit images.
@@ -179,7 +159,7 @@ public:
     Image(int frames, int width, int height, int channels, float *data);
 
     /**
-    * @brief Image destructor. This deallocates: data, dataUC, dataRGBE, dataTMP,
+    * @brief Image destructor. This deallocates: data, dataUC, and dataRGBE
     */
     ~Image();
 
@@ -445,16 +425,29 @@ public:
 
     /**
      * @brief getPercentileVal computes the n-th value given a percentile.
-     * @param perCent is the percentile.
-     * @return This function returns the n-value given a percentile.
+     * @param percentile is the percentile.
+     * @param box is the bounding box where to compute the function. If it
+     * is set to NULL the function will be computed on the entire image.
+     * @param percentile is the percentile.
+     * @param ret is an array where the function computations are stored. If it
+     * is set to NULL an array will be allocated.
+     * @return This function returns an array where the function computations
+     * are stored.
      */
-    float getPercentileVal(float perCent);
+    float *getPercentileVal(float percentile, BBox *box, float *ret);
+
 
     /**
-     * @brief getMedVal computes the median value.
-     * @return This function returns the median value.
+     * @brief getPercentileVal computes the median value value given a percentile.
+     * @param box is the bounding box where to compute the function. If it
+     * is set to NULL the function will be computed on the entire image.
+     * @param percentile is the percentile.
+     * @param ret is an array where the function computations are stored. If it
+     * is set to NULL an array will be allocated.
+     * @return This function returns an array where the function computations
+     * are stored.
      */
-    float getMedVal();
+    float *getMedVal( BBox *box, float *ret);
 
     /**
      * @brief getDynamicRange computes the dynamic range of the image.
@@ -463,11 +456,6 @@ public:
      * @return
      */
     float getDynamicRange(bool bRobust, float percentile);
-
-    /**
-     * @brief sort sorts values in data and stores them into dataTMP.
-     */
-    void sort();
 
     /**
      * @brief getdataUC
@@ -866,6 +854,23 @@ public:
      * @return it returns (this / a)
      */
     Image operator /(const Image &a) const;
+
+    /**
+     * @brief sort
+     * @return
+     */
+    float *sort()
+    {
+        if(!isValid()) {
+            return NULL;
+        }
+
+        int size_i = size();
+        float *tmp = new float[size_i];
+        memcpy(tmp, data, sizeof(float) * size_i);
+        std::sort(tmp, tmp + size_i);
+        return tmp;
+    }
 };
 
 PIC_INLINE void Image::setNULL()
@@ -891,7 +896,6 @@ PIC_INLINE void Image::setNULL()
     framesf = -1.0f;
     frames1f = -1.0f;
 
-    dataTMP = NULL;
     data = NULL;
     dataUC = NULL;
     dataRGBE = NULL;
@@ -1000,7 +1004,6 @@ PIC_INLINE void Image::release()
         data = delete_vec_s(data);
     }
 
-    dataTMP = delete_vec_s(dataTMP);
     dataUC = delete_vec_s(dataUC);
     dataRGBE = delete_vec_s(dataRGBE);
 
@@ -1032,7 +1035,7 @@ PIC_INLINE void Image::allocate(int width, int height, int channels, int frames)
     this->height = height;
     this->notOwned = false;
 
-    data = new float [height * width * channels * frames];
+    data = new float [size()];
 
     allocateAux();
 }
@@ -1198,7 +1201,6 @@ PIC_INLINE void Image::scaleCosine()
     int half_h = height >> 1;
 
     #pragma omp parallel for
-
     for(int i = 0; i < height; i++) {
         float angle  = C_PI * float(i - half_h) / float(height);
         float cosAng = MAX(cosf(angle), 0.0f);
@@ -1219,10 +1221,10 @@ PIC_INLINE void Image::applyFunction(float(*func)(float))
         return;
     }
 
-    int size = frames * width * height * channels;
+    int size_i = size();
 
     #pragma omp parallel for
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size_i; i++) {
         data[i] = (*func)(data[i]);
     }
 }
@@ -1233,50 +1235,69 @@ PIC_INLINE void Image::applyFunctionParam(float(*func)(float, std::vector<float>
         return;
     }
 
-    int size = frames * width * height * channels;
+    int size_i = size();
 
     #pragma omp parallel for
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size_i; i++) {
         data[i] = (*func)(data[i], param);
     }
 }
 
-PIC_INLINE void Image::sort()
+PIC_INLINE float *Image::getPercentileVal(float percentile, BBox *box, float *ret)
 {
     if(!isValid()) {
-        return;
+        return ret;
     }
 
-    int size = frames * width * height * channels;
-
-    if(dataTMP == NULL) {
-        dataTMP = new float[size];
-        memcpy(dataTMP, data, sizeof(float) * size);
+    if(box == NULL) {
+        box = &fullBox;
     }
 
-    std::sort(dataTMP, dataTMP + size);
+    if(ret == NULL) {
+        ret = new float[channels << 1];
+    }
+
+    int size_i = box->Size();
+    float *dataTMP = new float[size_i];
+
+    for(int ch = 0; ch < channels; ch++) {
+        int counter = 0;
+        for(int k = box->z0; k < box->z1; k++) {
+            for(int j = box->y0; j < box->y1; j++) {
+                for(int i = box->x0; i < box->x1; i++) {
+                    dataTMP[counter] = (*this)(i, j, k)[ch];
+                    counter++;
+                }
+            }
+        }
+
+        std::sort(dataTMP, dataTMP + size_i);
+
+        int size_i_t = size_i - 1;
+        int index_r = ch << 1;
+
+        float index_f;
+        int index;
+
+        float size_i_t_f = float(size_i_t);
+
+        index_f = percentile * size_i_t_f;
+        index = CLAMPi(int(index_f), 0, size_i_t);
+        ret[index_r    ] = dataTMP[index];
+
+        index_f = (1.0f - percentile) * size_i_t_f;
+        index = CLAMPi(int(index_f), 0, size_i_t);
+        ret[index_r + 1] = dataTMP[index];
+    }
+
+    delete[] dataTMP;
+
+    return ret;
 }
 
-PIC_INLINE float Image::getPercentileVal(float perCent = 0.5f)
+PIC_INLINE float *Image::getMedVal(BBox *box, float *ret)
 {
-    if(!isValid()) {
-        return -1.0f;
-    }
-
-    if(dataTMP == NULL) {
-        sort();
-    }
-
-    int size = frames * width * height * channels;
-    size--;
-    float index_f = perCent * float(size);
-    int index = MIN(int(index_f), size);
-    return dataTMP[index];
-}
-
-PIC_INLINE float Image::getMedVal()
-{
-    return getPercentileVal(0.5f);
+    return getPercentileVal(0.5f, box, ret);
 }
 
 PIC_INLINE float Image::getDynamicRange(bool bRobust = false, float percentile = 0.99f)
@@ -1292,8 +1313,9 @@ PIC_INLINE float Image::getDynamicRange(bool bRobust = false, float percentile =
 
         float percentile_low = 1.0f - percentile;
 
-        float min_val = getPercentileVal(percentile_low);
-        float max_val = getPercentileVal(percentile);
+        float *values = getPercentileVal(percentile_low, NULL, NULL);
+        float min_val = values[0];
+        float max_val = values[1];
 
         if(min_val > 0.0f) {
             return max_val / min_val;
@@ -1572,7 +1594,8 @@ PIC_INLINE float *Image::getMomentsVal(int x0, int y0, int radius, float *ret = 
     return ret;
 }
 
-PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL, BBox *box = NULL,
+PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL,
+                                        BBox *box = NULL,
                                         float *ret = NULL)
 {
     if(!isValid()) {

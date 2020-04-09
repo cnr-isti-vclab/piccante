@@ -26,11 +26,11 @@ namespace pic {
 class CachedTable
 {
 public:
-    int		n;
-    float	COS_TABLE[512];
-    float	SIN_TABLE[512];
-    float	*PATCH;
-    float	inv_width, inv_height;
+    int n;
+    float COS_TABLE[512];
+    float SIN_TABLE[512];
+    float *PATCH;
+    float inv_width, inv_height;
 
     /**
      * @brief CachedTable creates a precomputed table of sin and cos values.

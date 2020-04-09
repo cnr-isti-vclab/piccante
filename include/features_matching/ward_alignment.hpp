@@ -123,7 +123,8 @@ public:
         bool *maskThr = new bool[n * 2];
         bool *maskEb = &maskThr[n];
 
-        float medVal = L->getPercentileVal(percentile);
+        float *ret = L->getPercentileVal(percentile, NULL, NULL);
+        float medVal = ret[0];
 
         float A = medVal - tolerance;
         float B = medVal + tolerance;

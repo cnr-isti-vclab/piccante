@@ -18,12 +18,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_TILE_LIST_HPP
 #define PIC_UTIL_TILE_LIST_HPP
 
-#include "../base.hpp"
-
-#include "../util/tile.hpp"
-
 #include <thread>
 #include <mutex>
+#include <vector>
+
+#include "../base.hpp"
+#include "../util/tile.hpp"
 
 namespace pic {
 

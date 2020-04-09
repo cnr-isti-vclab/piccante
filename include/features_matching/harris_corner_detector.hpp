@@ -188,10 +188,12 @@ public:
         if(threshold < 0.0f) { //the best i-th points
             int bestPoints = int(-threshold);
 
-            ret->sort();
+            float *tmp = ret->sort();
 
             int n = ret->size();
-            threshold = ret->dataTMP[n - 1 - bestPoints];
+            threshold = tmp[n - 1 - bestPoints];
+
+            delete_vec_s(tmp);
         }
 
         for(int i = 0; i < height; i++) {

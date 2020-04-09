@@ -15,8 +15,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_UTIL_LOW_DYNAMIC_RANGE_HPP
-#define PIC_UTIL_LOW_DYNAMIC_RANGE_HPP
+#ifndef PIC_UTIL_DYNAMIC_RANGE_HPP
+#define PIC_UTIL_DYNAMIC_RANGE_HPP
 
 #include "../base.hpp"
 
@@ -26,6 +26,24 @@ namespace pic {
  * @brief The LDR_type enum
  */
 enum LDR_type { LT_NOR, LT_NOR_GAMMA, LT_NONE};
+
+/**
+ * @brief estimateAverageLuminance estimates the average luminance of the shot.
+ * @param shutter_speed is the shutter speed of the camera
+ * @param aperture_value is the aperture value of the camera
+ * @param iso_value is the ISO value of the camera
+ * @param K_value is a value in [10.6, 13.4] depending on the camera
+ * @return
+ */
+PIC_INLINE float estimateAverageLuminance(float shutter_speed,
+                                          float aperture_value = 1.0f,
+                                          float iso_value = 1.0f,
+                                          float K_value = 12.5f)
+{
+    K_value = CLAMPi(K_value, 10.6f, 13.4f);
+
+    return (iso_value * shutter_speed) / (K_value * aperture_value * aperture_value);
+}
 
 /**
  * @brief checkNormalized checks if data is in [0,1].
@@ -156,4 +174,4 @@ PIC_INLINE unsigned char *convertHDR2LDR(const float *dataIn, unsigned char *dat
 
 } // end namespace pic
 
-#endif //PIC_UTIL_LOW_DYNAMIC_RANGE_HPP
+#endif //PIC_UTIL_DYNAMIC_RANGE_HPP
