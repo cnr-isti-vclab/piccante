@@ -103,7 +103,6 @@ public:
     static T *add(T *bufferOut, T *bufferIn0, T *bufferIn1, int n)
     {
         #pragma omp parallel for
-
         for(int i = 0; i < n; i++) {
             bufferOut[i] = bufferIn0[i] + bufferIn1[i];
         }
@@ -246,7 +245,6 @@ public:
     static T *sub(T *bufferOut, T *bufferIn0, T *bufferIn1, int n)
     {
         #pragma omp parallel for
-
         for(int i = 0; i < n; i++) {
             bufferOut[i] = bufferIn0[i] - bufferIn1[i];
         }
@@ -264,7 +262,6 @@ public:
     static T *sub(T *bufferOut, T *bufferIn, int n)
     {
         #pragma omp parallel for
-
         for(int i = 0; i < n; i++) {
             bufferOut[i] -= bufferIn[i];
         }

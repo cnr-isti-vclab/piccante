@@ -1081,26 +1081,25 @@ PIC_INLINE void Image::assign(const Image *imgIn)
     typeLoad = imgIn->typeLoad;
     flippedEXR = imgIn->flippedEXR;
 
-    memcpy(data, imgIn->data, frames * width * height * channels * sizeof(float));
+    memcpy(data, imgIn->data, size() * sizeof(float));
 }
 
 PIC_INLINE void Image::clamp(float a = 0.0f, float b = 1.0f)
 {
-    int n = size();
+    int size_i = size();
 
     #pragma omp parallel for
-
-    for(int i = 0; i < n; i++) {
+    for(int i = 0; i < size_i; i++) {
         data[i] = CLAMPi(data[i], a, b);
     }
 }
 
 PIC_INLINE void Image::removeSpecials()
 {
-    int n = size();
-    #pragma omp parallel for
+    int size_i = size();
 
-    for(int i = 0; i < n; i++) {
+    #pragma omp parallel for
+    for(int i = 0; i < size_i; i++) {
         float val = data[i];
 
         if(isnan(val) || isinf(val)) {
@@ -1322,7 +1321,6 @@ PIC_INLINE void Image::blend(Image *img, Image *weight)
     int size = height * width;
 
     #pragma omp parallel for
-
     for(int ind = 0; ind < size; ind++) {
         int i = ind * channels;
 
@@ -1377,7 +1375,6 @@ PIC_INLINE void Image::setZero()
     int n = size();
 
     #pragma omp parallel for
-
     for(int i = 0; i < n; i++) {
         data[i] = 0.0f;
     }

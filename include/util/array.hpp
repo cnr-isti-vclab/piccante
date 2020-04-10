@@ -192,7 +192,7 @@ public:
      * @param n
      * @return
      */
-    static inline T distanceSq(T *data0, T *data1, int n)
+    static T distanceSq(T *data0, T *data1, int n)
     {
         T tmp = data0[0] - data1[0];
         T distSq = tmp * tmp;
@@ -210,7 +210,7 @@ public:
      * @param n
      * @return
      */
-    static inline T* zeros(int n)
+    static T* zeros(int n)
     {
         T *ret = new T[n];
         assign(T(0), ret, n);
@@ -224,7 +224,7 @@ public:
      * @param n
      * @return
      */
-    static inline T norm_sq(float *data, int n)
+    static T norm_sq(float *data, int n)
     {
         T n_sq = data[0] * data[0];
 
@@ -242,29 +242,22 @@ public:
      * @param n
      * @return
      */
-    static inline float norm(float *data, int n)
+    static T norm(float *data, int n)
     {
-        float norm = data[0] * data[0];
-
-        for(int k = 1; k < n; k++) {
-            float tmp = data[k];
-            norm += tmp * tmp;
-        }
-
-        return sqrtf(norm);
+        return sqrtf(Array<float>::norm(data, n));
     }
 
     /**
      * @brief normalize
      * @param data
      * @param n
-     * @param norm
+     * @param norm_sq
      * @return
      */
-    static inline float normalize(float *data, int n, float norm = -1.0f)
+    static float normalize(float *data, int n, float norm_sq = -1.0f)
     {
         if(norm < 0.0f) {
-            norm = Array<float>::norm(data, n);
+            norm = Array<float>::norm_sq(data, n);
         }
 
         if(norm > 0.0f) {
@@ -285,7 +278,7 @@ public:
      * @param n
      * @return
      */
-    static inline T dot(T *data0, T *data1, int n)
+    static T dot(T *data0, T *data1, int n)
     {
         T out = data0[0] * data1[0];
 
@@ -303,7 +296,7 @@ public:
      * @param scale
      * @return
      */
-    static inline void mul(T *vec, int size, T scale)
+    static void mul(T *vec, int size, T scale)
     {
         if(vec == NULL || size < 1) {
             return;
@@ -321,7 +314,7 @@ public:
      * @param ret
      * @return
      */
-    static inline void mul(T *data, int size, T *ret)
+    static void mul(T *data, int size, T *ret)
     {
         if(data == NULL || size < 1 || ret == NULL) {
             return;
@@ -338,7 +331,7 @@ public:
      * @param size
      * @param ret
      */
-    static inline T* add(T *data, int size, T *ret)
+    static T* add(T *data, int size, T *ret)
     {
         for(int i = 0; i < size; i++) {
             ret[i] += data[i];
@@ -353,7 +346,7 @@ public:
      * @param size
      * @param value
      */
-    static inline void div(T *data, int size, T value)
+    static void div(T *data, int size, T value)
     {
         for(int i = 0; i < size; i++) {
             data[i] /= value;
@@ -367,7 +360,7 @@ public:
      * @param ind
      * @return
      */
-    static inline T getMean(T *data, int size)
+    static T getMean(T *data, int size)
     {
         if(data == NULL || size < 1) {
             return T(0);
@@ -390,7 +383,7 @@ public:
      * @param size
      * @return
      */
-    static inline T getVariance(T *data, int size)
+    static T getVariance(T *data, int size)
     {
         T mu = getMean(data, size);
 
@@ -411,7 +404,7 @@ public:
      * @param size
      * @return
      */
-    static inline T sum(T *data, int size)
+    static T sum(T *data, int size)
     {
         if(data == NULL || size < 1) {
             return T(0);
@@ -433,7 +426,7 @@ public:
      * @param ret
      * @return
      */
-    static inline T *cumsum(T *vec, int size, T *ret)
+    static T *cumsum(T *vec, int size, T *ret)
     {
         if(vec == NULL || size < 1) {
             return NULL;
@@ -459,7 +452,7 @@ public:
      * @param ret
      * @return
      */
-    static inline T* assign (T* data, int size, T* ret)
+    static T* assign (T* data, int size, T* ret)
     {
         memcpy(ret, data, sizeof(T) * size);
         return ret;
@@ -472,7 +465,7 @@ public:
      * @param size
      * @return
      */
-    static inline T* assign (T data, T* ret, int size)
+    static T* assign (T data, T* ret, int size)
     {
         for(int i = 0; i < size; i++) {
             ret[i] = data;
@@ -487,7 +480,7 @@ public:
      * @param ret
      * @return
      */
-    static inline T* apply(T *data,  int size, T *ret, T(*func)(T))
+    static T* apply(T *data,  int size, T *ret, T(*func)(T))
     {
         if(data == NULL || size < 1) {
             return ret;
@@ -511,7 +504,7 @@ public:
      * @param ind
      * @return
      */
-    static inline T getMax(T *data, int size, int &ind)
+    static T getMax(T *data, int size, int &ind)
     {
         if(data == NULL || size < 1) {
             return T(size + 1);
@@ -537,7 +530,7 @@ public:
      * @param ind
      * @return
      */
-    static inline T getMin(T *data, int size, int &ind)
+    static T getMin(T *data, int size, int &ind)
     {
         if(data == NULL || size < 1) {
             return T(size + 1);
@@ -564,7 +557,7 @@ public:
      * @param xval
      * @return
      */
-    static inline T interp(T *x, T *y, int size, T xval)
+    static T interp(T *x, T *y, int size, T xval)
     {
         int sm1 = size - 1;
         if((xval >= x[0]) && (xval <= x[sm1])) {
@@ -603,7 +596,7 @@ public:
      * @param high
      * @return
      */
-    static inline int binSearchLeft(T *data, T key, int low, int high)
+    static int binSearchLeft(T *data, T key, int low, int high)
     {
         if( (high < low) ||
             (key > data[high - 1]) ||
