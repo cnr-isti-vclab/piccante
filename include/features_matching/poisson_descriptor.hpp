@@ -31,10 +31,9 @@ namespace pic {
 class PoissonDescriptor
 {
 protected:
-    int         	kernelSize;
-    int             nSamples;
-    unsigned int    subBlock;
-    std::mt19937	*m;
+    int kernelSize, nSamples;
+    unsigned int subBlock;
+    std::mt19937 *m;
 
     RandomSampler<2> *rs;
 
@@ -60,6 +59,7 @@ protected:
     {
         unsigned int bits = sizeof(unsigned int) * 8;
         subBlock = (nSamples * (nSamples - 1)) / bits;
+
         if(desc == NULL) {
             desc = new unsigned int[subBlock];
             memset(desc, 0, sizeof(unsigned int) * subBlock);
@@ -137,12 +137,12 @@ public:
     }
 
     /**
-     * @brief get computes a descriptor at position (x0,y0) with size n.
-     * @param img
-     * @param x0
-     * @param y0
-     * @param desc
-     * @return
+     * @brief get computes a descriptor at position (x0,y0) with size n for a given image img.
+     * @param img is the input image
+     * @param x0 is the x-coordinate where to compute the descriptor
+     * @param y0 is the y-coordinate where to compute the descriptor
+     * @param desc is the output descriptor, if it is NULL, memory will be allocated
+     * @return it returns a pointer to the descriptor
      */
     unsigned int *get(Image *img, int x0, int y0, unsigned int *desc = NULL)
     {
@@ -161,7 +161,8 @@ public:
      * @brief getDescriptorSize returns the descriptor size.
      * @return the descriptor size.
      */
-    int getDescriptorSize() {
+    int getDescriptorSize()
+    {
         return subBlock;
     }
 

@@ -122,7 +122,6 @@ public:
         memcpy(this->data, data, sizeof(T) * nData);
     }
 
-
     /**
      * @brief genValue
      * @param value
@@ -227,9 +226,9 @@ public:
      */
     static inline T norm_sq(float *data, int n)
     {
-        T n_sq = T(0);
+        T n_sq = data[0] * data[0];
 
-        for(int k = 0; k < n; k++) {
+        for(int k = 1; k < n; k++) {
             T tmp = data[k];
             n_sq += tmp * tmp;
         }
@@ -245,9 +244,9 @@ public:
      */
     static inline float norm(float *data, int n)
     {
-        float norm = 0.0f;
+        float norm = data[0] * data[0];
 
-        for(int k = 0; k < n; k++) {
+        for(int k = 1; k < n; k++) {
             float tmp = data[k];
             norm += tmp * tmp;
         }
@@ -264,7 +263,6 @@ public:
      */
     static inline float normalize(float *data, int n, float norm = -1.0f)
     {
-
         if(norm < 0.0f) {
             norm = Array<float>::norm(data, n);
         }
