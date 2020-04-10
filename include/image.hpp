@@ -1140,60 +1140,9 @@ PIC_INLINE bool Image::isValid()
 
 PIC_INLINE void Image::copySubImage(Image *imgIn, int startX, int startY)
 {
-    if(imgIn == NULL) {
-        return;
-    }
-
-    if(!this->isValid() ||
-            !imgIn->isValid() ||
-            (imgIn->channels != channels)) {
-        return;
-    }
-
-    //check bounds
-    int sX, sY, eX, eY, dX, dY, shiftX, shiftY;
-
-    //start
-    sX = MIN(startX, width);
-    sX = MAX(sX, 0);
-
-    sY = MIN(startY, height);
-    sY = MAX(startY, 0);
-
-    dX = sX - startX;
-
-    if(dX < 0) {
-        shiftX = dX;
-    } else {
-        shiftX = -sX;
-    }
-
-    //end
-    eX = MIN(startX + imgIn->width, width);
-    eX = MAX(eX, 0);
-
-    eY = MIN(startY + imgIn->height, height);
-    eY = MAX(eY, 0);
-
-    dY = sY - startY;
-
-    if(dY < 0) {
-        shiftY = dY;
-    } else {
-        shiftY = -sY;
-    }
-
-    #pragma omp parallel for
-
-    for(int j = sY; j < eY; j++) {
-
-        for(int i = sX; i < eX; i++) {
-            float *curr_data = (*this)(i, j);
-            float *imgIn_data = (*imgIn)(i + shiftX, j + shiftY);
-
-            Arrayf::assign(imgIn_data, channels, curr_data);
-        }
-    }
+    Buffer<float>::copySubBuffer(imgIn->data, imgIn->width, imgIn->height, imgIn->channels,
+                                 startX, startY,
+                                 data, width, height, channels);
 }
 
 PIC_INLINE void Image::scaleCosine()

@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 #include "../util/math.hpp"
+#include "../util/array.hpp"
 
 namespace pic {
 
@@ -729,6 +730,80 @@ public:
     {
         for(int i = 0; i < n; i++) {
             uniqueValues.insert(buffer[i]);
+        }
+    }
+
+    /**
+     * @brief copySubBuffer
+     * @param bufIn
+     * @param bi_width
+     * @param bi_height
+     * @param bi_channels
+     * @param startX
+     * @param startY
+     * @param bufOut
+     * @param bo_width
+     * @param bo_height
+     * @param bo_channels
+     */
+    static void copySubBuffer(T *bufIn,
+                              int bi_width,
+                              int bi_height,
+                              int bi_channels,
+                              int startX,
+                              int startY,
+                              T *bufOut,
+                              int bo_width,
+                              int bo_height,
+                              int bo_channels)
+    {
+        if(bufIn == NULL || bufOut == NULL || bi_channels != bo_channels) {
+            return;
+        }
+
+        //check bounds
+        int sX, sY, eX, eY, dX, dY, shiftX, shiftY;
+
+        //start
+        sX = MIN(startX, bo_width);
+        sX = MAX(sX, 0);
+
+        sY = MIN(startY, bo_height);
+        sY = MAX(startY, 0);
+
+        dX = sX - startX;
+
+        if(dX < 0) {
+            shiftX = dX;
+        } else {
+            shiftX = -sX;
+        }
+
+        //end
+        eX = MIN(startX + bi_width, bo_width);
+        eX = MAX(eX, 0);
+
+        eY = MIN(startY + bi_height, bo_height);
+        eY = MAX(eY, 0);
+
+        dY = sY - startY;
+
+        if(dY < 0) {
+            shiftY = dY;
+        } else {
+            shiftY = -sY;
+        }
+
+        #pragma omp parallel for
+        for(int j = sY; j < eY; j++) {
+            int index_bi = (j + shiftY) * bi_width;
+            int index_bo = j * bo_width;
+
+            for(int i = sX; i < eX; i++) {
+                Array<T>::assign(bufIn + index_bi + i + shiftY,
+                                 bi_channels,
+                                 bufOut + index_bo + i);
+            }
         }
     }
 };
