@@ -29,6 +29,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "colors/color_conv_rgb_to_xyz.hpp"
 #include "colors/color_conv_xyz_to_cieluv.hpp"
 #include "colors/color_conv_xyz_to_logluv.hpp"
+#include "colors/color_conv_xyz_xyY.hpp"
 
 #include "colors/color_conv_xyz_to_cielab.hpp"
 #include "colors/color_conv_xyz_to_hdrlab.hpp"

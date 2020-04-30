@@ -256,19 +256,19 @@ public:
      */
     static float normalize(float *data, int n, float norm_sq = -1.0f)
     {
-        if(norm < 0.0f) {
-            norm = Array<float>::norm_sq(data, n);
+        if(norm_sq < 0.0f) {
+            norm_sq = Array<float>::norm_sq(data, n);
         }
 
-        if(norm > 0.0f) {
-            norm = sqrtf(norm);
+        if(norm_sq > 0.0f) {
+            norm_sq = sqrtf(norm_sq);
 
             for(int k = 0; k < n; k++) {
-                data[k] /= norm;
+                data[k] /= norm_sq;
             }
         }
 
-        return norm;
+        return norm_sq;
     }
 
     /**

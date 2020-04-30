@@ -1372,12 +1372,7 @@ PIC_INLINE void Image::setZero()
         return;
     }
 
-    int n = size();
-
-    #pragma omp parallel for
-    for(int i = 0; i < n; i++) {
-        data[i] = 0.0f;
-    }
+    Buffer<float>::assign(data, size(), 0.0f);
 }
 
 PIC_INLINE void Image::setRand(unsigned int seed = 1)
@@ -1694,7 +1689,6 @@ PIC_INLINE void Image::convertFromMask(bool *mask, int width, int height)
     int size = (width * height);
 
     #pragma omp parallel for
-
     for(int i = 0; i < size; i++) {
         data[i] = mask[i] ? 1.0f : 0.0f;
     }
@@ -2219,6 +2213,7 @@ PIC_INLINE Image Image::operator /(const Image &a) const
     *out /= a;
     return Image(out, false);
 }
+
 } // end namespace pic
 
 #endif /* PIC_IMAGE_HPP */

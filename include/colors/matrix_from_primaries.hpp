@@ -20,6 +20,16 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 
+#ifndef PIC_DISABLE_EIGEN
+    #ifndef PIC_EIGEN_NOT_BUNDLED
+        #include "../externals/Eigen/Dense"
+        #include "../externals/Eigen/QR"
+    #else
+        #include <Eigen/Dense>
+        #include <Eigen/QR>
+    #endif
+#endif
+
 namespace pic {
 
 /**
@@ -34,43 +44,91 @@ namespace pic {
 float *createMatrixFromPrimaries(float *red_XYZ,
                                  float *green_XYZ,
                                  float *blue_XYZ,
-                                 float *white_point_XYZ = NULL)
+                                 float *white_point_XYZ,
+                                 float *ret = NULL
+                                 )
 {
-    float *ret = new float[9];
+    if(red_XYZ == NULL || green_XYZ == NULL || blue_XYZ == NULL) {
+        return ret;
+    }
 
+    if(ret == NULL) {
+        ret = new float[9];
+    }
+
+#ifndef PIC_DISABLE_EIGEN
+
+    int w = 0;
+    if(white_point_XYZ != NULL) {
+        w = 3;
+    }
+
+    //set up a liner system A x = b
+    int nRow = 9 + w;
+    Eigen::MatrixXf A(nRow, 9);
+    Eigen::VectorXf b(nRow);
+
+    //A matrix
+    A.setZero();
+
+    //red
+    for(int j = 0; j < 3; j++) {
+        for(int i = 0 ; i < 3; i++) {
+            A(j, j * 3 + i) = red_XYZ[i];
+        }
+    }
+
+    //green`
+    for(int j = 0; j < 3; j++) {
+        for(int i = 0 ; i < 3; i++) {
+            A(j + 3, j * 3 + i) = green_XYZ[i];
+        }
+    }
+
+    //blue`
+    for(int j = 0; j < 3; j++) {
+        for(int i = 0 ; i < 3; i++) {
+            A(j + 6, j * 3 + i) = blue_XYZ[i];
+        }
+    }
+
+    //white
+    if(w == 3) {
+        for(int j = 0; j < 3; j++) {
+            for(int i = 0 ; i < 3; i++) {
+                A(j + 9, j * 3 + i) = white_point_XYZ[i];
+            }
+        }
+    }
+
+    //b vector
+    b(0) = 1.0f;
+    b(1) = 0.0f;
+    b(2) = 0.0f;
+
+    b(3) = 0.0f;
+    b(4) = 1.0f;
+    b(5) = 0.0f;
+
+    b(6) = 0.0f;
+    b(7) = 0.0f;
+    b(8) = 1.0f;
+
+    if(w == 3) {
+        b(9) = 1.0f;
+        b(10) = 1.0f;
+        b(11) = 1.0f;
+    }
+
+    //solve Ax=b
+    Eigen::VectorXf x = A.colPivHouseholderQr().solve(b);
+
+    for(int i = 0; i < 9; i++) {
+        ret[i] = x(i);
+    }
+#endif
     return ret;
 }
-
-/*
-
-A_R = [R(1) R(2) R(3) 0 0 0 0 0 0; ...
-       0 0 0 R(1) R(2) R(3) 0 0 0; ...
-       0 0 0 0 0 0 R(1) R(2) R(3)];
-b_R = [1; 0; 0];
-
-A_G = [G(1) G(2) G(3) 0 0 0 0 0 0; ...
-       0 0 0 G(1) G(2) G(3) 0 0 0; ...
-       0 0 0 0 0 0 G(1) G(2) G(3)];
-b_G = [0; 1; 0];
-
-A_B = [B(1) B(2) B(3) 0 0 0 0 0 0; ...
-       0 0 0 B(1) B(2) B(3) 0 0 0; ...
-       0 0 0 0 0 0 B(1) B(2) B(3)];
-b_B = [0; 0; 1];
-
-A_Wp = [Wp(1) Wp(2) Wp(3) 0 0 0 0 0 0; ...
-       0 0 0 Wp(1) Wp(2) Wp(3) 0 0 0; ...
-       0 0 0 0 0 0 Wp(1) Wp(2) Wp(3)];
-
-b_Wp = [1; 1; 1];
-
-A = [A_R; A_G; A_B; A_Wp];
-b = [b_R; b_G; b_B;  b_Wp];
-
-mtx = A \ b;
-
-mtx = reshape(mtx, 3, 3)';
-        */
 
 } // end namespace pic
 
