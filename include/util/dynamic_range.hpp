@@ -19,13 +19,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_UTIL_DYNAMIC_RANGE_HPP
 
 #include "../base.hpp"
+#include "../util/math.hpp"
 
 namespace pic {
 
 /**
  * @brief The LDR_type enum
  */
-enum LDR_type { LT_NOR, LT_NOR_GAMMA, LT_NONE};
+enum LDR_type {LT_NOR, LT_NOR_GAMMA, LT_LDR, LT_NONE};
 
 /**
  * @brief estimateAverageLuminance estimates the average luminance of the shot.
@@ -104,6 +105,10 @@ PIC_INLINE float *convertLDR2HDR(unsigned char *dataIn, float *dataOut,
             LUT[i] = powf(i_f / 255.0f, gamma);
         }
         break;
+
+        case LT_LDR: {
+            //do nothing
+        }
         }
     }
 
@@ -135,9 +140,7 @@ PIC_INLINE unsigned char *convertHDR2LDR(const float *dataIn, unsigned char *dat
         dataOut = new unsigned char[size];
     }
 
-    if(gamma <= 0.0f) {
-        gamma = 2.2f;
-    }
+    gamma = gamma > 0.0f ? gamma : 2.2f;
 
     float invGamma = 1.0f / gamma;
 
@@ -167,6 +170,10 @@ PIC_INLINE unsigned char *convertHDR2LDR(const float *dataIn, unsigned char *dat
         }
     }
     break;
+
+    case LT_LDR: {
+        //do nothing
+    }
     }
 
     return dataOut;

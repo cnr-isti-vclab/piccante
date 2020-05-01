@@ -30,6 +30,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter_channel.hpp"
 #include "../filtering/filter_sampler_2d.hpp"
 #include "../util/vec.hpp"
+#include "../util/std_util.hpp"
 
 namespace pic {
 
@@ -114,27 +115,18 @@ protected:
      */
     void release()
     {
-        if(img_G != NULL) {
-            delete img_G;
-        }
-
-        if(fZ != NULL) {
-            delete fZ;
-        }
-
-        if(g != NULL) {
-            delete g;
-        }
-
-        if(e != NULL) {
-            delete e;
-        }
-
-        if(pointers != NULL) {
-            delete pointers;
-        }
+        img_G = delete_s(img_G);
+        fZ = delete_s(fZ);
+        g = delete_s(g);
+        e = delete_s(e);
+        pointers = delete_s(pointers);
     }
 
+    /**
+     * @brief f1minusx
+     * @param x
+     * @return
+     */
     static float f1minusx(float x)
     {
         return 1.0f - x;

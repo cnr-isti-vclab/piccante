@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     //compute the conversion matrix from XYZ to RGB
     float *mtx = pic::createMatrixFromPrimaries(rXYZ, gXYZ, bXYZ, NULL, NULL);
 
-    printf("XYZ to RGB matrix:\n");
+    printf("Matrix from XYZ to sRGB (linear) matrix:\n");
     for(int i = 0; i < 3; i++) {
         for(int j = 0; j < 3; j++) {
             printf("%f ", mtx[i * 3 + j]);

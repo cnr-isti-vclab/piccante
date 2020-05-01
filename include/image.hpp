@@ -25,7 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <math.h>
 #include <float.h>
 #include <limits>
-#include <string.h>
+#include <string>
 
 #include "base.hpp"
 #include "util/compability.hpp"
@@ -476,11 +476,20 @@ public:
 
     /**
      * @brief size computes the number of values.
-     * @return This function returns the number of values.
+     * @return This function returns the number of values of the entire image.
      */
     int size() const
     {
         return height * width * channels * frames;
+    }
+
+    /**
+     * @brief size computes the number of values.
+     * @return This function returns the number of values of a frame.
+     */
+    int sizeFrame() const
+    {
+        return height * width * channels;
     }
 
     /**
@@ -1876,23 +1885,22 @@ PIC_INLINE bool Image::Read(std::string nameFile,
              }
          }
 
+         if(typeLoad == LT_LDR) {
+             return dataUC != NULL;
+         }
+
          float *tmpFloat = NULL;
 
          if(data != NULL) {
              tmpFloat = &data[tstride * readerCounter];
          }
 
-         float *tmpConv = convertLDR2HDR(tmp, tmpFloat, width * height * channels,
-                                         typeLoad);
+         float *tmpConv = convertLDR2HDR(tmp, tmpFloat, sizeFrame(), typeLoad);
 
          if(tmpConv != NULL) {
              if(data == NULL) {
-                 data = tmpConv;
-
-                 if(frames <= 0) {
-                     frames = 1;
-                 }
-
+                 data = tmpConv;                 
+                 frames = frames > 0 ? frames : 1;
                  allocateAux();
              }
 
@@ -1900,7 +1908,6 @@ PIC_INLINE bool Image::Read(std::string nameFile,
          } else {
              bReturn = false;
          }
-
     }
 
     readerCounter = (readerCounter + 1) % frames;
@@ -1977,10 +1984,13 @@ PIC_INLINE bool Image::Write(std::string nameFile, LDR_type typeWrite = LT_NOR_G
             dataWriter = data;
         }
 
-        unsigned char *tmp = convertHDR2LDR(dataWriter, dataUC,
-                                            width * height * channels, typeWrite);
+        unsigned char *tmp;
+        tmp = convertHDR2LDR(dataWriter, dataUC, sizeFrame(), typeWrite);
 
         if(dataUC == NULL) {
+            dataUC = tmp;
+        } else {
+            delete_vec_s(dataUC);
             dataUC = tmp;
         }
         //allocate memory: end
