@@ -22,13 +22,13 @@ as follow:
 If you have STB in the system path you can disable the local path include system
 by adding the following define before including piccante.hpp:
 ``` C
-#define PIC_STB_DISABLE
+#define PIC_DISABLE_STB
 ```
 
 
 To disable the use of STB, you can add the following define before including piccante.hpp:
  ``` C
-#define PIC_STB_LOCAL_DISABLE
+#define PIC_DISABLE_STB_LOCAL
  ```
 
 
