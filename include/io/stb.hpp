@@ -32,7 +32,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     #define STB_IMAGE_WRITE_IMPLEMENTATION
     #define STB_IMAGE_IMPLEMENTATION
 
-#ifndef PIC_STB_NOT_INSTALLED_LOCAL
+#ifndef PIC_STB_LOCAL_DISABLE
     #include "../../stb/stb_image_write.h"
     #include "../../stb/stb_image.h"
 #else

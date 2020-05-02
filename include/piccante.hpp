@@ -37,10 +37,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * to enable this flag.
  * \li \c PIC_DISABLE_TINY_EXR disables the support for the reading EXR files using TinyEXR library (https://github.com/syoyo/tinyexr).
  * This may be useful to have in the case .exr images are used. Note that TinyEXR is already bundled into Piccante (include/externals).
+ * \li \c PIC_STB_DISABLE disables the use of STB for reading/writing PNG and JPEG files (https://github.com/nothings/stb).
+ * If it is not defined, picccante.hpp searchs for STB in "../../stb"
+ * \li \c PIC_STB_LOCAL_DISABLE disables the use of local STB (i.e., placed in "../../stb")
  *
  * Note that when using Eigen types and standard containters, if you do not align containters, a good practice is to enable the following #define:
  * \li \c #define EIGEN_DONT_VECTORIZE
  * \li \c #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
+ * If you want to use your Eigen version you need to the add the following #define:
+ * \li \c PIC_EIGEN_NOT_BUNDLED
  *
  * \section descr_sec Modules
  *
