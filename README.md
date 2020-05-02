@@ -8,7 +8,7 @@ PICCANTE is a C++11 image processing library aimed to provide structures and fun
 DEPENDENCIES:
 ==============
 Piccante uses STB image library for reading and writing PNG and JPEG files.
-This library can be found here:
+STB can be downloaded here:
 https://github.com/nothings/stb
 
 By default this library is needed to run all examples, and needs to be localed
@@ -26,7 +26,7 @@ by adding the following define before including piccante.hpp:
 ```
 
 
-To disable the use of STB you can define the following define before including piccante.hpp:
+To disable the use of STB, you can add the following define before including piccante.hpp:
  ``` C
 #define PIC_STB_LOCAL_DISABLE
  ```
