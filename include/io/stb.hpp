@@ -24,15 +24,16 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../base.hpp"
 
 
-#ifndef PIC_STB_DISABLE
+#ifndef PIC_DISABLE_STB
     #define PIC_STB
+
     #define STBIWDEF inline
     #define STB_IMAGE_STATIC
     #define STB_IMAGE_WRITE_STATIC
     #define STB_IMAGE_WRITE_IMPLEMENTATION
     #define STB_IMAGE_IMPLEMENTATION
 
-#ifndef PIC_STB_LOCAL_DISABLE
+#ifndef PIC_DISABLE_STB_LOCAL
     #include "../../stb/stb_image_write.h"
     #include "../../stb/stb_image.h"
 #else
@@ -58,7 +59,7 @@ PIC_INLINE unsigned char *ReadSTB(std::string nameFile, int &width,
 {
     unsigned char *data = NULL;
     
-#ifndef PIC_STB_DISABLE
+#ifndef PIC_DISABLE_STB
     int w, h, c;
     stbi_info(nameFile.c_str(), &w, &h, &c);
     data = stbi_load(nameFile.c_str(), &width, &height, &channels, c);
@@ -81,7 +82,7 @@ PIC_INLINE bool WriteSTB(std::string nameFile, unsigned char *data, int width, i
 {
     int tmp = 0;
 
-    #ifndef PIC_STB_DISABLE
+    #ifndef PIC_DISABLE_STB
         tmp = stbi_write_png(nameFile.c_str(), width, height, channels, (void*) data, 0);
     #endif
     

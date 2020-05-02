@@ -22,6 +22,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifdef PIC_ENABLE_OPEN_EXR
 
+//include for OpenEXR 1.xx
+
 #include <ImfRgbaFile.h>
 #include <ImfStringAttribute.h>
 #include <ImfMatrixAttribute.h>
