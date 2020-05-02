@@ -23,14 +23,25 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../base.hpp"
 
-#define STBIWDEF inline
-#define STB_IMAGE_STATIC
-#define STB_IMAGE_WRITE_STATIC
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
 
-#include "../externals/stb/stb_image_write.h"
-#include "../externals/stb/stb_image.h"
+#ifndef PIC_STB_DISABLE
+    #define PIC_STB
+    #define STBIWDEF inline
+    #define STB_IMAGE_STATIC
+    #define STB_IMAGE_WRITE_STATIC
+    #define STB_IMAGE_WRITE_IMPLEMENTATION
+    #define STB_IMAGE_IMPLEMENTATION
+
+#ifndef PIC_STB_NOT_INSTALLED_LOCAL
+    #include "../../stb/stb_image_write.h"
+    #include "../../stb/stb_image.h"
+#else
+    #include <stb/stb_image_write.h>
+    #include <stb/stb_image.h>
+#endif
+
+#endif
+
 
 namespace pic {
 
@@ -45,9 +56,14 @@ namespace pic {
 PIC_INLINE unsigned char *ReadSTB(std::string nameFile, int &width,
                           int &height, int &channels)
 {
+    unsigned char *data = NULL;
+    
+#ifndef PIC_STB_DISABLE
     int w, h, c;
     stbi_info(nameFile.c_str(), &w, &h, &c);
-    unsigned char *data = stbi_load(nameFile.c_str(), &width, &height, &channels, c);
+    data = stbi_load(nameFile.c_str(), &width, &height, &channels, c);
+#endif
+    
     return data;
 }
 
@@ -63,7 +79,12 @@ PIC_INLINE unsigned char *ReadSTB(std::string nameFile, int &width,
 PIC_INLINE bool WriteSTB(std::string nameFile, unsigned char *data, int width, int height,
                 int channels = 3)
 {
-    int tmp =  stbi_write_png(nameFile.c_str(), width, height, channels, (void*) data, 0);
+    int tmp = 0;
+
+    #ifndef PIC_STB_DISABLE
+        tmp = stbi_write_png(nameFile.c_str(), width, height, channels, (void*) data, 0);
+    #endif
+    
     return (tmp == 1);
 }
 

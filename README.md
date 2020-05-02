@@ -5,6 +5,33 @@ The hottest hdr imaging library
 
 PICCANTE is a C++11 image processing library aimed to provide structures and functionalities for enabling both High Dynamic Range (HDR) and standard imaging.
 
+DEPENDENCIES:
+==============
+Piccante uses STB image library for reading and writing PNG and JPEG files.
+This library can be found here:
+https://github.com/nothings/stb
+
+By default this library is needed to run all examples, and needs to be localed
+as follow:
+``` C
+-folder
++___"piccante"
++___"stb"
+```
+
+If you have STB in the system path you can disable the local path include system
+by adding the following define before including piccante.hpp:
+``` C
+#define PIC_STB_DISABLE
+```
+
+
+To disable the use of STB you can define the following define before including piccante.hpp:
+ ``` C
+#define PIC_STB_LOCAL_DISABLE
+ ```
+
+
 HOW TO INSTALL:
 ===============
 
