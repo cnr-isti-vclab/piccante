@@ -30,50 +30,25 @@ This program is free software: you can redistribute it and/or modify
 
 int main(int argc, char *argv[])
 {
-    printf("Reading a stack of LDR images...");
-    //reading images and storing them with normalized values in [0,1]
-    pic::Image img[3];
-    img[0].Read("../data/input/stack_alignment/IMG_4209.jpg", pic::LT_NOR);
-    img[1].Read("../data/input/stack_alignment/IMG_4210.jpg", pic::LT_NOR);
-    img[2].Read("../data/input/stack_alignment/IMG_4211.jpg", pic::LT_NOR);
-
+    printf("Adding file names to the merger... ");
+    pic::HDRMerger merger;
+    merger.addFile("../data/input/stack_alignment/IMG_4209.jpg");
+    merger.addFile("../data/input/stack_alignment/IMG_4210.jpg");
+    merger.addFile("../data/input/stack_alignment/IMG_4211.jpg");
     printf("Ok\n");
 
-    printf("Are these images valid? ");
-    if(img[0].isValid() && img[1].isValid() && img[2].isValid()) {
-        printf("Ok\n");
+    printf("Merging LDR images into an HDR image... ");
+    pic::Image *imgOut = merger.execute(true, NULL);
+    printf("Ok\n");
 
-        printf("Aligning bright and dark exposure images to the well-exposed one... ");
-        pic::Vec2i shift_dark;
-        pic::Image *img_dark = pic::WardAlignment::execute(&img[0], &img[1], shift_dark);
-        img_dark->Write("../data/output/stack_aligned_dark.png", pic::LT_NOR);
-
-        pic::Vec2i shift_bright;
-        pic::Image *img_bright = pic::WardAlignment::execute(&img[0], &img[2], shift_bright);
-        img_bright->Write("../data/output/stack_aligned_bright.png", pic::LT_NOR);
-        printf("Ok\n");
-
-        printf("Estimating the camera response function... ");
-
-        pic::CameraResponseFunction crf;
-        crf.DebevecMalik(Triple(&img[0], &img[1], &img[2]));
-        printf("Ok.\n");
-
-        //set each exposure time to the related image
-        pic::ImageVec stack = Triple(&img[0], img_dark, img_bright);
-
-        printf("Assembling the different exposure images... ");
-        pic::FilterAssembleHDR merger(&crf, pic::CW_DEB97, pic::HRD_LOG);
-        pic::Image *imgOut = merger.Process(stack, NULL);
-
-        printf("Ok\n");
-
-        if(imgOut != NULL) {
-            imgOut->Write("../data/output/stack_aligned_hdr.hdr");
+    if(imgOut != NULL) {
+        if(imgOut->isValid()) {
+            imgOut->Write("../data/output/image_aligned.hdr");
+            pic::Image *imgTmo = pic::ReinhardTMO::executeGlobal1(imgOut, NULL);
+            imgTmo->Write("../data/output/image_aligned_tmo.png", pic::LT_NOR_GAMMA);
+            delete imgTmo;
+            delete imgOut;
         }
-
-    } else {
-        printf("No, the files are not valid!\n");
     }
 
     return 0;

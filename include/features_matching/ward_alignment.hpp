@@ -265,6 +265,48 @@ public:
         return cur_shift;
     }
 
+    static Vec2i execute(Image *imgTarget, Image *imgSource)
+    {
+        Vec2i shift;
+        WardAlignment wa;
+
+        if(imgTarget == NULL || imgSource == NULL) {
+            return shift;
+        }
+
+        if(!imgTarget->isSimilarType(imgSource)) {
+            return shift;
+        }
+
+        shift = wa.getExpShift(imgTarget, imgSource);
+
+        return shift;
+    }
+
+    static Image *shiftImage(Image *img, Vec2i shift, Image *ret = NULL)
+    {
+        if(img == NULL) {
+            return ret;
+        }
+
+        if(ret == NULL) {
+            ret = img->allocateSimilarOne();
+        } else {
+            if(!ret->isSimilarType(img)) {
+                ret = img->allocateSimilarOne();
+            }
+        }
+
+        ret->setZero();
+        Buffer<float>::shift(ret->data, img->data,
+                             shift[0], shift[1],
+                            img->width, img->height,
+                            img->channels, img->frames);
+
+        return ret;
+    }
+
+
     /**
      * @brief execute aligns imgSource to imgTarget
      * @param imgTarget
@@ -274,29 +316,14 @@ public:
      */
     static Image *execute(Image *imgTarget, Image *imgSource, Vec2i &shift)
     {
-        WardAlignment wa;
+        shift = execute(imgTarget, imgSource);
 
-        if(imgTarget == NULL || imgSource == NULL) {
-            return NULL;
+        if(shift[0] != 0 && shift[1] != 0) {
+            Image *ret = shiftImage(imgSource, shift, NULL);
+            return ret;
+        } else {
+            return imgSource;
         }
-
-        if(!imgTarget->isSimilarType(imgSource)) {
-            return NULL;
-        }
-
-        Image *ret = imgSource->allocateSimilarOne();
-        ret->setZero();
-
-        shift = wa.getExpShift(imgTarget, imgSource);
-
-        #ifdef PIC_DEBUG
-            printf("Ward alignment shift: (%d, %d)\n", shift[0], shift[1]);
-        #endif
-
-        Buffer<float>::shift(ret->data, imgSource->data, shift[0], shift[1], imgTarget->width,
-                    imgTarget->height, imgTarget->channels, imgTarget->frames);
-
-        return ret;
     }
 };
 

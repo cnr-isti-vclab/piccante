@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../util/std_util.hpp"
 
 #include "../image.hpp"
+#include "../image_vec.hpp"
 #include "../point_samplers/sampler_random.hpp"
 #include "../histogram.hpp"
 
@@ -237,7 +238,8 @@ public:
      * @brief getNSamples
      * @return
      */
-    int getNSamples() const {
+    int getNSamples() const
+    {
         return nSamples;
     }
 

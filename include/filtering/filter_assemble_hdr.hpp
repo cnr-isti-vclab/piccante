@@ -159,18 +159,28 @@ public:
      * @param linearization_type
      * @param icrf
      */
-    FilterAssembleHDR(CameraResponseFunction *crf, CRF_WEIGHT weight_type = CW_DEB97, HDR_REC_DOMAIN domain = HRD_LOG) : Filter()
+    FilterAssembleHDR(CameraResponseFunction *crf = NULL, CRF_WEIGHT weight_type = CW_DEB97, HDR_REC_DOMAIN domain = HRD_LOG)
+    {
+        update(crf, weight_type, domain);
+        minInputImages = 2;
+
+        //a numerical stability value when assembling images in the log-domain
+        this->delta_value = 1.0 / 65536.0f;
+    }
+
+    /**
+     * @brief update
+     * @param crf
+     * @param weight_type
+     * @param domain
+     */
+    void update(CameraResponseFunction *crf, CRF_WEIGHT weight_type = CW_DEB97, HDR_REC_DOMAIN domain = HRD_LOG)
     {        
         this->crf = crf;
 
         this->weight_type = weight_type;
 
         this->domain = domain;
-
-        //a numerical stability value when assembling images in the log-domain
-        this->delta_value = 1.0 / 65536.0f;
-
-        minInputImages = 2;
     }
 };
 
