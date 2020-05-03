@@ -42,8 +42,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * \li \c PIC_DISABLE_STB_LOCAL disables the use of local STB (i.e., placed in "../../stb")
  *
  * Note that when using Eigen types and standard containters, if you do not align containters, a good practice is to enable the following #define:
- * \li \c #define EIGEN_DONT_VECTORIZE
- * \li \c #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
+ * \li \c EIGEN_DONT_VECTORIZE
+ * \li \c EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
+ *
  * If you want to use your Eigen version you need to the add the following #define:
  * \li \c PIC_EIGEN_NOT_BUNDLED
  *
@@ -76,13 +77,17 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * \subsection algo_module Algorithms
  *
  * This module contains high-level imaging functionalities such as
- * Laplacian/Gaussian pyramids, a simple Poisson solver, SuperPixels (SLIC),
- * a simple gradient based demosacing method, a color to gray algorithm, etc.
+ * Laplacian/Gaussian pyramids, Push-pull, a simple Poisson solver, SuperPixels (SLIC),
+ * a simple gradient based demosacing method, live-wire counturing, Grow-Cut segmentation, etc.
+ * This module provides classes and functions for HDR imaging such as a class for
+ * merging LDR images at different exposures, a class for estimating a camera response function (CRF), etc.
  *
  * \subsection colors_module Colors
  *
  * This module provides classes and methods for editing, processing
  * and converting colors.
+ * Supported color spaces:
+ *
  * For example, the class pic::Color3 provides a basic type for three color
  * components representations. This can be useful for some applications
  * such as a 3D renderer.
@@ -101,14 +106,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * \li \c VOL: a volumetric format for rendering; 32-bit per voxel.
  *
  * The module provides an interface for OpenEXR, but it requires
- * the linking with the OpenEXR library (please have a look at <a href="http://www.openexr.com">the official website</a>).
+ * either the linking with the OpenEXR library (see <a href="http://www.openexr.com">the official website</a>)
+ * or the use of TinyEXR (see <a href="https://github.com/syoyo/tinyexr"> the official website</a>):
  * \li \c EXR: ILM's OpenEXR format; HDR color images at 16-bit per component.
+ *
+ * In addition, the module provides an interface for STB, which is a library for reading/writing LDR images. This
+ * library is required for reading/writing JPEG and PNG files. This can be found at its <a href="https://github.com/nothings/stb">official website</a>.
  *
  * \subsection metrics_module Metrics
  *
  * This module provides classic objective metrics for measuring differences in images.
- * Several metrics are provided such as: PSNR, mPSNR (for HDR images), RMSE,
- * logRMSE (for HDR images), maximum error, relative error, etc.
+ * Several metrics are provided such as: PSNR, mPSNR (for HDR images), TMQI (for tone mapped images), SSIM, RMSE,
+ * logRMSE (for HDR images), maximum error, relative error, etc. This metrics can be applied to HDR images using PU encoding.
  *
  * \subsection ps_module Point Samplers
  *
@@ -127,7 +136,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * This module provides tone mapping operators (TMOs) for reducing the dynamic
  * range in HDR images. Several TMOs are present such as: Ward Histogram Adjustment,
  * Reinhard Photographic Tone Reproduction Operator, Lischinski Improved Photographic Tone
- * Reproduction Operator, Drago TMO, Banterle Hybrid TMO, etc.
+ * Reproduction Operator, Drago TMO, Banterle Hybrid TMO, Schlick TMO, Tumblin TMO, Ward Global TMO,
+ * Raman TMO, Durand and Dorsey TMO, etc.
  *
  * \subsection fm_module Features and Matching
  *
