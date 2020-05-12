@@ -33,7 +33,8 @@ class FilterWarp2D: public Filter
 protected:
     ImageSamplerBilinear isb;
     Matrix3x3 h, h_inv;
-    int bmin[2], bmax[2], mid[2];
+    int bmin[2], bmax[2];
+    float mid[2];
     bool bComputeBoundingBox;
 
     /**
@@ -54,7 +55,7 @@ protected:
             for(int i = box->x0; i < box->x1; i++) {
                 float *tmp_dst = (*dst)(i, j);
 
-                pos[0] = float(i + bmin[0] ) - mid[0];
+                pos[0] = float(i + bmin[0]) - mid[0];
 
                 h_inv.projection(pos, pos_out);
 
@@ -96,6 +97,7 @@ public:
      */
     FilterWarp2D(Matrix3x3 h, bool bSameSize = false, bool bCentroid = false) : Filter()
     {
+        this->bComputeBoundingBox = true;
         update(h, bSameSize, bCentroid);
     }
 
@@ -146,11 +148,11 @@ public:
         }
 
         //compute the bounding box
-        bmin[0] = 1 << 30;
-        bmin[1] = bmin[0];
+        bmin[0] = 1 << 24;
+        bmin[1] = 1 << 24;
 
-        bmax[0] = - (1 << 30);
-        bmax[1] = bmax[0];
+        bmax[0] = -1;
+        bmax[1] = -1;
 
         for(int i = 0; i < 4; i++) {
 
@@ -166,23 +168,14 @@ public:
             int y = int(bbox_out[i][1]);
 
             //min point
-            if(x < bmin[0]) {
-                bmin[0] = x;
-            }
+            bmin[0] = (x < bmin[0]) ? x : bmin[0];
+            bmin[1] = (y < bmin[1]) ? y : bmin[1];
 
-            if(y < bmin[1]) {
-                bmin[1] = y;
-            }
-
-            //max point
-            if(x > bmax[0]) {
-                bmax[0] = x;
-            }
-
-            if(y > bmax[1]) {
-                bmax[1] = y;
-            }
+            bmax[0] = (x > bmax[0]) ? x : bmax[0];
+            bmax[1] = (y > bmax[1]) ? y : bmax[1];
         }
+
+        printf("%d %d\n", bmax[0], bmin[0], bmax[1], bmin[1]);
     }
 
     /**
@@ -225,15 +218,15 @@ public:
     void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(bCentroid) {
-            mid[0] = imgIn[0]->width >> 1;
-            mid[1] = imgIn[0]->height >> 1;
+            mid[0] = imgIn[0]->widthf;
+            mid[1] = imgIn[0]->heightf;
         } else {
-            mid[0] = 0;
-            mid[1] = 0;
+            mid[0] = 0.0f;
+            mid[1] = 0.0f;
         }
 
         if(!bSameSize) {
-            if(this->bComputeBoundingBox) {
+            if(bComputeBoundingBox) {
                 computeBoundingBox(h, bCentroid,
                                    imgIn[0]->widthf, imgIn[0]->heightf,
                                    bmin, bmax);
@@ -242,6 +235,12 @@ public:
             width  = bmax[0] - bmin[0];
             height = bmax[1] - bmin[1];
         } else {
+            bmin[0] = 0;
+            bmin[1] = 0;
+
+            bmax[0] = 0;
+            bmax[1] = 0;
+
             width  = imgIn[0]->width;
             height = imgIn[0]->height;
         }
