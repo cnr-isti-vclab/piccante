@@ -55,8 +55,8 @@ int main(int argc, char *argv[])
         std::vector< Eigen::Vector2f > corners_from_img1;
 
         //compute the luminance images
-        pic::Image *L0 = pic::FilterLuminance::Execute(&img0, NULL, pic::LT_CIE_LUMINANCE);
-        pic::Image *L1 = pic::FilterLuminance::Execute(&img1, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *L0 = pic::FilterLuminance::execute(&img0, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *L1 = pic::FilterLuminance::execute(&img1, NULL, pic::LT_CIE_LUMINANCE);
 
         //get corners
         printf("Extracting corners...\n");
@@ -65,9 +65,11 @@ int main(int argc, char *argv[])
         hcd.execute(L1, &corners_from_img1);
 
         //compute luminance images
-        pic::Image *L0_flt = pic::FilterGaussian2D::Execute(L0, NULL, 2.5f);
-        pic::Image *L1_flt = pic::FilterGaussian2D::Execute(L1, NULL, 2.5f);
+        pic::Image *L0_flt = pic::FilterGaussian2D::execute(L0, NULL, 2.5f);
+        pic::Image *L1_flt = pic::FilterGaussian2D::execute(L1, NULL, 2.5f);
 
+        L0_flt->Write("../out0.png");
+        L1_flt->Write("../out1.png");
         //compute ORB descriptors for each corner and image
         printf("Computing ORB descriptors...\n");
 
@@ -99,7 +101,7 @@ int main(int argc, char *argv[])
         pic::printfMat(H);
 
         printf("Applying H to the first image..");
-        pic::Image *img0_H = pic::FilterWarp2D::Execute(&img0, NULL, pic::MatrixConvert(H), true, false);
+        pic::Image *img0_H = pic::FilterWarp2D::execute(&img0, NULL, pic::MatrixConvert(H), true, false);
         img0_H->Write("../data/output/simple_matching_img_0_H_applied.png", pic::LT_NOR);
         printf("Ok.\n");
 

@@ -60,7 +60,7 @@ public:
         this->nBin = nBin;
 
         half_patchSize = patchSize >> 1;
-        this->patchSize = (half_patchSize) << 1 + 1;
+        this->patchSize = (half_patchSize << 1) + 1;
         this->subPatchSize = subPatchSize;
 
         subPatchSize_sq = subPatchSize *  subPatchSize;
@@ -142,7 +142,7 @@ public:
         }
 
         int index;
-        Arrayf::getMax(orientation, 36, &index);
+        Arrayf::getMax(orientation, 36, index);
 
         return reference_angles_orientation[index];
     }
