@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
         printf("Matches:\n");
         std::vector< Eigen::Vector2f > m0, m1;
-        pic::BinaryFeatureMatcher::filterMatches(corners_from_img0, corners_from_img1, matches, m0, m1);
+        pic::FeatureMatcher<unsigned int>::filterMatches(corners_from_img0, corners_from_img1, matches, m0, m1);
 
         printf("Estimating a homography matrix H from the matches...");
         std::vector< unsigned int > inliers;

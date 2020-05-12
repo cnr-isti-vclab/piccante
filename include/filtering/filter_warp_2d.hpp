@@ -65,9 +65,7 @@ protected:
                    pos_out[1] >= 0.0f && pos_out[1] <= src[0]->height1f) {
                     isb.SampleImageUC(src[0], pos_out[0], pos_out[1], tmp_dst);
                 } else {
-                    for(int k=0; k<channels; k++) {
-                        tmp_dst[k] = 0.0f;
-                    }
+                    Arrayf::assign(0.0f, tmp_dst, channels);
                 }
             }
         }

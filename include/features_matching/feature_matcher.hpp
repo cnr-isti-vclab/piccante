@@ -15,8 +15,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_FEATURES_MATCHING_BINARY_FEATURE_MATCHER
-#define PIC_FEATURES_MATCHING_BINARY_FEATURE_MATCHER
+#ifndef PIC_FEATURES_MATCHING_FEATURE_MATCHER
+#define PIC_FEATURES_MATCHING_FEATURE_MATCHER
 
 #include <vector>
 
@@ -33,27 +33,26 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic{
 
 /**
- * @brief The BinaryFeatureMatcher class
+ * @brief The FeatureMatcher class
  */
-class BinaryFeatureMatcher
+template<class T>
+class FeatureMatcher
 {
 protected:
-    std::vector<unsigned int *> *descs;
-    unsigned int desc_size;
-    unsigned int R;
+    std::vector<T *> *descs;
+    T desc_size;
 
 public:
 
     /**
-     * @brief BinaryFeatureMatcher
+     * @brief FeatureMatcher
      * @param descs
      * @param n
      */
-    BinaryFeatureMatcher(std::vector<unsigned int *> *descs, unsigned int desc_size)
+    FeatureMatcher(std::vector<T *> *descs, T desc_size)
     {
         this->desc_size = desc_size;
         this->descs = descs;
-        this->R = ((desc_size * sizeof(unsigned int) * 8) * 90) / 100;
     }
 
     /**
@@ -63,7 +62,7 @@ public:
      * @param dist_1
      * @return
      */
-    virtual bool getMatch(unsigned int *desc, int &matched_j, unsigned int &dist_1)
+    virtual bool getMatch(T *desc, int &matched_j, T &dist_1)
     {
         return false;
     }
@@ -75,7 +74,7 @@ public:
 
         for(unsigned int i = 0; i< descs0.size(); i++) {
             int matched_j;
-            unsigned int dist_1;
+            T dist_1;
 
             if(getMatch(descs0.at(i), matched_j, dist_1)) {
                 matches.push_back(Eigen::Vector3i(i, matched_j, dist_1));
@@ -122,4 +121,4 @@ public:
 
 }
 
-#endif // PIC_FEATURES_MATCHING_BINARY_FEATURE_MATCHER
+#endif // PIC_FEATURES_MATCHING_FEATURE_MATCHER

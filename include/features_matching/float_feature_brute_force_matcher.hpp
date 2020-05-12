@@ -15,30 +15,31 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_FEATURES_MATCHING_BINARY_FEATURE_BRUTE_FORCE_MATCHER
-#define PIC_FEATURES_MATCHING_BINARY_FEATURE_BRUTE_FORCE_MATCHER
+#ifndef PIC_FEATURES_MATCHING_FLOAT_FEATURE_BRUTE_FORCE_MATCHER
+#define PIC_FEATURES_MATCHING_FLOAT_FEATURE_BRUTE_FORCE_MATCHER
 
 #include <vector>
 
 #include "../features_matching/feature_matcher.hpp"
+#include "../features_matching/sift_descriptor.hpp"
 
 namespace pic{
 
 #ifndef PIC_DISABLE_EIGEN
 
 /**
- * @brief The BinaryFeatureBruteForceMatcher class
+ * @brief The FloatFeatureBruteForceMatcher class
  */
-class BinaryFeatureBruteForceMatcher : public FeatureMatcher<unsigned int>
+class FloatFeatureBruteForceMatcher : public FeatureMatcher<float>
 {
 public:
 
     /**
-     * @brief BinaryFeatureBruteForceMatcher
+     * @brief FloatFeatureBruteForceMatcher
      * @param descs
      * @param n
      */
-    BinaryFeatureBruteForceMatcher(std::vector<unsigned int *> *descs, unsigned int desc_size) : FeatureMatcher<unsigned int>(descs, desc_size)
+    FloatFeatureBruteForceMatcher(std::vector<unsigned int *> *descs, unsigned int desc_size) : FeatureMatcher<float>(descs, desc_size)
     {
     }
 
@@ -49,29 +50,29 @@ public:
      * @param dist_1
      * @return
      */
-    bool getMatch(unsigned int *desc, int &matched_j, unsigned int &dist_1)
+    bool getMatch(float *desc, int &matched_j, float &dist_1)
     {
-        unsigned int dist_2 = 0;
+        float dist_2 = 1e32f;
 
-        dist_1 = 0;
+        dist_1 = 1e32f;
 
         matched_j = -1;
 
         for(unsigned int j = 0; j < descs->size(); j++) {
-            unsigned int dist = BRIEFDescriptor::match(desc, descs->at(j), desc_size);
+            float dist = SIFTDescriptor::match(desc, descs->at(j), desc_size);
 
-            if(dist > dist_1) {
+            if(dist < dist_1) {
                 dist_2 = dist_1;
                 dist_1 = dist;
                 matched_j = j;
              } else {
-                if(dist > dist_2) {
+                if(dist < dist_2) {
                     dist_2 = dist;
                 }
             }
         }
 
-        return ((dist_1 * 100 > dist_2 * 105) && matched_j != -1);
+        return ((dist_1 > dist_2 * 1.2f) && matched_j != -1);
     }
 };
 
@@ -79,4 +80,4 @@ public:
 
 }
 
-#endif // PIC_FEATURES_MATCHING_BINARY_FEATURE_BRUTE_FORCE_MATCHER
+#endif // PIC_FEATURES_MATCHING_FLOAT_FEATURE_BRUTE_FORCE_MATCHER

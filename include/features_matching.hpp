@@ -42,7 +42,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "features_matching/motion_estimation.hpp"
 
 //binary feature matcher
-#include "features_matching/binary_feature_matcher.hpp"
+#include "features_matching/feature_matcher.hpp"
 #include "features_matching/binary_feature_brute_force_matcher.hpp"
 #include "features_matching/binary_feature_lsh_matcher.hpp"
 
