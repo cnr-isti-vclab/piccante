@@ -30,12 +30,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+enum HDRAlign{HA_NONE, HA_MTB, HA_FEATURES};
+
 class HDRMerger
 {
 protected:
     CameraResponseFunction *crf;
     FilterAssembleHDR merger;
-    bool bAlignment;
+    HDRAlign hdra;
 
     CRF_WEIGHT weight;
     HDR_REC_DOMAIN domain;
@@ -78,7 +80,7 @@ public:
     {
         domain = HRD_LOG;
         weight = CW_DEB97;
-        bAlignment = false;
+        hdra = HA_NONE;
 
         crf = NULL;
     }
@@ -102,8 +104,10 @@ public:
      * @param crf
      */
     void update(CRF_WEIGHT weight, HDR_REC_DOMAIN domain,
+                HDRAlign hdra,
                 CameraResponseFunction *crf = NULL)
     {
+        this->hdra = hdra;
         this->weight = weight;
         this->domain = domain;
         this->crf = crf;
@@ -122,11 +126,10 @@ public:
 
     /**
      * @brief execute
-     * @param bAlignment
      * @param imgOut
      * @return
      */
-    Image *execute(bool bAlignment, Image *imgOut = NULL)
+    Image *execute(Image *imgOut = NULL)
     {
         ImageVec stack;
 
@@ -148,22 +151,26 @@ public:
         ImageVec stack_aligned_track;
 
         //align images
-        if(bAlignment && (n > 1)) {
+        if(hdra != HA_NONE && (n > 1)) {
+
 
             ImaveVecSortByExposureTime(stack);
-            std::vector<Vec2i> shifts;
-            incrementalAlignment(stack, shifts);
 
-            stack_aligned.push_back(stack[n - 1]);
+            if(hdra == HA_MTB) {
+                std::vector<Vec2i> shifts;
+                incrementalAlignment(stack, shifts);
 
-            for(int i = 0; i < int(shifts.size()); i++) {
-                auto s_i = shifts[i];
-                if(s_i[0] == 0 && s_i[1] == 0) {
-                    stack_aligned.push_back(stack[i]);
-                } else {
-                    auto tmp_i = WardAlignment::shiftImage(stack[i], shifts[i], NULL);
-                    stack_aligned.push_back(tmp_i);
-                    stack_aligned_track.push_back(tmp_i);
+                stack_aligned.push_back(stack[n - 1]);
+
+                for(int i = 0; i < int(shifts.size()); i++) {
+                    auto s_i = shifts[i];
+                    if(s_i[0] == 0 && s_i[1] == 0) {
+                        stack_aligned.push_back(stack[i]);
+                    } else {
+                        auto tmp_i = WardAlignment::shiftImage(stack[i], shifts[i], NULL);
+                        stack_aligned.push_back(tmp_i);
+                        stack_aligned_track.push_back(tmp_i);
+                    }
                 }
             }
         }
@@ -177,7 +184,7 @@ public:
         //merge all exposure images
         merger.update(crf, weight, domain);
 
-        if(bAlignment) {
+        if(hdra != HA_NONE) {
             imgOut = merger.Process(stack_aligned, imgOut);
         } else {
             imgOut = merger.Process(stack, imgOut);

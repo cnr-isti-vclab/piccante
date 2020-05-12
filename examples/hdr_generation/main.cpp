@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     printf("\nOk\n");
 
     printf("Merging LDR images into an HDR image...");
-    pic::Image *imgOut = merger.execute(false, NULL);
+    pic::Image *imgOut = merger.execute(NULL);
     printf("\nOk\n");
 
     if(imgOut != NULL) {

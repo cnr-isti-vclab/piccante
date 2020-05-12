@@ -33,6 +33,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "features_matching/lucid_descriptor.hpp"
 #include "features_matching/brief_descriptor.hpp"
 #include "features_matching/orb_descriptor.hpp"
+#include "features_matching/sift_descriptor.hpp"
 
 #include "features_matching/patch_comp.hpp"
 #include "features_matching/transform_data.hpp"

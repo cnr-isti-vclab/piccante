@@ -27,19 +27,25 @@ class SIFTDescriptor
 {
 protected:
     float thr_weak, sigma, sigma_sq_2;
-    float sector_angle, nBinf;
+
     float *reference_angles;
+    float sector_angle, nBinf;
+
+    float reference_angles_orientation[36];
+    float sector_angle_orientation;
+
     int patchSize, half_patchSize, subPatchSize, subPatchSize_sq, nBin, tot;
 
 public:
 
     SIFTDescriptor(float thr_weak = 0.01f, int patchSize = 16, int subPatchSize = 4, int nBin = 8)
     {
-        Update(thr_weak, patchSize, subPatchSize, nBin);
+        reference_angles = NULL;
+        update(thr_weak, patchSize, subPatchSize, nBin);
     }
 
     /**
-     * @brief Update
+     * @brief update
      * @param thr_weak
      * @param patchSize
      * @param subPatchSize
@@ -63,14 +69,20 @@ public:
         sigma = float(patchSize) * 1.5f;
         sigma_sq_2 = sigma * sigma * 2.0f;
 
+        reference_angles = delete_vec_s(reference_angles);
         reference_angles = new float[nBin];
         nBinf = float(nBin);
 
         for(int i = 0; i < nBin; i++) {
             reference_angles[i] = (float(i) * C_PI_2) / nBinf;
         }
-
         sector_angle = C_PI_2 / float(nBin);
+
+        for(int i = 0; i < 36; i++) {
+            reference_angles_orientation[i] = (float(i) * C_PI_2) / 36.0f;
+        }
+        sector_angle_orientation = C_PI_2 / 36.0f;
+
     }
 
     /**
@@ -80,6 +92,59 @@ public:
     int getDescriptorSize()
     {
         return tot;
+    }
+
+    /**
+     * @brief computePatchOrientation
+     * @param imgGrad
+     * @param x0
+     * @param y0
+     * @return
+     */
+    float computePatchOrientation(Image *imgGrad, int x0, int y0)
+    {
+        float orientation[36];
+        Arrayf::assign(0.0f, orientation, 36);
+
+        int nBin = 36;
+        float nBinf = float(nBin);
+
+        for(int i = 0; i < patchSize; i ++) {
+            int y_local = i - half_patchSize;
+            int y = y_local + y0;
+
+            for(int j = 0; j < patchSize; j ++) {
+                int x_local = j  - half_patchSize;
+                int x = x_local + x0;
+
+                float *grad = (*imgGrad)(x, y);
+
+                //compute current (x,y) angle
+                float angle = atan2f(grad[1], grad[0]);
+                angle = (angle >= 0.0f) ? angle : angle + C_PI_2;
+                angle = CLAMPi(angle, 0.0f, C_PI_2);
+
+                //place it in the bin
+                float index_f = nBinf * (angle / C_PI_2);
+                int index = int(floorf(index_f));
+                int index_1 = (index + 1) % nBin;
+
+                float dist = (angle - reference_angles_orientation[index]) / sector_angle_orientation;
+                dist = CLAMPi(dist, 0.0f, 1.0f);
+
+                int squared = x_local * x_local + y_local * y_local;
+
+                float mag = grad[2] * expf(-float(squared) / sigma_sq_2);
+
+                orientation[index]   += mag * (1.0f - dist);
+                orientation[index_1] += mag * dist;
+            }
+        }
+
+        int index;
+        Arrayf::getMax(orientation, 36, &index);
+
+        return reference_angles_orientation[index];
     }
 
     /**
@@ -102,17 +167,12 @@ public:
 
         memset(desc, 0, sizeof(float) * tot);
 
-        float *key_point = (*imgGrad)(x0, y0);
-
-        float kp_angle = atan2f(key_point[1], key_point[0]);
-
-        if(kp_angle < 0.0f) {
-            kp_angle += C_PI_2;
-        }
+        float kp_angle = computePatchOrientation(imgGrad, x0, y0);
 
         float cosAngle = cosf(-kp_angle);
         float sinAngle = sinf(-kp_angle);
 
+        //compute the descriptor
         int counter = 0;
 
         for(int i = 0; i < patchSize; i += subPatchSize) {
@@ -138,8 +198,10 @@ public:
                         float r_gy = grad[0] * sinAngle + grad[1] * cosAngle;
 
                         float angle = atan2f(r_gy, r_gx);
-                        angle = CLAMPi(angle + C_PI, 0.0f, C_PI_2);
+                        angle = (angle >= 0.0f) ? angle : angle + C_PI_2;
+                        angle = CLAMPi(angle, 0.0f, C_PI_2);
 
+                        //find the bin
                         float index_f = nBinf * (angle / C_PI_2);
                         int index = int(floorf(index_f));
                         int index_1 = (index + 1) % nBin;
@@ -147,10 +209,11 @@ public:
                         float dist = (angle - reference_angles[index]) / sector_angle;
                         dist = CLAMPi(dist, 0.0f, 1.0f);
 
-                        float y_local = float(i + k - half_patchSize);
-                        float x_local = float(j + l - half_patchSize);
+                        int y_local = i + k - half_patchSize;
+                        int x_local = j + l - half_patchSize;
+                        int squared = x_local * x_local + y_local * y_local;
 
-                        float mag = grad[2] * expf(-(x_local * x_local + y_local * y_local) / sigma_sq_2);
+                        float mag = grad[2] * expf(-float(squared) / sigma_sq_2);
 
                         desc[counter + index]   += mag * (1.0f - dist);
                         desc[counter + index_1] += mag * dist;

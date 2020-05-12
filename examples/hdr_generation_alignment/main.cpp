@@ -37,8 +37,10 @@ int main(int argc, char *argv[])
     merger.addFile("../data/input/stack_alignment/IMG_4211.jpg");
     printf("Ok\n");
 
+    merger.update(pic::CW_DEB97, pic::HRD_LOG, pic::HA_MTB, NULL);
+
     printf("Merging LDR images into an HDR image... ");
-    pic::Image *imgOut = merger.execute(true, NULL);
+    pic::Image *imgOut = merger.execute(NULL);
     printf("Ok\n");
 
     if(imgOut != NULL) {
