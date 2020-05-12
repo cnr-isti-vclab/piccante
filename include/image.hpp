@@ -1990,7 +1990,7 @@ PIC_INLINE bool Image::Write(std::string nameFile, LDR_type typeWrite = LT_NOR_G
         if(dataUC == NULL) {
             dataUC = tmp;
         } else {
-            delete_vec_s(dataUC);
+            dataUC = delete_vec_s(dataUC);
             dataUC = tmp;
         }
         //allocate memory: end

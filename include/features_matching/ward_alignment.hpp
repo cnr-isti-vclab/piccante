@@ -29,8 +29,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-#ifndef PIC_DISABLE_EIGEN
-
 /**
  * @brief The WardAlignment class
  */
@@ -326,8 +324,6 @@ public:
         }
     }
 };
-
-#endif
 
 } // end namespace pic
 

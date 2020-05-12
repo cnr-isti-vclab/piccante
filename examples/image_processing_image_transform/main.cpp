@@ -56,9 +56,9 @@ int main(int argc, char *argv[])
         //setting up a 64,64 pixels translation matrix
         printf("\nTranslating the image of 64,64 pixels...");
         pic::Matrix3x3 h;
-        h.SetTranslationMatrix(64.0f, 64.0f);
+        h.setTranslationMatrix(64.0f, 64.0f);
 
-        pic::Image *imgOut_tra = pic::FilterWarp2D::Execute(&img, NULL, h, bSameSize);
+        pic::Image *imgOut_tra = pic::FilterWarp2D::execute(&img, NULL, h, bSameSize);
         printf("Ok\n");
 
         printf("Writing the output...");
@@ -72,9 +72,9 @@ int main(int argc, char *argv[])
 
         //setting up a 45 degree rotation matrix
         printf("\nRotating the image of 45 degrees...");
-        h.SetRotationMatrix(pic::Deg2Rad(45.0f));
+        h.setRotationMatrix(pic::Deg2Rad(45.0f));
 
-        pic::Image *imgOut_rot = pic::FilterWarp2D::Execute(&img, NULL, h, bSameSize, true);
+        pic::Image *imgOut_rot = pic::FilterWarp2D::execute(&img, NULL, h, bSameSize, true);
         printf("Ok\n");
 
         printf("Writing the output...");
@@ -88,8 +88,8 @@ int main(int argc, char *argv[])
 
         //setting up a shear degree rotation matrix
         printf("\nApplying shear transform to the image...");
-        h.SetShearMatrix(0.2f, 0.1f);        
-        pic::Image *imgOut_sheared = pic::FilterWarp2D::Execute(&img, NULL, h, bSameSize, true);
+        h.setShearMatrix(0.2f, 0.1f);
+        pic::Image *imgOut_sheared = pic::FilterWarp2D::execute(&img, NULL, h, bSameSize, true);
 
         printf("Ok\n");
 
@@ -104,8 +104,8 @@ int main(int argc, char *argv[])
 
         //setting up a scaling matrix
         printf("\nApplying a scaling transform to the image...");
-        h.SetScaleMatrix(2.0f, 0.5f);
-        pic::Image *imgOut_scaled = pic::FilterWarp2D::Execute(&img, NULL, h, bSameSize, true);
+        h.setScaleMatrix(2.0f, 0.5f);
+        pic::Image *imgOut_scaled = pic::FilterWarp2D::execute(&img, NULL, h, bSameSize, true);
 
         printf("Ok\n");
 
