@@ -947,6 +947,13 @@ PIC_INLINE Image::Image(Image *imgIn, bool deepCopy = true)
         framesf = imgIn->framesf;
 
         data = imgIn->data;
+        dataUC = imgIn->dataUC;
+        dataRGBE = imgIn->dataRGBE;
+
+    #ifdef PIC_ENABLE_OPEN_EXR
+        dataRGBE = imgIn->dataRGBE;
+    #endif
+
 
         notOwned = true;
         exposure = imgIn->exposure;
@@ -1011,14 +1018,13 @@ PIC_INLINE void Image::release()
     //release all allocated resources
     if(!notOwned) {
         data = delete_vec_s(data);
+        dataUC = delete_vec_s(dataUC);
+        dataRGBE = delete_vec_s(dataRGBE);
+
+        #ifdef PIC_ENABLE_OPEN_EXR
+            delete_vec_s(dataEXR);
+        #endif
     }
-
-    dataUC = delete_vec_s(dataUC);
-    dataRGBE = delete_vec_s(dataRGBE);
-
-    #ifdef PIC_ENABLE_OPEN_EXR
-        delete_vec_s(dataEXR);
-    #endif
 }
 
 PIC_INLINE void Image::allocate(int width, int height, int channels, int frames)
