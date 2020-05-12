@@ -73,10 +73,7 @@ int main(int argc, char *argv[])
         printf("Extracting corners...\n");
         pic::HarrisCornerDetector hcd(2.5f, 5);
         hcd.execute(L0, &corners_from_img0);
-        hcd.getCornersImage(&corners_from_img0, NULL, L0->width, L0->height, true)->Write("../test1.bmp");
-
         hcd.execute(L1, &corners_from_img1);
-        hcd.getCornersImage(&corners_from_img1, NULL, L1->width, L1->height, true)->Write("../test2.bmp");
 
         //compute ORB descriptors for each corner and image
         //compute luminance images
@@ -88,10 +85,10 @@ int main(int argc, char *argv[])
         //pic::PoissonDescriptor b_desc(16);
         pic::ORBDescriptor b_desc(31, 512);
 
-        std::vector< unsigned int *> descs0;
+        std::vector< pic::uint* > descs0;
         b_desc.getAll(L0_flt, corners_from_img0 , descs0);
 
-        std::vector< unsigned int *> descs1;
+        std::vector< pic::uint* > descs1;
         b_desc.getAll(L1_flt, corners_from_img1 , descs1);
 
         printf("Matching ORB descriptors...\n");
@@ -109,11 +106,11 @@ int main(int argc, char *argv[])
 
         //filter
         std::vector< Eigen::Vector2f > m0, m1;
-        pic::FeatureMatcher<unsigned int>::filterMatches(corners_from_img0, corners_from_img1, matches, m0, m1);
+        pic::FeatureMatcher<pic::uint>::filterMatches(corners_from_img0, corners_from_img1, matches, m0, m1);
 
         printf("Estimating a homography matrix H from the matches...");
 
-        std::vector< unsigned int > inliers;
+        std::vector< pic::uint > inliers;
         Eigen::Matrix3d H = pic::estimateHomographyWithNonLinearRefinement(m0, m1, inliers, 10000, 2.5f, 1, 10000, 1e-5f);
 
         Eigen::Matrix34d cam = pic::getCameraMatrixFromHomography(H, K);

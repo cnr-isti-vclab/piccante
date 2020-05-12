@@ -21,7 +21,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 typedef unsigned int uint;
-typedef unsigned char u8;
+typedef unsigned char uchar;
+
+typedef uint* puint;
+typedef uchar* puchar;
+
 
 #ifndef PIC_DISABLE_INLINING
 

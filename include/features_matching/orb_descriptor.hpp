@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
+#include "../base.hpp"
 #include "../image.hpp"
 #include "../features_matching/brief_descriptor.hpp"
 
@@ -60,15 +61,15 @@ protected:
      */
     void rotateSamples()
     {
-        unsigned int n2 = n * 2;
+        uint n2 = n * 2;
 
-        for(unsigned int i = 0; i < 360; i += 12) {
+        for(uint i = 0; i < 360; i += 12) {
             int * X_r = new int[n2];
             int * Y_r = new int[n2];
 
             float ang = (float(i) * C_PI_2) / 360.0f;
 
-            for(unsigned int j = 0; j < n2; j += 2) {
+            for(uint j = 0; j < n2; j += 2) {
                 rotate2D(x[j], x[j + 1], X_r[j], X_r[j + 1], ang);
                 rotate2D(y[j], y[j + 1], Y_r[j], Y_r[j + 1], ang);
             }
@@ -113,7 +114,7 @@ public:
      * @param desc
      * @return
      */
-    unsigned int *get(Image *img, int x0, int y0, unsigned int *desc = NULL)
+    uint *get(Image *img, int x0, int y0, uint* desc = NULL)
     {
         if(img == NULL){
             return NULL;

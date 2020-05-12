@@ -51,6 +51,16 @@ public:
      */
     FeatureMatcher(std::vector<T *> *descs, T desc_size)
     {
+        update(descs, desc_size);
+    }
+
+    /**
+     * @brief update
+     * @param descs
+     * @param desc_size
+     */
+    void update(std::vector<T *> *descs, T desc_size)
+    {
         this->desc_size = desc_size;
         this->descs = descs;
     }

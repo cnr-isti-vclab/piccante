@@ -20,7 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <random>
 #include <chrono>
+#include <vector>
 
+#include "../base.hpp"
 #include "../util/std_util.hpp"
 #include "../util/math.hpp"
 #include "../image.hpp"
@@ -114,7 +116,7 @@ protected:
      * @param desc
      * @return
      */
-    unsigned int *getAux(Image *img, int x0, int y0, int *x, int *y, unsigned int *desc = NULL)
+    uint* getAux(Image *img, int x0, int y0, int *x, int *y, uint *desc = NULL)
     {
         unsigned int bits = sizeof(unsigned int) * 8;
         unsigned int subBlock = n / bits;
@@ -201,7 +203,7 @@ public:
      * @param desc
      * @return
      */
-    unsigned int *get(Image *img, int x0, int y0, unsigned int *desc = NULL)
+    uint *get(Image *img, int x0, int y0, uint *desc = NULL)
     {
         if(img == NULL) {
             return NULL;
@@ -223,7 +225,7 @@ public:
      */
     void getAll(Image *img,
                 std::vector< Eigen::Vector2f > &corners,
-                std::vector< unsigned int *> &descs)
+                std::vector< uint* > &descs)
     {
         descs.clear();
 
@@ -250,15 +252,14 @@ public:
      * @param nfv
      * @return
      */
-    static unsigned int match(unsigned int *fv0, unsigned int *fv1, unsigned int nfv)
+    static uint match(uint *fv0, uint *fv1, uint nfv)
     {
         if((fv0 == NULL) || (fv1 == NULL)) {
             return 0;
         }
 
-        unsigned int ret = 0;
-
-        for(unsigned int i = 0; i < nfv; i++) {
+        uint ret = 0;
+        for(uint i = 0; i < nfv; i++) {
             ret += countZeros(fv0[i] ^ fv1[i]);
         }
 

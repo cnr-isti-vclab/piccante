@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
+#include "../base.hpp"
 #include "../features_matching/hash_table_lsh.hpp"
 #include "../features_matching/feature_matcher.hpp"
 
@@ -30,26 +31,26 @@ namespace pic {
 /**
  * @brief The LSH class
  */
-class BinaryFeatureLSHMatcher: public FeatureMatcher<unsigned int>
+class BinaryFeatureLSHMatcher: public FeatureMatcher<uint>
 {
 protected:
     std::vector< HashTableLSH* > tables;
-    unsigned int R;
+    uint R;
 
 public:
 
     /**
      * @brief LSH
      */
-    BinaryFeatureLSHMatcher(std::vector< unsigned int *> *descs, unsigned int desc_size, unsigned int nTables = 32, unsigned int hash_size = 8) : FeatureMatcher<unsigned int>(descs, desc_size)
+    BinaryFeatureLSHMatcher(std::vector< uint *> *descs, uint desc_size, uint nTables = 32, uint hash_size = 8) : FeatureMatcher<uint>(descs, desc_size)
     {
-        this->R = ((desc_size * sizeof(unsigned int) * 8) * 90) / 100;
+        this->R = ((desc_size * sizeof(uint) * 8) * 90) / 100;
 
         std::mt19937 m_rnd(1);
 
-        for(unsigned int i=0; i < nTables; i++) {
-            unsigned int n = desc_size * sizeof(unsigned int) * 8;
-            unsigned int *g_f = getHash(m_rnd, n, hash_size);
+        for(uint i=0; i < nTables; i++) {
+            uint n = desc_size * sizeof(uint) * 8;
+            uint *g_f = getHash(m_rnd, n, hash_size);
             HashTableLSH *tmp = new HashTableLSH(hash_size, g_f, descs, desc_size);
             tables.push_back(tmp);
         }
@@ -62,19 +63,19 @@ public:
      * @param seed
      * @return
      */
-    static unsigned int *getHash(std::mt19937 &m, unsigned int dim, unsigned int hash_size = 0)
+    static uint *getHash(std::mt19937 &m, uint dim, uint hash_size = 0)
     {
         if(hash_size == 0) {
             hash_size = 8;
         }
 
-        unsigned int *out = new unsigned int[hash_size];
+        uint *out = new uint[hash_size];
 
-        std::set<unsigned int> tmp;
+        std::set<uint> tmp;
 
         int c = 0;
         while (tmp.size() < hash_size) {
-            unsigned int val = m() % dim;
+            uint val = m() % dim;
             auto result = tmp.insert(val);
 
             if(result.second) {
@@ -93,14 +94,14 @@ public:
      * @param dist_1
      * @return
      */
-    bool getMatch(unsigned int *desc, int &matched_j, unsigned int &dist_1)
+    bool getMatch(uint *desc, int &matched_j, uint &dist_1)
     {
-        unsigned int dist_2 = 0;
+        uint dist_2 = 0;
 
         dist_1 = R;
         matched_j = -1;
 
-        for(unsigned int i=0; i<tables.size(); i++) {
+        for(uint i = 0; i < tables.size(); i++) {
             tables[i]->getNearest(desc, matched_j, dist_1, dist_2);
         }
 
