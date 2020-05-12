@@ -954,7 +954,6 @@ PIC_INLINE Image::Image(Image *imgIn, bool deepCopy = true)
         dataRGBE = imgIn->dataRGBE;
     #endif
 
-
         notOwned = true;
         exposure = imgIn->exposure;
         nameFile = imgIn->nameFile;
@@ -1902,6 +1901,8 @@ PIC_INLINE bool Image::Read(std::string nameFile,
          }
 
          float *tmpConv = convertLDR2HDR(tmp, tmpFloat, sizeFrame(), typeLoad);
+
+         dataUC = delete_vec_s(dataUC);
 
          if(tmpConv != NULL) {
              if(data == NULL) {
