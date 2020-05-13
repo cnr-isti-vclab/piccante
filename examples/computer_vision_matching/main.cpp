@@ -50,52 +50,7 @@ int main(int argc, char *argv[])
     if(img0.isValid() && img1.isValid()) {
         printf("OK\n");
 
-        //output corners
-        std::vector< Eigen::Vector2f > corners_from_img0;
-        std::vector< Eigen::Vector2f > corners_from_img1;
-
-        //compute the luminance images
-        pic::Image *L0 = pic::FilterLuminance::execute(&img0, NULL, pic::LT_CIE_LUMINANCE);
-        pic::Image *L1 = pic::FilterLuminance::execute(&img1, NULL, pic::LT_CIE_LUMINANCE);
-
-        //get corners
-        printf("Extracting corners...\n");
-        pic::HarrisCornerDetector hcd(2.5f, 5);
-        hcd.execute(L0, &corners_from_img0);
-        hcd.execute(L1, &corners_from_img1);
-
-        //compute luminance images
-        pic::Image *L0_flt = pic::FilterGaussian2D::execute(L0, NULL, 2.5f);
-        pic::Image *L1_flt = pic::FilterGaussian2D::execute(L1, NULL, 2.5f);
-
-        L0_flt->Write("../out0.png");
-        L1_flt->Write("../out1.png");
-        //compute ORB descriptors for each corner and image
-        printf("Computing ORB descriptors...\n");
-
-        pic::ORBDescriptor b_desc(31, 512);
-
-        std::vector< unsigned int *> descs0;
-        b_desc.getAll(L0_flt, corners_from_img0, descs0);
-
-        std::vector< unsigned int *> descs1;
-        b_desc.getAll(L1_flt, corners_from_img1, descs1);
-
-        printf("Matching ORB descriptors...\n");
-        int n = b_desc.getDescriptorSize();
-        printf("Descriptor size: %d\n", n);
-        pic::BinaryFeatureBruteForceMatcher bfm(&descs1, n);
-        std::vector< Eigen::Vector3i > matches;
-        bfm.getAllMatches(descs0, matches);
-        printf("Number of Matches: %d\n", matches.size());
-
-        printf("Matches:\n");
-        std::vector< Eigen::Vector2f > m0, m1;
-        pic::FeatureMatcher<unsigned int>::filterMatches(corners_from_img0, corners_from_img1, matches, m0, m1);
-
-        printf("Estimating a homography matrix H from the matches...");
-        std::vector< unsigned int > inliers;
-        Eigen::Matrix3d H = pic::estimateHomographyWithNonLinearRefinement(m0, m1, inliers, 10000, 2.5f, 1, 10000, 1e-5f);
+        auto H = getHomographyMatrixFromTwoImage(&img0, &img1);
 
         printf("\nHomography matrix:\n");
         pic::printfMat(H);
@@ -104,13 +59,6 @@ int main(int argc, char *argv[])
         pic::Image *img0_H = pic::FilterWarp2D::execute(&img0, NULL, pic::MatrixConvert(H), true, false);
         img0_H->Write("../data/output/simple_matching_img_0_H_applied.png", pic::LT_NOR);
         printf("Ok.\n");
-
-        printf("\nEstimating the fundamental matrix F from the matches...");
-        Eigen::Matrix3d F = pic::estimateFundamentalRansac(m0, m1, inliers, 10000);
-        printf("Ok.\n");
-
-        printf("\nFoundamental matrix:\n");
-        pic::printfMat(F);
     } else {
         printf("No there is at least an invalid file!\n");
     }

@@ -39,6 +39,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "computer_vision/nelder_mead_opt_ICP_2D.hpp"
 #include "computer_vision/find_checker_board.hpp"
 
+#include "computer_vision/image_alignment.hpp"
+
 #include "computer_vision/simple_ply.hpp"
 
 
