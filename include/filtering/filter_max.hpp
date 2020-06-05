@@ -39,7 +39,6 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
         int channels = dst->channels;
-        float *maxVal = new float[channels];
         
         for(int j = box->y0; j < box->y1; j++) {
             for(int i = box->x0; i < box->x1; i++) {
@@ -48,7 +47,7 @@ protected:
                 float *src_data = (*src[0])(i, j);
 
                 for(int k = 0; k < channels; k++) {
-                    maxVal[k] = src_data[k];
+                    dst_data[k] = src_data[k];
                 }
 
                 for(int k = -halfSize; k <= halfSize; k++) {
@@ -57,19 +56,14 @@ protected:
                         src_data = (*src[0])(i + l, j + k);
 
                         for(int ch = 0; ch < channels; ch++) {
-                            maxVal[ch] = maxVal[ch] > src_data[ch] ?
-                                         maxVal[ch] : src_data[ch];
+                            dst_data[ch] = dst_data[ch] > src_data[ch] ?
+                                           dst_data[ch] : src_data[ch];
                         }
                     }
                 }
 
-                for(int k = 0; k < channels; k++) {
-                    dst_data[k] = maxVal[k];
-                }
             }
         }
-
-        delete[] maxVal;
     }
 
 public:

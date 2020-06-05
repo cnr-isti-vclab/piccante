@@ -121,15 +121,34 @@ public:
      * @brief sortCornersAndTransfer
      * @param corners
      * @param cornersOut
+     * @param nBestPoints
      * @param bDescend
      */
-    static void sortCornersAndTransfer(std::vector< Eigen::Vector3f > *corners, std::vector< Eigen::Vector2f > *cornersOut, bool bDescend = true)
+    static void sortCornersAndTransfer(std::vector< Eigen::Vector3f > *corners,
+                                       std::vector< Eigen::Vector2f > *cornersOut,
+                                       int nBestPoints = -1,
+                                       bool bDescend = true)
     {
         sortCorners(corners, bDescend);
 
-        for(size_t i = 0; i < corners->size(); i++) {
-            Eigen::Vector3f tmp = corners->at(i);
+        int a, b;
 
+        int n = int(corners->size());
+        if(nBestPoints < 0) {
+            a = 0;
+            b = n;
+        } else {
+            if(bDescend) {
+                a = 0;
+                b = MIN(nBestPoints, n);
+            } else {
+                b = MIN(int(corners->size()), n);
+                a = MAX(b - nBestPoints, 0);
+            }
+        }
+
+        for(int i = a; i < b; i++) {
+            Eigen::Vector3f tmp = corners->at(i);
             Eigen::Vector2f p;
             p[0] = tmp[0];
             p[1] = tmp[1];

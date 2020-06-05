@@ -218,20 +218,16 @@ public:
         }
 
         //non-maximal supression
-        lum = FilterMax::execute(ret, lum, radius * 2 + 1);
+        lum = FilterMax::execute(ret, lum, (radius << 1) + 1);
         Image* ret_flt = lum;
 
         float w = 1.0f;
 
+        int bestPoints = -1;
+
         if(threshold < 0.0f) { //the best i-th points
-            int bestPoints = int(-threshold);
-
-            float *tmp = ret->sort();
-
-            int n = ret->size();
-            threshold = tmp[n - 1 - bestPoints];
-
-            delete_vec_s(tmp);
+            bestPoints = int(-threshold);
+            threshold = -FLT_MAX;
         }
 
         for(int i = 0; i < height; i++) {
@@ -274,7 +270,7 @@ public:
             }
         }
 
-        sortCornersAndTransfer(&corners_w_quality, corners);
+        sortCornersAndTransfer(&corners_w_quality, corners, bestPoints);
     }
 };
 
