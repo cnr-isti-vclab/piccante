@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
         //Harris corners
         std::vector< Eigen::Vector2f > corners_harris;
         pic::HarrisCornerDetector hcd;
-        hcd.update(1.0f, 5);
+        hcd.update(1.0f, 5, -1024.0f, 0.04f, pic::CD_HARRIS);
         hcd.execute(&img, &corners_harris);
 
         printf("\nHarris Corner Detector Test:\n");
@@ -83,6 +83,37 @@ int main(int argc, char *argv[])
 
         pic::Image *imgCorners_harris = hcd.getCornersImage(&corners_harris, NULL, img.width, img.height, true);
         bWritten = imgCorners_harris->Write("../data/output/corner_harris_output.png", pic::LT_NOR);
+
+        //Noble corners
+        corners_harris.clear();
+        hcd.update(1.0f, 5, -1024.0f, 0.04f, pic::CD_NOBLE);
+        hcd.execute(&img, &corners_harris);
+
+        printf("\nNoble-Harris Corner Detector Test:\n");
+        for(unsigned int i = 0; i < corners_harris.size(); i++) {
+            printf("X: %3.2f Y: %3.2f\n", corners_harris[i][0], corners_harris[i][1]);
+        }
+        printf("\n");
+
+        imgCorners_harris->setZero();
+        imgCorners_harris = hcd.getCornersImage(&corners_harris, imgCorners_harris, img.width, img.height, true);
+        bWritten = imgCorners_harris->Write("../data/output/corner_noble_output.png", pic::LT_NOR);
+
+        //Shi-Tomasi corners
+        corners_harris.clear();
+        hcd.update(1.0f, 5, -1024.0f, 0.04f, pic::CD_SHI_TOMASI);
+        hcd.execute(&img, &corners_harris);
+
+        printf("\nShi-Tomasi Corner Detector Test:\n");
+        for(unsigned int i = 0; i < corners_harris.size(); i++) {
+            printf("X: %3.2f Y: %3.2f\n", corners_harris[i][0], corners_harris[i][1]);
+        }
+        printf("\n");
+
+        imgCorners_harris->setZero();
+        imgCorners_harris = hcd.getCornersImage(&corners_harris, imgCorners_harris, img.width, img.height, true);
+        bWritten = imgCorners_harris->Write("../data/output/corner_shi_tomasi_output.png", pic::LT_NOR);
+
 
         //SUSAN corners
         std::vector< Eigen::Vector2f > corners_susan;

@@ -18,8 +18,13 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FEATURES_MATCHING_HARRIS_CORNER_DETECTOR_HPP
 #define PIC_FEATURES_MATCHING_HARRIS_CORNER_DETECTOR_HPP
 
+#include <vector>
+
 #include "../util/vec.hpp"
 #include "../util/std_util.hpp"
+#include "../util/polynomial.hpp"
+#include "../base.hpp"
+
 #include "../image.hpp"
 #include "../filtering/filter_luminance.hpp"
 #include "../filtering/filter_gaussian_2d.hpp"
@@ -39,6 +44,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
+enum CORENE_DETECTOR_TYPE{CD_SHI_TOMASI, CD_HARRIS, CD_NOBLE};
+
 #ifndef PIC_DISABLE_EIGEN
 
 /**
@@ -52,8 +59,9 @@ protected:
     Image *ret;
 
     //Harris Corners detector parameters
-    float sigma, threshold;
+    float sigma, threshold, ki;
     int radius;
+    CORENE_DETECTOR_TYPE type;
 
     //previous values
     int width, height;
@@ -74,6 +82,7 @@ protected:
      */
     void setNULL()
     {
+        type = CD_NOBLE;
         width = -1;
         height = -1;
         lum = NULL;
@@ -90,10 +99,12 @@ public:
      * @param radius
      * @param threshold
      */
-    HarrisCornerDetector(float sigma = 1.0f, int radius = 3, float threshold = 0.001f) : GeneralCornerDetector()
+    HarrisCornerDetector(float sigma = 1.0f, int radius = 3,
+                         float threshold = 0.001f, float ki = 0.04f,
+                         CORENE_DETECTOR_TYPE type = CD_NOBLE) : GeneralCornerDetector()
     {
         setNULL();
-        update(sigma, radius, threshold);
+        update(sigma, radius, threshold, type);
     }
 
     ~HarrisCornerDetector()
@@ -107,11 +118,15 @@ public:
      * @param radius
      * @param threshold
      */
-    void update(float sigma = 1.0f, int radius = 3, float threshold = 0.001f)
+    void update(float sigma = 1.0f, int radius = 3,
+                float threshold = 0.001f, float ki = 0.04f,
+                CORENE_DETECTOR_TYPE type = CD_NOBLE)
     {
         this->sigma = sigma > 0.0f ? sigma : 1.0f;
         this->radius = radius > 0 ? radius : 1;
-        this->threshold = threshold > 0.0f ? threshold : 0.001f;
+        this->threshold = threshold;
+        this->type = type;
+        this->ki = CLAMPi(ki, 0.04f, 0.15f);
     }
 
     /**
@@ -175,7 +190,30 @@ public:
                 float y2 = I_grad_val[1];
                 float xy = I_grad_val[2];
 
-                data_ret[0] =  (x2 * y2 - xy * xy) / (x2 + y2 + eps);
+                float detA = x2 * y2 - xy * xy;
+                float trA = x2 + y2;
+
+                switch(type)
+                {
+                    case CD_SHI_TOMASI: {
+
+                        float x0, x1;
+                        if(Polynomial::getSecondOrderRoots(1.0f, -trA, detA, &x0, &x1)) {
+                            data_ret[0] = x0 < x1 ? x0 : x1;
+                        } else {
+                            data_ret[0] = -1.0f;
+                        }
+                    } break;
+
+                    case CD_HARRIS: {
+                       data_ret[0] = detA - ki * trA;
+                    } break;
+
+                    case CD_NOBLE: {
+                        data_ret[0] = detA / (trA + eps);
+                    } break;
+                }
+
             }
         }
 

@@ -1991,9 +1991,9 @@ PIC_INLINE bool Image::Write(std::string nameFile, LDR_type typeWrite = LT_NOR_G
             dataWriter = data;
         }
 
-        unsigned char *tmp;
-        tmp = convertHDR2LDR(dataWriter, dataUC, sizeFrame(), typeWrite);
+        dataUC = convertHDR2LDR(dataWriter, dataUC, sizeFrame(), typeWrite);
 
+        /*
         if(dataUC == NULL) {
             dataUC = tmp;
         } else {
@@ -2001,6 +2001,7 @@ PIC_INLINE bool Image::Write(std::string nameFile, LDR_type typeWrite = LT_NOR_G
             dataUC = tmp;
         }
         //allocate memory: end
+        */
 
         if(bExt) {
             return WriteSTB(nameFile, dataUC, width, height, channels);
