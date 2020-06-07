@@ -126,7 +126,7 @@ public:
         this->radius = radius > 0 ? radius : 1;
         this->threshold = threshold;
         this->type = type;
-        this->ki = CLAMPi(ki, 0.04f, 0.15f);
+        this->ki = CLAMPi(ki, 0.04f, 0.06f);
     }
 
     /**
@@ -206,7 +206,7 @@ public:
                     } break;
 
                     case CD_HARRIS: {
-                       data_ret[0] = detA - ki * trA;
+                       data_ret[0] = detA - ki * trA * trA;
                     } break;
 
                     case CD_NOBLE: {

@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
         //Harris corners
         std::vector< Eigen::Vector2f > corners_harris;
         pic::HarrisCornerDetector hcd;
-        hcd.update(1.0f, 5, 0.0001f, 0.04f, pic::CD_HARRIS);
+        hcd.update(1.0f, 5, -1024.0f, 0.04f, pic::CD_HARRIS);
         hcd.execute(&img, &corners_harris);
 
         printf("\nHarris Corner Detector Test:\n");
