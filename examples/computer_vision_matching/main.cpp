@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     if(img0.isValid() && img1.isValid()) {
         printf("OK\n");
 
-        auto H = getHomographyMatrixFromTwoImage(&img0, &img1);
+        auto H = pic::getHomographyMatrixFromTwoImage(&img0, &img1);
 
         printf("\nHomography matrix:\n");
         pic::printfMat(H);

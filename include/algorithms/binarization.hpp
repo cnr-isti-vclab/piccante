@@ -45,7 +45,7 @@ PIC_INLINE Image *binarization(Image *imgIn, bool bAdaptive = false)
     if(bAdaptive) {
         FilterThreshold flt_thr(0.0f, true);
 
-        FilterGaussian2D flt_gauss(MAX(imgIn->widthf, imgIn->heightf) * 0.2f);
+        FilterGaussian2D flt_gauss(MIN(imgIn->widthf, imgIn->heightf) * 0.2f);
         Image *imgIn_lum_flt = flt_gauss.Process(Single(imgIn_lum), NULL);
 
         ret = flt_thr.Process(Double(imgIn_lum, imgIn_lum_flt), NULL);

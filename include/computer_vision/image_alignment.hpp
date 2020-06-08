@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <vector>
 
 #include "../base.hpp"
+#include "../image.hpp"
 #include "../features_matching/orb_descriptor.hpp"
 #include "../features_matching/harris_corner_detector.hpp"
 #include "../features_matching/binary_feature_brute_force_matcher.hpp"

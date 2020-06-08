@@ -134,12 +134,13 @@ public:
             theta = CLAMPi(C_PI_2 + theta, 0.0f, C_PI_2);
         }
 
-        float theta_nor = CLAMPi(theta / C_PI_2, 0.0f, 1.0f);
+        //float theta_nor = CLAMPi(theta / C_PI_2, 0.0f, 1.0f);
 
-        int n = int(x_theta.size()) - 1;
-        float n_f = float(n);
+        uint theta_nor = CLAMPi(uint(theta * 255.0f / C_PI_2), 0, 255);
 
-        int index = int(theta_nor * n_f);
+        uint n = x_theta.size() - 1;
+
+        uint index = (n * theta_nor) >> 8;
 
         return getAux(img, x0, y0, x_theta[index], y_theta[index], desc);
     }
