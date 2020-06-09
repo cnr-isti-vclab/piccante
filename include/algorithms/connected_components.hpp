@@ -33,8 +33,8 @@ namespace pic {
 
 struct LabelInfo
 {
-    unsigned int id;
-    unsigned int minLabel;
+    uint id;
+    uint minLabel;
 
     friend bool operator<(LabelInfo const &a, LabelInfo const &b)
     {
@@ -45,7 +45,7 @@ struct LabelInfo
 class LabelOutput
 {
 public:
-    unsigned int id;
+    uint id;
     std::vector< int > coords;
     std::set< int > neighbors;
     bool bValid;
@@ -56,7 +56,7 @@ public:
         bValid = true;
     }
 
-    LabelOutput(unsigned int id, int i)
+    LabelOutput(uint id, int i)
     {
         this->id = id;
         coords.push_back(i);
@@ -85,7 +85,7 @@ protected:
      * @param imgOut
      * @param labelEq
      */
-    void secondPass(unsigned int *imgOut, std::vector<LabelOutput> &ret, std::set<LabelInfo> &labelEq, int n)
+    void secondPass(uint *imgOut, std::vector<LabelOutput> &ret, std::set<LabelInfo> &labelEq, int n)
     {
         //Label Search
         LabelInfo tmpLI;
@@ -119,9 +119,9 @@ protected:
         //Second pass: using tracked neighbors
         //for assigning the correct labels
         //TO DO: optimizing outside this loop
-        std::set<unsigned int> unique;
-        //std::set<unsigned int>::iterator uniqueIt;
-        std::map<unsigned int, int> mapping;
+        std::set<uint> unique;
+        //std::set<uint>::iterator uniqueIt;
+        std::map<uint, int> mapping;
 
         int counter = 0;
 
@@ -140,7 +140,7 @@ protected:
             if(uniqueIt != unique.end()) {
                 ret[mapping[id]].push_back(i);
             } else {
-                std::pair<unsigned int, int> tmp = std::make_pair(id, counter);
+                std::pair<uint, int> tmp = std::make_pair(id, counter);
                 mapping.insert(tmp);
 
                 LabelOutput tmpRet(id, i);
@@ -152,7 +152,7 @@ protected:
         }
     }
 
-    void track(unsigned int *imgOut, int &label, std::set<LabelInfo> &labelEq,
+    void track(uint *imgOut, int &label, std::set<LabelInfo> &labelEq,
                int neighbors[2], int nNeighbors, int ind)
     {
         std::set<LabelInfo>::iterator it;
@@ -168,7 +168,7 @@ protected:
 
         if(nNeighbors == 2) {
             //Assign the label of neighbors
-            unsigned int minVal, t1, t2;
+            uint minVal, t1, t2;
             t1 = imgOut[neighbors[0]];
             t2 = imgOut[neighbors[1]];
             minVal = MIN(t1, t2);
@@ -250,7 +250,7 @@ public:
      * @param imgOut
      * @param ret
      */
-    unsigned int *execute(Image *imgIn, unsigned int *imgOut, std::vector<LabelOutput> &ret)
+    uint *execute(Image *imgIn, uint *imgOut, std::vector<LabelOutput> &ret)
     {
         //Check input paramters
         if(imgIn == NULL) {
@@ -265,10 +265,10 @@ public:
         int n = width * height;
 
         if(imgOut == NULL) {
-            imgOut = new unsigned int[n];
+            imgOut = new uint[n];
         }
 
-        Buffer<unsigned int>::assign(imgOut, n, 0);
+        Buffer<uint>::assign(imgOut, n, 0);
 
         //First pass:
         // 1) assign basics labels
@@ -330,7 +330,7 @@ public:
      * @param ret
      * @return
      */
-    unsigned int *execute(T *imgIn, int width, int height, unsigned int *imgOut, std::vector<LabelOutput> &ret)
+    uint *execute(T *imgIn, int width, int height, uint *imgOut, std::vector<LabelOutput> &ret)
     {
         //Check input paramters
         if(imgIn == NULL) {
@@ -340,10 +340,10 @@ public:
         int n = width * height;
 
         if(imgOut == NULL) {
-            imgOut = new unsigned int[n];
+            imgOut = new uint[n];
         }
 
-        Buffer<unsigned int>::assign(imgOut, n, 0);
+        Buffer<uint>::assign(imgOut, n, 0);
 
         T *data = imgIn;
         //First pass:
@@ -391,14 +391,14 @@ public:
      * @param ret
      * @return
      */
-    static unsigned int *reCount(unsigned int *imgLabel, std::vector<LabelOutput> &labelsList)
+    static uint *reCount(uint *imgLabel, std::vector<LabelOutput> &labelsList)
     {
         if(imgLabel == NULL) {
             return NULL;
         }
 
-        unsigned int c = 0;
-        for(unsigned int i = 0; i < labelsList.size(); i++) {
+        uint c = 0;
+        for(uint i = 0; i < labelsList.size(); i++) {
             if(labelsList[i].bValid) {
                 labelsList[i].id = c;
                 IndexedArrayui::assign(imgLabel, labelsList[i].coords, c);
@@ -417,7 +417,7 @@ public:
      * @param height
      * @return
      */
-    static Image* convertFromIntegerToImage(unsigned int *imgLabel, Image *imgOut, int width, int height)
+    static Image* convertFromIntegerToImage(uint *imgLabel, Image *imgOut, int width, int height)
     {
         if(imgLabel == NULL) {
             return imgOut;
@@ -441,7 +441,7 @@ public:
      * @param n
      * @param labelsList
      */
-    static void computeLabelsListFromImageLabels(unsigned int *labels, int n,  std::vector<LabelOutput> &labelsList)
+    static void computeLabelsListFromImageLabels(uint *labels, int n,  std::vector<LabelOutput> &labelsList)
     {
         if(labels == NULL || n < 1) {
             return;
@@ -449,13 +449,13 @@ public:
 
         labelsList.clear();
 
-        std::set<unsigned int> labels_tracker;
+        std::set<uint> labels_tracker;
 
-        std::map<unsigned int, int> labels_map;
+        std::map<uint, int> labels_map;
 
         int c = 0;
         for(int i = 0; i < n; i++) {
-            unsigned int j = labels[i];
+            uint j = labels[i];
             auto search = labels_tracker.find(j);
             if (search != labels_tracker.end()) {
                 labels_tracker.insert(j);
@@ -479,19 +479,19 @@ public:
      * @param n
      * @return
      */
-    static unsigned int *computeImageLabelsFromLabelsList(std::vector<LabelOutput> &labelsList, unsigned int *labels, int n)
+    static uint *computeImageLabelsFromLabelsList(std::vector<LabelOutput> &labelsList, uint *labels, int n)
     {
         if(n < 1 || labelsList.empty()) {
             return labels;
         }
 
         if(labels == NULL) {
-            labels = new unsigned int[n];
+            labels = new uint[n];
         }
 
-        for(unsigned int i = 0; i < labelsList.size(); i++) {
+        for(uint i = 0; i < labelsList.size(); i++) {
             if(labelsList[i].bValid) {
-                for(unsigned int j = 0; j < labelsList[i].coords.size(); j++) {
+                for(uint j = 0; j < labelsList[i].coords.size(); j++) {
                     int k = labelsList[i].coords[j];
                     labels[k] = labelsList[i].id;
                 }
@@ -507,9 +507,9 @@ public:
      * @param labelsList
      * @param labels_map
      */
-    static void getMappingLabelsList(std::vector<LabelOutput> &labelsList, std::map<unsigned int, int> &labels_map)
+    static void getMappingLabelsList(std::vector<LabelOutput> &labelsList, std::map<uint, int> &labels_map)
     {
-        for(unsigned int i = 0; i < labelsList.size(); i++) {
+        for(uint i = 0; i < labelsList.size(); i++) {
             labels_map[labelsList[i].id] = i;
         }
     }
@@ -521,9 +521,9 @@ public:
      * @param height
      * @param labelsList
      */
-    static void computeNeighbors(unsigned int *labels, int width, int height, std::vector<LabelOutput> &labelsList)
+    static void computeNeighbors(uint *labels, int width, int height, std::vector<LabelOutput> &labelsList)
     {
-        std::map<unsigned int, int> labels_map;
+        std::map<uint, int> labels_map;
         getMappingLabelsList(labelsList, labels_map);
 
         int width_m_1 = width - 1;
@@ -535,7 +535,7 @@ public:
             for(int j = 0; j < width; j++) {
                 int ind = shift + j;
 
-                unsigned int l_ind = labels[ind];
+                uint l_ind = labels[ind];
                 int ind2 = labels_map[l_ind];
 
                 if(i > 0) {
@@ -574,7 +574,7 @@ public:
      * @param labelsList
      * @param threshold
      */
-    static void mergeIsolatedAreasWithThreshold(unsigned int *labels, int width, int height, std::vector<LabelOutput> &labelsList, int threshold = 1)
+    static void mergeIsolatedAreasWithThreshold(uint *labels, int width, int height, std::vector<LabelOutput> &labelsList, int threshold = 1)
     {
         if(threshold < 1 || labels == NULL || labelsList.empty()) {
             return;
@@ -584,16 +584,16 @@ public:
             computeNeighbors(labels, width, height, labelsList);
         }
 
-        std::map<unsigned int, int> labels_map;
+        std::map<uint, int> labels_map;
         getMappingLabelsList(labelsList, labels_map);
 
-        for(unsigned int i = 0; i < labelsList.size(); i++) {
+        for(uint i = 0; i < labelsList.size(); i++) {
             if(!labelsList[i].bValid || labelsList[i].neighbors.empty()) {
                 continue;
             }
 
             if(labelsList[i].neighbors.size() == 1) {
-                unsigned int id = *labelsList[i].neighbors.begin();
+                uint id = *labelsList[i].neighbors.begin();
                 int index = labels_map[id];
 
                 if(labelsList[index].bValid) {
@@ -612,7 +612,7 @@ public:
 
                             //update all neighbors removing index and adding i!
                             for (auto it = labelsList[index].neighbors.begin(); it != labelsList[index].neighbors.end(); it++) {
-                                unsigned int id2 = *it;
+                                uint id2 = *it;
                                 int index2 = labels_map[id2];
 
                                 labelsList[index2].neighbors.erase(index);

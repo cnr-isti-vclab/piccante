@@ -33,13 +33,12 @@ namespace pic {
  * @param bAdaptive
  * @return
  */
-PIC_INLINE Image *binarization(Image *imgIn, bool bAdaptive = false)
+PIC_INLINE Image *binarization(Image *imgIn, Image *imgOut = NULL, bool bAdaptive = false)
 {
     if(imgIn == NULL) {
         return NULL;
     }
 
-    Image *ret = NULL;
     Image *imgIn_lum = FilterLuminance::execute(imgIn, NULL);
 
     if(bAdaptive) {
@@ -48,7 +47,7 @@ PIC_INLINE Image *binarization(Image *imgIn, bool bAdaptive = false)
         FilterGaussian2D flt_gauss(MIN(imgIn->widthf, imgIn->heightf) * 0.2f);
         Image *imgIn_lum_flt = flt_gauss.Process(Single(imgIn_lum), NULL);
 
-        ret = flt_thr.Process(Double(imgIn_lum, imgIn_lum_flt), NULL);
+        imgOut = flt_thr.Process(Double(imgIn_lum, imgIn_lum_flt), imgOut);
 
         delete imgIn_lum_flt;
     } else {
@@ -58,10 +57,10 @@ PIC_INLINE Image *binarization(Image *imgIn, bool bAdaptive = false)
 
         FilterThreshold flt_thr(mean_lum, false);
 
-        ret = flt_thr.Process(Single(imgIn_lum), NULL);
+        imgOut = flt_thr.Process(Single(imgIn_lum), imgOut);
     }
 
-    return ret;
+    return imgOut;
 }
 
 } // end namespace pic

@@ -55,10 +55,10 @@ int main(int argc, char *argv[])
         bool bWritten;
         std::string name = pic::getFileNameOnly(img_str);
 
-        pic::Image *img_global_bin = pic::binarization(&img, false);
+        pic::Image *img_out = pic::binarization(&img, NULL, false);
 
 
-        bWritten = img_global_bin->Write("../data/output/" + name + "_global_bin.png");
+        bWritten = img_out->Write("../data/output/" + name + "_global_bin.png");
 
         if(bWritten) {
             printf("Ok\n");
@@ -66,9 +66,9 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
-        pic::Image *img_local_bin = pic::binarization(&img, true);
+        img_out = pic::binarization(&img, img_out, true);
 
-        bWritten = img_local_bin->Write("../data/output/" + name + "_adaptive_bin.png");
+        bWritten = img_out->Write("../data/output/" + name + "_adaptive_bin.png");
 
         if(bWritten) {
             printf("Ok\n");
