@@ -38,6 +38,8 @@ public:
      */
     ColorConvRGBtosRGB()
     {
+        linear = false;
+
         gamma = 2.4f;
         gamma_inv = 1.0f / gamma;
         a = 0.055f;

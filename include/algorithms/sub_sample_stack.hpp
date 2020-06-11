@@ -50,7 +50,7 @@ protected:
         int c = 0;
         for(int j = 0; j < channels; j++) {
             for(int i = 0; i < exposures; i++) {
-                h[c].calculate(stack[i], VS_LDR, 256, j);
+                h[c].calculate(stack[i], VS_LDR, 256, NULL, j);
                 h[c].cumulativef(true);
                 c++;
             }

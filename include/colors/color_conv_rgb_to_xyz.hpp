@@ -42,28 +42,10 @@ public:
     /**
      * @brief ColorConvRGBtoXYZ
      */
-    ColorConvRGBtoXYZ()
+    ColorConvRGBtoXYZ() : ColorConv()
     {
-    }
-
-    /**
-     * @brief direct
-     * @param colIn
-     * @param colOut
-     */
-    void direct(float *colIn, float *colOut)
-    {
-        apply(mtxRGBtoXYZ, colIn, colOut);
-    }
-
-    /**
-     * @brief inverse
-     * @param colIn
-     * @param colOut
-     */
-    void inverse(float *colIn, float *colOut)
-    {
-        apply(mtxXYZtoRGB, colIn, colOut);
+        memcpy(mtx, mtxRGBtoXYZ, 9 * sizeof(float));
+        memcpy(mtx_inv, mtxXYZtoRGB, 9 * sizeof(float));
     }
 };
 

@@ -25,6 +25,11 @@ namespace pic {
  */
 class ColorConv
 {
+protected:
+    bool linear;
+
+    float mtx[9], mtx_inv[9];
+
 public:
 
     /**
@@ -32,6 +37,7 @@ public:
      */
     ColorConv()
     {
+        linear = true;
     }
 
     /**
@@ -39,14 +45,20 @@ public:
     * \param colIn a pointer to the input color to be converted.
     * \param colOut a pointer to the output color.
     */
-    virtual void direct(float *colIn, float *colOut) {}
+    virtual void direct(float *colIn, float *colOut)
+    {
+        apply(mtx, colIn, colOut);
+    }
 
     /**
     * @brief inverse is the inverse of direct.
     * \param colIn a pointer to the input color to be converted.
     * \param colOut a pointer to the output color.
     */
-    virtual void inverse(float *colIn, float *colOut) {}
+    virtual void inverse(float *colIn, float *colOut)
+    {
+        apply(mtx_inv, colIn, colOut);
+    }
 
     /**
      * @brief transform

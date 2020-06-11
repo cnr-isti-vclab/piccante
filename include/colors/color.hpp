@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_COLORS_COLOR_HPP
 #define PIC_COLORS_COLOR_HPP
 
+#include "../base.hpp"
+
 #include "../util/math.hpp"
 #include "../util/vec.hpp"
 
@@ -28,7 +30,7 @@ namespace pic {
  * @param in
  * @param tau
  */
-template<unsigned int N>
+template<uint N>
 void scaleTau(Vec<N, float> &in, const Vec<N, float> &tau)
 {
     for (int i = 0; i < N; i++) {
@@ -42,7 +44,7 @@ void scaleTau(Vec<N, float> &in, const Vec<N, float> &tau)
  * @param sigma_t
  * @param tau
  */
-template<unsigned int N>
+template<uint N>
 void scaleTau(Vec<N, float> &in, const Vec<N, float> &sigma_t, const Vec<N, float> &tau)
 {
     for (int i = 0; i < N; i++) {
@@ -56,7 +58,7 @@ void scaleTau(Vec<N, float> &in, const Vec<N, float> &sigma_t, const Vec<N, floa
  * @param sigma_t
  * @param t
  */
-template<unsigned int N>
+template<uint N>
 void scaleTau(Vec<N, float> &in, const Vec<N, float> &sigma_t, float t)
 {
     for (int i = 0; i < N; i++) {
@@ -69,7 +71,7 @@ void scaleTau(Vec<N, float> &in, const Vec<N, float> &sigma_t, float t)
  * @param in
  * @return
  */
-template<unsigned int N>
+template<uint N>
 float colorLuminance(Vec<N, float> &in)
 {
     return  0.213f * in.data[0] +
@@ -81,7 +83,7 @@ float colorLuminance(Vec<N, float> &in)
  * @brief colorSaturate
  * @param in
  */
-template<unsigned int N>
+template<uint N>
 void colorSaturate(Vec<N, float> &in)
 {
     for (int i = 0; i < N; i++) {
@@ -96,23 +98,23 @@ void colorSaturate(Vec<N, float> &in)
  * @param channel
  * @param pdf
  */
-template<unsigned int N>
+template<uint N>
 void importanceSampling(Vec<N, float> &in, float e, int &channel, float &pdf)
 {
     float sum = 0.0f;
-    for(unsigned int i = 0; i < N; i++) {
+    for(uint i = 0; i < N; i++) {
         sum += in.data[i];
     }
 
     if(sum > 0.0f) {
         float CDF[N];
         CDF[0] = in.data[0] / sum;
-        for(unsigned int i = 1; i < (N - 1); i++) {
+        for(uint i = 1; i < (N - 1); i++) {
             CDF[i] = (CDF[i - 1] + in.data[i]) / sum;
         }
         CDF[N - 1] = 1.0f; // sanity check
 
-        for(unsigned int i = 0; i < N; i++) {
+        for(uint i = 0; i < N; i++) {
             if(e <= CDF[i]) {
                 channel = i;
                 pdf = in.data[i] / sum;
@@ -132,7 +134,7 @@ void importanceSampling(Vec<N, float> &in, float e, int &channel, float &pdf)
  * @param maxVal
  * @return
  */
-template<unsigned int N>
+template<uint N>
 Vec<N, float> convertToLDR(Vec<N, float> &in, float exposure = 1.0f, float gammaCor = 2.2f, float maxVal = 255.0f)
 {
     Vec<N, float> ret = in.clone();

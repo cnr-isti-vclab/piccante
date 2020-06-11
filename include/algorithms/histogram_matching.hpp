@@ -97,8 +97,8 @@ public:
         std::vector<int *> lut;
 
         for(int i = 0; i < channels; i++) {
-            h_source[i].calculate(img_source, VS_LIN, nBin, i);
-            h_target[i].calculate(img_target, VS_LIN, nBin, i);
+            h_source[i].calculate(img_source, VS_LIN, nBin, NULL, i);
+            h_target[i].calculate(img_target, VS_LIN, nBin, NULL, i);
 
             h_source[i].cumulativef(true);
             h_target[i].cumulativef(true);

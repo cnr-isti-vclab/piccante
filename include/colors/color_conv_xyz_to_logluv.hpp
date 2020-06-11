@@ -37,6 +37,7 @@ public:
      */
     ColorConvXYZtoLogLuv()
     {
+        linear = false;
         epsilon = 1.0f;
     }
 

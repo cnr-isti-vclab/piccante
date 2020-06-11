@@ -46,6 +46,7 @@ public:
      */
     ColorConvXYZtoCIELAB()
     {
+        linear = false;
         white_point[0] = 1.0f;
         white_point[1] = 1.0f;
         white_point[2] = 1.0f;

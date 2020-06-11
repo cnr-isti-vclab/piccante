@@ -26,12 +26,13 @@ class ColorConvXYZtoCIELUV: public ColorConv
 {
 protected:
 
-    float		white_point[3];
+    float white_point[3];
 
 public:
 
     ColorConvXYZtoCIELUV()
     {
+        linear = false;
         white_point[0] = 1.0f;
         white_point[1] = 1.0f;
         white_point[2] = 1.0f;

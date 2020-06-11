@@ -19,6 +19,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_HISTOGRAM_HPP
 
 #include "image.hpp"
+#include "base.hpp"
+
+#include "util/bbox.hpp"
 #include "util/std_util.hpp"
 #include "util/array.hpp"
 #include "util/math.hpp"
@@ -105,8 +108,27 @@ protected:
         return x;
     }
 
+    /**
+     * @brief update
+     * @param x
+     */
+    inline void update(float x)
+    {
+        float val = projectDomain(x);
+
+        int indx = int(((val - fMin) * nBinf) / deltaMaxMin);
+
+        #ifdef PIC_DEBUG
+        if((indx >= nBin) || (indx < 0)) {
+            printf("Error in Calculate %d.\n",indx);
+        }
+        #endif
+
+        bin[CLAMP(indx, nBin)]++;
+    }
+
 public:
-    unsigned int *bin, *bin_work;
+    uint *bin, *bin_work;
 
     /**
      * @brief Histogram is the basic constructor setting variables to defaults.
@@ -147,7 +169,7 @@ public:
         epsilon = 1e-6f;
         this->nBin = 0;
 
-        calculate(imgIn, type, nBin, channel);
+        calculate(imgIn, type, nBin, NULL, channel);
     }
 
     /**
@@ -185,10 +207,11 @@ public:
      * (logarithm 10 base).
      * @param nBin is the number of bins of the Histogram to be computed. The default value
      * is 256.
+     * @param box is the slice where to compute the histogram.
      * @param channel is the color channel for which the Histogram will be computed.
      */
     void calculate(Image *imgIn, VALUE_SPACE type, int nBin,
-                              int channel = 0)
+                   BBox *box = NULL, int channel = 0)
     {
         if((imgIn == NULL) || (channel < 0) ) {
             return;
@@ -207,8 +230,8 @@ public:
         if(c1 || c2)  {
             release();
 
-            bin = new unsigned int[nBin];
-            memset((void *)bin, 0, nBin * sizeof(unsigned int));
+            bin = new uint[nBin];
+            memset((void *)bin, 0, nBin * sizeof(uint));
         }
 
         this->nBin = nBin;
@@ -221,10 +244,22 @@ public:
         fMin =  FLT_MAX;
         fMax = -FLT_MAX;
 
-        for(int i = channel; i < size; i += channels) {
-            float val = imgIn->data[i];
-            fMin = MIN(fMin, val);
-            fMax = MAX(fMax, val);
+        if(box == NULL) {
+            for(int i = channel; i < size; i += channels) {
+                float val = imgIn->data[i];
+                fMin = MIN(fMin, val);
+                fMax = MAX(fMax, val);
+            }
+        } else {
+            for(int k = box->z0; k < box->z1; k++) {
+                for(int j = box->y0; j < box->y1; j++) {
+                    for(int i = box->x0; i < box->x1; i++) {
+                        float *tmp_data = (*imgIn)(i, j, k);
+                        fMin = MIN(fMin, tmp_data[channel]);
+                        fMax = MAX(fMax, tmp_data[channel]);
+                    }
+                }
+            }
         }
 
         fMin = projectDomain(fMin);
@@ -234,18 +269,20 @@ public:
         nBinf = float(nBin - 1);
 
         //compute the histogram
-        for(int i = channel; i < size; i += channels) {           
-            float val = projectDomain(imgIn->data[i]);
-
-            int indx = int(((val - fMin) * nBinf) / deltaMaxMin);
-
-            #ifdef PIC_DEBUG
-            if((indx >= nBin) || (indx < 0)) {
-                printf("Error in Calculate %d.\n",indx);
+        if(box == NULL) {
+            for(int i = channel; i < size; i += channels) {
+                update(imgIn->data[i]);
             }
-            #endif
+        } else {
+            for(int k = box->z0; k < box->z1; k++) {
+                for(int j = box->y0; j < box->y1; j++) {
+                    for(int i = box->x0; i < box->x1; i++) {
+                        float *tmp_data = (*imgIn)(i, j, k);
+                        update(tmp_data[channel]);
 
-            bin[CLAMP(indx, nBin)]++;
+                    }
+                }
+            }
         }
     }
 
@@ -278,7 +315,7 @@ public:
      */
     void ceiling(float k)
     {
-        float tolerance = float(Array<unsigned int>::sum(bin, nBin)) * 0.025f;
+        float tolerance = float(Array<uint>::sum(bin, nBin)) * 0.025f;
         int   trimmings = 0;
         bool  bFlag = true;
 
@@ -286,13 +323,13 @@ public:
 
         while((trimmings <= tolerance) && bFlag) {
             trimmings = 0;
-            float T = float(Array<unsigned int>::sum(bin, nBin));
+            float T = float(Array<uint>::sum(bin, nBin));
 
             if(T < tolerance) {
                 bFlag = false;
             } else {
                 bool bTrimmed = false;
-                unsigned int ceiling = int(T * k);
+                uint ceiling = int(T * k);
 
                 for(int i = 0; i < nBin; i++) {
                     if(bin[i] > ceiling) {
@@ -360,7 +397,7 @@ public:
         }
 
         int ind;
-        float maxValf = float(Array<unsigned int>::getMax(bin, nBin, ind));
+        float maxValf = float(Array<uint>::getMax(bin, nBin, ind));
 
         for(int i = 0; i < nBin; i++) {
             bin_nor[i] = float(bin[i]) / maxValf;
@@ -418,13 +455,13 @@ public:
         int removingBins = int(float(nBits) /dMM + overlap);
 
         if( bin_work == NULL) {
-            bin_work = new unsigned int [nBin];
+            bin_work = new uint [nBin];
         }
 
-        memcpy(bin_work, bin, sizeof(unsigned int) * nBin);
+        memcpy(bin_work, bin, sizeof(uint) * nBin);
 
         int countIndex = 0;
-        while(Array<unsigned int>::sum(bin_work, nBin) > 0) {
+        while(Array<uint>::sum(bin_work, nBin) > 0) {
 
 
             int count = -1;
@@ -460,7 +497,7 @@ public:
 
             /*
             int ind;
-            Array<unsigned int>::getMax(bin_work, nBin, ind);
+            Array<uint>::getMax(bin_work, nBin, ind);
 
             int indMin = MAX(ind - removingBins_half, 0);
             int indMax = MIN(ind + removingBins_half, nBin);

@@ -29,6 +29,11 @@ class ColorConvXYZtoxyY: public ColorConv
 {
 public:
 
+    ColorConvXYZtoxyY()
+    {
+        linear = false;
+    }
+
     /**
      * @brief direct
      * @param colIn

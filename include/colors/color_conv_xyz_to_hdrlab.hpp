@@ -41,6 +41,8 @@ public:
      */
     ColorConvXYZtoHDRLAB()
     {
+        linear = false;
+
         whitePoint[0] = 1.0f;
         whitePoint[1] = 1.0f;
         whitePoint[2] = 1.0f;
