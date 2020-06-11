@@ -214,10 +214,12 @@ public:
                    BBox *box = NULL, int channel = 0)
     {
         if((imgIn == NULL) || (channel < 0) ) {
+            uniform(1, type, nBin);
             return;
         }
 
         if(!imgIn->isValid() || (channel >= imgIn->channels)) {
+            uniform(1, type, nBin);
             return;
         }
 
@@ -284,6 +286,28 @@ public:
                 }
             }
         }
+    }
+
+    /**
+     * @brief uniform
+     * @param value
+     * @param type
+     * @param nBin
+     */
+    void uniform(uint value, VALUE_SPACE type, int nBin)
+    {
+        bool c1 = (nBin != this->nBin) && (bin != NULL);
+        bool c2 = (bin == NULL);
+        if(c1 || c2)  {
+            release();
+
+            bin = new uint[nBin];
+        }
+
+        this->nBin = nBin;
+        this->type = type;
+
+        memset((void*)bin, value, nBin * sizeof(uint));
     }
 
     /**
