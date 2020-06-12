@@ -33,6 +33,50 @@ class HistogramMatching
 protected:
     int nBin;
 
+    /**
+     * @brief computeHistograms
+     * @param img_s
+     * @param img_t
+     * @param hist_s
+     * @param hist_t
+     * @param lut
+     */
+    void computeHistograms(Image *img_s, Image *img_t,
+                           Histogram *hist_s, Histogram *hist_t,
+                           std::vector<int *> &lut)
+    {
+        int channels = img_s->channels;
+
+        for(int i = 0; i < channels; i++) {
+            hist_s[i].calculate(img_s, VS_LIN, nBin, NULL, i);
+
+            if(img_t != NULL) {
+                hist_t[i].calculate(img_t, VS_LIN, nBin, NULL, i);
+            } else {
+                uint value = (img_s->width * img_s->height) / nBin;
+                hist_t[i].uniform(hist_s[i].getfMin(),
+                                  hist_s[i].getfMax(),
+                                  MAX(value, 1), VS_LIN, nBin);
+            }
+
+            hist_s[i].cumulativef(true);
+            hist_t[i].cumulativef(true);
+
+            float *c_s = hist_s[i].getCumulativef();
+            float *c_t = hist_t[i].getCumulativef();
+
+            int *tmp_lut = new int[nBin];
+
+            for(int j = 0; j < nBin; j++) {
+                float x = c_s[j];
+                float *ptr = std::upper_bound(c_t, c_t + nBin, x);
+                tmp_lut[j] = MAX((int)(ptr - c_t), 0);
+            }
+
+            lut.push_back(tmp_lut);
+        }
+    }
+
 public:
 
     /**
@@ -49,11 +93,7 @@ public:
      */
     void update(int nBin)
     {
-        if(nBin < 1) {
-            nBin = 256;
-        } else {
-            this->nBin = nBin;
-        }
+        this->nBin = nBin > 1 ? nBin : 256;
     }
 
     /**
@@ -103,43 +143,19 @@ public:
 
         std::vector<int *> lut;
 
-        for(int i = 0; i < channels; i++) {
-            h_source[i].calculate(img_source, VS_LIN, nBin, NULL, i);
+        computeHistograms(img_source, img_target, h_source, h_target, lut);
 
-            if(img_target != NULL) {
-                h_target[i].calculate(img_target, VS_LIN, nBin, NULL, i);
-            } else {
-                uint value = (img_source->width * img_source->height) / nBin;
-                h_target[i].uniform(h_source[i].getfMin(),
-                                    h_source[i].getfMax(),
-                                    MAX(value, 1), VS_LIN, nBin);
-            }
-
-            h_source[i].cumulativef(true);
-            h_target[i].cumulativef(true);
-
-            float *c_source = h_source[i].getCumulativef();
-            float *c_target = h_target[i].getCumulativef();
-
-            int *tmp_lut = new int[nBin];
-
-            for(int j = 0; j < nBin; j++) {
-                float x = c_source[j];
-                float *ptr = std::upper_bound(c_target, c_target + nBin, x);
-                tmp_lut[j] = MAX((int)(ptr - c_target), 0);
-            }
-
-            lut.push_back(tmp_lut);
-        }
 
         for(int i = 0; i < imgOut->size(); i += channels) {
 
             for(int j = 0; j < channels; j++) {
-                int ind_source = h_source[j].project(img_source->data[i + j]);
+                int k = i + j;
+
+                int ind_source = h_source[j].project(img_source->data[k]);
 
                 int ind_target = lut[j][ind_source];
 
-                imgOut->data[i + j] = h_target[j].unproject(ind_target);
+                imgOut->data[k] = h_target[j].unproject(ind_target);
             }
         }
 
