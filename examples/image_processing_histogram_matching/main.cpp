@@ -59,8 +59,16 @@ int main(int argc, char *argv[])
     if(img_source.isValid() && img_target.isValid()) {
 
         pic::Image *out = pic::HistogramMatching::execute(&img_source, &img_target, NULL);
-
         out->Write(img_out_str);
+
+        auto name = pic::removeExtension(img_out_str);
+
+        pic::Image *out_eq_1 = pic::HistogramMatching::executeEqualization(&img_source);
+        out_eq_1->Write(name + "_source_equalization.png");
+
+        pic::Image *out_eq_2 = pic::HistogramMatching::executeEqualization(&img_target);
+        out_eq_2->Write(name + "_target_equalization.png");
+
     } else {
         printf("No, the files are not valid!\n");
     }

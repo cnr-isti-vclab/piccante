@@ -214,12 +214,12 @@ public:
                    BBox *box = NULL, int channel = 0)
     {
         if((imgIn == NULL) || (channel < 0) ) {
-            uniform(1, type, nBin);
+            uniform(0.0f, 1.0f, 1, type, nBin);
             return;
         }
 
         if(!imgIn->isValid() || (channel >= imgIn->channels)) {
-            uniform(1, type, nBin);
+            uniform(0.0f, 1.0f, 1, type, nBin);
             return;
         }
 
@@ -294,7 +294,7 @@ public:
      * @param type
      * @param nBin
      */
-    void uniform(uint value, VALUE_SPACE type, int nBin)
+    void uniform(float fMin, float fMax, uint value, VALUE_SPACE type, int nBin)
     {
         bool c1 = (nBin != this->nBin) && (bin != NULL);
         bool c2 = (bin == NULL);
@@ -307,7 +307,13 @@ public:
         this->nBin = nBin;
         this->type = type;
 
-        memset((void*)bin, value, nBin * sizeof(uint));
+        memset((void *)bin, value, nBin * sizeof(uint));
+
+        nBinf = float(nBin - 1);
+
+        this->fMin = fMin;
+        this->fMax = fMax;
+        deltaMaxMin = (fMax - fMin);
     }
 
     /**
@@ -408,6 +414,25 @@ public:
     float *getCumulativef()
     {
         return bin_c;
+    }
+
+    /**
+     * @brief getfMin
+     * @return
+     */
+    float getfMin()
+    {
+        return fMin;
+    }
+
+
+    /**
+     * @brief getfMax
+     * @return
+     */
+    float getfMax()
+    {
+        return fMax;
     }
 
     /**

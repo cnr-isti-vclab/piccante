@@ -64,28 +64,35 @@ public:
      */
     Image *Process(ImageVec imgIn, Image *imgOut = NULL)
     {
-        if(!ImageVecCheck(imgIn, 2)) {
+        Image *img_source = NULL; //imgIn[0]
+        Image *img_target = NULL; //imgIn[1]
+
+        int count = 0;
+        if(ImageVecCheck(imgIn, 1)) {
+            img_source = imgIn[0];
+            count = 1;
+        }
+
+        if(ImageVecCheck(imgIn, 2)) {
+            img_target = imgIn[1];
+
+            if(imgIn[0]->channels != imgIn[1]->channels) {
+                return imgOut;
+            }
+            count = 2;
+        }
+
+        if(count == 0) {
             return imgOut;
         }
 
-        if(imgIn[0]->channels != imgIn[1]->channels) {
-            return imgOut;
-        }
-
-        //
-        // imgIn[0] --> img_source
-        //
-        // imgIn[1] --> img_target
-        //
-
-        auto img_source = imgIn[0];
-        auto img_target = imgIn[1];
+        count--;
 
         if(imgOut == NULL) {
-            imgOut = imgIn[1]->clone();
+            imgOut = imgIn[count]->clone();
         } else {
-            if(!imgOut->isSimilarType(imgIn[1])) {
-                imgOut = imgIn[1]->allocateSimilarOne();
+            if(!imgOut->isSimilarType(imgIn[count])) {
+                imgOut = imgIn[count]->allocateSimilarOne();
             }
         }
 
@@ -98,7 +105,15 @@ public:
 
         for(int i = 0; i < channels; i++) {
             h_source[i].calculate(img_source, VS_LIN, nBin, NULL, i);
-            h_target[i].calculate(img_target, VS_LIN, nBin, NULL, i);
+
+            if(img_target != NULL) {
+                h_target[i].calculate(img_target, VS_LIN, nBin, NULL, i);
+            } else {
+                uint value = (img_source->width * img_source->height) / nBin;
+                h_target[i].uniform(h_source[i].getfMin(),
+                                    h_source[i].getfMax(),
+                                    MAX(value, 1), VS_LIN, nBin);
+            }
 
             h_source[i].cumulativef(true);
             h_target[i].cumulativef(true);
@@ -143,10 +158,23 @@ public:
      * @param imgOut
      * @return
      */
-    static Image* execute(Image *img_source, Image *img_target, Image *imgOut)
+    static Image* execute(Image *img_source, Image *img_target, Image *imgOut = NULL)
     {
         HistogramMatching hm;
         imgOut = hm.Process(Double(img_source, img_target), imgOut);
+        return imgOut;
+    }
+
+    /**
+     * @brief executeEqualization
+     * @param img
+     * @param imgOut
+     * @return
+     */
+    static Image* executeEqualization(Image *img, Image *imgOut = NULL)
+    {
+        HistogramMatching hm;
+        imgOut = hm.Process(Double(img, NULL), imgOut);
         return imgOut;
     }
 };
