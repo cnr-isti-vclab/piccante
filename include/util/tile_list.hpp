@@ -33,7 +33,7 @@ namespace pic {
 class TileList
 {
 protected:
-    unsigned int counter;
+    uint counter;
 
 #ifndef PIC_DISABLE_THREAD
     std::mutex mutex;
@@ -75,13 +75,13 @@ public:
      * @brief getNext returns the index of the next tile to process.
      * @return This function returns the index of the next tile to proces.
      */
-    unsigned int getNext();
+    uint getNext();
 
     /**
      * @brief size
      * @return
      */
-    unsigned int size();
+    uint size();
 
     /**
      * @brief resetCounter sets the counter to zero.
@@ -149,9 +149,9 @@ PIC_INLINE BBox TileList::getBBox(int index)
     return tiles[i].getBBox(width, height);
 }
 
-PIC_INLINE unsigned int TileList::getNext()
+PIC_INLINE uint TileList::getNext()
 {
-    unsigned int ret = 0;
+    uint ret = 0;
     {
 #ifndef PIC_DISABLE_THREAD
         std::lock_guard<std::mutex> lock(mutex);
@@ -162,9 +162,9 @@ PIC_INLINE unsigned int TileList::getNext()
     return ret;
 }
 
-PIC_INLINE unsigned int TileList::size()
+PIC_INLINE uint TileList::size()
 {
-    return (unsigned int)(tiles.size());
+    return (uint)(tiles.size());
 }
 
 PIC_INLINE void TileList::resetCounter()
@@ -252,7 +252,7 @@ PIC_INLINE void TileList::writeIntoMemory(Image *output)
         return;
     }
 
-    for(unsigned int i = 0; i < tiles.size(); i++) { //for each tile
+    for(uint i = 0; i < tiles.size(); i++) { //for each tile
         if(tiles[i].tile != NULL) {
             output->copySubImage(tiles[i].tile, tiles[i].startX, tiles[i].startY);
         }

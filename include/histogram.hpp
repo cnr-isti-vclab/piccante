@@ -281,7 +281,6 @@ public:
                     for(int i = box->x0; i < box->x1; i++) {
                         float *tmp_data = (*imgIn)(i, j, k);
                         update(tmp_data[channel]);
-
                     }
                 }
             }
@@ -342,6 +341,7 @@ public:
     /**
      * @brief ceiling limits the maximum value of the histogram using Ward
      * algorithm.
+     * @param k
      */
     void ceiling(float k)
     {
@@ -359,7 +359,7 @@ public:
                 bFlag = false;
             } else {
                 bool bTrimmed = false;
-                uint ceiling = int(T * k);
+                uint ceiling = uint(T * k);
 
                 for(int i = 0; i < nBin; i++) {
                     if(bin[i] > ceiling) {
@@ -381,6 +381,35 @@ public:
                     bFlag = false;
                 }
             }
+        }
+    }
+
+    /**
+     * @brief clip clips the histogram to value.
+     * @param value the maximum allowed value in the histogram.
+     */
+    void clip(uint value)
+    {
+        int redistrib = 0;
+        for(int i = 0; i < nBin; i++) {
+            if(bin[i] > value) {
+                redistrib += bin[i] - value + 1;
+                bin[i] = value;
+            }
+        }
+
+        int nCount = redistrib / nBin;
+
+        for(int i = 0; i < nCount; i++) {
+            for(int j = 0; j < nBin; j++) {
+                bin[j]++;
+            }
+        }
+
+        int remainder = redistrib % nBin;
+
+        for(int i =0; i < remainder; i++) {
+            bin[rand() % nBin]++;
         }
     }
 

@@ -32,6 +32,8 @@ class HistogramMatching
 {
 protected:
     int nBin;
+    bool bClipping;
+    float clip_value;
 
     /**
      * @brief computeHistograms
@@ -45,6 +47,13 @@ protected:
                            Histogram *hist_s, Histogram *hist_t,
                            std::vector<int *> &lut)
     {
+
+        if(img_s == NULL) {
+            return;
+        }
+
+        uint clip_value_ui = uint(clip_value * float(img_s->nPixels() / nBin));
+
         int channels = img_s->channels;
 
         for(int i = 0; i < channels; i++) {
@@ -53,10 +62,16 @@ protected:
             if(img_t != NULL) {
                 hist_t[i].calculate(img_t, VS_LIN, nBin, NULL, i);
             } else {
-                uint value = (img_s->width * img_s->height) / nBin;
+                uint value = MAX(img_s->nPixels() / nBin, 1);
+
                 hist_t[i].uniform(hist_s[i].getfMin(),
                                   hist_s[i].getfMax(),
-                                  MAX(value, 1), VS_LIN, nBin);
+                                  value, VS_LIN, nBin);
+            }
+
+            if(bClipping) {
+                hist_s[i].clip(clip_value_ui);
+                hist_t[i].clip(clip_value_ui);
             }
 
             hist_s[i].cumulativef(true);
@@ -84,16 +99,19 @@ public:
      */
     HistogramMatching()
     {
-        update(256);
+        update(256, -1.0f);
     }
 
     /**
      * @brief update
      * @param nBin
+     * @param clip_value
      */
-    void update(int nBin)
+    void update(int nBin, float clip_value = 1.0f)
     {
         this->nBin = nBin > 1 ? nBin : 256;
+        this->clip_value = clip_value;
+        bClipping = clip_value > 0.0f;
     }
 
     /**
@@ -145,7 +163,6 @@ public:
 
         computeHistograms(img_source, img_target, h_source, h_target, lut);
 
-
         for(int i = 0; i < imgOut->size(); i += channels) {
 
             for(int j = 0; j < channels; j++) {
@@ -185,11 +202,13 @@ public:
      * @brief executeEqualization
      * @param img
      * @param imgOut
+     * @param clip_value
      * @return
      */
-    static Image* executeEqualization(Image *img, Image *imgOut = NULL)
+    static Image* executeEqualization(Image *img, Image *imgOut = NULL, float clip_value = 0.9f)
     {
         HistogramMatching hm;
+        hm.update(256, clip_value);
         imgOut = hm.Process(Double(img, NULL), imgOut);
         return imgOut;
     }
