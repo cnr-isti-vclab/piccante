@@ -76,10 +76,10 @@ protected:
      * @brief computeLUT
      * @param hist_s
      * @param hist_t
-     * @param lut
      * @param channels
+     * @param lut
      */
-    void computeLUT(Histogram *hist_s, Histogram *hist_t, std::vector<int *> &lut, int channels)
+    void computeLUT(Histogram *hist_s, Histogram *hist_t, int channels, std::vector<int *> &lut)
     {
         for(int i = 0 ; i < channels; i++) {
             hist_s[i].cumulativef(true);
@@ -170,7 +170,7 @@ public:
 
         computeHistograms(img_source, img_target, h_source, h_target);
         std::vector<int *> lut;
-        computeLUT(h_source, h_target, channels, lut)
+        computeLUT(h_source, h_target, channels, lut);
 
         for(int i = 0; i < imgOut->size(); i += channels) {
 
