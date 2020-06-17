@@ -41,20 +41,17 @@ protected:
      * @param img_t
      * @param hist_s
      * @param hist_t
-     * @param lut
      */
     void computeHistograms(Image *img_s, Image *img_t,
-                           Histogram *hist_s, Histogram *hist_t,
-                           std::vector<int *> &lut)
+                           Histogram *hist_s, Histogram *hist_t)
     {
 
         if(img_s == NULL) {
             return;
         }
 
-        uint clip_value_ui = uint(clip_value * float(img_s->nPixels() / nBin));
-
         int channels = img_s->channels;
+        uint clip_value_ui = uint(clip_value * float(img_s->nPixels() / nBin));
 
         for(int i = 0; i < channels; i++) {
             hist_s[i].calculate(img_s, VS_LIN, nBin, NULL, i);
@@ -68,12 +65,23 @@ protected:
                                   hist_s[i].getfMax(),
                                   value, VS_LIN, nBin);
             }
-
             if(bClipping) {
                 hist_s[i].clip(clip_value_ui);
                 hist_t[i].clip(clip_value_ui);
             }
+        }
+    }
 
+    /**
+     * @brief computeLUT
+     * @param hist_s
+     * @param hist_t
+     * @param lut
+     * @param channels
+     */
+    void computeLUT(Histogram *hist_s, Histogram *hist_t, std::vector<int *> &lut, int channels)
+    {
+        for(int i = 0 ; i < channels; i++) {
             hist_s[i].cumulativef(true);
             hist_t[i].cumulativef(true);
 
@@ -159,9 +167,10 @@ public:
         Histogram *h_source = new Histogram[channels];
         Histogram *h_target = new Histogram[channels];
 
-        std::vector<int *> lut;
 
-        computeHistograms(img_source, img_target, h_source, h_target, lut);
+        computeHistograms(img_source, img_target, h_source, h_target);
+        std::vector<int *> lut;
+        computeLUT(h_source, h_target, channels, lut)
 
         for(int i = 0; i < imgOut->size(); i += channels) {
 
