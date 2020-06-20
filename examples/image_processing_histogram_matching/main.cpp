@@ -69,6 +69,9 @@ int main(int argc, char *argv[])
         pic::Image *out_eq_2 = pic::HistogramMatching::executeEqualization(&img_target);
         out_eq_2->Write(name + "_target_equalization.png");
 
+        pic::Image *out_eq_1_local = pic::FilerCLAHE::execute(&img_source, NULL, 128);
+        out_eq_1_local->Write(name + "_target_clahe.png");
+
     } else {
         printf("No, the files are not valid!\n");
     }

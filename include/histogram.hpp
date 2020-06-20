@@ -234,6 +234,8 @@ public:
 
             bin = new uint[nBin];
             memset((void *)bin, 0, nBin * sizeof(uint));
+        } else {
+            memset((void *)bin, 0, nBin * sizeof(uint));
         }
 
         this->nBin = nBin;
@@ -316,14 +318,30 @@ public:
     }
 
     /**
+     * @brief update
+     * @param fMin
+     * @param fMax
+     */
+    void update(float fMin, float fMax)
+    {        
+        this->fMin = projectDomain(fMin);
+        this->fMax = projectDomain(fMax);
+        deltaMaxMin = (fMax - fMin);
+    }
+
+    /**
      * @brief project converts an input value in the histogram domain.
      * @param x is an input value.
      * @return x is projected in the histogram domain.
      */
     int project(float x)
     {
-        float y = projectDomain(x);
-        return int(((y - fMin) * nBinf) / deltaMaxMin);
+        if(deltaMaxMin > 0.0f) {
+            float y = projectDomain(x);
+            return int(((y - fMin) * nBinf) / deltaMaxMin);
+        } else {
+            return 0.5f;
+        }
     }
 
     /**
@@ -477,8 +495,12 @@ public:
         int ind;
         float maxValf = float(Array<uint>::getMax(bin, nBin, ind));
 
-        for(int i = 0; i < nBin; i++) {
-            bin_nor[i] = float(bin[i]) / maxValf;
+        if(maxValf > 0.0f) {
+            for(int i = 0; i < nBin; i++) {
+                bin_nor[i] = float(bin[i]) / maxValf;
+            }
+        } else {
+            Arrayf::assign(0.0f, bin_nor, nBin);
         }
 
         return bin_nor;

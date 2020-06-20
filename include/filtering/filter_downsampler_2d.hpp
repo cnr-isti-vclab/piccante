@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_DOWNSAMPLER_2D_HPP
 #define PIC_FILTERING_FILTER_DOWNSAMPLER_2D_HPP
 
+#include "../util/std_util.hpp"
 #include "../filtering/filter_npasses.hpp"
 #include "../filtering/filter_sampler_1d.hpp"
 #include "../image_samplers/image_sampler_nearest.hpp"
@@ -182,15 +183,8 @@ PIC_INLINE FilterDownSampler2D::~FilterDownSampler2D()
 PIC_INLINE void FilterDownSampler2D::release()
 {
     for (int i = 0; i < 2; i++) {
-        if (flt[i] != NULL) {
-            delete flt[i];
-            flt[i] = NULL;
-        }
-
-        if (isg[i] != NULL) {
-            delete isg[i];
-            isg[i] = NULL;
-        }
+        flt[i] = delete_s(flt[i]);
+        isg[i] = delete_s(isg[i]);
     }
 }
 

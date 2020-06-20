@@ -99,6 +99,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "filtering/filter_tmqi.hpp"
 #include "filtering/filter_nearest_neighbors.hpp"
 #include "filtering/filter_luminance_adaptation.hpp"
+#include "filtering/filter_clahe.hpp"
 
 //360 panoramic images
 #include "filtering/filter_rotation.hpp"

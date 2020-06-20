@@ -109,8 +109,8 @@ public:
             float scaleX = (dirs[X_DIRECTION] == 1) ? scale : 1.0f;
             float scaleY = (dirs[Y_DIRECTION] == 1) ? scale : 1.0f;
 
-            width  = int(imgIn[0]->width  * scaleX);
-            height = int(imgIn[0]->height * scaleY);
+            width  = int(imgIn[0]->widthf  * scaleX);
+            height = int(imgIn[0]->heightf * scaleY);
         } else {
             width  = (dirs[X_DIRECTION] == 1) ? size : imgIn[0]->width;
             height = (dirs[Y_DIRECTION] == 1) ? size : imgIn[0]->height;
