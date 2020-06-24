@@ -90,7 +90,7 @@ public:
     void update(int size)
     {
         this->halfSize = checkHalfSize(size);
-        this->nBin = 100;//size;
+        this->nBin = halfSize;//size;
 
         uint area = halfSize * halfSize;
         this->value = MAX(area / nBin, 1);

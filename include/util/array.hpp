@@ -296,14 +296,14 @@ public:
      * @param scale
      * @return
      */
-    static void mul(T *vec, int size, T scale)
+    static void mul(T *data, int size, T scale)
     {
-        if(vec == NULL || size < 1) {
+        if(data == NULL || size < 1) {
             return;
         }
 
         for(int i = 0; i < size; i++) {
-            vec[i] *= scale;
+            data[i] *= scale;
         }
     }
 
@@ -333,6 +333,10 @@ public:
      */
     static T* add(T *data, int size, T *ret)
     {
+        if(data == NULL || size < 1) {
+            return;
+        }
+
         for(int i = 0; i < size; i++) {
             ret[i] += data[i];
         }
@@ -385,6 +389,10 @@ public:
      */
     static T getVariance(T *data, int size)
     {
+        if(data == NULL || size < 2) {
+            return T(-1);
+        }
+
         T mu = getMean(data, size);
 
         T tmp = data[0] - mu;
@@ -395,6 +403,7 @@ public:
             ret += tmp * tmp;
         }
 
+        size--;
         return ret / T(size);
     }
 

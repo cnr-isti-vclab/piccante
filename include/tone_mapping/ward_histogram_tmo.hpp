@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_TONE_MAPPING_WARD_HISTOGRAM_TMO_HPP
 #define PIC_TONE_MAPPING_WARD_HISTOGRAM_TMO_HPP
 
+#include "../base.hpp"
 #include "../image.hpp"
 #include "../image_vec.hpp"
 #include "../histogram.hpp"
@@ -71,7 +72,7 @@ protected:
             h.ceiling(delta_log_L / (float(nBin) * delta_log_Ld));
         }
 
-        Pcum = Array<unsigned int>::cumsum(h.bin, nBin, Pcum);
+        Pcum = Array<uint>::cumsum(h.bin, nBin, Pcum);
         float maxPcumf = float(Pcum[nBin - 1]);
 
         for(int i = 0; i < nBin; i++) {
@@ -87,6 +88,7 @@ protected:
             float Ld = expf(delta_log_Ld * Arrayf::interp(x, PcumNorm, nBin, log_L_w) + log_LdMin) - epsilon;
 
             float scale = (MAX(Ld, 0.0f) - LdMin) / (delta_Ld * L_w);
+            scale = MAX(scale, 0.0f);
 
             int index = i * imgOut->channels;
             for(int j = 0; j < imgOut->channels; j++) {
