@@ -18,7 +18,7 @@
 # See the GNU Lesser General Public License
 # ( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
 
-TARGET = s_kmeans
+TARGET = u_polynomials
 
 QT       += core
 TEMPLATE = app

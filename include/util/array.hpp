@@ -333,8 +333,8 @@ public:
      */
     static T* add(T *data, int size, T *ret)
     {
-        if(data == NULL || size < 1) {
-            return;
+        if(data == NULL || ret == NULL || size < 1) {
+            return ret;
         }
 
         for(int i = 0; i < size; i++) {
