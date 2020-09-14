@@ -51,7 +51,11 @@ int main(int argc, char *argv[])
 
     int k = 3;
 
-    float *centers = pic::kMeans<float>(points, n, nDim, k, NULL, labels, 100);
+    pic::KMeans<float> km(k, 100);
+
+    float *centers = km.execute(points, n, nDim, NULL, labels);
+
+//     = pic::kMeans<float>(points, n, nDim, k, NULL, labels, 100);
 
     if(centers != NULL) {
         printf("K-Means ok!\n");
