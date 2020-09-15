@@ -48,10 +48,10 @@ int main(int argc, char *argv[])
         int nSamples = 0;
         float *samples = img.getColorSamples(NULL, nSamples, 0.125f);
 
-        std::vector< std::set<unsigned int> *> labels;
+        std::vector< std::set<pic::uint> *> labels;
         int channels = img.channels;
-        unsigned int k;
-        float *centers = pic::kMeansSelect<float>(samples, nSamples, channels, k, labels, 0.1f, 100);
+        pic::uint k;
+        float *centers = pic::KMeans<float>::select(samples, nSamples, channels, labels, k, 0.05f, 100);
 
         printf("The number of k is: %d\n", k);
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
                 float *data_out = NULL;
                 float dist = FLT_MAX;
 
-                for(unsigned int j = 0; j < k; j++) {
+                for(pic::uint j = 0; j < k; j++) {
                     float *data_j = &centers[j * channels];
                     float tmp_dist = pic::Array<float>::distanceSq(data_i, data_j, channels);
 

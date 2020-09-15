@@ -124,12 +124,11 @@ public:
     {
         this->k = k;
         this->maxIter = maxIter;
-
     }
 
     T* execute(T *samples, int nSamples, int nDim,
-                 T* centers,
-                 std::vector< std::set<uint> *> &labels)
+               T* centers,
+               std::vector< std::set<uint> *> &labels)
     {
         if(nSamples < k) {
             return NULL;
@@ -193,68 +192,64 @@ public:
         delete[] mean;
 
         return centers;
-
     }
-};
 
-/*
-template<class T>
-PIC_INLINE  T* kMeansSelect(T *samples, int nSamples, int nDim,
-                uint &k,
-                std::vector< std::set<uint> *> &labels,
-                float threshold = 1e-2f,
-                uint maxIter = 100)
-{
+    static T* select(T *samples, int nSamples, int nDim,
+              std::vector< std::set<uint> *> &labels,
+              uint &k,
+              float threshold = 1e-2f,
+              uint maxIter = 100)
+    {
+        T *centers = NULL;
+        k = 1;
+        T prevErr;
+        bool bFlag = true;
+        while(bFlag) {
+            k++;
 
-    T *centers = NULL;
-
-    k = 1;
-    T prevErr;
-    bool bFlag = true;
-    while(bFlag) {
-        k++;
-
-        #ifdef PIC_DEBUG
-            printf("k: %d\n", k);
-        #endif
-
-        labels.clear();
-        if(centers != NULL) {
-            delete[] centers;
-        }
-
-        centers = kMeans<T>(samples, nSamples, nDim, k, NULL, labels, maxIter);
-
-        T err = T(0);
-        for(int i = 0; i < labels.size(); i++) {
-            T *center_i = &centers[i * nDim];
-
-            std::set<uint> * cluster = labels.at(i);
-            for (std::set<uint>::iterator it = cluster->begin(); it != cluster->end(); it++) {
-                int i = *it;
-                err += Array<T>::distanceSq(&samples[i * nDim], center_i, nDim);
-            }
-
-        }
-
-        if(k > 2) {
-            float relErr = fabsf(float(err - prevErr)) / float(prevErr);
-
-             #ifdef PIC_DEBUG
-                printf("%f %f %f\n", err, prevErr, relErr);
+            #ifdef PIC_DEBUG
+                printf("k: %d\n", k);
             #endif
 
-            if(relErr < threshold) {
-                bFlag = false;
+            labels.clear();
+            if(centers != NULL) {
+                delete[] centers;
             }
+
+            KMeans km(k, maxIter);
+
+            centers = km.execute(samples, nSamples, nDim, NULL, labels);
+
+            T err = T(0);
+            for(uint i = 0; i < labels.size(); i++) {
+                T *center_i = &centers[i * nDim];
+
+                std::set<uint> * cluster = labels.at(i);
+                for (std::set<uint>::iterator it = cluster->begin(); it != cluster->end(); it++) {
+                    int i = *it;
+                    err += Array<T>::distanceSq(&samples[i * nDim], center_i, nDim);
+                }
+
+            }
+
+            if(k > 2) {
+                float relErr = fabsf(float(err - prevErr)) / float(prevErr);
+
+                 #ifdef PIC_DEBUG
+                    printf("%f %f %f\n", err, prevErr, relErr);
+                #endif
+
+                if(relErr < threshold) {
+                    bFlag = false;
+                }
+            }
+
+            prevErr = err;
         }
 
-        prevErr = err;
+        return centers;
     }
-
-    return centers;
-}
-*/
+};
 
 }
 
