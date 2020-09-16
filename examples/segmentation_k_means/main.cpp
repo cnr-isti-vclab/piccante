@@ -42,12 +42,12 @@ int main(int argc, char *argv[])
     int nDim = 2;
     float *points = new float[nDim * n];
     for(int i = 0; i< n; i++) {
-        pic::Vec<2, float> tmp = pic::randomPoint<2>(&m);
+        pic::Vec2f tmp = pic::randomPoint<2>(&m);
         points[i * 2    ] = tmp[0];
         points[i * 2 + 1] = tmp[1];
     }
 
-    std::vector< std::set<unsigned int> *> labels;
+    std::vector< std::set<pic::uint> *> labels;
 
     int k = 3;
 

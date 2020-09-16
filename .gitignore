@@ -269,3 +269,4 @@ examples/data/output/image.ppm
 examples/data/output/image.tga
 examples/build-hdr_generation_alignment-Desktop_Qt_5_8_0_clang_64bit-Release/hdr_generation_alignment
 examples/build-hdr_generation_alignment-Desktop_Qt_5_8_0_clang_64bit-Release/Makefile
+examples/build-s_kmeans-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile

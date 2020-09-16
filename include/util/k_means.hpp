@@ -34,61 +34,42 @@ class KMeans
 {
 protected:
 
-    T* getRandomCenters(T *samples, int nSamples, int nDim, T* centers, bool bType = true)
+    virtual T* getRandomCenters(T *samples, int nSamples, int nDim, T* centers)
     {
-        if(centers != NULL) {
-            delete[] centers;
+        if(centers == NULL) {
+            centers = new T[k * nDim];
         }
-
-        centers = new T[k * nDim];
 
         std::mt19937 m(42);
 
-        if(bType) {
-            T *tMin = new T[nDim];
-            T *tMax = new T[nDim];
+        T *tMin = new T[nDim];
+        T *tMax = new T[nDim];
 
-            for(int j = 0; j < nDim; j++) {
-                T s = samples[j];
-                tMin[j] = s;
-                tMax[j] = s;
-            }
-
-            for(int i = 1; i < nSamples; i++) {
-                int index = i * nDim;
-                for(int j = 0; j < nDim; j++) {
-                    T s = samples[index + j];
-
-                    tMin[j] = MIN(tMin[j], s);
-                    tMax[j] = MAX(tMax[j], s);
-                }
-            }
-
-            for(uint i = 0; i < k; i++) {
-                int index = i * nDim;
-                for(int j = 0; j < nDim; j++) {
-                    centers[index + j] = T(getRandom(m()) * (tMax[j] - tMin[j]) + tMin[j]);
-                }
-            }
-
-            delete[] tMin;
-            delete[] tMax;
-        } else {
-            std::set< uint > chosen;
-            for(uint i = 0; i < k; i++) {
-
-                bool bCheck = true;
-                while(bCheck) {
-                    uint index = m() % nSamples;
-                    if(chosen.find(index) == chosen.end()) {
-
-                        chosen.insert(index);
-                        Array<T>::assign(&samples[index * nDim], nDim, &centers[i * nDim]);
-                        bCheck = false;
-                    }
-                }
-             }
+        for(int j = 0; j < nDim; j++) {
+            T s = samples[j];
+            tMin[j] = s;
+            tMax[j] = s;
         }
+
+        for(int i = 1; i < nSamples; i++) {
+            int index = i * nDim;
+            for(int j = 0; j < nDim; j++) {
+                T s = samples[index + j];
+
+                tMin[j] = MIN(tMin[j], s);
+                tMax[j] = MAX(tMax[j], s);
+            }
+        }
+
+        for(uint i = 0; i < k; i++) {
+            int index = i * nDim;
+            for(int j = 0; j < nDim; j++) {
+                centers[index + j] = T(getRandom(m()) * (tMax[j] - tMin[j]) + tMin[j]);
+            }
+        }
+
+        delete[] tMin;
+        delete[] tMax;
 
         return centers;
     }
@@ -133,6 +114,7 @@ protected:
     uint k, maxIter;
 
 public:
+
     KMeans(uint k, uint maxIter)
     {
         setup(k, maxIter);
@@ -266,8 +248,44 @@ public:
 
         return centers;
     }
+
+    static T* execute(T *samples, int nSamples, int nDim,
+                      T* centers, int k,
+                      std::vector< std::set<uint> *> &labels,
+                      uint maxIter = 100)
+    {
+        KMeans km(k, maxIter);
+
+        return km.Process(samples, nSamples, nDim, centers, labels);
+    }
 };
 
-}
+/*
+    virtual T* getRandomCenters(T *samples, int nSamples, int nDim, T* centers)
+    {
+        std::mt19937 m(42);
+        if(centers == NULL) {
+            centers = new T[this->k * nDim];
+        }
+
+        std::set< uint > chosen;
+        for(uint i = 0; i < this->k; i++) {
+
+           bool bCheck = true;
+           while(bCheck) {
+               uint index = m() % nSamples;
+               if(chosen.find(index) == chosen.end()) {
+
+                   chosen.insert(index);
+                   Array<T>::assign(&samples[index * nDim], nDim, &centers[i * nDim]);
+                   bCheck = false;
+               }
+           }
+        }
+        return centers;
+    }
+ */
+
+} //end namespace pic
 
 #endif // PIC_UTIL_K_MEANS_HPP

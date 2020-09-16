@@ -61,10 +61,10 @@ Eigen::Matrix3d getHomographyMatrixFromTwoImage(Image *img0, Image *img1)
     //compute ORB descriptors for each corner and image
     ORBDescriptor b_desc(31, 512);
 
-    std::vector< pic::uint *> descs0;
+    std::vector< pic::uint* > descs0;
     b_desc.getAll(img0, corners_from_img0, descs0);
 
-    std::vector< pic::uint *> descs1;
+    std::vector< pic::uint* > descs1;
     b_desc.getAll(img1, corners_from_img1, descs1);
 
     //match descriptors

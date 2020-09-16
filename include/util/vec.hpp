@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <random>
 #include <assert.h>
 
+#include "../base.hpp"
 #include "../util/math.hpp"
 
 #include "../util/string.hpp"
@@ -30,7 +31,7 @@ namespace pic {
 /**
  * @brief The Vec class
  */
-template<unsigned int N, class T>
+template<uint N, class T>
 class Vec
 {
 public:
@@ -41,7 +42,7 @@ public:
      */
     Vec<N, T>()
     {
-        for(unsigned int i = 0; i < N; i++) {
+        for(uint i = 0; i < N; i++) {
             this->data[i] = T(0);
         }
     }
@@ -687,7 +688,7 @@ public:
  * @param sample
  * @return
  */
-template<unsigned int N>
+template<uint N>
 PIC_INLINE bool insideVecBBox(const Vec<N, float> &sample)
 {
     for(auto i = 0; i < N; i++) {
@@ -699,7 +700,7 @@ PIC_INLINE bool insideVecBBox(const Vec<N, float> &sample)
     return true;
 }
 
-template<unsigned int N>
+template<uint N>
 PIC_INLINE Vec<N, float> normalize(Vec<N, float> x)
 {
     float length = x.squaredSum();
@@ -719,7 +720,7 @@ PIC_INLINE Vec<N, float> normalize(Vec<N, float> x)
  * @param m
  * @return
  */
-template<unsigned int N>
+template<uint N>
 PIC_INLINE Vec<N, float> randomPoint(std::mt19937 *m)
 {
     Vec<N, float> x;
@@ -731,7 +732,7 @@ PIC_INLINE Vec<N, float> randomPoint(std::mt19937 *m)
     return x;
 }
 
-template<unsigned int N>
+template<uint N>
 void vecrint(Vec<N, float> &ret)
 {
     printf("\n Values :");
@@ -748,7 +749,7 @@ void vecrint(Vec<N, float> &ret)
  * @param radius
  * @return
  */
-template<unsigned int N>
+template<uint N>
 PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, float radius)
 {
     Vec<N, float> x;
@@ -772,7 +773,7 @@ PIC_INLINE Vec<N, float> annulusSampling(std::mt19937 *m, Vec<N, float> center, 
     return x;
 }
 
-template<unsigned int N>
+template<uint N>
 void vecGamma(Vec<N, float> &ret, float g)
 {
     for (auto i = 0; i < N; i++) {
@@ -780,7 +781,7 @@ void vecGamma(Vec<N, float> &ret, float g)
     }
 }
 
-template<unsigned int N>
+template<uint N>
 void vecSqrt(Vec<N, float> &ret)
 {
     for (auto i = 0; i < N; i++) {
@@ -788,7 +789,7 @@ void vecSqrt(Vec<N, float> &ret)
     }
 }
 
-template<unsigned int N>
+template<uint N>
 Vec<N, float> vecValOver(Vec<N, float> &in, float value)
 {
     Vec<N, float> ret;
@@ -799,7 +800,7 @@ Vec<N, float> vecValOver(Vec<N, float> &in, float value)
     return ret;
 }
 
-template<unsigned int N, class T>
+template<uint N, class T>
 void transferFromVecToPlain(std::vector< Vec<N, T> > &in, std::vector< T > &out)
 {
     for(auto i = 0; i < in.size(); i++) {
@@ -809,7 +810,7 @@ void transferFromVecToPlain(std::vector< Vec<N, T> > &in, std::vector< T > &out)
     }
 }
 
-template<unsigned int N, class T>
+template<uint N, class T>
 void transferFromPlainToVec(std::vector< T > &in, std::vector< Vec<N, T> > &out)
 {
     for(auto i = 0; i < in.size(); i+= N) {

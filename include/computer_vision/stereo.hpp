@@ -154,8 +154,8 @@ public:
         auto i_l_g = flt_grad.Process(Single(i_l_l), NULL);
         auto i_r_g = flt_grad.Process(Single(i_r_l), NULL);
 
-        disp_left  = flt_disp.Process(pic::Quad(img_left, img_right, i_l_g, i_r_g), disp_left);
-        disp_right = flt_disp.Process(pic::Quad(img_right, img_left, i_r_g, i_l_g), disp_right);
+        disp_left  = flt_disp.Process(Quad(img_left, img_right, i_l_g, i_r_g), disp_left);
+        disp_right = flt_disp.Process(Quad(img_right, img_left, i_r_g, i_l_g), disp_right);
 
         crossCheck(disp_left, disp_right);
         crossCheck(disp_right, disp_left);
