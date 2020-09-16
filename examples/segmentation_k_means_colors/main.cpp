@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         std::vector< std::set<pic::uint> *> labels;
         int channels = img.channels;
         pic::uint k;
-        float *centers = pic::KMeans<float>::select(samples, nSamples, channels, labels, k, 0.01f, 32);
+        float *centers = pic::KMeans<float>::select(samples, nSamples, channels, labels, k, 0.01f, 100);
 
         printf("The number of k is: %d\n", k);
 

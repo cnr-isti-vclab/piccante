@@ -34,7 +34,7 @@ class KMeans
 {
 protected:
 
-    T* getRandomCenters(T *samples, int nSamples, int nDim, T* centers)
+    T* getRandomCenters(T *samples, int nSamples, int nDim, T* centers, bool bType = true)
     {
         if(centers != NULL) {
             delete[] centers;
@@ -42,36 +42,53 @@ protected:
 
         centers = new T[k * nDim];
 
-        std::mt19937 m(std::chrono::system_clock::now().time_since_epoch().count());
+        std::mt19937 m(42);
 
-        T *tMin = new T[nDim];
-        T *tMax = new T[nDim];
+        if(bType) {
+            T *tMin = new T[nDim];
+            T *tMax = new T[nDim];
 
-        for(int j = 0; j < nDim; j++) {
-            T s = samples[j];
-            tMin[j] = s;
-            tMax[j] = s;
-        }
-
-        for(int i = 1; i < nSamples; i++) {
-            int index = i * nDim;
             for(int j = 0; j < nDim; j++) {
-                T s = samples[index + j];
-
-                tMin[j] = MIN(tMin[j], s);
-                tMax[j] = MAX(tMax[j], s);
+                T s = samples[j];
+                tMin[j] = s;
+                tMax[j] = s;
             }
-        }
 
-        for(uint i = 0; i < k; i++) {
-            int index = i * nDim;
-            for(int j = 0; j < nDim; j++) {
-                centers[index + j] = T(getRandom(m()) * (tMax[j] - tMin[j]) + tMin[j]);
+            for(int i = 1; i < nSamples; i++) {
+                int index = i * nDim;
+                for(int j = 0; j < nDim; j++) {
+                    T s = samples[index + j];
+
+                    tMin[j] = MIN(tMin[j], s);
+                    tMax[j] = MAX(tMax[j], s);
+                }
             }
-        }
 
-        delete[] tMin;
-        delete[] tMax;
+            for(uint i = 0; i < k; i++) {
+                int index = i * nDim;
+                for(int j = 0; j < nDim; j++) {
+                    centers[index + j] = T(getRandom(m()) * (tMax[j] - tMin[j]) + tMin[j]);
+                }
+            }
+
+            delete[] tMin;
+            delete[] tMax;
+        } else {
+            std::set< uint > chosen;
+            for(uint i = 0; i < k; i++) {
+
+                bool bCheck = true;
+                while(bCheck) {
+                    uint index = m() % nSamples;
+                    if(chosen.find(index) == chosen.end()) {
+
+                        chosen.insert(index);
+                        Array<T>::assign(&samples[index * nDim], nDim, &centers[i * nDim]);
+                        bCheck = false;
+                    }
+                }
+             }
+        }
 
         return centers;
     }
