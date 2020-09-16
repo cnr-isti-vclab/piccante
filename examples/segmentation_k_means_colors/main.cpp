@@ -51,35 +51,37 @@ int main(int argc, char *argv[])
         std::vector< std::set<pic::uint> *> labels;
         int channels = img.channels;
         pic::uint k;
-        float *centers = pic::KMeans<float>::select(samples, nSamples, channels, labels, k, 0.05f, 100);
+        float *centers = pic::KMeans<float>::select(samples, nSamples, channels, labels, k, 0.01f, 32);
 
         printf("The number of k is: %d\n", k);
 
         if(centers != NULL) {
+            printf("The number of k is: %d\n", k);
+
             int n = img.size();
 
             for(int i = 0; i < n; i+= channels) {
                 float *data_i = &img.data[i];
-                float *data_out = NULL;
+                float *data_c = NULL;
                 float dist = FLT_MAX;
 
                 for(pic::uint j = 0; j < k; j++) {
                     float *data_j = &centers[j * channels];
-                    float tmp_dist = pic::Array<float>::distanceSq(data_i, data_j, channels);
+                    float tmp_dist = pic::Arrayf::distanceSq(data_i, data_j, channels);
 
                     if(tmp_dist < dist) {
                         dist = tmp_dist;
-                        data_out = data_j;
+                        data_c = data_j;
                     }
                 }
 
-                for(int j = 0; j < channels; j++) {
-                    data_i[j] = data_out[j];
-                }
-
+                pic::Arrayf::assign(data_c, channels, data_i);
             }
 
-            img.Write("../data/output/s_kmeans_colors.png");
+            bool bWrite = img.Write("../data/output/s_kmeans_colors.png");
+            if(bWrite) {
+                printf("s_kmeans_colors.png was written with success!\n");
+            }
         }
     }
 

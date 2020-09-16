@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     pic::KMeans<float> km(k, 100);
 
-    float *centers = km.execute(points, n, nDim, NULL, labels);
+    float *centers = km.Process(points, n, nDim, NULL, labels);
 
 //     = pic::kMeans<float>(points, n, nDim, k, NULL, labels, 100);
 

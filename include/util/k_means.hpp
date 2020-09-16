@@ -25,6 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../base.hpp"
 #include "../util/array.hpp"
 #include "../util/math.hpp"
+#include "../util/std_util.hpp"
 
 namespace pic{
 
@@ -98,7 +99,7 @@ protected:
         T dist = Array<T>::distanceSq(sample_j, &centers[0], nDim);
         uint label = 0;
 
-        for(auto i = 1; i < k; i++) {
+        for(uint i = 1; i < k; i++) {
             T *center_i = &centers[i * nDim];
 
             T tmp_dist = Array<T>::distanceSq(sample_j, center_i, nDim);
@@ -126,7 +127,7 @@ public:
         this->maxIter = maxIter;
     }
 
-    T* execute(T *samples, int nSamples, int nDim,
+    T* Process(T *samples, int nSamples, int nDim,
                T* centers,
                std::vector< std::set<uint> *> &labels)
     {
@@ -173,6 +174,8 @@ public:
                 #ifdef PIC_DEBUG
                     printf("Max iterations: %d\n", i);
                 #endif
+
+                delete[] mean;
                 return centers;
             } else {
                 //clear labels
@@ -212,13 +215,10 @@ public:
             #endif
 
             labels.clear();
-            if(centers != NULL) {
-                delete[] centers;
-            }
+            centers = delete_vec_s(centers);
 
             KMeans km(k, maxIter);
-
-            centers = km.execute(samples, nSamples, nDim, NULL, labels);
+            centers = km.Process(samples, nSamples, nDim, NULL, labels);
 
             T err = T(0);
             for(uint i = 0; i < labels.size(); i++) {
