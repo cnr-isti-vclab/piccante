@@ -34,7 +34,7 @@ class KMeans
 {
 protected:
 
-    virtual T* getRandomCenters(T *samples, int nSamples, int nDim, T* centers)
+    virtual T* initCenters(T *samples, int nSamples, int nDim, T* centers)
     {
         if(centers == NULL) {
             centers = new T[k * nDim];
@@ -139,7 +139,7 @@ public:
             labels.push_back(new std::set<uint>);
         }
 
-        centers = getRandomCenters(samples, nSamples, nDim, centers);
+        centers = initCenters(samples, nSamples, nDim, centers);
 
         for(uint i = 0; i < nSamples; i++) {
             T *sample_i = &samples[i * nDim];
@@ -259,32 +259,6 @@ public:
         return km.Process(samples, nSamples, nDim, centers, labels);
     }
 };
-
-/*
-    virtual T* getRandomCenters(T *samples, int nSamples, int nDim, T* centers)
-    {
-        std::mt19937 m(42);
-        if(centers == NULL) {
-            centers = new T[this->k * nDim];
-        }
-
-        std::set< uint > chosen;
-        for(uint i = 0; i < this->k; i++) {
-
-           bool bCheck = true;
-           while(bCheck) {
-               uint index = m() % nSamples;
-               if(chosen.find(index) == chosen.end()) {
-
-                   chosen.insert(index);
-                   Array<T>::assign(&samples[index * nDim], nDim, &centers[i * nDim]);
-                   bCheck = false;
-               }
-           }
-        }
-        return centers;
-    }
- */
 
 } //end namespace pic
 

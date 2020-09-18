@@ -441,12 +441,10 @@ public:
     {
         getNormalized();
     
-        bin_c = Array<float>::cumsum(bin_nor, nBin, bin_c);
+        bin_c = Arrayf::cumsum(bin_nor, nBin, bin_c);
 
         if(bNormalized) {
-            for(int i = 0; i < nBin; i++) {
-                bin_c[i] /= bin_c[nBin - 1];
-            }
+            Arrayf::div(bin_c, nBin, bin_c[nBin - 1]);
         }
 
         return bin_c;
@@ -496,9 +494,7 @@ public:
         float maxValf = float(Array<uint>::getMax(bin, nBin, ind));
 
         if(maxValf > 0.0f) {
-            for(int i = 0; i < nBin; i++) {
-                bin_nor[i] = float(bin[i]) / maxValf;
-            }
+            Arrayf::div(bin_nor, nBin, maxValf);
         } else {
             Arrayf::assign(0.0f, bin_nor, nBin);
         }
@@ -517,7 +513,7 @@ public:
 
         if(bNor) {
             getNormalized();
-            memcpy(img.data, bin_nor, sizeof(float)*nBin);
+            memcpy(img.data, bin_nor, sizeof(float) * nBin);
         } else {
             for(int i = 0; i < nBin; i++) {
                 img.data[i] = float(bin[i]);
