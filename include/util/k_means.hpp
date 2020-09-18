@@ -34,6 +34,43 @@ class KMeans
 {
 protected:
 
+    T* getMean(T *samples, T *out, int nDim, std::set<uint> *cluster)
+    {
+        Array<T>::assign(T(0), out, nDim);
+
+        int count = 0;
+         for (auto it = cluster->begin(); it != cluster->end(); it++) {
+             int i = *it;
+             Array<T>::add(&samples[i * nDim], nDim, out);
+             count++;
+         }
+
+         if(count > 0) {
+             Array<T>::div(out, nDim, T(count));
+         }
+
+         return out;
+    }
+
+    uint assignLabel(T* sample_j, int nDim, T* centers)
+    {
+        T dist = Array<T>::distanceSq(sample_j, &centers[0], nDim);
+        uint label = 0;
+
+        for(uint i = 1; i < k; i++) {
+            T *center_i = &centers[i * nDim];
+
+            T tmp_dist = Array<T>::distanceSq(sample_j, center_i, nDim);
+
+            if(tmp_dist < dist) {
+                dist = tmp_dist;
+                label = i;
+            }
+        }
+
+        return label;
+    }
+
     virtual T* initCenters(T *samples, int nSamples, int nDim, T* centers)
     {
         if(centers == NULL) {
@@ -74,43 +111,6 @@ protected:
         return centers;
     }
 
-    T* getMean(T *samples, T *out, int nDim, std::set<uint> *cluster)
-    {
-        Array<T>::assign(T(0), out, nDim);
-
-        int count = 0;
-         for (auto it = cluster->begin(); it != cluster->end(); it++) {
-             int i = *it;
-             Array<T>::add(&samples[i * nDim], nDim, out);
-             count++;
-         }
-
-         if(count > 0) {
-             Array<T>::div(out, nDim, T(count));
-         }
-
-         return out;
-    }
-
-    uint assignLabel(T* sample_j, int nDim, T* centers)
-    {
-        T dist = Array<T>::distanceSq(sample_j, &centers[0], nDim);
-        uint label = 0;
-
-        for(uint i = 1; i < k; i++) {
-            T *center_i = &centers[i * nDim];
-
-            T tmp_dist = Array<T>::distanceSq(sample_j, center_i, nDim);
-
-            if(tmp_dist < dist) {
-                dist = tmp_dist;
-                label = i;
-            }
-        }
-
-        return label;
-    }
-
     uint k, maxIter;
 
 public:
@@ -125,7 +125,6 @@ public:
         this->k = k;
         this->maxIter = maxIter;
     }
-
     T* Process(T *samples, int nSamples, int nDim,
                T* centers,
                std::vector< std::set<uint> *> &labels)
@@ -196,6 +195,17 @@ public:
         return centers;
     }
 
+    static T* execute(T *samples, int nSamples, int nDim,
+                      T* centers, int k,
+                      std::vector< std::set<uint> *> &labels,
+                      uint maxIter = 100)
+    {
+
+        KMeans<T> km(k, maxIter);
+
+        return km.Process(samples, nSamples, nDim, centers, labels);
+    }
+
     static T* select(T *samples, int nSamples, int nDim,
               std::vector< std::set<uint> *> &labels,
               uint &k,
@@ -216,8 +226,7 @@ public:
             labels.clear();
             centers = delete_vec_s(centers);
 
-            KMeans km(k, maxIter);
-            centers = km.Process(samples, nSamples, nDim, NULL, labels);
+            centers = KMeans::execute(samples, nSamples, nDim, NULL, k, labels, maxIter);
 
             T err = T(0);
             for(uint i = 0; i < labels.size(); i++) {
@@ -249,15 +258,6 @@ public:
         return centers;
     }
 
-    static T* execute(T *samples, int nSamples, int nDim,
-                      T* centers, int k,
-                      std::vector< std::set<uint> *> &labels,
-                      uint maxIter = 100)
-    {
-        KMeans km(k, maxIter);
-
-        return km.Process(samples, nSamples, nDim, centers, labels);
-    }
 };
 
 } //end namespace pic

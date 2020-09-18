@@ -35,7 +35,7 @@ class KMeansRand: public KMeans<T>
 {
 protected:
 
-    virtual T* initCenters(T *samples, int nSamples, int nDim, T* centers)
+    T* initCenters(T *samples, int nSamples, int nDim, T* centers)
     {
         std::mt19937 m(42);
         if(centers == NULL) {
@@ -65,6 +65,16 @@ public:
     {
     }
 
+    static T* execute(T *samples, int nSamples, int nDim,
+                      T* centers, int k,
+                      std::vector< std::set<uint> *> &labels,
+                      uint maxIter = 100)
+    {
+
+        KMeansRand<T> km(k, maxIter);
+
+        return km.Process(samples, nSamples, nDim, centers, labels);
+    }
 };
 
 } //end namespace pic
