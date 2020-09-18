@@ -46,11 +46,14 @@ int main(int argc, char *argv[])
 
     if(img.isValid()) {
         int nSamples = 0;
-        float *samples = img.getColorSamples(NULL, nSamples, 0.125f);
+
+        pic::Image *img_lab = pic::FilterColorConv::fromRGBtoCIELAB(&img, NULL);
+        float *samples = img_lab->getColorSamples(NULL, nSamples, 0.125f);
 
         std::vector< std::set<pic::uint> *> labels;
         int channels = img.channels;
         pic::uint k;
+
         float *centers = pic::KMeansRand<float>::select(samples, nSamples, channels, labels, k, 0.01f, 100);
 
         printf("The number of k is: %d\n", k);
@@ -61,7 +64,7 @@ int main(int argc, char *argv[])
             int n = img.size();
 
             for(int i = 0; i < n; i+= channels) {
-                float *data_i = &img.data[i];
+                float *data_i = &img_lab->data[i];
                 float *data_c = NULL;
                 float dist = FLT_MAX;
 
@@ -77,6 +80,9 @@ int main(int argc, char *argv[])
 
                 pic::Arrayf::assign(data_c, channels, data_i);
             }
+
+            pic::FilterColorConv::fromCIELABtoRGB(img_lab, &img);
+
 
             bool bWrite = img.Write("../data/output/s_kmeans_colors.png");
             if(bWrite) {

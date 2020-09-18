@@ -71,7 +71,7 @@ public:
      * @param data input data, they are assumed to be 9 floats.
      * The matrix is stored by rows.
      */
-    void set(float *data)
+    void set(const float *data)
     {
         if(data != NULL) {
             memcpy(this->data, data, 9 * sizeof(float));
