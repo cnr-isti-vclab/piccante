@@ -51,12 +51,12 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         printf("Creating an image with bayering RGGB...");
-        pic::Image *img_RGGB = pic::FilterMosaic::Execute(&img, NULL);
+        pic::Image *img_RGGB = pic::FilterMosaic::execute(&img, NULL);
         printf("Ok\n");
 
         printf("Debayering the image...");
         pic::Image out(1, img.width, img.height, img.channels);
-        pic::FilterDemosaic::Execute(img_RGGB, &out);
+        pic::FilterDemosaic::execute(img_RGGB, &out);
         printf("Ok\n");
 
         printf("Computing the difference image...");
