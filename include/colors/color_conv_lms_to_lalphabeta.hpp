@@ -22,16 +22,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-const float mtxLMStoLab[] = {   0.57735f,   0.57735f,   0.57735f,
-                                0.408248f,  0.408248f, -0.816497f,
-                                0.707107f, -0.707107f,  0.0
-                            };
-
-const float mtxLabtoLMS[] = {   0.57735f,   0.408248f,   0.707107f,
-                                0.57735f,   0.408248f,  -0.707107f,
-                                0.57735f,  -0.816497f,   0.0f
-                            };
-
 /**
  * @brief The ColorConvLMStoLAlphaBeta class
  */
@@ -44,8 +34,21 @@ public:
      */
     ColorConvLMStoLAlphaBeta() : ColorConv()
     {
-        memcpy(mtx, mtxLMStoLab, 9 * sizeof(float));
-        memcpy(mtx_inv, mtxLMStoLab, 9 * sizeof(float));
+        float c1 = 1.0f / sqrtf(3.0f);
+        float c2 = 1.0f / sqrtf(6.0f);
+        float c3 = 1.0f / sqrtf(2.0f);
+        float c4 = -c2 * 2.0f;
+        
+        float mtxLMStoLalphabeta[] = { c1, c1, c1,
+                                       c2, c2, c4,
+                                       c3, -c3, 0.0f};
+
+        float mtxLalphabetatoLMS[] = { c1, c2,  c3,
+                                       c1, c2, -c3,
+                                       c1, c4, 0.0f};
+
+        memcpy(mtx, mtxLMStoLalphabeta, 9 * sizeof(float));
+        memcpy(mtx_inv, mtxLalphabetatoLMS, 9 * sizeof(float));
     }
 };
 
