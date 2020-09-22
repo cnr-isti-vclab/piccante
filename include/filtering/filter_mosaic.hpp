@@ -110,20 +110,6 @@ public:
         FilterMosaic flt;
         return flt.Process(Single(imgIn), imgOut);
     }
-
-    /**
-     * @brief execute
-     * @param fileInput
-     * @param fileOutput
-     * @return
-     */
-    static Image *execute(std::string fileInput, std::string fileOutput)
-    {
-        Image imgIn(fileInput);
-        Image *out = FilterMosaic::execute(&imgIn, NULL);
-        out->Write(fileOutput);
-        return out;
-    }
 };
 
 } // end namespace pic
