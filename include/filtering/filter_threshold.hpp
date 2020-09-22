@@ -109,6 +109,13 @@ public:
         channels    = 1;
         frames      = imgIn[0]->frames;
     }
+
+    static Image* execute(Image* imgIn, Image *imgOut, float threshold, bool bAdaptive)
+    {
+        FilterThreshold flt(threshold, bAdaptive);
+        imgOut = flt.Process(Single(imgIn), imgOut);
+        return imgOut;
+    }
 };
 
 } // end namespace pic
