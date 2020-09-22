@@ -210,7 +210,7 @@ public:
      * @param box is the slice where to compute the histogram.
      * @param channel is the color channel for which the Histogram will be computed.
      */
-    void calculate(Image *imgIn, VALUE_SPACE type, int nBin,
+    void calculate(Image *imgIn, VALUE_SPACE type = VS_LIN, int nBin = 256,
                    BBox *box = NULL, int channel = 0)
     {
         if((imgIn == NULL) || (channel < 0) ) {
@@ -484,22 +484,70 @@ public:
      * @brief getNormalized normalizes the Histogram.
      * @return It returns the normalized Histogram as a float pointer.
      */
-    float *getNormalized()
+    float *getNormalized(bool bNor = true)
     {
         if(bin_nor == NULL) {
             bin_nor = new float[nBin];
         }
 
         int ind;
-        float maxValf = float(Array<uint>::getMax(bin, nBin, ind));
+        float maxValf;
+        if(bNor) {
+            maxValf = float(Array<uint>::getMax(bin, nBin, ind));
+        } else {
+            maxValf = float(Array<uint>::sum(bin, nBin));
+        }
 
         if(maxValf > 0.0f) {
-            Arrayf::div(bin_nor, nBin, maxValf);
+            for(int i = 0; i < nBin; i++) {
+                bin_nor[i] = float(bin[i]) / maxValf;
+            }
         } else {
             Arrayf::assign(0.0f, bin_nor, nBin);
         }
 
         return bin_nor;
+    }
+
+    /**
+     * @brief getOtsu
+     * @return
+     */
+    float getOtsu()
+    {
+        float *pdf = getNormalized(false);
+
+        float w0 = 0.0f;
+        float w1 = 1.0f;
+        float mu0 = 0.0f;
+        float mu1 = 0.0f;
+        int index = 0;
+        for(int i = 0; i < nBin; i++) {
+            mu1 += unproject(i) * pdf[i];
+        }
+
+        float sigma_b_max = 0.0f;
+        for(int i = 1; i < nBin; i++) {
+
+            w0 += pdf[i];
+            w1 -= pdf[i];
+
+            float tmp = unproject(i) * pdf[i];
+            mu0 += tmp;
+            mu1 -= tmp;
+
+            if(w0 > 0.0f && w1 > 0.0f) {
+                float delta = (mu0 / w0) - (mu1 / w1);
+                float sigma_b = w0 * w1 * delta * delta;
+
+                if(sigma_b > sigma_b_max) {
+                    sigma_b_max = sigma_b;
+                    index = i;
+                }
+            }
+        }
+
+        return unproject(index);
     }
 
     /**
