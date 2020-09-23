@@ -128,7 +128,7 @@ public:
 
         pic::Image *imgLum;
         if(imgIn->channels == 3) {
-            imgLum = pic::FilterLuminance::execute(&img, NULL);
+            imgLum = pic::FilterLuminance::execute(imgIn, NULL);
         } else {
             imgLum = imgIn;
         }
