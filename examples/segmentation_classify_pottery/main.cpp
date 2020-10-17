@@ -229,6 +229,13 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         float *white_pixel = img(82, 126);
 
+        pic::Histogram h;
+        h.calculate(&img);
+        float val = h.getOtsu();
+        printf("%f\n", val);
+        pic::Image *img_thr = pic::FilterThreshold::execute(&img, NULL, val, false);
+        img_thr->Write("../data/output/segmentation_otsu.png");
+
         bool *mask = pic::computeColorClassification(&img, white_pixel, data_pottery_colors, 171, 3,  data_pottery_var_distance);
 
         pic::Image *opt = new pic::Image();
