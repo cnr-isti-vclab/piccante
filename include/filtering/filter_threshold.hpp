@@ -18,7 +18,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_THRESHOLD_HPP
 #define PIC_FILTERING_FILTER_THRESHOLD_HPP
 
+#include "../image.hpp"
+#include "../histogram.hpp"
 #include "../filtering/filter.hpp"
+#include "../filtering/filter_luminance.hpp"
 
 namespace pic {
 
@@ -114,6 +117,31 @@ public:
     {
         FilterThreshold flt(threshold, bAdaptive);
         imgOut = flt.Process(Single(imgIn), imgOut);
+        return imgOut;
+    }
+
+    static Image* Otsu(Image* imgIn, Image *imgOut)
+    {
+        if(imgIn == NULL) {
+            return imgOut;
+        }
+
+        pic::Image *imgLum;
+        if(imgIn->channels == 3) {
+            imgLum = pic::FilterLuminance::execute(imgIn, NULL);
+        } else {
+            imgLum = imgIn;
+        }
+
+        pic::Histogram h;
+        h.calculate(imgLum, pic::VS_LIN, 1024, NULL, 0);
+        float thr = h.getOtsu();
+        imgOut = pic::FilterThreshold::execute(imgLum, imgOut, thr, false);
+
+        if(imgIn->channels == 3) {
+            delete imgLum;
+        }
+
         return imgOut;
     }
 };

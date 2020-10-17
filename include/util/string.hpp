@@ -170,8 +170,8 @@ inline std::string removeLocalPath(std::string name)
 
 /**
  * @brief getFileNameOnly
- * @param name
- * @return
+ * @param name is the input name with global/local path and extension
+ * @return it returns ONLY the file name without path
  */
 inline std::string getFileNameOnly(std::string name)
 {
