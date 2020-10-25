@@ -22,6 +22,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <utility>
 #include <algorithm>
 
+#include "../base.hpp"
+
 namespace pic{
 
 /**
@@ -43,7 +45,7 @@ protected:
      * @param x0
      * @param n
      */
-    void InitSimplex(Scalar *x0, unsigned int n)
+    void InitSimplex(Scalar *x0, uint n)
     {
         simplex.clear();
 
@@ -55,12 +57,12 @@ protected:
 
         simplex.push_back(std::make_pair(function_vertex_0, vertex_0));
 
-        //computing the other vertices of the simplex
-        for(unsigned int i = 0; i < n; i++) {
+        //compute the other vertices of the simplex
+        for(uint i = 0; i < n; i++) {
             Scalar *vertex = new Scalar[n];
             memcpy(vertex, x0, sizeof(Scalar) * n);
 
-            if(vertex[i] != 0.0f) {
+            if(vertex[i] != Scalar(0)) {
                 vertex[i] += x0[i] * delta;
             } else {
                 vertex[i] = delta_zero;
@@ -79,24 +81,24 @@ protected:
      * @param x_mean
      * @param n
      */
-    void ComputeMean(Scalar *x_mean, unsigned int n)
+    void ComputeMean(Scalar *x_mean, uint n)
     {
         Scalar n_f = Scalar(n);
 
         //computing the mean point in the simplex
-        for(unsigned int i = 0; i < n; i++) {
+        for(uint i = 0; i < n; i++) {
             x_mean[i] = Scalar(0);
         }
 
-        for(unsigned int j = 0; j < n; j++) {
+        for(uint j = 0; j < n; j++) {
             Scalar *vertex = simplex[j].second;
 
-            for(unsigned int i = 0; i < n; i++) {
+            for(uint i = 0; i < n; i++) {
                 x_mean[i] += vertex[i];
             }
         }
 
-        for(unsigned int i = 0; i < n; i++) {
+        for(uint i = 0; i < n; i++) {
             x_mean[i] /= n_f;
         }
     }
@@ -108,11 +110,11 @@ protected:
      * @param n
      * @return
      */
-    Scalar ComputeReflected(Scalar *x_r, Scalar *x_mean, unsigned int n)
+    Scalar ComputeReflected(Scalar *x_r, Scalar *x_mean, uint n)
     {
         Scalar *x_n = simplex[n].second;
 
-        for(unsigned int i = 0; i < n; i++) {
+        for(uint i = 0; i < n; i++) {
             x_r[i] = x_mean[i] + alpha * (x_mean[i] - x_n[i]);
         }
 
@@ -126,11 +128,11 @@ protected:
      * @param n
      * @return
      */
-    Scalar ComputeExpansion(Scalar *x_e, Scalar *x_mean, unsigned int n)
+    Scalar ComputeExpansion(Scalar *x_e, Scalar *x_mean, uint n)
     {
         Scalar *x_n = simplex[n].second;
 
-        for(unsigned int i = 0; i < n; i++) {
+        for(uint i = 0; i < n; i++) {
             x_e[i] = x_mean[i] + gamma * (x_mean[i] - x_n[i]);
         }
 
@@ -144,11 +146,11 @@ protected:
      * @param n
      * @return
      */
-    Scalar ComputeContractionInside(Scalar *x_c, Scalar *x_mean, unsigned int n)
+    Scalar ComputeContractionInside(Scalar *x_c, Scalar *x_mean, uint n)
     {
         Scalar *x_n = simplex[n].second;
 
-        for(unsigned int i = 0; i < n; i++) {
+        for(uint i = 0; i < n; i++) {
             x_c[i] = x_mean[i] + lambda * (x_mean[i] - x_n[i]);
         }
 
@@ -159,15 +161,15 @@ protected:
      * @brief ComputeReduction
      * @param n
      */
-    void ComputeReduction(unsigned int n)
+    void ComputeReduction(uint n)
     {
         Scalar *x_0 = simplex[0].second;
 
-        for(unsigned int i = 1; i < (n + 1); i++) {
+        for(uint i = 1; i < (n + 1); i++) {
 
             Scalar *x_i = simplex[i].second;
 
-            for(unsigned int j = 0; j < n ; j++) {
+            for(uint j = 0; j < n ; j++) {
                 x_i[j] = x_0[j] + sigma * (x_i[j] - x_0[j]);
             }
 
@@ -183,7 +185,7 @@ protected:
      * @param x
      * @return
      */
-    Scalar *run_aux(Scalar *x_start, unsigned int n, Scalar epsilon, int max_iterations = 1000, Scalar *x = NULL)
+    Scalar *run_aux(Scalar *x_start, uint n, Scalar epsilon, int max_iterations = 1000, Scalar *x = NULL)
     {
         InitSimplex(x_start, n);
 
@@ -208,7 +210,7 @@ protected:
                 Scalar function_vertex_x_mean = function(x_mean, n);
 
                 Scalar err = Scalar(0);
-                for(unsigned int j = 0; j < n; j++) {
+                for(uint j = 0; j < n; j++) {
                     Scalar tmp = simplex[j].first - function_vertex_x_mean;
                     err += tmp * tmp;
                 }
@@ -224,10 +226,10 @@ protected:
                 Scalar err_f = Scalar(0);
                 Scalar err_v = Scalar(0);
 
-                for(unsigned int j = 1; j < (n + 1); j++) {
+                for(uint j = 1; j < (n + 1); j++) {
                     err_f = MAX(err_f, fabs(simplex[j].first - simplex[0].first));
 
-                    for(unsigned int i = 0; i < n; i++) {
+                    for(uint i = 0; i < n; i++) {
                         err_v = MAX(err_v, fabs(simplex[j].second[i] - simplex[0].second[i]));
                     }
                 }
@@ -325,12 +327,12 @@ public:
      * @brief function
      * @return
      */
-    virtual Scalar function(Scalar *x, unsigned int n)
+    virtual Scalar function(Scalar *x, uint n)
     {
         return FLT_MAX;
     }
 
-    virtual Scalar *run(Scalar *x_start, unsigned int n, Scalar epsilon = 1e-4f, int max_iterations = 1000, Scalar *x = NULL)
+    virtual Scalar *run(Scalar *x_start, uint n, Scalar epsilon = 1e-4f, int max_iterations = 1000, Scalar *x = NULL)
     {
         if(x == NULL) {
             x = new Scalar[n];

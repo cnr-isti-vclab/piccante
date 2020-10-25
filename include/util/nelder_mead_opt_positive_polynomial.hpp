@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_COMPUTER_VISION_NELDER_MEAD_OPT_POSITIVE_POLYNOMIAL_HPP
 
 #include <random>
+#include <vector>
 
 #include "../base.hpp"
 #include "../util/nelder_mead_opt_base.hpp"
