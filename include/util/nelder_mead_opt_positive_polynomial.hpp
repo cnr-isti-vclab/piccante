@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <random>
 
+#include "../base.hpp"
 #include "../util/nelder_mead_opt_base.hpp"
 #include "../util/math.hpp"
 #include "../util/polynomial.hpp"
@@ -42,11 +43,10 @@ public:
 
     float function(float *x, unsigned int n)
     {
-
         Polynomial poly(x, n);
 
         float err = 0.0f;
-        for(auto i = 0; i < px.size(); i++) {
+        for(uint i = 0; i < px.size(); i++) {
             float py_i = poly.eval(px[i]);
             if(py_i > 0.0f) {
                 float delta_y = py_i - py[i];

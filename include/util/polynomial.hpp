@@ -112,7 +112,7 @@ public:
             return ret;
         }
 
-        auto nCoeff = coeff.size();
+        uint nCoeff = coeff.size();
 
         if(nCoeff > 1) {
 
@@ -123,8 +123,7 @@ public:
 
             ret = fromNumberToString(coeff[0]) + sep;
 
-            for(auto i = 1; i < (nCoeff - 1); i++) {
-
+            for(uint i = 1; i < (nCoeff - 1); i++) {
                 if(coeff[i + 1] > 0.0f) {
                     sep = "+ ";
                 } else {
@@ -151,7 +150,7 @@ public:
             ret = new float[coeff.size()];
         }
 
-        for(int i = 0; i < coeff.size(); i++) {
+        for(uint i = 0; i < coeff.size(); i++) {
             ret[i] = coeff[i];
         }
 
@@ -181,7 +180,7 @@ public:
      */
     float dEval(float x)
     {
-        auto nCoeff = coeff.size();
+        uint nCoeff = coeff.size();
 
         if(nCoeff < 2) {
             return 0.0f;
@@ -189,7 +188,7 @@ public:
 
         float ret = coeff[nCoeff - 1] * float(nCoeff - 1);
 
-        for(auto i = (nCoeff - 2); i > 0 ; i--) {
+        for(uint i = (nCoeff - 2); i > 0 ; i--) {
             ret = (ret * x) + coeff[i] * float(i);
         }
         return ret;
@@ -210,26 +209,26 @@ public:
 
         coeff.clear();
 
-        int np1 = n + 1;
+        uint np1 = n + 1;
 
-        int s = int(x.size());
+        uint s = x.size();
         Eigen::MatrixXf A(s, np1);
         Eigen::VectorXf b(s);
 
-        for(int i = 0; i < s; i++) {
+        for(uint i = 0; i < s; i++) {
             b(i) = y[i];
             A(i, n) = 1.0f;
         }
 
-        for(int j = (n - 1); j >= 0; j--) {
-            for(int i = 0; i < s; i++) {
+        for(uint j = (n - 1); j >= 0; j--) {
+            for(uint i = 0; i < s; i++) {
                 A(i, j) = x[i] * A(i, j + 1);
             }
         }
 
         Eigen::VectorXf _x = A.colPivHouseholderQr().solve(b);
 
-        for(int i = n; i >= 0; i--) {
+        for(uint i = n; i >= 0; i--) {
             coeff.push_back(_x(i));
         }
 #endif
@@ -240,11 +239,11 @@ public:
      */
     void normalForm()
     {
-        auto last = coeff.size() - 1;
+        uint last = coeff.size() - 1;
 
         if(fabsf(coeff[last]) > 0.0f) {
 
-            for(int i = 0; i < last; i++) {
+            for(uint i = 0; i < last; i++) {
                 coeff[i] /= coeff[last];
             }
 
@@ -260,12 +259,12 @@ public:
      */
     Polynomial horner(float d, float &remainder)
     {
-        int nCoeff = int(coeff.size());
+        uint nCoeff = coeff.size();
         Polynomial p(nCoeff - 1);
 
         p.coeff[nCoeff - 2] = coeff[nCoeff - 1];
 
-        for(int i = (nCoeff - 3); i >= 0 ; i--) {
+        for(uint i = (nCoeff - 3); i >= 0 ; i--) {
             p.coeff[i] = (p.coeff[i + 1] * d + coeff[i + 1]);
         }
 
@@ -283,7 +282,7 @@ public:
      */
     bool getRoots(float *x)
     {
-        auto nCoeff = coeff.size();
+        uint nCoeff = coeff.size();
 
         if(nCoeff < 2) {
             return false;
@@ -310,7 +309,7 @@ public:
 
         float max_coeff0 = -1.0f;
 
-        for(int i = 1; i < coeff.size(); i++) {
+        for(uint i = 1; i < coeff.size(); i++) {
             float tmp = fabsf(coeff[i]);
             if(tmp > max_coeff0) {
                 max_coeff0 = tmp;
@@ -337,17 +336,16 @@ public:
         float x_n;
         bool notConverged = true;
         int counter = 0;
-        float E_x_p;
         while(notConverged) {
-            E_x_p = eval(x_p);
+            float E_x_p = eval(x_p);
             x_n = x_p - E_x_p / dEval(x_p);
             x_p = x_n;
             counter++;
 
-            notConverged = (fabsf(E_x_p) > 1e-6f) && (counter < 500);
+            notConverged = (fabsf(E_x_p) > 1e-6f) && (counter < 1000);
         }
 
-        if(counter >= 500) {
+        if(counter >= 1000) {
             return false;
         } else {
             *x = x_n;
@@ -362,7 +360,8 @@ public:
      */
     bool getAllRoots(float *x)
     {
-        for(int i = 0; i < coeff.size() - 1; i++) {
+        uint nCoeff = coeff.size();
+        for(uint i = 0; i < nCoeff - 1; i++) {
             x[i] = FLT_MAX;
         }
 
@@ -376,8 +375,7 @@ public:
         Polynomial p = horner(x[0], r);
         p.normalForm();
 
-        int nCoeff = int(coeff.size());
-        for(int i = 1; i < (nCoeff - 2); i++) {
+        for(uint i = 1; i < (nCoeff - 2); i++) {
             bool bOut = p.getRoots(&x[i]);
 
             if(!bOut) {
