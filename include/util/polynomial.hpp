@@ -36,9 +36,76 @@ namespace pic {
 
 class Polynomial
 {
+protected:
+
+    /**
+     * @brief getRootsNetwonHorner
+     * @return
+     */
+    bool getRootsNetwonHorner(float *x)
+    {
+
+        float upper_bound = getUpperBoundRoots();
+
+
+    #ifdef PIC_DEBUG
+        float lower_bound = getNegativeLowerBoundRoots();
+        float lower_bound2 = getPositiveLowerBoundRoots();
+        float upper_bound2 = getNegativeUpperBoundRoots();
+        printf("Positive Lower bound: %f\n", lower_bound2);
+        printf("Positive Upper bound: %f\n", upper_bound);
+        printf("Negative Lower bound: %f\n", lower_bound);
+        printf("Negative Upper bound: %f\n", upper_bound2);
+    #endif
+
+        float x_p = upper_bound;
+        bool notConverged = true;
+        int counter = 0;
+        float E_x_p, d_E_x_p, delta;
+        float prev = x_p;
+
+        computeDCoeff();
+
+        while(notConverged) {
+            E_x_p = eval(x_p);
+            d_E_x_p = dEval(x_p);
+            x_p -= E_x_p / d_E_x_p;
+
+            delta = fabsf(x_p - prev);
+            prev = x_p;
+            counter++;
+            notConverged = (delta > 1e-5f) && (counter < 1000);
+        }
+
+        if(counter >= 1000) {
+            return false;
+        } else {
+            *x = x_p;
+            return true;
+        }
+    }
+
+    /**
+     * @brief computeDCoeff
+     */
+    void computeDCoeff()
+    {
+        if(coeff.empty()) {
+            return;
+        }
+
+        d_coeff.push_back(0.0f);
+
+        for(uint i = 1; i < coeff.size(); i++) {
+            float d_i = float(i) * coeff[i];
+            d_coeff.push_back(d_i);
+        }
+    }
+
 public:
+    std::vector<float> d_coeff;
     std::vector<float> coeff;
-    bool  all_coeff_positive;
+    bool all_coeff_positive;
 
     /**
      * @brief Polynomial
@@ -73,8 +140,7 @@ public:
         }
 
         this->coeff.assign(coeff, coeff + nCoeff);
-
-        computeAllCoeffPositive();
+        update();
     }
 
     ~Polynomial()
@@ -82,10 +148,16 @@ public:
 
     }
 
+    void update()
+    {
+        computeDCoeff();
+        computeAllPositiveCoeff();
+    }
+
     /**
-     * @brief computeAllCoeffPositive
+     * @brief computeAllPositiveCoeff
      */
-    void computeAllCoeffPositive()
+    void computeAllPositiveCoeff()
     {
         int counter = 0;
         for (const float &c : coeff) {
@@ -158,6 +230,22 @@ public:
     }
 
     /**
+     * @brief clone
+     * @return
+     */
+    Polynomial clone()
+    {
+        Polynomial out;
+
+        for(uint i = 0; i < coeff.size(); i++) {
+            out.coeff.push_back(coeff[i]);
+        }
+
+        out.update();
+        return out;
+    }
+
+    /**
      * @brief eval
      * @param x
      * @return
@@ -180,16 +268,21 @@ public:
      */
     float dEval(float x)
     {
-        uint nCoeff = coeff.size();
+        int nCoeff = int(coeff.size());
 
-        if(nCoeff < 2) {
+        if(nCoeff == 0) {
+            return FLT_MAX;
+        }
+
+        if(nCoeff == 1) {
             return 0.0f;
         }
 
-        float ret = coeff[nCoeff - 1] * float(nCoeff - 1);
+        float ret = d_coeff[nCoeff - 1];
 
-        for(uint i = (nCoeff - 2); i > 0 ; i--) {
-            ret = (ret * x) + coeff[i] * float(i);
+        for(int i = (nCoeff - 2); i > 0 ; i--) {
+            ret *= x;
+            ret += d_coeff[i];
         }
         return ret;
     }
@@ -209,26 +302,26 @@ public:
 
         coeff.clear();
 
-        uint np1 = n + 1;
+        int np1 = n + 1;
 
-        uint s = x.size();
+        int s = int(x.size());
         Eigen::MatrixXf A(s, np1);
         Eigen::VectorXf b(s);
 
-        for(uint i = 0; i < s; i++) {
+        for(int i = 0; i < s; i++) {
             b(i) = y[i];
             A(i, n) = 1.0f;
         }
 
-        for(uint j = (n - 1); j >= 0; j--) {
-            for(uint i = 0; i < s; i++) {
+        for(int j = (n - 1); j >= 0; j--) {
+            for(int i = 0; i < s; i++) {
                 A(i, j) = x[i] * A(i, j + 1);
             }
         }
 
         Eigen::VectorXf _x = A.colPivHouseholderQr().solve(b);
 
-        for(uint i = n; i >= 0; i--) {
+        for(int i = n; i >= 0; i--) {
             coeff.push_back(_x(i));
         }
 #endif
@@ -252,6 +345,35 @@ public:
     }
 
     /**
+     * @brief changeSign
+     */
+    void changeSign()
+    {
+        for(uint i = 0; i < coeff.size(); i++) {
+            coeff[i] = -coeff[i];
+        }
+    }
+
+    /**
+     * @brief inversePoly
+     */
+    void inversePoly()
+    {
+        std::reverse(coeff.begin(), coeff.end());
+    }
+
+    /**
+     * @brief negativePoly
+     */
+    void negativePoly()
+    {
+        for(int i = 1; i < coeff.size(); i+=2) {
+            coeff[i] = -coeff[i];
+        }
+        changeSign();
+    }
+
+    /**
      * @brief horner
      * @param d
      * @param remainder
@@ -259,20 +381,123 @@ public:
      */
     Polynomial horner(float d, float &remainder)
     {
-        uint nCoeff = coeff.size();
+        int nCoeff = int(coeff.size());
         Polynomial p(nCoeff - 1);
 
         p.coeff[nCoeff - 2] = coeff[nCoeff - 1];
 
-        for(uint i = (nCoeff - 3); i >= 0 ; i--) {
+        for(int i = (nCoeff - 3); i >= 0 ; i--) {
             p.coeff[i] = (p.coeff[i + 1] * d + coeff[i + 1]);
         }
 
-        p.computeAllCoeffPositive();
+        p.computeAllPositiveCoeff();
 
         remainder = coeff[0] + p.coeff[0] * d;
 
         return p;
+    }
+
+    /**
+     * @brief getUpperBoundRootsLagrange
+     * @return
+     */
+    float getUpperBoundRootsLagrange()
+    {
+        if(coeff.empty()) {
+            return FLT_MAX;
+        }
+
+        uint n =  coeff.size() - 1;
+
+        if((n == 0) || (coeff[n] == 0.0f)) {
+            return FLT_MAX;
+        }
+
+        float upper_bound = 1.0f;
+
+        for(uint i = 0; i < n; i++) {
+            upper_bound = MAX(upper_bound, fabsf(coeff[i] / coeff[n]));
+        }
+
+        return upper_bound;
+    }
+
+    /**
+     * @brief getUpperBoundRootsLagrange
+     * @return
+     */
+    float getUpperBoundRootsCauchy()
+    {
+        if(coeff.empty()) {
+            return FLT_MAX;
+        }
+
+        uint n =  coeff.size() - 1;
+
+        if((n == 0) || (coeff[n] == 0.0f)) {
+            return FLT_MAX;
+        }
+
+        float upper_bound = 0.0f;
+
+        for(uint i = 0; i < n; i++) {
+            upper_bound = MAX(upper_bound, fabsf(coeff[i] / coeff[n]));
+        }
+
+        return upper_bound + 1.0f;
+    }
+
+    /**
+     * @brief getNegativeLowerBoundRoots
+     * @return
+     */
+    float getNegativeLowerBoundRoots()
+    {
+        Polynomial tmp = clone();
+        tmp.negativePoly();
+        return -tmp.getUpperBoundRoots();
+    }
+
+    /**
+     * @brief getNegativeUpperBoundRoots
+     * @return
+     */
+    float getNegativeUpperBoundRoots()
+    {
+        Polynomial tmp = clone();
+        tmp.inversePoly();
+        tmp.negativePoly();
+        return -1.0f / tmp.getUpperBoundRoots();
+    }
+
+    /**
+     * @brief getUpperBoundRoots
+     * @return
+     */
+    float getPositiveLowerBoundRoots()
+    {
+        Polynomial tmp = clone();
+        tmp.inversePoly();
+        return 1.0f / tmp.getUpperBoundRoots();
+    }
+
+    /**
+     * @brief getUpperBoundRoots
+     * @return
+     */
+    float getUpperBoundRoots()
+    {
+        float lambda = 0.0f;
+
+        uint n = coeff.size() - 1;
+        for(uint i = 0; i < coeff.size(); i++) {
+            if((coeff[i] < 0.0f) && (coeff[i] < lambda)) {
+                lambda = coeff[i];
+            }
+        }
+        lambda = fabsf(lambda);
+
+        return 1.0f + lambda / fabsf(coeff[n]);
     }
 
     /**
@@ -307,50 +532,8 @@ public:
             return false;
         }
 
-        float max_coeff0 = -1.0f;
+        return getRootsNetwonHorner(x);
 
-        for(uint i = 1; i < coeff.size(); i++) {
-            float tmp = fabsf(coeff[i]);
-            if(tmp > max_coeff0) {
-                max_coeff0 = tmp;
-            }
-        }
-
-        float tmp = fabsf(coeff[0]);
-        float max_coeff;
-        if(max_coeff0 < tmp) {
-            max_coeff = tmp;
-        } else {
-            max_coeff = max_coeff0;
-        }
-
-        float lower_bound = fabsf(coeff[0]) / (fabsf(coeff[0]) + max_coeff0);
-
-#ifdef PIC_DEBUG
-        float upper_bound = 1.0f + max_coeff / fabsf(coeff[0]);
-        printf("Upper bound: %f\n", upper_bound);
-        printf("Lower bound: %f\n", lower_bound);
-#endif
-
-        float x_p = lower_bound;
-        float x_n;
-        bool notConverged = true;
-        int counter = 0;
-        while(notConverged) {
-            float E_x_p = eval(x_p);
-            x_n = x_p - E_x_p / dEval(x_p);
-            x_p = x_n;
-            counter++;
-
-            notConverged = (fabsf(E_x_p) > 1e-6f) && (counter < 1000);
-        }
-
-        if(counter >= 1000) {
-            return false;
-        } else {
-            *x = x_n;
-            return true;
-        }
     }
 
     /**
@@ -411,7 +594,8 @@ public:
         bool bOut = false;
 
         for (int i = 0; i < 4; i++) {
-            if (fabs(e(i).imag()) <= 0.0) {
+            double e_img = e(i).imag();
+            if (fabs(e_img) <= 0.0) {
                 x[i] = float(e(i).real());
                 bOut = true;
             }
