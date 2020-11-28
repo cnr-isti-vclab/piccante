@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
         //
 
         //we estimate the best exposure for this HDR image
-        fstop = pic::findBestExposureMean(&img);
+        fstop = pic::findBestExposureMean(&img, false);
 
         printf("The best exposure value (mean-based) is: %f f-stops\n", fstop);
 

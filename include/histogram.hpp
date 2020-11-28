@@ -607,16 +607,12 @@ public:
         int countIndex = 0;
         while(Array<uint>::sum(bin_work, nBin) > 0) {
 
-
             int count = -1;
             int index = 0;
 
             for(int i = 0; i < (nBin - removingBins); i++) {
-                int tmpCount = 0;
 
-                for(int j = i; j < (i + removingBins); j++) {
-                    tmpCount += bin_work[j];
-                }
+                int tmpCount = Array<uint>::sum(&bin_work[i], removingBins);
 
                 if(tmpCount > count) {
                     count = tmpCount;
@@ -632,77 +628,15 @@ public:
                 break;
             }
 
-            for(int j = index; j < (index + removingBins); j++) {
-                bin_work[j] = 0;
-            }
+            Array<uint>::assign(0, &bin_work[index], removingBins);
 
-            float fstop = (float(index + removingBins) * dMM) + fMin;
+            float fstop = (float(index + removingBins ) * dMM) + fMin;
 
-
-            /*
-            int ind;
-            Array<uint>::getMax(bin_work, nBin, ind);
-
-            int indMin = MAX(ind - removingBins_half, 0);
-            int indMax = MIN(ind + removingBins_half, nBin);
-
-            for(int i = indMin; i < indMax; i++) {
-                bin_work[i] = 0;
-            }
-
-            float fstop = -float(ind - removingBins_half) * dMM + fMin;*/
-
-            printf("%f\n", fstop);
             ret.push_back(fstop);
 
         }
 
         return ret;
-    }
-
-    /**
-     * @brief getBestExposure computes the best interval center.
-     * @param nBits is the number of bits in the budget for the output image.
-     * @return It returns the exposure, in f-stops, for setting the image
-     * with the best exposure at given dynamic range.
-     */
-    float getBestExposure(int nBits, float overlap = 0.5f)
-    {
-        if(overlap < 0.0f) {
-            overlap = 0.5f;
-        }
-
-        float nBits_f = float(nBits);
-        if((type != VS_LOG_2) && (nBits_f > deltaMaxMin) && (nBits < 1)){
-            return 0.0f;
-        }
-
-        float dMM = deltaMaxMin / nBinf;
-        int range_size_hist = int(float(nBits) /dMM + overlap);
-        range_size_hist = (range_size_hist < 1) ? 2 : range_size_hist;
-
-        #ifdef PIC_DEBUG
-            printf("Histogram [%f %f] %d\n", fMin, fMax, range_size_hist);
-        #endif
-
-        int count = -1;
-        int index = 0;
-
-        for(int i = 0; i < (nBin - range_size_hist); i++) {
-            int tmpCount = 0;
-
-            for(int j = i; j < (i + range_size_hist); j++) {
-                tmpCount += bin[j];
-            }
-
-            if(tmpCount > count) {
-                count = tmpCount;
-                index = i;
-            }
-        }
-
-        float fstop_index = (float(index + range_size_hist) * dMM) + fMin;
-        return -fstop_index;
     }
 };
 

@@ -52,13 +52,13 @@ PIC_INLINE float findBestExposureHistogram(Image *img)
 
     Histogram hist(lum, VS_LOG_2, 4096, 0);
 
-    float fstop = hist.getBestExposure(8);
+    std::vector<float> fstops = hist.exposureCovering(8);
 
     if(img->channels != 1) {
         delete lum;
     }
 
-    return fstop;
+    return fstops[0];
 }
 
 /**
@@ -66,7 +66,7 @@ PIC_INLINE float findBestExposureHistogram(Image *img)
  * @param img
  * @return It returns the exposure value in f-stops.
  */
-PIC_INLINE float findBestExposureMean(Image *img)
+PIC_INLINE float findBestExposureMean(Image *img, bool bMedian = false)
 {
     if(img == NULL) {
         return 0.0f;
@@ -85,7 +85,11 @@ PIC_INLINE float findBestExposureMean(Image *img)
     }
 
     float lum_mean;
-    lum->getMeanVal(NULL, &lum_mean);
+    if(bMedian) {
+        lum->getMeanVal(NULL, &lum_mean);
+    } else {
+        lum->getMeanVal(NULL, &lum_mean);
+    }
 
     float fstop = -log2f(lum_mean) - 1.0f;
 
