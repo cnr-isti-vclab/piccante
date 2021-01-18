@@ -53,10 +53,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 //color conversion
 #include "gl/colors/color_conv.hpp"
+#include "gl/colors/color_conv_linear.hpp"
 #include "gl/colors/color_conv_rgb_to_xyz.hpp"
 #include "gl/colors/color_conv_rgb_to_srgb.hpp"
 #include "gl/colors/color_conv_rgb_to_hsl.hpp"
 #include "gl/colors/color_conv_xyz_to_cielab.hpp"
+#include "gl/colors/color_conv_xyz_to_lms.hpp"
 #include "gl/filtering/filter_color_conv.hpp"
 
 #include "gl/filtering/filter_warp_2d.hpp"

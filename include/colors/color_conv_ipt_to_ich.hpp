@@ -23,9 +23,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace pic {
 
 /**
- * @brief The ColorConvXYZtoLogLuv class
+ * @brief The ColorConvIPTtoICH class
  */
-class ColorConvXYZtoLogLuv: public ColorConv
+class ColorConvIPTtoICH: public ColorConv
 {
 protected:
     float epsilon;
@@ -33,9 +33,9 @@ protected:
 public:
 
     /**
-     * @brief ColorConvXYZtoLogLuv
+     * @brief ColorConvIPTtoICH
      */
-    ColorConvXYZtoLogLuv()
+    ColorConvIPTtoICH()
     {
         linear = false;
         epsilon = 1.0f;
@@ -48,7 +48,7 @@ public:
      */
     void direct(float *colIn, float *colOut)
     {
-        colOut[0] = colIn[0]
+        colOut[0] = colIn[0];
 
         colOut[1] = sqrtf(colIn[1] * colIn[1] + colIn[2] * colIn[2]);
         colOut[2] = atan2f(colIn[1], colIn[2]);
@@ -61,10 +61,10 @@ public:
      */
     void inverse(float *colIn, float *colOut)
     {
-        colOut[0] = colIn[0]
+        colOut[0] = colIn[0];
 
         colOut[1] = colIn[1] * sinf(colIn[2]);
-        colOut[1] = colIn[1] * cosf(colIn[2]);
+        colOut[2] = colIn[1] * cosf(colIn[2]);
     }
 };
 
