@@ -99,7 +99,7 @@ public:
     /**
      * @brief FilterColorConv
      */
-    FilterColorConv()
+    FilterColorConv() : Filter()
     {
         this->bDirection = true;
         n = -1;
