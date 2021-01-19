@@ -19,8 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FILTERING_FILTER_COLOR_CORRECTION_POULI_HPP
 
 #include "../filtering/filter.hpp"
-#include "../colors/color_conv_rgb_to_xyz.hpp"
-#include "../colors/color_conv_xyz_to_lms.hpp"
+#include "../colors/color_conv_rgb_to_lms.hpp"
 #include "../colors/color_conv_lms_to_ipt.hpp"
 #include "../colors/color_conv_ipt_to_ich.hpp"
 
@@ -32,8 +31,7 @@ namespace pic {
 class FilterColorCorrectionPouli: public Filter
 {
 protected:
-    ColorConvRGBtoXYZ cXYZ;
-    ColorConvXYZtoLMS cLMS;
+    ColorConvRGBtoLMS cLMS;
     ColorConvLMStoIPT cIPT;
     ColorConvIPTtoICH cICH;
     float mHDR, mTMO;
@@ -62,22 +60,17 @@ protected:
                     nTMO[k] = data_tmo[k] / mTMO;
                 }
 
-                //RGB --> XYZ
-                cXYZ.direct(nHDR, tHDR);
-                cXYZ.direct(nTMO, tTMO);
-
-                //XYZ --> LMS
-                cLMS.direct(tHDR, nHDR);
-                cLMS.direct(tTMO, nTMO);
-
+                //RGB --> LMS
+                cLMS.direct(nHDR, tHDR);
+                cLMS.direct(nTMO, tTMO);
 
                 //LMS --> IPT
-                cIPT.direct(nHDR, tHDR);
-                cIPT.direct(nTMO, tTMO);
+                cIPT.direct(tHDR, nHDR);
+                cIPT.direct(tTMO, nTMO);
 
                 //IPT --> ICh
-                cICH.direct(tHDR, ICh_hdr);
-                cICH.direct(tTMO, ICh_tmo);
+                cICH.direct(nHDR, ICh_hdr);
+                cICH.direct(nTMO, ICh_tmo);
 
                 float tmp = ICh_tmo[0];
                 ICh_tmo[0] += 1e-5f;
@@ -98,8 +91,7 @@ protected:
 
                 cICH.inverse(ICh_tmo, tTMO);
                 cIPT.inverse(tTMO, nTMO);
-                cLMS.inverse(nTMO, tTMO);
-                cXYZ.inverse(tTMO, data_dst);
+                cLMS.inverse(nTMO, data_dst);
             }
         }
     }

@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_COLORS_COLOR_CONV_HPP
 #define PIC_COLORS_COLOR_CONV_HPP
 
+#include "../util/matrix_3_x_3.hpp"
+
 namespace pic {
 
 /**
@@ -29,6 +31,20 @@ protected:
     bool linear;
 
     float mtx[9], mtx_inv[9];
+
+    /**
+     * @brief computeInverse
+     */
+    void computeInverse()
+    {
+        Matrix3x3 tmp;
+        tmp.set(mtx);
+
+        Matrix3x3 tmp_inv;
+        tmp.inverse(&tmp_inv);
+
+        memcpy(mtx_inv, tmp_inv.data, 9 * sizeof(float));
+    }
 
 public:
 
