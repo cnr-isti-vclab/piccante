@@ -138,6 +138,10 @@ public:
      */
     static Image *execute(Image *imgHDR, Image *imgTMO, Image *imgOut)
     {
+        if(imgHDR == NULL || imgTMO == NULL) {
+            return imgOut;
+        }
+
         if(imgHDR->channels != 3 || imgTMO->channels != 3) {
             return imgOut;
         }

@@ -125,6 +125,24 @@ public:
 
         apply(mtx, colIn, colOut);
     }
+
+    /**
+     * @brief getMatrix
+     * @return
+     */
+    float *getMatrix()
+    {
+        return mtx;
+    }
+
+    /**
+     * @brief getMatrixInverse
+     * @return
+     */
+    float *getMatrixInverse()
+    {
+        return mtx_inv;
+    }
 };
 
 } // end namespace pic

@@ -20,6 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../base.hpp"
 
+#include "../../colors/color_conv_rgb_to_lms.hpp"
+#include "../../colors/color_conv_lms_to_ipt.hpp"
+
 #include "../../gl/filtering/filter.hpp"
 #include "../../gl/filtering/filter_luminance.hpp"
 
@@ -31,32 +34,141 @@ namespace pic {
 class FilterGLColorCorrectionPouli: public FilterGL
 {
 protected:
-    float b, Ld_Max, LMax, LMax_scaled, Lwa, Lwa_scaled;
-    float constant1, constant2;
     bool bGammaCorrection;
 
-    /**
-     * @brief computeConstants
-     */
-    void computeConstants();
+    float *mtx_RGBtoLMS, *mtx_RGBtoLMS_inv;
+    float *mtx_LMStoIPT, *mtx_LMStoIPT_inv;
 
     /**
      * @brief initShaders
      */
-    void initShaders();
+    void initShaders()
+    {
+        FragmentShader();
+        technique.initStandard("330", vertex_source, fragment_source, "FilterGLColorCorrectionPouli");
+    }
 
     /**
      * @brief FragmentShader
      */
-    void FragmentShader();
+    void FragmentShader()
+    {
+        fragment_source = MAKE_STRING
+                          (
+        uniform sampler2D u_hdr;\n
+        uniform sampler2D u_tmo;\n
+        uniform float mHDR;\n
+        uniform float mTMO;\n
+        uniform mat3 mRGBtoLMS;\n
+        uniform mat3 mLMStoIPT;\n
+        uniform mat3 mRGBtoLMS_inv;\n
+        uniform mat3 mLMStoIPT_inv;\n
 
+        out     vec4  f_color;\n
+
+        vec3 ccRGBtoICh(vec3 col, vec3 g)
+        {
+            vec3 LMS = mRGBtoLMS * col;
+
+            vec3 s = sign(LMS);
+            vec3 LMSp = pow(abs(LMS), g) * s;
+
+            vec3 IPT = mLMStoIPT * LMS;
+
+            vec3 ICh;
+            ICh.x = IPT.x;
+            ICh.y = sqrt(dot(IPT.yz, IPT.yz));
+            ICh.z = atan(IPT.y, IPT.z);
+            return ICh;
+        }
+
+        vec3 ccIChtoRGB(vec3 col, vec3 g)
+        {
+            vec3 IPT;
+            IPT.x = col.x;
+            IPT.y = col.y * sin(col.z);
+            IPT.z = col.y * cos(col.z);
+
+            vec3 LMSp = mLMStoIPT_inv * IPT;
+
+            vec3 s = sign(LMSp);
+            vec3 LMS = pow(abs(LMSp), g) * s;
+
+            vec3 rgb = mRGBtoLMS_inv * LMSp;
+            return rgb;
+        }
+
+        void main(void) {
+            \n
+            ivec2 coords   = ivec2(gl_FragCoord.xy);\n
+            vec3 cHDR    = texelFetch(u_hdr, coords, 0).xyz / mHDR;\n
+            vec3 cTMO    = texelFetch(u_tmo, coords, 0).xyz / mTMO;\n
+            vec3 ICh_TMO =  ccRGBtoICh(cTMO, vec3(0.43));\n
+            vec3 col = ccIChtoRGB(ICh_TMO, vec3(2.3256));\n
+            f_color = vec4(col, 1.0);\n
+        }\n
+                          );
+
+    }
+/*
+ *
+             vec3 s = sign(LMS);
+             vec3 LMSp = pow(LMS * s, vec3(g)) * s;
+             vec3 IPT = mLMStoIPT * LMSp;
+             vec3 ICh;
+             ICh.x = IPT.x + 1e-5;
+             ICh.y = sqrt(dot(IPT.yz, IPT.yz)) + 1e-5;
+             ICh.z = atan2(IPT.y, IPT.z);
+
+        vec3 colorConvInv(float3 col, float g) {
+            vec3 s = sign(LMS);
+            vec3 LMSp = pow(LMS * s, g) * s;
+            vec3 IPT = mLMStoIPT * LMSp;
+            vec3 ICh;
+            ICh.x = IPT.x  + 1e-5;
+            ICh.y = sqrt(dot(IPT.yz, IPT.yz)) + 1e-5;
+            ICh.z = atan2(IPT.y, IPT.z);
+            vec3 LMS = mRGBtoLMS_inv * col;
+            return ICh;
+        }
+
+        float saturation(vec3 col)
+        {
+            return col.y / sqrt(dot(col.xy, col.xy));
+        }
+
+            //vec3 ICh_hdr = colorConv(cHDR, 0.43);
+            //vec3 ICh_tmo = colorConv(cTMO, 0.43);
+            float C_tmo_prime = ICh_tmo.y * ICh_hdr.x / ICh_tmo.x;
+            float r1 = saturation(ICh_hdr.y, ICh_hdr.x);
+            float r2 = saturation(C_tmo_prime, ICh_tmo.x);
+            ICh_tmo.y = (C_tmo_prime * r1) / r2;
+            ICh_tmo.z = ICh_hdr.z;
+            vec3 color = colorConvInv(ICh_tmo, 1.0/0.43); * */
 public:
     /**
      * @brief FilterGLColorCorrectionPouli
      */
-    FilterGLColorCorrectionPouli();
+    FilterGLColorCorrectionPouli() : FilterGL()
+    {
+        ColorConvRGBtoLMS RGBtoLMS;
+        ColorConvLMStoIPT LMStoIPT;
 
-    ~FilterGLColorCorrectionPouli();
+        mtx_RGBtoLMS = RGBtoLMS.getMatrix();
+        mtx_RGBtoLMS_inv = RGBtoLMS.getMatrixInverse();
+
+        mtx_LMStoIPT = LMStoIPT.getMatrix();
+        mtx_LMStoIPT_inv = LMStoIPT.getMatrixInverse();
+
+        initShaders();
+
+        update(1.0f, 1.0f);
+    }
+
+    ~FilterGLColorCorrectionPouli()
+    {
+        release();
+    }
 
     /**
      * @brief update
@@ -65,115 +177,51 @@ public:
      * @param LMax
      * @param Lwa
      */
-    void update(float Ld_Max, float b, float LMax, float Lwa);
-};
-
-PIC_INLINE FilterGLColorCorrectionPouli::FilterGLColorCorrectionPouli(): FilterGL()
-{
-    Ld_Max	=  100.0f;
-    b		=  0.95f;
-    LMax	=  1e6f;
-    Lwa		= -1.0f;
-
-    bGammaCorrection = false;
-
-    FragmentShader();
-    initShaders();
-}
-
-PIC_INLINE FilterGLColorCorrectionPouli::~FilterGLColorCorrectionPouli()
-{
-    release();
-}
-
-
-PIC_INLINE void FilterGLColorCorrectionPouli::FragmentShader()
-{
-    fragment_source = MAKE_STRING
-                      (
-    uniform sampler2D u_hdr;\n
-    uniform sampler2D u_tmo;\n
-    uniform mat3 mRGBtoLMS;\n
-    uniform mat3 mLMStoIPT;\n
-
-    out     vec4  f_color;\n
-
-    vec3 colorConv(float3 col, float g) {
-        vec3 LMS = mRGBtoLMS * col;
-        vec3 s = sign(LMS);
-        vec3 LMSp = pow(LMS * s, g) * s;
-        vec3 IPT = mLMStoIPT * LMSp;
-        vec3 ICh;
-        ICh.x = IPT.x  + 1e-5;
-        ICh.y = sqrt(dot(IPT.yz, IPT.yz)) + 1e-5;
-        ICh.z = atan2(IPT.y, IPT.z);
-        return ICh;
-    }
-
-    vec3 colorConvInv(float3 col, float g) {
-        vec3 LMS = mRGBtoLMS * col;
-        vec3 s = sign(LMS);
-        vec3 LMSp = pow(LMS * s, g) * s;
-        vec3 IPT = mLMStoIPT * LMSp;
-        vec3 ICh;
-        ICh.x = IPT.x  + 1e-5;
-        ICh.y = sqrt(dot(IPT.yz, IPT.yz)) + 1e-5;
-        ICh.z = atan2(IPT.y, IPT.z);
-        return ICh;
-    }
-
-    float saturation(vec3 col)
+    void update(float mHDR, float mTMO)
     {
-        return col.y / sqrt(dot(col.xy, col.xy));
+        technique.bind();
+        technique.setUniform1i("u_hdr", 0);
+        technique.setUniform1i("u_tmo", 1);
+
+        technique.setUniform1f("mHDR", mHDR);
+        technique.setUniform1f("mTMO", mTMO);
+
+        technique.setUniform3x3("mRGBtoLMS", mtx_RGBtoLMS, true);
+        technique.setUniform3x3("mLMStoIPT", mtx_LMStoIPT, true);
+        technique.setUniform3x3("mRGBtoLMS_inv", mtx_RGBtoLMS_inv, true);
+        technique.setUniform3x3("mLMStoIPT_inv", mtx_LMStoIPT_inv, true);
+
+        technique.unbind();
     }
 
-    void main(void) {
-        \n
-        ivec2 coords   = ivec2(gl_FragCoord.xy);\n
-        vec3  cHDR    = texelFetch(u_hdr, coords, 0).xyz;\n
-        vec3 ICh_hdr = colorConv(cHDR, 0.43);
-        vec3 ICh_tmo = colorConv(cTMO, 0.43);
-        float C_tmo_prime = ICh_tmo.y * ICh_hdr.x / ICh_tmo.x;
-        float r1 = saturation(ICh_hdr.y, ICh_hdr.x);
-        float r2 = saturation(C_tmo_prime, ICh_tmo.x);
-        ICh_tmo.y = (C_tmo_prime * r1) / r2;
-        ICh_tmo.z = ICh_hdr.z;
-        vec3 color = colorConvInv(ICh_tmo, 1.0/0.43);
-        f_color = vec4(color, 1.0);\n
-        \n
-    }\n
-                      );
+    static ImageGL *execute(FilterGLColorCorrectionPouli *flt,
+                            ImageGL *imgHDR, ImageGL *imgTMO, ImageGL *imgOut)
+    {
+        if(imgHDR == NULL || imgTMO == NULL) {
+            return imgOut;
+        }
 
-    fragment_source = gammaCorrection(fragment_source, bGammaCorrection);
-}
+        if(imgHDR->channels != 3 || imgTMO->channels != 3) {
+            return imgOut;
+        }
 
-PIC_INLINE void FilterGLColorCorrectionPouli::initShaders()
-{
-    technique.initStandard("330", vertex_source, fragment_source, "FilterGLColorCorrectionPouli");
-    update(Ld_Max, b, LMax, Lwa);
-}
+        float mHDR[3], mTMO[3];
 
-PIC_INLINE void FilterGLColorCorrectionPouli::update(float Ld_Max, float b, float LMax, float Lwa)
-{
-    this->Ld_Max = Ld_Max > 0.0f ? Ld_Max : 100.0f;
-    this->b = b > 0.0f ? b : 0.95f;
-    this->LMax = LMax > 0.0f ? LMax : 1e6f;
-    this->Lwa = Lwa > 0.0f ? Lwa : 1.0f;
+        imgHDR->getMaxVal(mHDR);
+        imgTMO->getMaxVal(mTMO);
 
-    Lwa_scaled  = Lwa / powf(1.0f + b - 0.85f, 5.0f);
-    LMax_scaled = LMax / Lwa_scaled;
-    constant1   = logf(b) / logf(0.5f);
-    constant2   = (Ld_Max / 100.0f) / (log10(1 + LMax_scaled));
+        int ind;
+        float maxHDR = Arrayf::getMax(mHDR, 3, ind);
+        float maxTMO = Arrayf::getMax(mTMO, 3, ind);
 
-    technique.bind();
-    technique.setUniform1i("u_hdr", 0);
-    technique.setUniform1i("u_tmo", 0);
-    technique.setUniform1f("constant1", constant1);
-    technique.setUniform1f("constant2", constant2);
-    technique.setUniform1f("LMax", LMax_scaled);
-    technique.setUniform1f("Lwa", Lwa_scaled);
-    technique.unbind();
-}
+        if(maxHDR > 0.0f && maxTMO > 0.0f) {
+            flt->update(maxHDR, maxTMO);
+            return flt->Process(DoubleGL(imgHDR, imgTMO), imgOut);
+        } else {
+            return imgOut;
+        }
+    }
+};
 
 } // end namespace pic
 

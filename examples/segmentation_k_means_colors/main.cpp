@@ -27,7 +27,7 @@ This program is free software: you can redistribute it and/or modify
 #define PIC_DISABLE_OPENGL
 
 #include "piccante.hpp"
-
+#include "util/k_means_plusplus.hpp"
 int main(int argc, char *argv[])
 {
     std::string img_str;
@@ -47,14 +47,17 @@ int main(int argc, char *argv[])
     if(img.isValid()) {
         int nSamples = 0;
 
-        pic::Image *img_lab = pic::FilterColorConv::fromRGBtoCIELAB(&img, NULL);
+        pic::Image *img_lab_ori = pic::FilterColorConv::fromRGBtoCIELAB(&img, NULL);
+
+        pic::Image * out = pic::FilterBilateral2DF::execute(&img, NULL, 4.0f, 0.05f);
+        pic::Image *img_lab = pic::FilterColorConv::fromRGBtoCIELAB(out, NULL);
         float *samples = img_lab->getColorSamples(NULL, nSamples, 0.125f);
 
         std::vector< std::set<pic::uint> *> labels;
         int channels = img.channels;
-        pic::uint k;
+        pic::uint k = 8;
 
-        float *centers = pic::KMeansRand<float>::select(samples, nSamples, channels, labels, k, 0.01f, 100);
+        float *centers = pic::KMeansPlusPlus<float>::execute(samples, nSamples, channels, NULL, k, labels, 100);
 
         printf("The number of k is: %d\n", k);
 
@@ -64,7 +67,7 @@ int main(int argc, char *argv[])
             int n = img.size();
 
             for(int i = 0; i < n; i+= channels) {
-                float *data_i = &img_lab->data[i];
+                float *data_i = &img_lab_ori->data[i];
                 float *data_c = NULL;
                 float dist = FLT_MAX;
 
@@ -81,7 +84,7 @@ int main(int argc, char *argv[])
                 pic::Arrayf::assign(data_c, channels, data_i);
             }
 
-            pic::FilterColorConv::fromCIELABtoRGB(img_lab, &img);
+            pic::FilterColorConv::fromCIELABtoRGB(img_lab_ori, &img);
 
 
             bool bWrite = img.Write("../data/output/s_kmeans_colors.png");
