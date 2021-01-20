@@ -38,8 +38,6 @@ This program is free software: you can redistribute it and/or modify
 #include <QVBoxLayout>
 #include <QLabel>
 
-#define PIC_DEBUG
-
 #include "piccante.hpp"
 
 class GLWidget : public QGLWidget
@@ -83,7 +81,7 @@ protected:
         display = new pic::DisplayGL();
 
         //allocate Reinhard et al.'s TMO
-        reinhard_tmo = new pic::ReinhardTMOGL();
+        reinhard_tmo = new pic::ReinhardTMOGL(-1.0f, -1.0f, true, true);
 
         //allocate the color correction filter
         fltCC = new pic::FilterGLColorCorrectionPouli();
@@ -110,19 +108,18 @@ protected:
         }
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        //apply Reinhard et al.'s TMO (local version)
+        reinhard_tmo->update(-1.0f, -1.0f, false);
+        img_tmo = reinhard_tmo->execute(&img, img_tmo);
+
 
         switch(method) {
         case 0: {
-            //apply Reinhard et al.'s TMO (local version)
-            reinhard_tmo->update(-1.0f, -1.0f, false);
-            img_tmo = reinhard_tmo->execute(&img, img_tmo);
             display->Process(img_tmo);
         } break;
 
         case 1: {
-            //apply Reinhard et al.'s TMO (local version)
-            reinhard_tmo->update(-1.0f, -1.0f, false);
-            img_tmo = reinhard_tmo->execute(&img, img_tmo);
+            //apply Pouli et al.'s color correction
             img_tmo_cc = pic::FilterGLColorCorrectionPouli::execute(fltCC, &img, img_tmo, img_tmo_cc);
             display->Process(img_tmo_cc);
         } break;

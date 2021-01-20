@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
           this is quantized at 8-bit and gamma is applied.
           Note that pic::ReinhardTMO tone maps an HDR image
           but it does not apply gamma.*/
-        bWritten = image_tmo->Write("../data/output/" + nameOut + "_reinhard_gtmo1.png", pic::LT_NOR_GAMMA);
+        bWritten = image_tmo->Write("../data/output/" + nameOut + "_reinhard_gtmo1_cc_without.png", pic::LT_NOR_GAMMA);
 
         //Color Correction using Pouli et al.'s method
 

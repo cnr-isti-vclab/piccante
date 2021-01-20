@@ -100,7 +100,7 @@ protected:
 
         float saturation(float C, float I)
         {
-            return C / sqrt(C * C + I * I + 1e-10);
+            return C / sqrt(C * C + I * I + 2e-10);
         }
 
         void main(void) {
@@ -111,7 +111,7 @@ protected:
             vec3 ICh_hdr =  ccRGBtoICh(cHDR, vec3(0.43));\n
             vec3 ICh_tmo =  ccRGBtoICh(cTMO, vec3(0.43));\n
 
-            float C_tmo_p = ICh_tmo.y * ICh_hdr.x / ICh_tmo.x;
+            float C_tmo_p = (ICh_tmo.y * ICh_hdr.x) / (ICh_tmo.x + 1e-5);
             float r1 = saturation(ICh_hdr.y, ICh_hdr.x);
             float r2 = saturation(C_tmo_p, ICh_tmo.x);
             ICh_tmo.y = (C_tmo_p * r1) / r2;
