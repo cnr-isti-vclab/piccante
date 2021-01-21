@@ -25,7 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../gl/filtering/filter.hpp"
 #include "../../gl/filtering/filter_luminance.hpp"
-
+#include "../../filtering/filter_color_correction_pouli.hpp"
 namespace pic {
 
 /**
@@ -100,7 +100,7 @@ protected:
 
         float saturation(float C, float I)
         {
-            return C / sqrt(C * C + I * I + 2e-10);
+            return C / sqrt(C * C + I * I);
         }
 
         void main(void) {
@@ -111,10 +111,15 @@ protected:
             vec3 ICh_hdr =  ccRGBtoICh(cHDR, vec3(0.43));\n
             vec3 ICh_tmo =  ccRGBtoICh(cTMO, vec3(0.43));\n
 
-            float C_tmo_p = (ICh_tmo.y * ICh_hdr.x) / (ICh_tmo.x + 1e-5);
-            float r1 = saturation(ICh_hdr.y, ICh_hdr.x);
-            float r2 = saturation(C_tmo_p, ICh_tmo.x);
-            ICh_tmo.y = (C_tmo_p * r1) / r2;
+            float I_tmo = ICh_tmo.x;
+            ICh_hdr.xy += vec2(1e-5);
+            ICh_tmo.xy += vec2(1e-5);
+
+            float C_tmo_p = (ICh_tmo.y * ICh_hdr.x) / ICh_tmo.x;
+            float s1 = saturation(ICh_hdr.y, ICh_hdr.x);
+            float s2 = saturation(C_tmo_p, ICh_tmo.x);
+            ICh_tmo.y = I_tmo;
+            ICh_tmo.y = (C_tmo_p * s1) / s2;
             ICh_tmo.z = ICh_hdr.z;
 
             vec3 col = ccIChtoRGB(ICh_tmo, vec3(2.3256));\n

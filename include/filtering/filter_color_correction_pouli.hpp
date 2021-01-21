@@ -79,11 +79,11 @@ protected:
                 ICh_hdr[1] += 1e-5f;
 
                 float C_tmo_prime = ICh_tmo[1] * ICh_hdr[0] / ICh_tmo[0];
-                float r1 = saturation(ICh_hdr[1], ICh_hdr[0]);
-                float r2 = saturation(C_tmo_prime, ICh_tmo[0]);
+                float s1 = saturation(ICh_hdr[1], ICh_hdr[0]);
+                float s2 = saturation(C_tmo_prime, ICh_tmo[0]);
 
                 ICh_tmo[0] = tmp;
-                ICh_tmo[1] = (C_tmo_prime * r1) / r2;
+                ICh_tmo[1] = (C_tmo_prime * s1) / s2;
                 ICh_tmo[2] = ICh_hdr[2];
 
                 //output

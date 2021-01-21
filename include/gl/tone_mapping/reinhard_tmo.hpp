@@ -53,7 +53,7 @@ protected:
     {
         bAllocate = true;
         flt_lum = new FilterGLLuminance();
-        flt_tmo_global = new FilterGLSigmoidTMO(0.18f, false, false);
+        flt_tmo_global = new FilterGLSigmoidTMO(alpha, false, false);
     }
 
     /**

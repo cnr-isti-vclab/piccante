@@ -47,7 +47,7 @@ class GLWidget : public QGLWidget
 {
 protected:
     pic::FilterGLColorCorrectionPouli *fltCC;
-    pic::ReinhardTMOGL *reinhard_tmo;
+    pic::DragoTMOGL *reinhard_tmo;
     pic::DisplayGL *display;
     pic::ImageGL img, *img_tmo, *img_tmo_cc;
 
@@ -81,7 +81,7 @@ protected:
         display = new pic::DisplayGL();
 
         //allocate Reinhard et al.'s TMO
-        reinhard_tmo = new pic::ReinhardTMOGL(-1.0f, -1.0f, true, true);
+        reinhard_tmo = new pic::DragoTMOGL();
 
         //allocate the color correction filter
         fltCC = new pic::FilterGLColorCorrectionPouli();
@@ -109,7 +109,6 @@ protected:
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         //apply Reinhard et al.'s TMO (local version)
-        reinhard_tmo->update(-1.0f, -1.0f, false);
         img_tmo = reinhard_tmo->execute(&img, img_tmo);
 
 
