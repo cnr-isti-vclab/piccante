@@ -111,7 +111,6 @@ protected:
         //apply Reinhard et al.'s TMO (local version)
         img_tmo = reinhard_tmo->execute(&img, img_tmo);
 
-
         switch(method) {
         case 0: {
             display->Process(img_tmo);
@@ -139,6 +138,7 @@ public:
         setFixedHeight(684);
 
         img_tmo = NULL;
+        img_tmo_cc = NULL;
         method = 0;
     }
 
