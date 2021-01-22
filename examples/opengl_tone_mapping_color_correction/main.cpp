@@ -76,7 +76,7 @@ protected:
         img_tmo_cc = NULL;
 
         //read an input image
-        img.Read("../data/input/hdr/bottles.hdr");
+        img.Read("../data/input/bottles.hdr");
 
         img.generateTextureGL();
 
