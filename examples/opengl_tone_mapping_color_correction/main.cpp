@@ -37,7 +37,7 @@ This program is free software: you can redistribute it and/or modify
 #include <QApplication>
 #include <QVBoxLayout>
 #include <QLabel>
-
+#include <ctime>
 #define PIC_STB_DISABLE
 
 #include "piccante.hpp"
@@ -49,7 +49,7 @@ class GLWidget : public QGLWidget
 {
 protected:
     pic::FilterGLColorCorrectionPouli *fltCC;
-    pic::DragoTMOGL *reinhard_tmo;
+    pic::ReinhardTMOGL *reinhard_tmo;
     pic::DisplayGL *display;
     pic::ImageGL img, *img_tmo, *img_tmo_cc;
 
@@ -76,14 +76,15 @@ protected:
         img_tmo_cc = NULL;
 
         //read an input image
-        img.Read("../data/input/bottles.hdr");
+        img.Read("../data/input/hdr/bottles.hdr");
+
         img.generateTextureGL();
 
         //create a screen aligned quad
         display = new pic::DisplayGL();
 
         //allocate Reinhard et al.'s TMO
-        reinhard_tmo = new pic::DragoTMOGL();
+        reinhard_tmo = new pic::ReinhardTMOGL(0.15f, -1.0f, true, true);
 
         //allocate the color correction filter
         fltCC = new pic::FilterGLColorCorrectionPouli();
@@ -121,6 +122,7 @@ protected:
         case 1: {
             //apply Pouli et al.'s color correction
             img_tmo_cc = pic::FilterGLColorCorrectionPouli::execute(fltCC, &img, img_tmo, img_tmo_cc);
+
             display->Process(img_tmo_cc);
         } break;
         }

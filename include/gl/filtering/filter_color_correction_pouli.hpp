@@ -199,7 +199,7 @@ public:
 
         if(maxHDR > 0.0f && maxTMO > 0.0f) {
             flt->update(maxHDR, maxTMO);
-            return flt->Process(DoubleGL(imgHDR, imgTMO), imgOut);
+            imgOut = flt->Process(DoubleGL(imgHDR, imgTMO), imgOut);
         } else {
             return imgOut;
         }

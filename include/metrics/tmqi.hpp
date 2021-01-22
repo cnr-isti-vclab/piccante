@@ -196,7 +196,7 @@ public:
 
         Image *t_HDR = L_HDR;
         Image *t_LDR = L_LDR;
-        for(auto i = 0; i < weights.size(); i++) {
+        for(uint i = 0; i < weights.size(); i++) {
             f /= 2.0f;
 
             if(t_HDR != NULL && t_LDR != NULL) {
