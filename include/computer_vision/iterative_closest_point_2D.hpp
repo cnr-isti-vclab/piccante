@@ -224,12 +224,12 @@ PIC_INLINE ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen
     printf("Size: %d\n", size_descs);
 #endif
 
-    for(int i = 0; i < p1.size(); i++) {
+    for(uint i = 0; i < p1.size(); i++) {
         auto p_i = p1[i];
 
         float d_min = FLT_MAX;
         int index = -1;
-        for(int j = 0; j < p0.size(); j++) {
+        for(uint j = 0; j < p0.size(); j++) {
             auto delta_ij = p_i - p0[j];
             float d_tmp = delta_ij.norm();
 
@@ -281,7 +281,7 @@ PIC_INLINE ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen
     Eigen::Matrix2f R = V * U_t;
 
     if(R.determinant() < 0.0f) {
-        for(unsigned int i = 0; i < V.rows(); i++) {
+        for(auto i = 0; i < V.rows(); i++) {
             V(i, 1) = -V(i, 1);
         }
 

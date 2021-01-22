@@ -454,7 +454,7 @@ PIC_INLINE float estimateLengthOfCheckers(std::vector< Eigen::Vector2f > &corner
 
     int closest = -1;
     float ret = FLT_MAX;
-    for(auto j = 0; j < corners_model.size(); j++) {
+    for(uint j = 0; j < corners_model.size(); j++) {
         if(j != selected) {
             auto delta_ij = p_0 - corners_model[j];
             float dist = delta_ij.norm();

@@ -178,9 +178,9 @@ public:
     static std::string exportToString(std::vector< Eigen::Vector2f > *corners)
     {
         std::string out = "[";
-        auto n = corners->size();
+        uint n = corners->size();
 
-        for(auto i = 0; i < (n - 1); i++) {
+        for(uint i = 0; i < (n - 1); i++) {
             out += fromNumberToString(corners->at(i)[0]) + " ";
             out += fromNumberToString(corners->at(i)[1]) + "; ";
         }
@@ -232,7 +232,7 @@ public:
                     point[1] = (*corners)[i][1];
                     int point_c = 1;
 
-                    for(auto j = 0; j < indices.size(); j++) {
+                    for(uint j = 0; j < indices.size(); j++) {
                         auto k = indices[j];
                         if(!processed[k]) {
                             processed[k] = true;

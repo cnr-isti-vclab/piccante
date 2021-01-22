@@ -86,7 +86,7 @@ PIC_INLINE std::vector< int > executeLiveWireMultipleJNI(std::string imageInPath
         Polyline2i pl(out_tmp);
         pl.simplify(32);
 
-        for(auto i = 0; i < pl.points.size(); i++) {
+        for(uint i = 0; i < pl.points.size(); i++) {
             auto point = pl.points.at(i);
 
             if(bDownsample) {

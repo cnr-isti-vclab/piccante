@@ -621,8 +621,8 @@ public:
         float xf = 1.0f - ((atan2f(z, -x) * C_INV_PI) * 0.5f + 0.5f);
         float yf = (acosf(y) * C_INV_PI);
 
-        int ix = CLAMP(int(floorf(x * width)), width);
-        int iy = CLAMP(int(floorf(y * height)), height);
+        int ix = CLAMP(int(floorf(xf * width)), width);
+        int iy = CLAMP(int(floorf(yf * height)), height);
 
         return data + ix * xstride + iy * ystride;
     }

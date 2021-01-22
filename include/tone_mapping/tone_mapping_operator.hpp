@@ -78,7 +78,7 @@ public:
     void updateImage(Image *imgIn)
     {
         bool bRelease = false;
-        for(auto i = 0; i < images.size(); i++) {
+        for(uint i = 0; i < images.size(); i++) {
             if(images[i] != NULL) {
                 if((imgIn->width  != images[i]->width) ||
                    (imgIn->height != images[i]->height)) {

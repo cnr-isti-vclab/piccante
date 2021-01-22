@@ -175,7 +175,9 @@ public:
             bmax[1] = (y > bmax[1]) ? y : bmax[1];
         }
 
-        printf("%d %d\n", bmax[0], bmin[0], bmax[1], bmin[1]);
+        #ifdef PIC_DEBUG
+            printf("%d %d %d %d\n", bmax[0], bmin[0], bmax[1], bmin[1]);
+        #endif
     }
 
     /**

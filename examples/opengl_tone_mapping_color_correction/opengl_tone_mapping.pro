@@ -1,4 +1,4 @@
-TARGET = opengl_tone_mapping
+TARGET = opengl_tone_mapping_color_correction
 
 QT += core
 QT += gui

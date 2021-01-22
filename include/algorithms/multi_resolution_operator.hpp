@@ -77,7 +77,7 @@ public:
         std::vector<Pyramid *> pIn;
 
         int n = (1 << 30) - 1;
-        for(int i = 0; i < imgIn.size(); i++) {
+        for(uint i = 0; i < imgIn.size(); i++) {
             Pyramid *s_i = new Pyramid(imgIn[i], false, pyramid_limit);
             pIn.push_back(s_i);
 
@@ -91,7 +91,7 @@ public:
         for(int i = (n - 1); i >= 0; i--) {
 
             ImageVec imgIn_i;
-            for(int j = 0; j < pIn.size(); j++) {
+            for(uint j = 0; j < pIn.size(); j++) {
                 imgIn_i.push_back(pIn[j]->get(i));
             }
 

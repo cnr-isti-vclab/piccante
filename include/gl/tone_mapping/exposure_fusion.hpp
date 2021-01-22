@@ -195,7 +195,7 @@ public:
 
         //compute weights values
         *acc = 0.0f;
-        for(auto j = 0; j < n; j++) {
+        for(uint j = 0; j < n; j++) {
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
             weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 
@@ -205,7 +205,7 @@ public:
         //accumulate on a pyramid
         pOut->setValue(0.0f);
 
-        for(auto j = 0; j < n; j++) {
+        for(uint j = 0; j < n; j++) {
             lum = flt_lum->Process(SingleGL(imgIn[j]), lum);
             weights = flt_weights->Process(DoubleGL(lum, imgIn[j]), weights);
 

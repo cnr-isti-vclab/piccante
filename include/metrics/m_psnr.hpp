@@ -98,7 +98,7 @@ PIC_INLINE double mPSNR(Image *ori, Image *cmp, MULTI_EXPOSURE_TYPE type, int mi
     float gamma = 2.2f; //typically 2.2
     auto n = exposures.size();
     double mse = 0.0;
-    for(auto i = 0; i < n; i++) {
+    for(uint i = 0; i < n; i++) {
         double mse_i = MSE(ori, cmp, gamma, exposures[i], nBit);
 
         #ifdef PIC_DEBUG

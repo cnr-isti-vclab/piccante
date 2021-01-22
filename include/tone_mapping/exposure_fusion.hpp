@@ -83,7 +83,7 @@ protected:
      */
     Image *ProcessAuxStack(ImageVec imgIn, Image *imgOut)
     {
-        auto n = imgIn.size();
+        uint n = imgIn.size();
 
         if(n < 2 || !ImageVecCheck(imgIn, -1)) {
             return imgOut;
@@ -102,7 +102,7 @@ protected:
 
         //compute weights values
         *images[2] = 0.0f;
-        for(auto j = 0; j < n; j++) {
+        for(uint j = 0; j < n; j++) {
             images[0] = flt_lum.Process(Single(imgIn[j]), images[0]);
             images[1] = flt_weights.Process(Double(images[0], imgIn[j]), images[1]);
 
@@ -120,7 +120,7 @@ protected:
 
         pOut->setValue(0.0f);
 
-        for(auto j = 0; j < n; j++) {
+        for(uint j = 0; j < n; j++) {
             images[0] = flt_lum.Process(Single(imgIn[j]), images[0]);
             images[1] = flt_weights.Process(Double(images[0], imgIn[j]), images[1]);
 

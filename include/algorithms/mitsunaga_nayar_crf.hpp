@@ -69,7 +69,7 @@ PIC_INLINE float MitsunagaNayarClassic(int *samples, const std::size_t nSamples,
     }
 
     R.assign(Q < 2 ? 0 : Q - 1, 1.f);
-    for (int q = 0; q < R.size(); ++q) {
+    for (unsigned int q = 0; q < R.size(); ++q) {
         R[q] = exposures[q] / exposures[q+1];
     }
 
@@ -256,8 +256,8 @@ PIC_INLINE float MitsunagaNayarFull(int *samples, const std::size_t nSamples, co
         _c = 0.f;
     }
     R.assign(Q < 2 ? 0 : Q, std::vector<float>(Q < 2 ? 0 : Q, 1.f));
-    for (int q1 = 0; q1 < R.size(); ++q1) {
-        for (int q2 = 0; q2 < R[q1].size(); ++q2) {
+    for (uint q1 = 0; q1 < R.size(); ++q1) {
+        for (uint q2 = 0; q2 < R[q1].size(); ++q2) {
             if (q2 == q1) {
                 R[q1][q2] = 1.f;
             } else {

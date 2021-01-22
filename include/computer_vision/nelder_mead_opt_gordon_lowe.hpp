@@ -98,7 +98,7 @@ public:
        int c = GL_PACKED_CAMERA_SIZE * int(m.size());
 
        Eigen::Vector4d point;
-       for(int i = 0; i < m[index].size(); i++) {
+       for(uint i = 0; i < m[index].size(); i++) {
            point = Eigen::Vector4d(x[c], x[c + 1], x[c + 2], 1.0);
 
            Eigen::Vector3d point_proj = P * point;

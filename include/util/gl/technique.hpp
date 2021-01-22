@@ -176,7 +176,7 @@ public:
     void printLog(std::string name)
     {
         printf("\nLog for: %s\n", name.c_str());
-        for(auto i = 0; i < shaders.size(); i++) {
+        for(uint i = 0; i < shaders.size(); i++) {
             shaders[i]->printLog();
         }
 

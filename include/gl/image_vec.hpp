@@ -85,7 +85,7 @@ PIC_INLINE bool ImageGLVecCheck(ImageGLVec &imgIn, int minInputImages)
     if(minInputImages < 0) {
         n = int(imgIn.size());
     } else {
-        if(imgIn.size() < minInputImages) {
+        if(int(imgIn.size()) < minInputImages) {
             return false;
         }
 

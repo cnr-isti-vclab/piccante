@@ -367,7 +367,7 @@ public:
      */
     void negativePoly()
     {
-        for(int i = 1; i < coeff.size(); i+=2) {
+        for(unsigned int i = 1; i < coeff.size(); i+=2) {
             coeff[i] = -coeff[i];
         }
         changeSign();

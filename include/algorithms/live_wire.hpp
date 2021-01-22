@@ -352,7 +352,7 @@ public:
         if(in != NULL) {
             pic::LiveWire *lw = new pic::LiveWire(in);
 
-            for(auto i = 0; i < (controlPoints.size() - 1); i++) {
+            for(uint i = 0; i < (controlPoints.size() - 1); i++) {
                 lw->execute(controlPoints.at(i), controlPoints.at(i + 1), out, true, true);
             }
 

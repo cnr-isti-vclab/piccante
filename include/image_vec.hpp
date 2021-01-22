@@ -150,7 +150,7 @@ PIC_INLINE bool ImageVecCheck(ImageVec &imgIn, int minInputImages)
     if(minInputImages < 0) {
         n = int(imgIn.size());
     } else {
-        if(imgIn.size() < minInputImages) {
+        if(int(imgIn.size()) < minInputImages) {
             return false;
         }
 
