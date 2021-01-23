@@ -111,18 +111,18 @@ protected:
             vec3 ICh_hdr =  ccRGBtoICh(cHDR, vec3(0.43));\n
             vec3 ICh_tmo =  ccRGBtoICh(cTMO, vec3(0.43));\n
 
-            float I_tmo = ICh_tmo.x;
-            ICh_hdr.xy += vec2(1e-5);
-            ICh_tmo.xy += vec2(1e-5);
+            float I_tmo = ICh_tmo.x;\n
+            ICh_hdr.xy += vec2(1e-5);\n
+            ICh_tmo.xy += vec2(1e-5);\n
 
-            float C_tmo_p = (ICh_tmo.y * ICh_hdr.x) / ICh_tmo.x;
-            float s1 = saturation(ICh_hdr.y, ICh_hdr.x);
-            float s2 = saturation(C_tmo_p, ICh_tmo.x);
-            ICh_tmo.y = I_tmo;
-            ICh_tmo.y = (C_tmo_p * s1) / s2;
-            ICh_tmo.z = ICh_hdr.z;
-
+            float C_tmo_p = (ICh_tmo.y * ICh_hdr.x) / ICh_tmo.x;\n
+            float s1 = saturation(ICh_hdr.y, ICh_hdr.x);\n
+            float s2 = saturation(C_tmo_p, ICh_tmo.x);\n
+            ICh_tmo.y = I_tmo;\n
+            ICh_tmo.y = (C_tmo_p * s1) / s2;\n
+            ICh_tmo.z = ICh_hdr.z;\n
             vec3 col = ccIChtoRGB(ICh_tmo, vec3(2.3256));\n
+            col = clamp(col * mTMO, vec3(0.0), vec3(1.0));\n
             f_color = vec4(col, 1.0);\n
         }\n
                           );
@@ -196,13 +196,14 @@ public:
         int ind;
         float maxHDR = Arrayf::getMax(mHDR, 3, ind);
         float maxTMO = Arrayf::getMax(mTMO, 3, ind);
+        printf("%f %f", maxHDR, maxTMO);
 
         if(maxHDR > 0.0f && maxTMO > 0.0f) {
+            printf("AAA");
             flt->update(maxHDR, maxTMO);
             imgOut = flt->Process(DoubleGL(imgHDR, imgTMO), imgOut);
-        } else {
-            return imgOut;
         }
+        return imgOut;
     }
 };
 

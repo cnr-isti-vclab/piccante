@@ -92,6 +92,9 @@ protected:
                 cICH.inverse(ICh_tmo, tTMO);
                 cIPT.inverse(tTMO, nTMO);
                 cLMS.inverse(nTMO, data_dst);
+
+                Arrayf::mul(data_dst, 3, mTMO);
+                Arrayf::clamp(data_dst, 3, 0.0f, 1.0f);
             }
         }
     }

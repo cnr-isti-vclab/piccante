@@ -61,7 +61,7 @@ PIC_INLINE unsigned char *ReadSTB(std::string nameFile, int &width,
 #ifndef PIC_STB_DISABLE
     int w, h, c;
     stbi_info(nameFile.c_str(), &w, &h, &c);
-    unsigned char *data = stbi_load(nameFile.c_str(), &width, &height, &channels, c);
+    data = stbi_load(nameFile.c_str(), &width, &height, &channels, c);
 #endif
     
     return data;

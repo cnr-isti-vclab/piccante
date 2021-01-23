@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
 
         printf("Tone mapping using global Reinhard et al.'s TMO...");
         image_tmo = pic::ReinhardTMO::executeGlobal1(&img, image_tmo);
+        image_tmo->clamp(0.0f, 1.0f);
 
         /*pic::LT_NOR_GAMMA implies that when we save the image,
           this is quantized at 8-bit and gamma is applied.

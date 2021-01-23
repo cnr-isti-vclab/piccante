@@ -84,7 +84,7 @@ protected:
         display = new pic::DisplayGL();
 
         //allocate Reinhard et al.'s TMO
-        reinhard_tmo = new pic::ReinhardTMOGL(0.15f, -1.0f, true, true);
+        reinhard_tmo = new pic::ReinhardTMOGL(0.5f, -1.0f, true, true);
 
         //allocate the color correction filter
         fltCC = new pic::FilterGLColorCorrectionPouli();
@@ -113,6 +113,7 @@ protected:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         //apply Reinhard et al.'s TMO (local version)
         img_tmo = reinhard_tmo->execute(&img, img_tmo);
+        img_tmo->clamp(0.0f, 1.0f);
 
         switch(method) {
         case 0: {

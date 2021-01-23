@@ -271,6 +271,14 @@ public:
         return norm_sq;
     }
 
+    static void clamp(T *data, int n, T lower_bound, T upper_bound)
+    {
+        for(int i = 0; i < n; i++) {
+            data[i] = data[i] >= lower_bound ? data[i] : lower_bound;
+            data[i] = data[i] <= upper_bound ? data[i] : upper_bound;
+        }
+    }
+
     /**
      * @brief dot
      * @param data0
