@@ -25,7 +25,7 @@ namespace pic {
 /**
  * @brief The CRF_WEIGHT enum
  */
-enum CRF_WEIGHT {CW_ALL, CW_HAT, CW_DEB97, CW_DEB97p01, CW_ROBERTSON};
+enum CRF_WEIGHT {CW_ALL, CW_IDENTITY, CW_REVERSE, CW_HAT, CW_DEB97, CW_DEB97p01, CW_ROBERTSON};
 
 /**
  * @brief weightFunction computes weight functions for x in [0,1].
@@ -54,7 +54,19 @@ PIC_INLINE float weightFunction(float x, CRF_WEIGHT type)
         return (1.0f - val_quartic * val_quartic * val_quartic);
     }
     break;
+            
+    case CW_IDENTITY:
+    {
+        return x;
+    }
+    break;
 
+    case CW_REVERSE:
+    {
+        return 1.0 - x;
+    }
+    break;
+            
     case CW_DEB97: {
         static const float Zmin = 0.0f;
         static const float Zmax = 1.0f;

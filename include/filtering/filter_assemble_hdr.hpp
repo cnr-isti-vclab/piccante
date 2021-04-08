@@ -44,9 +44,9 @@ class FilterAssembleHDR: public Filter
 {
 protected:
     CameraResponseFunction *crf;
-    HDR_REC_DOMAIN          domain;
-    CRF_WEIGHT              weight_type;
-    float                   delta_value;
+    HDR_REC_DOMAIN domain;
+    CRF_WEIGHT weight_type;
+    float delta_value;
 
     /**
      * @brief ProcessBBox
@@ -62,13 +62,56 @@ protected:
         int n = int(src.size());
 
         float t_min = src[0]->exposure;
-        int index = 0;
+        int i_min = 0;
+
+        float t_max = src[0]->exposure;
+        int i_max = 0;
+
         for(int j = 1; j < n; j++) {
             if(src[j]->exposure < t_min) {
                 t_min = src[j]->exposure;
-                index = j;
+                i_min = j;
             }
-        }        
+            
+            if(src[j]->exposure > t_max) {
+                t_max = src[j]->exposure;
+                i_max = j;
+            }
+        }
+        
+        //check i_min
+        bool bMin = false;
+        Image *img_min = src[i_min];
+        for(int i = 0; i < img_min->size(); i++) {
+            if(img_min->data[i] > 0.9f) {
+                bMin = true;
+                break;
+            }
+        }
+
+        //check i_max
+        bool bMax = false;
+        Image *img_max = src[i_max];
+        for(int i = 0; i < img_max->size(); i++) {
+            if(img_max->data[i] < 0.1f) {
+                bMax = true;
+                break;
+            }
+        }
+
+        CRF_WEIGHT *weight_type_arr = new CRF_WEIGHT[n];
+        for(int l = 0; l < n; l++) {
+
+            weight_type_arr[l] = weight_type;
+
+            if((l == i_min) && bMin) {
+                weight_type_arr[l] = CW_IDENTITY;
+            }
+
+            if((l == i_max) && bMax) {
+                weight_type_arr[l] = CW_REVERSE;
+            }
+        }
 
         float *acc = new float[channels];
         float *totWeight = new float[channels];
@@ -82,24 +125,13 @@ protected:
                 Arrayf::assign(0.0f, acc, channels);
                 Arrayf::assign(0.0f, totWeight, channels);
 
-                float max_val_saturation = 1.0f;
-                float max_val_saturation_fb = -1.0f;
-
                 //for each exposure...
+
                 for(int l = 0; l < n; l++) {
 
-                    float x = Arrayf::sum(&src[l]->data[c], channels);
-                    x /= dst->channelsf;
-
-                    float t_mvs = x / t_min;
-
-                    max_val_saturation_fb = MAX(max_val_saturation_fb, t_mvs);
-
-                    if(l == index) {
-                        max_val_saturation = t_mvs;
-                    }
-
-                    float weight = weightFunction(x, weight_type);
+                    float x = Arrayf::sum(&src[l]->data[c], channels) / dst->channelsf;
+                    
+                    float weight = weightFunction(x, weight_type_arr[l]);
 
                     if(domain == HRD_SQ) {
                         weight *= (src[l]->exposure * src[l]->exposure);
@@ -127,26 +159,17 @@ protected:
                     }
                 }
 
-                bool bSaturated = false;
                 for(int k = 0; k < channels; k++) {
-                    bSaturated = bSaturated || (totWeight[k] < 1e-4f);
-                }
-
-                if(!bSaturated) {
-                    for(int k = 0; k < channels; k++) {
-                        acc[k] /= totWeight[k];
-                        if(domain == HRD_LOG) {
-                            acc[k] = expf(acc[k]);
-                        }
-                        dst->data[c + k] = acc[k];
+                    acc[k] /= totWeight[k];
+                    if(domain == HRD_LOG) {
+                        acc[k] = expf(acc[k]);
                     }
-                } else {
-                    max_val_saturation = MAX(max_val_saturation_fb, max_val_saturation);
-                    Arrayf::assign(max_val_saturation, &dst->data[c], channels);
+                    dst->data[c + k] = acc[k];
                 }
             }
         }
 
+        delete[] weight_type_arr;
         delete[] totWeight;
         delete[] acc;
     }
@@ -165,7 +188,7 @@ public:
         minInputImages = 2;
 
         //a numerical stability value when assembling images in the log-domain
-        this->delta_value = 1.0 / 65536.0f;
+        this->delta_value = 1.0 / 65535.0f;
     }
 
     /**
