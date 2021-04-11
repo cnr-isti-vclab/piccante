@@ -557,57 +557,131 @@ public:
      * @param bufferIn
      * @param dx
      * @param dy
+     * @param bReplicate
      * @param width
      * @param height
      * @param channels
      * @param frames
      * @return
      */
-    static T *shift(T *bufferOut, T *bufferIn, int dx, int dy, int width,
-                              int height, int channels, int frames)
+    static T *shift(T *bufferOut, T *bufferIn, int dx, int dy, bool bReplicate,
+                    int width, int height, int channels, int frames)
     {
         if(bufferOut == NULL) {
-            bufferOut = new T[width * height * channels * frames];
+            int n = width * height * channels * frames;
+            bufferOut = new T[n];
+            assign(bufferOut, n, T(0));
+        }
+
+        T zero = T(0);
+        int wS, wE, hS, hE;
+        int wfS, wfE, hfS, hfE;
+        if(dx > 0) {
+            wS = 0;
+            wE = width - dx;
+
+            wfS = width - dx;
+            wfE = width;
+        } else {
+            wS = -dx;
+            wE = width;
+
+            wfS = 0;
+            wfE = -dx;
+        }
+
+        if(dy > 0) {
+            hS = 0;
+            hE = height - dy;
+
+            hfS = height - dy;
+            hfE = height;
+        } else {
+            hS = -dy;
+            hE = height;
+
+            hfS = 0;
+            hfE = -dy;
         }
 
         #pragma omp parallel for
+        for(int iOut = hS; iOut < hE; iOut++) {
+            int strideOut = iOut * width;
+            int iIn = iOut + dy;
+            int strideIn = iIn * width;
+            for(int jOut = wS; jOut < wE; jOut++) {
+                int jIn = jOut + dx;
 
-        for(int i = 0; i < height; i++) {
-            int tmp1 = i * width;
-            int i2 = i + dy;
+                int indOut = (strideOut + jOut) * channels;
+                int indIn = (strideIn + jIn ) * channels;
 
-            if((i2) < 0 || (i2 >= height)) {
+                Array<T>::assign(&bufferIn[indIn], channels,
+                                 &bufferOut[indOut]);
+            }
+        }
 
-                for(int j=0; j<width; j++){
-                    int ind1 = (tmp1 + j) * channels;
-                    for(int k = 0; k < channels; k++) {
-                        bufferOut[ind1 + k] = T(0);
-                    }
-                }
 
-            } else {
-                int tmp2 = i2 * width;
+        //block 1
+        int strideIn = dy > 0 ? (height - 1) * width : 0;
+        for(int iOut = hfS; iOut < hfE; iOut++) {
+            int strideOut = iOut * width;
 
-                for(int j = 0; j < width; j++) {
-                    int j2 = j + dx;
-                    int ind1 = (tmp1 + j) * channels;
+            for(int jOut = wS; jOut < wE; jOut++) {
+                int jIn = jOut + dx;
 
-                    if((j2) < 0 || (j2 >= width)) {
-                        for(int k = 0; k < channels; k++) {
-                            bufferOut[ind1 + k] = T(0);
-                        }
-                    } else {
+                int indOut = (strideOut + jOut) * channels;
+                int indIn = (strideIn + jIn ) * channels;
 
-                        int ind2 = (tmp2 + j2) * channels;
-
-                        for(int k = 0; k < channels; k++) {
-                            bufferOut[ind1 + k] = bufferIn[ind2 + k];
-                        }
-                    }
+                if(bReplicate) {
+                    Array<T>::assign(&bufferIn[indIn], channels,
+                                     &bufferOut[indOut]);
+                } else {
+                    Array<T>::assign(zero, &bufferOut[indOut], channels);
                 }
             }
         }
 
+        //block 2
+        int jIn = dx > 0 ? width - 1 : 0;
+        for(int iOut = hS; iOut < hE; iOut++) {
+            int strideOut = iOut * width;
+            int iIn = iOut + dy;
+            int strideIn = iIn * width;
+
+            for(int jOut = wfS; jOut < wfE; jOut++) {
+
+                int indOut = (strideOut + jOut) * channels;
+                int indIn = (strideIn + jIn ) * channels;
+
+                if(bReplicate) {
+                    Array<T>::assign(&bufferIn[indIn], channels,
+                                     &bufferOut[indOut]);
+                } else {
+                    Array<T>::assign(zero, &bufferOut[indOut], channels);
+                }
+            }
+        }
+
+        //block3
+        jIn = dx > 0 ? width - 1 : 0;
+        strideIn = dy > 0 ? (height - 1) * width : 0;
+        int indIn = (strideIn + jIn ) * channels;
+
+        for(int iOut = hfS; iOut < hfE; iOut++) {
+            int strideOut = iOut * width;
+
+            for(int jOut = wfS; jOut < wfE; jOut++) {
+
+                int indOut = (strideOut + jOut) * channels;
+
+                if(bReplicate) {
+                    Array<T>::assign(&bufferIn[indIn], channels,
+                                     &bufferOut[indOut]);
+                } else {
+                    Array<T>::assign(zero, &bufferOut[indOut], channels);
+                }
+            }
+        }
         return bufferOut;
     }
 

@@ -152,8 +152,6 @@ public:
 
         //align images
         if(hdra != HA_NONE && (n > 1)) {
-
-
             ImaveVecSortByExposureTime(stack);
 
             if(hdra == HA_MTB) {

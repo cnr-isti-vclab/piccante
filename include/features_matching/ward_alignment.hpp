@@ -232,8 +232,8 @@ public:
                     int xs = cur_shift[0] + i;
                     int ys = cur_shift[1] + j;
 
-                    Buffer<bool>::shift(tb2_shifted, tb2, xs, ys, width, height, 1, 1);
-                    Buffer<bool>::shift(eb2_shifted, eb2, xs, ys, width, height, 1, 1);
+                    Buffer<bool>::shift(tb2_shifted, tb2, xs, ys, true, width, height, 1, 1);
+                    Buffer<bool>::shift(eb2_shifted, eb2, xs, ys, true, width, height, 1, 1);
 
                     int err = 0;
                     for(int k=0; k<n; k++) {
@@ -297,7 +297,7 @@ public:
 
         ret->setZero();
         Buffer<float>::shift(ret->data, img->data,
-                             shift[0], shift[1],
+                             shift[0], shift[1], true,
                             img->width, img->height,
                             img->channels, img->frames);
 
