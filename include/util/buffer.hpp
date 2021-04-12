@@ -321,7 +321,6 @@ public:
     static T *div(T *bufferOut, T *bufferIn0, T *bufferIn1, int n)
     {
         #pragma omp parallel for
-
         for(int i = 0; i < n; i++) {
             bufferOut[i] = bufferIn0[i] / bufferIn1[i];
         }
@@ -339,7 +338,6 @@ public:
     static T *div(T *bufferOut, T *bufferIn, int n)
     {
         #pragma omp parallel for
-
         for(int i = 0; i < n; i++) {
             bufferOut[i] /= bufferIn[i];
         }
@@ -384,9 +382,7 @@ public:
     {
         int steps = width >> 1;
 
-    //	for(int l=0;l<frames;l++)
         #pragma omp parallel for
-
         for(int i = 0; i < height; i++) {
             int ind = i * width;
 
@@ -416,9 +412,7 @@ public:
     {
         int steps = height >> 1;
 
-    //	for(int l=0;l<frames;l++)
         #pragma omp parallel for
-
         for(int i = 0; i < steps; i++) {
             int ind0 = i * width;
             int ind1 = (height - i - 1) * width;
