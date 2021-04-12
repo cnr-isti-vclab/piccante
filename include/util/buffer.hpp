@@ -568,9 +568,7 @@ public:
                     int width, int height, int channels, int frames)
     {
         if(bufferOut == NULL) {
-            int n = width * height * channels * frames;
-            bufferOut = new T[n];
-            assign(bufferOut, n, T(0));
+            bufferOut = new T[width * height * channels * frames];
         }
 
         T zero = T(0);
@@ -609,6 +607,10 @@ public:
             int strideOut = iOut * width;
             int iIn = iOut + dy;
             int strideIn = iIn * width;
+
+            Array<T>::assign(&bufferIn[(strideIn + wS + dx) * channels], channels * (wE - wS),
+                             &bufferOut[(strideOut + wS) * channels]);
+            /*
             for(int jOut = wS; jOut < wE; jOut++) {
                 int jIn = jOut + dx;
 
@@ -617,7 +619,7 @@ public:
 
                 Array<T>::assign(&bufferIn[indIn], channels,
                                  &bufferOut[indOut]);
-            }
+            }*/
         }
 
 
@@ -755,15 +757,11 @@ public:
     {
         #pragma omp parallel for
         for(int i = 0; i < n; i++) {
-
-                for(int k = 0; k < channels; k++) {
-
-                    int iIn  = k * n + i;
-                    int iOut = i * channels + k;
-
-                    bufferOut[iOut] = bufferIn[iIn];
-                }
-
+            for(int k = 0; k < channels; k++) {
+                int iIn  = k * n + i;
+                int iOut = i * channels + k;
+                bufferOut[iOut] = bufferIn[iIn];
+            }
         }
     }
 
@@ -870,11 +868,15 @@ public:
             int index_bi = (j + shiftY) * bi_width;
             int index_bo = j * bo_width;
 
+            Array<T>::assign(bufIn + index_bi + sX + shiftY,
+                             bi_channels * (eX - sX),
+                             bufOut + index_bo + sX);
+            /*
             for(int i = sX; i < eX; i++) {
                 Array<T>::assign(bufIn + index_bi + i + shiftY,
                                  bi_channels,
                                  bufOut + index_bo + i);
-            }
+            }*/
         }
     }
 };
