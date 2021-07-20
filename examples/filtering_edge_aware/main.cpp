@@ -118,25 +118,6 @@ int main(int argc, char *argv[])
             printf("Writing had some issues!\n");
         }
 
-        //the non-local means filter
-        printf("Filtering the image with Non-Local Means filter;\n");
-
-        pic::FilterNonLocalMeansF fltNLM(31, 5, 0.05f);
-        output = fltNLM.Process(input, output);
-
-        printf("Ok!\n");
-
-        printf("Writing the file to disk...");
-
-        bWritten = output->Write("../data/output/" + name + "_filtered_non_local_means.png", pic::LT_NOR_GAMMA);
-
-        if(bWritten) {
-            printf("Ok\n");
-        } else {
-            printf("Writing had some issues!\n");
-        }
-
-
         //the Anisotropic Diffusion
         printf("Filtering the image with the Anisotropic Diffusion;\n");
         printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
