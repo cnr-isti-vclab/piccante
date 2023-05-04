@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_UTIL_STRING_HPP
 
 #include <vector>
+#include <cstring>
 #include <string>
 #include <sstream>
 #include <iostream>
