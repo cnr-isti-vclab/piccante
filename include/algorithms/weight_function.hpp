@@ -63,7 +63,7 @@ PIC_INLINE float weightFunction(float x, CRF_WEIGHT type)
 
     case CW_REVERSE:
     {
-        return 1.0 - x;
+        return 1.0f - x;
     }
     break;
             

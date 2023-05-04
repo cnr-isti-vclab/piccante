@@ -195,7 +195,6 @@ public:
 
         for(int i = 0; i < iterations; i++) {
             output = flt.Process(input, output);
-
             Image *tmp = input[0];
             input[0] = output;
             output = tmp;

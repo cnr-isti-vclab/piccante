@@ -188,7 +188,7 @@ public:
         minInputImages = 2;
 
         //a numerical stability value when assembling images in the log-domain
-        this->delta_value = 1.0 / 65535.0f;
+        this->delta_value = 1.0f / 65535.0f;
     }
 
     /**
