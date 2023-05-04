@@ -183,7 +183,7 @@ protected:
                 it = labelEq.find(tmpLI);
 
                 if(it != labelEq.end()) {
-                    float tmpMinLabel = it->minLabel;
+                    uint tmpMinLabel = it->minLabel;
 
                     if(minVal > tmpMinLabel) {
                         minVal = tmpMinLabel;
