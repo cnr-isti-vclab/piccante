@@ -41,7 +41,7 @@ namespace pic {
  * @param white_point_XYZ is the XYZ values of the white point primary
  * @return It returns a 3x3 matrix for converting XYZ values into the defined color space
  */
-float *createMatrixFromPrimaries(float *red_XYZ,
+PIC_INLINE float *createMatrixFromPrimaries(float *red_XYZ,
                                  float *green_XYZ,
                                  float *blue_XYZ,
                                  float *white_point_XYZ,

@@ -479,7 +479,7 @@ inline std::string checkPath(std::string name)
  * @param pathFolder
  * @return
  */
-std::string adjustPath(std::string nameFile, std::string pathFolder)
+PIC_INLINE std::string adjustPath(std::string nameFile, std::string pathFolder)
 {
     if(!checkAbsolutePath(nameFile)) {
         std::string fullPath = checkPath(nameFile);

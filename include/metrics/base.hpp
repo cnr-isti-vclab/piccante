@@ -35,7 +35,7 @@ enum METRICS_DOMAIN{MD_LIN, MD_LOG10, MD_PU};
  * @param type
  * @return
  */
-float changeDomain(float x, METRICS_DOMAIN type = MD_LIN)
+PIC_INLINE float changeDomain(float x, METRICS_DOMAIN type = MD_LIN)
 {
     switch(type){
     case MD_LIN: {

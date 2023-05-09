@@ -82,11 +82,11 @@ private:
 
 };
 
-std::mutex ReduxOpsGL::mutex;
+PIC_INLINE std::mutex ReduxOpsGL::mutex;
 
-std::map<std::thread::id, bool> ReduxOpsGL::flag;
+PIC_INLINE std::map<std::thread::id, bool> ReduxOpsGL::flag;
 
-std::map<std::thread::id, ReduxOpsGL*> ReduxOpsGL::redux_ops_gl;
+PIC_INLINE std::map<std::thread::id, ReduxOpsGL*> ReduxOpsGL::redux_ops_gl;
 
 } // end namespace pic
 
