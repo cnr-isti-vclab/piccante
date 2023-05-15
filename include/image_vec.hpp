@@ -90,10 +90,10 @@ PIC_INLINE ImageVec Quad(Image *img1, Image *img2, Image *img3,
 }
 
 /**
- * @brief ImaveVecSortByExposureTime
+ * @brief ImageVecSortByExposureTime
  * @param stack
  */
-PIC_INLINE void ImaveVecSortByExposureTime(ImageVec &stack)
+PIC_INLINE void ImageVecSortByExposureTime(ImageVec &stack)
 {
     std::sort(stack.begin(), stack.end(), [](const Image *l, const Image *r)->bool{
         if (!l || !r) {
@@ -105,10 +105,10 @@ PIC_INLINE void ImaveVecSortByExposureTime(ImageVec &stack)
 
 
 /**
- * @brief ImaveVecGetExposureTimesAsArray
+ * @brief ImageVecGetExposureTimesAsArray
  * @param stack
  */
-PIC_INLINE void ImaveVecGetExposureTimesAsArray(ImageVec &stack, std::vector<float> &output, bool bLog)
+PIC_INLINE void ImageVecGetExposureTimesAsArray(ImageVec &stack, std::vector<float> &output, bool bLog)
 {
     output.clear();
 

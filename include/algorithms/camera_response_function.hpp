@@ -421,7 +421,7 @@ public:
 
         //log domain exposure time        
         std::vector< float > log_exposures;
-        ImaveVecGetExposureTimesAsArray(stack, log_exposures, true);
+        ImageVecGetExposureTimesAsArray(stack, log_exposures, true);
 
         #ifdef PIC_DEBUG
             printf("nSamples: %d\n", nSamples);
@@ -482,7 +482,7 @@ public:
         std::size_t nExposures = stack.size();
 
         std::vector< float > exposures;
-        ImaveVecGetExposureTimesAsArray(stack, exposures, false);
+        ImageVecGetExposureTimesAsArray(stack, exposures, false);
 
         int stride = nSamples * int(nExposures);
 
