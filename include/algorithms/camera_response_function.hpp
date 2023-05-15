@@ -465,7 +465,7 @@ public:
         type_linearization = IL_POLYNOMIAL;
 
         //sort the array by exposure
-        ImaveVecSortByExposureTime(stack);
+        ImageVecSortByExposureTime(stack);
 
         //subsample the image stack
         stackOut.execute(stack, nSamples, alpha);
