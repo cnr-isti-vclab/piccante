@@ -421,7 +421,7 @@ public:
 
         //log domain exposure time        
         std::vector< float > log_exposures;
-        ImaveVecGetExposureTimesAsArray(stack, log_exposures, true);
+        ImageVecGetExposureTimesAsArray(stack, log_exposures, true);
 
         #ifdef PIC_DEBUG
             printf("nSamples: %d\n", nSamples);
@@ -465,7 +465,7 @@ public:
         type_linearization = IL_POLYNOMIAL;
 
         //sort the array by exposure
-        ImaveVecSortByExposureTime(stack);
+        ImageVecSortByExposureTime(stack);
 
         //subsample the image stack
         stackOut.execute(stack, nSamples, alpha);
@@ -482,7 +482,7 @@ public:
         std::size_t nExposures = stack.size();
 
         std::vector< float > exposures;
-        ImaveVecGetExposureTimesAsArray(stack, exposures, false);
+        ImageVecGetExposureTimesAsArray(stack, exposures, false);
 
         int stride = nSamples * int(nExposures);
 
