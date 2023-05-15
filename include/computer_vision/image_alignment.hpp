@@ -47,7 +47,7 @@ namespace pic {
  * @param img1
  * @return
  */
-Eigen::Matrix3d getHomographyMatrixFromTwoImage(Image *img0, Image *img1)
+PIC_INLINE Eigen::Matrix3d getHomographyMatrixFromTwoImage(Image *img0, Image *img1)
 {
     //output corners
     std::vector< Eigen::Vector2f > corners_from_img0;
@@ -92,7 +92,7 @@ Eigen::Matrix3d getHomographyMatrixFromTwoImage(Image *img0, Image *img1)
  * @param imgOut
  * @return
  */
-Image* imageAlignmentWithORB(Image *img0, Image *img1, Image *imgOut)
+PIC_INLINE Image* imageAlignmentWithORB(Image *img0, Image *img1, Image *imgOut)
 {
     auto H = getHomographyMatrixFromTwoImage(img0, img1);
 

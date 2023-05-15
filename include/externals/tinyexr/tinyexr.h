@@ -707,7 +707,7 @@ const char *mz_version(void);
 //  MZ_STREAM_ERROR if the stream is bogus.
 //  MZ_PARAM_ERROR if the input parameters are bogus.
 //  MZ_MEM_ERROR on out of memory.
-int mz_deflateInit(mz_streamp pStream, int level);
+PIC_INLINE int mz_deflateInit(mz_streamp pStream, int level);
 
 // mz_deflateInit2() is like mz_deflate(), except with more control:
 // Additional parameters:
@@ -716,7 +716,7 @@ int mz_deflateInit(mz_streamp pStream, int level);
 //   zlib header/adler-32 footer) or -MZ_DEFAULT_WINDOW_BITS (raw deflate/no
 //   header or footer)
 //   mem_level must be between [1, 9] (it's checked but ignored by miniz.c)
-int mz_deflateInit2(mz_streamp pStream, int level, int method, int window_bits,
+PIC_INLINE int mz_deflateInit2(mz_streamp pStream, int level, int method, int window_bits,
                     int mem_level, int strategy);
 
 // Quickly resets a compressor without having to reallocate anything. Same as
@@ -741,7 +741,7 @@ int mz_deflateReset(mz_streamp pStream);
 //   MZ_BUF_ERROR if no forward progress is possible because the input and/or
 //   output buffers are empty. (Fill up the input buffer or free up some output
 //   space and try again.)
-int mz_deflate(mz_streamp pStream, int flush);
+PIC_INLINE int mz_deflate(mz_streamp pStream, int flush);
 
 // mz_deflateEnd() deinitializes a compressor:
 // Return values:
@@ -1525,7 +1525,7 @@ inline tdefl_status tdefl_compress_buffer(tdefl_compressor *d, const void *pIn_b
                                    size_t in_buf_size, tdefl_flush flush);
 
 inline tdefl_status tdefl_get_prev_return_status(tdefl_compressor *d);
-inline mz_uint32 tdefl_get_adler32(tdefl_compressor *d);
+PIC_INLINE  mz_uint32 tdefl_get_adler32(tdefl_compressor *d);
 
 // Can't use tdefl_create_comp_flags_from_zip_params if MINIZ_NO_ZLIB_APIS isn't
 // defined, because it uses some of its macros.
@@ -6894,7 +6894,7 @@ FP16 float_to_half_full(FP32 f) {
 // #define IMF_B44_COMPRESSION 6
 // #define IMF_B44A_COMPRESSION  7
 
-const char *ReadString(std::string &s, const char *ptr) {
+PIC_INLINE const char *ReadString(std::string &s, const char *ptr) {
   // Read untile NULL(\0).
   const char *p = ptr;
   const char *q = ptr;
@@ -6906,7 +6906,7 @@ const char *ReadString(std::string &s, const char *ptr) {
   return q + 1; // skip '\0'
 }
 
-const char *ReadAttribute(std::string &name, std::string &ty,
+PIC_INLINE const char *ReadAttribute(std::string &name, std::string &ty,
                           std::vector<unsigned char> &data, const char *ptr) {
 
   if ((*ptr) == 0) {
@@ -6933,7 +6933,7 @@ const char *ReadAttribute(std::string &name, std::string &ty,
   return p;
 }
 
-void WriteAttribute(FILE *fp, const char *name, const char *type,
+PIC_INLINE void WriteAttribute(FILE *fp, const char *name, const char *type,
                     const unsigned char *data, int len) {
   size_t n = fwrite(name, 1, strlen(name) + 1, fp);
   assert(n == strlen(name) + 1);
@@ -6954,7 +6954,7 @@ void WriteAttribute(FILE *fp, const char *name, const char *type,
   (void)n;
 }
 
-void WriteAttributeToMemory(std::vector<unsigned char> &out, const char *name,
+PIC_INLINE void WriteAttributeToMemory(std::vector<unsigned char> &out, const char *name,
                             const char *type, const unsigned char *data,
                             int len) {
   out.insert(out.end(), name, name + strlen(name) + 1);
@@ -6977,7 +6977,7 @@ typedef struct {
   int ySampling;
 } ChannelInfo;
 
-void ReadChannelInfo(std::vector<ChannelInfo> &channels,
+PIC_INLINE void ReadChannelInfo(std::vector<ChannelInfo> &channels,
                      const std::vector<unsigned char> &data) {
   const char *p = reinterpret_cast<const char *>(&data.at(0));
 
@@ -7007,7 +7007,7 @@ void ReadChannelInfo(std::vector<ChannelInfo> &channels,
   }
 }
 
-void WriteChannelInfo(std::vector<unsigned char> &data,
+PIC_INLINE void WriteChannelInfo(std::vector<unsigned char> &data,
                       const std::vector<ChannelInfo> &channels) {
 
   size_t sz = 0;
@@ -7052,7 +7052,7 @@ void WriteChannelInfo(std::vector<unsigned char> &data,
   (*p) = '\0';
 }
 
-void CompressZip(unsigned char *dst, unsigned long long &compressedSize,
+PIC_INLINE void CompressZip(unsigned char *dst, unsigned long long &compressedSize,
                  const unsigned char *src, unsigned long srcSize) {
 
   std::vector<unsigned char> tmpBuf(srcSize);
@@ -7114,7 +7114,7 @@ void CompressZip(unsigned char *dst, unsigned long long &compressedSize,
   compressedSize = outSize;
 }
 
-void DecompressZip(unsigned char *dst, unsigned long &uncompressedSize,
+PIC_INLINE void DecompressZip(unsigned char *dst, unsigned long &uncompressedSize,
                    const unsigned char *src, unsigned long srcSize) {
   std::vector<unsigned char> tmpBuf(uncompressedSize);
 
@@ -7269,7 +7269,7 @@ inline void wdec16(unsigned short l, unsigned short h, unsigned short &a,
 //
 
 #if 0 // @todo
-void wav2Encode(unsigned short *in, // io: values are transformed in place
+PIC_INLINE void wav2Encode(unsigned short *in, // io: values are transformed in place
                 int nx,             // i : x size
                 int ox,             // i : x offset
                 int ny,             // i : y size
@@ -7378,7 +7378,7 @@ void wav2Encode(unsigned short *in, // io: values are transformed in place
 // 2D Wavelet decoding:
 //
 
-void wav2Decode(unsigned short *in, // io: values are transformed in place
+PIC_INLINE void wav2Decode(unsigned short *in, // io: values are transformed in place
                 int nx,             // i : x size
                 int ox,             // i : x offset
                 int ny,             // i : y size
@@ -7518,7 +7518,6 @@ struct HufDec { // short code		long code
   int lit : 24; // lit			p size
   int *p;       // 0			lits
 };
-
 inline long long hufLength(long long code) { return code & 63; }
 
 inline long long hufCode(long long code) { return code >> 6; }

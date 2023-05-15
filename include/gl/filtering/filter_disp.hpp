@@ -87,7 +87,7 @@ public:
     }
 };
 
-FilterGLDisp::FilterGLDisp(): FilterGL()
+PIC_INLINE FilterGLDisp::FilterGLDisp(): FilterGL()
 {
     sigma = 2.0f;
     sigma_s = 2.0f;
@@ -95,7 +95,7 @@ FilterGLDisp::FilterGLDisp(): FilterGL()
     initShaders();
 }
 
-void FilterGLDisp::initShaders()
+PIC_INLINE void FilterGLDisp::initShaders()
 {
     fragment_source = MAKE_STRING
                       (
@@ -203,7 +203,7 @@ void FilterGLDisp::initShaders()
     technique.unbind();
 }
 
-void FilterGLDisp::update(float sigma, float sigma_s, float sigma_r, bool bUse,
+PIC_INLINE void FilterGLDisp::update(float sigma, float sigma_s, float sigma_r, bool bUse,
                           bool bLeft)
 {
     this->sigma = sigma;

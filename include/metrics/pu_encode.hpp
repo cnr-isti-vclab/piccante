@@ -34,7 +34,7 @@ namespace pic {
  * in the range [10^-6, 10^10] cd/m^2
  * @return it returns a perceptually uniform value
  */
-float PUEncode(float L)
+PIC_INLINE float PUEncode(float L)
 {
     return Arrayf::interp(C_PU_x, C_PU_y, 256, log10f(L + 1e-7f));
 }
@@ -44,7 +44,7 @@ float PUEncode(float L)
  * @param p is a perceptually uniform luminance value
  * @return it returns a luminance value in the range [10^-6, 10^10] cd/m^2
  */
-float PUDecode(float p)
+PIC_INLINE float PUDecode(float p)
 {
     return powf(10.0f, Arrayf::interp(C_PU_y, C_PU_x, 256, p));
 }

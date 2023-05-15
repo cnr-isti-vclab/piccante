@@ -41,6 +41,13 @@ HOW TO INSTALL:
 
 3) Include "piccante.hpp" in your project
 
+
+NOTE ON CODE USE:
+=================
+When you use parts or the full source code of this project in your own project, please remember to cite this project both in your project webpage and in its source code. This SHOULD be done even when you convert this code into another programming language.
+
+Be kind.
+
 NOTE ON PULL REQUESTS:
 =====================
 Please, send your pull requests to the develop branch.

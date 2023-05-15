@@ -33,7 +33,7 @@ namespace pic {
  * @param bMotorola
  * @return
  */
-unsigned int twoByteToValue(unsigned char data[2], bool bMotorola)
+PIC_INLINE unsigned int twoByteToValue(unsigned char data[2], bool bMotorola)
 {
     if(bMotorola) {
         return  (data[0] << 8) + (data[1]);
@@ -48,7 +48,7 @@ unsigned int twoByteToValue(unsigned char data[2], bool bMotorola)
  * @param bMotorola
  * @return
  */
-unsigned int fourByteToValue(unsigned char data[4], bool bMotorola)
+PIC_INLINE unsigned int fourByteToValue(unsigned char data[4], bool bMotorola)
 {
     if(bMotorola) {
         return (data[0] << 24) + (data[1] << 16) +
@@ -66,7 +66,7 @@ unsigned int fourByteToValue(unsigned char data[4], bool bMotorola)
  * @param bMotorola
  * @return
  */
-bool checkTag(unsigned char tag[2], unsigned short tag_r, bool bMotorola)
+PIC_INLINE bool checkTag(unsigned char tag[2], unsigned short tag_r, bool bMotorola)
 {
     unsigned char tag_ref[2];
     tag_ref[0] = (tag_r >> 8) & 0x00ff;
@@ -88,7 +88,7 @@ bool checkTag(unsigned char tag[2], unsigned short tag_r, bool bMotorola)
  * @param bMotorola
  * @return
  */
-int getTagID(unsigned char tag[2], bool bMotorola)
+PIC_INLINE int getTagID(unsigned char tag[2], bool bMotorola)
 {
     if(checkTag(tag, 0x829a, bMotorola)) {
         return 0;
@@ -118,7 +118,7 @@ int getTagID(unsigned char tag[2], bool bMotorola)
  * @param value
  * @return
  */
-int getBytesForComponents(int value)
+PIC_INLINE int getBytesForComponents(int value)
 {
     switch(value)
     {
@@ -183,7 +183,7 @@ int getBytesForComponents(int value)
  * @param length
  * @return
  */
-std::string readString(FILE *file, int length)
+PIC_INLINE std::string readString(FILE *file, int length)
 {
     char *tmp = new char[length];
     fread(tmp, 1, length, file);
@@ -199,7 +199,7 @@ std::string readString(FILE *file, int length)
  * @param data
  * @return
  */
-std::string readStringFromUChar(unsigned char *data, int length)
+PIC_INLINE std::string readStringFromUChar(unsigned char *data, int length)
 {
     std::string str;
 
@@ -216,7 +216,7 @@ std::string readStringFromUChar(unsigned char *data, int length)
  * @param bMotorola
  * @return
  */
-float readUnsignedRational(FILE *file, bool bMotorola)
+PIC_INLINE float readUnsignedRational(FILE *file, bool bMotorola)
 {
     unsigned char val0[4];
     fread(val0, 1, 4, file);
@@ -247,7 +247,7 @@ struct EXIFInfo
  * @param info
  * @return
  */
-bool readEXIF(std::string name, EXIFInfo &info)
+PIC_INLINE bool readEXIF(std::string name, EXIFInfo &info)
 {
     FILE *file = fopen(name.c_str(), "rb");
 

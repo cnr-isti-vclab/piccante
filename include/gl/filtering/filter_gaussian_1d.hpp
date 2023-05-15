@@ -91,7 +91,7 @@ public:
     }
 };
 
-FilterGLGaussian1D::FilterGLGaussian1D(float sigma, int direction = 0,
+PIC_INLINE FilterGLGaussian1D::FilterGLGaussian1D(float sigma, int direction = 0,
                                        GLenum target = GL_TEXTURE_2D): FilterGLConv1D(NULL, direction, target)
 {
     pg = NULL;
@@ -101,12 +101,12 @@ FilterGLGaussian1D::FilterGLGaussian1D(float sigma, int direction = 0,
     update(sigma);
 }
 
-FilterGLGaussian1D::~FilterGLGaussian1D()
+PIC_INLINE FilterGLGaussian1D::~FilterGLGaussian1D()
 {
     release();
 }
 
-void FilterGLGaussian1D::update(float sigma)
+PIC_INLINE void FilterGLGaussian1D::update(float sigma)
 {
     bool bChanges = false;
 
