@@ -1,5 +1,3 @@
-c
-
 //This means that we disable Eigen; some functionalities cannot be used.
 //For example, estimating the camera response function
 #define PIC_DISABLE_EIGEN
@@ -77,15 +75,15 @@ int main(int argc, char *argv[])
 
         printf("PSNR (classic): %3.3f \t PSNR (PU-encoding): %3.3f\n",
                pic::PSNR(&img0, tmp, -1.0f, false, pic::MD_LIN ),
-               pic::PSNR(&img0, tmp, -1.0f, false, pic::MD_PU ));
+               pic::PSNR(&img0, tmp, -1.0f, false, pic::MD_PU08 ));
 
         printf("MAE (classic): %3.3f \t MAE (PU-encoding): %3.3f\n",
                pic::MAE(&img0, tmp, false, pic::MD_LIN),
-               pic::MAE(&img0, tmp, false, pic::MD_PU));
+               pic::MAE(&img0, tmp, false, pic::MD_PU08));
 
         printf("Relative Error (classic): %3.3f \t Relative Error (PU-encoding): %3.3f\n",
                pic::RelativeError(&img0, tmp, false, pic::MD_LIN),
-               pic::RelativeError(&img0, tmp, false, pic::MD_PU));
+               pic::RelativeError(&img0, tmp, false, pic::MD_PU08));
 
     } else {
         printf("No, the file is not valid!\n");

@@ -19,7 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_METRICS_BASE_HPP
 
 #include "../util/math.hpp"
-#include "../metrics/pu_encode.hpp"
+#include "../metrics/pu_08.hpp"
 
 namespace pic {
 
@@ -27,7 +27,7 @@ const double C_SINGULARITY = 1e-6;
 const double C_LARGE_DIFFERENCES = 1e6;
 const float  C_LARGE_DIFFERENCESf = 1e6f;
 
-enum METRICS_DOMAIN{MD_LIN, MD_LOG10, MD_PU};
+enum METRICS_DOMAIN{MD_LIN, MD_LOG10, MD_PU08};
 
 /**
  * @brief changeDomain
@@ -46,7 +46,7 @@ PIC_INLINE float changeDomain(float x, METRICS_DOMAIN type = MD_LIN)
         return log10f(x);
     } break;
 
-    case MD_PU: {
+    case MD_PU08: {
         return PUEncode(x);
     } break;
     }

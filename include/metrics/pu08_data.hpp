@@ -26,7 +26,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-PIC_INLINE float C_PU_x[256] = {
+PIC_INLINE float PU08_x[256] = {
     -5.000000f,
     -4.882784f,
     -4.765568f,
@@ -285,7 +285,7 @@ PIC_INLINE float C_PU_x[256] = {
     10.000000f
 };
 
-PIC_INLINE float C_PU_y[256] = {
+PIC_INLINE float PU08_y[256] = {
     0.000000f,
     0.025875f,
     0.055091f,
