@@ -71,7 +71,7 @@ PIC_INLINE ImageVec Triple(Image *img1, Image *img2, Image *img3)
 }
 
 /**
- * @brief Triple creates an std::vector which contains img1, img2, img3, and img4; this is for filters input.
+ * @brief Quad creates an std::vector which contains img1, img2, img3, and img4; this is for filters input.
  * @param img1 is a pointer to a pic::Image
  * @param img2 is a pointer to a pic::Image
  * @param img3 is a pointer to a pic::Image

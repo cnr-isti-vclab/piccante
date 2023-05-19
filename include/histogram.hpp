@@ -340,7 +340,7 @@ public:
             float y = projectDomain(x);
             return int(((y - fMin) * nBinf) / deltaMaxMin);
         } else {
-            return 0.5f;
+            return 0;
         }
     }
 
