@@ -47,7 +47,7 @@ PIC_INLINE float changeDomain(float x, METRICS_DOMAIN type = MD_LIN)
     } break;
 
     case MD_PU08: {
-        return PUEncode(x);
+        return PU08Encode(x);
     } break;
     }
 

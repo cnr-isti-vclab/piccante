@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
             ssim_map->Write("../data/output/" + name + "_ssim_map_lin.pfm");
         }
 
-        ssim.update(-1.0f, -1.0f, -1.0f, -1.0f, true, pic::MD_PU);
+        ssim.update(-1.0f, -1.0f, -1.0f, -1.0f, true, pic::MD_PU08);
         ssim_map = ssim.execute(Double(&img0, tmp), ssim_index_pu, ssim_map);
 
         if(ssim_map != NULL) {
@@ -67,11 +67,11 @@ int main(int argc, char *argv[])
 
         printf("MSE (classic): %3.3f \t  MSE (PU-encoding): %3.3f\n",
                pic::MSE(&img0, tmp, false, pic::MD_LIN),
-               pic::MSE(&img0, tmp, false, pic::MD_PU));
+               pic::MSE(&img0, tmp, false, pic::MD_PU08));
 
         printf("RMSE (classic): %3.3f \t  RMSE (PU-encoding): %3.3f\n",
         pic::RMSE(&img0, tmp, false, pic::MD_LIN),
-        pic::RMSE(&img0, tmp, false, pic::MD_PU));
+        pic::RMSE(&img0, tmp, false, pic::MD_PU08));
 
         printf("PSNR (classic): %3.3f \t PSNR (PU-encoding): %3.3f\n",
                pic::PSNR(&img0, tmp, -1.0f, false, pic::MD_LIN ),
