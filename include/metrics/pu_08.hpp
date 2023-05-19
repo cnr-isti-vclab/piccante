@@ -36,7 +36,7 @@ namespace pic {
  */
 PIC_INLINE float PU08Encode(float L)
 {
-    return Arrayf::interp(C_PU_x, C_PU_y, 256, log10f(L + 1e-7f));
+    return Arrayf::interp(PU08_x, PU08_y, 256, log10f(L + 1e-7f));
 }
 
 /**
@@ -46,7 +46,7 @@ PIC_INLINE float PU08Encode(float L)
  */
 PIC_INLINE float PU08Decode(float p)
 {
-    return powf(10.0f, Arrayf::interp(C_PU_y, C_PU_x, 256, p));
+    return powf(10.0f, Arrayf::interp(PU08_y, PU08_x, 256, p));
 }
 
 } // end namespace pic
