@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
         pic::Image tmp;
         tmp.convertFromMask(mask, img.width, img.height);
 
-        auto img_cc = cc.execute(mask, img.width, img.height, NULL, ret);
+        auto img_cc = cc.execute(mask, img.width, img.height, NULL, &ret);
 
         printf("Ok!\n");
 
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
         printf("Writing the connected component labeling results to a file on the disk...");
 
         pic::Image *comp = pic::ConnectedComponents::convertFromIntegerToImage(img_cc, NULL, img.width, img.height);
-        bool bWritten = comp->Write("../data/output/connected_components.pfm");
+        bool bWritten = comp->Write("../data/output/connected_components.hdr");
 
         if(bWritten) {
             printf("Ok\n");

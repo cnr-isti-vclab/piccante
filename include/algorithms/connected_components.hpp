@@ -74,7 +74,6 @@ public:
     }
 };
 
-template<class T>
 class ConnectedComponents
 {
 protected:
@@ -85,7 +84,7 @@ protected:
      * @param imgOut
      * @param labelEq
      */
-    void secondPass(uint *imgOut, std::vector<LabelOutput> &ret, std::set<LabelInfo> &labelEq, int n)
+    void secondPass(uint *imgOut, std::vector<LabelOutput> *ret, std::set<LabelInfo> &labelEq, int n)
     {
         //Label Search
         LabelInfo tmpLI;
@@ -138,13 +137,13 @@ protected:
             auto uniqueIt = unique.find(id);
 
             if(uniqueIt != unique.end()) {
-                ret[mapping[id]].push_back(i);
+                (*ret)[mapping[id]].push_back(i);
             } else {
                 std::pair<uint, int> tmp = std::make_pair(id, counter);
                 mapping.insert(tmp);
 
                 LabelOutput tmpRet(id, i);
-                ret.push_back(tmpRet);
+                ret->push_back(tmpRet);
 
                 unique.insert(id);
                 counter++;
@@ -250,7 +249,7 @@ public:
      * @param imgOut
      * @param ret
      */
-    uint *execute(Image *imgIn, uint *imgOut, std::vector<LabelOutput> &ret)
+    uint *execute(Image *imgIn, uint *imgOut, std::vector<LabelOutput> *ret)
     {
         //Check input paramters
         if(imgIn == NULL) {
@@ -330,7 +329,8 @@ public:
      * @param ret
      * @return
      */
-    uint *execute(T *imgIn, int width, int height, uint *imgOut, std::vector<LabelOutput> &ret)
+    template<typename T>
+    uint *execute(T *imgIn, int width, int height, uint *imgOut, std::vector<LabelOutput> *ret)
     {
         //Check input paramters
         if(imgIn == NULL) {
