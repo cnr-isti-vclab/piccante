@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
         pic::Image tmp;
         tmp.convertFromMask(mask, img.width, img.height);
 
-        auto img_cc = cc.execute(mask, img.width, img.height, NULL, &ret);
+        auto img_cc = cc.execute(mask, img.width, img.height, NULL, ret);
 
         printf("Ok!\n");
 
