@@ -152,7 +152,7 @@ public:
 
         //align images
         if(hdra != HA_NONE && (n > 1)) {
-            ImaveVecSortByExposureTime(stack);
+            ImageVecSortByExposureTime(stack);
 
             if(hdra == HA_MTB) {
                 std::vector<Vec2i> shifts;

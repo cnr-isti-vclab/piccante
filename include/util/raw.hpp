@@ -92,7 +92,7 @@ public:
 
         //Calculate length of the file
         file.seekg(0, std::ios::end);
-        std::ios::streampos length = file.tellg();
+        std::streampos length = file.tellg();
         file.seekg(0, std::ios::beg);
 
         if(nData < 1) {

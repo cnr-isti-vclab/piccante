@@ -169,7 +169,7 @@ public:
 
 };
 
-FilterGLBilateral2DSE::FilterGLBilateral2DSE(float sigma_s, float sigma_p, float sigma_n, float sigma_a): FilterGL()
+PIC_INLINE FilterGLBilateral2DSE::FilterGLBilateral2DSE(float sigma_s, float sigma_p, float sigma_n, float sigma_a): FilterGL()
 {
     //protected values are assigned/computed
     this->sigma_s = sigma_s;
@@ -208,7 +208,7 @@ FilterGLBilateral2DSE::FilterGLBilateral2DSE(float sigma_s, float sigma_p, float
     initShaders();
 }
 
-FilterGLBilateral2DSE::~FilterGLBilateral2DSE()
+PIC_INLINE FilterGLBilateral2DSE::~FilterGLBilateral2DSE()
 {
     delete imageRand;
     delete ms;
@@ -216,7 +216,7 @@ FilterGLBilateral2DSE::~FilterGLBilateral2DSE()
     //free shader etc...
 }
 
-void FilterGLBilateral2DSE::FragmentShader()
+PIC_INLINE void FilterGLBilateral2DSE::FragmentShader()
 {
     fragment_source = MAKE_STRING(
     uniform sampler2D	u_tex;
@@ -273,7 +273,7 @@ void FilterGLBilateral2DSE::FragmentShader()
 
 }
 
-void FilterGLBilateral2DSE::initShaders()
+PIC_INLINE void FilterGLBilateral2DSE::initShaders()
 {
 #ifdef PIC_DEBUG
     printf("Number of samples: %d\n", ms->nSamples);
@@ -284,7 +284,7 @@ void FilterGLBilateral2DSE::initShaders()
     update(-1.0f, -1.0f, -1.0f, -1.0f);
 }
 
-void FilterGLBilateral2DSE::update(float sigma_s, float sigma_p, float sigma_n, float sigma_a)
+PIC_INLINE void FilterGLBilateral2DSE::update(float sigma_s, float sigma_p, float sigma_n, float sigma_a)
 {
 
     bool flag = false;
@@ -342,7 +342,7 @@ void FilterGLBilateral2DSE::update(float sigma_s, float sigma_p, float sigma_n, 
     technique.unbind();
 }
 
-ImageGL *FilterGLBilateral2DSE::Process(ImageGLVec imgIn,
+PIC_INLINE ImageGL *FilterGLBilateral2DSE::Process(ImageGLVec imgIn,
         ImageGL *imgOut)
 {
     if(imgIn[0] == NULL) {

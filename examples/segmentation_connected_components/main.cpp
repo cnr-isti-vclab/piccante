@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
         printf("Writing the connected component labeling results to a file on the disk...");
 
         pic::Image *comp = pic::ConnectedComponents::convertFromIntegerToImage(img_cc, NULL, img.width, img.height);
-        bool bWritten = comp->Write("../data/output/connected_components.pfm");
+        bool bWritten = comp->Write("../data/output/connected_components.hdr");
 
         if(bWritten) {
             printf("Ok\n");

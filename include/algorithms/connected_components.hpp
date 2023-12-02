@@ -74,7 +74,6 @@ public:
     }
 };
 
-template<class T>
 class ConnectedComponents
 {
 protected:
@@ -183,7 +182,7 @@ protected:
                 it = labelEq.find(tmpLI);
 
                 if(it != labelEq.end()) {
-                    float tmpMinLabel = it->minLabel;
+                    uint tmpMinLabel = it->minLabel;
 
                     if(minVal > tmpMinLabel) {
                         minVal = tmpMinLabel;
@@ -330,6 +329,7 @@ public:
      * @param ret
      * @return
      */
+    template<typename T>
     uint *execute(T *imgIn, int width, int height, uint *imgOut, std::vector<LabelOutput> &ret)
     {
         //Check input paramters

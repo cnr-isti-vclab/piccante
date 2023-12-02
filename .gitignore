@@ -272,4 +272,7 @@ examples/build-hdr_generation_alignment-Desktop_Qt_5_8_0_clang_64bit-Release/Mak
 examples/build-s_kmeans-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
 include/io/stb.hpp.autosave
 include/io/stb.hpp.autosave
-.DS_Store
+examples/build-s_kmeans_colors-Desktop_Qt_5_4_2_clang_64bit-Release/Makefile
+examples/build-s_kmeans_colors-Desktop_Qt_5_4_2_clang_64bit-Release/s_kmeans_colors
+examples/build-s_otsu-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
+examples/build-s_otsu-Desktop_Qt_5_4_2_clang_64bit-Debug/s_livewire

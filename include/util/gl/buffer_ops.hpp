@@ -101,11 +101,11 @@ private:
 
 };
 
-std::mutex BufferOpsGL::mutex;
+PIC_INLINE std::mutex BufferOpsGL::mutex;
 
-std::map<std::thread::id, bool> BufferOpsGL::flag;
+PIC_INLINE std::map<std::thread::id, bool> BufferOpsGL::flag;
 
-std::map<std::thread::id, BufferOpsGL*> BufferOpsGL::buffer_ops_gl;
+PIC_INLINE std::map<std::thread::id, BufferOpsGL*> BufferOpsGL::buffer_ops_gl;
 
 } // end namespace pic
 

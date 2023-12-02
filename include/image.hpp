@@ -1410,7 +1410,7 @@ PIC_INLINE float *Image::getMaxVal(BBox *box = NULL, float *ret = NULL)
     }
 
     if(box == NULL) {
-        box = new BBox(width, height, frames);
+        box = &fullBox;
     }
 
     if(ret == NULL) {
@@ -1443,7 +1443,7 @@ PIC_INLINE float *Image::getMinVal(BBox *box = NULL, float *ret = NULL)
     }
 
     if(box == NULL) {
-        box = new BBox(width, height, frames);
+        box = &fullBox;
     }
 
     if(ret == NULL) {

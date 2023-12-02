@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_UTIL_STRING_HPP
 
 #include <vector>
+#include <cstring>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -478,7 +479,7 @@ inline std::string checkPath(std::string name)
  * @param pathFolder
  * @return
  */
-std::string adjustPath(std::string nameFile, std::string pathFolder)
+PIC_INLINE std::string adjustPath(std::string nameFile, std::string pathFolder)
 {
     if(!checkAbsolutePath(nameFile)) {
         std::string fullPath = checkPath(nameFile);

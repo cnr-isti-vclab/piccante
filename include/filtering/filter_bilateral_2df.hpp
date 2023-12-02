@@ -106,7 +106,7 @@ PIC_INLINE FilterBilateral2DF::FilterBilateral2DF(float sigma_s, float sigma_r) 
     pg = new PrecomputedGaussian(sigma_s);
 }
 
-FilterBilateral2DF::~FilterBilateral2DF()
+PIC_INLINE FilterBilateral2DF::~FilterBilateral2DF()
 {
     pg = delete_s(pg);
 }

@@ -43,6 +43,8 @@ public:
         setTransform(direct);
     }
 
+    virtual ~ColorConvGL() = default;
+
     /**
      * @brief getDirectFunction
      * @return

@@ -126,14 +126,14 @@ public:
                 category[j]++;
             }
 
-            ConnectedComponents<int> cc_int;
+            ConnectedComponents cc_int;
 
             std::vector<LabelOutput> labelsList;
             img_labels = cc_int.execute(category, imgIn[0]->width, imgIn[0]->height, img_labels, labelsList);
 
-            ConnectedComponents<int>::mergeIsolatedAreasWithThreshold(img_labels, lum->width, lum->height, labelsList);
+            ConnectedComponents::mergeIsolatedAreasWithThreshold(img_labels, lum->width, lum->height, labelsList);
 
-            ConnectedComponents<int>::reCount(img_labels, labelsList);
+            ConnectedComponents::reCount(img_labels, labelsList);
 
             for(unsigned int j_ui = 0; j_ui < labelsList.size(); j_ui++) {
                 //mean luminance
