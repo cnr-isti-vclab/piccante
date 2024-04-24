@@ -363,10 +363,6 @@ public:
      */
     void ceiling(float k)
     {
-        // reference:
-        // G. W. Larson, H. Rushmeier and C. Piatko, "A visibility matching tone reproduction operator for high dynamic range scenes,"
-        // in IEEE Transactions on Visualization and Computer Graphics, vol. 3, no. 4, pp. 291-306, Oct.-Dec. 1997, doi: 10.1109/2945.646233.
-
         float tolerance = float(Array<uint>::sum(bin, nBin)) * 0.025f;
         int   trimmings = tolerance + 1.0f; // to make sure trimmings (as int) > tolerance (as float) when first enter the while loop
         bool  bFlag = true;
@@ -374,8 +370,6 @@ public:
         std::vector<bool> trimmed_vec;
 
         while((trimmings > tolerance) && bFlag) {
-            // the pseudo code of histogram_ceiling() from the reference paper says that adaptively update T and ceiling
-            // until trimming <= tolerance.
             trimmings = 0;
             float T = float(Array<uint>::sum(bin, nBin));
 
