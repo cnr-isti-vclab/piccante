@@ -68,18 +68,14 @@ REFERENCE:
 
 If you use PICCANTE in your work, please cite it using this reference:
 
+```
 @misc{banterle:pic:2014,
-
  Author = {Francesco Banterle and Luca Benedetti},
-
- Title = {{PICCANTE: An Open and Portable Library
-          for HDR Imaging}},
-
+ Title = {{PICCANTE: An Open and Portable Library for HDR Imaging}},
  Year  = {2014},
-
  Howpublished = {\url{ http://vcg.isti.cnr.it/piccante }}
-
  }
+```
  
 FREQUENTLY ASKED QUESTIONS (FAQs):
 ==================================
