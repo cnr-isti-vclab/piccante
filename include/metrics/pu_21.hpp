@@ -24,29 +24,36 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../image.hpp"
 #include "../util/array.hpp"
 
-#include "../metrics/pu08_data.hpp"
+//#include "../metrics/pu08_data.hpp"
 
 namespace pic {
 
 /**
  * @brief PUEncode encodes luminance values in a perceptually uniform space.
- * @param L is a luminance value in cd/m^2; it works for values
- * in the range [10^-6, 10^10] cd/m^2
+ * @param L is a luminance value in cd/m^2; it works 
  * @return it returns a perceptually uniform value
  */
-PIC_INLINE float PU08Encode(float L)
-{
-    return Arrayf::interp(PU08_x, PU08_y, 256, log10f(L + 1e-7f));
-}
+    PIC_INLINE float PU21Encode(float L)
+    {
+        L = Clamp(L, 0.005f, 10000.0f);
+
+        float p[] = { 0.353487901, 0.3734658629, 8.277049286e-05, 0.9062562627, 0.09150303166, 0.9099517204, 596.3148142 };
+
+        float L3 = powf(L, p[3]);
+        float t1 = (p[0] + p[1] * L3);
+        float t2 = (1.0f + p[2] * L3);
+        float out = p[6] * (powf(t1 / t2, p[4]) - p[5]);
+        return MAX(out, 0.0f);
+    }
 
 /**
  * @brief PUDecode decodes perceptually uniform values into luminance values.
  * @param p is a perceptually uniform luminance value
- * @return it returns a luminance value in the range [10^-6, 10^10] cd/m^2
+ * @return it returns a luminance value in the range [10^-5, 10^10] cd/m^2
  */
-PIC_INLINE float PU08Decode(float p)
+PIC_INLINE float PU21Decode(float p)
 {
-    return powf(10.0f, Arrayf::interp(PU08_y, PU08_x, 256, p));
+    return 1.0;
 }
 
 } // end namespace pic
