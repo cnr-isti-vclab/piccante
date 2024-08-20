@@ -4,7 +4,7 @@ PICCANTE
 The hottest HDR imaging library!
 http://vcg.isti.cnr.it/piccante
 
-Copyright (C) 2019
+Copyright (C) 2024
 Visual Computing Laboratory - ISTI CNR
 http://vcg.isti.cnr.it
 First author: Francesco Banterle
