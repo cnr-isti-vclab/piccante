@@ -55,6 +55,11 @@ public:
         type = JFALSE;
     }
 
+    void setNull()
+    {
+        type = JNULL;
+    }
+
     virtual void addName(std::string name) 
     {
 
@@ -67,7 +72,17 @@ public:
 
     virtual void print()
     {
+        if (type == JTRUE) {
+            printf("true");
+        }
 
+        if (type == JFALSE) {
+            printf("false");
+        }
+
+        if (type == JNULL) {
+            printf("null");
+        }
     }
 };
 
@@ -413,7 +428,64 @@ public:
                      c--;
                      std::string name = parseString(lines, c);
                      last_caller->addValue(new JSONString(name));
-                     last_caller->lookingForValue = false;
+
+                     if (last_caller->type == JOBJECT) {
+                         last_caller->lookingForValue = false;
+                     }
+                 }
+
+                 //parse true
+                 if (lines.at(c) == 't') {
+                     std::string tmp_str = lines.substr(c, 4);
+
+                     if (tmp_str.compare("true") == 0) {
+                         JSONValue* value = new JSONValue();
+                         value->setTrue();
+                         last_caller->addValue(value);
+
+                         if (last_caller->type == JOBJECT) {
+                             last_caller->lookingForValue = false;
+                         }
+                     }
+                     else {
+                         return NULL;
+                     }
+                 }
+
+                 //parse false
+                 if (lines.at(c) == 'f') {
+                     std::string tmp_str = lines.substr(c, 5);
+
+                     if (tmp_str.compare("false") == 0) {
+                         JSONValue* value = new JSONValue();
+                         value->setFalse();
+                         last_caller->addValue(value);
+
+                         if (last_caller->type == JOBJECT) {
+                             last_caller->lookingForValue = false;
+                         }
+                     }
+                     else {
+                         return NULL;
+                     }
+                 }
+
+                 //parse null
+                 if (lines.at(c) == 'n') {
+                     std::string tmp_str = lines.substr(c, 4);
+
+                     if (tmp_str.compare("null") == 0) {
+                         JSONValue* value = new JSONValue();
+                         value->setNull();
+                         last_caller->addValue(value);
+
+                         if (last_caller->type == JOBJECT) {
+                             last_caller->lookingForValue = false;
+                         }
+                     }
+                     else {
+                         return NULL;
+                     }
                  }
 
                  //parse numbers values
