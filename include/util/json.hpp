@@ -23,7 +23,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <set>
 #include <regex>
 #include <vector>
-
+#include <stack>
 #include "../base.hpp"
 #include "../util/string.hpp"
 #include "../util/math.hpp"
@@ -37,9 +37,11 @@ class JSONValue
 {
 public:
     JSONVALUETYPE type;
+    bool lookingForValue;
 
     JSONValue()
     {
+        lookingForValue = false;
         type = JNULL;
     }
 
@@ -52,6 +54,21 @@ public:
     {
         type = JFALSE;
     }
+
+    virtual void addName(std::string name) 
+    {
+
+    }
+
+    virtual void addValue(JSONValue* value) 
+    {
+
+    }
+
+    virtual void print()
+    {
+
+    }
 };
 
 class JSONString: public JSONValue
@@ -61,11 +78,23 @@ public:
 
     JSONString()
     {
-        str = "";
-        type = JSTRING;
+        this->str = "";
+        this->type = JSTRING;
+    }
+
+    JSONString(std::string str)
+    {
+        this->str = str;
+        this->type = JSTRING;
+    }
+
+    void print()
+    {
+        printf("%s", str.c_str());
     }
 
 };
+
 
 class JSONNumber: public JSONValue
 {
@@ -92,25 +121,48 @@ public:
 class JSONArray: public JSONValue
 {
 public:
-    std::vector<JSONValue> array;
+    std::vector<JSONValue*> array;
 
     JSONArray()
     {
         type = JARRAY;
+    }
+
+    void addValue(JSONValue* data) {
+        array.push_back(data);
     }
 };
 
 class JSONObject: JSONValue
 {
 public:
-    std::string name;
-    JSONValue *value;
+    std::vector<std::string> names;
+    std::vector<JSONValue*> values;
 
     JSONObject()
     {
         type = JOBJECT;
-        value = NULL;
     }
+
+    void addName(std::string name) {
+        names.push_back(name);
+    }
+
+    void addValue(JSONValue* data) {
+        values.push_back(data);
+    }
+
+    void print()
+    {
+        printf("{\n");
+        int n = MIN(names.size(), values.size());
+        for (int i = 0; i < n; i++) {
+            printf("   %s:", names[i].c_str());
+            values[i]->print();
+        }
+        printf("\n}\n");
+    }
+
 };
 
 class JSONFile
@@ -128,26 +180,26 @@ public:
       * @param str
       * @return
       */
-     bool parseNumber(std::string str, JSONNumber &ret)
+     bool parseNumber(std::string str, JSONNumber *ret)
      {
          std::regex j_integer("(\\+|-)?[[:digit:]]+");
          std::regex j_float("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?");
          std::regex j_float_scientific("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?((e|E)((\\+|-)?)[[:digit:]]+)?");
 
          if(regex_match(str, j_integer)) {
-             ret.bFloat = false;
-             ret.numi = atoi(str.c_str());
+             ret->bFloat = false;
+             ret->numi = atoi(str.c_str());
              return true;
          } else {
              if(std::regex_match(str, j_float)) {
-                 ret.bFloat = true;
-                 ret.numf = atof(str.c_str());
+                 ret->bFloat = true;
+                 ret->numf = atof(str.c_str());
 
                  return true;
              } else {
                  if(std::regex_match(str, j_float_scientific)) {
-                     ret.bFloat = true;
-                     ret.numf = atof(str.c_str());
+                     ret->bFloat = true;
+                     ret->numf = atof(str.c_str());
                      return true;
 
                  }
@@ -156,10 +208,12 @@ public:
              }
          }
      }
+      
 
      bool parseString(std::string str, JSONString &ret)
      {
-         std::regex j_string("\"[[:print:]*[:blank:]*[:punct:]*[:upper:]*[\\]*[\n]*[\/]*[\"]*[\b]*[\f]*[\n]*[\r]*[\t]*]*\"");
+         std::regex j_string("\"([[:print:]]*[[:space:]]*[[:punct:]]*[[:upper:]]*)*\"");
+         //         [\\]*[\n]*[\/]*[\"]*[\b]*[\f]*[\n]*[\r]*[\t]*
          if (regex_match(str, j_string)) {
              ret.str = str;
              ret.str.erase(0, 1);
@@ -169,9 +223,9 @@ public:
          return false;
      }
 
-     bool parseWhitespace(std::string str, JSONString& ret)
+     bool parseWhitespace(std::string str)
      {
-         std::regex j_string("[[:space:]*[\t]*[\r]*[\n]*]*");
+         std::regex j_string("([[:space:]]*[[:blank:]]*\t*\r*\n*)*");
          if (regex_match(str, j_string)) {
              return true;
          }
@@ -188,6 +242,13 @@ public:
 
      }
 
+     bool checkWhitespace(char current) {
+         std::regex j_string("([[:space:]]*[[:blank:]]*\t*\r*\n*)*");
+
+         std::string str(1, current);
+         return regex_match(str, j_string);
+     }
+
      /**
       * @brief testParserNumbers
       */
@@ -195,17 +256,17 @@ public:
      {
          printf("Test numbers:\n");
          JSONNumber ret;
-         parseNumber("121324", ret);
+         parseNumber("121324", &ret);
          printf("\n");
          ret.print();
 
          printf("\n");
 
-         parseNumber("121.324", ret);
+         parseNumber("121.324", &ret);
          ret.print();
          printf("\n");
 
-         parseNumber("1.4e6", ret);
+         parseNumber("1.4e6", &ret);
          ret.print();
          printf("\n");
 
@@ -218,8 +279,159 @@ public:
          parseString("\"number1\"", ret);
          printf("%s\n", ret.str.c_str());
 
+         parseString("\"num ber1\"", ret);
+         printf("%s\n", ret.str.c_str());
+
          parseString("\"./number1\"", ret);
          printf("%s\n", ret.str.c_str());
+     }
+
+     std::string parseString(std::string lines, int &c) {
+         std::string tmp_str;
+
+         bool bFlag = true;
+         int n = lines.size() - 1;
+         while ((c < n) && bFlag) {
+             c++;
+
+             if (lines.at(c) == '\"') {
+                 while ((c < n) && bFlag) {
+                     c++;    
+                     if (lines.at(c) == '\\') {
+                         c++;
+                         switch (lines.at(c)) {
+                         case '\"':
+                             tmp_str += '\"';
+                         case '\\':
+                             tmp_str += '\\';
+                         case '/':
+                             tmp_str += '\/';
+                         case 'b':
+                             tmp_str += '\b';
+                         case 'n':
+                             tmp_str += '\n';
+                         case 'f':
+                             tmp_str += '\f';
+                         case 'r':
+                             tmp_str += '\r';
+                         case 't':
+                             tmp_str += '\t';
+                         default:
+                             tmp_str += '\\';
+                             tmp_str += lines.at(c);
+                         }
+                     } else {
+                         if (lines.at(c) == '\"') {
+                             bFlag = false;
+                         } else {
+                             tmp_str += lines.at(c);
+                         }
+                     }
+                 }
+             }
+         }
+
+         return tmp_str;
+     }
+
+     void find(std::string lines, char toBeFound, int &c) {
+         int n = (lines.size() - 1);
+
+         while (c < n) {
+             if (lines.at(c) != toBeFound) {
+                 break;
+             }
+             c++;
+         }
+     }
+
+     JSONValue* parse(std::string filename)
+     {
+         std::ifstream in(filename, std::ios_base::in);
+
+         std::string line;
+         std::string lines;
+         while (getline(in, line)) {
+             lines += "\n" + line;
+         }
+         bool bParse = true;
+
+
+         int c = 0;
+         JSONValue* last_caller = NULL;
+         std::stack<JSONValue*> stack;
+         JSONValue* root = NULL;
+
+         int n = (lines.size() - 1);
+         while (c < n) {
+
+             if (lines.at(c) == '{') {
+                 JSONObject* tmp = new JSONObject();
+
+                 if (last_caller == NULL) {
+                     root = (JSONValue*)tmp;
+                 }
+                 else {
+                     last_caller->addValue((JSONValue*)tmp);
+                     stack.push(last_caller);
+                 }
+                 last_caller = (JSONValue*)tmp;
+
+             }
+
+             if (last_caller != NULL) {
+                 //parse strings value
+                 if (lines.at(c) == '\"') {
+                     c--;
+                     std::string name = parseString(lines, c);
+                     last_caller->addValue(new JSONString(name));
+                     last_caller->lookingForValue = false;
+                 }
+
+                 //parse numbers values
+                 std::string number(1, lines.at(c));
+                 std::regex j_integer("(\\+|-)?[[:digit:]]*");
+                 if (regex_match(number, j_integer) && last_caller->lookingForValue) {
+                     int c2 = c;
+                     while (c2 < n) {
+                         c2++;
+                         auto current = lines.at(c2);
+                         if (checkWhitespace(current) || (current == ',') || (current == '}') || (current == ']')) {
+                             break;
+                             c2--;
+                         }
+                     }
+
+                     JSONNumber *out = new JSONNumber();
+                     parseNumber(lines.substr(c, c2 - c), out);
+                     last_caller->addValue(out);
+
+                     last_caller->lookingForValue = false;
+                 }
+
+                 if ((last_caller->type == JOBJECT) && (!last_caller->lookingForValue)) {
+                     std::string name = parseString(lines, c);
+                     last_caller->addName(name);
+                     find(lines, ':', c);
+                     last_caller->lookingForValue = true;
+                 }
+             }
+
+             if (lines.at(c) == '}') {
+
+                 if (!stack.empty()) {
+                     last_caller = stack.top();
+                     stack.pop();
+                 }
+                 else {
+                     last_caller = NULL;
+                 }
+             }
+
+             c++;
+         }
+
+         return root;
      }
 };
 
