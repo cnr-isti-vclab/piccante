@@ -60,6 +60,11 @@ public:
         type = JNULL;
     }
 
+    virtual JSONValue* check(std::string key)
+    {
+        return NULL;
+    }
+
     virtual void addName(std::string name) 
     {
 
@@ -111,7 +116,7 @@ public:
 };
 
 
-class JSONNumber: public JSONValue
+class JSONNumber : public JSONValue
 {
 public:
     float numf;
@@ -125,15 +130,16 @@ public:
 
     void print()
     {
-        if(bFloat) {
+        if (bFloat) {
             printf("%f", numf);
-        } else {
+        }
+        else {
             printf("%d", numi);
         }
     }
 };
 
-class JSONArray: public JSONValue
+class JSONArray : public JSONValue
 {
 public:
     std::vector<JSONValue*> array;
@@ -156,12 +162,12 @@ public:
                 printf(", ");
             }
         }
- 
-       printf("   ]");
+
+        printf("   ]");
     }
 };
 
-class JSONObject: JSONValue
+class JSONObject : JSONValue
 {
 public:
     std::vector<std::string> names;
@@ -192,6 +198,18 @@ public:
         printf("\n}\n");
     }
 
+    JSONValue *check(std::string key)
+    {
+        JSONValue* out = NULL;
+        for (int i = 0; i < names.size(); i++) {
+            if (names[i].compare(key) == 0) {
+                out = values[i];
+                break;
+            }
+        }
+
+        return out;
+    }
 };
 
 class JSONFile
