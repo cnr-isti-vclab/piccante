@@ -53,6 +53,8 @@ PIC_INLINE float PU21Encode(float L)
  */
 PIC_INLINE float PU21Decode(float p)
 {
+    p = MIN(p, 745.0f);
+
     float data[] = { 0.353487901, 0.3734658629, 8.277049286e-05, 0.9062562627, 0.09150303166, 0.9099517204, 596.3148142 };
     
     float t0 = MAX((p / data[6]) + data[5], 0.0f);

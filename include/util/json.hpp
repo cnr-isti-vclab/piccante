@@ -157,6 +157,27 @@ public:
          }
      }
 
+     bool parseString(std::string str, JSONString &ret)
+     {
+         std::regex j_string("\"[[:print:]*[:blank:]*[:punct:]*[:upper:]*[\\]*[\n]*[\/]*[\"]*[\b]*[\f]*[\n]*[\r]*[\t]*]*\"");
+         if (regex_match(str, j_string)) {
+             ret.str = str;
+             ret.str.erase(0, 1);
+             ret.str.erase(ret.str.size() -1);
+             return true;
+         }
+         return false;
+     }
+
+     bool parseWhitespace(std::string str, JSONString& ret)
+     {
+         std::regex j_string("[[:space:]*[\t]*[\r]*[\n]*]*");
+         if (regex_match(str, j_string)) {
+             return true;
+         }
+         return false;
+     }
+
      void parseObject()
      {
 
@@ -172,6 +193,7 @@ public:
       */
      void testParserNumbers()
      {
+         printf("Test numbers:\n");
          JSONNumber ret;
          parseNumber("121324", ret);
          printf("\n");
@@ -183,12 +205,21 @@ public:
          ret.print();
          printf("\n");
 
-         printf("\n");
-
          parseNumber("1.4e6", ret);
          ret.print();
          printf("\n");
 
+     }
+
+     void testParserString()
+     {
+         printf("Test strings:\n");
+         JSONString ret;
+         parseString("\"number1\"", ret);
+         printf("%s\n", ret.str.c_str());
+
+         parseString("\"./number1\"", ret);
+         printf("%s\n", ret.str.c_str());
      }
 };
 
