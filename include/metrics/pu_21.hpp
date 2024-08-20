@@ -33,18 +33,18 @@ namespace pic {
  * @param L is a luminance value in cd/m^2; it works 
  * @return it returns a perceptually uniform value
  */
-    PIC_INLINE float PU21Encode(float L)
-    {
-        L = Clamp(L, 0.005f, 10000.0f);
+PIC_INLINE float PU21Encode(float L)
+{
+    L = Clamp(L, 0.005f, 10000.0f);
 
-        float p[] = { 0.353487901, 0.3734658629, 8.277049286e-05, 0.9062562627, 0.09150303166, 0.9099517204, 596.3148142 };
+    float data[] = { 0.353487901, 0.3734658629, 8.277049286e-05, 0.9062562627, 0.09150303166, 0.9099517204, 596.3148142 };
 
-        float L3 = powf(L, p[3]);
-        float t1 = (p[0] + p[1] * L3);
-        float t2 = (1.0f + p[2] * L3);
-        float out = p[6] * (powf(t1 / t2, p[4]) - p[5]);
-        return MAX(out, 0.0f);
-    }
+    float L3 = powf(L, data[3]);
+    float t1 = (data[0] + data[1] * L3);
+    float t2 = (1.0f + data[2] * L3);
+    float out = data[6] * (powf(t1 / t2, data[4]) - data[5]);
+    return MAX(out, 0.0f);
+}
 
 /**
  * @brief PUDecode decodes perceptually uniform values into luminance values.
@@ -53,7 +53,14 @@ namespace pic {
  */
 PIC_INLINE float PU21Decode(float p)
 {
-    return 1.0;
+    float data[] = { 0.353487901, 0.3734658629, 8.277049286e-05, 0.9062562627, 0.09150303166, 0.9099517204, 596.3148142 };
+    
+    float t0 = MAX((p / data[6]) + data[5], 0.0f);
+    float t1 = powf(t0, 1.0 / data[4]);
+    float t2 = MAX(t1 - data[0], 0.0f);
+    float t3 = t2 / (data[1] - data[2] * t1);
+    float L = powf(t3,  1.0 / data[3]);
+    return L;
 }
 
 } // end namespace pic
