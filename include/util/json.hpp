@@ -131,6 +131,19 @@ public:
     void addValue(JSONValue* data) {
         array.push_back(data);
     }
+
+    void print()
+    {
+        printf("   [");
+        for (int i = 0; i < array.size(); i++) {
+            array[i]->print();
+            if (i < (array.size() - 1)) {
+                printf(", ");
+            }
+        }
+ 
+       printf("   ]");
+    }
 };
 
 class JSONObject: JSONValue
@@ -159,6 +172,7 @@ public:
         for (int i = 0; i < n; i++) {
             printf("   %s:", names[i].c_str());
             values[i]->print();
+            printf("\n");
         }
         printf("\n}\n");
     }
@@ -376,7 +390,21 @@ public:
                      stack.push(last_caller);
                  }
                  last_caller = (JSONValue*)tmp;
+             }
 
+             if (lines.at(c) == '[') {
+                 JSONArray* tmp = new JSONArray();
+
+                 if (last_caller == NULL) {
+                     root = (JSONValue*)tmp;
+                 }
+                 else {
+                     last_caller->addValue((JSONValue*)tmp);
+                     stack.push(last_caller);
+                 }
+
+                 tmp->lookingForValue = true;
+                 last_caller = (JSONValue*)tmp;
              }
 
              if (last_caller != NULL) {
@@ -403,10 +431,15 @@ public:
                      }
 
                      JSONNumber *out = new JSONNumber();
-                     parseNumber(lines.substr(c, c2 - c), out);
+                     std::string number_only_str = lines.substr(c, c2 - c);
+                     parseNumber(number_only_str, out);
                      last_caller->addValue(out);
 
-                     last_caller->lookingForValue = false;
+                     if (last_caller->type == JOBJECT) {
+                         last_caller->lookingForValue = false;
+                     }
+                     c--;
+                     c += number_only_str.size();
                  }
 
                  if ((last_caller->type == JOBJECT) && (!last_caller->lookingForValue)) {
@@ -417,7 +450,7 @@ public:
                  }
              }
 
-             if (lines.at(c) == '}') {
+             if ((lines.at(c) == '}') || (lines.at(c) == ']')) {
 
                  if (!stack.empty()) {
                      last_caller = stack.top();
