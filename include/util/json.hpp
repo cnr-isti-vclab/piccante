@@ -75,6 +75,23 @@ public:
 
     }
 
+    void printType() 
+    {
+        switch (type)
+        {
+        case JARRAY:
+            printf("Array");
+            break;
+        case JOBJECT:
+            printf("Object");
+            break;
+        case JSTRING:
+            printf("String");
+            break;
+        }
+        printf("\n");
+    }
+
     virtual void print()
     {
         if (type == JTRUE) {
@@ -110,7 +127,7 @@ public:
 
     void print()
     {
-        printf("%s", str.c_str());
+        printf("\"%s\"", str.c_str());
     }
 
 };
@@ -184,7 +201,7 @@ public:
 
     void print()
     {
-        printf("   [");
+        printf("[");
         for (int i = 0; i < array.size(); i++) {
             array[i]->print();
             if (i < (array.size() - 1)) {
@@ -192,11 +209,11 @@ public:
             }
         }
 
-        printf("   ]");
+        printf("]");
     }
 };
 
-class JSONObject : JSONValue
+class JSONObject : public JSONValue
 {
 public:
     std::vector<std::string> names;
@@ -224,10 +241,13 @@ public:
     {
         printf("{\n");
         int n = MIN(names.size(), values.size());
+
         for (int i = 0; i < n; i++) {
             printf("   %s:", names[i].c_str());
             values[i]->print();
-            printf("\n");
+            if (i < (n - 1)) {
+                printf(",\n");
+            }
         }
         printf("\n}\n");
     }
@@ -367,13 +387,16 @@ public:
          printf("%s\n", ret.str.c_str());
      }
 
-     std::string parseString(std::string lines, int &c) {
+     std::string parseString(std::string lines, int &c, int &code) {
          std::string tmp_str;
-
          bool bFlag = true;
          int n = lines.size() - 1;
          while ((c < n) && bFlag) {
              c++;
+             if ((lines.at(c) == '}') || (lines.at(c) == ']')) {
+                 code = -1;
+                 return "";
+             }
 
              if (lines.at(c) == '\"') {
                  while ((c < n) && bFlag) {
@@ -411,7 +434,7 @@ public:
                  }
              }
          }
-
+         code = 0;
          return tmp_str;
      }
 
@@ -448,43 +471,50 @@ public:
 
              if (lines.at(c) == '{') {
                  JSONObject* tmp = new JSONObject();
+                 tmp->lookingForValue = false;
 
                  if (last_caller == NULL) {
                      root = (JSONValue*)tmp;
-                 }
-                 else {
-                     last_caller->addValue((JSONValue*)tmp);
+                     last_caller = tmp;
+                 } else {
                      stack.push(last_caller);
+
+                     if (last_caller->lookingForValue) {
+                         last_caller->addValue((JSONValue*)tmp);
+                     }
+
+                     last_caller = tmp;
                  }
-                 last_caller = (JSONValue*)tmp;
              }
 
              if (lines.at(c) == '[') {
                  JSONArray* tmp = new JSONArray();
+                 tmp->lookingForValue = true;
 
                  if (last_caller == NULL) {
                      root = (JSONValue*)tmp;
-                 }
-                 else {
+                 } else {
                      last_caller->addValue((JSONValue*)tmp);
                      stack.push(last_caller);
                  }
-
-                 tmp->lookingForValue = true;
-                 last_caller = (JSONValue*)tmp;
+                 last_caller = tmp;
              }
 
              if (last_caller != NULL) {
                  //parse strings value
                  if (lines.at(c) == '\"') {
                      c--;
-                     std::string name = parseString(lines, c);
-                     last_caller->addValue(new JSONString(name));
+                     int code = 0;
+                     std::string name = parseString(lines, c, code);
+                     if (last_caller->lookingForValue) {
+                         last_caller->addValue(new JSONString(name));
+                     }
 
                      if (last_caller->type == JOBJECT) {
                          last_caller->lookingForValue = false;
                      }
                  }
+                 
 
                  //parse true
                  if (lines.at(c) == 't') {
@@ -567,18 +597,32 @@ public:
                  }
 
                  if ((last_caller->type == JOBJECT) && (!last_caller->lookingForValue)) {
-                     std::string name = parseString(lines, c);
-                     last_caller->addName(name);
-                     find(lines, ':', c);
-                     last_caller->lookingForValue = true;
+                     int code = 0;
+                     std::string name = parseString(lines, c, code);
+                     if (code == 0) {
+                         last_caller->addName(name);
+                         find(lines, ':', c);
+                         last_caller->lookingForValue = true;
+                     }
                  }
              }
 
              if ((lines.at(c) == '}') || (lines.at(c) == ']')) {
 
+
                  if (!stack.empty()) {
+
+                     last_caller->lookingForValue = false;
                      last_caller = stack.top();
                      stack.pop();
+
+                     if (last_caller->type == JOBJECT) {
+                         last_caller->lookingForValue = false;
+                     }
+
+                     if (last_caller->type == JARRAY) {
+                         last_caller->lookingForValue = true;
+                     }
                  }
                  else {
                      last_caller = NULL;
