@@ -128,6 +128,25 @@ public:
         type = JNUMBER;
     }
 
+    float getFloat()
+    {
+        if (bFloat) {
+            return numf;
+        } else {
+            return float(numi);
+        }
+    }
+
+    float getInteger()
+    {
+        if (bFloat) {
+            return int(numf);
+        }
+        else {
+            return numi;
+        }
+    }
+
     void print()
     {
         if (bFloat) {
@@ -147,6 +166,16 @@ public:
     JSONArray()
     {
         type = JARRAY;
+    }
+
+    int size()
+    {
+        return array.size();
+    }
+
+    JSONValue *get(int index)
+    {
+        return array.at(index);
     }
 
     void addValue(JSONValue* data) {
@@ -176,6 +205,11 @@ public:
     JSONObject()
     {
         type = JOBJECT;
+    }
+
+    bool empty()
+    {
+        return names.empty();
     }
 
     void addName(std::string name) {
