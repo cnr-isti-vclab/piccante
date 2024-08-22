@@ -83,7 +83,7 @@ protected:
      */
     Image *ProcessAuxStack(ImageVec imgIn, Image *imgOut)
     {
-        uint n = imgIn.size();
+        uint n = uint(imgIn.size());
 
         if(n < 2 || !ImageVecCheck(imgIn, -1)) {
             return imgOut;

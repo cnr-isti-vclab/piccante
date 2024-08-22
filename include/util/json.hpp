@@ -136,7 +136,7 @@ public:
 class JSONNumber : public JSONValue
 {
 public:
-    float numf;
+    double numf;
     int numi;
     bool bFloat;
 
@@ -148,13 +148,23 @@ public:
     float getFloat()
     {
         if (bFloat) {
-            return numf;
+            return float(numf);
         } else {
             return float(numi);
         }
     }
 
-    float getInteger()
+    double getDouble()
+    {
+        if (bFloat) {
+            return numf;
+        }
+        else {
+            return double(numi);
+        }
+    }
+
+    int getInteger()
     {
         if (bFloat) {
             return int(numf);
@@ -187,7 +197,7 @@ public:
 
     int size()
     {
-        return array.size();
+        return int(array.size());
     }
 
     JSONValue *get(int index)
@@ -240,7 +250,7 @@ public:
     void print()
     {
         printf("{\n");
-        int n = MIN(names.size(), values.size());
+        int n = int(MIN(names.size(), values.size()));
 
         for (int i = 0; i < n; i++) {
             printf("   %s:", names[i].c_str());
@@ -333,16 +343,6 @@ public:
          return false;
      }
 
-     void parseObject()
-     {
-
-     }
-
-     void parseArray()
-     {
-
-     }
-
      bool checkWhitespace(char current) {
          std::regex j_string("([[:space:]]*[[:blank:]]*\t*\r*\n*)*");
 
@@ -390,7 +390,7 @@ public:
      std::string parseString(std::string lines, int &c, int &code) {
          std::string tmp_str;
          bool bFlag = true;
-         int n = lines.size() - 1;
+         int n = int(lines.size()) - 1;
          while ((c < n) && bFlag) {
              c++;
              if ((lines.at(c) == '}') || (lines.at(c) == ']')) {
@@ -439,7 +439,7 @@ public:
      }
 
      void find(std::string lines, char toBeFound, int &c) {
-         int n = (lines.size() - 1);
+         int n = int(lines.size()) - 1;
 
          while (c < n) {
              if (lines.at(c) != toBeFound) {
@@ -466,7 +466,7 @@ public:
          std::stack<JSONValue*> stack;
          JSONValue* root = NULL;
 
-         int n = (lines.size() - 1);
+         int n = int(lines.size()) - 1;
          while (c < n) {
 
              if (lines.at(c) == '{') {
@@ -593,7 +593,7 @@ public:
                          last_caller->lookingForValue = false;
                      }
                      c--;
-                     c += number_only_str.size();
+                     c += int(number_only_str.size());
                  }
 
                  if ((last_caller->type == JOBJECT) && (!last_caller->lookingForValue)) {

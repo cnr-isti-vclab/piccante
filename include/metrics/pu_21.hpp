@@ -37,7 +37,7 @@ PIC_INLINE float PU21Encode(float L)
 {
     L = Clamp(L, 0.005f, 10000.0f);
 
-    float data[] = { 0.353487901, 0.3734658629, 8.277049286e-05, 0.9062562627, 0.09150303166, 0.9099517204, 596.3148142 };
+    float data[] = { 0.353487901f, 0.3734658629f, 8.277049286e-05f, 0.9062562627f, 0.09150303166f, 0.9099517204f, 596.3148142f };
 
     float L3 = powf(L, data[3]);
     float t1 = (data[0] + data[1] * L3);
@@ -55,13 +55,13 @@ PIC_INLINE float PU21Decode(float p)
 {
     p = MIN(p, 745.0f);
 
-    float data[] = { 0.353487901, 0.3734658629, 8.277049286e-05, 0.9062562627, 0.09150303166, 0.9099517204, 596.3148142 };
-    
+    float data[] = { 0.353487901f, 0.3734658629f, 8.277049286e-05f, 0.9062562627f, 0.09150303166f, 0.9099517204f, 596.3148142f };
+
     float t0 = MAX((p / data[6]) + data[5], 0.0f);
-    float t1 = powf(t0, 1.0 / data[4]);
+    float t1 = powf(t0, 1.0f / data[4]);
     float t2 = MAX(t1 - data[0], 0.0f);
     float t3 = t2 / (data[1] - data[2] * t1);
-    float L = powf(t3,  1.0 / data[3]);
+    float L = powf(t3,  1.0f / data[3]);
     return L;
 }
 
