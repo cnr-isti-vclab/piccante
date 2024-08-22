@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_HISTOGRAM_HPP
 #define PIC_HISTOGRAM_HPP
 
+#include <cmath>
+
 #include "image.hpp"
 #include "base.hpp"
 
@@ -363,21 +365,22 @@ public:
      */
     void ceiling(float k)
     {
-        float tolerance = float(Array<uint>::sum(bin, nBin)) * 0.025f;
-        int   trimmings = 0;
+        //tolerance is the 2.5%
+        uint tolerance = (Array<uint>::sum(bin, nBin) * 25) / 1000;
+        uint trimmings = tolerance + 1;
         bool  bFlag = true;
 
         std::vector<bool> trimmed_vec;
 
         while((trimmings > tolerance) && bFlag) {
             trimmings = 0;
-            float T = float(Array<uint>::sum(bin, nBin));
+            uint T = Array<uint>::sum(bin, nBin);
 
-            if(T < tolerance) {
+            if(T <= tolerance) {
                 bFlag = false;
             } else {
                 bool bTrimmed = false;
-                uint ceiling = uint(T * k);
+                uint ceiling = uint(float(T) * k);
 
                 for(int i = 0; i < nBin; i++) {
                     if(bin[i] > ceiling) {
