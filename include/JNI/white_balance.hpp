@@ -51,9 +51,7 @@ PIC_INLINE int applyWhiteBalanceJNI(std::string imageInPath, std::string imageOu
             printf("applyWhiteBalanceJNI: the image could not be written.\n");
         }
 
-        if(out != NULL) {
-            delete out;
-        }
+        delete out;
 
         return bWrite ? 1 : 0;
     } else {

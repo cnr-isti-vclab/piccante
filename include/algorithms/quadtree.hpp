@@ -79,10 +79,9 @@ public:
 
     ~Quadtree()
     {
-        for(int i = 0; i < 4; i++)
-            if(children[i] != NULL) {
-                delete children[i];
-            }
+        for(int i = 0; i < 4; i++) {
+            delete children[i];
+        }
     }
 
     /**

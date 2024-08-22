@@ -256,15 +256,8 @@ PIC_INLINE ReduxGL::ReduxGL(std::string reduxOperation, bool bDomainTransform)
 
 PIC_INLINE ReduxGL::~ReduxGL()
 {
-    if(quad != NULL) {
-        delete quad;
-        quad = NULL;
-    }
-
-    if(fbo != NULL) {
-        delete fbo;
-        fbo = NULL;
-    }
+    delete quad;
+    delete fbo;
 }
 
 PIC_INLINE void ReduxGL::initShaders()

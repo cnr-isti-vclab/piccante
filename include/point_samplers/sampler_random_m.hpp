@@ -173,9 +173,7 @@ PIC_INLINE bool MRSamplers<N>::Read(std::string name)
         return false;
     }
 
-    if(samplers != NULL) {
-        delete[] samplers;
-    }
+    delete[] samplers;
 
     samplers = new RandomSampler<N> *[nSamplers];
 

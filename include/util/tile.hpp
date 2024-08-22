@@ -53,11 +53,7 @@ public:
 
     ~Tile()
     {
-        if(tile != NULL) {
-            delete tile;
-        }
-
-        tile = NULL;
+        delete tile;
     }
 
     /**

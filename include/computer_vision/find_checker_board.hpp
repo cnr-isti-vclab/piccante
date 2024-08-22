@@ -429,10 +429,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     #ifdef PIC_DEBUG
         drawPoints(img_wb, corners_model, yellow);
         img_wb->Write("../data/output/img_wb.bmp");
-
-        if(img_wb != NULL) {
-            delete img_wb;
-        }
+        delete img_wb;
     #endif
 }
 

@@ -44,10 +44,7 @@ protected:
      */
     void release()
     {
-        if(bLum) {
-            lum = delete_s(lum);
-        }
-
+        lum = delete_s(lum);
         bLum = false;
     }
 

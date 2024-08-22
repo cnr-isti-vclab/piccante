@@ -194,11 +194,7 @@ PIC_INLINE StrokeGL::StrokeGL(int width, int height, int brushSize = 128,
 
 PIC_INLINE StrokeGL::~StrokeGL()
 {
-    if(shape != NULL) {
-        delete shape;
-    }
-
-    shape = NULL;
+    delete shape;
 }
 
 PIC_INLINE void StrokeGL::initShaders()
@@ -371,9 +367,7 @@ PIC_INLINE void StrokeGL::Resample()
     positions.clear();
     positions.insert(positions.begin(), resampledPos.begin(), resampledPos.end());
 
-    if(sampleGrid != NULL) {
-        delete[] sampleGrid;
-    }
+    delete[] sampleGrid;
 }
 
 PIC_INLINE void StrokeGL::Insert2DPoint(int x, int y)

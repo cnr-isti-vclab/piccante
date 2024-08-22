@@ -25,6 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../histogram.hpp"
 #include "../filtering/filter_mean.hpp"
 #include "../util/polynomial.hpp"
+#include "../util/std_util.hpp"
 
 #include "../algorithms/sub_sample_stack.hpp"
 #include "../algorithms/weight_function.hpp"
@@ -123,19 +124,8 @@ protected:
     {
         stackOut.release();
 
-        for(unsigned int i = 0; i < icrf.size(); i++) {
-            if(icrf[i] != NULL) {
-                delete[] icrf[i];
-                icrf[i] = NULL;
-            }
-        }
-
-        for(unsigned int i = 0; i < crf.size(); i++) {
-            if(crf[i] != NULL) {
-                delete[] crf[i];
-                crf[i] = NULL;
-            }
-        }
+        stdVectorClear(icrf);
+        stdVectorClear(crf);
 
         icrf.clear();
         crf.clear();
