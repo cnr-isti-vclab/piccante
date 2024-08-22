@@ -349,7 +349,7 @@ public:
      */
     void changeSign()
     {
-        for(uint i = 0; i < coeff.size(); i++) {
+        for(auto i = 0; i < coeff.size(); i++) {
             coeff[i] = -coeff[i];
         }
     }

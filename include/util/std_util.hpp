@@ -51,10 +51,7 @@ inline void stdVectorClear(std::vector<T *> &vec)
 {
     for(unsigned int i = 0; i < vec.size(); i++) {
         T *tmp = vec[i];
-
-        if(tmp != NULL) {
-            delete tmp;
-        }
+        delete tmp;
 
         vec[i] = NULL;
     }
@@ -73,9 +70,9 @@ inline void stdVectorArrayClear(std::vector<T *> &vec)
     for(unsigned int i = 0; i < vec.size(); i++) {
         T *tmp = vec[i];
 
-        if(tmp != NULL) {
+        //if(tmp != NULL) {
             delete[] tmp;
-        }
+        //}
     }
 
     vec.clear();
@@ -106,11 +103,10 @@ inline void setToANullVector(std::vector< T* > &vec, unsigned int n)
 template<class T>
 inline T* releasePtr(T *data)
 {
-    if(data != NULL) {
+//    if(data != NULL) {
         delete data;
         data = NULL;
-    }
-
+ //   }
     return data;
 }
 
@@ -122,10 +118,10 @@ inline T* releasePtr(T *data)
 template<class T>
 inline T* delete_s(T *data)
 {
-    if(data != NULL) {
+//    if(data != NULL) {
         delete data;
         data = NULL;
-    }
+ //   }
     return data;
 }
 
@@ -137,10 +133,10 @@ inline T* delete_s(T *data)
 template<class T>
 inline T* delete_vec_s(T *data)
 {
-    if(data != NULL) {
+//    if(data != NULL) {
         delete[] data;
         data = NULL;
-    }
+//    }
     return data;
 }
 
