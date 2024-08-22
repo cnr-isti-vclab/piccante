@@ -369,7 +369,7 @@ public:
 
         std::vector<bool> trimmed_vec;
 
-        while((trimmings <= tolerance) && bFlag) {
+        while((trimmings > tolerance) && bFlag) {
             trimmings = 0;
             float T = float(Array<uint>::sum(bin, nBin));
 
