@@ -129,11 +129,7 @@ public:
      */
     void release()
     {
-
-        if(m != NULL) {
-            delete m;
-            m = NULL;
-        }
+        delete m;
     }
 
     /**

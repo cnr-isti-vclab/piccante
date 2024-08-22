@@ -91,16 +91,8 @@ public:
     ~DurandTMOGL()
     {       
         stdVectorClear<FilterGL>(filters);
-
-        if(img_lum != NULL) {
-            delete img_lum;
-            img_lum = NULL;
-        }
-
-        if(img_lum_base != NULL) {
-            delete img_lum_base;
-            img_lum_base = NULL;
-        }
+        delete img_lum;
+        delete img_lum_base;
     }
 
     /**

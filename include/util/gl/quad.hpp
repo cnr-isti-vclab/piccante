@@ -60,13 +60,11 @@ public:
 
         if(vbo[0] > 0) {
             glDeleteBuffers(1, &vbo[0]);
-
             vbo[0] = 0;
         }
 
         if(vbo[1] > 0) {
             glDeleteBuffers(1, &vbo[1]);
-
             vbo[1] = 0;
         }
     }

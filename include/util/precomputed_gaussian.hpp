@@ -38,11 +38,7 @@ protected:
         halfKernelSize = kernelSize >> 1;
         kernelSize = (halfKernelSize << 1) + 1;
 
-        if(coeff != NULL) {
-            delete[] coeff;
-            coeff = NULL;
-        }
-
+        delete[] coeff;
         coeff = new float[kernelSize];
 
         float sigma_sq_2 = (2.0f * sigma * sigma);

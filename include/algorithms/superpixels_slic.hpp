@@ -220,37 +220,14 @@ protected:
      */
     void release()
     {
-        if(lap_img != NULL) {
-            delete lap_img;
-        }
-
-        if(labels_distance != NULL) {
-            delete labels_distance;
-        }
-
-        if(centers != NULL) {
-            delete[] centers;
-        }
-
-        if(prevX != NULL) {
-            delete[] prevX;
-        }
-
-        if(prevY != NULL) {
-            delete[] prevY;
-        }
-
-        if(counter != NULL) {
-            delete[] counter;
-        }
-
-        if(col_values != NULL) {
-            delete[] col_values;
-        }
-
-        if(mPixel != NULL) {
-            delete[] mPixel;
-        }
+        delete lap_img;
+        delete labels_distance;
+        delete[] centers;
+        delete[] prevX;
+        delete[] prevY;
+        delete[] counter;
+        delete[] col_values;
+        delete[] mPixel;
     }
 
 public:

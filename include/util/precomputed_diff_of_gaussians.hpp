@@ -86,11 +86,7 @@ public:
 
     ~PrecomputedDiffOfGaussians()
     {
-        if(coeff != NULL) {
-            delete[] coeff;
-        }
-
-        coeff = NULL;
+        delete[] coeff;
     }
 
     /**

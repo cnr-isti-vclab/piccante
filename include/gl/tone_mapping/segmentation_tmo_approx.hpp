@@ -71,16 +71,8 @@ public:
 
     ~SegmentationGL()
     {
-        if(imgIn_flt != NULL) {
-            delete imgIn_flt;
-            imgIn_flt = NULL;
-        }
-
-        if(L != NULL) {
-            delete L;
-            L = NULL;
-        }
-
+        delete imgIn_flt;
+        delete L;
         delete flt_it;
         delete flt_bil;
         delete flt_seg;

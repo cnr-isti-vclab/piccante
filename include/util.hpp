@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_HPP
 #define PIC_UTIL_HPP
 
+#include "util/json.hpp"
 #include "util/array.hpp"
 #include "util/indexed_array.hpp"
 #include "util/bbox.hpp"

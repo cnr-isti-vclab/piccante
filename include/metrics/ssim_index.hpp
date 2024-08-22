@@ -131,10 +131,10 @@ public:
 
         switch(type)
         {
-            case MD_PU08:
+            case MD_PU21:
             {
-                L_ori->applyFunction(PU08Encode);
-                L_cmp->applyFunction(PU08Encode);
+                L_ori->applyFunction(PU21Encode);
+                L_cmp->applyFunction(PU21Encode);
             } break;
 
             case MD_LOG10:

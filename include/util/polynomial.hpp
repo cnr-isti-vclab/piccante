@@ -129,7 +129,7 @@ public:
     }
 
     /**
-     * @brief coeffnomial
+     * @brief Polynomial
      * @param coeff
      * @param nCoeff
      */
@@ -184,7 +184,7 @@ public:
             return ret;
         }
 
-        uint nCoeff = coeff.size();
+        int nCoeff = int(coeff.size());
 
         if(nCoeff > 1) {
 
@@ -195,7 +195,7 @@ public:
 
             ret = fromNumberToString(coeff[0]) + sep;
 
-            for(uint i = 1; i < (nCoeff - 1); i++) {
+            for(int i = 1; i < (nCoeff - 1); i++) {
                 if(coeff[i + 1] > 0.0f) {
                     sep = "+ ";
                 } else {
@@ -222,7 +222,7 @@ public:
             ret = new float[coeff.size()];
         }
 
-        for(uint i = 0; i < coeff.size(); i++) {
+        for(auto i = 0; i < coeff.size(); i++) {
             ret[i] = coeff[i];
         }
 
@@ -237,7 +237,7 @@ public:
     {
         Polynomial out;
 
-        for(uint i = 0; i < coeff.size(); i++) {
+        for(auto i = 0; i < coeff.size(); i++) {
             out.coeff.push_back(coeff[i]);
         }
 
@@ -332,11 +332,11 @@ public:
      */
     void normalForm()
     {
-        uint last = coeff.size() - 1;
+        int last = int(coeff.size()) - 1;
 
         if(fabsf(coeff[last]) > 0.0f) {
 
-            for(uint i = 0; i < last; i++) {
+            for(int i = 0; i < last; i++) {
                 coeff[i] /= coeff[last];
             }
 
@@ -349,7 +349,7 @@ public:
      */
     void changeSign()
     {
-        for(uint i = 0; i < coeff.size(); i++) {
+        for(auto i = 0; i < coeff.size(); i++) {
             coeff[i] = -coeff[i];
         }
     }
@@ -407,7 +407,7 @@ public:
             return FLT_MAX;
         }
 
-        uint n =  coeff.size() - 1;
+        int n =  int(coeff.size()) - 1;
 
         if((n == 0) || (coeff[n] == 0.0f)) {
             return FLT_MAX;
@@ -415,7 +415,7 @@ public:
 
         float upper_bound = 1.0f;
 
-        for(uint i = 0; i < n; i++) {
+        for(int i = 0; i < n; i++) {
             upper_bound = MAX(upper_bound, fabsf(coeff[i] / coeff[n]));
         }
 
@@ -432,7 +432,7 @@ public:
             return FLT_MAX;
         }
 
-        uint n =  coeff.size() - 1;
+        int n = int(coeff.size()) - 1;
 
         if((n == 0) || (coeff[n] == 0.0f)) {
             return FLT_MAX;
@@ -440,7 +440,7 @@ public:
 
         float upper_bound = 0.0f;
 
-        for(uint i = 0; i < n; i++) {
+        for(int i = 0; i < n; i++) {
             upper_bound = MAX(upper_bound, fabsf(coeff[i] / coeff[n]));
         }
 
@@ -489,8 +489,8 @@ public:
     {
         float lambda = 0.0f;
 
-        uint n = coeff.size() - 1;
-        for(uint i = 0; i < coeff.size(); i++) {
+        int n = int(coeff.size()) - 1;
+        for(int i = 0; i < coeff.size(); i++) {
             if((coeff[i] < 0.0f) && (coeff[i] < lambda)) {
                 lambda = coeff[i];
             }
@@ -507,7 +507,7 @@ public:
      */
     bool getRoots(float *x)
     {
-        uint nCoeff = coeff.size();
+        int nCoeff = int(coeff.size());
 
         if(nCoeff < 2) {
             return false;
@@ -543,8 +543,8 @@ public:
      */
     bool getAllRoots(float *x)
     {
-        uint nCoeff = coeff.size();
-        for(uint i = 0; i < nCoeff - 1; i++) {
+        int nCoeff = int(coeff.size());
+        for(int i = 0; i < nCoeff - 1; i++) {
             x[i] = FLT_MAX;
         }
 
@@ -558,7 +558,7 @@ public:
         Polynomial p = horner(x[0], r);
         p.normalForm();
 
-        for(uint i = 1; i < (nCoeff - 2); i++) {
+        for(int i = 1; i < (nCoeff - 2); i++) {
             bool bOut = p.getRoots(&x[i]);
 
             if(!bOut) {

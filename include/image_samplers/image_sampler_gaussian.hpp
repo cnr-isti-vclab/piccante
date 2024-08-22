@@ -57,11 +57,7 @@ public:
      */
     void update(float sigma, unsigned int direction)
     {
-        if(pg != NULL) {
-            delete pg;
-            pg = NULL;
-        }
-
+        delete pg;
         pg = new PrecomputedGaussian(sigma);
 
         SetDirection(direction);

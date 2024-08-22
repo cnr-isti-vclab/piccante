@@ -45,9 +45,7 @@ protected:
      */
     void release() {
         for(unsigned int i = 1; i < stack.size(); i++) {
-            if(stack[i] != NULL){
-                delete stack[i];
-            }
+            delete stack[i];
         }
 
         stack.clear();

@@ -40,7 +40,6 @@ public:
     {
         flt_conv = NULL;
         psf_hat = NULL;
-
         img_est_conv = NULL;
         img_err = NULL;
         img_rel_blur = NULL;
@@ -48,25 +47,11 @@ public:
 
     ~RichardsonLucyDeconvolutionGL()
     {
-        if(flt_conv != NULL) {
-            delete flt_conv;
-        }
-
-        if(psf_hat != NULL) {
-            delete psf_hat;
-        }
-
-        if(img_est_conv != NULL) {
-            delete img_est_conv;
-        }
-
-        if(img_err != NULL) {
-            delete img_err;
-        }
-
-        if(img_rel_blur != NULL) {
-            delete img_rel_blur;
-        }
+        delete flt_conv;
+        delete psf_hat;
+        delete img_est_conv;
+        delete img_err;
+        delete img_rel_blur;
     }
 
     /**
