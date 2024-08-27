@@ -382,11 +382,14 @@ public:
                 out = false;
             }
         }
+
         return out;
     }
 
     void getFloatArray(std::string key, std::vector<float> &out)
     {
+        out.clear();
+
         pic::JSONValue* tmp = check(key);
 
         if (tmp != NULL) {
