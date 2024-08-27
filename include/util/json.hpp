@@ -35,6 +35,8 @@ enum JSONVALUETYPE{JNUMBER, JOBJECT, JARRAY, JSTRING, JFALSE, JTRUE, JNULL};
 
 class JSONObject;
 
+class JSONArray;
+
 class JSONValue
 {
 public:
@@ -116,6 +118,18 @@ public:
         if (tmp != NULL) {
             if (tmp->type == JOBJECT) {
                 return (JSONObject*)tmp;
+            }
+        }
+        return NULL;
+    }
+
+    JSONArray* getArray(std::string key)
+    {
+        JSONValue* tmp = check(key);
+
+        if (tmp != NULL) {
+            if (tmp->type == JARRAY) {
+                return (JSONArray*)tmp;
             }
         }
         return NULL;
@@ -290,19 +304,6 @@ public:
         }
 
         return out;
-    }
-
-
-    JSONArray* getArray(std::string key)
-    {
-        JSONValue* tmp = check(key);
-
-        if (tmp != NULL) {
-            if (tmp->type == pic::JARRAY) {
-                return (JSONArray*)tmp;
-            }
-        }
-        return NULL;
     }
 
     std::string getString(std::string key)
