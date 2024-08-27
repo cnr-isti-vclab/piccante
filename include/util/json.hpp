@@ -33,6 +33,8 @@ namespace pic {
 
 enum JSONVALUETYPE{JNUMBER, JOBJECT, JARRAY, JSTRING, JFALSE, JTRUE, JNULL};
 
+class JSONObject;
+
 class JSONValue
 {
 public:
@@ -106,6 +108,18 @@ public:
             printf("null");
         }
     }
+
+    JSONObject* getObject(std::string key)
+    {
+        JSONValue* tmp = check(key);
+
+        if (tmp != NULL) {
+            if (tmp->type == JOBJECT) {
+                return (JSONObject*)tmp;
+            }
+        }
+        return NULL;
+    }
 };
 
 class JSONString: public JSONValue
@@ -142,6 +156,9 @@ public:
 
     JSONNumber()
     {
+        bFloat = false;
+        numf = 0.0;
+        numi = 0;
         type = JNUMBER;
     }
 
@@ -262,7 +279,7 @@ public:
         printf("\n}\n");
     }
 
-    JSONValue *check(std::string key)
+    JSONValue* check(std::string key)
     {
         JSONValue* out = NULL;
         for (int i = 0; i < names.size(); i++) {
@@ -274,6 +291,113 @@ public:
 
         return out;
     }
+
+
+    JSONArray* getArray(std::string key)
+    {
+        JSONValue* tmp = check(key);
+
+        if (tmp != NULL) {
+            if (tmp->type == pic::JARRAY) {
+                return (JSONArray*)tmp;
+            }
+        }
+        return NULL;
+    }
+
+    std::string getString(std::string key)
+    {
+        std::string out = "";
+
+        JSONValue* tmp = check(key);
+        if (tmp != NULL) {
+            if (tmp->type == JSTRING) {
+                auto tmp2 = (JSONString*)tmp;
+                out = tmp2->str;
+            }
+        }
+        return out;
+    }
+
+    float getFloat(std::string key)
+    {
+        float out = 0.0f;
+
+        pic::JSONValue* tmp = check(key);
+
+        if (tmp != NULL) {
+            if (tmp->type == JNUMBER) {
+                auto tmp2 = (JSONNumber*)tmp;
+                return tmp2->getFloat();
+            }
+        }
+
+        return out;
+    }
+
+    int getInteger(std::string key)
+    {
+        int out = 0;
+
+        pic::JSONValue* tmp = check(key);
+
+        if (tmp != NULL) {
+            if (tmp->type == JNUMBER) {
+                auto tmp2 = (JSONNumber*)tmp;
+                return tmp2->getInteger();
+            }
+        }
+
+        return out;
+    }
+
+    double getDouble(std::string key)
+    {
+        double out = 0.0;
+
+        pic::JSONValue* tmp = check(key);
+
+        if (tmp != NULL) {
+            if (tmp->type == JNUMBER) {
+                auto tmp2 = (JSONNumber*)tmp;
+                return tmp2->getDouble();
+            }
+        }
+
+        return out;
+    }
+
+    bool getBool(std::string key)
+    {
+        bool out = false;
+
+        JSONValue* tmp = check(key);
+        if (tmp != NULL) {
+            if (tmp->type == JTRUE) {
+                out = true;
+            }
+
+            if (tmp->type == JFALSE) {
+                out = false;
+            }
+        }
+        return out;
+    }
+
+    void getFloatArray(std::string key, std::vector<float> &out)
+    {
+        pic::JSONValue* tmp = check(key);
+
+        if (tmp != NULL) {
+            if (tmp->type == pic::JARRAY) {
+                pic::JSONArray* arr = (pic::JSONArray*)tmp;
+                for (int i = 0; i < arr->size(); i++) {
+                    out.push_back(((pic::JSONNumber*)((pic::JSONNumber*)arr->get(i)))->getFloat());
+                }
+            }
+        }
+    }
+
 };
 
 class JSONFile
