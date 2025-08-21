@@ -276,3 +276,4 @@ examples/build-s_kmeans_colors-Desktop_Qt_5_4_2_clang_64bit-Release/Makefile
 examples/build-s_kmeans_colors-Desktop_Qt_5_4_2_clang_64bit-Release/s_kmeans_colors
 examples/build-s_otsu-Desktop_Qt_5_4_2_clang_64bit-Debug/Makefile
 examples/build-s_otsu-Desktop_Qt_5_4_2_clang_64bit-Debug/s_livewire
+.DS_Store
