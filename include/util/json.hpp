@@ -537,7 +537,7 @@ public:
                          case '\\':
                              tmp_str += '\\';
                          case '/':
-                             tmp_str += '\/';
+                             tmp_str += '/';
                          case 'b':
                              tmp_str += '\b';
                          case 'n':
