@@ -26,7 +26,7 @@ namespace pic {
 /**
  * @brief The LDR_type enum
  */
-enum LDR_type {LT_NOR, LT_NOR_GAMMA, LT_LDR, LT_NONE};
+enum LDR_type {LT_NOR, LT_NOR_GAMMA, LT_NONE};
 
 /**
  * @brief estimateAverageLuminance estimates the average luminance of the shot.
@@ -91,24 +91,20 @@ PIC_INLINE float *convertLDR2HDR(unsigned char *dataIn, float *dataOut,
         float i_f = float(i);
 
         switch(type) {
-        case LT_NONE: {//simple cast
-            LUT[i] = i_f;
-        }
-        break;
+            case LT_NOR: {//normalize in [0,1]
+                LUT[i] = i_f / 255.0f;
+            }
+            break;
 
-        case LT_NOR: {//normalize in [0,1]
-            LUT[i] = i_f / 255.0f;
-        }
-        break;
+            case LT_NOR_GAMMA: {//normalize in [0,1] + GAMMA correction removal
+                LUT[i] = powf(i_f / 255.0f, gamma);
+            }
+            break;
 
-        case LT_NOR_GAMMA: {//normalize in [0,1] + GAMMA correction removal
-            LUT[i] = powf(i_f / 255.0f, gamma);
-        }
-        break;
-
-        case LT_LDR: {
-            //do nothing
-        }
+            case LT_NONE: { //LT_NONE
+                //do nothing
+                LUT[i] = i_f;
+            }
         }
     }
 
@@ -145,35 +141,30 @@ PIC_INLINE unsigned char *convertHDR2LDR(const float *dataIn, unsigned char *dat
     float invGamma = 1.0f / gamma;
 
     switch(type) {
-
-    case LT_NONE: {//simple cast
-        #pragma omp parallel for
-        for(int i = 0; i < size; i++) {
-            dataOut[i] = CLAMPi(int(lround(dataIn[i])), 0, 255);
+        case LT_NONE: {//simple cast
+            #pragma omp parallel for
+            for(int i = 0; i < size; i++) {
+                dataOut[i] = CLAMPi(int(lround(dataIn[i])), 0, 255);
+            }
         }
-    }
-    break;
+        break;
 
-    case LT_NOR: {//convert into 8-bit
-        #pragma omp parallel for
-        for(int i = 0; i < size; i++) {
-            dataOut[i] = CLAMPi(int(lround(dataIn[i] * 255.0f)), 0, 255);
+        case LT_NOR: {//convert into 8-bit
+            #pragma omp parallel for
+            for(int i = 0; i < size; i++) {
+                dataOut[i] = CLAMPi(int(lround(dataIn[i] * 255.0f)), 0, 255);
+            }
         }
-    }
-    break;
+        break;
 
-    case LT_NOR_GAMMA: {//convert into 8-bit + GAMMA correction application
-        #pragma omp parallel for
-        for(int i = 0; i < size; i++) {
-            float tmp = powf(dataIn[i], invGamma);
-            dataOut[i] = CLAMPi(int(lround(tmp * 255.0f)), 0, 255);
+        case LT_NOR_GAMMA: {//convert into 8-bit + GAMMA correction application
+            #pragma omp parallel for
+            for(int i = 0; i < size; i++) {
+                float tmp = powf(dataIn[i], invGamma);
+                dataOut[i] = CLAMPi(int(lround(tmp * 255.0f)), 0, 255);
+            }
         }
-    }
-    break;
-
-    case LT_LDR: {
-        //do nothing
-    }
+        break;
     }
 
     return dataOut;

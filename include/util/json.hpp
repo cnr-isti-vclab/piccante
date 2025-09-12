@@ -708,7 +708,7 @@ public:
                          auto current = lines.at(c2);
                          if (checkWhitespace(current) || (current == ',') || (current == '}') || (current == ']')) {
                              break;
-                             c2--;
+                             //c2--;
                          }
                      }
 

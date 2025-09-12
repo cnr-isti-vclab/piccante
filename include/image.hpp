@@ -1890,10 +1890,6 @@ PIC_INLINE bool Image::Read(std::string nameFile,
              }
          }
 
-         if(typeLoad == LT_LDR) {
-             return dataUC != NULL;
-         }
-
          float *tmpFloat = NULL;
 
          if(data != NULL) {

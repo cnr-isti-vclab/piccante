@@ -151,7 +151,7 @@ protected:
         }
     }
 
-    void track(uint *imgOut, int &label, std::set<LabelInfo> &labelEq,
+    void track(uint *imgOut, uint &label, std::set<LabelInfo> &labelEq,
                int neighbors[2], int nNeighbors, int ind)
     {
         std::set<LabelInfo>::iterator it;
@@ -272,7 +272,7 @@ public:
         //First pass:
         // 1) assign basics labels
         // 2) generate the list of neighbors
-        int label = 1;
+        uint label = 1;
         std::set<LabelInfo> labelEq;
         for(int j = 0; j < height; j++) {
             int indY = j * width;
@@ -349,7 +349,7 @@ public:
         //First pass:
         // 1) assign basics labels
         // 2) generate the list of neighbors
-        int label = 1;
+        uint label = 1;
         std::set<LabelInfo> labelEq;
         for(int j = 0; j < height; j++) {
             int indY = j * width;

@@ -156,8 +156,8 @@ PIC_INLINE bool WriteTGA(std::string nameFile, const unsigned char *data,
 
     header.x_origin = 0;
     header.y_origin = 0;
-    header.width = width;
-    header.height = height;
+    header.width = short(width);
+    header.height = short(height);
     header.depth = 8 * channels;
 
     if(channels == 4) {
