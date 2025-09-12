@@ -243,7 +243,7 @@ public:
     void print()
     {
         printf("[");
-        for (int i = 0; i < array.size(); i++) {
+        for (unsigned int i = 0; i < array.size(); i++) {
             array[i]->print();
             if (i < (array.size() - 1)) {
                 printf(", ");
@@ -296,7 +296,7 @@ public:
     JSONValue* check(std::string key)
     {
         JSONValue* out = NULL;
-        for (int i = 0; i < names.size(); i++) {
+        for (unsigned int i = 0; i < names.size(); i++) {
             if (names[i].compare(key) == 0) {
                 out = values[i];
                 break;

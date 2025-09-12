@@ -111,7 +111,8 @@ PIC_INLINE FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
         k = 0.11f;
     }
 
-    if(mode > 2 || mode < 0) {
+    if(mode > 2
+        ) {
         mode = 0;
     }
 

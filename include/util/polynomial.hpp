@@ -222,7 +222,7 @@ public:
             ret = new float[coeff.size()];
         }
 
-        for(auto i = 0; i < coeff.size(); i++) {
+        for(unsigned int i = 0; i < coeff.size(); i++) {
             ret[i] = coeff[i];
         }
 
@@ -237,7 +237,7 @@ public:
     {
         Polynomial out;
 
-        for(auto i = 0; i < coeff.size(); i++) {
+        for(unsigned int i = 0; i < coeff.size(); i++) {
             out.coeff.push_back(coeff[i]);
         }
 
@@ -349,7 +349,7 @@ public:
      */
     void changeSign()
     {
-        for(auto i = 0; i < coeff.size(); i++) {
+        for(unsigned int i = 0; i < coeff.size(); i++) {
             coeff[i] = -coeff[i];
         }
     }
@@ -490,7 +490,7 @@ public:
         float lambda = 0.0f;
 
         int n = int(coeff.size()) - 1;
-        for(int i = 0; i < coeff.size(); i++) {
+        for(unsigned int i = 0; i < coeff.size(); i++) {
             if((coeff[i] < 0.0f) && (coeff[i] < lambda)) {
                 lambda = coeff[i];
             }
