@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
         printf("SSIM index: %3.3f\n", ssim_index);
         printf("MSE: %3.3f\n", pic::MSE(&img0, tmp, false));
         printf("RMSE: %3.3f\n", pic::RMSE(&img0, tmp));
-        printf("PSNR: %3.3f\n", pic::PSNR(&img0, tmp, -1.0f, false, pic::MD_PU ));
+        printf("PSNR: %3.3f\n", pic::PSNR(&img0, tmp, -1.0f, false, pic::MD_PU21 ));
         printf("MAE: %3.3f\n", pic::MAE(&img0, tmp, false));
         printf("Relative Error: %f\n", pic::RelativeError(&img0, tmp));
 

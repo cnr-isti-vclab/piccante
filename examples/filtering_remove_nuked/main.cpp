@@ -33,6 +33,8 @@ This program is free software: you can redistribute it and/or modify
 
 int main(int argc, char *argv[])
 {
+    std::string img0_str;
+    
     if(argc == 2) {
         img0_str = argv[1];
     } else {
@@ -51,8 +53,8 @@ int main(int argc, char *argv[])
 
         printf("Filtering the image with a Gaussian filter with sigma_s = 4.0...");
 
-        pic::Image *output = pic::FilterRemoveInfNaN::Execute(&img, NULL);
-        pic::Image *output2 = pic::FilterRemoveNuked::Execute(output, NULL, 0.95f);
+        pic::Image *output = pic::FilterRemoveInfNaN::execute(&img, NULL);
+        pic::Image *output2 = pic::FilterRemoveNuked::execute(output, NULL, 0.95f);
 
         printf("Ok!\n");
 

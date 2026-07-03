@@ -23,8 +23,6 @@ This program is free software: you can redistribute it and/or modify
     ( http://www.gnu.org/licenses/lgpl-3.0.html ) for more details.
 */
 
-#include <QCoreApplication>
-
 //This means that OpenGL acceleration layer is disabled
 #define PIC_DISABLE_OPENGL
 #include "piccante.hpp"

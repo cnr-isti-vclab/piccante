@@ -27,7 +27,7 @@ This program is free software: you can redistribute it and/or modify
 #define PIC_DISABLE_OPENGL
 
 #include "piccante.hpp"
-#include "util/k_means_plusplus.hpp"
+
 int main(int argc, char *argv[])
 {
     std::string img_str;
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
         int channels = img.channels;
         pic::uint k = 8;
 
-        float *centers = pic::KMeansPlusPlus<float>::execute(samples, nSamples, channels, NULL, k, labels, 100);
+        float *centers = pic::KMeans<float>::execute(samples, nSamples, channels, NULL, k, labels, 100);
 
         printf("The number of k is: %d\n", k);
 

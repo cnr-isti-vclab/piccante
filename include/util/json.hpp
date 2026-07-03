@@ -84,13 +84,16 @@ public:
         switch (type)
         {
         case JARRAY:
-            printf("Array");
+                printf("Array");
             break;
         case JOBJECT:
-            printf("Object");
+                printf("Object");
             break;
         case JSTRING:
-            printf("String");
+                printf("String");
+            break;
+        default:
+                printf("None");
             break;
         }
         printf("\n");

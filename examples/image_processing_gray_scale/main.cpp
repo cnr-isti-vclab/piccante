@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
         //Computing grey scale by computing the mean of color channels
         printf("Computing a gray scale image by computing the mean of color channels...");
-        pic::Image *img_mean = pic::FilterLuminance::Execute(&img, NULL, pic::LT_MEAN);
+        pic::Image *img_mean = pic::FilterLuminance::execute(&img, NULL, pic::LT_MEAN);
 
         bWritten = img_mean->Write("../data/output/singapore_mean.png");
 
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 
         //Computing grey scale by computing the weighted average following CIE weights for Y
         printf("Computing a gray scale image by computing the weighted mean of color channels using CIE weights for Y...");
-        pic::Image *img_cie_y = pic::FilterLuminance::Execute(&img, NULL, pic::LT_CIE_LUMINANCE);
+        pic::Image *img_cie_y = pic::FilterLuminance::execute(&img, NULL, pic::LT_CIE_LUMINANCE);
 
         bWritten = img_cie_y->Write("../data/output/singapore_cie_y.png");
 
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
         //Computing grey scale by using Exposure Fusion
         printf("Computing a gray scale image by using Exposure Fusion...");
-        pic::Image *img_cg_ef = pic::colorToGray(&img, NULL);
+        pic::Image *img_cg_ef = pic::ColorToGray::execute(&img, NULL);
 
         bWritten = img_cg_ef->Write("../data/output/singapore_cg_ef.png");
 

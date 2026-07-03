@@ -49,41 +49,41 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         pic::ImageSamplerGaussian is_lc;
-        pic::Image *out_d = pic::FilterDownSampler2D::Execute(&img, NULL, 0.5f);
+        pic::Image *out_d = pic::FilterDownSampler2D::execute(&img, NULL, 0.5f);
         if(out_d != NULL) {
             out_d->Write("../data/output/bottles_half_gaussian.hdr");
         }
 
         pic::ImageSamplerNearest is_near;
-        pic::Image *out = pic::FilterSampler2D::Execute(&img, NULL, 2.0f, &is_near);
+        pic::Image *out = pic::FilterSampler2D::execute(&img, NULL, 2.0f, &is_near);
 
         if(out != NULL) {
             out->Write("../data/output/bottles_2x_nearest.hdr");
         }
 
         pic::ImageSamplerBilinear is_bil;
-        out = pic::FilterSampler2D::Execute(&img, out, 2.0f, &is_bil);
+        out = pic::FilterSampler2D::execute(&img, out, 2.0f, &is_bil);
 
         if(out != NULL) {
             out->Write("../data/output/bottles_2x_bilinear.hdr");
         }
 
         pic::ImageSamplerCatmullRom is_cr;
-        out = pic::FilterSampler2D::Execute(&img, out, 2.0f, &is_cr);
+        out = pic::FilterSampler2D::execute(&img, out, 2.0f, &is_cr);
 
         if(out != NULL) {
             out->Write("../data/output/bottles_2x_catmull_rom.hdr");
         }
 
         pic::ImageSamplerBicubic is_bic;
-        out = pic::FilterSampler2D::Execute(&img, out, 2.0f, &is_bic);
+        out = pic::FilterSampler2D::execute(&img, out, 2.0f, &is_bic);
 
         if(out != NULL) {
             out->Write("../data/output/bottles_2x_bicubic.hdr");
         }
 
         pic::ImageSamplerLanczos is_lan;
-        out = pic::FilterSampler2D::Execute(&img, out, 2.0f, &is_lan);
+        out = pic::FilterSampler2D::execute(&img, out, 2.0f, &is_lan);
 
         if(out != NULL) {
             out->Write("../data/output/bottles_2x_lanczos.hdr");

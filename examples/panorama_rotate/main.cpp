@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         bool bWritten;
         std::string name = pic::getFileNameOnly(img_str);
 
-        pic::Image *img_rot_simple = pic::FilterRotation::execute(&img, NULL, pic::Deg2Rad(0.0f), pic::Deg2Rad(90.0f));
+        pic::Image *img_rot_simple = pic::FilterRotation::execute(&img, NULL, pic::Deg2Rad(0.0f), pic::Deg2Rad(90.0f), pic::Deg2Rad(0.0f));
         bWritten = img_rot_simple->Write("../data/output/" + name + "_rot_phi_90.hdr");
 
     } else {

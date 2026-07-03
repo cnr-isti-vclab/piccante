@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
         printf("OK\n");
 
         printf("DCT transform...");
-        pic::Image *img_dct = pic::FilterDCT2D::Transform(&img, NULL, 8);
+        pic::Image *img_dct = pic::FilterDCT2D::transform(&img, NULL, 8);
         printf(" Ok\n");
 
         printf("Removing small coefficients...");
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         }
         printf(" Ok\n");
 
-        pic::Image *imgOut = pic::FilterDCT2D::Inverse(img_dct, NULL, 8);
+        pic::Image *imgOut = pic::FilterDCT2D::inverse(img_dct, NULL, 8);
 
         printf("Writing the file to disk...");
         bool bWritten = imgOut->Write("../data/output/ip_simple_dct.png");
