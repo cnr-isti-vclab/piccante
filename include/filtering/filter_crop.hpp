@@ -89,8 +89,7 @@ public:
      * @param max
      * @return
      */
-    static Image *execute(Image *imgIn, Image *imgOut, Vec4i min,
-                             Vec4i max)
+    static Image *execute(Image *imgIn, Image *imgOut, Vec4i min, Vec4i max)
     {
         FilterCrop fltCrop(min, max);
         return fltCrop.Process(Single(imgIn), imgOut);
@@ -104,8 +103,7 @@ public:
      * @param max
      * @return
      */
-    static Image *execute(Image *imgIn, Image *imgOut, Vec2i min,
-                             Vec2i max)
+    static Image *execute(Image *imgIn, Image *imgOut, Vec2i min, Vec2i max)
     {
         FilterCrop fltCrop(min, max);
         return fltCrop.Process(Single(imgIn), imgOut);

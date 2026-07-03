@@ -630,7 +630,6 @@ public:
 
             std::vector<float> x(pixelcount);
 
-            float prevDelta = 0.0f;
             for (size_t iter=0; iter<maxIterations; iter++) {
                 // Normalize inv crf to midpoint
                 {
@@ -772,8 +771,6 @@ public:
                     if (delta < MaxDelta) {
                         break;
                     }
-
-                    prevDelta = delta;
                 }
             }
         }
