@@ -47,6 +47,8 @@ public:
         }
     }
     
+    Vec(const Vec<N,T> &) = default;
+
     /**
      * @brief Vec<N, T>
      * @param data0
@@ -376,39 +378,52 @@ public:
     *	Scalar Operands
     *
     */
-
-    /**
-     * @brief operator =
-     * @param a
-     */
-    void operator =(const T &a)
+    
+    Vec &operator=(const T &a)
     {
-        for (auto i = 0; i < N; i++) {
+        for(uint i = 0; i < N; i++) {
             this->data[i] = a;
         }
+
+        return *this;
     }
+
+    Vec &operator=(const T *a)
+    {
+        for(uint i = 0; i < N; i++) {
+            this->data[i] = a[i];
+        }
+
+        return *this;
+    }
+    
+    Vec<N,T> &operator=(const Vec<N,T> &) = default;
 
     /**
     * @brief operator =
     * @param a
     */
+    /*
     void operator =(const T *a)
     {
         for (auto i = 0; i < N; i++) {
             this->data[i] = a[i];
         }
     }
-
+     */
+    
     /**
     * @brief operator =
     * @param a
     */
+    /*
     void operator =(const Vec<N, T> &a)
     {
         for (auto i = 0; i < N; i++) {
             this->data[i] = a.data[i];
         }
     }
+    */
 
     /**
      * @brief operator +=

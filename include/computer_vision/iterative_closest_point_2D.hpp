@@ -343,15 +343,18 @@ PIC_INLINE void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pa
                               int size_descs,
                               int maxIterations = 1000)
 {
+    
+    if (maxIterations < 1) {
+        maxIterations = 1;
+    }
+        
     ICP2DTransform t_init;
     t_init.t = getMedianVector2f(points) - getMeanVector2f(points_pattern);
     t_init.apply(points_pattern);
 
-    float err = getErrorPointsList(points_pattern, points);;
-    float prev_err = 1e32f;
+    getErrorPointsList(points_pattern, points);
     int iter = 0;
     while(iter < maxIterations) {
-        prev_err = err;
         ICP2DTransform t = estimateRotatioMatrixAndTranslation(points, points_pattern,
                                                                points_descs, points_pattern_descs,
                                                                size_descs);
@@ -363,7 +366,7 @@ PIC_INLINE void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pa
 //        std::vector< Eigen::Vector2f > points_pattern_tmp;
         t.apply(points_pattern);
 
-        err = getErrorPointsList(points_pattern, points);
+        getErrorPointsList(points_pattern, points);
 
         /*
         if(err < prev_err) {
@@ -373,11 +376,11 @@ PIC_INLINE void iterativeClosestPoints2D(std::vector<Eigen::Vector2f> &points_pa
         } else {
             iter = maxIterations;
         }
-        */
 
         #ifdef PIC_DEBUG
             printf("Error: %f %f\n", err, prev_err);
         #endif
+        */
 
         iter++;
     }
