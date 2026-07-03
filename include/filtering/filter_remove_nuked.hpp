@@ -38,7 +38,6 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        float maxVal;
         float values[9];
 
         int channels = dst->channels;
@@ -51,7 +50,6 @@ protected:
             
                 for(int ch = 0; ch < channels; ch++) {
 
-                    maxVal = -FLT_MAX;
                     int c2 = 0;
                     int nuked = 0;
                     float val = tmp_data[ch];

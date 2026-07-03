@@ -825,7 +825,7 @@ public:
         }
 
         //check bounds
-        int sX, sY, eX, eY, dX, dY, shiftX, shiftY;
+        int sX, sY, eX, eY, dX, dY, shiftY;
 
         //start
         sX = MIN(startX, bo_width);
@@ -836,11 +836,14 @@ public:
 
         dX = sX - startX;
 
+        /*
+        int shiftX
         if(dX < 0) {
             shiftX = dX;
         } else {
             shiftX = -sX;
         }
+        */
 
         //end
         eX = MIN(startX + bi_width, bo_width);

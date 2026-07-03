@@ -30,10 +30,9 @@ namespace pic {
  * @brief MaximumError computes the maximum error between two images.
  * @param ori is the original image.
  * @param cmp is the distorted image.
- * @param bLargeDifferences, if true, skips big differences for stability.
  * @return It returns the maxium error value between ori and cmp.
  */
-PIC_INLINE float MaximumError(Image *ori, Image *cmp, bool bLargeDifferences = false)
+PIC_INLINE float MaximumError(Image *ori, Image *cmp)
 {
     if(ori == NULL || cmp == NULL) {
         return -2.0f;
@@ -48,12 +47,6 @@ PIC_INLINE float MaximumError(Image *ori, Image *cmp, bool bLargeDifferences = f
     }
 
     int size = ori->size();
-
-
-    float largeDifferences = C_LARGE_DIFFERENCESf;
-    if(!bLargeDifferences) {
-        largeDifferences = FLT_MAX;
-    }
 
     float maxVal = -FLT_MAX;
     for(int i = 0; i < size; i++) {
