@@ -92,7 +92,7 @@ protected:
 
                 for(int i = box->x0; i < box->x1; i++) {
                     f_data.x = i;
-                    f_data.out = (*dst)(i, j);
+                    f_data.out = (*dst)(i, j, k);
 
                     f(&f_data);
                 }

@@ -15,8 +15,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_UTIL_coeffNOMIAL_HPP
-#define PIC_UTIL_coeffNOMIAL_HPP
+#ifndef PIC_UTIL_POLYNOMIAL_HPP
+#define PIC_UTIL_POLYNOMIAL_HPP
 
 #include <vector>
 
@@ -658,4 +658,4 @@ public:
 
 } // end namespace pic
 
-#endif //PIC_UTIL_coeffNOMIAL_HPP
+#endif //PIC_UTIL_POLYNOMIAL_HPP

@@ -103,5 +103,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //360 panoramic images
 #include "filtering/filter_rotation.hpp"
 
+//deep learning
+#include "filtering/filter_max_pooling.hpp"
+
+
 #endif /* PIC_FILTERING_HPP */
 
