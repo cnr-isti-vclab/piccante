@@ -32,16 +32,14 @@ namespace pic {
 
 namespace pic {
 
-class FilterConv2DNN : public Filter
+class FilterLinearNN : public Filter
 {
 protected:
 
     int inChannels;
     int outChannels;
-    int kernelSize;
     int nWeights;
     int kernelArea;
-
 
     float *weights;
     float *bias;
@@ -49,51 +47,23 @@ protected:
     void f(FilterFData *data)
     {
         Image *img = data->src[0];
-
-        int x = data->x;
-        int y = data->y;
-        int z = data->z;
-
-        int z_stride = z * img->tstride;
-        int x_stride = x * img->xstride;
         
-        for(int oc = 0; oc < outChannels; oc++) {
-
-            float sum = bias[oc];
-            int oc_inChannels = oc * inChannels;
-
-            for(int ic = 0; ic < inChannels; ic++) {
-
-                int weightBase = (oc_inChannels + ic) * kernelArea;
-
-                for(int ky = 0; ky < kernelSize; ky++) {
-
-                    float *src = img->data + z_stride + (y + ky) * img->ystride + x_stride;
-
-                    int weightRow = weightBase + ky * kernelSize;
-
-                    for(int kx = 0; kx < kernelSize; kx++) {
-                        sum += src[kx * img->xstride + ic] * weights[weightRow + kx];
-                    }
-                }
-            }
-
-            data->out[oc] = sum;
+        float *in = (*img)(data->x, data->y, data->z);
+        
+        for(int i = 0; i < outChannels; i++) {
+            data->out[i] = bias[i];
+            data->out[i] += Arrayf::dot(in, weights[i * inChannels]);
         }
     }
 
 public:
 
-    FilterConv2DNN(int inChannels, int outChannels, int kernelSize)
+    FilterLinearNN(int inChannels, int outChannels)
     {
         this->inChannels  = inChannels;
         this->outChannels = outChannels;
-        this->kernelSize  = kernelSize;
         
-        this->kernelArea = kernelSize * kernelSize;
-
-
-        this->nWeights = outChannels * inChannels * kernelSize * kernelSize;
+        this->nWeights = outChannels * inChannels;
 
         weights = new float[nWeights];
         bias = new float[outChannels];
@@ -119,7 +89,7 @@ public:
 
     virtual std::string signature()
     {
-        return "CONV2D_NN";
+        return "LINEAR_NN";
     }
 };
 
