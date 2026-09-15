@@ -105,6 +105,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 //deep learning
 #include "filtering/filter_max_pooling.hpp"
+#include "filtering/filter_linear_nn.hpp"
+#include "filtering/filter_conv_2d_nn.hpp"
 
 
 #endif /* PIC_FILTERING_HPP */

@@ -15,20 +15,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-#ifndef PIC_FILTERING_FILTER_CONV_2D_NN_HPP
-#define PIC_FILTERING_FILTER_CONV_2D_NN_HPP
+#ifndef PIC_FILTERING_FILTER_LINEAR_NN_HPP
+#define PIC_FILTERING_FILTER_LINEAR_NN_HPP
 
 #include "../util/array.hpp"
 
 #include "../filtering/filter.hpp"
-
-namespace pic {
-
-#ifndef PIC_FILTERING_FILTER_CONV_2D_NN_HPP
-#define PIC_FILTERING_FILTER_CONV_2D_NN_HPP
-
-#include <vector>
-#include "filter.hpp"
 
 namespace pic {
 
@@ -52,7 +44,7 @@ protected:
         
         for(int i = 0; i < outChannels; i++) {
             data->out[i] = bias[i];
-            data->out[i] += Arrayf::dot(in, weights[i * inChannels]);
+            data->out[i] += Arrayf::dot(in, &weights[i * inChannels], inChannels);
         }
     }
 
@@ -77,14 +69,14 @@ public:
         frames   = imgIn[0]->frames;
     }
 
-    void setWeights(const float *weights)
+    void setWeights(float *weights)
     {
-        Arrayf::assign(weights, this->nWeights, this->weights)
+        Arrayf::assign(weights, this->nWeights, this->weights);
     }
 
-    void setBias(const float *bias)
+    void setBias(float *bias)
     {
-        Arrayf::assign(bias, outChannels, this->bias)
+        Arrayf::assign(bias, outChannels, this->bias);
     }
 
     virtual std::string signature()
@@ -95,5 +87,5 @@ public:
 
 } // end namespace pic
 
-#endif /* PIC_FILTERING_FILTER_CONV_2D_NN_HPP */
+#endif /* PIC_FILTERING_FILTER_LINEAR_NN_HPP */
 

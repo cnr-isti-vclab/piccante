@@ -24,14 +24,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-#ifndef PIC_FILTERING_FILTER_CONV_2D_NN_HPP
-#define PIC_FILTERING_FILTER_CONV_2D_NN_HPP
-
-#include <vector>
-#include "filter.hpp"
-
-namespace pic {
-
 class FilterConv2DNN : public Filter
 {
 protected:
@@ -107,14 +99,14 @@ public:
         frames   = imgIn[0]->frames;
     }
 
-    void setWeights(const float *weights)
+    void setWeights(float *weights)
     {
-        Arrayf::assign(weights, this->nWeights, this->weights)
+        Arrayf::assign(weights, this->nWeights, this->weights);
     }
 
-    void setBias(const float *bias)
+    void setBias(float *bias)
     {
-        Arrayf::assign(bias, outChannels, this->bias)
+        Arrayf::assign(bias, outChannels, this->bias);
     }
 
     virtual std::string signature()
