@@ -643,6 +643,31 @@ public:
 
         return low;
     }
+    
+    /**
+     * @brief linear
+     * @param value
+     * @param n
+     * @param ret
+     * @return
+     */
+    static T* linear(T* data, int nData, T *ret, int nRet, T *weights, T *bias)
+    {
+        if(nData < 1) {
+            return ret;
+        }
+
+        if(ret == NULL) {
+            ret = new T[nRet];
+        }
+        
+        for(int i = 0; i < nRet; i++) {
+            ret[i] = bias[i] + dot(data, &weights[i * nData], nData);
+        }
+
+        return ret;
+    }
+    
 };
 
 /**
