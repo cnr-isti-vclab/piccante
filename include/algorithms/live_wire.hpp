@@ -273,7 +273,7 @@ public:
                         }
 
                         auto g_r = (*g)(r[0], r[1]);
-                        if(bFlag && (g_tmp < g_r)) {
+                        if(bFlag && (g_tmp < g_r[0])) {
                             list.erase(index);
                         }
 

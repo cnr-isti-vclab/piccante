@@ -116,17 +116,21 @@ protected:
      */
     inline void update(float x)
     {
-        float val = projectDomain(x);
-
-        int indx = int(((val - fMin) * nBinf) / deltaMaxMin);
-
-        #ifdef PIC_DEBUG
-        if((indx >= nBin) || (indx < 0)) {
-            printf("Error in Calculate %d.\n",indx);
+        if (deltaMaxMin > 0.0f) {
+            float val = projectDomain(x);
+            
+            int indx = int(((val - fMin) * nBinf) / deltaMaxMin);
+            
+#ifdef PIC_DEBUG
+            if((indx >= nBin) || (indx < 0)) {
+                printf("Error in Calculate %d.\n",indx);
+            }
+#endif
+            
+            bin[CLAMP(indx, nBin)]++;
+        } else {
+            bin[0]++;
         }
-        #endif
-
-        bin[CLAMP(indx, nBin)]++;
     }
 
 public:
@@ -310,7 +314,8 @@ public:
         this->nBin = nBin;
         this->type = type;
 
-        memset((void *)bin, value, nBin * sizeof(uint));
+        Array<uint>::assign(value, bin, nBin);
+        //memset((void *)bin, value, nBin * sizeof(uint));
 
         nBinf = float(nBin - 1);
 
