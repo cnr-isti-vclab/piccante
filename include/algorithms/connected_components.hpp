@@ -457,7 +457,7 @@ public:
         for(int i = 0; i < n; i++) {
             uint j = labels[i];
             auto search = labels_tracker.find(j);
-            if (search != labels_tracker.end()) {
+            if (search == labels_tracker.end()) {
                 labels_tracker.insert(j);
                 labels_map[j] = c;
 
