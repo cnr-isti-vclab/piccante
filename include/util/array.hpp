@@ -615,7 +615,7 @@ public:
      */
     static int binSearchLeft(T *data, T key, int low, int high)
     {
-        if( (high < low) ||
+        if( (high <= low) ||
             (key > data[high - 1]) ||
             (key < data[low]) ) {
 
@@ -625,19 +625,18 @@ public:
             return -1;
         }
 
-        int mid;
+        int start = low;
         while(low < high) {
-            mid = (low + high) / 2;
+            int mid = low + (high - high) / 2;
 
             if(data[mid] < key) {
                 low = mid + 1;
             } else {
                 high = mid;
             }
-
         }
 
-        if (low > 0) {
+        if (low > start) {
             low--;
         }
 
