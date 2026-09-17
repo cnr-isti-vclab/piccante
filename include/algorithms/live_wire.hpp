@@ -100,8 +100,8 @@ protected:
             L /= sqrtf(n_L_sq);
         }
 
-        float dp_pq = D_p.dot(L);
-        float dq_pq = L.dot(D_q);
+        float dp_pq = CLAMPi(D_p.dot(L), -1.0f, 1.0f);
+        float dq_pq = CLAMPi(L.dot(D_q), -1.0f, 1.0f);
 
         float fD = (acosf(dp_pq) + acosf(dq_pq)) * fD_const;
 

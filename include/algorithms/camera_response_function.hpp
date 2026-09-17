@@ -158,7 +158,7 @@ protected:
                 tmp[j] = poly[i].eval(x);
             }
 
-            crf.push_back(tmp);
+            icrf.push_back(tmp);
         }
     }
 
