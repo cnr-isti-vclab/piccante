@@ -163,7 +163,7 @@ public:
         if(state_next == NULL) {
             state_next = state_cur->allocateSimilarOne();
         } else {
-            if(checkImage(state_cur, img->width, img->height, 2)) {
+            if(checkImage(state_next, img->width, img->height, 2)) {
                 state_next = state_cur->allocateSimilarOne();
             }
         }

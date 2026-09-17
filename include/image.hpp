@@ -1003,7 +1003,7 @@ PIC_INLINE Image::Image(float *color, int channels)
 
     if(color != NULL) {
         allocate(1, 1, channels, 1);
-        memcpy(data, color, channels);
+        memcpy(data, color, channels * sizeof(float));
     }
 }
 
@@ -2061,7 +2061,7 @@ PIC_INLINE Image *Image::clone() const
     ret->alpha = alpha;
     ret->typeLoad = typeLoad;
 
-    memcpy(ret->data, data, width * height * channels * sizeof(float));
+    memcpy(ret->data, data, size() * sizeof(float));
 
     return ret;
 }

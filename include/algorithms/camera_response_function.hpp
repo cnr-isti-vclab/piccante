@@ -26,6 +26,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter_mean.hpp"
 #include "../util/polynomial.hpp"
 #include "../util/std_util.hpp"
+#include "../util/array.hpp"
 
 #include "../algorithms/sub_sample_stack.hpp"
 #include "../algorithms/weight_function.hpp"
@@ -295,11 +296,13 @@ public:
      */
     void fromRAWJPEG(Image *img_raw, Image *img_jpg, int filteringSize = 11)
     {
-        if((img_raw == NULL) || (img_jpg == NULL))
+        if((img_raw == NULL) || (img_jpg == NULL)) {
             return;
+        }
 
-        if(!img_raw->isSimilarType(img_jpg))
+        if(!img_raw->isSimilarType(img_jpg)) {
             return;
+        }
         
         icrf.clear();
 
@@ -337,11 +340,13 @@ public:
         for(int k=0;k<channels;k++) {
 
             float *ret_c = new float[256];
+            
+            ret_c = Arrayf::assign(0.0, ret_c, 256);
 
-            for(int j=0;j<256;j++) {
+            for(int j = 0; j < 256; j++) {
                 coords.clear();
 
-                for(int i=0;i<256;i++) {
+                for(int i = 0; i < 256; i++) {
 
                     int addr = (i * 256 + j ) * channels + k;
 
@@ -363,7 +368,8 @@ public:
                 Image *filtered = FilterMean::execute(&toBeFiltered, NULL, filteringSize);
                 
                 icrf.push_back(filtered->data);
-
+                delete[] ret_c;
+                
             } else {
                 icrf.push_back(ret_c);
             }

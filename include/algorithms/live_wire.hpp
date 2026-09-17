@@ -264,6 +264,7 @@ public:
 
                         //check list
                         bool bFlag = false;
+                        
                         for(auto it = list.begin(); it != list.end(); it++) {
                             if(r.equal(*it)) {
                                 index = it;
@@ -271,7 +272,8 @@ public:
                             }
                         }
 
-                        if(bFlag && (g_tmp < g_q)) {
+                        auto g_r = (*g)(r[0], r[1]);
+                        if(bFlag && (g_tmp < g_r)) {
                             list.erase(index);
                         }
 

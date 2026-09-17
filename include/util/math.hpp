@@ -150,7 +150,7 @@ PIC_INLINE float getRandom(unsigned int n)
 PIC_INLINE int getRandomInt(int n, int a, int b)
 {
     if(a < b) {
-        return n % (b - a);
+        return a + (n % (b - a));
     } else {
         return 0;
     }
@@ -433,6 +433,10 @@ PIC_INLINE int powint(int x, int b)
  */
 PIC_INLINE void getRandomPermutation(std::mt19937 &m, unsigned int *perm, unsigned int nPerm, unsigned int n)
 {
+    if ((n == 0) || nPerm > n) {
+        return;
+    }
+    
     std::set< unsigned int > checker;
 
     unsigned int tmp = m() % n;
@@ -444,6 +448,7 @@ PIC_INLINE void getRandomPermutation(std::mt19937 &m, unsigned int *perm, unsign
         tmp = m() % n;
 
         if(checker.find(tmp) == checker.end()) {
+            checker.insert(tmp);
             perm[index] = tmp;
             index++;
         }
