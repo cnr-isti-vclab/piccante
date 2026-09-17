@@ -39,7 +39,11 @@ protected:
     /**
      * @brief release
      */
-    void release() {
+    void release()
+    {
+        delete flt_down;
+        delete flt_up;
+        
         for(unsigned int i = 1; i < stack.size(); i++) {
             delete stack[i];
         }
@@ -54,7 +58,8 @@ public:
      */
     PushPull()
     {
-
+        flt_down = NULL;
+        flt_up = NULL;
     }
 
     ~PushPull()
