@@ -572,11 +572,10 @@ public:
      * @param width
      * @param height
      * @param labelsList
-     * @param threshold
      */
-    static void mergeIsolatedAreasWithThreshold(uint *labels, int width, int height, std::vector<LabelOutput> &labelsList, int threshold = 1)
+    static void mergeIsolatedAreasWithThreshold(uint *labels, int width, int height, std::vector<LabelOutput> &labelsList)
     {
-        if(threshold < 1 || labels == NULL || labelsList.empty()) {
+        if(labels == NULL || labelsList.empty()) {
             return;
         }
 
