@@ -52,11 +52,14 @@ namespace pic {
  */
 PIC_INLINE Eigen::Vector2f getMeanVector2f(std::vector< Eigen::Vector2f > &p)
 {
-    auto c = p[0];
-    for(unsigned int i = 1; i < p.size(); i++) {
-        c += p[i];
+    Eigen::Vector2f c;
+    if (! p.empty()) {
+        c = p[0];
+        for(unsigned int i = 1; i < p.size(); i++) {
+            c += p[i];
+        }
+        c /= float(p.size());
     }
-    c /= float(p.size());
 
     return c;
 }

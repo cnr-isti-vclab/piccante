@@ -76,7 +76,9 @@ public:
 
             data = delete_vec_s(data);
             data = FilterConv1D::getKernelMean(size);
-        }        
+            
+            filter->update(data, size, 0);
+        }
     }
 
     /**

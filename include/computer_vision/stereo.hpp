@@ -98,15 +98,22 @@ public:
                 if(dL[1] > 0.0f) { // if it is valid
 
                     int j_forward = int(dL[0]);
-                    float *dR = (*disp_right)(j_forward, i);
-
-                    if(dR[1] > 0.0f) { // if it is valid
-                        int j_e = int(dR[0]);
-
-                        if(std::abs(j - j_e) > max_cross_check) {
-                            dL[0] = 0.0f;
-                            dL[1] = -1.0f;
+                    
+                    if ((j_forward >= 0) && (j_forward < disp_right->width) && (i < disp_right->height)) {
+                        
+                        float *dR = (*disp_right)(j_forward, i);
+                        
+                        if(dR[1] > 0.0f) { // if it is valid
+                            int j_e = int(dR[0]);
+                            
+                            if(std::abs(j - j_e) > max_cross_check) {
+                                dL[0] = 0.0f;
+                                dL[1] = -1.0f;
+                            }
                         }
+                    } else {
+                        dL[0] = 0.0f;
+                        dL[1] = -1.0f;
                     }
                 }
             }
@@ -162,6 +169,12 @@ public:
 
         computeLocalDisparity(disp_left);
         computeLocalDisparity(disp_right);
+        
+        delete i_l_l;
+        delete i_r_l;
+        delete i_l_g;
+        delete i_r_g;
+        
     }
 };
 

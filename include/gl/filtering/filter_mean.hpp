@@ -73,8 +73,7 @@ public:
     {
         kernelSize = kernelSize > 0 ? kernelSize : 3;
 
-        if(this->kernelSize != kernelSize)
-        {
+        if(this->kernelSize != kernelSize) {
             this->kernelSize = kernelSize;
 
             data = delete_vec_s(data);

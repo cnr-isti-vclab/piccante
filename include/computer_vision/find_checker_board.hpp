@@ -133,7 +133,7 @@ PIC_INLINE float estimateCheckerBoardSize(std::vector< Eigen::Vector2f > &points
  */
 PIC_INLINE float estimateCheckerBoardSizeCross(std::vector< Eigen::Vector2f > &points)
 {
-    if(points.size() < 2) {
+    if(points.size() < 4) {
         return -1.0f;
     }
 
@@ -409,7 +409,7 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
     }
 
     #ifdef PIC_DEBUG
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < 3; i++) {
             printf("%f\n", x[i]);
         }
     #endif
@@ -431,6 +431,9 @@ PIC_INLINE void findCheckerBoard(Image *img, std::vector< Eigen::Vector2f > &cor
         img_wb->Write("../data/output/img_wb.bmp");
         delete img_wb;
     #endif
+    
+    delete[] x;
+    delete[] tmp;
 }
 
 /**

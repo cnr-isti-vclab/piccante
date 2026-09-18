@@ -53,7 +53,7 @@ public:
         this->m.push_back(m1);
     }    
 
-    static Eigen::Matrix34d parseCameraMatrix(float *x, unsigned int index)
+    static Eigen::Matrix34d parseCameraMatrix(double *x, unsigned int index)
     {
         Eigen::Matrix3d K, R;
         Eigen::Vector3d t;
@@ -88,7 +88,7 @@ public:
      * @param index
      * @return
      */
-    double ProjectionError(float *x, unsigned int index) {
+    double ProjectionError(double *x, unsigned int index) {
 
        double err = 0.0;
 
@@ -122,14 +122,12 @@ public:
      * @param n
      * @return
      */
-    float function(float *x, unsigned int n)
-    {       
-        int n2 = int(m.size() * m[0].size());
-        double err = sqrt((ProjectionError(x, 0) + ProjectionError(x, 1)) / double(n2));
-
-        return float(err);
+    double function(double *x, uint n)
+    {
+        double n2 = double(m.size() * m[0].size());
+        double err = sqrt((ProjectionError(x, 0) + ProjectionError(x, 1)) / n2);
+        return err;
     }
-
 
     /**
      * @brief init3DPoints

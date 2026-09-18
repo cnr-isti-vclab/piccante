@@ -147,7 +147,7 @@ PIC_INLINE bool decomposeEssentialMatrixWithConfiguration(Eigen::Matrix3d &E, Ei
                                                std::vector< Eigen::Vector2f > &points0, std::vector< Eigen::Vector2f > &points1,
                                                Eigen::Matrix3d &R, Eigen::Vector3d &t)
 {
-    if(points0.size() != points1.size()) {
+    if( points0.empty() || (points0.size() != points1.size()) ){
         return false;
     }
 

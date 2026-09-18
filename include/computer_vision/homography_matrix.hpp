@@ -54,7 +54,7 @@ namespace pic {
  * @return It returns the homography matrix H.
  */
 PIC_INLINE Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > &points0,
-                                   std::vector< Eigen::Vector2f > &points1)
+                                              std::vector< Eigen::Vector2f > &points1)
 {
     Eigen::Matrix3d  H;
 
@@ -146,11 +146,17 @@ PIC_INLINE Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f
                                          double threshold = 4.0,
                                          unsigned int seed = 1)
 {
-    if(points0.size() < 5) {
+    if (points0.size() < 5) {
         return estimateHomography(points0, points1);
     }
 
     Eigen::Matrix3d H;
+    H.setZero();
+
+    if (points0.size() != points1.size()) {
+        return H;
+    }
+
     int nSubSet = 4;
 
     std::mt19937 m(seed);
@@ -216,6 +222,8 @@ PIC_INLINE Eigen::Matrix3d estimateHomographyRansac(std::vector< Eigen::Vector2f
 
         H = estimateHomography(sub_points0, sub_points1);
     }
+    
+    delete[] subSet;
 
     return H;
 }
@@ -247,6 +255,7 @@ PIC_INLINE Eigen::Matrix3d estimateHomographyWithNonLinearRefinement(
     float *H_array = getLinearArrayFromMatrix(H);
     nmoh.run(H_array, 8, thresholdNonLinear, maxIterationsNonLinear, H_array);
     H = getMatrix3dFromLinearArray(H_array);
+    delete[] H_array;
     return H;
 }
 

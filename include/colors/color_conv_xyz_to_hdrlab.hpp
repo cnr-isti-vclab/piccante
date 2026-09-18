@@ -48,9 +48,10 @@ public:
         whitePoint[2] = 1.0f;
 
         Ys = 0.5f;
-        Yabs = 1.0f;
+        Yabs = 100.0f;
 
-        two_e = powf(2.0f, computeEpsilon(Ys, Yabs));
+        epsilon = computeEpsilon(Ys, Yabs);
+        two_e = powf(2.0f, epsilon);
     }
 
     /**
@@ -60,6 +61,8 @@ public:
      */
     ColorConvXYZtoHDRLAB(float Yabs, float *whitePoint)
     {
+        linear = false;
+
         this->Yabs = Yabs;
         this->whitePoint[0] = whitePoint[0];
         this->whitePoint[1] = whitePoint[1];
@@ -149,7 +152,7 @@ public:
     static float computeEpsilon(float Ys, float Yabs)
     {
         if(Yabs <= 0.0f) {
-            Yabs = 1.0f;
+            Yabs = 100.0f;
         }
 
         if(Ys < 0.0f || Ys > 1.0f) {

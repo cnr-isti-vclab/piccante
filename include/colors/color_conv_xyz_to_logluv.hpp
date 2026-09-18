@@ -52,15 +52,23 @@ public:
         colOut[0] = logf(colIn[1] + epsilon);
 
         float norm = colIn[0] + colIn[1] + colIn[2];
-        float x = colIn[0] / norm;
-        float y = colIn[1] / norm;
-
-        float norm_uv = -2.0f * x + 12.0f * y + 3.0f;
-        float u_prime =  4.0f * x / norm_uv;
-        float v_prime =  9.0f * y / norm_uv;
-
-        colOut[1] = u_prime;
-        colOut[2] = v_prime;
+        
+        if ( norm > 0.0f ) {
+            
+            float x = colIn[0] / norm;
+            float y = colIn[1] / norm;
+            
+            float norm_uv = -2.0f * x + 12.0f * y + 3.0f;
+            float u_prime =  4.0f * x / norm_uv;
+            float v_prime =  9.0f * y / norm_uv;
+            
+            colOut[1] = u_prime;
+            colOut[2] = v_prime;
+        } else {
+            colOut[0] = 0.0f;
+            colOut[1] = 0.0f;
+            colOut[2] = 0.0f;
+        }
     }
 
     /**

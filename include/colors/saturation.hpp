@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_COLORS_SATURATION_HPP
 #define PIC_COLORS_SATURATION_HPP
 
-namespace pic {
-
 #include "../base.hpp"
 #include "../util/math.hpp"
 #include "../util/array.hpp"
+
+namespace pic {
 
 /**
  * @brief computeSaturation

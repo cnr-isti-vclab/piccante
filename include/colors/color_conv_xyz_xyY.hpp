@@ -61,7 +61,7 @@ public:
      */
     void inverse(float *colIn, float *colOut)
     {
-        if(colIn[0] != 0.0f) {
+        if(colIn[1] != 0.0f) {
             float ratio = colIn[2] / colIn[1];
             float z = CLAMPi(1.0f - colIn[0] - colIn[1], 0.0f, 1.0f);
 

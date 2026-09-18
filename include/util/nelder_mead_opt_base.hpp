@@ -306,6 +306,26 @@ public:
     }
 
     /**
+     * @brief NelderMeadOptBase
+     */
+    ~NelderMeadOptBase()
+    {
+        release();
+    }
+    
+    /**
+     * @brief release
+     */
+    void release()
+    {
+        for(auto i = 0; i < simplex.size(); i++) {
+            delete[] simplex[i].second;
+        }
+
+        simplex.clear();
+    }
+        
+    /**
      * @brief GlobalSettings
      */
     void GlobalSettings()

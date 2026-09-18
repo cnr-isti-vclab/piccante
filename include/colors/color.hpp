@@ -110,14 +110,16 @@ void importanceSampling(Vec<N, float> &in, float e, int &channel, float &pdf)
         float CDF[N];
         CDF[0] = in.data[0] / sum;
         for(uint i = 1; i < (N - 1); i++) {
-            CDF[i] = (CDF[i - 1] + in.data[i]) / sum;
+            CDF[i] = CDF[i - 1] + (in.data[i] / sum);
         }
+        
         CDF[N - 1] = 1.0f; // sanity check
 
         for(uint i = 0; i < N; i++) {
             if(e <= CDF[i]) {
                 channel = i;
                 pdf = in.data[i] / sum;
+                break;
             }
         }
     } else {
