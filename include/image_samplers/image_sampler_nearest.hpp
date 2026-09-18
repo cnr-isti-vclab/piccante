@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_IMAGE_SAMPLERS_IMAGE_SAMPLER_NEAREST_HPP
 #define PIC_IMAGE_SAMPLERS_IMAGE_SAMPLER_NEAREST_HPP
 
+#include <math.h>
+
 #include "../image_samplers/image_sampler.hpp"
 
 namespace pic {
@@ -62,8 +64,8 @@ public:
     void SampleImageUC(Image *img, float x, float y, float *vOut)
     {
         //Integer coordinates
-        int ix = CLAMP(int(x), img->width);
-        int iy = CLAMP(int(y), img->height);
+        int ix = CLAMP(int(roundf(x)), img->width);
+        int iy = CLAMP(int(roundf(y)), img->height);
 
         //Bilinear interpolation indicies
         int ind = (ix * img->xstride + iy * img->ystride);
@@ -93,9 +95,9 @@ public:
         t = t * img->frames1f;
 
         //integer coordinates
-        int ix = int(x);
-        int iy = int(y);
-        int it = int(t);
+        int ix = int(roundf(x));
+        int iy = int(roundf(y));
+        int it = int(roundf(t));
 
         //indicies
         int ind = (ix * img->xstride + iy * img->ystride + it * img->tstride);

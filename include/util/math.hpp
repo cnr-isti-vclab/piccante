@@ -56,7 +56,9 @@ const float C_INV_PI_2          = 0.159154943091895335768883763f;
 const float C_PI_4              = 12.566370614359172953850573533118f;
 //One over PI times 4
 const float C_INV_PI_4          = 0.07957747154594766788444188168626f;
-//PI*PI*2
+//PI * PI
+const float C_PI_SQ             = 9.8696044f;
+//PI * PI * 2
 const float C_PI_2_2            = 19.739208802178717237668981999752f;
 // 1/PI
 const float C_INV_PI            = 0.31830988618379067153776526745f;

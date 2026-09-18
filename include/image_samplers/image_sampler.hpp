@@ -36,9 +36,15 @@ public:
     /**
      * @brief ImageSampler
      */
-    ImageSampler() {}
+    ImageSampler()
+    {
+        SetDirection(0);
+    }
 
-    ~ImageSampler() {}
+    ~ImageSampler()
+    {
+        
+    }
 
     void SetDirection(unsigned int direction)
     {

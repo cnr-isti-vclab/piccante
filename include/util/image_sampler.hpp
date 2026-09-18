@@ -175,7 +175,7 @@ inline float Lanczos(float x, float a)
 
     if(y > 0.0f && y < a) {
         float t = C_PI * x;
-        float d = C_PI_2 * x * x;
+        float d = C_PI_SQ * x * x;
 
         return (a * sinf(t) * sinf(t / a)) / d;
     } else {

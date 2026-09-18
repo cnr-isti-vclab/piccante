@@ -47,9 +47,9 @@ public:
      * @param direction
      */
     ImageSamplerLanczos(float a)
-    {
-        this->a = a;
-        a_i = int(a);
+    {        
+        this->a = MAX(a, 1.0f);
+        a_i = int(this->a);
     }
 
     /**

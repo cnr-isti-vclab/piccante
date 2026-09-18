@@ -38,6 +38,7 @@ public:
     ImageSamplerGaussian()
     {
         pg = NULL;
+        update(1.0f, 0);
     }
 
     /**
@@ -47,7 +48,13 @@ public:
      */
     ImageSamplerGaussian(float sigma, unsigned int direction)
     {
+        pg = NULL;
         update(sigma, direction);
+    }
+    
+    ~ImageSamplerGaussian()
+    {
+        delete pg;
     }
 
     /**
@@ -80,8 +87,9 @@ public:
         int iy = int(y * img->heightf);
 
         for(int i = 0; i < pg->kernelSize ; i++) {
-            int ex = CLAMP(ix + i * dirs[0], img->width);
-            int ey = CLAMP(iy + i * dirs[1], img->height);
+            int offset = i - pg->halfKernelSize;
+            int ex = CLAMP(ix + offset * dirs[0], img->width);
+            int ey = CLAMP(iy + offset * dirs[1], img->height);
 
             int ind = (ey * img->width + ex) * img->channels;
 
