@@ -69,7 +69,7 @@ inline void invBilinear(float A, float dx, float dy, float *out)
     out[3] = out[1] * i_dy;
 
     out[0] = out[0] * dy;
-    out[1] = out[0] * dy;
+    out[1] = out[1] * dy;
 }
 
 /**

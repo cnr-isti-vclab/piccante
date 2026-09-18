@@ -35,8 +35,7 @@ PIC_INLINE void warpSquareCircle(float x, float y, float *xo, float *yo)
 {
     float phi, r;
 
-
-    if(x * x > y * y) {
+    if((x * x) > (y * y)) {
         r = x;
         phi = (C_PI / 4.0f) * (y / x);
     } else {
@@ -55,7 +54,7 @@ PIC_INLINE void warpSquareCircle(float x, float y, float *xo, float *yo)
  */
 PIC_INLINE float warpNormalDistribution(float u0, float u1)
 {
-    return sqrtf(MAX(-2.0f * logf(u0), 0.0f)) * cosf(u1);
+    return sqrtf(MAX(-2.0f * logf(u0), 0.0f)) * cosf(C_PI_2 * u1);
 }
 
 /**
@@ -69,7 +68,7 @@ PIC_INLINE float warpNormalDistribution(float u0, float u1)
 PIC_INLINE float warpGaussianDistribution(float u0, float u1, float mu, float sigma)
 {
     float x = warpNormalDistribution(u0, u1);
-    return (x + mu) * sigma;
+    return (x * sigma) + mu;
 }
 
 } // end namespace pic

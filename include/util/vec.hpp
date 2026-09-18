@@ -262,7 +262,7 @@ public:
     {
         float valMax = getMax();
 
-        for (auto i = 1; i < N; i++) {
+        for (auto i = 0; i < N; i++) {
             if (valMax == this->data[i]) {
                 return i;
             }
@@ -443,7 +443,7 @@ public:
     void operator +=(const T *a)
     {
         for (auto i = 0; i < N; i++) {
-            this->data[i] = a[i];
+            this->data[i] += a[i];
         }
     }
 
@@ -752,7 +752,7 @@ void vecrint(Vec<N, float> &ret)
 {
     printf("\n Values :");
     for(auto i = 0; i < N; i++) {
-        printf("%d ", ret.data[i]);
+        printf("%f ", ret.data[i]);
     }
     printf("\n");
 }

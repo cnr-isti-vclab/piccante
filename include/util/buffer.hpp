@@ -407,8 +407,7 @@ public:
      * @param channels
      * @param frames
      */
-    static void flipV(T *buffer, int width, int height, int channels,
-                                int frames)
+    static void flipV(T *buffer, int width, int height, int channels, int frames)
     {
         int steps = height >> 1;
 
@@ -499,7 +498,7 @@ public:
      * @param height
      * @param channels
      */
-    static void rotate90CCW(T *buffer, int &width, int &height, int channels)
+    static void rotate90CCW(T *buffer, int &width, int &height, int channels, int frames)
     {
         if(buffer==NULL) {
             return;
@@ -507,11 +506,12 @@ public:
 
         if(width == height) { //in place rotation
             #pragma omp parallel for
-            for(int i = 0; i < (height - 2); i++) {
+            for(int i = 0; i < height; i++) {
 
-                for(int j = (i + 1); j < (width - 1); j++) {
+                auto i_width = i * width;
+                for(int j = (i + 1); j < width; j++) {
 
-                    int i0 = (i * width + j) * channels;
+                    int i0 = (i_width + j) * channels;
                     int i1 = (j * width + i) * channels;
 
                     for(int k = 0; k < channels; k++) { //swap
@@ -521,15 +521,19 @@ public:
                     }
                 }
             }
+            
+            flipV(buffer, width, height, channels, frames);
+            
         } else {
             T *tmpBuffer = new T[width * height * channels];
             memcpy(tmpBuffer, buffer, sizeof(T) * width * height * channels);
 
             #pragma omp parallel for
             for(int i = 0; i < height; i++) {
+                auto i_width = i * width ;
                 for(int j = 0; j < width; j++) {
-                    int i0 = (i * width  + j) * channels;
-                    int i1 = ((width-j-1) * height + i) * channels;
+                    int i0 = (i_width + j) * channels;
+                    int i1 = ((width - j - 1) * height + i) * channels;
 
                     for(int k = 0; k < channels; k++) {
                         buffer[i1 + k] = tmpBuffer[i0 + k];

@@ -71,6 +71,7 @@ public:
             this->data = data;
             this->bShallow = bShallow;
         } else {
+            this->bShallow = false;
             this->data = new T[nData];
             memcpy(this->data, data, sizeof(T) * nData);
         }
@@ -120,6 +121,7 @@ public:
     {
         Array<T> *out = new Array<T>(nData);
         memcpy(this->data, data, sizeof(T) * nData);
+        return out;
     }
 
     /**
@@ -244,7 +246,7 @@ public:
      */
     static T norm(float *data, int n)
     {
-        return sqrtf(Array<float>::norm(data, n));
+        return sqrtf(Array<float>::norm_sq(data, n));
     }
 
     /**
@@ -507,7 +509,7 @@ public:
             ret = new T[size];
         }
 
-        for(int i = 1; i < size; i++) {
+        for(int i = 0; i < size; i++) {
             ret[i] = func(data[i]);
         }
 
@@ -627,7 +629,7 @@ public:
 
         int start = low;
         while(low < high) {
-            int mid = low + (high - high) / 2;
+            int mid = low + (high - low) / 2;
 
             if(data[mid] < key) {
                 low = mid + 1;

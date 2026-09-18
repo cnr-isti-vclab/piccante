@@ -47,7 +47,7 @@ protected:
      */
     void InitSimplex(Scalar *x0, uint n)
     {
-        simplex.clear();
+        release();
 
         //first point of simplex is x0
         Scalar *vertex_0 = new Scalar[n];

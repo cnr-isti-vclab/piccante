@@ -118,15 +118,15 @@ public:
         Matrix3x3 ret;
         ret.data[0] = data[0] * mtx.data[0] +  data[1] * mtx.data[3] + data[2] * mtx.data[6];
         ret.data[1] = data[0] * mtx.data[1] +  data[1] * mtx.data[4] + data[2] * mtx.data[7];
-        ret.data[2] = data[0] * mtx.data[2] +  data[1] * mtx.data[6] + data[2] * mtx.data[8];
+        ret.data[2] = data[0] * mtx.data[2] +  data[1] * mtx.data[5] + data[2] * mtx.data[8];
 
         ret.data[3] = data[3] * mtx.data[0] +  data[4] * mtx.data[3] + data[5] * mtx.data[6];
         ret.data[4] = data[3] * mtx.data[1] +  data[4] * mtx.data[4] + data[5] * mtx.data[7];
-        ret.data[5] = data[3] * mtx.data[2] +  data[4] * mtx.data[6] + data[5] * mtx.data[8];
+        ret.data[5] = data[3] * mtx.data[2] +  data[4] * mtx.data[5] + data[5] * mtx.data[8];
 
         ret.data[6] = data[6] * mtx.data[0] +  data[7] * mtx.data[3] + data[8] * mtx.data[6];
         ret.data[7] = data[6] * mtx.data[1] +  data[7] * mtx.data[4] + data[8] * mtx.data[7];
-        ret.data[8] = data[6] * mtx.data[2] +  data[7] * mtx.data[6] + data[8] * mtx.data[8];
+        ret.data[8] = data[6] * mtx.data[2] +  data[7] * mtx.data[5] + data[8] * mtx.data[8];
 
         return ret;
     }
@@ -291,11 +291,11 @@ public:
             ret = new Matrix3x3();
         }
 
-        ret->set(ret);
+        ret->set(this);
 
-        std::swap(ret->data[1], data[3]);
-        std::swap(data[5], data[7]);
-        std::swap(data[2], data[6]);
+        std::swap(ret->data[1], ret->data[3]);
+        std::swap(ret->data[2], ret->data[6]);
+        std::swap(ret->data[5], ret->data[7]);
 
         return ret;
     }

@@ -159,11 +159,11 @@ public:
                 getMean(samples, &mean[index], nDim, tmp);
 
                 //update centers
-                float dist = Arrayf::distanceSq(&centers[index], &mean[index], nDim);
+                T dist = Array<T>::distanceSq(&centers[index], &mean[index], nDim);
 
-                Arrayf::assign(&mean[index], nDim, &centers[index]);
+                Array<T>::assign(&mean[index], nDim, &centers[index]);
 
-                if(dist > 1e-6f) {
+                if(dist > T(1e-6f)) {
                     bNoChanges = false;
                 }
             }

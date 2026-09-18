@@ -64,7 +64,7 @@ inline std::string stdStringRep(std::string str, std::string strSub,
     size_t found = ret.find(strSub);
 
     if(found != std::string::npos) {
-        ret.replace(found, strRep.length(), strRep);
+        ret.replace(found, strSub.length(), strRep);
     }
 
     return ret;
@@ -447,7 +447,7 @@ inline std::string checkPath(std::string name)
         return "";
     }
 
-    if((name.at(0) == '.') && (name.at(0) == '.')) {
+    if((name.at(0) == '.') && (name.at(1) == '.')) {
         #ifdef PIC_WIN32
             char *path = _getcwd(NULL, 0);
         #endif

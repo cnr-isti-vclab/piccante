@@ -237,7 +237,7 @@ public:
      */
     void rotate90CCW()
     {
-        Buffer<float>::rotate90CCW(data, width, height, channels);
+        Buffer<float>::rotate90CCW(data, width, height, channels, frames);
         allocateAux();
     }
 

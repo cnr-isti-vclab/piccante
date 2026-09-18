@@ -33,6 +33,8 @@ protected:
      */
     void precomputeCoefficients()
     {
+        delete[] coeff;
+        
         halfKernelSize = kernelSize >> 1;
         kernelSize = (halfKernelSize << 1) + 1;
         coeff = new float[kernelSize];

@@ -195,7 +195,7 @@ PIC_INLINE void drawPoints(Image *img, std::vector< Eigen::Vector2f > &points, f
 PIC_INLINE void evaluateGaussian(Image *img, float sigma = -1.0f,
                                  bool bNormTerm = false)
 {
-    if(img != NULL) {
+    if(img == NULL) {
         return;
     }
 
@@ -203,12 +203,12 @@ PIC_INLINE void evaluateGaussian(Image *img, float sigma = -1.0f,
         sigma = float(MIN(img->width, img->height)) / 5.0f;
     }
 
-    float sigma2 = (sigma * sigma * 2.0f);
+    float sigma_sq_2 = (sigma * sigma * 2.0f);
 
     int halfWidth  = img->width  >> 1;
     int halfHeight = img->height >> 1;
 
-    float normTerm = bNormTerm ? sigma * sqrtf(C_PI) : 1.0f ;
+    float normTerm = bNormTerm ? sqrtf(2.0f * C_PI) * sigma : 1.0f ;
 
     #pragma omp parallel for
 
@@ -220,7 +220,7 @@ PIC_INLINE void evaluateGaussian(Image *img, float sigma = -1.0f,
             int i_squared = i - halfWidth;
             i_squared = i_squared * i_squared;
 
-            float gaussVal = expf(-float(i_squared + j_squared) / sigma2) / normTerm;
+            float gaussVal = expf(-float(i_squared + j_squared) / sigma_sq_2) / normTerm;
 
             float *tmp_data = (*img)(i, j);
 
