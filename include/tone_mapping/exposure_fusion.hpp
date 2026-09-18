@@ -143,9 +143,16 @@ protected:
         int ind;
         float minV = Arrayf::getMin(minVal, imgOut->channels, ind);
         float maxV = Arrayf::getMax(maxVal, imgOut->channels, ind);
-        *imgOut -= minV;
-        *imgOut /= (maxV- minV);
+        float deltaV = maxV - minV;
+        
+        if (deltaV > 0.0f) {
+            *imgOut -= minV;
+            *imgOut /= (maxV- minV);
+        }
 
+        delete[] minVal;
+        delete[] maxVal;
+        
         imgOut->applyFunction(removeNegative);
 
         return imgOut;

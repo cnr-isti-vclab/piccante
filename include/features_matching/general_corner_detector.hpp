@@ -67,6 +67,9 @@ public:
 
     ~GeneralCornerDetector()
     {
+        if (bLum) {
+            delete lum;
+        }
     }
 
     /**
@@ -103,14 +106,12 @@ public:
 
         imgOut->setZero();
 
-        for(unsigned int i = 0; i < corners->size(); i++) {
+        for(auto i = 0; i < corners->size(); i++) {
             int x = int((*corners)[i][0]);
             int y = int((*corners)[i][1]);
 
             if(bColor) {
                 (*imgOut)(x, y)[0] = 1.0f;
-            } else {
-                (*imgOut)(x, y)[0] = (*corners)[i][2];
             }
         }
 
@@ -208,7 +209,7 @@ public:
 
                 std::vector< int > indices;
                 for(int j = 0; j < n; j++) {
-                    if(j != i) {
+                    if(j == i) {
                         continue;
                     }
 

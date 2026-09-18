@@ -34,7 +34,7 @@ protected:
     float reference_angles_orientation[36];
     float sector_angle_orientation;
 
-    int patchSize, half_patchSize, subPatchSize, subPatchSize_sq, nBin, tot;
+    int patchSize, half_patchSize, subPatchSize, nBin, tot;
 
 public:
 
@@ -59,14 +59,15 @@ public:
         this->thr_weak = thr_weak;
         this->nBin = nBin;
 
-        half_patchSize = patchSize >> 1;
-        this->patchSize = (half_patchSize << 1) + 1;
-        this->subPatchSize = subPatchSize;
+        this->subPatchSize = MAX(subPatchSize, 1);
+        this->patchSize = MAX(patchSize, this->subPatchSize);
 
-        subPatchSize_sq = subPatchSize *  subPatchSize;
-        tot = subPatchSize_sq * nBin;
+        int nSubPatches = this->patchSize / this->subPatchSize;
+        this->patchSize = nSubPatches * this->subPatchSize;
+        half_patchSize = this->patchSize >> 1;
+        tot = (nSubPatches * nSubPatches) * nBin;
 
-        sigma = float(patchSize) * 1.5f;
+        sigma = float(this->patchSize) * 1.5f;
         sigma_sq_2 = sigma * sigma * 2.0f;
 
         reference_angles = delete_vec_s(reference_angles);

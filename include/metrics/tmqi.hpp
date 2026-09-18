@@ -145,9 +145,6 @@ public:
 
         Image img12 = (*L_HDR) * (*L_LDR);
 
-        delete L_HDR;
-        delete L_LDR;
-
         Image mu12 = (*mu1) * (*mu2);
 
         mu1->applyFunction(square);

@@ -56,8 +56,8 @@ protected:
                 int y0 = y + halfBlockSize;
 
 
-                int x_e = MAX((x + blockSize), imgOut->width);
-                int y_e = MAX((y + blockSize), imgOut->height);
+                int x_e = MIN((x + blockSize), imgOut->width);
+                int y_e = MIN((y + blockSize), imgOut->height);
 
                 int dx = 0;
                 int dy = 0;

@@ -86,6 +86,8 @@ protected:
                                       images[0]->data[indexL] * scale[j];
             }
         }
+        
+        delete[] scale;
 
         //NOTE: this is done to have values in [0,1] and not in cd/m^2!
         *imgOut /= Ld_Max;
