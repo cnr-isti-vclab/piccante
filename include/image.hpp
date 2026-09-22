@@ -1540,7 +1540,7 @@ PIC_INLINE float *Image::getMomentsVal(int x0, int y0, int radius, float *ret = 
             float *tmp_data = (*this)(x, y);
 
             for(int l = 0; l < channels; l++) {
-                int l_2 = (l << 1)
+                int l_2 = (l << 1);
                 ret[l_2    ] += j * tmp_data[l];
                 ret[l_2 + 1] += i * tmp_data[l];
             }
