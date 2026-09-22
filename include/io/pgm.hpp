@@ -68,6 +68,11 @@ PIC_INLINE unsigned char *ReadPGM(std::string nameFile, unsigned char *data,
         printf("ERROR ReadPGM: BPP\n");
         return data;
     }
+    
+    if(bpp < 1) {
+        printf("ERROR ReadPGM: BPP\n");
+        return data;
+    }
 
     channels = 1;
     width = int(tmpWidth);

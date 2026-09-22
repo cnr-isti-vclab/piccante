@@ -118,6 +118,12 @@ public:
     Image(Image *imgIn, bool deepCopy);
 
     /**
+     * @brief Image embeds an existing image in the new image.
+     * @param imgIn is the input image to embed.
+     */
+    Image(const Image &imgIn);
+    
+    /**
     * @brief Image loads an Image from a file on the disk.
     * @param nameFile is the file name.
     * @param typeLoad is an option for LDR images only:
@@ -951,7 +957,7 @@ PIC_INLINE Image::Image(Image *imgIn, bool deepCopy = true)
         dataRGBE = imgIn->dataRGBE;
 
     #ifdef PIC_ENABLE_OPEN_EXR
-        dataRGBE = imgIn->dataRGBE;
+        dataEXR = imgIn->dataEXR;
     #endif
 
         notOwned = true;
@@ -962,7 +968,12 @@ PIC_INLINE Image::Image(Image *imgIn, bool deepCopy = true)
 
         allocateAux();
     }
+}
 
+PIC_INLINE Image::Image(const Image &imgIn)
+{
+    setNULL();
+    this->assign(&imgIn);
 }
 
 PIC_INLINE Image::Image(int width, int height, int channels = 3)
@@ -1023,6 +1034,8 @@ PIC_INLINE void Image::release()
         #ifdef PIC_ENABLE_OPEN_EXR
             delete_vec_s(dataEXR);
         #endif
+    } else {
+        setNULL();
     }
 }
 

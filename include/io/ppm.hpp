@@ -64,7 +64,12 @@ PIC_INLINE unsigned char *ReadPPM(std::string nameFile, unsigned char *data,
     ppm_in >> tmpWidth >> tmpHeight >> bpp;
 
     if(bpp > 255) {
-        printf("ERROR ReadPPM: BPP\n");
+        printf("ReadPPM: ERROR ReadPPM: BPP\n");
+        return data;
+    }
+    
+    if(bpp < 1) {
+        printf("ReadPPM: ERROR ReadPPM: BPP\n");
         return data;
     }
 

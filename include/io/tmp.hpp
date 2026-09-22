@@ -69,15 +69,15 @@ PIC_INLINE float *ReadTMP(std::string nameFile, float *data, int &width,
         }
     }
 
-    if(data == NULL) {
-        data = new float[width * height * channels * frames];
-    }
-
     if(bHeader) {
         width    = header.width;
         height   = header.height;
         channels = header.channels;
         frames   = header.frames;
+    }
+
+    if(data == NULL) {
+        data = new float[width * height * channels * frames];
     }
 
     fread(data, sizeof(float), frames * width * height * channels, file);

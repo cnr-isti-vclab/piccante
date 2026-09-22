@@ -386,18 +386,23 @@ public:
         
         int steps = width >> 1;
 
-        #pragma omp parallel for
-        for(int i = 0; i < height; i++) {
-            int ind = i * width;
-
-            for(int j = 0; j < steps; j++) {
-                int i0 = (ind + j) * channels;
-                int i1 = (ind + width - j - 1) * channels;
-
-                for(int k = 0; k < channels; k++) { //swap
-                    T tmp        = buffer[i0 + k];
-                    buffer[i0 + k] = buffer[i1 + k];
-                    buffer[i1 + k] = tmp;
+        int whc = width * height * channels;
+        
+        for(int f = 0; f < frames; f++) {
+            int ind_f = f * whc;
+            #pragma omp parallel for
+            for(int i = 0; i < height; i++) {
+                int ind = ind_f + i * width;
+                
+                for(int j = 0; j < steps; j++) {
+                    int i0 = (ind + j) * channels;
+                    int i1 = (ind + width - j - 1) * channels;
+                    
+                    for(int k = 0; k < channels; k++) { //swap
+                        T tmp        = buffer[i0 + k];
+                        buffer[i0 + k] = buffer[i1 + k];
+                        buffer[i1 + k] = tmp;
+                    }
                 }
             }
         }
@@ -419,19 +424,24 @@ public:
         
         int steps = height >> 1;
 
-        #pragma omp parallel for
-        for(int i = 0; i < steps; i++) {
-            int ind0 = i * width;
-            int ind1 = (height - i - 1) * width;
+        int whc = width * height * channels;
 
-            for(int j = 0; j < width; j++) {
-                int i0 = (ind0 + j) * channels;
-                int i1 = (ind1 + j) * channels;
-
-                for(int k = 0; k < channels; k++) { //swap
-                    T tmp          = buffer[i0 + k];
-                    buffer[i0 + k] = buffer[i1 + k];
-                    buffer[i1 + k] = tmp;
+        for(int f = 0; f < frames; f++) {
+            int ind_f = f * whc;
+            #pragma omp parallel for
+            for(int i = 0; i < steps; i++) {
+                int ind0 = ind_f + i * width;
+                int ind1 = ind_f + (height - i - 1) * width;
+                
+                for(int j = 0; j < width; j++) {
+                    int i0 = (ind0 + j) * channels;
+                    int i1 = (ind1 + j) * channels;
+                    
+                    for(int k = 0; k < channels; k++) { //swap
+                        T tmp          = buffer[i0 + k];
+                        buffer[i0 + k] = buffer[i1 + k];
+                        buffer[i1 + k] = tmp;
+                    }
                 }
             }
         }
