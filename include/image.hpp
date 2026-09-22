@@ -246,7 +246,7 @@ public:
      */
     void rotate90CW()
     {
-        Buffer<float>::rotate90CW(data, width, height, channels);
+        Buffer<float>::rotate90CW(data, width, height, channels, frames);
         allocateAux();
     }
 
@@ -752,7 +752,7 @@ public:
      * @brief operator =
      * @param a
      */
-    void operator =(const Image &a);
+    Image& operator =(const Image &a);
 
     /**
      * @brief operator =
@@ -1270,7 +1270,7 @@ PIC_INLINE float Image::getDynamicRange(bool bRobust = false, float percentile =
 
     if(bRobust) {
         if(percentile <= 0.5f) {
-            percentile = 0.99f;
+            return 0.0f;
         }
 
         float percentile_low = 1.0f - percentile;
@@ -1278,15 +1278,13 @@ PIC_INLINE float Image::getDynamicRange(bool bRobust = false, float percentile =
         float *values = getPercentileVal(percentile_low, NULL, NULL);
         float min_val = values[0];
         float max_val = values[1];
+        
+        delete[] values;
 
         if(min_val > 0.0f) {
             return max_val / min_val;
         } else {
-            if(percentile > 0.5f) {
-                return getDynamicRange(true, percentile * 0.99f);
-            } else {
-                return 0.0f;
-            }
+            return getDynamicRange(true, percentile * 0.99f);
         }
     } else {
         float ret = -1.0f;
@@ -1541,9 +1539,10 @@ PIC_INLINE float *Image::getMomentsVal(int x0, int y0, int radius, float *ret = 
 
             float *tmp_data = (*this)(x, y);
 
-            for(int l = 0; l < channels_2; l += 2) {
-                ret[l    ] += j * tmp_data[l];
-                ret[l + 1] += i * tmp_data[l];
+            for(int l = 0; l < channels; l++) {
+                int l_2 = (l << 1)
+                ret[l_2    ] += j * tmp_data[l];
+                ret[l_2 + 1] += i * tmp_data[l];
             }
         }
     }
@@ -2099,9 +2098,13 @@ PIC_INLINE float* Image::getColorSamples(float *samples,
     return samples;
 }
 
-PIC_INLINE void Image::operator =(const Image &a)
+PIC_INLINE Image& Image::operator =(const Image &a)
 {
-    this->assign(&a);
+    if(this != &a) {
+        this->assign(&a);
+    }
+    
+    return *this;
 }
 
 PIC_INLINE void Image::operator =(const float &a)
@@ -2116,9 +2119,9 @@ PIC_INLINE void Image::operator +=(const float &a)
 
 PIC_INLINE Image Image::operator +(const float &a) const
 {
-    Image *out = this->clone();
-    *out += a;
-    return Image(out, false);
+    Image out(*this);
+    out += a;
+    return out;
 }
 
 PIC_INLINE void Image::operator +=(const Image &a)
@@ -2135,9 +2138,9 @@ PIC_INLINE void Image::operator +=(const Image &a)
 
 PIC_INLINE Image Image::operator +(const Image &a) const
 {
-    Image *out = this->clone();
-    *out += a;
-    return Image(out, false);
+    Image out(*this);
+    out += a;
+    return out;
 }
 
 PIC_INLINE void Image::operator *=(const float &a)
@@ -2147,9 +2150,9 @@ PIC_INLINE void Image::operator *=(const float &a)
 
 PIC_INLINE Image Image::operator *(const float &a) const
 {
-    Image *out = this->clone();
-    *out *= a;
-    return Image(out, false);
+    Image out(*this);
+    out *= a;
+    return out;
 }
 
 PIC_INLINE void Image::operator *=(const Image &a)
@@ -2165,9 +2168,9 @@ PIC_INLINE void Image::operator *=(const Image &a)
 
 PIC_INLINE Image Image::operator *(const Image &a) const
 {
-    Image *out = this->clone();
-    *out *= a;
-    return Image(out, false);
+    Image out(*this);
+    out *= a;
+    return out;
 }
 
 PIC_INLINE void Image::operator -=(const float &a)
@@ -2177,9 +2180,9 @@ PIC_INLINE void Image::operator -=(const float &a)
 
 PIC_INLINE Image Image::operator -(const float &a) const
 {
-    Image *out = this->clone();
-    *out -= a;
-    return Image(out, false);
+    Image out(*this);
+    out -= a;
+    return out;
 }
 
 PIC_INLINE void Image::operator -=(const Image &a)
@@ -2195,9 +2198,9 @@ PIC_INLINE void Image::operator -=(const Image &a)
 
 PIC_INLINE Image Image::operator -(const Image &a) const
 {
-    Image *out = this->clone();
-    *out -= a;
-    return Image(out, false);
+    Image out(*this);
+    out -= a;
+    return out;
 }
 
 PIC_INLINE void Image::operator /=(const float &a)
@@ -2207,9 +2210,9 @@ PIC_INLINE void Image::operator /=(const float &a)
 
 PIC_INLINE Image Image::operator /(const float &a) const
 {
-    Image *out = this->clone();
-    *out /= a;
-    return Image(out, false);
+    Image out(*this);
+    out /= a;
+    return out;
 }
 
 PIC_INLINE void Image::operator /=(const Image &a)
@@ -2225,9 +2228,9 @@ PIC_INLINE void Image::operator /=(const Image &a)
 
 PIC_INLINE Image Image::operator /(const Image &a) const
 {
-    Image *out = this->clone();
-    *out /= a;
-    return Image(out, false);
+    Image out(*this);
+    out /= a;
+    return out;
 }
 
 } // end namespace pic

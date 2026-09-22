@@ -380,6 +380,10 @@ public:
     static void flipH(T *buffer, int width, int height, int channels,
                             int frames)
     {
+        if(buffer == NULL) {
+            return;
+        }
+        
         int steps = width >> 1;
 
         #pragma omp parallel for
@@ -409,6 +413,10 @@ public:
      */
     static void flipV(T *buffer, int width, int height, int channels, int frames)
     {
+        if(buffer == NULL) {
+            return;
+        }
+        
         int steps = height >> 1;
 
         #pragma omp parallel for
@@ -437,9 +445,9 @@ public:
      * @param height
      * @param channels
      */
-    static void rotate90CW(T *buffer, int &width, int &height, int channels)
+    static void rotate90CW(T *buffer, int &width, int &height, int channels, int frames)
     {
-        if(buffer==NULL) {
+        if(buffer == NULL) {
             return;
         }
 

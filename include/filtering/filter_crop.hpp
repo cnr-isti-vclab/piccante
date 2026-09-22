@@ -18,6 +18,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_CROP_HPP
 #define PIC_FILTERING_FILTER_CROP_HPP
 
+#include <climits>
+
 #include "../filtering/filter.hpp"
 #include "../util/vec.hpp"
 
