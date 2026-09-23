@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_ALGORITHMS_RADIAL_BASIS_FUNCTION
 
 #include <math.h>
+#include <cstring>
 
 #include "../util/std_util.hpp"
 

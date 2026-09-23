@@ -282,7 +282,7 @@ public:
      * @return This function return true if the current Image is allocated,
      * otherwise false.
      */
-    bool isValid();
+    bool isValid() const;
 
     /**
      * @brief isSimilarType checks if the current image is similar to img;
@@ -960,6 +960,7 @@ PIC_INLINE Image::Image(Image *imgIn, bool deepCopy = true)
         dataEXR = imgIn->dataEXR;
     #endif
 
+        alpha = imgIn->alpha;
         notOwned = true;
         exposure = imgIn->exposure;
         nameFile = imgIn->nameFile;
@@ -1107,6 +1108,7 @@ PIC_INLINE void Image::assign(const Image *imgIn)
         allocate(imgIn->width, imgIn->height, imgIn->channels, imgIn->frames);
     }
 
+    alpha = imgIn->alpha;
     exposure = imgIn->exposure;
     nameFile = imgIn->nameFile;
     typeLoad = imgIn->typeLoad;
@@ -1162,7 +1164,7 @@ PIC_INLINE bool Image::isSimilarType(const Image *img)
     return ret;
 }
 
-PIC_INLINE bool Image::isValid()
+PIC_INLINE bool Image::isValid() const
 {
     return (width > 0) && (height > 0) && (channels > 0) && (frames > 0) &&
            (data != NULL);
@@ -1607,7 +1609,9 @@ PIC_INLINE float *Image::getVarianceVal(float *meanVal = NULL,
 
     float totf = float(box->Size() - 1);
 
-    Arrayf::div(ret, channels, totf);
+    if(totf > 0.0f) {
+        Arrayf::div(ret, channels, totf);
+    }
 
     if(bDeleteMeanVal) {
         delete[] meanVal;
@@ -1662,7 +1666,9 @@ PIC_INLINE float *Image::getCovMtxVal(float *meanVal, BBox *box, float *ret)
 
     float totf = float(box->Size() - 1);
 
-    Arrayf::div(ret, n, totf);
+    if(totf > 0.0f) {
+        Arrayf::div(ret, n, totf);
+    }
 
     if(bMeanValAllocated) {
         delete[] meanVal;
@@ -2092,6 +2098,11 @@ PIC_INLINE float* Image::getColorSamples(float *samples,
 
     int nTot = nPixels();
     nSamples = int(ceilf(float(nTot) * percentage));
+    
+    if (nSamples < 1) {
+        nSamples = -1;
+        return samples;
+    }
 
     if(samples == NULL) {
         samples = new float[nSamples * channels];

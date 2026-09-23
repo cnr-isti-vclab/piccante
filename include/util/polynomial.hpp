@@ -19,6 +19,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_UTIL_POLYNOMIAL_HPP
 
 #include <vector>
+#include <string>
+#include <cmath>
+#include <cstddef>
 
 #include "../base.hpp"
 

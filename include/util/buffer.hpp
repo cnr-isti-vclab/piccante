@@ -389,14 +389,14 @@ public:
         int whc = width * height * channels;
         
         for(int f = 0; f < frames; f++) {
-            int ind_f = f * whc;
+            int stride_frame = f * whc;
             #pragma omp parallel for
             for(int i = 0; i < height; i++) {
-                int ind = ind_f + i * width;
+                int ind = i * width;
                 
                 for(int j = 0; j < steps; j++) {
-                    int i0 = (ind + j) * channels;
-                    int i1 = (ind + width - j - 1) * channels;
+                    int i0 = stride_frame + (ind + j) * channels;
+                    int i1 = stride_frame + (ind + width - j - 1) * channels;
                     
                     for(int k = 0; k < channels; k++) { //swap
                         T tmp        = buffer[i0 + k];
@@ -427,15 +427,15 @@ public:
         int whc = width * height * channels;
 
         for(int f = 0; f < frames; f++) {
-            int ind_f = f * whc;
+            int stride_frame = f * whc;
             #pragma omp parallel for
             for(int i = 0; i < steps; i++) {
-                int ind0 = ind_f + i * width;
-                int ind1 = ind_f + (height - i - 1) * width;
+                int ind0 = i * width;
+                int ind1 = (height - i - 1) * width;
                 
                 for(int j = 0; j < width; j++) {
-                    int i0 = (ind0 + j) * channels;
-                    int i1 = (ind1 + j) * channels;
+                    int i0 = stride_frame + (ind0 + j) * channels;
+                    int i1 = stride_frame + (ind1 + j) * channels;
                     
                     for(int k = 0; k < channels; k++) { //swap
                         T tmp          = buffer[i0 + k];

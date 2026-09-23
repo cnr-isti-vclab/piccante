@@ -18,6 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_IO_TGA_HPP
 #define PIC_IO_TGA_HPP
 
+#include <fstream>
 #include <stdio.h>
 #include <string>
 #include <iostream>

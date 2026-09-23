@@ -19,6 +19,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_UTIL_INDEXED_ARRAY_HPP
 
 #include <vector>
+#include <algorithm>
+#include <cfloat>
 
 #include "../util/math.hpp"
 

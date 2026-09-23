@@ -63,8 +63,7 @@ PIC_INLINE float *ReadTMP(std::string nameFile, float *data, int &width,
     if(bHeader) {
         fread(&header, sizeof(TMP_IMG_HEADER), 1, file);
 
-        if(header.channels < 1 && header.frames < 1 && header.height < 1 &&
-           header.width < 1) { //invalid image!
+        if((header.channels < 1) || (header.frames < 1) || (header.height < 1) || (header.width < 1)) { //invalid image!
             return NULL;
         }
     }

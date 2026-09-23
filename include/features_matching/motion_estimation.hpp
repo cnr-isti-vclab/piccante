@@ -19,8 +19,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_FEATURES_MATCHING_MOTION_ESTIMATION_HPP
 
 #include <functional>
+#include <cfloat>
 
 #include "../image.hpp"
+#include "../util/tile_list.hpp"
 #include "../util/std_util.hpp"
 #include "../features_matching/patch_comp.hpp"
 

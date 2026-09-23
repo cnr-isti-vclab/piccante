@@ -19,6 +19,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_ALGORITHMS_QUADTREE_HPP
 
 #include <set>
+#include<cmath>
+#include<cstddef>
 
 namespace pic {
 
