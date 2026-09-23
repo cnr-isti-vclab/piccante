@@ -1097,6 +1097,10 @@ PIC_INLINE void Image::assign(const Image *imgIn)
     if(imgIn == NULL) {
         return;
     }
+    
+    if(!imgIn->isValid()) {
+        return;
+    }
 
     if(!isSimilarType(imgIn)) {
         release();
