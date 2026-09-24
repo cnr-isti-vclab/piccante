@@ -643,6 +643,10 @@ public:
             ret.push_back(fstop);
 
         }
+        
+        if (ret.empty()) {
+            ret.push_back(0.0f);
+        }
 
         return ret;
     }

@@ -91,7 +91,11 @@ PIC_INLINE float findBestExposureMean(Image *img, bool bMedian = false)
         lum->getMeanVal(NULL, &lum_mean);
     }
 
-    float fstop = -log2f(lum_mean) - 1.0f;
+    float fstop = 0.0f;
+    
+    if (lum_mean > 0.0f) {
+        fstop = -log2f(lum_mean) - 1.0f;
+    }
 
     if(img->channels != 1) {
         delete lum;

@@ -87,7 +87,10 @@ protected:
             float log_L_w = logf(L_w + epsilon);
             float Ld = expf(delta_log_Ld * Arrayf::interp(x, PcumNorm, nBin, log_L_w) + log_LdMin) - epsilon;
 
-            float scale = (MAX(Ld, 0.0f) - LdMin) / (delta_Ld * L_w);
+            float scale = 0.0f;            
+            if ((delta_Ld > 0.0f) && (L_w > epsilon)) {
+                scale = (MAX(Ld, 0.0f) - LdMin) / (delta_Ld * L_w);
+            }
             scale = MAX(scale, 0.0f);
 
             int index = i * imgOut->channels;
@@ -190,7 +193,7 @@ public:
         this->LdMax = LdMax > 0.0f ? LdMax : 100.0f;
         this->LdMin = LdMin > 0.0f ? LdMin : 1.0f;
 
-        if(this->LdMin > this->LdMax) {
+        if(this->LdMin >= this->LdMax) {
             LdMin = 1.0f;
             LdMax = 100.0f;
         }

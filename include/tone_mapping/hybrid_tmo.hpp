@@ -55,6 +55,16 @@ public:
         Ld_Max = 100.0f;
         b = 0.95f;
     }
+    
+    ~HybridTMO()
+    {
+        delete imgDrago;
+        delete imgReinhard;
+        delete seg_map;
+        delete pyrA;
+        delete pyrB;
+        delete pyrWeight;
+    }
 
     /**
      * @brief ReinhardApprox
@@ -132,12 +142,12 @@ public:
 
         switch(value) {
         case 0: {
-            fltDragoTMO.Process(Single(imgIn), imgOut);
+            imgOut = fltDragoTMO.Process(Single(imgIn), imgOut);
         }
         break;
 
         case 1: {
-            fltReinhardTMO.Process(Single(imgIn), imgOut);
+            imgOut = fltReinhardTMO.Process(Single(imgIn), imgOut);
         }
         break;
 
@@ -169,7 +179,7 @@ public:
 
             //blend
             pyrA->blend(pyrB, pyrWeight);
-            pyrA->reconstruct(imgOut);
+            imgOut = pyrA->reconstruct(imgOut);
         }
         break;
         }

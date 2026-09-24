@@ -135,6 +135,8 @@ protected:
             *tmp *= *images[1];
 
             *imgOut += *tmp;
+            
+            delete tmp;
         }
 
         *imgOut /= *images[2];

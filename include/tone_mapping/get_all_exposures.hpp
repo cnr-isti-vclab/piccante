@@ -38,7 +38,14 @@ namespace pic {
  */
 PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
 {
+    minFstop = 0;
+    maxFstop = 0;
+    
     if(imgIn == NULL) {
+        return;
+    }
+    
+    if(!imgIn->isValid()) {
         return;
     }
 
@@ -54,23 +61,33 @@ PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
 
     IntCoord coord;
     IndexedArray<float>::findSimple(img_lum->data, nData, IndexedArray<float>::bFuncNotNeg, coord);
+    
+    if (coord.empty()) {
+        if(imgIn->channels != 1) {
+            delete img_lum;
+        }
+        
+        return;
+    }
 
     float commonMin = IndexedArray<float>::min(img_lum->data, coord);
     float commonMax = IndexedArray<float>::max(img_lum->data, coord);
 
-    float tminFstop = log2f(commonMin);
-    float tmaxFstop = log2f(commonMax);
-
-    minFstop = int(lround(tminFstop));
-    maxFstop = int(lround(tmaxFstop));
-
-    int halfFstops = (maxFstop - minFstop + 1) >> 1;
-    minFstop = -halfFstops + 1;
-    maxFstop =  halfFstops - 1;
-
-    if(minFstop == maxFstop) {
-        minFstop--;
-        maxFstop++;
+    if ((commonMin > 0.0f) && (commonMax > 0.0f)) {
+        float tminFstop = log2f(commonMin);
+        float tmaxFstop = log2f(commonMax);
+        
+        minFstop = int(lround(tminFstop));
+        maxFstop = int(lround(tmaxFstop));
+        
+        int halfFstops = (maxFstop - minFstop + 1) >> 1;
+        minFstop = -halfFstops + 1;
+        maxFstop =  halfFstops - 1;
+        
+        if(minFstop == maxFstop) {
+            minFstop--;
+            maxFstop++;
+        }
     }
 
     if(imgIn->channels != 1) {
