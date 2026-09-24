@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_UTIL_PRECOMPUTED_GAUSSIAN_HPP
 #define PIC_UTIL_PRECOMPUTED_GAUSSIAN_HPP
 
-namespace pic {
-
 #include <math.h>
 
 #include "../util/array.hpp"
+
+namespace pic {
 
 /**
  * @brief The PrecomputedGaussian class
@@ -96,17 +96,19 @@ public:
      */
     void calculateKernel(float sigma, int kernelSize = -1)
     {
-        this->sigma = sigma;
-
-        //the sigma for the size of the kernel
-        if(kernelSize < 3) {
-            this->kernelSize = PrecomputedGaussian::getKernelSize(sigma);
-        } else {
-            this->kernelSize = kernelSize;
+        if (sigma > 0.0f) {
+            this->sigma = sigma;
+            
+            //the sigma for the size of the kernel
+            if(kernelSize < 3) {
+                this->kernelSize = PrecomputedGaussian::getKernelSize(sigma);
+            } else {
+                this->kernelSize = kernelSize;
+            }
+            
+            //precompute Gaussian coefficients
+            precomputeCoefficients();
         }
-
-        //precompute Gaussian coefficients
-        precomputeCoefficients();
     }
 
     /**
@@ -116,8 +118,12 @@ public:
      */
     static int getKernelSize(float sigma)
     {
-        int kernelSize = int(ceilf(sigma * 5.0f));
-        return (kernelSize > 3) ? kernelSize : 3;
+        if (sigma > 0.0f) {
+            int kernelSize = int(ceilf(sigma * 5.0f));
+            return (kernelSize > 3) ? kernelSize : 3;
+        } else {
+            return -1;
+        }
     }
 };
 

@@ -20,6 +20,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #include "../colors/rgbe.hpp"
 #include "../base.hpp"

@@ -20,6 +20,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 #include <math.h>
+#include <cstring>
+
+#include "../util/math.hpp"
 
 namespace pic {
 
@@ -106,7 +109,7 @@ public:
      */
     void release()
     {
-        if(nData > 0 && data != NULL && !bShallow) {
+        if((nData > 0) && (data != NULL) && (!bShallow)) {
             delete[] data;
             data = NULL;
             nData = -1;
@@ -120,7 +123,7 @@ public:
     Array<T> *clone()
     {
         Array<T> *out = new Array<T>(nData);
-        memcpy(this->data, data, sizeof(T) * nData);
+        memcpy(out->data, this->data, sizeof(T) * nData);
         return out;
     }
 

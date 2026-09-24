@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include <cfloat>
 
 #include "../base.hpp"
 

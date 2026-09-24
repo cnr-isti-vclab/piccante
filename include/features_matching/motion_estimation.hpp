@@ -171,7 +171,7 @@ public:
         TileList lst(blockSize, width, height);
 
         //create threads
-        int numCores = std::thread::hardware_concurrency();
+        int numCores = MAX(1, std::thread::hardware_concurrency());
 
         std::thread **thrd = new std::thread*[numCores];
 
@@ -184,6 +184,11 @@ public:
         for(int i = 0; i < numCores; i++) {
             thrd[i]->join();
         }
+        
+        for(int i = 0; i < numCores; i++) {
+            delete thrd[i];
+        }
+        delete[] thrd;
 
         return imgOut;
     }

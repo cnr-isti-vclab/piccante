@@ -2100,7 +2100,7 @@ PIC_INLINE float* Image::getColorSamples(float *samples,
     nSamples = int(ceilf(float(nTot) * percentage));
     
     if (nSamples < 1) {
-        nSamples = -1;
+        nSamples = 0;
         return samples;
     }
 

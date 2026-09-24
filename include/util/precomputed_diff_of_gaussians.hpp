@@ -82,7 +82,7 @@ public:
      */
     PrecomputedDiffOfGaussians(float sigma1, float sigma2)
     {
-
+        coeff = NULL;
         calculateKernel(sigma1, sigma2);
     }
 
