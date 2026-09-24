@@ -90,11 +90,11 @@ public:
      */
     static Image* getUniformGrid(int sampleX, int sampleY)
     {
-        if(sampleX < 1) {
+        if(sampleX < 2) {
             sampleX = 5;
         }
 
-        if(sampleY < 1) {
+        if(sampleY < 2) {
             sampleY = 5;
         }
 

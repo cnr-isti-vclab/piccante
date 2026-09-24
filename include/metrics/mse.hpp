@@ -66,13 +66,13 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, bool bLargeDifferences = false, ME
 
         double delta = double(o_val - c_val);
 
-        if(delta <= largeDifferences) {
+        if(std::isfinite(delta) && (std::fabs(delta) <= largeDifferences)) {
             acc += delta * delta;
             count++;
         }
     }
 
-    return acc / double(count);
+    return (count > 0) ? acc / double(count) : -1.0;
 }
 
 /**

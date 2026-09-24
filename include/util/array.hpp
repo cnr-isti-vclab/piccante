@@ -160,6 +160,10 @@ public:
      */
     static T *genRange(T minVal, T step, T maxVal, T *ret, int &n)
     {
+        if (step == T(0)) {
+            return ret;
+        }
+        
         n = int((maxVal - minVal) / step) + 1;
 
         if(ret == NULL) {

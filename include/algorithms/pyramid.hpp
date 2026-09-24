@@ -164,7 +164,11 @@ public:
      */
     Image *get(int index)
     {
-        return stack[index % stack.size()];
+        if (!stack.empty()) {
+            return stack[index % stack.size()];
+        } else {
+            return NULL;
+        }
     }
 
     /**

@@ -64,13 +64,13 @@ PIC_INLINE double MAE(Image *ori, Image *cmp, bool bLargeDifferences = false, ME
 
         double delta = fabs(o_val - c_val);
 
-        if(delta < largeDifferences) {
+        if(std:fabs(delta) < largeDifferences) {
             acc += delta;
             count++;
         }
     }
 
-    return acc / double(count);
+    return (count > 0) ? acc / double(count) : -3.0;
 }
 
 } // end namespace pic

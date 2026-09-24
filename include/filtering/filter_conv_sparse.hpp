@@ -51,12 +51,12 @@ public:
     {
         float sum = 0.0f;
         for(int i = 0; i < kernel.size(); i++) {
-            sum += kernel[i].value;
+            sum += data[i].value;
         }
 
         if(sum > 0.0f) {
             for(int i = 0; i < kernel.size(); i++) {
-                kernel[i].valu /= sum;
+                data[i].value /= sum;
             }
         }
     }

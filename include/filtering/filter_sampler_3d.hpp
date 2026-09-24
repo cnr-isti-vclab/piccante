@@ -88,18 +88,22 @@ PIC_INLINE void FilterSampler3D::ProcessBBox(Image *dst, ImageVec src, BBox *box
 {
     Image *source = src[0];
 
+    float f1f = float(MAX(box->frames - 1, 1));
+    float h1f = float(MAX(box->height - 1, 1));
+    float w1f = float(MAX(box->width  - 1, 1));
+    
     for(int p = box->z0; p < box->z1; p++) {
-        float t = float(p) / float(box->frames - 1);
+        float t = float(p) / f1f;
 
         for(int j = box->y0; j < box->y1; j++) {
-            float y = float(j) / float(box->height - 1);
+            float y = float(j) / h1f;
 
             for(int i = box->x0; i < box->x1; i++) {
-                float x = float(i) / float(box->width - 1);
+                float x = float(i) / w1f;
 
-                int c = p * source->tstride + j * source->ystride + i * source->xstride;
+                float *out = (*dst) (i, j, p);
 
-                isb->SampleImage(source, x, y, t, &dst->data[c]);
+                isb->SampleImage(source, x, y, t, out);
             }
         }
     }

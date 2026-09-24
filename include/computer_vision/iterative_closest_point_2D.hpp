@@ -252,8 +252,12 @@ PIC_INLINE ICP2DTransform estimateRotatioMatrixAndTranslation(std::vector< Eigen
             n++;
         }
     }
+    
+    if (n > 0) {
+        delete[] ind;
+        return ret;
+    }
     c0 /= float(n);
-
 
     //compute R
     Eigen::Matrix2f H;

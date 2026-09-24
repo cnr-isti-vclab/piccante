@@ -764,7 +764,7 @@ public:
 
                     float delta = 0.0f;
                     int count   = 0;
-                    for (int m=0; m<256; m++) {
+                    for (int m = 0; m < 256; m++) {
                         if( fun[m] != 0.0f ) {
                             float diff = fun[m] - funPrev[m];
                             delta += diff * diff;
@@ -772,7 +772,12 @@ public:
                             count++;
                         }
                     }
-                    delta /= count;
+                    
+                    if (count > 0) {
+                        delta /= count;
+                    } else {
+                        break;
+                    }
 
                     if (delta < MaxDelta) {
                         break;
@@ -788,10 +793,12 @@ public:
             int ind;
             maxV = std::max(Arrayf::getMax(this->icrf[ch], 256, ind), maxV);
         }
-
-        for (int ch=0; ch<channels; ch++) {
-            Buffer<float>::div(this->icrf[ch], 256, maxV);
-            this->icrf[ch][255] = 1.0f;
+        
+        if ((maxV > 0.0f) && std::isfinite(maxV)) {
+            for (int ch=0; ch<channels; ch++) {
+                Buffer<float>::div(this->icrf[ch], 256, maxV);
+                this->icrf[ch][255] = 1.0f;
+            }
         }
 
         // clean quantized stack

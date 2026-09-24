@@ -207,13 +207,16 @@ public:
             dataAcc = getMeanRAWIterative(&imgRAW, dataAcc, i == 0);
         }
 
-        RAW<T> *imgOut = imgRAW.copy();
-
-        for(int i = 0; i < imgOut->nData; i++) {
-            imgOut->data[i] = dataAcc[i] / vec.size();
+        if (dataAcc != NULL) {
+            RAW<T> *imgOut = imgRAW.copy();
+            
+            for(int i = 0; i < imgOut->nData; i++) {
+                imgOut->data[i] = dataAcc[i] / vec.size();
+            }
+            return imgOut;
         }
-
-        return imgOut;
+        
+        return NULL;
     }
 
     /**

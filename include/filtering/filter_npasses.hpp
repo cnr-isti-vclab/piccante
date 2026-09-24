@@ -152,8 +152,12 @@ PIC_INLINE void FilterNPasses::release()
 
 PIC_INLINE Filter* FilterNPasses::getFilter(int i)
 {
-    int j = i % filters.size();
-    return filters[j];
+    if (!filters.empty()) {
+        int j = i % filters.size();
+        return filters[j];
+    } else {
+        return NULL;
+    }
 }
 
 PIC_INLINE int FilterNPasses::getIterations()

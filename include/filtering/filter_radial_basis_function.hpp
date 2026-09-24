@@ -18,11 +18,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_FILTERING_FILTER_RADIAL_BASIS_FUNCTION
 #define PIC_FILTERING_FILTER_RADIAL_BASIS_FUNCTION
 
-namespace pic {
-
 #include "../algorithms/radial_basis_function.hpp"
 
 #include "../filtering/filter.hpp"
+
+namespace pic {
 
 /**
  * @brief The FilterRadialBasisFunction class
