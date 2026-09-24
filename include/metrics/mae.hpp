@@ -64,7 +64,7 @@ PIC_INLINE double MAE(Image *ori, Image *cmp, bool bLargeDifferences = false, ME
 
         double delta = fabs(o_val - c_val);
 
-        if(std:fabs(delta) < largeDifferences) {
+        if(std::fabs(delta) < largeDifferences) {
             acc += delta;
             count++;
         }
