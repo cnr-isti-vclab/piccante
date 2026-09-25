@@ -82,7 +82,7 @@ protected:
     {
         int n = int(imgIn.size());
 
-        if(n < 2 || !ImageVecCheck(imgIn, -1)) {
+        if(n < 2 || !ImageVecCheck(imgIn, -1) || ImageVecCheckSimilarType(imgIn)) {
             return imgOut;
         }
 
@@ -122,7 +122,7 @@ protected:
 
             images[0]->getMinVal(NULL, &min);
             images[0]->getMaxVal(NULL, &max);
-            float sigma_r = K2 * (max - min);
+            float sigma_r = MAX(K2 * (max - min), 1e-6f);
 
             images[1] = FilterBilateral2DG::execute(images[0], images[1], sigma_s, sigma_r);
             *images[1] -= *images[0];

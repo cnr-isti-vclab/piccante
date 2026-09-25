@@ -61,4 +61,3 @@ PIC_INLINE ImageGLVec getAllExposuresImagesGL(ImageGL *imgIn, float gamma = 2.2f
 } // end namespace pic
 
 #endif /* PIC_GL_TONE_MAPPING_GET_ALL_EXPOSURES_HPP */
-

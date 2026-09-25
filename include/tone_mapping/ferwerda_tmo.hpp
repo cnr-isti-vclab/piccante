@@ -53,7 +53,7 @@ protected:
         if(Lw_a < 0.0f) {
             float maxVal;
             images[0]->getMaxVal(NULL, &maxVal);
-            Lw_a = maxVal / 2.0f;
+            Lw_a = MAX(maxVal / 2.0f, 1e-6f);
         }
 
         float mC = Tp(Ld_a) / Tp(Lw_a);
@@ -124,7 +124,7 @@ public:
     {
         this->Ld_Max = Ld_Max > 0.0f ? Ld_Max : 100.0f;
         this->Ld_a = Ld_a > 0.0f ? Ld_a : (this->Ld_Max / 2.0f);
-        this->Lw_a = Lw_a;
+        this->Lw_a = MAX(Lw_a, 1e-6f);
     }
 
     /**

@@ -61,7 +61,7 @@ public:
      */
     void update(float gamma, float fstop)
     {
-        this->gamma = 1.0f / gamma;
+        this->gamma = gamma > 0.0f ? (1.0f / gamma) : (1.0f / 2.2f);
         this->fstop = fstop;
         exposure = powf(2.0f, fstop);
     }

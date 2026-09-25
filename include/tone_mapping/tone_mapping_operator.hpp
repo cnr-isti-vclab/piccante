@@ -61,13 +61,22 @@ public:
     {
 
     }
-
+    
+    ~ToneMappingOperator()
+    {
+        stdVectorClear(images);
+    }
+    
     /**
      * @brief release
      */
     void release()
     {
-        stdVectorClear<Image>(images);
+        for(uint i = 0; i < images.size(); i++) {
+            delete images[i];
+            images[i] = NULL;
+        }
+        
         releaseAux();
     }
 
@@ -77,6 +86,14 @@ public:
      */
     void updateImage(Image *imgIn)
     {
+        if(imgIn == NULL) {
+            return;
+        }
+        
+        if(!imgIn->isValid()) {
+            return;
+        }
+        
         bool bRelease = false;
         for(uint i = 0; i < images.size(); i++) {
             if(images[i] != NULL) {
@@ -107,8 +124,11 @@ public:
         float viewAngleWidth  = 2.0f * atanf(imgIn->width / maxCoordf);
         float viewAngleHeight = 2.0f * atanf(imgIn->height / maxCoordf);
 
-        fScaleX = int((2.0f * tanf(viewAngleWidth / 2.0f) / 0.01745f));
+        fScaleX = int((2.0f * tanf(viewAngleWidth  / 2.0f) / 0.01745f));
         fScaleY = int((2.0f * tanf(viewAngleHeight / 2.0f) / 0.01745f));
+        
+        fScaleX = MAX(fScaleX, 1);
+        fScaleY = MAX(fScaleY, 1);
     }
 
     /**

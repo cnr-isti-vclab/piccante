@@ -602,6 +602,11 @@ public:
             return ret;
         }
 
+        if((nBin < 2) || (deltaMaxMin <= 1e-6f)) {
+            ret.push_back(0.0f);
+            return ret;
+        }
+        
         float dMM = deltaMaxMin / nBinf;
 
         int removingBins = int(float(nBits) /dMM + overlap);

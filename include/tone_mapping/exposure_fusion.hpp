@@ -85,7 +85,7 @@ protected:
     {
         uint n = uint(imgIn.size());
 
-        if(n < 2 || !ImageVecCheck(imgIn, -1)) {
+        if(n < 2 || !ImageVecCheck(imgIn, -1) || !ImageVecCheckSimilarType(imgIn)) {
             return imgOut;
         }
 

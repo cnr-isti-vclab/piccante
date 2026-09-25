@@ -142,6 +142,11 @@ public:
         images.push_back(NULL);
         update(alpha, whitePoint);
     }
+    
+    ~LischinskiTMO()
+    {
+        release();
+    }
 
     /**
      * @brief update

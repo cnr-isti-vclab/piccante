@@ -35,6 +35,7 @@ namespace pic {
  * @param imgIn is an image.
  * @param minFstop is the mininum f-stop of imgIn, output.
  * @param maxFstop is the maximum f-stop of imgIn, output.
+ * @param frame the current frame
  */
 PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
 {
@@ -63,10 +64,12 @@ PIC_INLINE void getMinMaxFstops(Image *imgIn, int &minFstop, int &maxFstop)
     IndexedArray<float>::findSimple(img_lum->data, nData, IndexedArray<float>::bFuncNotNeg, coord);
     
     if (coord.empty()) {
+        minFstop = 0;
+        maxFstop = 0;
+        
         if(imgIn->channels != 1) {
             delete img_lum;
         }
-        
         return;
     }
 
@@ -160,6 +163,10 @@ PIC_INLINE std::vector<float> getAllExposures(Image *imgIn) {
  */
 PIC_INLINE ImageVec getAllExposuresImages(Image *imgIn, std::vector<float> &fstops, float gamma = 2.2f)
 {
+    if(gamma <= 0.0f) {
+        gamma = 1.0f;
+    }
+    
     ImageVec ret;
     FilterSimpleTMO flt(gamma, 0.0f);
 

@@ -71,7 +71,7 @@ public:
 
     ~FilterLuminance()
     {
-        weights = delete_s(weights);
+        weights = delete_vec_s(weights);
     }
 
     /**
