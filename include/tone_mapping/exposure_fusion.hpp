@@ -176,8 +176,7 @@ public:
      * @param wE
      * @param wS
      */
-    ExposureFusion(float wC = 1.0f, float wE = 1.0f,
-                   float wS = 1.0f)
+    ExposureFusion(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
     {
         pW = NULL;
         pI = NULL;
@@ -200,8 +199,7 @@ public:
      * @param wE
      * @param wS
      */
-    void update(float wC = 1.0f, float wE = 1.0f,
-                float wS = 1.0f)
+    void update(float wC = 1.0f, float wE = 1.0f, float wS = 1.0f)
     {
         flt_weights.update(wC, wE, wS);
     }

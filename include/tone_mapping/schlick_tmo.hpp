@@ -136,7 +136,7 @@ public:
         this->k = CLAMPi(k, 0.0f, 1.0f);
         this->nBit = nBit < 1 ? 8 : nBit;
         this->p = p < 1.0f ? 200.0f : p;
-        this->L0 = L0 < 0.0f ? 1.0f : L0;
+        this->L0 = L0 > 0.0f ? L0 : 1.0f;
     }
 
     /**

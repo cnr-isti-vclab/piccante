@@ -163,11 +163,20 @@ PIC_INLINE std::vector<float> getAllExposures(Image *imgIn) {
  */
 PIC_INLINE ImageVec getAllExposuresImages(Image *imgIn, std::vector<float> &fstops, float gamma = 2.2f)
 {
+    ImageVec ret;
+
+    if (imgIn == NULL) {
+        return ret;
+    }
+    
+    if (!imgIn->isValid()) {
+        return ret;
+    }
+
     if(gamma <= 0.0f) {
         gamma = 1.0f;
     }
     
-    ImageVec ret;
     FilterSimpleTMO flt(gamma, 0.0f);
 
     ImageVec input = Single(imgIn);

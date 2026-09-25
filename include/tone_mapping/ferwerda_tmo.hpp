@@ -124,7 +124,7 @@ public:
     {
         this->Ld_Max = Ld_Max > 0.0f ? Ld_Max : 100.0f;
         this->Ld_a = Ld_a > 0.0f ? Ld_a : (this->Ld_Max / 2.0f);
-        this->Lw_a = MAX(Lw_a, 1e-6f);
+        this->Lw_a = Lw_a;
     }
 
     /**
@@ -185,8 +185,12 @@ public:
      */
     static float WalravenValetonK(float Lw_a, float sigma = 100.0f)
     {
-        float k = (sigma - Lw_a / 4.0f) / (sigma + Lw_a);
-        return (k > 0.0f) ?  k : 0.0f;
+        if (Lw_a > 0.0f) {
+            float k = (sigma - Lw_a / 4.0f) / (sigma + Lw_a);
+            return (k > 0.0f) ?  k : 0.0f;
+        } else {
+            return 0.0f;
+        }
     }
 
     /**

@@ -105,7 +105,7 @@ public:
 
         //long t0 = timeGetTime();
 
-        imgOut = filter.Process(Single(imgIn), NULL); //Filtering
+        imgOut = filter.Process(Single(imgIn), imgOut); //Filtering
 
         //long t1 = timeGetTime();
         //printf("Bilateral Grid Filter time: %f\n", float(t1 - t0) / 1000.0f);

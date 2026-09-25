@@ -103,9 +103,9 @@ public:
         mu = 0.5f;
         sigma_sq_2 = 2.0f * sigma * sigma;
 
-        this->wC = wC > 0.0f ? MIN(wC, 1.0f) : 1.0f;
-        this->wE = wE > 0.0f ? MIN(wE, 1.0f) : 1.0f;
-        this->wS = wS > 0.0f ? MIN(wS, 1.0f) : 1.0f;
+        this->wC = CLAMPi(wC, 0.0f, 1.0f);
+        this->wE = CLAMPi(wE, 0.0f, 1.0f);
+        this->wS = CLAMPi(wS, 0.0f, 1.0f);
     }
 };
 

@@ -205,7 +205,7 @@ public:
         this->phi = phi;
         this->sig_mode = sig_mode;
 
-        flt_sigmoid.update(SIG_TMO, this->alpha, this->whitePoint, -1.0f, false);
+        flt_sigmoid.update(this->sig_mode, this->alpha, this->whitePoint, -1.0f, false);
     }
 
     /**

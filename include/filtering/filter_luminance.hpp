@@ -45,14 +45,16 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        for(int j = box->y0; j < box->y1; j++) {
-
-            for(int i = box->x0; i < box->x1; i++) {
-
-                float *data_src = (*src[0])(i, j);
-                float *data_dst = (*dst)(i, j);
-
-                data_dst[0] = Arrayf::dot(data_src, weights, src[0]->channels);
+        for(int k = box->z0; k < box->z1; k++) {
+            for(int j = box->y0; j < box->y1; j++) {
+                
+                for(int i = box->x0; i < box->x1; i++) {
+                    
+                    float *data_src = (*src[0])(i, j, k);
+                    float *data_dst = (*dst)(i, j, k);
+                    
+                    data_dst[0] = Arrayf::dot(data_src, weights, src[0]->channels);
+                }
             }
         }
     }
