@@ -98,8 +98,9 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 
         return -1.0;
     }
     
+    float invGamma;
     if(gamma > 0.0f) {
-        float invGamma = 1.0f / gamma;
+        invGamma = 1.0f / gamma;
     } else {
         return -3.0;
     }
