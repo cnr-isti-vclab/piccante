@@ -461,42 +461,50 @@ public:
             return;
         }
 
+        int stride_frame = width * height * channels;
+
         if(width == height) { //in place rotation
-          //  #pragma omp parallel for
             int n = width;
-            for(int i = 0; i < n/2; i++) {
-                int i_n = n - i  - 1 ;
-
-                for(int j = i; j < (n - i - 1); j++) {
-                    int j_n = n - j  - 1 ;
-
-                    int i0 = (i   * n + j  ) * channels;
-                    int i1 = (j_n * n + i  ) * channels;
-                    int i2 = (i_n * n + j_n) * channels;
-                    int i3 = (j   * n + i_n) * channels;
-
-
-                    for(int k = 0; k < channels; k++) { //swap
-                        T tmp          = buffer[i0 + k];
-                        buffer[i0 + k] = buffer[i1 + k];
-                        buffer[i1 + k] = buffer[i2 + k];
-                        buffer[i2 + k] = buffer[i3 + k];
-                        buffer[i3 + k] = tmp;
+            for(int l = 0; l < frames; l++) {
+                int stride = stride_frame * l;
+                #pragma omp parallel for
+                for(int i = 0; i < n/2; i++) {
+                    int i_n = n - i  - 1 ;
+                    
+                    for(int j = i; j < (n - i - 1); j++) {
+                        int j_n = n - j  - 1 ;
+                        
+                        int i0 = stride + (i   * n + j  ) * channels;
+                        int i1 = stride + (j_n * n + i  ) * channels;
+                        int i2 = stride + (i_n * n + j_n) * channels;
+                        int i3 = stride + (j   * n + i_n) * channels;
+                        
+                        
+                        for(int k = 0; k < channels; k++) { //swap
+                            T tmp          = buffer[i0 + k];
+                            buffer[i0 + k] = buffer[i1 + k];
+                            buffer[i1 + k] = buffer[i2 + k];
+                            buffer[i2 + k] = buffer[i3 + k];
+                            buffer[i3 + k] = tmp;
+                        }
                     }
                 }
             }
         } else {
-            T *tmpBuffer = new T[width * height * channels];
-            memcpy(tmpBuffer, buffer, sizeof(T) * width * height * channels);
+            T *tmpBuffer = new T[stride_frame * frames];
+            memcpy(tmpBuffer, buffer, sizeof(T) * stride_frame * frames);
 
-            #pragma omp parallel for
-            for(int i = 0; i < height; i++) {
-                for(int j = 0; j < width; j++) {
-                    int i0 = (i * width + j) * channels;
-                    int i1 = (j * height + height - i - 1) * channels;
-
-                    for(int k = 0; k < channels; k++) {
-                        buffer[i1 + k] = tmpBuffer[i0 + k];
+            for(int l = 0; i < frames; l++) {
+                
+                #pragma omp parallel for
+                for(int i = 0; i < height; i++) {
+                    for(int j = 0; j < width; j++) {
+                        int i0 = stride_frame + (i * width + j) * channels;
+                        int i1 = stride_frame + (j * height + height - i - 1) * channels;
+                        
+                        for(int k = 0; k < channels; k++) {
+                            buffer[i1 + k] = tmpBuffer[i0 + k];
+                        }
                     }
                 }
             }
@@ -522,20 +530,25 @@ public:
             return;
         }
 
+        int stride_frame = width * height * channels;
+        
         if(width == height) { //in place rotation
-            #pragma omp parallel for
-            for(int i = 0; i < height; i++) {
-
-                auto i_width = i * width;
-                for(int j = (i + 1); j < width; j++) {
-
-                    int i0 = (i_width + j) * channels;
-                    int i1 = (j * width + i) * channels;
-
-                    for(int k = 0; k < channels; k++) { //swap
-                        T tmp          = buffer[i0 + k];
-                        buffer[i0 + k] = buffer[i1 + k];
-                        buffer[i1 + k] = tmp;
+            for(int l = 0; l < frames; l++) {
+                int stride = stride_frame * l;
+                #pragma omp parallel for
+                for(int i = 0; i < height; i++) {
+                    
+                    auto i_width = i * width;
+                    for(int j = (i + 1); j < width; j++) {
+                        
+                        int i0 = stride + (i_width + j) * channels;
+                        int i1 = stride + (j * width + i) * channels;
+                        
+                        for(int k = 0; k < channels; k++) { //swap
+                            T tmp          = buffer[i0 + k];
+                            buffer[i0 + k] = buffer[i1 + k];
+                            buffer[i1 + k] = tmp;
+                        }
                     }
                 }
             }
@@ -543,18 +556,21 @@ public:
             flipV(buffer, width, height, channels, frames);
             
         } else {
-            T *tmpBuffer = new T[width * height * channels];
-            memcpy(tmpBuffer, buffer, sizeof(T) * width * height * channels);
+            T *tmpBuffer = new T[stride_frame * frames];
+            memcpy(tmpBuffer, buffer, sizeof(T) * stride_frame * frames);
 
-            #pragma omp parallel for
-            for(int i = 0; i < height; i++) {
-                auto i_width = i * width ;
-                for(int j = 0; j < width; j++) {
-                    int i0 = (i_width + j) * channels;
-                    int i1 = ((width - j - 1) * height + i) * channels;
-
-                    for(int k = 0; k < channels; k++) {
-                        buffer[i1 + k] = tmpBuffer[i0 + k];
+            for (int l = 0; l < frames; l++) {
+                int stride = stride_frame * l;
+                #pragma omp parallel for
+                for(int i = 0; i < height; i++) {
+                    auto i_width = i * width ;
+                    for(int j = 0; j < width; j++) {
+                        int i0 = stride + (i_width + j) * channels;
+                        int i1 = stride + ((width - j - 1) * height + i) * channels;
+                        
+                        for(int k = 0; k < channels; k++) {
+                            buffer[i1 + k] = tmpBuffer[i0 + k];
+                        }
                     }
                 }
             }
