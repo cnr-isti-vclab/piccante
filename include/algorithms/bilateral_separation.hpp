@@ -54,21 +54,22 @@ PIC_INLINE void bilateralSeparation(Image *imgIn, ImageVec &out,
         sigma_s = MAX(imgIn->widthf, imgIn->heightf) * 0.02f;
     }
 
-    if(sigma_r <= 0.0f) {
-        sigma_r = 0.4f;
-    }
+    sigma_r = sigma_r > 0.0f ? sigma_r: 0.4f;
 
-    Image *img_tmp = imgIn->clone();
+    if (out[1] == NULL) {
+        out[1] = imgIn->clone();
+    } else {
+        out[1]->assign(imgIn);
+    }
+    Image *img_detail = out[1];
 
     img_tmp->applyFunction(log10fPlusEpsilon);
-
-    Image *img_flt = FilterBilateral2DS::execute(img_tmp, NULL, sigma_s, sigma_r);
+    Image *img_flt = FilterBilateral2DS::execute(img_tmp, out[0], sigma_s, sigma_r);
 
     if(!bLogDomain) {
         img_flt->applyFunction(powf10fMinusEpsilon);
     }
 
-    Image *img_detail = img_tmp;
 
     if(bLogDomain) {
         *img_detail -= *img_flt;
