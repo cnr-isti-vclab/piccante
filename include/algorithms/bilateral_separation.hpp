@@ -63,13 +63,12 @@ PIC_INLINE void bilateralSeparation(Image *imgIn, ImageVec &out,
     }
     Image *img_detail = out[1];
 
-    img_tmp->applyFunction(log10fPlusEpsilon);
-    Image *img_flt = FilterBilateral2DS::execute(img_tmp, out[0], sigma_s, sigma_r);
+    img_detail->applyFunction(log10fPlusEpsilon);
+    Image *img_flt = FilterBilateral2DS::execute(img_detail, out[0], sigma_s, sigma_r);
 
     if(!bLogDomain) {
         img_flt->applyFunction(powf10fMinusEpsilon);
     }
-
 
     if(bLogDomain) {
         *img_detail -= *img_flt;

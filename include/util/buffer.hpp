@@ -494,7 +494,7 @@ public:
             T *tmpBuffer = new T[stride_frame * frames];
             memcpy(tmpBuffer, buffer, sizeof(T) * stride_frame * frames);
 
-            for(int l = 0; i < frames; l++) {
+            for(int l = 0; l < frames; l++) {
                 
                 #pragma omp parallel for
                 for(int i = 0; i < height; i++) {
