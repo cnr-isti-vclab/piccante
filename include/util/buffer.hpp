@@ -495,12 +495,12 @@ public:
             memcpy(tmpBuffer, buffer, sizeof(T) * stride_frame * frames);
 
             for(int l = 0; l < frames; l++) {
-                
+                int stride = stride_frame * l;
                 #pragma omp parallel for
                 for(int i = 0; i < height; i++) {
                     for(int j = 0; j < width; j++) {
-                        int i0 = stride_frame + (i * width + j) * channels;
-                        int i1 = stride_frame + (j * height + height - i - 1) * channels;
+                        int i0 = stride + (i * width + j) * channels;
+                        int i1 = stride + (j * height + height - i - 1) * channels;
                         
                         for(int k = 0; k < channels; k++) {
                             buffer[i1 + k] = tmpBuffer[i0 + k];

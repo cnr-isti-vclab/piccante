@@ -131,7 +131,7 @@ public:
         scale = 1.0f;
     }
 
-    ~Filter()
+    virtual ~Filter()
     {
         release();
     }

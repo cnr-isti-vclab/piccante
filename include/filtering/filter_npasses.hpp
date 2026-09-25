@@ -165,7 +165,7 @@ PIC_INLINE int FilterNPasses::getIterations()
     return int(filters.size());
 }
 
-PIC_INLINE void FilterNPasses::OutputSize(ImageVec imgIn, int &width, int &height, int &frames, int &channels)
+PIC_INLINE void FilterNPasses::OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
 {
     Image *imgIn0 = new Image(imgIn[0], false);
 

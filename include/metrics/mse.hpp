@@ -97,8 +97,13 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 
     if(!ori->isSimilarType(cmp)) {
         return -1.0;
     }
+    
+    if(gamma > 0.0f) {
+        float invGamma = 1.0f / gamma;
+    } else {
+        return -3.0;
+    }
 
-    float invGamma = 1.0f / gamma;
     float exposure = powf(2.0f, fstop);
 
     int area = ori->width * ori->height;

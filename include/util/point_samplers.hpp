@@ -19,6 +19,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #define PIC_UTIL_POINT_SAMPLERS_HPP
 
 #include <cstdlib>
+#include <cmath>
 
 namespace pic {
 

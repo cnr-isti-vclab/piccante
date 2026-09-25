@@ -160,11 +160,14 @@ public:
      */
     static T *genRange(T minVal, T step, T maxVal, T *ret, int &n)
     {
-        if (step == T(0)) {
+        auto delta = (maxVal - minVal);
+
+        if (step == T(0) || (minVal >= maxVal)) {
+            n = 0;
             return ret;
         }
         
-        n = int((maxVal - minVal) / step) + 1;
+        n = int(delta / step) + 1;
 
         if(ret == NULL) {
             ret = new T[n];
