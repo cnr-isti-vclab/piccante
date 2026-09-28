@@ -51,7 +51,7 @@ namespace pic {
  * @param v is 3D vector.
  * @return It returns a skew 3x3 matrix.
  */
-PIC_INLINE Eigen::Vector3d computeSkewMatrix(Eigen::Vector3d &v)
+PIC_INLINE Eigen::Matrix3d computeSkewMatrix(Eigen::Vector3d &v)
 {
     Eigen::Matrix3d m;
     
