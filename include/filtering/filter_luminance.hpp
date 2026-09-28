@@ -73,7 +73,16 @@ public:
 
     ~FilterLuminance()
     {
-        weights = delete_vec_s(weights);
+        release();
+    }
+    
+    /**
+     * @brief release
+     */
+    void release()
+    {
+        delete[] weights;
+        weights = NULL;
     }
 
     /**
@@ -154,7 +163,7 @@ public:
         channels    = 1;
         frames      = imgIn[0]->frames;
 
-        weights = delete_s(weights);
+        release();
         weights = computeWeights(type, imgIn[0]->channels, weights);
     }
 

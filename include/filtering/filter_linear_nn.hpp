@@ -61,7 +61,7 @@ public:
         bias = new float[outChannels];
     }
     
-    ~FilterLinearNN() override
+    ~FilterLinearNN()
     {
         delete[] weights;
         delete[] bias;

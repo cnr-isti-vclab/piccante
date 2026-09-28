@@ -91,7 +91,7 @@ protected:
 
                     Arrayf::assign(0.0f, dataOut, channels);
 
-                    for(int k = 0; k < kernel.data.size(); i++) {
+                    for(int k = 0; k < kernel.data.size(); k++) {
                         float *dataIn = (*source)(i + kernel.data[k].pos[0],
                                                   j + kernel.data[k].pos[1],
                                                   m + kernel.data[k].pos[2]);

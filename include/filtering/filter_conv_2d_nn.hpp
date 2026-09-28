@@ -91,7 +91,7 @@ public:
         bias = new float[outChannels];
     }
     
-    ~FilterConv2DNN() override
+    ~FilterConv2DNN()
     {
         delete[] weights;
         delete[] bias;

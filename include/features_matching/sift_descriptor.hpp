@@ -43,6 +43,11 @@ public:
         reference_angles = NULL;
         update(thr_weak, patchSize, subPatchSize, nBin);
     }
+    
+    ~SIFTDescriptor()
+    {
+        delete[] reference_angles;
+    }
 
     /**
      * @brief update
@@ -70,7 +75,7 @@ public:
         sigma = float(this->patchSize) * 1.5f;
         sigma_sq_2 = sigma * sigma * 2.0f;
 
-        reference_angles = delete_vec_s(reference_angles);
+        delete[] reference_angles;
         reference_angles = new float[nBin];
         nBinf = float(nBin);
 
@@ -127,7 +132,7 @@ public:
 
                 //place it in the bin
                 float index_f = nBinf * (angle / C_PI_2);
-                int index = int(floorf(index_f));
+                int index = CLAMPi(int(floorf(index_f)), 0, nBin - 1);
                 int index_1 = (index + 1) % nBin;
 
                 float dist = (angle - reference_angles_orientation[index]) / sector_angle_orientation;
@@ -231,7 +236,7 @@ public:
 
         //remove strong edges; i.e., over 0.2
         for(int i = 0; i < tot; i++) {
-            desc[i] = desc[i] > 0.2f ? desc[i] : 0.2f;
+            desc[i] = desc[i] > 0.2f ? 0.2f : desc[i];
         }
 
         //re-normalize desc
