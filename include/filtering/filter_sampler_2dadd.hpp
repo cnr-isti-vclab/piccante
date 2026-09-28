@@ -61,8 +61,8 @@ protected:
                 Arrayf::add(vSrc1, dst->channels, tmp_dst);
             }
         }
-
-        delete_s(vSrc1);
+        
+        delete[] vSrc1;
     }
 
 public:

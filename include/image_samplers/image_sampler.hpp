@@ -41,7 +41,7 @@ public:
         SetDirection(0);
     }
 
-    ~ImageSampler()
+    virtual ~ImageSampler()
     {
         
     }

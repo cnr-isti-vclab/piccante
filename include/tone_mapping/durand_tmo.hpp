@@ -90,7 +90,8 @@ public:
         base->getMinVal(NULL, &min_log_base);
         base->getMaxVal(NULL, &max_log_base);
 
-        float compression_factor = log10fPlusEpsilon(target_contrast) / (max_log_base - min_log_base);
+        float range = max_log_base - min_log_base;
+        float compression_factor = range > 1e-8f ? log10fPlusEpsilon(target_contrast) / range : 1.0f;
         float log_absoulte = compression_factor * max_log_base;
 
         *base *= compression_factor;

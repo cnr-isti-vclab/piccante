@@ -309,7 +309,7 @@ public:
     /**
      * @brief NelderMeadOptBase
      */
-    ~NelderMeadOptBase()
+    virtual ~NelderMeadOptBase()
     {
         release();
     }

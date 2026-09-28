@@ -191,6 +191,10 @@ public:
      */
     static T *linspace(T minVal, T maxVal, int n, T *ret)
     {
+        if (n < 2) {
+            return ret;
+        }
+        
         T step = (maxVal - minVal) / (n - 1);
         int tmp = n;
 

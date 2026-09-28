@@ -36,6 +36,11 @@ public:
     {
         pyramid_limit = 4;
     }
+    
+    virtual ~MultiResolutionOperator()
+    {
+        
+    }
 
     /**
      * @brief setup

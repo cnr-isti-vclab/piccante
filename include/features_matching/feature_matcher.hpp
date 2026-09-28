@@ -53,6 +53,11 @@ public:
     {
         update(descs, desc_size);
     }
+    
+    virtual ~FeatureMatcher()
+    {
+        
+    }
 
     /**
      * @brief update

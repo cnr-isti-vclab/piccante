@@ -190,8 +190,7 @@ PIC_INLINE void FilterNPasses::OutputSize(ImageVec imgIn, int &width, int &heigh
     delete imgIn0;
 }
 
-PIC_INLINE Image *FilterNPasses::setupAuxNGen(ImageVec imgIn,
-        Image *imgOut)
+PIC_INLINE Image *FilterNPasses::setupAuxNGen(ImageVec imgIn, Image *imgOut)
 {   
     int width, height, frames, channels;
     OutputSize(imgIn, width, height, frames, channels);

@@ -62,7 +62,7 @@ public:
 
     }
     
-    ~ToneMappingOperator()
+    virtual ~ToneMappingOperator()
     {
         stdVectorClear(images);
     }

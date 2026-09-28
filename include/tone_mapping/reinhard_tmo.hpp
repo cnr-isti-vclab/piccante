@@ -171,9 +171,14 @@ public:
         float log2Min     = logf(LMin       + 1e-9f) / log2f;
         float log2Average = logf(logAverage + 1e-9f) / log2f;
 
-        float tmp = (2.0f * log2Average - log2Min - log2Max) / (log2Max - log2Min);
-
-        return 0.18f * powf(4.0f, tmp);
+        float range = (log2Max - log2Min);
+        
+        if (range > 0.0f) {
+            float tmp = (2.0f * log2Average - log2Min - log2Max) / range;            
+            return 0.18f * powf(4.0f, tmp);
+        } else {
+            return 0.18f;
+        }
     }
 
     /**

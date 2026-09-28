@@ -119,6 +119,7 @@ PIC_INLINE FilterGaussian1D::FilterGaussian1D(PrecomputedGaussian *pg, int direc
         return;
     }
 
+    this->pg = pg;
     bPgOwned = false;
 
     FilterConv1D::update(pg->coeff, pg->kernelSize, direction);

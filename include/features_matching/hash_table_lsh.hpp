@@ -65,6 +65,11 @@ public:
             table[address].push_back(i);
         }
     }
+    
+    ~HashTableLSH()
+    {
+        delete[] table;
+    }
 
     /**
      * @brief getAddress

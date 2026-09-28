@@ -61,6 +61,11 @@ protected:
         #endif
 
         total = this->nSamples * this->channels * this->exposures;
+        
+        if (total < 1) {
+            return;
+        }
+        
         samples = new int[total];
 
         #ifdef PIC_DEBUG
@@ -92,6 +97,7 @@ protected:
             printf("Ok\n");
         #endif
 
+        delete[] samples;
         delete[] h;
     }
 

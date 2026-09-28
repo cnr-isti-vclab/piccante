@@ -61,6 +61,11 @@ public:
         inv_height = 1.0f / float(height - 1);
 
     }
+    
+    ~CachedTable()
+    {
+        delete[] PATCH;
+    }
 };
 
 } // end namespace pic

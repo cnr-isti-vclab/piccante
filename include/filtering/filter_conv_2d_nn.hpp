@@ -90,6 +90,12 @@ public:
         weights = new float[nWeights];
         bias = new float[outChannels];
     }
+    
+    ~FilterConv2DNN() override
+    {
+        delete[] weights;
+        delete[] bias;
+    }
 
     void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {

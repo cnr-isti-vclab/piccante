@@ -315,6 +315,8 @@ PIC_INLINE Image *Filter::cachedProcess(ImageVec imgIn, Image *imgOut,
     Image *imgOut2 = new Image(outputName);
 
     if(imgOut2->data == NULL) {
+        delete imgOut2;
+
         if(!cachedOnly) {
             imgOut = Process(imgIn, imgOut);
             imgOut->Write(outputName);
@@ -325,6 +327,7 @@ PIC_INLINE Image *Filter::cachedProcess(ImageVec imgIn, Image *imgOut,
     } else {
         if(imgOut != NULL) {
             imgOut->assign(imgOut2);
+            delete imgOut2;
             return imgOut;
         } else {
             return imgOut2;

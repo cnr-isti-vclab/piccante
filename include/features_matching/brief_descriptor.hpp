@@ -191,8 +191,13 @@ public:
     void release()
     {
         m = delete_s(m);
-        x = delete_s(x);
-        y = delete_s(y);
+        
+        delete[] x;
+        delete[] y;
+
+        m = NULL;
+        x = NULL;
+        y = NULL;
     }
 
     /**
