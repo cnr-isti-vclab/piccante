@@ -31,9 +31,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "../filtering/filter_warp_2d.hpp"
 #include "../filtering/filter_rotation.hpp"
 
-#include "../computer_vision/camera_matrix.hpp"
-
 #include "../util/eigen_util.hpp"
+#include "../computer_vision/camera_matrix.hpp"
 
 #ifndef PIC_DISABLE_EIGEN
 

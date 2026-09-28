@@ -51,7 +51,7 @@ namespace pic {
  * @param v is 3D vector.
  * @return It returns a skew 3x3 matrix.
  */
-PIC_INLINE Eigen::Vector3d computeSkewMatrix(Eigen::Vecotr3d &v)
+PIC_INLINE Eigen::Vector3d computeSkewMatrix(Eigen::Vector3d &v)
 {
     Eigen::Matrix3d m;
     
@@ -76,7 +76,7 @@ PIC_INLINE Eigen::Vector3d computeSkewMatrix(Eigen::Vecotr3d &v)
  * @param theta is the angle of rotation around axis.
  * @return It returns a 3x3 rotation matrix.
  */
-PIC_INLINE Eigen::Matrix3d getMatrixFromAxisRotation(Eigen::Vecotr3d &axis, double theta)
+PIC_INLINE Eigen::Matrix3d getMatrixFromAxisRotation(Eigen::Vector3d &axis, double theta)
 {
     Eigen::Matrix3d R;
     
@@ -88,7 +88,7 @@ PIC_INLINE Eigen::Matrix3d getMatrixFromAxisRotation(Eigen::Vecotr3d &axis, doub
     
     auto N = computeSkewMatrix(axis);
 
-    auto R = I + sinTheta * N + (1.0 - cosTheta) * (N * N);
+    R = I + sinTheta * N + (1.0 - cosTheta) * (N * N);
     return R;
 }
 
