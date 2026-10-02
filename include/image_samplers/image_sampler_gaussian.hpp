@@ -64,8 +64,9 @@ public:
      */
     void update(float sigma, unsigned int direction)
     {
+        auto tmp = new PrecomputedGaussian(sigma);
         delete pg;
-        pg = new PrecomputedGaussian(sigma);
+        pg = tmp;
 
         SetDirection(direction);
     }
@@ -83,8 +84,8 @@ public:
             vOut[k] = 0.0f;
         }
 
-        int ix = int(x * img->widthf);
-        int iy = int(y * img->heightf);
+        int ix = int(floorf(x * img->width1f));
+        int iy = int(floorf(y * img->height1f));
 
         for(int i = 0; i < pg->kernelSize ; i++) {
             int offset = i - pg->halfKernelSize;

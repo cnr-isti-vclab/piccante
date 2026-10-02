@@ -46,10 +46,10 @@ public:
      * @param sigma
      * @param direction
      */
-    ImageSamplerLanczos(float a)
-    {        
-        this->a = MAX(a, 1.0f);
-        a_i = int(this->a);
+    ImageSamplerLanczos(int a)
+    {
+        this->a_i = MAX(a, 1);
+        this->a = float(a_i);
     }
 
     /**
@@ -85,6 +85,7 @@ public:
 
         float rx, ry;
         int ey, ex;
+        float weightSum = 0.0f;
         for(int j = - a_i + 1; j <= a_i; j++) {
             ry = Lanczos(dy - float(j), a);
             ey = CLAMP(iy + j, img->height);
@@ -94,11 +95,19 @@ public:
                 ex = CLAMP(ix + i, img->width);
                 int ind = (ey * img->width + ex) * img->channels;
 
-                rx *= ry;
+                float w = rx * ry;
+                weightSum += w;
                 for(int k = 0; k < img->channels; k++) {
-                    vOut[k] += img->data[ind + k] * rx;
+                    vOut[k] += img->data[ind + k] * w;
                 }
             }
+        }
+        
+        if(weightSum > 1e-8f) {
+            for(int k = 0; k < img->channels; k++) {
+                vOut[k] /= weightSum;
+            }
+
         }
     }
 };
