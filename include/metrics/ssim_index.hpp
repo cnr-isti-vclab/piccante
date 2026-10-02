@@ -152,7 +152,7 @@ public:
         float dynamic_range_local = dynamic_range;
         
         if(dynamic_range <= 0.0f) {
-            dynamic_range = L_ori->getDynamicRange(false, 1.0f);
+            dynamic_range_local = L_ori->getDynamicRange(false, 1.0f);
         }
 
         float C0 = K0 * dynamic_range_local;
@@ -173,6 +173,13 @@ public:
         Image *img_sigma2_sq = flt_gauss2D.Process(Single(L_cmp), NULL);
         Image *img_sigma1_sigma2 = flt_gauss2D.Process(Single(&img_ori_cmp), NULL);
 
+        ImageVec src;
+        src.push_back(img_mu1);
+        src.push_back(img_mu2);
+        src.push_back(img_sigma1_sq);
+        src.push_back(img_sigma2_sq);
+        src.push_back(img_sigma1_sigma2);
+
         if(C0 > 0.0f && C1 > 0.0f) {
             flt_ssim.update(C0, C1);
 
@@ -183,12 +190,6 @@ public:
             }
         }
         
-        ImageVec src;
-        src.push_back(img_mu1);
-        src.push_back(img_mu2);
-        src.push_back(img_sigma1_sq);
-        src.push_back(img_sigma2_sq);
-        src.push_back(img_sigma1_sigma2);
         src.push_back(L_ori);
         src.push_back(L_cmp);
         stdVectorClear<Image>(src);
