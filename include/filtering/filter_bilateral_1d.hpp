@@ -54,6 +54,11 @@ public:
      * @param sigma_r
      */
     FilterBilateral1D(float sigma_s, float sigma_r);
+    
+    ~FilterBilateral1D()
+    {
+        pg = delete_s(pg);
+    }
 
     /**
      * @brief update
@@ -172,7 +177,7 @@ PIC_INLINE void FilterBilateral1D::ProcessBBox(Image *dst, ImageVec src, BBox *b
                     //Range filtering
                     float *curEdge = (*edge)(ci, cj, cm); 
 
-                    float edgeDist = Arrayf::distanceSq(curEdge, tmpEdge, dst->channels);
+                    float edgeDist = Arrayf::distanceSq(curEdge, tmpEdge, edge->channels);
                     edgeDist = expf(-edgeDist / sigma_r_sq_2);
 
                     //Weight
@@ -191,8 +196,8 @@ PIC_INLINE void FilterBilateral1D::ProcessBBox(Image *dst, ImageVec src, BBox *b
                 if(sum > 0.0f) {
                     Arrayf::div(tmpDst, dst->channels, sum);
                 } else {
-                    float *base = (*edge)(i, j, m);
-                    Arrayf::assign(base, dst->channels, tmpDst);
+                    float *base_data = (*base)(i, j, m);
+                    Arrayf::assign(base_data, dst->channels, tmpDst);
                 }
             }
         }

@@ -49,10 +49,6 @@ protected:
     void ProcessBBox(Image *dst, ImageVec src, BBox *box);
 
 public:
-    /**
-     * @brief FilterBilateral2DF
-     */
-    FilterBilateral2DF();
 
     /**
      * @brief FilterBilateral2DF
@@ -90,11 +86,6 @@ public:
     }
 };
 
-PIC_INLINE FilterBilateral2DF::FilterBilateral2DF() : Filter()
-{
-    pg = NULL;
-}
-
 PIC_INLINE FilterBilateral2DF::FilterBilateral2DF(float sigma_s, float sigma_r) : Filter()
 {
     //protected values are assigned/computed
@@ -103,7 +94,7 @@ PIC_INLINE FilterBilateral2DF::FilterBilateral2DF(float sigma_s, float sigma_r) 
     this->sigma_r_sq_2 = this->sigma_r * this->sigma_r * 2.0f;
 
     //Precomputation of the Gaussian filter
-    pg = new PrecomputedGaussian(sigma_s);
+    pg = new PrecomputedGaussian(this->sigma_s);
 }
 
 PIC_INLINE FilterBilateral2DF::~FilterBilateral2DF()

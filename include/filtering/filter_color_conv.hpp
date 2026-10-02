@@ -102,7 +102,7 @@ public:
     FilterColorConv() : Filter()
     {
         this->bDirection = true;
-        n = -1;
+        n = 0;
     }
 
     /**

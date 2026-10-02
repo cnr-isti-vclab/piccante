@@ -39,7 +39,7 @@ protected:
         float *inXm = (*data->src[0])(data->x + 1, data->y);
         float *inYm = (*data->src[0])(data->x,     data->y + 1);
 
-        for(int k = 0; k < data->dst->channels; k++) {
+        for(int k = 0; k < data->src[0]->channels; k++) {
             int tmp = k << 1;
             data->out[tmp  ]   = inXm[k] - in[k];
             data->out[tmp + 1] = inYm[k] - in[k];

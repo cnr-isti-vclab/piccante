@@ -62,7 +62,7 @@ public:
     void update(int maxLayers = 32, float threshold = 0.05f)
     {
         this->threshold = threshold > 0.0f ? threshold : 0.05f;
-        this->maxLayers = maxLayers > 0 ? maxLayers : 32;
+        this->maxLayers = maxLayers > 1 ? maxLayers : 32;
 
         bin_size_1 = 0.5f;
         bin_size_2 = 2.0f;
@@ -144,6 +144,8 @@ public:
         (*imgOut) /= float (maxLayers);
 
         imgOut->applyFunction(powf10fMinusEpsilon);
+        
+        delete[] category;
 
         return imgOut;
     }

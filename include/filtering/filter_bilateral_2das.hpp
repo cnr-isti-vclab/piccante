@@ -89,7 +89,10 @@ public:
         samplingMap = fsm.Process(imgIn, samplingMap);
         float maxVal;
         samplingMap->getMaxVal(NULL, &maxVal);
-        *samplingMap /= maxVal;
+        
+        if (maxVal > 0.0f) {
+            *samplingMap /= maxVal;
+        }
 
         return allocateOutputMemory(imgIn, imgOut, bDelete);
     }
@@ -152,6 +155,8 @@ PIC_INLINE void FilterBilateral2DAS::update(float sigma_s,
     this->sigma_s = sigma_s > 0.0f ? sigma_s : 1.0f;
     this->sigma_r = sigma_r > 0.0f ? sigma_r : 0.01f;
     this->sigma_r_sq_2 = this->sigma_r * this->sigma_r * 2.0f;
+    
+    mult = (mult != 0) ? mult : 1;
 
     //precompute the Gaussian Kernel
     pg = delete_s(pg);
@@ -198,7 +203,7 @@ PIC_INLINE void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox 
     std::mt19937 m(seed);
 
     for(int i = box->y0; i < box->y1; i++) {
-        float x = float(i) / dst->heightf;
+        float y = float(i) / dst->heightf;
 
         for(int j = box->x0; j < box->x1; j++) {
 
@@ -211,7 +216,7 @@ PIC_INLINE void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox 
             ps = ms->getSampler(&m);
 
             //calculate the number of samples
-            float y = float(j) / dst->widthf;
+            float x = float(j) / dst->widthf;
             isb.SampleImage(samplingMap, x, y, &valOut);
 
             float tmpValOut = 1.0f - valOut; //+valOut[1]+valOut[2])/3.0f;
@@ -252,7 +257,7 @@ PIC_INLINE void FilterBilateral2DAS::ProcessBBox(Image *dst, ImageVec src, BBox 
                 //
                 //Range Gaussian Kernel
                 //
-                float tmp = Arrayf::distanceSq(cur_edge, edge_data, channels);
+                float tmp = Arrayf::distanceSq(cur_edge, edge_data, edge->channels);
                 float G2 = expf(-tmp / sigma_r_sq_2);
 
                 //Weight

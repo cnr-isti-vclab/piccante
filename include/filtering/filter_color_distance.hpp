@@ -39,9 +39,9 @@ protected:
     {
         float *in = (*data->src[0])(data->x, data->y);
 
-        float sum = Arrayf::distanceSq(in, color, data->dst->channels);
+        float sum = Arrayf::distanceSq(in, color, data->src[0]->channels);
 
-        data->out[0] = expf(- sum / sigma_sq_2);
+        data->out[0] = expf(-sum / sigma_sq_2);
     }
 
     /**
@@ -86,6 +86,8 @@ public:
      */
     FilterColorDistance(float *color, float sigma) : Filter()
     {
+        this->color = NULL;
+        
         update(color, sigma);
     }
 
@@ -100,9 +102,8 @@ public:
             this->color = color;
         }
 
-        sigma = sigma > 0.0f ? sigma : 1.0f;
-        this->sigma = sigma;
-        sigma_sq_2 = sigma * sigma * 2.0f;
+        this->sigma = sigma > 0.0f ? sigma : 1.0f;
+        sigma_sq_2 = this->sigma * this->sigma * 2.0f;
     }
 
     /**

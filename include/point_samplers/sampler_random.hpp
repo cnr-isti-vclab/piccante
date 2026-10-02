@@ -395,7 +395,7 @@ template <unsigned int N>PIC_INLINE void RandomSampler<N>::Write(
 
 template <unsigned int N> PIC_INLINE int RandomSampler<N>::getSamplesPerLevel(int level)
 {
-    if((level < 0) || (level >= levelsR.size()) {
+    if((level < 0) || (level >= levelsR.size())) {
         return -1;
     }
 
