@@ -38,12 +38,18 @@ template<unsigned int N>
 void getDartThrowingSamples(std::mt19937 *m, float radius2, int nSamples,
                          std::vector<float> &samples)
 {
+    if((samples.size() % N) != 0) {
+        return;
+    }
+    
     float dist2, delta;
     Vec<N, float> val;
 
     int counter = 0;
 
-    while(counter < (nSamples * CONST_DARTTHROWING)) {
+    int accepted = 0;
+    
+    while((counter < (nSamples * CONST_DARTTHROWING)) && (accepted< nSamples)) {
         for(unsigned int j = 0; j < N; j++) {
             val[j] = ( getRandom((*m)()) * 2.0f - 1.0f);
         }
@@ -70,6 +76,7 @@ void getDartThrowingSamples(std::mt19937 *m, float radius2, int nSamples,
                 for(unsigned int j = 0; j < N; j++) {
                     samples.push_back(val[j]);
                 }
+                accepted++;
             }
         }
 

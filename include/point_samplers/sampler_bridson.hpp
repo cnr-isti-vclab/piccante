@@ -58,10 +58,14 @@ template<unsigned int N>
 void getBridsonSamples(std::mt19937 *m, float radius, std::vector<float> &samples,
                     int kSamples = 30)
 {
+    if(radius <= 0.0f) {
+        return;
+    }
+    
     if(kSamples < 1) {
         kSamples = 30;
     }
-
+    
     //Step 0: Creating an N-grid
 //	Grid<N> grid(0.999f * radius / sqrtf(float(N)));
 

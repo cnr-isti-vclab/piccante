@@ -58,6 +58,17 @@ public:
      */
     MRSamplers(SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels,
                int nSamplers);
+    
+    ~MRSamplers()
+    {
+        if(samplers != NULL) {
+            for(int i = 0; i < nSamplers; ++i) {
+                delete samplers[i];
+            }
+
+            delete[] samplers;
+        }
+    }
 
     /**
      * @brief update
@@ -104,17 +115,16 @@ PIC_INLINE MRSamplers<N>::MRSamplers(
     SAMPLER_TYPE type, Vec<N, int> window, int nSamples, int nLevels, int nSamplers)
 {
     this->type = type;
-    this->nSamplers = nSamplers;
+    this->nSamplers = MAX(nSamplers, 1);
     this->nLevels = nLevels;
     oldSamples = nSamples;
     oldWindow = window;
 
-    samplers = new RandomSampler< N > *[nSamplers];
+    samplers = new RandomSampler< N > *[this->nSamplers];
 
     #pragma omp parallel for
-
-    for(int i = 0; i < nSamplers; i++) {
-        samplers[i] = new RandomSampler< N >(type, window, nSamples, nLevels, 0);
+    for(int i = 0; i < this->nSamplers; i++) {
+        samplers[i] = new RandomSampler< N >(type, window, nSamples, nLevels, i);
     }
 }
 

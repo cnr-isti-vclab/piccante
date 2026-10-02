@@ -130,7 +130,7 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 
         acc += delta * delta;
     }
 
-    return acc / double(size));
+    return acc / double(size);
 }
 
 /**

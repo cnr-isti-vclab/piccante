@@ -64,7 +64,14 @@ public:
      */
     RandomSampler()
     {
-
+        m = NULL;
+        nSamples = 0;
+    }
+    
+    ~RandomSampler()
+    {
+        delete m;
+        m = NULL;
     }
 
     /**
@@ -158,10 +165,8 @@ public:
         int c = 1;
 
         for(int i = 1; i <= 5; i++) {
-            RandomSampler<N> *p2Ds = new RandomSampler<N>(type, window * c, window * c,
-                    1); //2*c,1);
-            printf("Samples expected: %d \t Real Samples: %d\n", (window * 2)*c,
-                   p2Ds->samplesR.size() / N);
+            RandomSampler<N> *p2Ds = new RandomSampler<N>(type, window * c, window * c, 1, 1); //2*c,1);
+            printf("Samples expected: %d \t Real Samples: %d\n", (window * 2) * c, p2Ds->samplesR.size() / N);
             std::string str = "test_poisson_sampler_";
             std::stringstream sstr;
             sstr << i;
@@ -239,6 +244,8 @@ template <unsigned int N> PIC_INLINE void RandomSampler<N>::cutRescale(
 
 template <unsigned int N> PIC_INLINE void RandomSampler<N>::wrap(float alpha)
 {
+    alpha = alpha > 0.0f ? alpha : 1.0f;
+    
     float x, y, ang, r, r2;
 
     for(int i = 0; i < samples.size(); i += 2) {
@@ -388,7 +395,7 @@ template <unsigned int N>PIC_INLINE void RandomSampler<N>::Write(
 
 template <unsigned int N> PIC_INLINE int RandomSampler<N>::getSamplesPerLevel(int level)
 {
-    if(level<0) {
+    if((level < 0) || (level >= levelsR.size()) {
         return -1;
     }
 
@@ -425,13 +432,15 @@ PIC_INLINE void ConvertVectorToPlus1(std::vector<RandomSampler<N> > &rsVec,
     //Copy data
     int halfSize = rsVec.size() / 2;
 
-    for(int i = -halfSize; i <= halfSize; i++) {
+    for(int i = 0; i < rsVec.size(); i++) {
+        int i_p = i - halfSize;
         for(int k = 0; k < rsVec[i].samplesR.size(); k += N) {
+            
             for(int l = 0; l < N; l++) {
                 rsOut.samplesR.push_back(rsVec[i].samplesR[k + l]);
             }
 
-            rsOut.samplesR.push_back(i);
+            rsOut.samplesR.push_back(i_p);
         }
     }
 
