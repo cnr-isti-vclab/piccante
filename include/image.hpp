@@ -508,7 +508,7 @@ public:
     }
 
     /**
-     * @brief checkCoordinates checks (x, y, z) coordinates) if they are valid or not.
+     * @brief fappCoordinates checks (x, y, z) coordinates) if they are valid or not.
      * @param x is the horizontal coordinate.
      * @param y is the vertical coordinate.
      * @param z is the temporal coordinate.

@@ -43,7 +43,7 @@ PIC_INLINE float changeDomain(float x, METRICS_DOMAIN type = MD_LIN)
     } break;
 
     case MD_LOG10: {
-        return log10f(x);
+        return log10f(MAX(x, C_SINGULARITY));
     } break;
 
     case MD_PU21: {

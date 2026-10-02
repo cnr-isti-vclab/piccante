@@ -166,6 +166,10 @@ public:
         if(imgGrad == NULL) {
             return desc;
         }
+        
+        if(!imgGrad->isValid()) {
+            return desc;
+        }
 
         if(desc == NULL) {
             desc = new float[tot];

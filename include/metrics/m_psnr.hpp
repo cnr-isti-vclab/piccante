@@ -58,30 +58,24 @@ PIC_INLINE double mPSNR(Image *ori, Image *cmp, MULTI_EXPOSURE_TYPE type, int mi
 
     std::vector<float> exposures;
 
-    switch (type) {
-        case MET_HISTOGRAM: {
-            exposures = getAllExposures(ori);
-        } break;
+    if (type == MET_HISTOGRAM) {
+        exposures = getAllExposures(ori);
+    } else {
 
-        case MET_MIN_MAX: {
-            if(minFstop == maxFstop) {
-                getMinMaxFstops(ori, minFstop, maxFstop);
-            }
-
+        if(type == MET_MIN_MAX) {
+            getMinMaxFstops(ori, minFstop, maxFstop);
+        }
+        
+        if(minFstop == maxFstop) {
+            exposures.push_back(float(minFstop));
+        } else {
             int nExposures_v = 0;
             float *exposures_v = NULL;
             Arrayf::genRange(float(minFstop), 1.0f, float(maxFstop), exposures_v, nExposures_v);
 
             exposures.insert(exposures.begin(), exposures_v, exposures_v + nExposures_v);
-
-        } break;
-
-        case MET_FROM_INPUT: {
-            for(int i = minFstop; i <= maxFstop; i++) {
-                exposures.push_back(float(i));
-            }
-
-        } break;
+            delete[] exposures_v;
+        }
     }
 
     if(exposures.empty()) {
@@ -108,7 +102,7 @@ PIC_INLINE double mPSNR(Image *ori, Image *cmp, MULTI_EXPOSURE_TYPE type, int mi
         mse += mse_i;
     }
 
-    mse /= double(n * ori->channels);
+    mse /= double(n);
 
     int nValues = (1 << nBit) - 1;
     double nValuesd = double(nValues);

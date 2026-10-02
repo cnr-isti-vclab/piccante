@@ -104,7 +104,7 @@ public:
             float var_i;
             L_LDR->getVarianceVal(NULL, &box, &var_i);
 
-            sig += sqrtf(var_i);
+            sig += sqrtf(MAX(0.0f, var_i));
         }
 
         sig /= float(n);
@@ -204,8 +204,19 @@ public:
 
                 int width = t_HDR->width >> 1;
                 int height = t_HDR->height >> 1;
-                t_HDR = FilterSampler2D::execute(t_HDR, NULL, width, height);
-                t_LDR = FilterSampler2D::execute(t_LDR, NULL, width, height);
+                
+                if((width < 1) || (height < 1)) {
+                    break;
+                }
+                
+                auto t_HDR_next = FilterSampler2D::execute(t_HDR, NULL, width, height);
+                auto t_LDR_next = FilterSampler2D::execute(t_LDR, NULL, width, height);
+                
+                delete t_HDR;
+                delete t_LDR;
+                
+                t_HDR = t_HDR_next;
+                t_LDR = t_LDR_next;
             } else {
                 break;
             }
@@ -253,7 +264,12 @@ public:
 
         *L_HDR -= min_L_HDR;
 
-        float scale = (powf(2.0f, 32.0f) - 1.0f) / (max_L_HDR - min_L_HDR);
+        float delta = (max_L_HDR - min_L_HDR);
+        float scale = 0.0f;
+        if (delta > 0.0f) {
+            scale = (powf(2.0f, 32.0f) - 1.0f) / delta;
+        }
+        
         *L_HDR *= scale;
 
         N = statisticalNaturalness(L_LDR);
@@ -261,7 +277,7 @@ public:
         S = structuralFidelity(L_HDR, L_LDR);
 
         Q = a * powf(S, alpha) + invA * powf(N, beta);
-
+        
         return tmqi_map;
     }
 

@@ -18,7 +18,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_METRICS_MAXIMUM_ERROR_HPP
 #define PIC_METRICS_MAXIMUM_ERROR_HPP
 
-#include <math.h>
+#include <cmath>
 
 #include "../base.hpp"
 #include "../image.hpp"
@@ -48,11 +48,11 @@ PIC_INLINE float MaximumError(Image *ori, Image *cmp)
 
     int size = ori->size();
 
-    float maxVal = -FLT_MAX;
+    float maxVal = 0.0f;
     for(int i = 0; i < size; i++) {
         float delta = fabsf(ori->data[i] - cmp->data[i]);
 
-        if((delta < C_LARGE_DIFFERENCES) && (maxVal < delta)) {
+        if(std::isfinite(delta) && (maxVal < delta)) {
             maxVal = delta;
         }
     }

@@ -77,13 +77,13 @@ public:
                 METRICS_DOMAIN type = MD_LIN)
     {
         this->K0 = K0 > 0.0f ? K0 : this->K0;
-        this->K1 = K1 > 0.0f ? K1 : this->K0;
+        this->K1 = K1 > 0.0f ? K1 : this->K1;
         this->sigma_window = sigma_window > 0.0f ? sigma_window : this->sigma_window;
         this->dynamic_range = dynamic_range > 0.0f ? dynamic_range : this->dynamic_range;
         this->bDownsampling = bDownsampling;
         this->type = type;
 
-        flt_gauss2D.update(sigma_window);
+        flt_gauss2D.update(this->sigma_window);
     }
 
     /**
@@ -149,14 +149,16 @@ public:
             } break;
         }
 
+        float dynamic_range_local = dynamic_range;
+        
         if(dynamic_range <= 0.0f) {
             dynamic_range = L_ori->getDynamicRange(false, 1.0f);
         }
 
-        float C0 = K0 * dynamic_range;
+        float C0 = K0 * dynamic_range_local;
         C0 = C0 * C0;
 
-        float C1 = K1 * dynamic_range;
+        float C1 = K1 * dynamic_range_local;
         C1 = C1 * C1;
 
         Image *img_mu1 = flt_gauss2D.Process(Single(L_ori), NULL);
@@ -174,21 +176,22 @@ public:
         if(C0 > 0.0f && C1 > 0.0f) {
             flt_ssim.update(C0, C1);
 
-            ImageVec src;
-            src.push_back(img_mu1);
-            src.push_back(img_mu2);
-            src.push_back(img_sigma1_sq);
-            src.push_back(img_sigma2_sq);
-            src.push_back(img_sigma1_sigma2);
-
             ssim_map = flt_ssim.Process(src, ssim_map);
 
             if(ssim_map != NULL) {
                 ssim_map->getMeanVal(NULL, &ssim_index);
             }
-
-            stdVectorClear<Image>(src);
         }
+        
+        ImageVec src;
+        src.push_back(img_mu1);
+        src.push_back(img_mu2);
+        src.push_back(img_sigma1_sq);
+        src.push_back(img_sigma2_sq);
+        src.push_back(img_sigma1_sigma2);
+        src.push_back(L_ori);
+        src.push_back(L_cmp);
+        stdVectorClear<Image>(src);
 
         if(bAllocated) {
             auto vec = Double(ori_d, cmp_d);

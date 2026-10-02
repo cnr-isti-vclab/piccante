@@ -104,11 +104,14 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 
     } else {
         return -3.0;
     }
+    
+    if(nBit < 1) {
+        return -5.0f;
+    }
 
     float exposure = powf(2.0f, fstop);
 
-    int area = ori->width * ori->height;
-    int size = area * ori->channels;
+    int size = ori->size();
 
     unsigned long long acc = 0;
 
@@ -116,18 +119,18 @@ PIC_INLINE double MSE(Image *ori, Image *cmp, float gamma = 2.2f, float fstop = 
     float nValuesf = float(nValues);
 
     for(int i = 0; i < size; i++) {
-        int oriLDR = int(nValuesf * (powf(ori->data[i] * exposure, invGamma)));
-        int cmpLDR = int(nValuesf * (powf(cmp->data[i] * exposure, invGamma)));
+        int oriLDR = int(nValuesf * (powf(MAX(0.0f, ori->data[i]) * exposure, invGamma)));
+        int cmpLDR = int(nValuesf * (powf(MAX(0.0f, cmp->data[i]) * exposure, invGamma)));
 
         oriLDR = CLAMPi(oriLDR, 0, nValues);
         cmpLDR = CLAMPi(cmpLDR, 0, nValues);
 
-        int delta = cmpLDR - oriLDR;
+        unsigned long long delta = cmpLDR - oriLDR;
 
         acc += delta * delta;
     }
 
-    return (double(acc) / double(area));
+    return (double(acc) / double(size));
 }
 
 /**

@@ -60,9 +60,15 @@ PIC_INLINE float PU21Decode(float p)
     float t0 = MAX((p / data[6]) + data[5], 0.0f);
     float t1 = powf(t0, 1.0f / data[4]);
     float t2 = MAX(t1 - data[0], 0.0f);
-    float t3 = t2 / (data[1] - data[2] * t1);
-    float L = powf(t3,  1.0f / data[3]);
-    return L;
+    float dnm =  (data[1] - data[2] * t1);
+    
+    if(dnm > 0.0f) {
+        float t3 = t2 / dnm;
+        float L = powf(t3,  1.0f / data[3]);
+        return L;
+    } else {
+        return 1e4f;
+    }
 }
 
 } // end namespace pic

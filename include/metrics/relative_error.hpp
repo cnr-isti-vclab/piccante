@@ -66,10 +66,9 @@ PIC_INLINE double RelativeError(Image *ori, Image *cmp, bool bLargeDifferences =
         double delta = fabs(o_val - c_val);
 
         if(std::fabs(delta) <= largeDifferences) {
-            count++;
-
             if(o_val > C_SINGULARITY) { //to avoid singularities
                 relErr += delta / o_val;
+                count++;
             }
         }
     }
