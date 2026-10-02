@@ -103,6 +103,11 @@ public:
     void update(std::vector<int> channels_vec)
     {
         this->channels_vec = channels_vec;
+        
+        int n = this->channels_vec.size();
+        for(int i = 0; i < n; i++) {
+            this->channels_vec[i] = CLAMPi(this->channels_vec[i], 0, n - 1);
+        }
     }
 
     /**
