@@ -133,23 +133,26 @@ public:
         Image *img_source = NULL; //imgIn[0]
         Image *img_target = NULL; //imgIn[1]
 
-        if(ImageVecCheck(imgIn, 2)) {
+        if(ImageVecCheck(imgIn, 1)) {
             img_source = imgIn[0];
-            img_target = imgIn[1];
             
-            if((img_source == NULL) || (img_target == NULL)) {
+            if(img_source == NULL)
                 return imgOut;
             }
             
-            if(!img_source->isValid() || !img_target->isValid()) {
+            if(!img_source->isValid()) {
                 return imgOut;
             }
-        } else {
-            return imgOut;
         }
 
-        if(imgIn[0]->channels != imgIn[1]->channels) {
-            return imgOut;
+        if(ImageVecCheck(imgIn, 2)) {
+            img_target = imgIn[1];
+        }
+
+        if(img_target != NULL) {
+            if(img_source->channels != img_target->channels) {
+                return imgOut;
+            }
         }
 
         if(imgOut == NULL) {
