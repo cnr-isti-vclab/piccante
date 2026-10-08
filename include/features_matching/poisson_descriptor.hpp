@@ -58,7 +58,7 @@ protected:
     unsigned int *getAux(Image *img, int x0, int y0, unsigned int *desc = NULL)
     {
         unsigned int bits = sizeof(unsigned int) * 8;
-        subBlock = (nSamples * (nSamples - 1)) / bits;
+        subBlock = (nSamples * (nSamples - 1) + bits - 1) / bits;
 
         if(desc == NULL) {
             desc = new unsigned int[subBlock];

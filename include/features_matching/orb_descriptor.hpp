@@ -88,7 +88,7 @@ public:
      * @param S
      * @param n
      */
-    ORBDescriptor(int S = 31, int n = 256, unsigned int seed = 1)
+    ORBDescriptor(int S = 31, int n = 256, unsigned int seed = 42)
     {
         m = new std::mt19937(seed);
 
@@ -104,6 +104,15 @@ public:
     ~ORBDescriptor()
     {
         release();
+    }
+    
+    void release()
+    {
+        delete m;
+        m = NULL;
+        
+        stdVectorArrayClear(x_theta);
+        stdVectorArrayClear(y_theta);
     }
 
     /**

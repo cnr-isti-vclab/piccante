@@ -22,6 +22,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../image.hpp"
 #include "../util/vec.hpp"
+#include "../util/std_util.hpp"
 #include "../util/string.hpp"
 #include "../image_samplers/image_sampler_bilinear.hpp"
 #include "../filtering/filter_downsampler_2d.hpp"
@@ -51,33 +52,19 @@ public:
 
     ~WardAlignment()
     {
-        for(unsigned int i=0; i< luminance.size(); i++) {
-            delete luminance[i];
-        }
-
-        for(unsigned int i=0; i< img1_v.size(); i++) {
-            delete img1_v[i];
-        }
-
-        for(unsigned int i=0; i< img2_v.size(); i++) {
-            delete img2_v[i];
-        }
-
-        for(unsigned int i=0; i< tb1_v.size(); i++) {
-            delete[] tb1_v[i];
-        }
-
-        for(unsigned int i=0; i< tb2_v.size(); i++) {
-            delete[] tb2_v[i];
-        }
-
-        for(unsigned int i=0; i< eb2_shifted_v.size(); i++) {
-            delete[] eb2_shifted_v[i];
-        }
-
-        for(unsigned int i=0; i<tb2_shifted_v.size(); i++) {
-            delete[] tb2_shifted_v[i];
-        }
+        release();
+    }
+    
+    void release()
+    {
+        stdVectorClear(luminance);
+        stdVectorClear(img1_v);
+        stdVectorClear(img2_v);
+        
+        stdVectorArrayClear(tb1_v);
+        stdVectorArrayClear(tb2_v);
+        stdVectorArrayClear(eb2_shifted_v);
+        stdVectorArrayClear(tb2_shifted_v);
     }
 
     /**
@@ -87,7 +74,7 @@ public:
      */
     void update(float percentile, float tolerance)
     {
-        if(percentile < 0.0f && percentile > 1.0f) {
+        if(percentile < 0.0f || percentile > 1.0f) {
             percentile = 0.5f;
         }
 
@@ -146,8 +133,7 @@ public:
      * @param shift_bits
      * @return
      */
-    Vec2i getExpShift(Image *img1, Image *img2,
-                                   int shift_bits = 6)
+    Vec2i getExpShift(Image *img1, Image *img2, int shift_bits = 6)
     {
         if(img1 == NULL || img2 == NULL) {
             return Vec2i(0, 0);
@@ -156,18 +142,20 @@ public:
         if(!img1->isSimilarType(img2)) {
             return Vec2i(0, 0);
         }
+        
+        release();
 
         Image *L1, *L2;
 
         if(img1->channels == 1) {
-            L1 = img1;
+            L1 = img1.clone();
         } else {
             L1 = FilterLuminance::execute(img1, NULL, LT_WARD_LUMINANCE);
             luminance.push_back(L1);
         }
 
         if(img2->channels == 1) {
-            L2 = img2;
+            L2 = img2.clone();
         } else {
             L2 = FilterLuminance::execute(img2, NULL, LT_WARD_LUMINANCE);
             luminance.push_back(L2);
@@ -316,7 +304,7 @@ public:
     {
         shift = execute(imgTarget, imgSource);
 
-        if(shift[0] != 0 && shift[1] != 0) {
+        if((shift[0] != 0) || (shift[1] != 0)) {
             Image *ret = shiftImage(imgSource, shift, NULL);
             return ret;
         } else {

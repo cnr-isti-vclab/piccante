@@ -119,6 +119,14 @@ PIC_INLINE FilterBilateral2DG::FilterBilateral2DG(float sigma_s, float sigma_r) 
     //protected values are assigned/computed
     this->sigma_s = sigma_s;
     this->sigma_r = sigma_r;
+    
+    if (this->sigma_s <= 0.0f) {
+        this->sigma_s = 1.0f;
+    }
+
+    if (this->sigma_r <= 0.0f) {
+        this->sigma_r = 0.05f;
+    }
 
     parallel = false;
 
@@ -213,8 +221,7 @@ PIC_INLINE Image *FilterBilateral2DG::Splat(Image *base, Image *edge, int channe
     return grid;
 }
 
-PIC_INLINE void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge,
-                               int channels)
+PIC_INLINE void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge, int channels)
 {
     float widthf = float(grid->width);
     float heightf = float(grid->height);
@@ -253,14 +260,12 @@ PIC_INLINE void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge,
             }
 
 #else
-            if(vOut[out->channels] > 0.0f) {
-                for(int k = 0; k < out->channels; k++) {
-                    out->data[ind + k] = vOut[k] / vOut[out->channels];
-                }
-            } else {
-                Arrayf::assign(0.0f, &out->data[ind], out->channels);
+            bool bFlag = (vOut[out->channels] > 0.0f);
+            for(int k = 0; k < out->channels; k++) {
+                out->data[ind + k] = bFlag ? vOut[k] / vOut[out->channels] : 0.0f;
             }
-
+            
+            delete[] vOut;
 #endif
         }
     }
@@ -296,13 +301,20 @@ PIC_INLINE Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
 
         delete[] edgeMaxVal;
 
-        *edge /= maxVal;
+        if (maxVal > 0.0f) {
+            *edge /= maxVal;
+        }
     } else {
         edge = imgIn[0];
+    }
+    
+    if(maxVal <= 0.0f) {
+        return imgOut;
     }
 
     //Range in [0,1]
     *base /= maxVal;
+    
     float tmpSigma_r = sigma_r;
     sigma_r /= maxVal;
 

@@ -151,8 +151,8 @@ public:
         bmin[0] = 1 << 24;
         bmin[1] = 1 << 24;
 
-        bmax[0] = -1;
-        bmax[1] = -1;
+        bmax[0] = -bmin[0];
+        bmax[1] = -bmin[1];
 
         for(int i = 0; i < 4; i++) {
 
@@ -220,8 +220,8 @@ public:
     void OutputSize(ImageVec imgIn, int &width, int &height, int &channels, int &frames)
     {
         if(bCentroid) {
-            mid[0] = imgIn[0]->widthf;
-            mid[1] = imgIn[0]->heightf;
+            mid[0] = imgIn[0]->widthf * 0.5f;
+            mid[1] = imgIn[0]->heightf * 0.5f;
         } else {
             mid[0] = 0.0f;
             mid[1] = 0.0f;

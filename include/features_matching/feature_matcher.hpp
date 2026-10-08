@@ -40,7 +40,7 @@ class FeatureMatcher
 {
 protected:
     std::vector<T *> *descs;
-    T desc_size;
+    uint desc_size;
 
 public:
 
@@ -49,14 +49,19 @@ public:
      * @param descs
      * @param n
      */
-    FeatureMatcher(std::vector<T *> *descs, T desc_size)
+    FeatureMatcher(std::vector<T *> *descs, uint desc_size)
     {
         update(descs, desc_size);
     }
     
     virtual ~FeatureMatcher()
     {
-        
+        release();
+    }
+    
+    void release()
+    {
+        stdVectorArrayClear(descs);
     }
 
     /**
@@ -64,7 +69,7 @@ public:
      * @param descs
      * @param desc_size
      */
-    void update(std::vector<T *> *descs, T desc_size)
+    void update(std::vector<T *> *descs, uint desc_size)
     {
         this->desc_size = desc_size;
         this->descs = descs;
@@ -83,11 +88,11 @@ public:
     }
 
 #ifndef PIC_DISABLE_EIGEN
-    void getAllMatches(std::vector<unsigned int *> &descs0, std::vector< Eigen::Vector3i > &matches)
+    void getAllMatches(std::vector<T *> &descs0, std::vector< Eigen::Vector3i > &matches)
     {
         matches.clear();
 
-        for(unsigned int i = 0; i< descs0.size(); i++) {
+        for(uint i = 0; i< descs0.size(); i++) {
             int matched_j;
             T dist_1;
 

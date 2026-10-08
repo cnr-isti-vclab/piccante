@@ -44,7 +44,11 @@ protected:
      */
     void release()
     {
-        lum = delete_s(lum);
+        if(bLum) {
+            lum = delete_s(lum);
+        }
+        
+        lum = NULL;
         bLum = false;
     }
 
@@ -75,7 +79,7 @@ public:
     {
         this->sigma = sigma > 0.0f ? sigma : 1.4f;
         this->threshold_1 = threshold_1 > 0.0f ? threshold_1 : 0.05f;
-        this->threshold_2 = threshold_2 > 0.0f ? threshold_1 : 0.3f;
+        this->threshold_2 = threshold_2 > 0.0f ? threshold_2 : 0.3f;
 
         if(threshold_2 < threshold_1) {
             float tmp = threshold_1;

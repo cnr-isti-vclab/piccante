@@ -66,12 +66,6 @@ public:
         update(sigma, radius, threshold);
     }
 
-    ~FastCornerDetector()
-    {
-        lum = delete_s(lum);
-        lum_flt = delete_s(lum_flt);
-    }
-
     /**
      * @brief update
      * @param sigma
@@ -273,6 +267,7 @@ public:
 
         sortCornersAndTransfer(&corners_w_quality, corners);
 
+        delete[] corners_map;
         delete[] indices;
     }
 };

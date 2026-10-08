@@ -67,9 +67,16 @@ public:
 
     ~GeneralCornerDetector()
     {
-        if (bLum) {
+        release();
+    }
+    
+    void release()
+    {
+        if(bLum) {
             delete lum;
         }
+        lum = NULL;
+        bLum = false;
     }
 
     /**

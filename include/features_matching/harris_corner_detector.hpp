@@ -67,21 +67,11 @@ protected:
     int width, height;
 
     /**
-     * @brief release
-     */
-    void release()
-    {
-        lum = delete_s(lum);
-        I_grad = delete_s(I_grad);
-        I_grad_flt = delete_s(I_grad_flt);
-        ret = delete_s(ret);
-    }
-
-    /**
      * @brief setNULL
      */
     void setNULL()
     {
+        bLum = false;
         type = CD_NOBLE;
         width = -1;
         height = -1;
@@ -103,6 +93,7 @@ public:
                          float threshold = 0.001f, float ki = 0.04f,
                          CORENE_DETECTOR_TYPE type = CD_NOBLE) : GeneralCornerDetector()
     {
+        bLum = true;
         setNULL();
         update(sigma, radius, threshold, type);
     }
@@ -110,6 +101,16 @@ public:
     ~HarrisCornerDetector()
     {
         release();
+    }
+    
+    /**
+     * @brief release
+     */
+    void release()
+    {
+        I_grad = delete_s(I_grad);
+        I_grad_flt = delete_s(I_grad_flt);
+        ret = delete_s(ret);
     }
 
     /**
@@ -160,7 +161,10 @@ public:
         float delta = maxL - minL;
 
         *lum -= minL;
-        *lum *= delta;
+        
+        if (delta > 0.0f) {
+            *lum /= delta;
+        }
 
         corners->clear();
 
@@ -225,9 +229,12 @@ public:
 
         int bestPoints = -1;
 
+        float local_threshold;
         if(threshold < 0.0f) { //the best i-th points
             bestPoints = int(-threshold);
-            threshold = -FLT_MAX;
+            local_threshold = -FLT_MAX;
+        } else {
+            local_threshold = threshold;
         }
 
         for(int i = 0; i < height; i++) {
@@ -239,11 +246,11 @@ public:
                 float R = (*ret)(j, i)[0];
                 float R_flt = (*ret_flt)(j, i)[0];
 
-                if((R == R_flt) && (R > threshold)) {
-                    float Rr = (*ret)(j, i + 1)[0];
-                    float Rl = (*ret)(j, i - 1)[0];
-                    float Ru = (*ret)(j + 1, i)[0];
-                    float Rd = (*ret)(j - 1, i)[0];
+                if((R == R_flt) && (R > local_threshold)) {
+                    float Rr = (*ret)(j + 1, i)[0];
+                    float Rl = (*ret)(j - 1, i)[0];
+                    float Ru = (*ret)(j, i + 1)[0];
+                    float Rd = (*ret)(j, i - 1)[0];
 
                     cx = R;
                     ax = (Rl + Rr) / 2.0f - cx;

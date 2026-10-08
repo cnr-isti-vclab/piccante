@@ -39,7 +39,7 @@ public:
      * @param descs
      * @param n
      */
-    FloatFeatureBruteForceMatcher(std::vector<unsigned int *> *descs, unsigned int desc_size) : FeatureMatcher<float>(descs, desc_size)
+    FloatFeatureBruteForceMatcher(std::vector<float *> *descs, uint desc_size) : FeatureMatcher<float *>(descs, desc_size)
     {
     }
 
@@ -58,7 +58,7 @@ public:
 
         matched_j = -1;
 
-        for(unsigned int j = 0; j < descs->size(); j++) {
+        for(uint j = 0; j < descs->size(); j++) {
             float dist = SIFTDescriptor::match(desc, descs->at(j), desc_size);
 
             if(dist < dist_1) {
@@ -72,7 +72,7 @@ public:
             }
         }
 
-        return ((dist_1 > dist_2 * 1.2f) && matched_j != -1);
+        return ((dist_1 * 1.2f) < dist_2) && (matched_j != -1);
     }
 };
 

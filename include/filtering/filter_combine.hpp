@@ -177,6 +177,10 @@ public:
             src.push_back(out);
             filter.update(SingleInt(i + 1));
         }
+        
+        for(int i = 0; i < src.size(); i++) {
+            delete src[i];
+        }
 
         imgOut = execute(src, NULL);
 

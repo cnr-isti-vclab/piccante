@@ -40,9 +40,7 @@ public:
      */
     LUCIDDescriptor(int patchSize = 31)
     {
-        if(patchSize < 2) {
-            patchSize = 31;
-        }
+        patchSize = patchSize > 2 ? patchSize : 31;
 
         this->patchSize = patchSize;
         this->halfPatchSize = patchSize >> 1;
@@ -111,7 +109,7 @@ public:
      */
     static unsigned int match(unsigned int *fv0, unsigned int *fv1, unsigned int nfv)
     {
-        if((fv0 == NULL) && (fv1 == NULL)) {
+        if((fv0 == NULL) || (fv1 == NULL)) {
             return 0;
         }
 
