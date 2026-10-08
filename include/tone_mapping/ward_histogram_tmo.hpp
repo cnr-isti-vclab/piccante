@@ -119,6 +119,10 @@ protected:
 
         releaseAux();
 
+        delete[] Pcum;
+        delete[] PcumNorm;
+        delete[] x;
+        
         Pcum = new unsigned int[nBin];
         PcumNorm = new float[nBin];
         x = new float[nBin];
@@ -176,6 +180,10 @@ public:
         Pcum = delete_vec_s(Pcum);
         PcumNorm = delete_vec_s(PcumNorm);
         x = delete_vec_s(x);
+
+        Pcum = NULL;
+        PcumNorm = NULL;
+        x = NULL;
     }
 
     /**
