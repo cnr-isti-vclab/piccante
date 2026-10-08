@@ -61,6 +61,7 @@ public:
      */
     ColorConvLMStoIPT() : ColorConv()
     {
+        linear = false;
         memcpy(mtx, mtxLMStoIPT, 9 * sizeof(float));
         memcpy(mtx_inv, mtxIPTtoLMS, 9 * sizeof(float));
     }

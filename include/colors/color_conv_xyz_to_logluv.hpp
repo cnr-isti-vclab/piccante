@@ -85,11 +85,18 @@ public:
         float z = 1.0f - x - y;
 
         float Y = MAX(expf(colIn[0]) - epsilon, 0.0f);
-        norm = Y / y;
-
-        colOut[0] = x * norm;
-        colOut[1] = Y;
-        colOut[2] = z * norm;
+        
+        if (fabsf(y) > 0.0f) {
+            norm = Y / y;
+            
+            colOut[0] = x * norm;
+            colOut[1] = Y;
+            colOut[2] = z * norm;
+        } else {
+            colOut[0] = 0.0f;
+            colOut[1] = 0.0f;
+            colOut[2] = 0.0f;
+        }
     }
 };
 

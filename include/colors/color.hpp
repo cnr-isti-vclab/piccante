@@ -74,6 +74,8 @@ void scaleTau(Vec<N, float> &in, const Vec<N, float> &sigma_t, float t)
 template<uint N>
 float colorLuminance(Vec<N, float> &in)
 {
+    static_assert(N >= 3);
+    
     return  0.213f * in.data[0] +
             0.715f * in.data[1] +
             0.072f * in.data[2];
@@ -123,7 +125,7 @@ void importanceSampling(Vec<N, float> &in, float e, int &channel, float &pdf)
             }
         }
     } else {
-        channel = int(e * float(N - 1));
+        channel = MIN(int(e * float(N)), N - 1);
         pdf = 1.0f / float(N);
     }
 }

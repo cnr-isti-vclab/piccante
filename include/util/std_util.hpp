@@ -69,8 +69,7 @@ template<class T>
 inline void stdVectorArrayClear(std::vector<T *> &vec)
 {
     for(unsigned int i = 0; i < vec.size(); i++) {
-        T *tmp = vec[i];
-        delete[] tmp;
+        delete[] vec[i];
     }
 
     vec.clear();

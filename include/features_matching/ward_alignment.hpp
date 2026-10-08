@@ -148,14 +148,14 @@ public:
         Image *L1, *L2;
 
         if(img1->channels == 1) {
-            L1 = img1.clone();
+            L1 = img1->clone();
         } else {
             L1 = FilterLuminance::execute(img1, NULL, LT_WARD_LUMINANCE);
             luminance.push_back(L1);
         }
 
         if(img2->channels == 1) {
-            L2 = img2.clone();
+            L2 = img2->clone();
         } else {
             L2 = FilterLuminance::execute(img2, NULL, LT_WARD_LUMINANCE);
             luminance.push_back(L2);

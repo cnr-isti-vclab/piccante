@@ -41,6 +41,10 @@ PIC_INLINE void fromFloatToRGBE(float *colFloat, unsigned char *colRGBE)
 {
     float v;
     int e;
+    
+    colFloat[0] = MAX(colFloat[0], 0.0f);
+    colFloat[1] = MAX(colFloat[1], 0.0f);
+    colFloat[2] = MAX(colFloat[2], 0.0f);
 
     v = *colFloat;
 
@@ -62,7 +66,7 @@ PIC_INLINE void fromFloatToRGBE(float *colFloat, unsigned char *colRGBE)
 
     v = frexp(v, &e) * 256.0f / v;
 
-    *(colRGBE) = int((*(colFloat)) * v);
+    *(colRGBE)     = int((*(colFloat    )) * v);
     *(colRGBE + 1) = int((*(colFloat + 1)) * v);
     *(colRGBE + 2) = int((*(colFloat + 2)) * v);
     *(colRGBE + 3) = (e + 128);

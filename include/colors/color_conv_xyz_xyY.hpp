@@ -46,7 +46,7 @@ public:
         if(XYZ > 0.0f) {
             colOut[0] = colIn[0] / XYZ;
             colOut[1] = colIn[1] / XYZ;
-            colOut[2] = colIn[2];
+            colOut[2] = colIn[1];
         } else {
             colOut[0] = -1.0f;
             colOut[1] = -1.0f;

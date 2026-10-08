@@ -54,6 +54,15 @@ PIC_INLINE float *createMatrixFromPrimaries(float *red_XYZ,
 
     if(ret == NULL) {
         ret = new float[9];
+        ret[0] = 1.0f;
+        ret[1] = 0.0f;
+        ret[2] = 0.0f;
+        ret[3] = 0.0f;
+        ret[4] = 1.0f;
+        ret[5] = 0.0f;
+        ret[6] = 0.0f;
+        ret[7] = 0.0f;
+        ret[8] = 1.0f;
     }
 
 #ifndef PIC_DISABLE_EIGEN

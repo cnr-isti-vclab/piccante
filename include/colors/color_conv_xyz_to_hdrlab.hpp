@@ -38,24 +38,6 @@ public:
 
     /**
      * @brief ColorConvXYZtoHDRLAB
-     */
-    ColorConvXYZtoHDRLAB()
-    {
-        linear = false;
-
-        whitePoint[0] = 1.0f;
-        whitePoint[1] = 1.0f;
-        whitePoint[2] = 1.0f;
-
-        Ys = 0.5f;
-        Yabs = 100.0f;
-
-        epsilon = computeEpsilon(Ys, Yabs);
-        two_e = powf(2.0f, epsilon);
-    }
-
-    /**
-     * @brief ColorConvXYZtoHDRLAB
      * @param Yabs
      * @param whitePoint
      */
@@ -63,14 +45,22 @@ public:
     {
         linear = false;
 
-        this->Yabs = Yabs;
-        this->whitePoint[0] = whitePoint[0];
-        this->whitePoint[1] = whitePoint[1];
-        this->whitePoint[2] = whitePoint[2];
+        this->Yabs = MAX(Yabs, 100.0f);
+                
+        if(whitePoint != NULL) {
+            this->whitePoint[0] = whitePoint[0];
+            this->whitePoint[1] = whitePoint[1];
+            this->whitePoint[2] = whitePoint[2];
+        } else {
+            //we set the white point to D65
+            this->whitePoint[0] = 0.95047f;
+            this->whitePoint[1] = 1.0f;
+            this->whitePoint[2] = 1.08883f;
+        }
 
-        Ys = 0.5f;
+        this->Ys = 0.5f;
 
-        epsilon = computeEpsilon(Ys, Yabs);
+        epsilon = computeEpsilon(this->Ys, this->Yabs);
         two_e = powf(2.0f, epsilon);
     }
 
@@ -140,7 +130,7 @@ public:
     float f_inv(float x)
     {
         float omega_e = ( (x - 0.02f) * two_e ) / (247.0f + 0.02f - x);
-        return powf(omega_e, 1.0f / epsilon);
+        return powf(omega_e, 1.0f / MAX(epsilon, 1e-6f));
     }
 
     /**
@@ -151,19 +141,15 @@ public:
      */
     static float computeEpsilon(float Ys, float Yabs)
     {
-        if(Yabs <= 0.0f) {
-            Yabs = 100.0f;
-        }
-
-        if(Ys < 0.0f || Ys > 1.0f) {
-            Ys = 0.5f;
-        }
-
         float sf = 1.25f - 0.25f * (Ys / 0.184f);
 
-        float lf = logf(318.0f) / logf(Yabs);
-
-        return 0.58f / (sf * lf);
+        if (Yabs > 1.0f) {
+            float lf = logf(318.0f) / logf(Yabs);
+            
+            return 0.58f / (sf * lf);
+        } else {
+            return 0.0f;
+        }
     }
 };
 

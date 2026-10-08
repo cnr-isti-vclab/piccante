@@ -18,6 +18,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef PIC_COLORS_COLOR_CONV_HPP
 #define PIC_COLORS_COLOR_CONV_HPP
 
+#include <cstring>
+#include <cstdio>
+
 #include "../util/matrix_3_x_3.hpp"
 
 namespace pic {
@@ -54,6 +57,23 @@ public:
     ColorConv()
     {
         linear = true;
+        
+        mtx[0] = 1.0f;
+        mtx[1] = 0.0f;
+        mtx[2] = 0.0f;
+        mtx[3] = 0.0f;
+        mtx[4] = 1.0f;
+        mtx[5] = 0.0f;
+        mtx[6] = 0.0f;
+        mtx[7] = 0.0f;
+        mtx[8] = 1.0f;
+        
+        memcpy(mtx_inv, mtx, sizeof(float) * 9);
+    }
+    
+    virtual ~ColorConv()
+    {
+        
     }
 
     /**

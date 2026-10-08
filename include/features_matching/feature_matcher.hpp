@@ -20,6 +20,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <vector>
 
+#include "../util/std_util.hpp"
+
 #ifndef PIC_DISABLE_EIGEN
 
 #ifndef PIC_EIGEN_NOT_BUNDLED
@@ -51,6 +53,7 @@ public:
      */
     FeatureMatcher(std::vector<T *> *descs, uint desc_size)
     {
+        this->descs = NULL;
         update(descs, desc_size);
     }
     
@@ -61,7 +64,13 @@ public:
     
     void release()
     {
-        stdVectorArrayClear(descs);
+        for(unsigned int i = 0; i < descs->size(); i++) {
+            delete[] descs->at(i);
+        }
+        descs->clear();
+        
+        delete descs;
+        descs = NULL;
     }
 
     /**
