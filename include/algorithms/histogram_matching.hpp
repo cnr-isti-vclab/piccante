@@ -136,7 +136,7 @@ public:
         if(ImageVecCheck(imgIn, 1)) {
             img_source = imgIn[0];
             
-            if(img_source == NULL)
+            if(img_source == NULL) {
                 return imgOut;
             }
             
