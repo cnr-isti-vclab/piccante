@@ -61,7 +61,7 @@ protected:
     //Harris Corners detector parameters
     float sigma, threshold, ki;
     int radius;
-    CORENE_DETECTOR_TYPE type;
+    CORNER_DETECTOR_TYPE type;
 
     //previous values
     int width, height;
