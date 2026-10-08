@@ -39,22 +39,14 @@ namespace pic {
  */
 PIC_INLINE void fromFloatToRGBE(float *colFloat, unsigned char *colRGBE)
 {
-    float v;
+    float v, R, G, B;
     int e;
     
-    colFloat[0] = MAX(colFloat[0], 0.0f);
-    colFloat[1] = MAX(colFloat[1], 0.0f);
-    colFloat[2] = MAX(colFloat[2], 0.0f);
+    R = MAX(colFloat[0], 0.0f);
+    G = MAX(colFloat[1], 0.0f);
+    B = MAX(colFloat[2], 0.0f);
 
-    v = *colFloat;
-
-    if(v < * (colFloat + 1)) {
-        v = *(colFloat + 1);
-    }
-
-    if(v < * (colFloat + 2)) {
-        v = *(colFloat + 2);
-    }
+    v = MAX(MAX(R, G), B);
 
     if(v < 1e-32f) { //is it too small?
         *(colRGBE) = 0;
@@ -66,9 +58,9 @@ PIC_INLINE void fromFloatToRGBE(float *colFloat, unsigned char *colRGBE)
 
     v = frexp(v, &e) * 256.0f / v;
 
-    *(colRGBE)     = int((*(colFloat    )) * v);
-    *(colRGBE + 1) = int((*(colFloat + 1)) * v);
-    *(colRGBE + 2) = int((*(colFloat + 2)) * v);
+    *(colRGBE)     = int(R * v);
+    *(colRGBE + 1) = int(G * v);
+    *(colRGBE + 2) = int(B * v);
     *(colRGBE + 3) = (e + 128);
 }
 

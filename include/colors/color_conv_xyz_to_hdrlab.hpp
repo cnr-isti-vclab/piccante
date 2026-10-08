@@ -53,9 +53,9 @@ public:
             this->whitePoint[2] = whitePoint[2];
         } else {
             //we set the white point to D65
-            this->whitePoint[0] = 0.95047f;
-            this->whitePoint[1] = 1.0f;
-            this->whitePoint[2] = 1.08883f;
+            this->whitePoint[0] = this->Yabs * 0.95047f;
+            this->whitePoint[1] = this->Yabs;
+            this->whitePoint[2] = this->Yabs * 1.08883f;
         }
 
         this->Ys = 0.5f;
