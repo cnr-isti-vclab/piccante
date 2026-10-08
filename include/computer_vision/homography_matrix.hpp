@@ -128,7 +128,12 @@ PIC_INLINE Eigen::Matrix3d estimateHomography(std::vector< Eigen::Vector2f > &po
     H(2, 2) = V(8, n);
 
     H = mat_1.inverse() * H * mat_0;
-    return H / H(2, 2);
+    
+    if (fabsf(H(2, 2)) > 0.0f) {
+        return H / H(2, 2);
+    } else {
+        return H;
+    }
 }
 
 /**

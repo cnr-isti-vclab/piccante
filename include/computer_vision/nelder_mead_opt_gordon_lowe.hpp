@@ -137,7 +137,10 @@ public:
      * @param x
      * @param distance
      */
-    static void init3DPoints(Eigen::Matrix3d K, std::vector< Vec<2, float> > &m, std::vector< Eigen::Vector3d > &x, float distance = 20.0f)
+    static void init3DPoints(Eigen::Matrix3d K,
+                             std::vector< Vec<2, float> > &m,
+                             std::vector< Eigen::Vector3d > &x,
+                             float distance = 20.0f)
     {
         Eigen::Matrix3d K_inv = K.inverse();
     \
@@ -163,16 +166,16 @@ public:
      * @param ret_size
      * @return
      */
-    static double *prepareInputData(std::vector< Eigen::Matrix3d > &K, std::vector< Eigen::Matrix3d > &R, std::vector< Eigen::Vector3d > &t, std::vector< Eigen::Vector3d > &x, unsigned int &ret_size)
+    static double *prepareInputData(std::vector< Eigen::Matrix3d > &K,
+                                    std::vector< Eigen::Matrix3d > &R,
+                                    std::vector< Eigen::Vector3d > &t,
+                                    std::vector< Eigen::Vector3d > &x,
+                                    unsigned int &ret_size)
     {
-        if(R.size() != t.size()) {
+        if (x.empty() || R.empty() || (R.size() != t.size()) || (R.size() != K.size())) {
             return NULL;
         }
-
-        if(x.empty()) {
-            return NULL;
-        }
-
+        
         int n = int (R.size());
         ret_size = GL_PACKED_CAMERA_SIZE * n + GL_3D_POINT_SIZE * int(x.size());
         double *ret = new double[ret_size];

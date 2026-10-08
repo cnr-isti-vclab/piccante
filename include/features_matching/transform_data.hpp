@@ -36,7 +36,13 @@ public:
      */
     TransformData()
     {
-        this->quality = -1.0f;
+        x = 0.0f;
+        y = 0.0f;
+        angle = 0.0f;
+        scale = 1.0f;
+        gain = 1.0f;
+        bias = 0.0f;
+        quality = -1.0f;
     }
 
     /**

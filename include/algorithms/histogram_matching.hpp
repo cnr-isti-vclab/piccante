@@ -133,32 +133,30 @@ public:
         Image *img_source = NULL; //imgIn[0]
         Image *img_target = NULL; //imgIn[1]
 
-        int count = 0;
-        if(ImageVecCheck(imgIn, 1)) {
-            img_source = imgIn[0];
-            count = 1;
-        }
-
         if(ImageVecCheck(imgIn, 2)) {
+            img_source = imgIn[0];
             img_target = imgIn[1];
-
-            if(imgIn[0]->channels != imgIn[1]->channels) {
+            
+            if((img_source == NULL) || (img_target == NULL)) {
                 return imgOut;
             }
-            count = 2;
-        }
-
-        if(count == 0) {
+            
+            if(!img_source->isValid() || !img_target->isValid()) {
+                return imgOut;
+            }
+        } else {
             return imgOut;
         }
 
-        count--;
+        if(imgIn[0]->channels != imgIn[1]->channels) {
+            return imgOut;
+        }
 
         if(imgOut == NULL) {
-            imgOut = imgIn[count]->clone();
+            imgOut = img_source->clone();
         } else {
-            if(!imgOut->isSimilarType(imgIn[count])) {
-                imgOut = imgIn[count]->allocateSimilarOne();
+            if(!imgOut->isSimilarType(img_source)) {
+                imgOut = img_source->allocateSimilarOne();
             }
         }
 
@@ -166,7 +164,6 @@ public:
 
         Histogram *h_source = new Histogram[channels];
         Histogram *h_target = new Histogram[channels];
-
 
         computeHistograms(img_source, img_target, h_source, h_target);
         std::vector<int *> lut;

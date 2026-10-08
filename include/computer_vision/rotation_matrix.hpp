@@ -86,6 +86,7 @@ PIC_INLINE Eigen::Matrix3d getMatrixFromAxisRotation(Eigen::Vector3d &axis, doub
     double sinTheta = sin(theta);
     double cosTheta = cos(theta);
     
+    axis.normalize();
     auto N = computeSkewMatrix(axis);
 
     R = I + sinTheta * N + (1.0 - cosTheta) * (N * N);

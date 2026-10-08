@@ -156,7 +156,7 @@ PIC_INLINE Image *computePoissonImageEditing(Image *source, Image *target, bool 
 
                     b[count] = -(*lap_source)(j, i)[k];
 
-                    if((j + 1) < (width - 1)) {
+                    if((j + 1) < width) {
                         if(!mask[indI + 1]) {
                             b[count] += (*target)(j + 1, i)[k];
                         }
@@ -168,7 +168,7 @@ PIC_INLINE Image *computePoissonImageEditing(Image *source, Image *target, bool 
                         }
                     }                        
 
-                    if((i + 1) < (height - 1)) {
+                    if((i + 1) < height) {
                         if(!mask[indI + width]) {
                             b[count] += (*target)(j, i + 1)[k];
                         }

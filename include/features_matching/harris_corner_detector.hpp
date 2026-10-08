@@ -148,6 +148,7 @@ public:
         }
 
         if(img->channels == 1) {
+            delete lum;
             lum = img->clone();
         } else {
             lum = FilterLuminance::execute(img, lum, LT_CIE_LUMINANCE);

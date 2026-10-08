@@ -67,7 +67,7 @@ public:
     {
         float scale = 1.0f;
         if(n == 4) {
-            if(x[3] < 1.0f) {
+            if(x[3] < 1e-6f) {
                 return FLT_MAX;
             }
 

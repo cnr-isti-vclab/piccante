@@ -238,14 +238,13 @@ PIC_INLINE Eigen::Matrix3d estimateFundamentalRansac(std::vector< Eigen::Vector2
  * @return
  */
 PIC_INLINE Eigen::Matrix3d estimateFundamentalWithNonLinearRefinement(std::vector< Eigen::Vector2f > &points0,
-                                                           std::vector< Eigen::Vector2f > &points1,
-                                                           std::vector< unsigned int >    &inliers,
-                                                           unsigned int maxIterationsRansac = 100,
-                                                           double thresholdRansac = 0.01,
-                                                           unsigned int seed = 1,
-                                                           unsigned int maxIterationsNonLinear = 10000,
-                                                           float thresholdNonLinear = 1e-4f
-                                                           )
+                                                                      std::vector< Eigen::Vector2f > &points1,
+                                                                      std::vector< unsigned int >    &inliers,
+                                                                      unsigned int maxIterationsRansac = 100,
+                                                                      double thresholdRansac = 0.01,
+                                                                      unsigned int seed = 1,
+                                                                      unsigned int maxIterationsNonLinear = 10000,
+                                                                      float thresholdNonLinear = 1e-4f)
 {
     Eigen::Matrix3d F = estimateFundamentalRansac(points0, points1, inliers, maxIterationsRansac, thresholdRansac, seed);
 
@@ -253,8 +252,11 @@ PIC_INLINE Eigen::Matrix3d estimateFundamentalWithNonLinearRefinement(std::vecto
     NelderMeadOptFundamental nmf(points0, points1, inliers);
         
     float F_data_opt[9];
-    nmf.run(getLinearArrayFromMatrix(F), 9, thresholdNonLinear, maxIterationsNonLinear, &F_data_opt[0]);
+    float *f_vec = getLinearArrayFromMatrix(F);
+    nmf.run(f_vec, 9, thresholdNonLinear, maxIterationsNonLinear, &F_data_opt[0]);
     F = getMatrixdFromLinearArray(F_data_opt, 3, 3);
+    
+    delete[] f_vec;
 
     return F;
 }

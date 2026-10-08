@@ -54,7 +54,10 @@ namespace pic {
  * @param t is the translation matrix between the two views.
  * @return
  */
-PIC_INLINE Eigen::Vector3d triangulationLonguetHiggins(Eigen::Vector3d &point_0, Eigen::Vector3d &point_1, Eigen::Matrix3d &R, Eigen::Vector3d &t)
+PIC_INLINE Eigen::Vector3d triangulationLonguetHiggins(Eigen::Vector3d &point_0,
+                                                       Eigen::Vector3d &point_1,
+                                                       Eigen::Matrix3d &R,
+                                                       Eigen::Vector3d &t)
 {
     Eigen::Vector3d ret;
 

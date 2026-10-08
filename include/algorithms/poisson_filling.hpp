@@ -199,7 +199,9 @@ public:
             imgOut->assign(imgIn);
         }
 
+        bool bDelete = false;
         if(mask == NULL) {
+            bDelete = true;
             float *color = Arrayf::genValue(value, 3, NULL);
 
             mask = imgIn->convertToMask(color, threshold, false, NULL);
@@ -226,6 +228,10 @@ public:
 
         if((i % 2) == 1) {
             imgOut->assign(imgTmp);
+        }
+        
+        if(bDelete) {
+            delete[] mask;
         }
 
         return imgOut;
