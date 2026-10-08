@@ -65,7 +65,7 @@ public:
         bLum = false;
     }
 
-    ~GeneralCornerDetector()
+    virtual ~GeneralCornerDetector()
     {
         release();
     }

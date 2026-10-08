@@ -44,7 +44,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace pic {
 
-enum CORENE_DETECTOR_TYPE{CD_SHI_TOMASI, CD_HARRIS, CD_NOBLE};
+enum CORNER_DETECTOR_TYPE{CD_SHI_TOMASI, CD_HARRIS, CD_NOBLE};
 
 #ifndef PIC_DISABLE_EIGEN
 
@@ -71,7 +71,6 @@ protected:
      */
     void setNULL()
     {
-        bLum = false;
         type = CD_NOBLE;
         width = -1;
         height = -1;
@@ -91,11 +90,10 @@ public:
      */
     HarrisCornerDetector(float sigma = 1.0f, int radius = 3,
                          float threshold = 0.001f, float ki = 0.04f,
-                         CORENE_DETECTOR_TYPE type = CD_NOBLE) : GeneralCornerDetector()
+                         CORNER_DETECTOR_TYPE type = CD_NOBLE) : GeneralCornerDetector()
     {
-        bLum = true;
         setNULL();
-        update(sigma, radius, threshold, type);
+        update(sigma, radius, threshold, ki, type);
     }
 
     ~HarrisCornerDetector()
@@ -121,8 +119,9 @@ public:
      */
     void update(float sigma = 1.0f, int radius = 3,
                 float threshold = 0.001f, float ki = 0.04f,
-                CORENE_DETECTOR_TYPE type = CD_NOBLE)
+                CORNER_DETECTOR_TYPE type = CD_NOBLE)
     {
+        this->bLum = true;
         this->sigma = sigma > 0.0f ? sigma : 1.0f;
         this->radius = radius > 0 ? radius : 1;
         this->threshold = threshold;

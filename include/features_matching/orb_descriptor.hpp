@@ -88,16 +88,9 @@ public:
      * @param S
      * @param n
      */
-    ORBDescriptor(int S = 31, int n = 256, unsigned int seed = 42)
+    ORBDescriptor(int S = 31, int n = 256, unsigned int seed = 42) : BRIEFDescriptor(S, n, seed)
     {
-        m = new std::mt19937(seed);
-
-        this->S = S;
         this->halfS = S >> 1;
-        this->sigma_sq = float(S * S) / 25.0f;
-        this->sigma_sq_2 = 2.0f * this->sigma_sq;
-
-        generateSamples(n);
         rotateSamples();
     }
 
@@ -147,9 +140,11 @@ public:
 
         uint theta_nor = CLAMPi(uint(theta * 255.0f / C_PI_2), 0, 255);
 
-        uint n = x_theta.size() - 1;
-
-        uint index = (n * theta_nor) >> 8;
+        //uint n = x_theta.size() - 1;
+        //uint index = (n * theta_nor) >> 8;
+        
+        uint n =  x_theta.size();
+        uint index = MIN((n * theta_nor) >> 8, n - 1);
 
         return getAux(img, x0, y0, x_theta[index], y_theta[index], desc);
     }

@@ -64,13 +64,8 @@ public:
     
     void release()
     {
-        for(unsigned int i = 0; i < descs->size(); i++) {
-            delete[] descs->at(i);
-        }
-        descs->clear();
-        
-        delete descs;
         descs = NULL;
+        desc_size = 0;
     }
 
     /**

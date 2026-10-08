@@ -21,6 +21,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <vector>
 
 #include "../base.hpp"
+#include "../util/std_util.hpp"
 #include "../features_matching/hash_table_lsh.hpp"
 #include "../features_matching/feature_matcher.hpp"
 
@@ -55,6 +56,11 @@ public:
             tables.push_back(tmp);
         }
     }
+    
+    ~BinaryFeatureLSHMatcher()
+    {
+        stdVectorClear(tables);        
+    }
 
     /**
      * @brief getHash
@@ -70,6 +76,10 @@ public:
         }
 
         uint *out = new uint[hash_size];
+        
+        if (dim == 0) {
+            return out;
+        }
 
         std::set<uint> tmp;
 

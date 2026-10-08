@@ -39,7 +39,7 @@ public:
      * @param descs
      * @param n
      */
-    FloatFeatureBruteForceMatcher(std::vector<float *> *descs, uint desc_size) : FeatureMatcher<float *>(descs, desc_size)
+    FloatFeatureBruteForceMatcher(std::vector<float *> *descs, uint desc_size) : FeatureMatcher<float>(descs, desc_size)
     {
     }
 

@@ -115,7 +115,8 @@ public:
 
         //filter the input image
         FilterGaussian2D flt(sigma);
-        lum_flt = flt.Process(Single(lum), NULL);
+        
+        lum_flt = flt.Process(Single(lum), lum_flt);
 
         //"rasterizing" a circle
         std::vector< int > x, y;
@@ -141,7 +142,7 @@ public:
 
         float C = float(x.size());
 
-        float t = 0.05f; //depends on image noise
+        float t = this->threshold; //depends on image noise
 
         float g = C * 0.5f; //geometric constant for determing corners
 

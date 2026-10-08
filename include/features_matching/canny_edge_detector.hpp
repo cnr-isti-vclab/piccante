@@ -81,10 +81,10 @@ public:
         this->threshold_1 = threshold_1 > 0.0f ? threshold_1 : 0.05f;
         this->threshold_2 = threshold_2 > 0.0f ? threshold_2 : 0.3f;
 
-        if(threshold_2 < threshold_1) {
-            float tmp = threshold_1;
-            threshold_1 = threshold_2;
-            threshold_2 = tmp;
+        if(this->threshold_2 < this->threshold_1) {
+            float tmp = this->threshold_1;
+            this->threshold_1 = this->threshold_2;
+            this->threshold_2 = tmp;
         }
     }
 

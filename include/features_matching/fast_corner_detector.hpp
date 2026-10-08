@@ -65,6 +65,11 @@ public:
 
         update(sigma, radius, threshold);
     }
+    
+    ~FastCornerDetector()
+    {
+        lum_flt = delete_s(lum_flt);
+    }
 
     /**
      * @brief update
@@ -104,7 +109,12 @@ public:
 
         //filter the input image
         FilterGaussian2D flt(sigma);
-        lum_flt = flt.Process(Single(lum), lum_flt);
+        auto tmp_flt = flt.Process(Single(lum), lum_flt);
+        
+        if (tmp_flt != lum_flt) {
+            delete lum_flt;
+            lum_flt = tmp_flt;
+        }
 
         int x[] = {0, 1, 2, 3, 3,  3,  2,  1,  0, -1, -2, -3, -3, -3, -2, -1};
         int y[] = {3, 3, 2, 1, 0, -1, -2, -3, -3, -3, -2, -1,  0,  1,  2,  3};
@@ -170,7 +180,7 @@ public:
                 int counter_bright = 0;
 
                 //corners_map[ind] = false;
-                for(int k=0; k<16; k++){
+                for(int k = 0; k < 16; k++){
                     if(bDark[k]){
                         counter_dark++;
                     } else {
@@ -180,7 +190,7 @@ public:
                     if(bBright[k]){
                         counter_bright++;
                     } else {
-                        counter_dark = 0;
+                        counter_bright = 0;
                     }
 
                     if((counter_bright > 11) || (counter_dark > 11)) {

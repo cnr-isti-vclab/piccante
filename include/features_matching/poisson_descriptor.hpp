@@ -129,7 +129,11 @@ public:
      */
     void release()
     {
+        delete rs;
         delete m;
+        
+        m = NULL;
+        rs = NULL;
     }
 
     /**

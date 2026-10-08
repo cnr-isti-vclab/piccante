@@ -151,15 +151,15 @@ public:
             L1 = img1->clone();
         } else {
             L1 = FilterLuminance::execute(img1, NULL, LT_WARD_LUMINANCE);
-            luminance.push_back(L1);
         }
+        luminance.push_back(L1);
 
         if(img2->channels == 1) {
             L2 = img2->clone();
         } else {
             L2 = FilterLuminance::execute(img2, NULL, LT_WARD_LUMINANCE);
-            luminance.push_back(L2);
         }
+        luminance.push_back(L2);
 
         int min_coord = MIN(L1->width, L1->height);
          if(min_coord < (1 << shift_bits)) {

@@ -116,7 +116,7 @@ public:
 
     ~MotionEstimation()
     {
-        delete_s(pmc);
+        pmc = delete_s(pmc);
     }
 
     /**
@@ -154,6 +154,7 @@ public:
         this->width = img0->width;
         this->height = img0->height;
 
+        delete pmc;
         pmc = new PatchComp(img0, img1, blockSize);
     }
 
