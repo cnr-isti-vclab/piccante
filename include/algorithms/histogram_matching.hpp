@@ -93,7 +93,7 @@ protected:
             for(int j = 0; j < nBin; j++) {
                 float x = c_s[j];
                 float *ptr = std::upper_bound(c_t, c_t + nBin, x);
-                tmp_lut[j] = MAX((int)(ptr - c_t), 0);
+                tmp_lut[j] = CLAMPi((int)(ptr - c_t), 0, nBin - 1);
             }
 
             lut.push_back(tmp_lut);
@@ -143,6 +143,8 @@ public:
             if(!img_source->isValid()) {
                 return imgOut;
             }
+        } else {
+            return imgOut;
         }
 
         if(ImageVecCheck(imgIn, 2)) {
