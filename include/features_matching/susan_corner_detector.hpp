@@ -221,7 +221,7 @@ public:
                     for(int k = 1; k < counter; k++){
                         float R_neighbor = R.data[indices[k]];
                         
-                        if ((R_neighbor > R_value) || (R_neighbor == R_value) ) {
+                        if ((R_neighbor > R_value) || (R_neighbor == R_value && indices[k] < ind) ) {
                             R_value = R_neighbor;
                             index = k;
                             break;
