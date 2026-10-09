@@ -182,7 +182,7 @@ PIC_INLINE Image *FilterBilateral2DG::Splat(Image *base, Image *edge, int channe
 
     grid->setZero();
     
-    float channelsf = float(edge->channels);
+    float channelsf = 1.0f / float(edge->channels);
 
     for(int j = 0; j < base->height; j++) {
         
@@ -202,7 +202,7 @@ PIC_INLINE Image *FilterBilateral2DG::Splat(Image *base, Image *edge, int channe
                 E += edge->data[ind_edge + k];
             }
             
-            E /= channelsf;
+            E *= channelsf;
 #endif
             E = (E - edge_min_val) * mul_E;
 
@@ -237,7 +237,7 @@ PIC_INLINE void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge, 
     float *vOut = new float [out->channels + 1];
 #endif
 
-    float channelsf = float(edge->channels);
+    float channelsf = 1.0f / float(edge->channels);
     
     for(int j = 0; j < out->height; j++) {
         float y = float(j) * s_S + padding;
@@ -257,7 +257,7 @@ PIC_INLINE void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge, 
                 E += edge->data[ind_edge + k];
             }
             
-            E /= channelsf;
+            E *= channelsf;
 #endif
             E = (E - edge_min_val) * mul_E + padding;
 
