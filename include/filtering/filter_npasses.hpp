@@ -67,7 +67,6 @@ protected:
                tc != imgTmp[0]->channels) {
 
                 stdVectorClear<Image>(imgTmp);
-
                 setToANullVector<Image>(imgTmp, n);
             }
         }
@@ -203,19 +202,22 @@ protected:
         imgOut = setupAuxNSame(imgIn, imgOut);
 
         int n = getIterations();
-        auto flt_0 = getFilter(0);
-                
-        flt_0->changePass(0, n);
 
-        flt_0->Process(imgIn, imgTmpSame[0]);
-
-        for(int i = 1; i < n; i++) {
+        for(int i = 0; i < n; i++) {
             auto flt_i = getFilter(i);
             flt_i->changePass(i, n);
 
-            imgIn[0] = imgTmpSame[(i + 1) % 2];
+            if(i > 0) {
+                imgIn[0] = imgTmpSame[(i + 1) % 2];
+            }
 
-            flt_i->Process(imgIn, imgTmpSame[i % 2]);
+            auto dst = imgTmpSame[i % 2];
+            
+            auto result = flt_i->Process(imgIn, dst);
+            
+            if (result != dst) {
+                return NULL;
+            }
         }
 
         return imgOut;
