@@ -99,10 +99,6 @@ public:
     {
     }
 
-    ~FilterZeroCrossing()
-    {
-    }
-
     /**
      * @brief execute
      * @param imgIn
