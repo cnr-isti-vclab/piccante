@@ -181,6 +181,8 @@ PIC_INLINE Image *FilterBilateral2DG::Splat(Image *base, Image *edge, int channe
     }
 
     grid->setZero();
+    
+    float channelsf = float(edge->channels);
 
     for(int j = 0; j < base->height; j++) {
         
@@ -195,12 +197,12 @@ PIC_INLINE Image *FilterBilateral2DG::Splat(Image *base, Image *edge, int channe
 #ifdef PIC_BILATERAL_GRID_MULTI_PASS
             float E = edge->data[ind_edge + channel];
 #else
-            float E = 0.0f;
-
-            for(int k = 0; k < edge->channels; k++) {
+            float E = edge->data[ind_edge];
+            for(int k = 1; k < edge->channels; k++) {
                 E += edge->data[ind_edge + k];
             }
-
+            
+            E /= channelsf;
 #endif
             E = (E - edge_min_val) * mul_E;
 
@@ -235,6 +237,8 @@ PIC_INLINE void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge, 
     float *vOut = new float [out->channels + 1];
 #endif
 
+    float channelsf = float(edge->channels);
+    
     for(int j = 0; j < out->height; j++) {
         float y = float(j) * s_S + padding;
 
@@ -248,11 +252,12 @@ PIC_INLINE void FilterBilateral2DG::Slice(Image *out, Image *base, Image *edge, 
 #ifdef PIC_BILATERAL_GRID_MULTI_PASS
             float E = edge->data[ind_edge + channel];
 #else
-            float E = 0.0f;
-            
-            for(int k = 0; k < edge->channels; k++) {
+            float E = edge->data[ind_edge];
+            for(int k = 1; k < edge->channels; k++) {
                 E += edge->data[ind_edge + k];
             }
+            
+            E /= channelsf;
 #endif
             E = (E - edge_min_val) * mul_E + padding;
 
@@ -328,11 +333,11 @@ PIC_INLINE Image *FilterBilateral2DG::Process(ImageVec imgIn, Image *imgOut)
 
 #ifdef PIC_BILATERAL_GRID_MULTI_PASS
     int n = imgIn[0]->channels;
-    mul_E = s_R;
 #else
     int n = 1;
-    mul_E = s_R / float(edge->channels);
 #endif
+
+    mul_E = s_R;
 
     for(int i = 0; i < n; i++) {
         //splat
