@@ -82,11 +82,11 @@ public:
      * @param radius
      * @param threshold
      */
-    void update(float sigma = 1.0f, int radius_maxima = 5, int radius = 3, float threshold = 0.001f)
+    void update(float sigma = 1.0f, int radius_maxima = 5, int radius = 3, float threshold = 0.005f)
     {
         this->sigma = sigma > 0.0f ? sigma : 1.0f;
         this->radius = radius > 0 ? radius : 3;
-        this->threshold = threshold > 0.0f ? threshold : 0.001f;
+        this->threshold = threshold > 0.0f ? threshold : 0.005f;
         this->radius_maxima = radius_maxima > 0 ? radius_maxima : 5;
     }
 
@@ -176,14 +176,16 @@ public:
         int side = radius_maxima * 2 + 1;
         int *indices = new int [side * side];
 
-        for(int i = radius_maxima; i< (height - radius_maxima - 1); i++) {
+        for(int i = radius_maxima; i< (height - radius_maxima); i++) {
 
-            int tmp = i * width;
+            int stride = i * width;
 
-            for(int j = radius_maxima; j < (width - radius_maxima - 1); j++) {
-                int ind = tmp + j;
+            for(int j = radius_maxima; j < (width - radius_maxima); j++) {
+                int ind = stride + j;
 
-                if(R.data[ind] <= 0.0f) {
+                float R_value = R.data[ind];
+                
+                if(R_value <= 0.0f) {
                     continue;
                 }
 
@@ -201,10 +203,10 @@ public:
 
                         int xx = CLAMP(j + l, width);
 
-                        ind = yy * width + xx;
+                        int local_ind = yy * width + xx;
 
-                        if(R.data[ind]>0.0f){
-                            indices[counter] = ind;
+                        if(R.data[local_ind] > 0.0f){
+                            indices[counter] = local_ind;
                             counter++;
                         }
 
@@ -214,30 +216,33 @@ public:
                 //are other corners near-by?
                 if(counter > 1) {
                     //find the maximum value
-                    float R_value = R.data[indices[0]];
                     int index = 0;
 
                     for(int k = 1; k < counter; k++){
-                        if(R.data[indices[k]] > R_value) {
-                            R_value = R.data[indices[k]];
+                        float R_neighbor = R.data[indices[k]];
+                        
+                        if ((R_neighbor > R_value) || (R_neighbor == R_value) ) {
+                            R_value = R_neighbor;
                             index = k;
+                            break;
                         }
                     }
 
                     if(index == 0){
-                        corners_w_quality.push_back(Eigen::Vector3f (float(j), float(i), 1.0f) );
+                        corners_w_quality.push_back(Eigen::Vector3f (float(j), float(i), R_value) );
                     }
                 } else {
-                    corners_w_quality.push_back(Eigen::Vector3f (float(j), float(i), 1.0f) );
+                    corners_w_quality.push_back(Eigen::Vector3f (float(j), float(i), R_value) );
                 }
             }
         }
 
         sortCornersAndTransfer(&corners_w_quality, corners);
 
-        if(indices != NULL) {
-            delete[] indices;
-            indices = NULL;
+        delete[] indices;
+        
+        if(bLum) {
+            delete lum;
         }
     }
 };
