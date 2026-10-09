@@ -50,7 +50,7 @@ protected:
     Image *setupAuxNGen(ImageVec imgIn, Image *imgOut)
     {
         int width, height, frames, channels;
-        OutputSize(imgIn, width, height, frames, channels);
+        OutputSize(imgIn, width, height, channels, frames);
 
         int n = getIterations();
 
@@ -59,7 +59,7 @@ protected:
         } else {
             int tw, th, tf, tc;
 
-            filters[0]->OutputSize(imgIn, tw, th, tf, tc);
+            filters[0]->OutputSize(imgIn, tw, th, tc, tf);
 
             if(tw != imgTmp[0]->width ||
                th != imgTmp[0]->height ||
@@ -179,7 +179,6 @@ protected:
         for(int i = 0; i < n2; i++) {
             auto flt_i = getFilter(i);
             flt_i->changePass(i, n);
-
             imgTmp[i] = flt_i->Process(imgIn, imgTmp[i]);
 
             imgIn[0] = imgTmp[i];
@@ -187,8 +186,7 @@ protected:
 
         auto flt_n = getFilter(n2);
         flt_n->changePass(n2, n);
-
-        imgOut = filters[n2]->Process(imgIn, imgOut);
+        imgOut = flt_n->Process(imgIn, imgOut);
 
         return imgOut;
     }
@@ -286,6 +284,10 @@ public:
     Image *Process(ImageVec imgIn, Image *imgOut)
     {
         if(imgIn.empty() || filters.empty()) {
+            return imgOut;
+        }
+        
+        if(imgIn[0] == NULL) {
             return imgOut;
         }
 
