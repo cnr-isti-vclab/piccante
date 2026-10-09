@@ -264,7 +264,41 @@ public:
     {
         return sqrtf(widthf * widthf + heightf * heightf);
     }
+    
+    /**
+     * @brief normalize
+     * @param minVal
+     * @param maxVal
+     */
+    void normalize(float minVal, float maxVal) {
+        if((minVal == maxVal) || (maxVal < minVal)) {
+            return;
+        }
+        
+        float delta = maxVal - minVal;
+        
+        for(int i = 0; i < size(); i++) {
+            data[i] = (data[i] - minVal) / delta;
+        }
+    }
 
+    /**
+     * @brief unNormalize
+     * @param minVal
+     * @param maxVal
+     */
+    void unNormalize(float minVal, float maxVal) {
+        if((minVal == maxVal) || (maxVal < minVal)) {
+            return;
+        }
+        
+        float delta = maxVal - minVal;
+        
+        for(int i = 0; i < size(); i++) {
+            data[i] = (data[i] * delta) + minVal;
+        }
+    }
+    
     /**
      * @brief setZero sets data to 0.0f.
      */

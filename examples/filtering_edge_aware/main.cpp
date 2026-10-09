@@ -63,18 +63,35 @@ int main(int argc, char *argv[])
 
         //the bilateral filter
         printf("Filtering the image with a Fast Bilateral filter;\n");
-        printf("this has sigma_s = 4.0 and sigma_r = 0.05 ... ");
+        printf("this has sigma_s = 8.0 and sigma_r = 0.05 ... ");
 
         pic::FilterBilateral2DS flt(8.0f, 0.05f);
         output = flt.Process(input, output);
-
-        //output = pic::FilterBilateral2DAS::execute(&img, output, 8.0f, 0.05f);
 
         printf("Ok!\n");
 
         printf("Writing the file to disk...");
 
         bWritten = output->Write("../data/output/" + name + "_filtered_bilateral.png", pic::LT_NOR_GAMMA);
+
+        if(bWritten) {
+            printf("Ok\n");
+        } else {
+            printf("Writing had some issues!\n");
+        }
+        
+        //the bilateral grid
+        printf("Filtering the image with a Bilateral Grid filter;\n");
+        printf("this has sigma_s = 8.0 and sigma_r = 0.05 ... ");
+
+        pic::FilterBilateral2DG fltGrid(8.0, 0.05f);
+        output = fltGrid.Process(input, output);
+
+        printf("Ok!\n");
+
+        printf("Writing the file to disk...");
+
+        bWritten = output->Write("../data/output/" + name + "_filtered_bilateral_grid.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
