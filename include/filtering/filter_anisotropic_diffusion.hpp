@@ -60,8 +60,10 @@ public:
      * @return
      */
     static Image *execute(ImageVec imgIn, Image *imgOut,
-                                          float k, unsigned int mode, unsigned int iterations)
+                          float k, unsigned int mode, unsigned int iterations)
     {
+        iterations = MAX(iterations, 1);
+        
         FilterAnsiotropicDiffusion ansio_flt(k, mode);
         FilterIterative iter_flt(&ansio_flt, iterations);
         imgOut = iter_flt.Process(imgIn, imgOut);
@@ -78,7 +80,7 @@ public:
      * @return
      */
     static Image *execute(ImageVec imgIn, Image *imgOut,
-                                          float sigma_s, float sigma_r, int maxIterations = -1)
+                          float sigma_s, float sigma_r, int maxIterations = -1)
     {
         if(sigma_s <= 0.0f) {
             sigma_s = 1.0f;
@@ -104,28 +106,17 @@ public:
 
 };
 
-PIC_INLINE FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k,
-        unsigned int mode)
+PIC_INLINE FilterAnsiotropicDiffusion::FilterAnsiotropicDiffusion(float k, unsigned int mode)
 {
-    if(k <= 0.0f) {
-        k = 0.11f;
-    }
-
-    if(mode > 2
-        ) {
-        mode = 0;
-    }
-
+    mode = mode > 2 ? 0 : mode;
+    this->k = k > 0.0f ? k : 0.11f;
+    this->k_sq = this->k * this->k;
     delta_t = 1.0f / 7.0f;
-
-    this->k = k;
-    this->k_sq = k * k;
 
     this->mode = mode;
 }
 
-PIC_INLINE void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src,
-        BBox *box)
+PIC_INLINE void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src, BBox *box)
 {
     Image *img = src[0];
     int channels = img->channels;
@@ -198,11 +189,16 @@ PIC_INLINE void FilterAnsiotropicDiffusion::ProcessBBox(Image *dst, ImageVec src
             }
 
             for(int p = 0; p < channels; p++) {
-                dst_data[p] = img_data[p] + delta_t *
-                        (cN * gN[p] + cS * gS[p] + cW * gW[p] + cE * gE[p]);
+                dst_data[p] = img_data[p] +
+                              delta_t * (cN * gN[p] + cS * gS[p] + cW * gW[p] + cE * gE[p]);
             }
         }
     }
+    
+    delete[] gN;
+    delete[] gS;
+    delete[] gE;
+    delete[] gW;
 }
 
 } // end namespace pic

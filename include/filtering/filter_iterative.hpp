@@ -35,14 +35,24 @@ protected:
      * @param i
      * @return
      */
-    Filter* getFilter(int i);
-
+    int getIterations()
+    {
+        return iterations;
+    }
+    
     /**
      * @brief getFilter
      * @param i
      * @return
      */
-    int getIterations();
+    Filter* getFilter(int i)
+    {
+        if (!filters.empty()) {
+            return filters[0];
+        } else {
+            return NULL;
+        }
+    }
 
 public:
 
@@ -51,49 +61,35 @@ public:
      * @param flt
      * @param iterations
      */
-    FilterIterative(Filter *flt, int iterations);
+    FilterIterative(Filter *flt, int iterations) : FilterNPasses()
+    {
+        printf("\n\nFilterIterative passes: %d\n\n", iterations);
+        update(flt, iterations);
+    }
 
     /**
      * @brief update
      * @param flt
      * @param iterations
      */
-    void update(Filter *flt, int iterations);
+    void update(Filter *flt, int iterations)
+    {
+        if(iterations > 0) {
+            this->iterations = iterations;
+        }
+
+        if(flt == NULL) {
+            return;
+        }
+
+        if(!filters.empty()) {
+            filters.clear();
+        }
+
+        filters.push_back(flt);
+    }
 
 };
-
-PIC_INLINE FilterIterative::FilterIterative(Filter *flt, int iterations) : FilterNPasses()
-{
-    printf("\n\n%d\n\n", iterations);
-    update(flt, iterations);
-}
-
-PIC_INLINE void FilterIterative::update(Filter *flt, int iterations)
-{
-    if(iterations > 0) {
-        this->iterations = iterations;
-    }
-
-    if(flt == NULL) {
-        return;
-    }
-
-    if(!filters.empty()) {
-        filters.clear();
-    }
-
-    filters.push_back(flt);
-}
-
-PIC_INLINE Filter* FilterIterative::getFilter(int i)
-{
-    return filters[0];
-}
-
-PIC_INLINE int FilterIterative::getIterations()
-{
-    return iterations;
-}
 
 } // end namespace pic
 

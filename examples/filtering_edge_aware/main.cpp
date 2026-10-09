@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 
         printf("Writing the file to disk...");
 
-        bWritten = output->Write("../data/output/" + name + "filtered_median_vec.png", pic::LT_NOR_GAMMA);
+        bWritten = output->Write("../data/output/" + name + "_filtered_median_vec.png", pic::LT_NOR_GAMMA);
 
         if(bWritten) {
             printf("Ok\n");
