@@ -36,34 +36,15 @@ protected:
     int nWhite;
 
     /**
-     * @brief ProcessBBox
-     * @param dst
-     * @param src
-     * @param box
+     * @brief f
+     * @param data
      */
-    void ProcessBBox(Image *dst, ImageVec src, BBox *box)
+    void f(FilterFData *data)
     {
-        if(white == NULL) {
-            return;
-        }
-
-        int width    = src[0]->width;
-        int channels = src[0]->channels;
-        float *data  = src[0]->data;
-
-        int transformChannels = MIN(channels, nWhite);
-
-        for(int j = box->y0; j < box->y1; j++) {
-            int c = j * width;
-
-            for(int i = box->x0; i < box->x1; i++) {
-                int indOut = c + i;
-                int ind = indOut * channels;
-
-                for(int k = 0; k < transformChannels; k++) {
-                    dst->data[ind + k] = data[ind + k] * white[k];
-                }
-            }
+        float *data_in = (*data->src[0])(data->x, data->y, data->z);
+        
+        for(int i = 0; i < data->dst->channels; i++) {
+            data->out[i] = data_in[i] * white[i];
         }
     }
 
@@ -145,7 +126,7 @@ public:
             memcpy(this->white, white, sizeof(float) * nWhite);
         }
 
-        for(unsigned int i = 0; i < nWhite; i++) {
+        for(int i = 0; i < nWhite; i++) {
             if(fabsf(this->white[i]) <= 1e-9f) {
                 this->white[i] = 1.0f;
             }

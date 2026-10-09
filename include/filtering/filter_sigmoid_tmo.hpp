@@ -204,7 +204,7 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
         img_flt = src[0];
     }
 
-    float alpha_over_epsilon = alpha / epsilon;
+    float alpha_over_epsilon = epsilon > 0.0f ? alpha / epsilon : alpha;
 
     for(int j = box->y0; j < box->y1; j++) {
 
@@ -233,8 +233,11 @@ PIC_INLINE void FilterSigmoidTMO::ProcessBBox(Image *dst, ImageVec src, BBox *bo
                 for(int k = 0; k < dst->channels; k++) {
                     dstOut[k] = (p[k] * Ld) / L;
                 }
+                
             } else {
-                Arrayf::assign(0.0f, dstOut, dst->channels);
+                for(int k = 0; k < dst->channels; k++) {
+                    dstOut[k] = 0.0f;
+                }
             }
         }
     }
