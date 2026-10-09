@@ -40,7 +40,7 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        float *vSrc1 = new float[dst->channels];
+        float *vSrc1 = new float[src[1]->channels];
 
         float height1f = float(box->height - 1);
         float width1f = float(box->width - 1);
@@ -99,15 +99,16 @@ public:
 
     /**
      * @brief execute
-     * @param imgIn
+     * @param imgA
+     * @param imgB
      * @param imgOut
      * @param isb
      * @return
      */
-    static Image *execute(Image *imgIn, Image *imgOut, ImageSampler *isb)
+    static Image *execute(Image *imgA, Image *imgB, Image *imgOut, ImageSampler *isb)
     {
         FilterSampler2DSub filter(isb);
-        return filter.Process(Single(imgIn), imgOut);
+        return filter.Process(Double(imgA, imgB), imgOut);
     }
 };
 

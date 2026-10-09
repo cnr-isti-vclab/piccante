@@ -37,7 +37,7 @@ protected:
      */
     void ProcessBBox(Image *dst, ImageVec src, BBox *box)
     {
-        if(src[0]->channels != 3){
+        if(src[0]->channels < 1){
             return;
         }
 

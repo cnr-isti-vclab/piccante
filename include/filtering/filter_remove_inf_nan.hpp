@@ -70,7 +70,7 @@ protected:
                             tmp_dst[ch] = 0.0f;
                         } else {
                             std::sort(values, values + c2);
-                            tmp_dst[ch] = values[5];
+                            tmp_dst[ch] = values[c2 >> 1];
                         }
                     } else {
                         tmp_dst[ch] = val;

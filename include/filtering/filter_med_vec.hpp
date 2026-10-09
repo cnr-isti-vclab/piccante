@@ -60,7 +60,7 @@ protected:
                 }
 
                 //compute distances
-                int best = -1;
+                int best = 0;
                 float distBest = FLT_MAX;
 
                 for(int k = 0; k < areaKernel; k++) {

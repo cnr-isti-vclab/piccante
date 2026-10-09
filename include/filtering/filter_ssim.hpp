@@ -81,6 +81,7 @@ public:
     FilterSSIM() : Filter()
     {
         minInputImages = 5;
+        update();
     }
 
     /**
@@ -98,7 +99,7 @@ public:
      * @param C0
      * @param C1
      */
-    void update(float C0, float C1)
+    void update(float C0 = 0.01f, float C1 = 0.03f)
     {
         this->C0 = C0;
         this->C1 = C1;

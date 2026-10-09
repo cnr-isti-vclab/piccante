@@ -74,7 +74,7 @@ public:
     {
         width       = imgIn[1]->width;
         height      = imgIn[1]->height;
-        channels    = imgIn[1]->channels;
+        channels    = imgIn[0]->channels;
         frames      = imgIn[1]->frames;
     }
 

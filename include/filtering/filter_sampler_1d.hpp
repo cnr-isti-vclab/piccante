@@ -173,6 +173,8 @@ PIC_INLINE void FilterSampler1D::update(int size, int direction,
 
 PIC_INLINE void FilterSampler1D::setDirection(int direction = 0)
 {
+    direction = MAX(direction, 0);
+    
     dirs[ direction      % 3] = 1;
     dirs[(direction + 1) % 3] = 0;
     dirs[(direction + 2) % 3] = 0;

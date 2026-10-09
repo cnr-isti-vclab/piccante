@@ -187,8 +187,7 @@ public:
 
 };
 
-PIC_INLINE FilterSampler2D::FilterSampler2D(float scale,
-        ImageSampler *isb = NULL): Filter()
+PIC_INLINE FilterSampler2D::FilterSampler2D(float scale, ImageSampler *isb = NULL): Filter()
 {
     this->scale  = scale;
     this->scaleX = scale;
