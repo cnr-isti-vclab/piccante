@@ -43,6 +43,16 @@ protected:
     FilterSampler2D *fltD;
     FilterGaussian2D *fltG2D;
     FilterChannel *fltC;
+    
+    void release()
+    {
+        fltL = delete_s(fltL);
+        fltD = delete_s(fltD);
+        fltS = delete_s(fltS);
+        fltC = delete_s(fltC);
+        fltG = delete_s(fltG);
+        fltG2D = delete_s(fltG2D);
+    }
 
 public:
     /**
@@ -58,7 +68,10 @@ public:
      */
     FilterSamplingMap(float sigma, float scale);
 
-    ~FilterSamplingMap();
+    ~FilterSamplingMap()
+    {
+        release();
+    }
 
     /**
      * @brief update
@@ -117,19 +130,11 @@ PIC_INLINE FilterSamplingMap::FilterSamplingMap(float sigma, float scale) : Filt
     update(sigma * scale, scale);
 }
 
-PIC_INLINE FilterSamplingMap::~FilterSamplingMap()
-{
-    delete_s(fltL);
-    delete_s(fltD);
-    delete_s(fltS);
-    delete_s(fltC);
-    delete_s(fltG);
-    delete_s(fltG2D);
-}
-
 PIC_INLINE void FilterSamplingMap::update(float sigma, float scale)
 {
     this->scale = scale;
+    
+    release();
 
     //allocate filters
     fltL = new FilterLuminance(LT_CIE_LUMINANCE);
