@@ -562,7 +562,7 @@ public:
      * @param width is the horizontal number of pixels.
      * @param height is the vertical number of pixels.
      */
-    void convertFromMask(bool *mask, int width, int height);
+    void convertFromMask(bool *mask, int width, int height, int frames);
 
     /**
      * @brief convertToMask converts an Image into a boolean mask.
@@ -1748,17 +1748,21 @@ PIC_INLINE float *Image::getLogMeanVal(BBox *box = NULL, float *ret = NULL)
     return ret;
 }
 
-PIC_INLINE void Image::convertFromMask(bool *mask, int width, int height)
+PIC_INLINE void Image::convertFromMask(bool *mask, int width, int height, int frames = 1)
 {
     if((mask == NULL) || (width < 1) || (height < 1)) {
         return;
     }
-
-    if(!isValid() || this->width != width || this->height != height) {
-        allocate(width, height, 1, 1);
+    
+    if(frames < 1) {
+        frames = 1;
     }
 
-    int size = (width * height);
+    if(!isValid() || (this->width != width) || (this->height != height) || (this->frames != frames) || (this->channels != 1)) {
+        allocate(width, height, 1, frames);
+    }
+
+    int size = (width * height * frames);
 
     #pragma omp parallel for
     for(int i = 0; i < size; i++) {

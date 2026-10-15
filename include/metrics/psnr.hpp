@@ -73,7 +73,7 @@ PIC_INLINE double PSNR(Image *ori, Image *cmp, double max_value = -1.0, bool bLa
     if(rmse_value > 0.0) {
         return 20.0 * log10(max_value / rmse_value);
     } else {
-        return -3.0;
+        return FLT_MAX;
     }
 }
 

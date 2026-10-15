@@ -75,11 +75,13 @@ public:
             hash_size = 8;
         }
 
-        uint *out = new uint[hash_size];
-        
-        if (dim == 0) {
+        if ((dim == 0) || (hash_size > dim)) {
+            printf("BinaryFeatureLSHMatcher::getHash: requires has_size in [1, dim]")
             return out;
         }
+        
+        uint *out = new uint[hash_size];
+        
 
         std::set<uint> tmp;
 

@@ -70,8 +70,7 @@ PIC_INLINE double mPSNR(Image *ori, Image *cmp, MULTI_EXPOSURE_TYPE type, int mi
             exposures.push_back(float(minFstop));
         } else {
             int nExposures_v = 0;
-            float *exposures_v = NULL;
-            Arrayf::genRange(float(minFstop), 1.0f, float(maxFstop), exposures_v, nExposures_v);
+            float *exposures_v = Arrayf::genRange(float(minFstop), 1.0f, float(maxFstop), NULL, nExposures_v);
 
             exposures.insert(exposures.begin(), exposures_v, exposures_v + nExposures_v);
             delete[] exposures_v;

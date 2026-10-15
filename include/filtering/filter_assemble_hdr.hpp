@@ -134,7 +134,7 @@ protected:
                     float weight = weightFunction(x, weight_type_arr[l]);
 
                     if(domain == HRD_SQ) {
-                        weight *= (src[l]->exposure * src[l]->exposure);
+                        weight *= src[l]->exposure;
                     }
 
                     for(int k = 0; k < channels; k++) {
@@ -144,26 +144,29 @@ protected:
                         switch(domain) {
                             case HRD_LIN: {
                                 acc[k] += (weight * x_lin) / src[l]->exposure;
+                                totWeight[k] += weight;
                             } break;
 
                             case HRD_LOG: {
                                 acc[k] += weight * (logf(x_lin + delta_value) - logf(src[l]->exposure));
+                                totWeight[k] += weight;
                             } break;
 
                             case HRD_SQ: {
-                                acc[k] += (weight * x_lin) * src[l]->exposure;
+                                acc[k] += (weight * x_lin);
+                                totWeight[k] += weight * src[l]->exposure;
                             } break;
                         }
-
-                        totWeight[k] += weight;
                     }
                 }
 
                 for(int k = 0; k < channels; k++) {
                     acc[k] /= totWeight[k];
+                    
                     if(domain == HRD_LOG) {
                         acc[k] = expf(acc[k]);
                     }
+                    
                     dst->data[c + k] = acc[k];
                 }
             }
