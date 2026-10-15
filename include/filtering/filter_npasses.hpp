@@ -270,6 +270,7 @@ public:
             imgIn0->height = height;
             imgIn0->channels = channels;
             imgIn0->frames = frames;
+            imgIn0->allocateAux(); // Keep cached dimensions/strides consistent between passes.
         }
 
         imgIn[0] = tmp;

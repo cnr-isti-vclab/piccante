@@ -1818,8 +1818,7 @@ PIC_INLINE bool *Image::convertToMask(float *color = NULL, float threshold = 0.2
     return mask;
 }
 
-PIC_INLINE bool Image::Read(std::string nameFile,
-                               LDR_type typeLoad = LT_NOR_GAMMA)
+PIC_INLINE bool Image::Read(std::string nameFile, LDR_type typeLoad = LT_NOR_GAMMA)
 {
     this->nameFile = nameFile;
 

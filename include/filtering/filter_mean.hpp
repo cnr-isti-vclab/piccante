@@ -47,9 +47,9 @@ public:
         data = NULL;
         this->size = -1;
 
-        update(size);
-
         filter = new FilterConv1D(data, size);
+
+        update(size);
 
         insertFilter(filter);
         insertFilter(filter);
@@ -74,7 +74,7 @@ public:
         if(this->size != size) {
             this->size = size;
 
-            data = delete_vec_s(data);
+            delete[] data;
             data = FilterConv1D::getKernelMean(size);
             
             filter->update(data, size, 0);

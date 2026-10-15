@@ -97,7 +97,6 @@ protected:
             printf("Ok\n");
         #endif
 
-        delete[] samples;
         delete[] h;
     }
 
